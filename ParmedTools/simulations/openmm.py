@@ -14,7 +14,7 @@ from chemistry.amber.openmmreporters import (AmberStateDataReporter,
                EnergyMinimizerReporter)
 from math import sqrt
 from chemistry.amber.mdin import mdin as Mdin
-from MMPBSA_mods.timer import Timer
+from timer import Timer
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
 from os.path import exists
