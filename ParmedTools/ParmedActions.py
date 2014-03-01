@@ -88,9 +88,9 @@ Usages = {
               'lmod' : 'lmod',
             'addpdb' : 'addPDB <filename> [elem] [strict] [allicodes]',
          'deletepdb' : 'deletePDB',
-         'add12_6_4' : 'add12_6_4 [<divalent ion mask>]'
-                       '[c4file <C4 Param. File> | watermodel < water model>]'
-                       '[polfile <Pol. Param File>] [tunfactor < tunfactor >]',
+         'add12_6_4' : 'add12_6_4 [<divalent ion mask>] '
+                       '[c4file <C4 Param. File> | watermodel <water model>] '
+                       '[polfile <Pol. Param File>] [tunfactor <tunfactor>]',
   'hmassrepartition' : 'HMassRepartition [<mass>] [dowater]',
             'openmm' : 'OpenMM -p <parm>|<parm index> [sander/pmemd options] '
                        '-platform <platform> -precision <precision model> '
