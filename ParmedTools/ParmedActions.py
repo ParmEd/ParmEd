@@ -40,7 +40,7 @@ Usages = {
       'changeljpair' : 'changeLJPair <mask1> <mask2> <Rmin> <epsilon>',
     'changelj14pair' : 'changeLJ14Pair <mask1> <mask2> <Rmin> <epsilon>',
      'checkvalidity' : 'checkValidity',
-            'change' : 'change <property> <mask> <new_value>',
+            'change' : 'change <property> <mask> <new_value> [quiet]',
          'printinfo' : 'printInfo <flag>',
          'addljtype' : 'addLJType <mask> [radius <new_radius>] '
                        '[epsilon <new_epsilon>] [radius_14 <new_radius14>] '
@@ -96,7 +96,7 @@ Usages = {
                        '-platform <platform> -precision <precision model> '
                        '[dcd] [progress] [script <script_file.py>] [norun]',
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-                       '[Ewald]] [applayer] [platform <platform>] '
+                       '[Ewald]] [nodisper] [applayer] [platform <platform>] '
                        '[precision <precision model>] [decompose]',
 #         'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] '
 #                      '| [Ewald]] [[restrain <mask>] [weight <k>]] [norun] '
@@ -504,9 +504,15 @@ class change(Action):
    Changes the property of given atoms to a new value. <property> can be CHARGE,
    MASS, RADII, SCREEN, ATOM_NAME, AMBER_ATOM_TYPE, ATOM_TYPE_INDEX, or
    ATOMIC_NUMBER (note, changing elements with this command will NOT change
-   their assignment for SHAKE!)
+   their assignment for SHAKE!).
+   
+   If given, the [quiet] keyword will prevent ParmEd from printing out a summary
+   with every property changed for every atom that was changed (useful for
+   suppressing overwhelming output if you are zeroing every charge, for
+   instance)
    """
    def init(self, arg_list):
+      self.quiet = arg_list.has_key('quiet')
       self.mask = AmberMask(self.parm, arg_list.get_next_mask())
       self.prop = arg_list.get_next_string().upper()
       if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'MASS'):
@@ -531,6 +537,8 @@ class change(Action):
       atnums = self.mask.Selection()
       if sum(atnums) == 0:
          return "change %s: Nothing to do" % self.prop
+      if self.quiet:
+         return "Changing %s of %s to %s" % (self.prop, self.mask, self.new_val)
       string = '\n'
       for i in range(self.parm.ptr('natom')):
          if atnums[i] == 1:
@@ -730,9 +738,9 @@ class scee(Action):
          self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
                                          for i in range(self.parm.ptr('nptra'))]
       # Now add it to each of the torsions
-      for dih in self.dihedrals_inc_h:
+      for dih in self.parm.dihedrals_inc_h:
          dih.dihed_type.scee = self.scee_value
-      for dih in self.dihedrals_without_h:
+      for dih in self.parm.dihedrals_without_h:
          dih.dihed_type.scee = self.scee_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -756,9 +764,9 @@ class scnb(Action):
          self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
                                          for i in range(self.parm.ptr('nptra'))]
       # Now add it to each of the torsions
-      for dih in self.dihedrals_inc_h:
+      for dih in self.parm.dihedrals_inc_h:
          dih.dihed_type.scnb = self.scnb_value
-      for dih in self.dihedrals_without_h:
+      for dih in self.parm.dihedrals_without_h:
          dih.dihed_type.scnb = self.scnb_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2866,6 +2874,7 @@ class energy(Action):
    For periodic systems:
 
    Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME
+   nodisper : Do not use a long-range vdW dispersion correction
 
    Other options:
 

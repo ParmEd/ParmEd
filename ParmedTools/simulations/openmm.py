@@ -859,6 +859,7 @@ def energy(parm, args, output=sys.stdout):
    prec = args.get_key_string('precision', 'mixed')
    decomp = args.has_key('decompose')
    applayer = args.has_key('applayer')
+   vdw_longrange = not args.has_key('nodisper')
    # Get any unmarked arguments
    unmarked_cmds = args.unmarked()
    if len(unmarked_cmds) > 0:
@@ -935,6 +936,11 @@ def energy(parm, args, output=sys.stdout):
          else:
             # Treat the rest as nonbonded forces
             force.setForceGroup(parm.NONBONDED_FORCE_GROUP)
+
+   # Now see if we want to turn on or off the dispersion correction
+   for force in system.getForces():
+      if isinstance(force, mm.NonbondedForce):
+         force.setUseDispersionCorrection(vdw_longrange)
 
    # Create a dummy integrator
    integrator = mm.VerletIntegrator(2.0)

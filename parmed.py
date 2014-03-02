@@ -10,7 +10,8 @@ import warnings
 # Load custom modules
 from ParmedTools.logos import Logo
 from ParmedTools import parmed_cmd
-from ParmedTools.exceptions import ParmError, SeriousParmWarning
+from ParmedTools.exceptions import (ParmError, SeriousParmWarning,
+                                    InterpreterError)
 from ParmedTools.parmed_cmd import ParmedCmd
 from ParmedTools.ParmedActions import Action
 from ParmedTools.parmlist import ParmList
@@ -138,6 +139,8 @@ if len(opt.script) > 0:
       # Loop through all of the commands
       try:
          parmed_commands.cmdloop()
+      except InterpreterError, err:
+         sys.exit('%s: %s' % (type(err).__name__, err))
       except ParmError:
          # This has already been caught and printed. If it was re-raised, then
          # that means we wanted to exit
@@ -154,6 +157,8 @@ else:
    # Loop through all of the commands
    try:
       parmed_commands.cmdloop()
+   except InterpreterError, err:
+      sys.exit('%s: %s' % (type(err).__name__, err))
    except ParmError:
       # This has already been caught and printed. If it was re-raised, then that
       # means we wanted to exit
