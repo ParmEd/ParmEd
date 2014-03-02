@@ -14,10 +14,8 @@ from math import ceil
 import warnings as _warnings
 
 VELSCALE = 20.455
-FRCSCALE = 20.455 * 20.455
 
 ONEVELSCALE = 1 / VELSCALE
-ONEFRCSCALE = 1 / FRCSCALE
 
 try:
    import bz2
