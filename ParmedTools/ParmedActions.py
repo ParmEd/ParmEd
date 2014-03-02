@@ -96,8 +96,8 @@ Usages = {
                        '-platform <platform> -precision <precision model> '
                        '[dcd] [progress] [script <script_file.py>] [norun]',
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-                       '[Ewald]] [platform <platform>] '
-                       '[precision <precision model>]',
+                       '[Ewald]] [applayer] [platform <platform>] '
+                       '[precision <precision model>] [decompose]',
 #         'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] '
 #                      '| [Ewald]] [[restrain <mask>] [weight <k>]] [norun] '
 #                      '[script <script_file.py>] [platform <platform>] '
@@ -729,6 +729,11 @@ class scee(Action):
       else:
          self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
                                          for i in range(self.parm.ptr('nptra'))]
+      # Now add it to each of the torsions
+      for dih in self.dihedrals_inc_h:
+         dih.dihed_type.scee = self.scee_value
+      for dih in self.dihedrals_without_h:
+         dih.dihed_type.scee = self.scee_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -750,6 +755,11 @@ class scnb(Action):
       else:
          self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
                                          for i in range(self.parm.ptr('nptra'))]
+      # Now add it to each of the torsions
+      for dih in self.dihedrals_inc_h:
+         dih.dihed_type.scnb = self.scnb_value
+      for dih in self.dihedrals_without_h:
+         dih.dihed_type.scnb = self.scnb_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2856,6 +2866,11 @@ class energy(Action):
    For periodic systems:
 
    Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME
+
+   Other options:
+
+   decompose : Print bond, angle, dihedral, and nonbonded energies separately
+   applayer : Use OpenMM's class to compute the energy
    """
 
    output = sys.stdout

@@ -14,17 +14,17 @@ from chemistry.amber.openmmreporters import (AmberStateDataReporter,
                EnergyMinimizerReporter)
 from math import sqrt
 from chemistry.amber.mdin import mdin as Mdin
-from timer import Timer
+from MMPBSA_mods.timer import Timer
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
-from os.path import exists
+import os
 import sys
 import warnings
 try:
    import simtk.unit as u
    from simtk.openmm.vec3 import Vec3
    from simtk.openmm.app import (forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2,
-                                 Simulation, DCDReporter)
+                                 Simulation, DCDReporter, amberprmtopfile)
    import simtk.openmm as mm
    HAS_OPENMM = True
 except ImportError:
@@ -207,17 +207,17 @@ def simulate(parm, args):
    # Make sure no files will be overwritten unless overwrite is enabled
    if not overwrite:
       ERROR_MESSAGE = '%s exists. Use -O to overwrite.'
-      if exists(outputfile):
+      if os.path.exists(outputfile):
          raise SimulationError(ERROR_MESSAGE % outputfile)
-      if exists(mdinfo):
+      if os.path.exists(mdinfo):
          raise SimulationError(ERROR_MESSAGE % mdinfo)
-      if exists(restart) and mdin.cntrl_nml['imin'] != 5:
+      if os.path.exists(restart) and mdin.cntrl_nml['imin'] != 5:
          raise SimulationError(ERROR_MESSAGE % restart)
-      if exists(trajectory) and runmd and mdin.cntrl_nml['ntwx'] != 0:
+      if os.path.exists(trajectory) and runmd and mdin.cntrl_nml['ntwx'] != 0:
          raise SimulationError(ERROR_MESSAGE % trajectory)
-      if exists(mdvel) and runmd and mdin.cntrl_nml['ntwv'] > 0:
+      if os.path.exists(mdvel) and runmd and mdin.cntrl_nml['ntwv'] > 0:
          raise SimulationError(ERROR_MESSAGE % mdvel)
-      if exists(mdfrc) and runmd and mdin.cntrl_nml['ntwf'] > 0:
+      if os.path.exists(mdfrc) and runmd and mdin.cntrl_nml['ntwf'] > 0:
          raise SimulationError(ERROR_MESSAGE % mdfrc)
 
    # Set some dependent defaults
@@ -846,6 +846,7 @@ def energy(parm, args, output=sys.stdout):
    Computes a single-point energy using OpenMM and prints the result to the
    desired output destination (defaults to stdout)
    """
+   import tempfile
    global HAS_OPENMM
    if not HAS_OPENMM:
       raise SimulationError('Could not import OpenMM!')
@@ -857,6 +858,7 @@ def energy(parm, args, output=sys.stdout):
    plat = args.get_key_string('platform', None)
    prec = args.get_key_string('precision', 'mixed')
    decomp = args.has_key('decompose')
+   applayer = args.has_key('applayer')
    # Get any unmarked arguments
    unmarked_cmds = args.unmarked()
    if len(unmarked_cmds) > 0:
@@ -894,16 +896,45 @@ def energy(parm, args, output=sys.stdout):
       raise SimulationError('Only orthorhombic boxes currently supported in '
                   'OpenMM')
 
+   parm_ = parm
+   if applayer:
+      # Write out a temporary topology file, load an amberprmtopfile, then
+      # delete that file
+      tmp = tempfile.mktemp(suffix='.parm7')
+      try:
+         parm.writeParm(tmp)
+         parm_ = amberprmtopfile.AmberPrmtopFile(tmp)
+         os.unlink(tmp)
+      except IOError:
+         raise SimulationError('Could not create temporary file for app layer '
+                               'energy calculation.')
+      except Exception, exc:
+         raise SimulationError('Error creating parm object from app layer. '
+                               '[ %s: %s ]' % (type(exc).__name__, exc))
+
    # Time to create the OpenMM system
-   system = parm.createSystem(nonbondedMethod=nbmeth,
+   system = parm_.createSystem(nonbondedMethod=nbmeth,
                      nonbondedCutoff=cutoff*u.angstrom,
                      constraints=None, rigidWater=True,
                      removeCMMotion=False, implicitSolvent=gbmeth,
                      implicitSolventKappa=kappa*(1.0/u.angstrom),
                      soluteDielectric=1.0, solventDielectric=78.5,
-                     ewaldErrorTolerance=5e-5, flexibleConstraints=True,
-                     verbose=False
+                     ewaldErrorTolerance=5e-5,
    )
+
+   # If we used the app layer, we need to assign force groups to enable energy
+   # decomposition
+   if applayer:
+      for force in system.getForces():
+         if isinstance(force, mm.HarmonicBondForce):
+            force.setForceGroup(parm.BOND_FORCE_GROUP)
+         elif isinstance(force, mm.HarmonicAngleForce):
+            force.setForceGroup(parm.ANGLE_FORCE_GROUP)
+         elif isinstance(force, mm.PeriodicTorsionForce):
+            force.setForceGroup(parm.DIHEDRAL_FORCE_GROUP)
+         else:
+            # Treat the rest as nonbonded forces
+            force.setForceGroup(parm.NONBONDED_FORCE_GROUP)
 
    # Create a dummy integrator
    integrator = mm.VerletIntegrator(2.0)
