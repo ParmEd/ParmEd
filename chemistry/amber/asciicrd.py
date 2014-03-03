@@ -14,7 +14,6 @@ from math import ceil
 import warnings as _warnings
 
 VELSCALE = 20.455
-
 ONEVELSCALE = 1 / VELSCALE
 
 try:

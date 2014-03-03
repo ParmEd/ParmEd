@@ -25,7 +25,7 @@ def needs_openmm(fcn):
 
 RADDEG = 180 / pi # radians to degrees
 VELUNIT = u.angstrom / u.picosecond
-FRCUNIT = u.dalton * u.angstrom / u.picosecond / u.picosecond
+FRCUNIT = u.kilocalorie_per_mole / u.angstrom
 
 class AmberStateDataReporter(object):
    """
@@ -311,7 +311,6 @@ class NetCDFReporter(object):
          self._out.add_velocities(vels)
       if self.frcs:
          frcs = state.getForces().value_in_unit(FRCUNIT)
-         frcs = [v / self._out.force_scale for v in frcs]
          self._out.add_forces(frcs)
       # Now it's time to add the time.
       self._out.add_time(state.getTime().value_in_unit(u.picosecond))
@@ -404,8 +403,6 @@ class MdcrdReporter(object):
          self._out.add_coordinates(flatvel)
       if self.frcs:
          frcs = state.getForces().value_in_unit(FRCUNIT)
-         # See comment above for why scaling is required here.
-         frcs = [v / FRCSCALE for v in frcs]
          flatfrc = [0 for i in range(self.atom*3)]
          for i in range(self.atom):
             flatfrc[3*i], flatfrc[3*i+1], flatfrc[3*i+2] = frcs[i]

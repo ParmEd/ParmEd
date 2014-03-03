@@ -375,8 +375,7 @@ class NetCDFTraj(object):
       if inst.hasfrcs:
          v = inst._ncfile.createVariable('forces', 'f',
                ('frame', 'atom', 'spatial'))
-         v.units = 'amu*angstrom/picosecond^2'
-         inst.force_scale = v.scale_factor = 20.455 * 20.455
+         v.units = 'kilocalorie/mole/angstrom'
          inst._last_frc_frame = 0
       if inst.hasbox:
          v = inst._ncfile.createVariable('cell_lengths', 'd',
@@ -425,8 +424,6 @@ class NetCDFTraj(object):
                      'cell_angles' in inst._ncfile.variables)
       if inst.hasvels:
          inst.velocity_scale = inst._ncfile.variables['velocities'].scale_factor
-      if inst.hasfrcs:
-         inst.force_scale = inst._ncfile.variables['forces'].scale_factor
       if inst.frame is None:
          if 'time' in inst._ncfile.variables:
             inst.frame = len(inst._ncfile.variables['time'][:])
@@ -507,8 +504,7 @@ class NetCDFTraj(object):
          numpy array of length 3*atom with the given forces properly
          scaled to be of units amu*angstrom/picosecond^2
       """
-      return (self._ncfile.variables['forces'][frame][:].flatten() *
-              self.force_scale)
+      return (self._ncfile.variables['forces'][frame][:].flatten())
 
    def add_forces(self, stuff):
       """
@@ -523,7 +519,7 @@ class NetCDFTraj(object):
       """
       if not isinstance(stuff, np.ndarray): stuff = np.asarray(stuff)
       self._ncfile.variables['forces'][self._last_frc_frame] = \
-            np.reshape(stuff, (self.atom, 3)) / self.force_scale
+            np.reshape(stuff, (self.atom, 3))
       self._last_frc_frame += 1
 
    def cell_lengths_angles(self, frame):
