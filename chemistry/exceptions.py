@@ -69,11 +69,29 @@ class AmoebaParamFileError(ChemError):
 class AmoebaParamFileWarning(ChemWarning):
    """ When a parameter file is incorrect """
 
+class TinkerFileError(ChemError):
+   """ Raised when one of the TINKER parsing routines hits a bad file """
+
+class TinkerAnaloutError(TinkerFileError):
+   """ When the analout file is not a valid format """
+
+class TinkerKeyFileError(TinkerFileError):
+   """ When a keyword control file is invalid """
+
+class TinkerDynFileError(TinkerFileError):
+   """ When a .dyn file is corrupt or badly formatted """
+
 class CmapError(ChemError):
    """ If there is an error with a correction-map potential """
 
 class OpenMMError(ChemError):
    """ If there's a problem making an OpenMM system """
+
+class FormatError(ChemError):
+   """ If there's a problem in formatting """
+
+class AmoebaError(ChemError):
+   """ If there's a problem with the AMOEBA force field """
 
 class CreateInputError(ChemError):
    """ If there's a problem making a mdin input file """

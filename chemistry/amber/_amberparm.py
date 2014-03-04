@@ -230,7 +230,8 @@ class AmberParm(AmberFormat):
       # The next is probably only there for LES-prmtops
       try:
          self.pointers["NCOPY"] = self.parm_data["POINTERS"][NCOPY]
-      except: pass
+      except:
+         pass
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -937,6 +938,10 @@ class AmberParm(AmberFormat):
 
    @property
    def chamber(self):
+      return False
+
+   @property
+   def amoeba(self):
       return False
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

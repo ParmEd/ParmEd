@@ -25,6 +25,7 @@ Boston, MA 02111-1307, USA.
 from chemistry.amber.amberformat import AmberFormat
 from chemistry.amber._amberparm import AmberParm, Rst7
 from chemistry.amber._chamberparm import ChamberParm
+from chemistry.amber._tinkerparm import AmoebaParm
 from warnings import warn as _warn
 
 # Define importables via *
@@ -55,6 +56,8 @@ def LoadParm(parmname, rst7name=None):
    parm = AmberFormat(parmname)
    if 'CTITLE' in parm.flag_list:
       parm = parm.view(ChamberParm)
+   elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
+      parm = parm.view(AmoebaParm)
    else:
       parm = parm.view(AmberParm)
 

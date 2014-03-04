@@ -2,9 +2,9 @@
 This module contains objects that deal with system topology and parameters, such
 as atoms, residues, bonds, angles, etc.
 
-These are intended for use with the AmberParm class and are used to recompute
-the parameter topology file when necessary (i.e., it provides high-level access
-to Amber prmtop data)
+These are intended for use with the AmberParm and ChamberParm classes and are
+used to recompute the parameter topology file when necessary (i.e., it provides
+high-level access to Amber prmtop data)
 
 Designed so it can be used like:
    from chemistry.amber.topologyobjects import *
@@ -171,7 +171,7 @@ class Atom(object):
       Log this atom as angled to another atom. Check if this has already been
       added to the bond list. If so, do nothing
       """
-      if self == other:
+      if self is other:
          raise BondError("Cannot angle an atom with itself!")
       self.angle_partners.add(other)
    
@@ -182,7 +182,7 @@ class Atom(object):
       Log this atom as dihedral-ed to another atom. Check if this has already been
       added to the bond or angle list. If so, do nothing
       """
-      if self == other:
+      if self is other:
          raise BondError("Cannot dihedral an atom with itself!")
       self.dihedral_partners.add(other)
       
@@ -193,7 +193,7 @@ class Atom(object):
       Add one atom to my exclusion list, even if it's not bonded to, angled to, or
       dihedraled to it
       """
-      if self == other:
+      if self is other:
          raise BondError("Cannot exclude an atom from itself")
       self.exclusion_partners.add(other)
       # If he is excluded from me, then I am excluded from him
@@ -268,7 +268,7 @@ class Bond(object):
    
    def __contains__(self, thing):
       """ Quick and easy way to see if an Atom is in this Bond """
-      return id(thing) == id(self.atom1) or id(thing) == id(self.atom2)
+      return thing is self.atom1 or thing is self.atom2
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

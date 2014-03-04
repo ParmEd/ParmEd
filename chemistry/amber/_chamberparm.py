@@ -386,6 +386,10 @@ class ChamberParm(AmberParm):
    @property
    def chamber(self):
       return True
+   
+   @property
+   def amoeba(self):
+      return False
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
