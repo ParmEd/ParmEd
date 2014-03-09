@@ -12,6 +12,7 @@ Designed so it can be used like:
 by Jason Swails
 """
 
+from compat24 import property
 from chemistry.amber.constants import NATOM
 from chemistry.exceptions import (BondError, AmberParmError, AmoebaError)
 from chemistry.amber.topologyobjects import (_TypeList, TrackedList,
@@ -67,12 +68,12 @@ class Atom(object):
 
    # Make 'element' an alias for 'atomic_number'
 
-   def _get_element(self):
+   @property
+   def element(self):
       return self.atomic_number
-   def _set_element(self, val):
-      self.atomic_number = val
-
-   element = property(fget=_get_element, fset=_set_element)
+   @element.setter
+   def element(self, value):
+      self.atomic_number = value
 
    #===================================================
    
@@ -145,7 +146,8 @@ class Atom(object):
 
    def polar_to(self, other):
       if self is other:
-         raise BondError('Cannot be in the same polar group as self.')
+         raise BondError('Cannot be in the same polar group as self (%d).' %
+                         self.starting_index)
       self.polar_partners.add(other)
       other.polar_partners.add(self)
 
@@ -155,6 +157,31 @@ class Atom(object):
          raise BondError('Cannot exclude atom from itself')
       self.exclusion_partners.add(other)
       other.exclusion_partners.add(self)
+
+   def determine_polar_partners(self):
+      """
+      The only way to determine which atoms are in the same polar group is to
+      determine which other atoms are in the exclusion list but NOT already
+      accounted for by the bonds, angles, torsions, and coupled-torsions
+      """
+      excset = set()
+      exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
+      exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
+      first_excl = sum(exclat[:self.starting_index])
+#     print first_excl
+      nexcl = exclat[self.starting_index]
+#     print nexcl
+      for i in range(nexcl):
+         idx = exclist[first_excl+i] - 1
+#        print "adding atom", idx
+         excset.add(self.parm.atom_list[idx])
+      # Now subtract off all of the bonds, angles, torsions, and tortors
+      excset = excset.difference(self.bond_partners)
+      excset = excset.difference(self.angle_partners)
+      excset = excset.difference(self.dihedral_partners)
+      excset = excset.difference(self.tortor_partners)
+      for atm in excset:
+         self.polar_to(atm)
 
    #===================================================
    
@@ -604,6 +631,7 @@ class Dihedral(_FourAtomTerm):
    def __init__(self, atom1, atom2, atom3, atom4, dihedral_type):
       _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
       self.dihedral_type = dihedral_type
+      self.register()
 
    def write_info(self, parm, idx):
       # If unused, skip this parameter
@@ -620,6 +648,14 @@ class Dihedral(_FourAtomTerm):
           self.atom3 is other.atom1 and self.atom4 is other.atom4):
          return self.trigang_type == other.trigang_type
       return False
+
+   def register(self):
+      self.atom1.dihedral_to(self.atom2)
+      self.atom1.dihedral_to(self.atom3)
+      self.atom1.dihedral_to(self.atom4)
+      self.atom2.dihedral_to(self.atom3)
+      self.atom2.dihedral_to(self.atom4)
+      self.atom3.dihedral_to(self.atom4)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -681,7 +717,7 @@ class PiTorsion(object):
       return (thing is self.atom1 or thing is self.atom2 or thing is self.atom3
            or thing is self.atom4 or thing is self.atom5 or thing is self.atom6)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PiTorsionType(DihedralType):
 
@@ -763,10 +799,26 @@ class StretchBendTypeList(_TypeList):
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class TorsionTorsion(_Cmap):
+   
+   def __init__(self, *args, **kwargs):
+      _Cmap.__init__(self, *args, **kwargs)
+      self.register()
 
    def write_info(self, parm, idx):
       if idx == -1: return
       _Cmap.write_info(self, parm, 'AMOEBA_TORSION_TORSION_LIST', idx)
+
+   def register(self):
+      self.atom1.tortor_to(self.atom2)
+      self.atom1.tortor_to(self.atom3)
+      self.atom1.tortor_to(self.atom4)
+      self.atom1.tortor_to(self.atom5)
+      self.atom2.tortor_to(self.atom3)
+      self.atom2.tortor_to(self.atom4)
+      self.atom2.tortor_to(self.atom5)
+      self.atom3.tortor_to(self.atom4)
+      self.atom3.tortor_to(self.atom5)
+      self.atom4.tortor_to(self.atom5)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

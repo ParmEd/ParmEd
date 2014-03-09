@@ -197,7 +197,7 @@ class AmoebaParm(AmberParm):
          id3 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+2] - 1
          id4 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+3] - 1
          typ = self.parm_data['AMOEBA_TORSION_LIST'][5*i+4] - 1
-         self.oopbend_list.append(
+         self.dihedral_list.append(
                Dihedral(self.atom_list[id1], self.atom_list[id2],
                         self.atom_list[id3], self.atom_list[id4],
                         self.dihedral_type_list[typ])
@@ -251,7 +251,7 @@ class AmoebaParm(AmberParm):
          id4 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+3] - 1
          id5 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+4] - 1
          typ = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+5] - 1
-         self.pitorsion_list.append(
+         self.torsion_torsion_list.append(
                TorsionTorsion(self.atom_list[id1], self.atom_list[id2],
                               self.atom_list[id3], self.atom_list[id4],
                               self.atom_list[id5],
@@ -281,6 +281,8 @@ class AmoebaParm(AmberParm):
                MultipoleFrame(self.atom_list[id1], fpn, vct, vch, nvc)
          )
       self.multipole_frame_list.changed = False
+      ##### Finally we can determine the polar group exclusions #####
+      for atom in self.atom_list: atom.determine_polar_partners()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

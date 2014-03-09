@@ -5,7 +5,8 @@ topology file
 
 from ParmedTools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
                                     FixableParmWarning, NonfatalWarning,
-                                    NonUniversalWarning, MissingDisulfide)
+                                    NonUniversalWarning, MissingDisulfide,
+                                    LongBondWarning)
 from chemistry.amber.constants import TINY
 from chemistry.amber.mask import AmberMask
 from chemistry.exceptions import MoleculeError
@@ -202,6 +203,7 @@ def check_validity(parm, warnings):
          break
 
    if hasattr(parm, 'coords'):
+      # Check if we think any disulfide bonds might be missing.
       mask = AmberMask(parm, ':CYS,CYM@SG')
       s_atms = []
       for i, sel in enumerate(mask.Selection()):
@@ -213,14 +215,36 @@ def check_validity(parm, warnings):
                dx = s_atms[i].xx - s_atms[j].xx
                dy = s_atms[i].xy - s_atms[j].xy
                dz = s_atms[i].xz - s_atms[j].xz
-               if (dx * dx + dy * dy + dz * dz) < 16.0:
+               if (dx * dx + dy * dy + dz * dz) < 9.0:
                   warnings.warn('Detected two cysteine residues whose sulfur '
-                     'atoms are within 4 Angstroms. Rename CYS to CYX in the '
+                     'atoms are within 3 Angstroms. Rename CYS to CYX in the '
                      'PDB file and use the \'bond\' command in tleap to create '
                      'the disulfide bond', MissingDisulfide)
                   raise StopIteration
       except StopIteration:
          pass
+      # Now check if we have any bonds that seem unreasonably large. This would
+      # indicate gaps in the structure.
+      for bnd in parm.bonds_without_h:
+         dx = bnd.atom1.xx - bnd.atom2.xx
+         dy = bnd.atom1.xy - bnd.atom2.xy
+         dz = bnd.atom1.xz - bnd.atom2.xz
+         d2 = dx*dx + dy*dy + dz*dz
+         req = bnd.bond_type.req
+         # Warn if any bond starts at > 3 times its equilibrium length
+         if d2 > 9 * req*req:
+            warnings.warn('Atoms %d (%s %d [%s]) and %d (%s %d [%s]) are '
+                 'bonded (equilibrium length %.3f A) but are %.3f A apart. '
+                 'This often indicates gaps in the original sequence and '
+                 'should be checked carefully.' %
+                     (bnd.atom1.starting_index+1, bnd.atom1.residue.resname,
+                      bnd.atom1.residue.idx+1, bnd.atom1.atname,
+                      bnd.atom2.starting_index+1, bnd.atom2.residue.resname,
+                      bnd.atom2.residue.idx+1, bnd.atom2.atname,
+                      req, sqrt(d2)),
+                 LongBondWarning
+            )
+
 
 def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
                        addaction=None, typ=str, warnings=None):

@@ -362,6 +362,8 @@ class AmberFormat(object):
       # Next read the charges
       tmp_data, line_idx = read_float(line_idx, prmtop_lines,
                                       self.parm_data['POINTERS'][NATOM])
+      # Divide by the electrostatic constant
+      tmp_data = [x / AMBER_ELECTROSTATIC for x in tmp_data]
       self.addFlag('CHARGE', '5E16.8', data=tmp_data)
 
       # Next read the masses

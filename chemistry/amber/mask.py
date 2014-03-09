@@ -55,7 +55,7 @@ class AmberMask(object):
 
       # 3) evaluate the postfix notation
       if invert:
-         return [abs(i-1) for i in AmberMask._evaluate(self, postfix, prnlev)]
+         return [1-i for i in AmberMask._evaluate(self, postfix, prnlev)]
       return AmberMask._evaluate(self, postfix, prnlev)
 
    #======================================================

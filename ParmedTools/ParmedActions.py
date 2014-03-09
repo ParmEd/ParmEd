@@ -72,6 +72,7 @@ Usages = {
           'setangle' : 'setAngle <mask1> <mask2> <mask3> <k> <THETeq>',
    'addatomicnumber' : 'addAtomicNumber',
     'deletedihedral' : 'deleteDihedral <mask1> <mask2> <mask3> <mask4>',
+        'deletebond' : 'deleteBond <mask1> <mask2>',
      'printljmatrix' : 'printLJMatrix <mask>|<index>',
             'source' : 'source <file>',
               'parm' : 'parm <filename> [<filename> [<filename> ...]] || '
@@ -2896,3 +2897,154 @@ class energy(Action):
          raise SimulationError('OpenMM could not be imported. Skipping.')
 
       energy(self.parm, self.arg_list, self.output)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class deletebond(Action):
+   """
+   This action deletes any bonds that occur between the atoms in two masks.
+
+   <mask1> : Amber mask defining one of the atoms in a bond
+   <mask2> : Amber mask defining the other atom in the bond
+   [verbose] : Print out every bond that is deleted as well as the number of
+               other valence terms that were eliminated.
+
+   All bonds will be matched in which one atom comes from <mask1> and the other
+   atom comes from <mask2>. This action will also delete any other valence term
+   (like angles and dihedrals) that would get severed by the deletion of one of
+   the bonds.
+   """
+
+   def init(self, arg_list):
+      self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
+      self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
+      self.verbose = arg_list.has_key('verbose')
+      # Go through each atom in mask1 and see if it forms a bond with any atom
+      # in mask2.
+      self.del_h_bonds = set()
+      self.del_noh_bonds = set()
+      deleted_bond_list = set()
+      for i in self.mask1.Selected():
+         ai = self.parm.atom_list[i]
+         for j in self.mask2.Selected():
+            aj = self.parm.atom_list[j]
+            # Skip if these two atoms are identical
+            if ai is aj: continue
+            if aj in ai.bonds():
+               # A bond exists here. Now find the bond in the appropriate list
+               # (is there a hydrogen or not?) and add its index to the relevant
+               # list.
+               if 1 in (ai.atomic_number, aj.atomic_number):
+                  for ii, bond in enumerate(self.parm.bonds_inc_h):
+                     if ai in bond and aj in bond:
+                        self.del_h_bonds.add(ii)
+                        deleted_bond_list.add(bond)
+                        break
+               else:
+                  for ii, bond in enumerate(self.parm.bonds_without_h):
+                     if ai in bond and aj in bond:
+                        self.del_noh_bonds.add(ii)
+                        deleted_bond_list.add(bond)
+                        break
+      # Now go through all of our other valence terms and collect the terms we
+      # need to delete.
+      if not deleted_bond_list:
+         # Nothing to delete
+         return
+      self.del_h_angles = set()
+      self.del_noh_angles = set()
+      self.del_h_dihedrals = set()
+      self.del_noh_dihedrals = set()
+      if self.parm.chamber:
+         self.del_impropers = set()
+         self.del_ureybrad = set()
+         self.del_cmap = set()
+      for bond in deleted_bond_list:
+         for i, angle in enumerate(self.parm.angles_inc_h):
+            if bond in angle:
+               self.del_h_angles.add(i)
+         for i, angle in enumerate(self.parm.angles_without_h):
+            if bond in angle:
+               self.del_noh_angles.add(i)
+         for i, dihed in enumerate(self.parm.dihedrals_inc_h):
+            if bond in dihed:
+               self.del_h_dihedrals.add(i)
+         for i, dihed in enumerate(self.parm.dihedrals_without_h):
+            if bond in dihed:
+               self.del_noh_dihedrals.add(i)
+         if self.parm.chamber:
+            for i, ureybrad in enumerate(self.parm.urey_bradley):
+               if bond in ureybrad:
+                  self.del_ureybrad.add(i)
+            for i, improper in enumerate(self.parm.improper):
+               if bond in improper:
+                  self.del_impropers.add(i)
+            if hasattr(self.parm, 'cmap'):
+               for i, cmap in enumerate(self.parm.cmap):
+                  if bond in cmap:
+                     self.del_cmap.add(i)
+
+   def __str__(self):
+      if not self.del_h_bonds and not self.del_noh_bonds:
+         return 'No bonds to delete'
+      if not self.verbose:
+         return 'Deleting the %d bonds found between %s and %s' % (
+                  len(self.del_h_bonds) + len(self.del_noh_bonds),
+                  self.mask1, self.mask2)
+      # Now we want full statistics
+      retstr = 'Deleting %d bonds between %s and %s:\n' % (
+                  len(self.del_h_bonds) + len(self.del_noh_bonds),
+                  self.mask1, self.mask2)
+      for i in sorted(list(self.del_h_bonds)):
+         a1 = self.parm.bonds_inc_h[i].atom1
+         a2 = self.parm.bonds_inc_h[i].atom2
+         retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.starting_index+1,
+                  a1.residue.resname, a1.residue.idx, a1.atname,
+                  a2.starting_index+1, a2.residue.resname, a2.residue.idx,
+                  a2.atname)
+      for i in sorted(list(self.del_noh_bonds)):
+         a1 = self.parm.bonds_without_h[i].atom1
+         a2 = self.parm.bonds_without_h[i].atom2
+         retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.starting_index+1,
+                  a1.residue.resname, a1.residue.idx, a1.atname,
+                  a2.starting_index+1, a2.residue.resname, a2.residue.idx,
+                  a2.atname)
+      retstr += 'Deleting %d angles, ' % (len(self.del_h_angles) +
+                                          len(self.del_noh_angles))
+      if self.parm.chamber:
+         retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
+                    'and %d CMAPs' % (
+                    len(self.del_ureybrad), len(self.del_impropers),
+                    len(self.del_h_dihedrals) + len(self.del_noh_dihedrals),
+                    len(self.del_cmap))
+         )
+      else:
+         retstr += ' and %d dihedrals' % (len(self.del_h_dihedrals) +
+                                          len(self.del_noh_dihedrals))
+      return retstr
+
+   @staticmethod
+   def _dfl(selection, mylist):
+      """ Delete From List """
+      if not selection: return
+      for i in reversed(list(selection)):
+         del mylist[i]
+
+   def execute(self):
+      if not self.del_h_bonds and not self.del_noh_bonds:
+         # Nothing to do...
+         return
+      self._dfl(self.del_h_bonds, self.parm.bonds_inc_h)
+      self._dfl(self.del_noh_bonds, self.parm.bonds_without_h)
+      self._dfl(self.del_h_angles, self.parm.angles_inc_h)
+      self._dfl(self.del_noh_angles, self.parm.angles_without_h)
+      self._dfl(self.del_h_dihedrals, self.parm.dihedrals_inc_h)
+      self._dfl(self.del_noh_dihedrals, self.parm.dihedrals_without_h)
+      # Now get rid of chamber sections
+      if self.parm.chamber:
+         self._dfl(self.del_ureybrad, self.parm.urey_bradley)
+         self._dfl(self.del_impropers, self.parm.improper)
+         if self.del_cmap:
+            self._dfl(self.del_cmap, self.parm.cmap)
+      # If we had anything to do, remake the parm
+      self.parm.remake_parm()

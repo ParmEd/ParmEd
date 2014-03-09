@@ -377,7 +377,7 @@ class MdcrdReporter(object):
        - simulation (Simulation) The Simulation to generate a report for
        - state (State) The current state of the simulation
       """
-      from chemistry.amber.mdcrd import FRCSCALE, VELSCALE
+      from chemistry.amber.mdcrd import VELSCALE
       global RADDEG, VELUNIT, FRCUNIT
       if self._out is None:
          # This must be the first frame, so set up the trajectory now

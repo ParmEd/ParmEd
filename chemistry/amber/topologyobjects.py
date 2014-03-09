@@ -16,7 +16,7 @@ from chemistry.exceptions import (BondError, DihedralError, AmberParmError,
             CmapError)
 from chemistry.amber.constants import NATOM, TINY
 from chemistry.periodic_table import AtomicNum, Mass, Element as _Element
-from compat24 import all
+from compat24 import all, property
 
 __all__ = ['Atom', 'Bond', 'BondType', 'Angle', 'AngleType', 'Dihedral',
            'DihedralType', 'Residue', 'ResidueList', 'AtomList', 'BondTypeList',
@@ -108,12 +108,12 @@ class Atom(object):
 
    # Make 'element' an alias for 'atomic_number'
 
-   def _get_element(self):
+   @property
+   def element(self):
       return self.atomic_number
-   def _set_element(self, val):
-      self.atomic_number = val
-
-   element = property(fget=_get_element, fset=_set_element)
+   @element.setter
+   def element(self, value):
+      self.atomic_number = value
 
    #===================================================
 
@@ -212,17 +212,19 @@ class Atom(object):
 
    #===================================================
 
+   # Comparisons are done by comparing the starting indexes
+
    def __eq__(self, other):
-      return id(self) == id(other)
+      return self.starting_index == other.starting_index
       
    def __ne__(self, other):
       return not Atom.__eq__(self, other)
 
    def __gt__(self, other):
-      return self.idx > other.idx
+      return self.starting_index > other.starting_index
 
    def __lt__(self, other):
-      return self.idx < other.idx
+      return self.starting_index < other.starting_index
 
    def __ge__(self, other):
       return not Atom.__lt__(self, other)
@@ -339,9 +341,12 @@ class Angle(object):
    #===================================================
 
    def __contains__(self, thing):
-      """ Quick and easy way to see if an Atom is in this Angle """
-      return (id(thing) == id(self.atom1) or id(thing) == id(self.atom2) or
-              id(thing) == id(self.atom3))
+      """ Quick and easy way to see if an Atom or a Bond is in this Angle """
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or 
+                 (self.atom2 in thing and self.atom3 in thing))
+      # Assume it's a bond
+      return thing is self.atom1 or thing is self.atom2 or thing is self.atom3
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -435,9 +440,17 @@ class Dihedral(object):
    #===================================================
 
    def __contains__(self, thing):
-      """ Quick and easy way to find out if an Atom is in this Dihedral """
-      return id(thing) == id(self.atom1) or id(thing) == id(self.atom2) or \
-             id(thing) == id(self.atom3) or id(thing) == id(self.atom4)
+      """
+      Quick and easy way to find out if an Atom or Bond is in this Dihedral
+      """
+      if isinstance(thing, Bond):
+         # A dihedral is made up of 3 bonds
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom3 in thing and self.atom4 in thing))
+      # Otherwise assume thing is an Atom
+      return (thing is self.atom1 or thing is self.atom2 or
+              thing is self.atom3 or thing is self.atom4)
 
    #===================================================
 
@@ -542,8 +555,38 @@ class UreyBradley(object):
    #===================================================
    
    def __contains__(self, thing):
-      """ Quick and easy way to see if an Atom is in this Bond """
-      return id(thing) == id(self.atom1) or id(thing) == id(self.atom2)
+      " Quick and easy way to see if an Atom or Bond is in this Urey-Bradley "
+      # If this is a bond things are a bit more complicated since we don't know
+      # the central atom if this Urey-Bradley. We need to make sure that one of
+      # the atoms of the bond is either atom1 or atom2 and that the OTHER atom
+      # in Bond "thing" has the OTHER atom in this Urey-Bradley in its list of
+      # bonded partners.
+      if isinstance(thing, Bond):
+         if not thing.atom1 in self:
+            if not thing.atom2 in self:
+               # Neither atom is in this Urey-Bradley...
+               return False
+            # If we are here, thing.atom2 is in self
+            end1 = thing.atom2
+            cent = thing.atom1
+         else:
+            # If we are here, thing.atom1 is in self
+            end1 = thing.atom1
+            cent = thing.atom2
+         # If we are here, end1 and cent are set. Look through the bond partners
+         # of cent(er) and see if any of them is in this Urey-Bradley (but ONLY
+         # if that atom is not the original end1)
+         for atm in cent.bonds():
+            if atm is end1: continue
+            if atm in self:
+               # If we got here, we found both atoms in this Urey-Bradley
+               # separated by 2 bonds, so "thing" IS in this Urey-Bradley
+               return True
+         # If we got here, we could not find the other atom connected by 2 bonds
+         return False
+      # If we are here, "thing" must not be a Bond and we therefore assume it's
+      # an Atom
+      return thing is self.atom1 or thing is self.atom2
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -608,9 +651,21 @@ class Improper(object):
    #===================================================
 
    def __contains__(self, thing):
-      """ Quick and easy way to find out if an Atom is in this Improper """
-      return id(thing) == id(self.atom1) or id(thing) == id(self.atom2) or \
-             id(thing) == id(self.atom3) or id(thing) == id(self.atom4)
+      " Quick and easy way to find out if an Atom or Bond is in this Improper "
+      # An improper is defined as shown below
+      #             A3
+      #             |
+      #             |
+      #    A4 ----- A1 ----- A2
+      #
+      # So the bonds will either be between atom1 and any other atom
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom1 in thing and self.atom3 in thing) or
+                 (self.atom1 in thing and self.atom4 in thing))
+      # Here we assume that we just have an atom
+      return (thing is self.atom1 or thing is self.atom2 or
+              thing is self.atom3 or thing is self.atom4)
 
    #===================================================
 
@@ -711,10 +766,19 @@ class Cmap(object):
    #===================================================
 
    def __contains__(self, thing):
-      """ Quick and easy way to find out an atom is in this coupled-torsion """
-      return id(thing) == id(self.atom1) or id(thing) == id(self.atom2) or \
-             id(thing) == id(self.atom3) or id(thing) == id(self.atom4) or \
-             id(thing) == id(self.atom5)
+      """
+      Quick and easy way to find out an atom or bond is in this coupled-torsion
+      """
+      # If we have a bond, see if it is 1 of the 4 sequential bonds that make up
+      # this coupled-torsion
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom3 in thing and self.atom4 in thing) or
+                 (self.atom4 in thing and self.atom5 in thing))
+      # Otherwise assume we have an atom
+      return (thing is self.atom1 or thing is self.atom2 or
+              thing is self.atom3 or thing is self.atom4 or thing is self.atom5)
 
    #===================================================
 
@@ -844,7 +908,7 @@ class AtomList(list):
    
    def _index_us(self):
       """ We have deleted an atom, so now we have to re-index everybody """
-      for i in range(len(self)): self[i].idx = i
+      for i in range(len(self)): self[i].idx = self[i].starting_index = i
 
    #===================================================
 

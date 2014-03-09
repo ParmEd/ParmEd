@@ -81,6 +81,9 @@ class NonUniversalWarning(ParmWarning):
 class MissingDisulfide(ParmWarning):
    pass
 
+class LongBondWarning(ParmWarning):
+   pass
+
 class NonexistentParm(ParmError):
    pass
 
