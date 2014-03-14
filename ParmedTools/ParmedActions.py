@@ -22,7 +22,7 @@ from chemistry.amber.readparm import AmberFormat
 from chemistry.amber.topologyobjects import (Bond, BondType, Angle, AngleType,
                                              Dihedral, DihedralType)
 from chemistry.periodic_table import Element as _Element
-from compat24 import any, all
+from compat24 import any
 import math
 import os
 import warnings

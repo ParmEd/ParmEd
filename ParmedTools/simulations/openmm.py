@@ -269,6 +269,8 @@ def simulate(parm, args):
       elif mdin.ewald_nml['eedmeth'] != 1:
          warnings.warn('eedmeth must be 1 or 4. Other values are ignored.',
                        SimulationWarning)
+      if mdin.ewald_nml['vdwmeth'] not in (0, 1):
+         raise SimulationError('vdwmeth must be 0 or 1')
 
    # Determine our constraints
    if mdin.cntrl_nml['ntc'] == 1:
@@ -325,6 +327,18 @@ def simulate(parm, args):
          (nbmeth, mdin.cntrl_nml['cut'], constraints, rw, gbmeth, kappa,
             mdin.cntrl_nml['intdiel'], mdin.cntrl_nml['extdiel'],
             mdin.cntrl_nml['nscm']>0, mdin.ewald_nml['rsum_tol'], flexconst))
+
+   # See if we need to turn off the long-range dispersion correction
+   if mdin.cntrl_nml['ntb'] > 0 and mdin.ewald_nml['vdwmeth'] == 0:
+      # Disable the long-range vdW correction
+      for i, frc in enumerate(system.getForces()):
+         if (isinstance(frc, mm.NonbondedForce) or
+             isinstance(frc, mm.CustomNonbondedForce)):
+            frc.setUseDispersionCorrection(False)
+            if scriptfile is not None:
+               scriptfile.write('# Disable the long-range vdW correction\n')
+               scriptfile.write('system.getForces()[%d].'
+                                'setUseDispersionCorrection(False)\n\n' % i)
 
    timer.stop_timer('system')
    

@@ -39,7 +39,6 @@ class Atom(object):
       self.angle_partners = set()
       self.dihedral_partners = set()
       self.tortor_partners = set()
-      self.polar_partners = set()
       self.exclusion_partners = set()
       self.idx = -1
       self.atomic_number = parm.parm_data['AMOEBA_ATOMIC_NUMBER'][si]
@@ -89,8 +88,6 @@ class Atom(object):
       for atm in self.dihedrals():
          if atm.idx > self.idx: numex += 1
       for atm in self.tortors():
-         if atm.idx > self.idx: numex += 1
-      for atm in self.polars():
          if atm.idx > self.idx: numex += 1
       for atm in self.exclusions():
          if atm.idx > self.idx: numex += 1
@@ -144,13 +141,6 @@ class Atom(object):
       self.tortor_partners.add(other)
       other.tortor_partners.add(self)
 
-   def polar_to(self, other):
-      if self is other:
-         raise BondError('Cannot be in the same polar group as self (%d).' %
-                         self.starting_index)
-      self.polar_partners.add(other)
-      other.polar_partners.add(self)
-
    def exclude(self, other):
       """ Exclude atoms from each other """
       if self is other:
@@ -158,22 +148,23 @@ class Atom(object):
       self.exclusion_partners.add(other)
       other.exclusion_partners.add(self)
 
-   def determine_polar_partners(self):
+   #===================================================
+   
+   def determine_all_exclusion_partners(self):
       """
-      The only way to determine which atoms are in the same polar group is to
-      determine which other atoms are in the exclusion list but NOT already
-      accounted for by the bonds, angles, torsions, and coupled-torsions
+      Amoeba topologies have complex exclusions due to the existence of
+      polarization groups and the exclusions of 1-2, 1-3, 1-4, and 1-5 pairs.
+      This method looks through the exclusion list and adds any atoms that are
+      not naturally accounted for by the bond, angle, torsion, and
+      coupled-torsion parameters
       """
       excset = set()
       exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
       exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
       first_excl = sum(exclat[:self.starting_index])
-#     print first_excl
       nexcl = exclat[self.starting_index]
-#     print nexcl
       for i in range(nexcl):
          idx = exclist[first_excl+i] - 1
-#        print "adding atom", idx
          excset.add(self.parm.atom_list[idx])
       # Now subtract off all of the bonds, angles, torsions, and tortors
       excset = excset.difference(self.bond_partners)
@@ -181,40 +172,41 @@ class Atom(object):
       excset = excset.difference(self.dihedral_partners)
       excset = excset.difference(self.tortor_partners)
       for atm in excset:
-         self.polar_to(atm)
+         self.exclude(atm)
 
+   #===================================================
+   
+   def determine_exclusions_from_bonds(self):
+      """
+      Add all atoms that are connected by 2, 3, and 4 bonds to the relevant
+      exclusion list
+      """
+   
    #===================================================
    
    # Iterators
 
-   def polars(self):
-      """ These are the first line of exclusions """
-      return sorted(list(self.polar_partners))
-
    def bonds(self):
-      return sorted(list(self.bond_partners.difference(self.polar_partners)))
+      return sorted(list(self.bond_partners))
 
    def angles(self):
-      p_and_b = self.polar_partners.union(self.bond_partners)
-      return sorted(list(self.angle_partners.difference(p_and_b)))
+      b = self.bond_partners
+      return sorted(list(self.angle_partners.difference(b)))
 
    def dihedrals(self):
-      p_and_b = self.polar_partners.union(self.bond_partners)
-      pb_and_a = self.angle_partners.union(p_and_b)
-      return sorted(list(self.dihedral_partners.difference(pb_and_a)))
+      b_and_a = self.angle_partners.union(self.bond_partners)
+      return sorted(list(self.dihedral_partners.difference(b_and_a)))
 
    def tortors(self):
-      p_and_b = self.polar_partners.union(self.bond_partners)
-      pb_and_a = self.angle_partners.union(p_and_b)
-      pba_and_d = self.dihedral_partners.union(pb_and_a)
-      return sorted(list(self.tortor_partners.difference(pba_and_d)))
+      b_and_a = self.angle_partners.union(self.bond_partners)
+      ba_and_d = self.dihedral_partners.union(b_and_a)
+      return sorted(list(self.tortor_partners.difference(ba_and_d)))
 
    def exclusions(self):
-      p_and_b = self.polar_partners.union(self.bond_partners)
-      pb_and_a = self.angle_partners.union(p_and_b)
-      pba_and_d = self.dihedral_partners.union(pb_and_a)
-      pbad_and_tt = self.tortor_partners.union(pba_and_d)
-      return sorted(list(self.exclusion_partners.difference(pbad_and_tt)))
+      b_and_a = self.angle_partners.union(self.bond_partners)
+      ba_and_d = self.dihedral_partners.union(b_and_a)
+      bad_and_tt = self.tortor_partners.union(ba_and_d)
+      return sorted(list(self.exclusion_partners.difference(bad_and_tt)))
 
    #===================================================
 

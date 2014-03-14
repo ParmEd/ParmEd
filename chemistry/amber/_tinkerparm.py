@@ -86,12 +86,7 @@ class AmoebaParm(AmberParm):
                self.valid = False
 
          # Load the structure arrays
-#        try:
          self._load_structure()
-#        except (KeyError, IndexError, AttributeError):
-#           warn('Error loading molecule topology. Cannot use delete_mask',
-#                AmberParmWarning)
-#           self.valid = False
       
       if rst7_name is not None:
          self.LoadRst7(rst7_name)
@@ -282,7 +277,7 @@ class AmoebaParm(AmberParm):
          )
       self.multipole_frame_list.changed = False
       ##### Finally we can determine the polar group exclusions #####
-      for atom in self.atom_list: atom.determine_polar_partners()
+      for atom in self.atom_list: atom.determine_all_exclusion_partners()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
