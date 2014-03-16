@@ -214,16 +214,16 @@ class AmberFormat(object):
       """
       Returns a view of the current object as another object.
 
-      @param cls Class definition of an AmberParm subclass for the current
+      Parameters:
+         cls Class definition of an AmberParm subclass for the current
              object to be converted into
 
-      @returns instance of cls initialized from data in this object
+      Returns:
+         instance of cls initialized from data in this object
       """
-      try:
+      if hasattr(cls, 'load_from_rawdata'):
          return cls.load_from_rawdata(self)
-      except AttributeError:
-         raise ValueError('Cannot instantiate %s from AmberFormat' %
-                          cls.__name__)
+      raise ValueError('Cannot instantiate %s from AmberFormat' % cls.__name__)
 
    #===================================================
 
@@ -592,13 +592,36 @@ class AmberFormat(object):
    #===================================================
 
    def addFlag(self, flag_name, flag_format, data=None, num_items=-1,
-               comments=[]):
+               comments=[], after=None):
       """
       Adds a new flag with the given flag name and Fortran format string and
       initializes the array with the values given, or as an array of 0s
       of length num_items
+
+      Parameters:
+         flag_name (str): Name of the flag to insert. It is converted to all
+                          upper case
+         flag_format (str): Fortran Format statement (do not enclose in ()'s)
+         data (list): Sequence with data for the new flag. If None, a list of
+                      zeros of length num_items is given as a holder
+         num_items (int): Number of items in the section (only used if data is
+                          None)
+         comments (list): List of comments to put in this section
+         after (str): If not None, this flag will be added after the given flag.
+                      If the 'after' flag does not exist, IndexError is raised.
       """
-      self.flag_list.append(flag_name.upper())
+      if after is not None:
+         after = after.upper()
+         if not after in self.flag_list:
+            raise IndexError('%s not found in topology flag list' % after)
+         # If the 'after' flag is the last one, just append
+         if self.flag_list[-1] == after:
+            self.flag_list.append(flag_name.upper())
+         # Otherwise find the index and add it after
+         idx = self.flag_list.index(after) + 1
+         self.flag_list.insert(idx, flag_name.upper())
+      else:
+         self.flag_list.append(flag_name.upper())
       self.formats[flag_name.upper()] = FortranFormat(flag_format)
       if data is not None:
          self.parm_data[flag_name.upper()] = list(data)

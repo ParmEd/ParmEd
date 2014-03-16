@@ -90,7 +90,7 @@ class AmberMask(object):
             # convert
             if p == '=' and i == len(self.mask) - 1: # wildcard
                if flag > 0: p = '*'
-               else: raise MaskError('AmberMask: \'=\' not in name list syntax')
+               else: raise MaskError("AmberMask: '=' not in name list syntax")
             # If this is the end of an operand, terminate the buffer, flush
             # it to infix, and reset flag to 0 and empty the buffer
             if flag > 0:
@@ -110,19 +110,18 @@ class AmberMask(object):
                try:
                   self.parm.coords[0]
                except AttributeError:
-                  raise MaskError('AmberMask: <,> operators require ' +
-                        'a loaded restart file!')
+                  raise MaskError('<,> operators require coordinates')
                if not p in [':','@']:
-                  raise MaskError('AmberMask: Bad syntax [%s]' % self.mask)
+                  raise MaskError('Bad syntax [%s]' % self.mask)
          elif self._isOperand(p):
             if flag == 0:
                buffer = '(['
                flag = 1
                if p != '*':
-                  raise MaskError('AmberMask: Bad syntax [%s]' % self.mask)
+                  raise MaskError('Bad syntax [%s]' % self.mask)
             if p == '=': # wildcard
                if flag > 0: p = '*'
-               else: raise MaskError('AmberMask: \'=\' not in name list syntax')
+               else: raise MaskError("'=' not in name list syntax")
             buffer += p
          elif p == ':':
             if flag == 0:
@@ -142,7 +141,7 @@ class AmberMask(object):
                buffer += '])|([@'
                flag = 2
          else:
-            raise MaskError('AmberMask: Unknown symbol (%s) expression when parsing Mask' % p)
+            raise MaskError('Unknown symbol (%s) expression' % p)
          i += 1
       # end while i < len(self.mask):
       # Check that each operand has at least 4 characters: [:1] and [@C], etc.
@@ -156,7 +155,7 @@ class AmberMask(object):
             flag = 1
          elif p == ']':
             if n < 4 and infix[i-1] != '*':
-               raise MaskError('AmberMask: empty token in infix')
+               raise MaskError('empty token in infix')
             n = 1
          else:
             if flag == 1:
@@ -200,7 +199,7 @@ class AmberMask(object):
             pp = stack.pop()
             while pp != '(':
                if pp == '_':
-                  raise MaskError('AmberMask: Unbalanced parentheses in Mask.')
+                  raise MaskError('Unbalanced parentheses in Mask.')
                postfix += pp
                pp = stack.pop()
          # At this point both ()s are discarded
@@ -208,7 +207,7 @@ class AmberMask(object):
             pp = stack.pop()
             while pp != '_':
                if pp == '(':
-                  raise MaskError('AmberMask: Unbalanced parentheses in Mask.')
+                  raise MaskError('Unbalanced parentheses in Mask.')
                postfix += pp
                pp = stack.pop()
          elif self._isOperator(p):
@@ -224,7 +223,7 @@ class AmberMask(object):
                   P2 = self._priority(stack[len(stack)-1])
                stack.append(p)
          else:
-            raise MaskError('AmberMask: Unknown symbol %s' % p)
+            raise MaskError('Unknown symbol %s' % p)
          i += 1
       # end while i < len(infix):
       return postfix
@@ -255,7 +254,7 @@ class AmberMask(object):
                pmask2 = stack.pop()
                pmask = self._binop(p, pmask1, pmask2)
             except IndexError:
-               raise MaskError('AmberMask: Illegal binary operation')
+               raise MaskError('Illegal binary operation')
             stack.append(pmask)
          elif p in ['<','>']:
             if pos < len(postfix)-1 and postfix[pos+1] in [':','@']: buffer += p
@@ -269,17 +268,17 @@ class AmberMask(object):
                stack.append(pmask)
          elif p == '!':
             try: pmask1 = stack.pop()
-            except IndexError: raise MaskError('AmberMask: Illegal ! operation')
+            except IndexError: raise MaskError('Illegal ! operation')
             pmask = self._neg(pmask1)
             stack.append(pmask)
          else:
-            raise MaskError('AmberMask: Unknown symbol evaluating RPN: %s' % p)
+            raise MaskError('Unknown symbol evaluating RPN: %s' % p)
          pos += 1
       # end while i < len(postfix)
 
       pmask = stack.pop()
 
-      if stack: raise MaskError('AmberMask: There may be missing operands in the mask!')
+      if stack: raise MaskError('There may be missing operands in the mask!')
 
       if prnlev > 7: stderr.write('%d atoms selected by %s' % (sum(pmask), self.mask))
 
@@ -295,8 +294,7 @@ class AmberMask(object):
 
    def _selectDistd(self, pmask1, pmask2):
       """ Selects atoms based on a distance criteria """
-      raise MaskError("Distance mask is not implemented yet!")
-      pass
+      raise NotImplemented("Distance mask is not implemented yet!")
 
    #======================================================
 
@@ -361,7 +359,8 @@ class AmberMask(object):
          pmask.select_all()
       elif ptoken[0] in ['<','>']:
          return _mask(self.parm.ptr('natom')) # empty mask, this is ignored anyway
-      else: raise MaskError('AmberMask: Mask is missing : and @')
+      else:
+         raise MaskError('Mask is missing : and @')
       # end if ':' in ptoken:
 
       return pmask
@@ -391,7 +390,7 @@ class AmberMask(object):
             dash = 1
             buffer = ''
          if not (p.isdigit() or p in [',','-']):
-            raise MaskError('AmberMask: Unknown symbol in atom number parsing')
+            raise MaskError('Unknown symbol in atom number parsing [%s]' % p)
          pos += 1
 
    #======================================================
@@ -411,7 +410,7 @@ class AmberMask(object):
                self._atname_select(buffer, mask, key)
             buffer = ''
          if not (p.isalnum() or p in ",?*'+-"):
-            raise MaskError('AmberMask: Unrecognized symbol in atom name parsing %s' % p)
+            raise MaskError('Unrecognized symbol in atom name parsing [%s]' % p)
          pos += 1
 
    #======================================================
@@ -453,7 +452,7 @@ class AmberMask(object):
             dash = 1
             buffer = ''
          if not (p.isdigit() or p in [',','-']):
-            raise MaskError('AmberMask: Unknown symbol in residue number parsing')
+            raise MaskError('Unknown symbol in residue number parsing [%s]' % p)
          pos += 1
 
    #======================================================
@@ -473,7 +472,7 @@ class AmberMask(object):
                self._resname_select(buffer, mask)
             buffer = ''
          if not (p.isalnum() or p in ",?*'+-"):
-            raise MaskError('AmberMask: Unrecognized symbol in residue name parsing')
+            raise MaskError('Unknown symbol in residue name parsing [%s]' % p)
          pos += 1
       
 
@@ -488,7 +487,7 @@ class AmberMask(object):
    def _resnum_select(self, res1, res2, mask):
       """ Fills a _mask array between residues res1 and res2 """
       for i in range(self.parm.ptr('natom')):
-         res = self.parm.residue_container[i]
+         res = self.parm.atom_list[i].residue.idx
          if res >= res1 and res <= res2: mask[i] = 1
 
    #======================================================
@@ -505,12 +504,11 @@ class AmberMask(object):
    
    def _resname_select(self, resname, mask):
       """ Fills a _mask array with all residue names of a given name """
-      for i in range(self.parm.ptr('natom')):
-         if _nameMatch(resname, self.parm.parm_data['RESIDUE_LABEL'][
-                       self.parm.residue_container[i]-1]):
+      for i, atm in enumerate(self.parm.atom_list):
+         if _nameMatch(resname, atm.residue.resname):
             mask[i] = 1
          elif resname.isdigit():
-            mask[i] = int(int(resname) == self.parm.residue_container[i])
+            mask[i] = int(int(resname) == atm.residue.idx)
             
    #======================================================
    
@@ -518,7 +516,7 @@ class AmberMask(object):
       """ Does a binary operation on a pair of masks """
       if op == '&': return pmask1.And(pmask2)
       if op == '|': return pmask1.Or(pmask2)
-      raise MaskError('AmberMask: Unknown operator (%s)' % op)
+      raise MaskError('Unknown operator [%s]' % op)
 
    #======================================================
 
@@ -530,7 +528,7 @@ class AmberMask(object):
       if op in ['(']: return 2
       if op in ['_']: return 1
 
-      raise MaskError('AmberMask: Unknown operator (%s) in Mask ==%s==' % (op, self.mask))
+      raise MaskError('Unknown operator [%s] in Mask ==%s==' % (op, self.mask))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

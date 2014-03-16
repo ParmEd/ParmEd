@@ -51,18 +51,17 @@ class Atom(object):
 
    def angles(self):
       """ List of all angle partners that are NOT bond partners """
-      return sorted(list(self.angle_partners.difference(self.bond_partners)))
+      return sorted(list(self.angle_partners - self.bond_partners))
 
    def dihedrals(self):
       """ List of all dihedral partners that are NOT angle or bond partners """
-      bonds_and_angles = self.angle_partners.union(self.bond_partners)
-      return sorted(list(self.dihedral_partners.difference(bonds_and_angles)))
+      return sorted(list(self.dihedral_partners - self.angle_partners -
+                         self.bond_partners))
 
    def exclusions(self):
       " List of all exclusions not otherwise excluded by bonds/angles/torsions "
-      bnd_angl = self.angle_partners.union(self.bond_partners)
-      excl = self.dihedral_partners.union(bnd_angl)
-      return sorted(list(self.exclusion_partners.difference(excl)))
+      return sorted(list(self.exclusion_partners - self.dihedral_partners -
+                         self.angle_partners - self.bond_partners))
 
    #===================================================
 
@@ -242,7 +241,7 @@ class Bond(object):
    def __init__(self, atom1, atom2, bond_type):
       """ Bond constructor """
       # Make sure we're not bonding me to myself
-      if atom1 == atom2:
+      if atom1 is atom2:
          raise BondError('Cannot bond atom to itself!')
       # Order the atoms so the lowest atom # is first
       self.atom1 = atom1
@@ -309,7 +308,7 @@ class Angle(object):
    def __init__(self, atom1, atom2, atom3, angle_type):
       """ Angle constructor """
       # Make sure we're not angling me to myself
-      if atom1 == atom2 or atom1 == atom3 or atom2 == atom3:
+      if atom1 is atom2 or atom1 is atom3 or atom2 is atom3:
          raise BondError('Cannot angle atom to itself!')
       self.atom1 = atom1
       self.atom2 = atom2
@@ -387,7 +386,7 @@ class Dihedral(object):
       atmlist = [atom1, atom2, atom3, atom4]
       for i in range(len(atmlist)):
          for j in range(i+1, len(atmlist)):
-            if atmlist[i] == atmlist[j]:
+            if atmlist[i] is atmlist[j]:
                raise BondError('Cannot dihedral atom to itself!')
       # Set up instances
       self.atom1 = atom1
@@ -463,10 +462,10 @@ class Dihedral(object):
       """
       if isinstance(thing, Dihedral):
          # I'm comparing with another Dihedral here
-         return ( (self.atom1 == thing.atom1 and self.atom2 == thing.atom2 and
-                   self.atom3 == thing.atom3 and self.atom4 == thing.atom4) or
-                  (self.atom1 == thing.atom4 and self.atom2 == thing.atom3 and
-                   self.atom4 == thing.atom1) )
+         return ( (self.atom1 is thing.atom1 and self.atom2 is thing.atom2 and
+                   self.atom3 is thing.atom3 and self.atom4 is thing.atom4) or
+                  (self.atom1 is thing.atom4 and self.atom2 is thing.atom3 and
+                   self.atom4 is thing.atom1) )
       if isinstance(thing, list) or isinstance(thing, tuple):
          # Here, atoms are expected to index from 0 (Python standard) if we
          # are comparing with a list or tuple
@@ -536,7 +535,7 @@ class UreyBradley(object):
    def __init__(self, atom1, atom2, ub_type):
       """ Bond constructor """
       # Make sure we're not bonding me to myself
-      if atom1 == atom2:
+      if atom1 is atom2:
          raise BondError('Cannot angle atom to itself!')
       # Order the atoms so the lowest atom # is first
       self.atom1 = atom1
@@ -628,7 +627,7 @@ class Improper(object):
       atmlist = [atom1, atom2, atom3, atom4]
       for i in range(len(atmlist)):
          for j in range(i+1, len(atmlist)):
-            if atmlist[i] == atmlist[j]:
+            if atmlist[i] is atmlist[j]:
                raise BondError('Cannot improper atom to itself!')
       # Set up instances
       self.atom1 = atom1
@@ -642,10 +641,10 @@ class Improper(object):
 
    def write_info(self, parm, key, idx):
       """ Write the info to the topology file """
-      parm.parm_data[key][5*idx  ] = self.atom1.idx
-      parm.parm_data[key][5*idx+1] = self.atom2.idx
-      parm.parm_data[key][5*idx+2] = self.atom3.idx
-      parm.parm_data[key][5*idx+3] = self.atom4.idx
+      parm.parm_data[key][5*idx  ] = self.atom1.idx + 1
+      parm.parm_data[key][5*idx+1] = self.atom2.idx + 1
+      parm.parm_data[key][5*idx+2] = self.atom3.idx + 1
+      parm.parm_data[key][5*idx+3] = self.atom4.idx + 1
       parm.parm_data[key][5*idx+4] = self.improp_type.idx + 1
 
    #===================================================
@@ -741,7 +740,7 @@ class Cmap(object):
       atmlist = [atom1, atom2, atom3, atom4, atom5]
       for i in range(len(atmlist)):
          for j in range(i+1, len(atmlist)):
-            if atmlist[i] == atmlist[j]:
+            if atmlist[i] is atmlist[j]:
                raise BondError('Cannot cmap atom to itself!')
       # Set up instances
       self.atom1 = atom1
@@ -756,11 +755,11 @@ class Cmap(object):
 
    def write_info(self, parm, key, idx):
       """ Write the info to the topology file """
-      parm.parm_data[key][6*idx  ] = self.atom1.idx
-      parm.parm_data[key][6*idx+1] = self.atom2.idx
-      parm.parm_data[key][6*idx+2] = self.atom3.idx
-      parm.parm_data[key][6*idx+3] = self.atom4.idx
-      parm.parm_data[key][6*idx+4] = self.atom5.idx
+      parm.parm_data[key][6*idx  ] = self.atom1.idx + 1
+      parm.parm_data[key][6*idx+1] = self.atom2.idx + 1
+      parm.parm_data[key][6*idx+2] = self.atom3.idx + 1
+      parm.parm_data[key][6*idx+3] = self.atom4.idx + 1
+      parm.parm_data[key][6*idx+4] = self.atom5.idx + 1
       parm.parm_data[key][6*idx+5] = self.cmap_type.idx + 1
 
    #===================================================
@@ -792,12 +791,12 @@ class Cmap(object):
       if isinstance(thing, Cmap):
          # I'm comparing with another Improper here. Central atom must be the
          # same. Others can be in any order
-         return ( (self.atom1 == thing.atom1 and self.atom2 == thing.atom2 and
-                   self.atom3 == thing.atom3 and self.atom4 == thing.atom4 and
-                   self.atom5 == thing.atom5) or
-                  (self.atom1 == thing.atom5 and self.atom2 == thing.atom4 and
-                   self.atom3 == thing.atom3 and self.atom4 == thing.atom2 and
-                   self.atom5 == thing.atom1))
+         return ( (self.atom1 is thing.atom1 and self.atom2 is thing.atom2 and
+                   self.atom3 is thing.atom3 and self.atom4 is thing.atom4 and
+                   self.atom5 is thing.atom5) or
+                  (self.atom1 is thing.atom5 and self.atom2 is thing.atom4 and
+                   self.atom3 is thing.atom3 and self.atom4 is thing.atom2 and
+                   self.atom5 is thing.atom1))
       if isinstance(thing, list) or isinstance(thing, tuple):
          # Here, atoms are expected to index from 0 (Python standard) if we
          # are comparing with a list or tuple
@@ -851,16 +850,22 @@ class CmapType(object):
 class Residue(object):
    """ Residue class """
 
-   #===================================================
-
    def __init__(self, resname, idx):
       self.resname = resname
       self.idx = idx
+      self.atoms = []
 
-   #===================================================
+   def add_atom(self, atom):
+      atom.residue = self
+      self.atoms.append(atom)
 
-   def __contains__(self, atom):
-      return atom in self.atoms
+   # Implement some container methods over the list of atoms
+   def __contains__(self, thing):
+      """ True if an atom is present in this residue """
+      return thing in self.atoms
+
+   def __len__(self):
+      return len(self.atoms)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -870,9 +875,17 @@ class ResidueList(list):
    #===================================================
 
    def __init__(self, parm):
+      list.__init__(self, [Residue(parm.parm_data['RESIDUE_LABEL'][i], i+1)
+                    for i in range(parm.ptr('nres'))])
+      for i, val in enumerate(parm.parm_data['RESIDUE_POINTER']):
+         start = val - 1
+         try:
+            end = parm.parm_data['RESIDUE_POINTER'][i+1] - 1
+         except IndexError:
+            end = parm.parm_data['POINTERS'][NATOM]
+         for j in range(start, end):
+            self[i].add_atom(parm.atom_list[j])
       self.parm = parm
-      list.__init__(self, [Residue(self.parm.parm_data['RESIDUE_LABEL'][i], i+1)
-                    for i in range(self.parm.ptr('nres'))])
    
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1057,6 +1070,12 @@ class _TypeList(TrackedList):
    def write_to_parm(self):
       """ Writes the data here to the parm data """
       for item in self: item.write_info(self.parm)
+
+   #===================================================
+
+   def deindex(self):
+      """ Resets all of the type indexes to -1 """
+      for item in self: item.idx = -1
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

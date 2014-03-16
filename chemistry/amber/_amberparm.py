@@ -64,15 +64,10 @@ class AmberParm(AmberFormat):
       Initializes topology data structures, like the list of atoms, bonds, etc.,
       after the topology file has been read. The following methods are called:
       """
-
-      # Fill the residue container array
-      self._fill_res_container()
-
       # We need to handle RESIDUE_ICODE properly since it may have picked up
       # some extra values
       if 'RESIDUE_ICODE' in self.flag_list:
-         self.parm_data['RESIDUE_ICODE'] = \
-               self.parm_data['RESIDUE_ICODE'][:self.parm_data['POINTERS'][NRES]]
+         self._truncate_array('RESIDUE_ICODE', self.parm_data['POINTERS'][NRES])
 
       # instance variables other than those in AmberFormat
       self.pointers = {}       # list of all the pointers in the prmtop
@@ -172,7 +167,6 @@ class AmberParm(AmberFormat):
       if not self.valid: return other
 
       # Now fill the LJ and other data structures
-      other.residue_container = self.residue_container[:]
       for p in self.pointers: other.pointers[p] = self.pointers[p]
       for typ in self.LJ_types: other.LJ_types[typ] = self.LJ_types[typ]
       try:
@@ -245,9 +239,6 @@ class AmberParm(AmberFormat):
       self.atom_list = AtomList(self)
       ##### Next, load our residues #####
       self.residue_list = ResidueList(self)
-      for i in range(self.ptr('natom')):
-         residx = self.residue_container[i] - 1
-         self.atom_list[i].residue = self.residue_list[residx]
       ##### Next create our list of bonds #####
       self.bond_type_list = BondTypeList(self)
       self.bonds_inc_h, self.bonds_without_h = TrackedList(), TrackedList()
@@ -431,27 +422,14 @@ class AmberParm(AmberFormat):
          if atm.residue.idx == -1:
             self.parm_data['RESIDUE_LABEL'][num_res] = atm.residue.resname
             self.parm_data['RESIDUE_POINTER'][num_res] = i+1
-            atm.residue.idx = num_res
             num_res += 1
+            atm.residue.idx = num_res # index from 1
       self.parm_data['POINTERS'][NRES] = num_res
-      self.parm_data['RESIDUE_LABEL']=self.parm_data['RESIDUE_LABEL'][:num_res]
-      self.parm_data['RESIDUE_POINTER'] = self.parm_data['RESIDUE_POINTER'][
-                                                                      :num_res]
-      self._fill_res_container()
+      self._truncate_array('RESIDUE_LABEL', num_res)
+      self._truncate_array('RESIDUE_POINTER', num_res)
 
       # Adjust NMXRS (number of atoms in largest residue) in case that changed
-      max_atm = 0
-      for i in range(1,self.parm_data['POINTERS'][NRES]):
-         atm_in_res = self.parm_data['RESIDUE_POINTER'][i] \
-                    - self.parm_data['RESIDUE_POINTER'][i-1]
-         if atm_in_res > max_atm: max_atm = atm_in_res
-
-      # Check the last residue
-      max_atm = max(self.parm_data['POINTERS'][NATOM] -
-        self.parm_data['RESIDUE_POINTER'][self.parm_data['POINTERS'][NRES]-1]+1,
-        max_atm)
-      
-      self.parm_data['POINTERS'][NMXRS] = max_atm
+      self.parm_data['POINTERS'][NMXRS]=max([len(r) for r in self.residue_list])
 
       # Now write all of the bond arrays. We will loop through all of the bonds
       # to make sure that all of their atoms still exist (atm.idx > -1). At the
@@ -464,131 +442,118 @@ class AmberParm(AmberFormat):
       # which will be reduced in size if not every bond is actually added
       bond_num = 0
       bond_type_num = 0
-      self.parm_data['BONDS_INC_HYDROGEN'] = [0 for i in 
-                                              range(len(self.bonds_inc_h)*3)]
-      for i in range(len(self.bonds_inc_h)):
-         holder = self.bonds_inc_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx): continue
-         if holder.bond_type.idx == -1:
-            holder.bond_type.idx = bond_type_num
+      self.bond_type_list.deindex()
+      self.parm_data['BONDS_INC_HYDROGEN'] = _zeros(len(self.bonds_inc_h)*3)
+      for i, bnd in enumerate(self.bonds_inc_h):
+         if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
+         if bnd.bond_type.idx == -1:
+            bnd.bond_type.idx = bond_type_num
             bond_type_num += 1
-         holder.write_info(self, 'BONDS_INC_HYDROGEN', bond_num)
+         bnd.write_info(self, 'BONDS_INC_HYDROGEN', bond_num)
          bond_num += 1
       self.parm_data['POINTERS'][NBONH] = bond_num
-      self.parm_data['BONDS_INC_HYDROGEN'] = \
-               self.parm_data['BONDS_INC_HYDROGEN'][:3*bond_num]
+      self._truncate_array('BONDS_INC_HYDROGEN', 3*bond_num)
       # Now we know how many bonds with hydrogen we have. Note that bond_num is
       # +1 past the last index used, but that last index is -1 from total bond #
       # due to indexing from 0, so it's just right now. So is the bond_type
       # index, but that is applicable for the bonds_without_h as well.
       bond_num = 0
-      self.parm_data['BONDS_WITHOUT_HYDROGEN'] = \
-               [0 for i in range(len(self.bonds_without_h)*3)]
-      for i in range(len(self.bonds_without_h)):
-         holder = self.bonds_without_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx): continue
-         if holder.bond_type.idx == -1:
-            holder.bond_type.idx = bond_type_num
+      self.parm_data['BONDS_WITHOUT_HYDROGEN'] = _zeros(len(self.bonds_without_h)*3)
+      for i, bnd in enumerate(self.bonds_without_h):
+         if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
+         if bnd.bond_type.idx == -1:
+            bnd.bond_type.idx = bond_type_num
             bond_type_num += 1
-         holder.write_info(self, 'BONDS_WITHOUT_HYDROGEN', bond_num)
+         bnd.write_info(self, 'BONDS_WITHOUT_HYDROGEN', bond_num)
          bond_num += 1
       # Make sure BOND_FORCE_CONSTANT and BOND_EQUIL_VALUE arrays are big enough
-      self.parm_data['BOND_FORCE_CONSTANT'] = [0 for i in range(bond_type_num)]
-      self.parm_data['BOND_EQUIL_VALUE'] = [0 for i in range(bond_type_num)]
+      self.parm_data['BOND_FORCE_CONSTANT'] = _zeros(bond_type_num)
+      self.parm_data['BOND_EQUIL_VALUE'] = _zeros(bond_type_num)
       # Now we can write all of the bond types out
       self.bond_type_list.write_to_parm()
       # Now we know how many bonds without H we have and our # of bond types
       self.parm_data['POINTERS'][MBONA] = bond_num
       self.parm_data['POINTERS'][NBONA] = bond_num
       self.parm_data['POINTERS'][NUMBND] = bond_type_num
-      self.parm_data['BONDS_WITHOUT_HYDROGEN'] = \
-               self.parm_data['BONDS_WITHOUT_HYDROGEN'][:3*bond_num]
+      self._truncate_array('BONDS_WITHOUT_HYDROGEN', 3*bond_num)
 
       # Now do all of the angle arrays
       angle_num = 0
       angle_type_num = 0
+      self.angle_type_list.deindex()
       # Make sure we have enough ANGLES_INC_HYDROGEN
-      self.parm_data['ANGLES_INC_HYDROGEN'] = [0 
-                                       for i in range(len(self.angles_inc_h)*4)]
-      for i in range(len(self.angles_inc_h)):
-         holder = self.angles_inc_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx, holder.atom3.idx):
+      self.parm_data['ANGLES_INC_HYDROGEN'] = _zeros(len(self.angles_inc_h)*4)
+      for i, ang in enumerate(self.angles_inc_h):
+         if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx):
             continue
-         if holder.angle_type.idx == -1:
-            holder.angle_type.idx = angle_type_num
+         if ang.angle_type.idx == -1:
+            ang.angle_type.idx = angle_type_num
             angle_type_num += 1
-         holder.write_info(self, 'ANGLES_INC_HYDROGEN', angle_num)
+         ang.write_info(self, 'ANGLES_INC_HYDROGEN', angle_num)
          angle_num += 1
       self.parm_data['POINTERS'][NTHETH] = angle_num
-      self.parm_data['ANGLES_INC_HYDROGEN'] = \
-               self.parm_data['ANGLES_INC_HYDROGEN'][:4*angle_num]
+      self._truncate_array('ANGLES_INC_HYDROGEN', 4*angle_num)
       # Time for Angles without H
       angle_num = 0
       self.parm_data['ANGLES_WITHOUT_HYDROGEN'] = \
-               [0 for i in range(len(self.angles_without_h)*4)]
-      for i in range(len(self.angles_without_h)):
-         holder = self.angles_without_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx, holder.atom3.idx):
+                                          _zeros(len(self.angles_without_h)*4)
+      for i, ang in enumerate(self.angles_without_h):
+         if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx):
             continue
-         if holder.angle_type.idx == -1:
-            holder.angle_type.idx = angle_type_num
+         if ang.angle_type.idx == -1:
+            ang.angle_type.idx = angle_type_num
             angle_type_num += 1
-         holder.write_info(self, 'ANGLES_WITHOUT_HYDROGEN', angle_num)
+         ang.write_info(self, 'ANGLES_WITHOUT_HYDROGEN', angle_num)
          angle_num += 1
       # Make sure BOND_FORCE_CONSTANT and BOND_EQUIL_VALUE arrays are big enough
-      self.parm_data['ANGLE_FORCE_CONSTANT']=[0 for i in range(angle_type_num)]
-      self.parm_data['ANGLE_EQUIL_VALUE']=[0 for i in range(angle_type_num)]
+      self.parm_data['ANGLE_FORCE_CONSTANT'] = _zeros(angle_type_num)
+      self.parm_data['ANGLE_EQUIL_VALUE'] = _zeros(angle_type_num)
       # Write angle type info to parm
       self.angle_type_list.write_to_parm()
       self.parm_data['POINTERS'][NTHETA] = angle_num
       self.parm_data['POINTERS'][MTHETA] = angle_num
       self.parm_data['POINTERS'][NUMANG] = angle_type_num
-      self.parm_data['ANGLES_WITHOUT_HYDROGEN'] = \
-               self.parm_data['ANGLES_WITHOUT_HYDROGEN'][:4*angle_num]
+      self._truncate_array('ANGLES_WITHOUT_HYDROGEN', 4*angle_num)
 
       # Now do all of the dihedral arrays
       dihedral_num = 0
       dihedral_type_num = 0
-      self.parm_data['DIHEDRALS_INC_HYDROGEN'] = [0 for i in 
-                                             range(len(self.dihedrals_inc_h)*5)]
-      for i in range(len(self.dihedrals_inc_h)):
-         holder = self.dihedrals_inc_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx,
-                   holder.atom3.idx, holder.atom4.idx):
+      self.dihedral_type_list.deindex()
+      self.parm_data['DIHEDRALS_INC_HYDROGEN'] = \
+                                          _zeros(len(self.dihedrals_inc_h)*5)
+      for i, dih in enumerate(self.dihedrals_inc_h):
+         if -1 in (dih.atom1.idx, dih.atom2.idx, dih.atom3.idx, dih.atom4.idx):
             continue
-         if holder.dihed_type.idx == -1:
-            holder.dihed_type.idx = dihedral_type_num
+         if dih.dihed_type.idx == -1:
+            dih.dihed_type.idx = dihedral_type_num
             dihedral_type_num += 1
-         holder.write_info(self, 'DIHEDRALS_INC_HYDROGEN', dihedral_num)
+         dih.write_info(self, 'DIHEDRALS_INC_HYDROGEN', dihedral_num)
          dihedral_num += 1
       self.parm_data['POINTERS'][NPHIH] = dihedral_num
-      self.parm_data['DIHEDRALS_INC_HYDROGEN'] = \
-               self.parm_data['DIHEDRALS_INC_HYDROGEN'][:5*dihedral_num]
+      self._truncate_array('DIHEDRALS_INC_HYDROGEN', 5*dihedral_num)
       # Time for dihedrals without H
       dihedral_num = 0
       self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'] = \
-                  [0 for i in range(len(self.dihedrals_without_h)*5)]
-      for i in range(len(self.dihedrals_without_h)):
-         holder = self.dihedrals_without_h[i]
-         if -1 in (holder.atom1.idx, holder.atom2.idx,
-                   holder.atom3.idx, holder.atom4.idx):
+                                       _zeros(len(self.dihedrals_without_h)*5)
+      for i, dih in enumerate(self.dihedrals_without_h):
+         if -1 in (dih.atom1.idx, dih.atom2.idx,
+                   dih.atom3.idx, dih.atom4.idx):
             continue
-         if holder.dihed_type.idx == -1:
-            holder.dihed_type.idx = dihedral_type_num
+         if dih.dihed_type.idx == -1:
+            dih.dihed_type.idx = dihedral_type_num
             dihedral_type_num += 1
-         holder.write_info(self, 'DIHEDRALS_WITHOUT_HYDROGEN', dihedral_num)
+         dih.write_info(self, 'DIHEDRALS_WITHOUT_HYDROGEN', dihedral_num)
          dihedral_num += 1
       self.parm_data['POINTERS'][NPHIA] = dihedral_num
       self.parm_data['POINTERS'][MPHIA] = dihedral_num
       self.parm_data['POINTERS'][NPTRA] = dihedral_type_num
-      self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'] = \
-               self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'][:5*dihedral_num]
+      self._truncate_array('DIHEDRALS_WITHOUT_HYDROGEN', 5*dihedral_num)
 
       # Adjust lengths of the dihedral arrays to make sure they're long enough
       for key in ('DIHEDRAL_FORCE_CONSTANT', 'DIHEDRAL_PERIODICITY',
                   'DIHEDRAL_PHASE', 'SCEE_SCALE_FACTOR', 'SCNB_SCALE_FACTOR'):
          if not key in self.parm_data.keys(): continue
-         self.parm_data[key] = [0 for i in range(dihedral_type_num)]
+         self.parm_data[key] = _zeros(dihedral_type_num)
       
       self.dihedral_type_list.write_to_parm()
       
@@ -622,21 +587,6 @@ class AmberParm(AmberFormat):
       if topology_changed and hasattr(self, '_topology'):
          del self._topology
       return topology_changed
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-   def _fill_res_container(self):
-      """ Refills the residue_container array if we changed anything """
-      self.residue_container = []
-      for i in range(self.parm_data['POINTERS'][NRES]-1):
-         curres = self.parm_data['RESIDUE_POINTER'][i] - 1
-         nextres = self.parm_data['RESIDUE_POINTER'][i+1] - 1
-         for j in range(curres, nextres):
-            self.residue_container.append(i+1)
-      for i in range(self.parm_data['RESIDUE_POINTER'][
-                     self.parm_data['POINTERS'][NRES]-1]-1,
-                     self.parm_data['POINTERS'][NATOM]):
-         self.residue_container.append(self.parm_data['POINTERS'][NRES])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -946,6 +896,12 @@ class AmberParm(AmberFormat):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+   def _truncate_array(self, section, length):
+      """ Truncates an array to get the given length """
+      self.parm_data[section] = self.parm_data[section][:length]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
    def ToMolecule(self):
       """ Translates an amber system into a molecule format """
       from chemistry.molecule import Molecule
@@ -1202,3 +1158,9 @@ def _set_owner(parm, owner_array, atm, mol_id):
       elif partner.marked != mol_id:
          raise MoleculeError('Atom %d in multiple molecules' % 
                              partner.starting_index)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _zeros(length):
+   """ Returns an array of zeros of the given length """
+   return [0 for i in xrange(length)]

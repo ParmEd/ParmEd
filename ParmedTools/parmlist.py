@@ -5,7 +5,7 @@ loaded.
 """
 
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.amber.readparm import ChamberParm
+from chemistry.amber.readparm import ChamberParm, AmoebaParm
 try:
    from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
    _HAS_OPENMM = True
@@ -48,6 +48,8 @@ class ParmList(object):
          # to the list
          if 'CTITLE' in parm.flag_list:
             parm = parm.view(ChamberParm)
+         elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
+            parm = parm.view(AmoebaParm)
          else:
             parm = parm.view(AmberParm)
       # Otherwise, add in the new parm's name

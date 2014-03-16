@@ -45,13 +45,15 @@ def LoadParm(parmname, rst7name=None):
    """
    Loads a topology file using the correct class.
 
-   @param parmname The name of the topology file to load
-   @param rst7name The (optional) name of the restart file to load
+   Parameters:
+      parmname (str): The name of the topology file to load
+      rst7name (str): The (optional) name of the restart file to load
 
-   @returns AmberParm or ChamberParm instance, depending on whether it is an
-   Amber topology (i.e., created with LEaP) or a Chamber topology (i.e., created
-   with chamber), respectively. If the restart file is not None, it will load
-   the restart file into the parameter file
+   Returns:
+      AmberParm or ChamberParm instance, depending on whether it is an Amber
+      topology (i.e., created with LEaP) or a Chamber topology (i.e., created
+      with chamber), respectively. If the restart file is not None, it will load
+      the restart file into the parameter file
    """
    parm = AmberFormat(parmname)
    if 'CTITLE' in parm.flag_list:

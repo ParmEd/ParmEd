@@ -41,6 +41,13 @@ class Atom(object):
       self.tortor_partners = set()
       self.exclusion_partners = set()
       self.idx = -1
+      self.load_from_parm()
+
+   #===================================================
+
+   def load_from_parm(self):
+      parm = self.parm
+      si = self.starting_index
       self.atomic_number = parm.parm_data['AMOEBA_ATOMIC_NUMBER'][si]
       self.atname = parm.parm_data['ATOM_NAME'][si]
       self.mass = parm.parm_data['MASS'][si]
@@ -49,7 +56,7 @@ class Atom(object):
       self.typeidx = parm.parm_data['AMOEBA_ATOM_TYPE_INDEX'][si]
       self.classidx = parm.parm_data['AMOEBA_ATOM_CLASS_INDEX'][si]
       self.nb_idx = parm.parm_data['AMOEBA_VDW_ATOM_TYPES_LIST'][si]
-      self.vdw_par = parm.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST'][si]
+      self._vdw_par = parm.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST'][si]
       self.vdw_par_wt=parm.parm_data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'][si]
       self.multipoles = parm.parm_data['AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'] \
                                              [10*si:10*si+10]
@@ -76,6 +83,13 @@ class Atom(object):
 
    #===================================================
    
+   def __repr__(self):
+      """ For debugging purposes -- print out where I am """
+      return '<Atom %d [%s]; In residue %d %s>' % (self.starting_index + 1,
+                  self.atname, self.residue.idx, self.residue.resname)
+
+   #===================================================
+
    def add_data(self):
       """ Writes this atom's data to the TinkerParm object """
       # Determine how many excluded atoms we have. The only ones that count are
@@ -94,15 +108,17 @@ class Atom(object):
       # Make sure we are indexing from 0
       p = self.parm
       p.parm_data['ATOM_NAME'][self.idx] = self.atname[:4]
+      p.parm_data['NUMBER_EXCLUDED_ATOMS'][self.idx] = numex
       p.parm_data['CHARGE'][self.idx] = 0.0
       p.parm_data['MASS'][self.idx] = self.mass
+      p.parm_data['TREE_CHAIN_CLASSIFICATION'][self.idx] = self.tree
+      p.parm_data['ATOM_TYPE_INDEX'][self.idx] = 1 # hard-coded
       p.parm_data['AMBER_ATOM_TYPE'][self.idx] = self.attype
       p.parm_data['AMOEBA_ATOMIC_NUMBER'][self.idx] = self.atomic_number
-      p.parm_data['TREE_CHAIN_CLASSIFICATION'][self.idx] = self.tree
       p.parm_data['AMOEBA_ATOM_TYPE_INDEX'][self.idx] = self.typeidx
       p.parm_data['AMOEBA_ATOM_CLASS_INDEX'][self.idx] = self.classidx
       p.parm_data['AMOEBA_VDW_ATOM_TYPES_LIST'][self.idx] = self.nb_idx
-      p.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST'][self.idx] = self.vdw_par
+      p.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST'][self.idx] = self.vdw_par.idx+1
       p.parm_data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'][self.idx] = \
                                                                self.vdw_par_wt
       key = 'AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'
@@ -110,6 +126,15 @@ class Atom(object):
          idx = 10 * self.idx + i
          p.parm_data[key][idx] = self.multipoles[i]
       p.parm_data['AMOEBA_POLARIZABILITY_LIST'][self.idx] = self.polar
+
+   #===================================================
+
+   def reset_topology(self):
+      """ Resets all of the bonded partners and such """
+      self.bond_partners = set()
+      self.angle_partners = set()
+      self.dihedral_partners = set()
+      self.tortor_partners = set()
 
    #===================================================
    
@@ -158,6 +183,7 @@ class Atom(object):
       not naturally accounted for by the bond, angle, torsion, and
       coupled-torsion parameters
       """
+      self.determine_exclusions_from_bonds()
       excset = set()
       exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
       exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
@@ -167,10 +193,8 @@ class Atom(object):
          idx = exclist[first_excl+i] - 1
          excset.add(self.parm.atom_list[idx])
       # Now subtract off all of the bonds, angles, torsions, and tortors
-      excset = excset.difference(self.bond_partners)
-      excset = excset.difference(self.angle_partners)
-      excset = excset.difference(self.dihedral_partners)
-      excset = excset.difference(self.tortor_partners)
+      excset = (excset - self.bond_partners - self.angle_partners -
+                self.dihedral_partners - self.tortor_partners)
       for atm in excset:
          self.exclude(atm)
 
@@ -181,7 +205,28 @@ class Atom(object):
       Add all atoms that are connected by 2, 3, and 4 bonds to the relevant
       exclusion list
       """
+      for a1 in self.bonds():
+         # Now loop through every bond of every connected atom, and make sure it
+         # is part of the angle partners
+         for a2 in a1.bonds():
+            # All of these atoms are angle partners
+            if a2 is not self:
+               self.angle_partners.add(a2)
+            for a3 in a2.bonds():
+               # All of these atoms are dihedral partners
+               if a3 is not self:
+                  self.dihedral_partners.add(a3)
+               for a4 in a3.bonds():
+                  # All of these atoms are tortor partners
+                  if a4 is not self:
+                     self.tortor_partners.add(a4)
    
+   #===================================================
+
+   def register_vdw_parent(self, atom_list):
+      """ Sets the vdw_par from the atom list based on the parent index """
+      self.vdw_par = atom_list[self._vdw_par-1]
+
    #===================================================
    
    # Iterators
@@ -190,23 +235,19 @@ class Atom(object):
       return sorted(list(self.bond_partners))
 
    def angles(self):
-      b = self.bond_partners
-      return sorted(list(self.angle_partners.difference(b)))
+      return sorted(list(self.angle_partners - self.bond_partners))
 
    def dihedrals(self):
-      b_and_a = self.angle_partners.union(self.bond_partners)
-      return sorted(list(self.dihedral_partners.difference(b_and_a)))
+      return sorted(list(self.dihedral_partners - self.angle_partners -
+                         self.bond_partners))
 
    def tortors(self):
-      b_and_a = self.angle_partners.union(self.bond_partners)
-      ba_and_d = self.dihedral_partners.union(b_and_a)
-      return sorted(list(self.tortor_partners.difference(ba_and_d)))
+      return sorted(list(self.tortor_partners - self.dihedral_partners -
+                         self.angle_partners - self.bond_partners))
 
    def exclusions(self):
-      b_and_a = self.angle_partners.union(self.bond_partners)
-      ba_and_d = self.dihedral_partners.union(b_and_a)
-      bad_and_tt = self.tortor_partners.union(ba_and_d)
-      return sorted(list(self.exclusion_partners.difference(bad_and_tt)))
+      return sorted(list(self.exclusion_partners - self.tortor_partners -
+             self.dihedral_partners - self.angle_partners - self.bond_partners))
 
    #===================================================
 
@@ -217,10 +258,10 @@ class Atom(object):
       return not Atom.__eq__(self, other)
 
    def __gt__(self, other):
-      return self.idx > other.idx
+      return self.starting_index > other.starting_index
 
    def __lt__(self, other):
-      return self.idx < other.idx
+      return self.starting_index < other.starting_index
 
    def __ge__(self, other):
       return not Atom.__lt__(self, other)
@@ -243,6 +284,11 @@ class AtomList(list):
          list.__init__(self, [0 for i in range(natom)])
          for i, atm in enumerate(fill_from): self[i] = atm
       self.changed = False
+      # Register the vdW parent atom here, since we have to make sure that every
+      # atom exists before we try to assign the parent atoms (since we can't be
+      # assured that the necessary atom will already exist if we assign this at
+      # list construction time)
+      for atm in self: atm.register_vdw_parent(self)
 
    #===================================================
 
@@ -288,8 +334,14 @@ class AtomList(list):
       self.parm.parm_data['JOIN_ARRAY'] = zeros[:]
       self.parm.parm_data['TREE_CHAIN_CLASSIFICATION'] = zeros[:]
       self.parm.parm_data['IROTAT'] = zeros[:]
-      self.parm.parm_data['RADII'] = zeros[:]
-      self.parm.parm_data['SCREEN'] = zeros[:]
+      # Amoeba sections now
+      self.parm.parm_data['AMEOBA_ATOM_TYPE_INDEX'] = zeros[:]
+      self.parm.parm_data['AMOEBA_ATOM_CLASS_INDEX'] = zeros[:]
+      self.parm.parm_data['AMOEBA_VDW_ATOM_TYPES_LIST'] = zeros[:]
+      self.parm.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST'] = zeros[:]
+      self.parm.parm_data['AMOEBA_POLARIZABILITY_LIST'] = zeros[:]
+      self.parm.parm_data['AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'] = zeros * 10
+      self.parm.parm_data['AMOEBA_POLARIZABILITY_NUM_LIST'] = [len(self)]
       self._index_us()
       self._determine_exclusions()
       for atm in self: 
@@ -304,28 +356,8 @@ class AtomList(list):
       the topology file, since it's expensive
       """
       self.parm.parm_data['EXCLUDED_ATOMS_LIST'] = []
-      # We have to do something different for extra points. See the top of
-      # extra_pts.f in the sander src/ directory. Effectively, the EP is
-      # excluded from every atom that the atom it's attached to is excluded
-      # from. So here we go through and exclude every extra point from every
-      # other atom my bonded pair is excluded from:
-      for atm in self:
-         if not atm.attype[:2] in ['EP', 'LP']: continue
-         partner = atm.bonds()[0]
-         # Now add all bond partners
-         for patm in partner.bonds():
-            # Don't add myself
-            if patm is atm: continue
-            atm.exclude(patm)
-         # Now add all angle partners
-         for patm in partner.angles(): atm.exclude(patm)
-         # Now add all dihedral partners
-         for patm in partner.dihedrals(): atm.exclude(patm)
-         # Now add all other arbitrary exclusions
-         for patm in partner.exclusions():
-            if patm is atm: continue
-            atm.exclude(patm)
-
+      # The Amoeba force field does not have lone pairs. No need to determine EP
+      # exclusions here like we did in topologyobjects.py
       for atm in self:
          vals_to_add = []
          for member in atm.bonds():
@@ -334,12 +366,14 @@ class AtomList(list):
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
          for member in atm.dihedrals():
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-         # Enable additional (arbitrary) exclusions
+         for member in atm.tortors():
+            if member.idx > atm.idx: vals_to_add.append(member.idx+1)
          for member in atm.exclusions():
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
+         # Nothing to do? Return
+         if not vals_to_add:
+            continue
          vals_to_add.sort()
-         # See comment above about numex = 0 --> numex = 1
-         if not vals_to_add: vals_to_add = [0]
          self.parm.parm_data['EXCLUDED_ATOMS_LIST'].extend(vals_to_add)
 
    #===================================================
@@ -366,8 +400,9 @@ class AtomList(list):
 class Bond(_Bond):
    """ No real differences from the standard Bond class """
 
-   def write_info(self, parm, key, idx):
+   def write_info(self, parm, idx):
       """ Writes the bond info to the topology file. idx starts at 0 """
+      key = 'AMOEBA_REGULAR_BOND_LIST'
       # Atom indexes are not multiplied by 3 here.
       parm.parm_data[key][3*idx  ] = self.atom1.idx + 1
       parm.parm_data[key][3*idx+1] = self.atom2.idx + 1
@@ -407,6 +442,11 @@ class BondTypeList(_TypeList):
       klist = self.parm.parm_data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT']
       eqlist = self.parm.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE']
       list.__init__(self, [BondType(k, eq, -1) for k, eq in zip(klist, eqlist)])
+
+   def write_to_parm(self):
+      self.parm.parm_data['AMOEBA_REGULAR_BOND_FTAB_DEGREE'][0] = self.degree
+      self.parm.parm_data['AMOEBA_REGULAR_BOND_FTAB_COEFFS'] = self.coeffs[:]
+      super(BondTypeList, self).write_to_parm()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -448,13 +488,25 @@ class UreyBradleyTypeList(_TypeList):
       list.__init__(self, [UreyBradleyType(k, eq, -1)
                            for k, eq in zip(klist, eqlist)])
 
+   def write_to_parm(self):
+      self.parm.parm_data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][0] = \
+                           self.degree
+      self.parm.parm_data['AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS'] = \
+                           self.coeffs[:]
+      super(UreyBradleyTypeList, self).write_to_parm()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Angle(_Angle):
    """ A valence angle term """
 
    def write_info(self, parm, idx):
-      _Angle.write_info(self, parm, 'AMOEBA_REGULAR_ANGLE_LIST', idx)
+      key = 'AMOEBA_REGULAR_ANGLE_LIST'
+      # Atom indexes are not multiplied by 3 here.
+      parm.parm_data[key][4*idx  ] = self.atom1.idx + 1
+      parm.parm_data[key][4*idx+1] = self.atom2.idx + 1
+      parm.parm_data[key][4*idx+2] = self.atom3.idx + 1
+      parm.parm_data[key][4*idx+3] = self.angle_type.idx + 1
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -485,6 +537,11 @@ class AngleTypeList(_TypeList):
       eqlist = self.parm.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE']
       list.__init__(self, [AngleType(k, eq, -1)
                            for k, eq in zip(klist, eqlist)])
+
+   def write_to_parm(self):
+      self.parm.parm_data['AMOEBA_REGULAR_ANGLE_FTAB_DEGREE'][0] = self.degree
+      self.parm.parm_data['AMOEBA_REGULAR_ANGLE_FTAB_COEFFS'] = self.coeffs[:]
+      super(AngleTypeList, self).write_to_parm()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -521,7 +578,7 @@ class TrigonalAngle(_FourAtomTerm):
       # If unused, skip this parameter
       if idx == -1: return
       key = 'AMOEBA_TRIGONAL_ANGLE_LIST'
-      _FourAtomTerm.write_info(parm, key, idx)
+      _FourAtomTerm.write_info(self, parm, key, idx)
       parm.parm_data[key][5*idx+4] = self.trigang_type.idx + 1
 
    def __eq__(self, other):
@@ -532,6 +589,13 @@ class TrigonalAngle(_FourAtomTerm):
           self.atom3 is other.atom1 and self.atom4 is other.atom4):
          return self.trigang_type == other.trigang_type
       return False
+
+   def __contains__(self, thing):
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom2 in thing and self.atom4 in thing))
+      return super(TrigonalAngle, self).__contains__(thing)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -562,6 +626,11 @@ class TrigonalAngleTypeList(_TypeList):
       list.__init__(self, [TrigonalAngleType(k, eq, -1)
                            for k, eq in zip(klist, eqlist)])
 
+   def write_to_parm(self):
+      self.parm.parm_data['AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE'][0] = self.degree
+      self.parm.parm_data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'] = self.coeffs[:]
+      super(TrigonalAngleTypeList, self).write_to_parm()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class OutOfPlaneBend(_FourAtomTerm):
@@ -575,7 +644,7 @@ class OutOfPlaneBend(_FourAtomTerm):
       # If unused, skip this parameter
       if idx == -1: return
       key = 'AMOEBA_OPBEND_ANGLE_LIST'
-      _FourAtomTerm.write_info(parm, key, idx)
+      _FourAtomTerm.write_info(self, parm, key, idx)
       parm.parm_data[key][5*idx+4] = self.oopbend_type.idx + 1
 
    def __eq__(self, other):
@@ -586,6 +655,13 @@ class OutOfPlaneBend(_FourAtomTerm):
           self.atom3 is other.atom1 and self.atom4 is other.atom4):
          return self.trigang_type == other.trigang_type
       return False
+
+   def __contains__(self, thing):
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom2 in thing and self.atom4 in thing))
+      return super(OutOfPlaneBend, self).__contains__(thing)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -615,6 +691,11 @@ class OutOfPlaneBendTypeList(_TypeList):
       klist = self.parm.parm_data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT']
       list.__init__(self, [OutOfPlaneBendType(k, -1) for k in klist])
 
+   def write_to_parm(self):
+      self.parm.parm_data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'][0] = self.degree
+      self.parm.parm_data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'] = self.coeffs[:]
+      super(OutOfPlaneBendTypeList, self).write_to_parm()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Dihedral(_FourAtomTerm):
@@ -629,7 +710,7 @@ class Dihedral(_FourAtomTerm):
       # If unused, skip this parameter
       if idx == -1: return
       key = 'AMOEBA_TORSION_LIST'
-      _FourAtomTerm.write_info(parm, key, idx)
+      _FourAtomTerm.write_info(self, parm, key, idx)
       parm.parm_data[key][5*idx+4] = self.dihedral_type.idx + 1
 
    def __eq__(self, other):
@@ -648,6 +729,13 @@ class Dihedral(_FourAtomTerm):
       self.atom2.dihedral_to(self.atom3)
       self.atom2.dihedral_to(self.atom4)
       self.atom3.dihedral_to(self.atom4)
+
+   def __contains__(self, thing):
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom3 in thing and self.atom4 in thing))
+      return super(Dihedral, self).__contains__(thing)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -698,14 +786,19 @@ class PiTorsion(object):
       if idx == -1: return
       key = 'AMOEBA_PI_TORSION_LIST'
       parm.parm_data[key][7*idx  ] = self.atom1.idx + 1
-      parm.parm_data[key][7*idx+1] = self.atom1.idx + 1
-      parm.parm_data[key][7*idx+2] = self.atom1.idx + 1
-      parm.parm_data[key][7*idx+3] = self.atom1.idx + 1
-      parm.parm_data[key][7*idx+4] = self.atom1.idx + 1
-      parm.parm_data[key][7*idx+5] = self.atom1.idx + 1
+      parm.parm_data[key][7*idx+1] = self.atom2.idx + 1
+      parm.parm_data[key][7*idx+2] = self.atom3.idx + 1
+      parm.parm_data[key][7*idx+3] = self.atom4.idx + 1
+      parm.parm_data[key][7*idx+4] = self.atom5.idx + 1
+      parm.parm_data[key][7*idx+5] = self.atom6.idx + 1
       parm.parm_data[key][7*idx+6] = self.pitor_type.idx + 1
 
    def __contains__(self, thing):
+      if isinstance(thing, Bond):
+         return ((self.atom2 in thing and self.atom3 in thing) or
+                 (self.atom3 in thing and self.atom4 in thing) or
+                 (self.atom4 in thing and self.atom5 in thing) or
+                 (self.atom4 in thing and self.atom6 in thing))
       return (thing is self.atom1 or thing is self.atom2 or thing is self.atom3
            or thing is self.atom4 or thing is self.atom5 or thing is self.atom6)
 
@@ -749,6 +842,9 @@ class StretchBend(object):
       parm.parm_data[key][4*idx+3] = self.strbnd_type.idx + 1
 
    def __contains__(self, thing):
+      if isinstance(thing, Bond):
+         return ((self.atom1 in thing and self.atom2 in thing) or
+                 (self.atom2 in thing and self.atom3 in thing))
       return thing is self.atom1 or thing is self.atom2 or thing is self.atom3
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -811,6 +907,14 @@ class TorsionTorsion(_Cmap):
       self.atom3.tortor_to(self.atom4)
       self.atom3.tortor_to(self.atom5)
       self.atom4.tortor_to(self.atom5)
+
+   @property
+   def tortor_type(self):
+      return self.cmap_type
+
+   @tortor_type.setter
+   def tortor_type(self, thing):
+      self.cmap_type = thing
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -897,38 +1001,34 @@ class TorsionTorsionType(object):
       self.d2fda1da2 = _TorTorTable(ang1, ang2, d2fda1da2)
       self.idx = idx
 
-   def write_info(self, parm):
+   def write_info(self, parm, after):
       if self.idx == -1: return
       # We need to get rid of the existing sections in the prmtop and overwrite
       # it with the data here
       i = self.idx + 1
       prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d'
 
-      # Get rid of the existing flags
-      parm.deleteFlag((prefix + '_DIMS') % i)
-      parm.deleteFlag((prefix + '_ANGLE1') % i)
-      parm.deleteFlag((prefix + '_ANGLE1') % i)
-      parm.deleteFlag((prefix + '_FUNC') % i)
-      parm.deleteFlag((prefix + '_DFUNC_DANGLE1') % i)
-      parm.deleteFlag((prefix + '_DFUNC_DANGLE2') % i)
-      parm.deleteFlag((prefix + '_D2FUNC_DANGLE1_DANGLE2') % i)
-
       # Add these flags back with the correct data
       tblcmnt = ['dimension = (%d,%d)' % (self.dims)]
-      parm.addFlag((prefix + '_DIMS') % i, '(2I8)', data=list(self.dims),
-            comments=['dimension = (2)'])
-      parm.addFlag((prefix + '_ANGLE1') % i, '(5E16.8)', data=self.ang1[:],
-            comments=['dimension = (%d)' % self.dims[0]])
-      parm.addFlag((prefix + '_ANGLE2') % i, '(5E16.8)', data=self.ang2[:],
-            comments=['dimension = (%d)' % self.dims[0]])
-      parm.addFlag((prefix + '_FUNC') % i, '(5E16.8)', data=self.f.data[:],
-             comments=tblcmnt)
-      parm.addFlag((prefix + '_DFUNC_DANGLE1') % i, '(5E16.8)',
-            data=self.dfda1.data[:], comments=tblcmnt)
-      parm.addFlag((prefix + '_DFUNC_DANGLE2') % i, '(5E16.8)',
-            data=self.dfda2.data[:], comments=tblcmnt)
-      parm.addFlag((prefix + '_D2FUNC_DANGLE1_DANGLE2') % i, '(5E16.8)',
-            data=self.d2fda1da2.data[:], comments=tblcmnt)
+      parm.addFlag((prefix + '_DIMS') % i, '2I8', data=list(self.dims),
+            comments=['dimension = (2)'], after=after)
+      parm.addFlag((prefix + '_ANGLE1') % i, '5E16.8', data=self.ang1[:],
+            comments=['dimension = (%d)' % self.dims[0]],
+            after=(prefix + '_DIMS') % i)
+      parm.addFlag((prefix + '_ANGLE2') % i, '5E16.8', data=self.ang2[:],
+            comments=['dimension = (%d)' % self.dims[0]],
+            after=(prefix + '_ANGLE1') % i)
+      parm.addFlag((prefix + '_FUNC') % i, '5E16.8', data=self.f.data[:],
+             comments=tblcmnt, after=(prefix + '_ANGLE2') % i)
+      parm.addFlag((prefix + '_DFUNC_DANGLE1') % i, '5E16.8',
+            data=self.dfda1.data[:], comments=tblcmnt,
+            after=(prefix + '_FUNC') % i)
+      parm.addFlag((prefix + '_DFUNC_DANGLE2') % i, '5E16.8',
+            data=self.dfda2.data[:], comments=tblcmnt,
+            after=(prefix + '_DFUNC_DANGLE1') % i)
+      parm.addFlag((prefix + '_D2FUNC_DANGLE1_DANGLE2') % i, '5E16.8',
+            data=self.d2fda1da2.data[:], comments=tblcmnt,
+            after=(prefix + '_DFUNC_DANGLE2') % i)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -949,6 +1049,13 @@ class TorsionTorsionTypeList(_TypeList):
          self.append(TorsionTorsionType(dims, ang1, ang2, f, dfda1, dfda2,
                                         d2fda1da2, -1))
 
+   def write_to_parm(self):
+      after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
+      for i, typ in enumerate(self):
+         typ.write_info(self.parm, after)
+         after = ('AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_D2FUNC_DANGLE1_'
+                  'DANGLE2' % (i+1))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChiralFrame(object):
@@ -962,7 +1069,7 @@ class ChiralFrame(object):
       if idx == -1: return
       key = 'AMOEBA_CHIRAL_FRAME_LIST'
       parm.parm_data[key][3*idx  ] = self.atom1.idx + 1
-      parm.parm_data[key][3*idx+1] = self.atom1.idx + 1
+      parm.parm_data[key][3*idx+1] = self.atom2.idx + 1
       parm.parm_data[key][3*idx+2] = self.chirality # 1 or -1
 
    def __contains__(self, thing):
@@ -987,6 +1094,42 @@ class MultipoleFrame(object):
       parm.parm_data[key][5*idx+2] = self.vectail
       parm.parm_data[key][5*idx+3] = self.vechead
       parm.parm_data[key][5*idx+4] = self.nvec
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class ExclusionAssignment(object):
+   
+   def __init__(self, atom1, atom2, weight):
+      self.atom1 = atom1
+      self.atom2 = atom2
+      self.weight = weight
+
+   def write_info(self, parm, idx):
+      if idx == -1: return
+      data = parm.parm_data['AMOEBA_ADJUST_LIST']
+      data[3*idx  ] = self.atom1.idx + 1
+      data[3*idx+1] = self.atom2.idx + 1
+      data[3*idx+2] = self.weight
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class ExclusionAssignmentWeights(object):
+   
+   def __init__(self, parm):
+      self.vdw = parm.parm_data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'][:]
+      self.mpole = parm.parm_data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'][:]
+      self.direct = parm.parm_data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'][:]
+      self.polar = parm.parm_data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'][:]
+      self.mutual = parm.parm_data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST'][:]
+      self.parm = parm
+
+   def write_to_parm(self):
+      data = self.parm.parm_data
+      data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'] = self.vdw[:]
+      data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'] = self.mpole[:]
+      data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'] = self.direct[:]
+      data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'] = self.polar[:]
+      data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST'] = self.mutual[:]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

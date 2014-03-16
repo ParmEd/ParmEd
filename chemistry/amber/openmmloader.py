@@ -104,7 +104,7 @@ class OpenMMAmberParm(AmberParm):
       chain = self._topology.addChain()
       last_residue = None
       for i, atm in enumerate(self.atom_list):
-         resnum = self.residue_container[i] # residue_container indexes from 1
+         resnum = atm.residue.idx
          if last_residue != resnum:
             last_residue = resnum
             resname = atm.residue.resname

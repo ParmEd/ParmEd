@@ -841,26 +841,13 @@ class printdetails(Action):
       retstr += "%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" % ('ATOM',
                 'RES','RESNAME','NAME','TYPE','LJ Radius','LJ Depth','Mass',
                 'Charge','GB Radius','GB Screen')
-      for i in range(self.parm.ptr('natom')):
+      for i, atm in enumerate(self.parm.atom_list):
          if selection[i] == 1:
-            if not 'RADII' in self.parm.parm_data:
-               radii = 0.0
-            else:
-               radii = self.parm.parm_data['RADII'][i]
-            if not 'SCREEN' in self.parm.parm_data:
-               screen = 0.0
-            else:
-               screen = self.parm.parm_data['SCREEN'][i]
             retstr += "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"%(
-              i+1, self.parm.residue_container[i],
-              self.parm.parm_data['RESIDUE_LABEL'][
-                                             self.parm.residue_container[i]-1],
-              self.parm.parm_data['ATOM_NAME'][i], 
-              self.parm.parm_data['AMBER_ATOM_TYPE'][i],
-              self.parm.LJ_radius[self.parm.parm_data['ATOM_TYPE_INDEX'][i]-1],
-              self.parm.LJ_depth[self.parm.parm_data['ATOM_TYPE_INDEX'][i]-1],
-              self.parm.parm_data['MASS'][i], self.parm.parm_data['CHARGE'][i],
-              radii, screen)
+                       i+1, atm.residue.idx, atm.residue.resname, atm.atname,
+                       atm.attype, self.parm.LJ_radius[atm.nb_idx-1], 
+                       self.parm.LJ_depth[atm.nb_idx-1], atm.mass, atm.charge,
+                       atm.radii, atm.screen)
       return retstr
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1047,9 +1034,9 @@ class changeprotstate(Action):
       sel = self.mask.Selection()
       if sum(sel) == 0:
          return "No residues selected for state change"
-      res = self.parm.residue_container[sel.index(1)]
-      return 'Changing protonation state of residue %d (%s) to %d' % (res,
-         self.parm.parm_data['RESIDUE_LABEL'][res-1], self.state)
+      res = self.atom_list[self.index(1)].residue
+      return 'Changing protonation state of residue %d (%s) to %d' % (res.idx,
+                           res.resname, self.state)
    
    @staticmethod
    def _add_ash_glh(residues):
@@ -1087,8 +1074,9 @@ class changeprotstate(Action):
       sel = self.mask.Selection()
       # If we didn't select any residues, just return
       if sum(sel) == 0: return
-      resnum = self.parm.residue_container[sel.index(1)]
-      resname = self.parm.parm_data['RESIDUE_LABEL'][resnum-1]
+      res = self.parm.atom_list[sel.index(1)].residue
+      resnum = res.idx
+      resname = res.resname
       # Get the charges from cpin_data. The first 2 elements are energy and 
       # proton count so the charges are chgs[2:]
       if not resname in residues.titratable_residues:

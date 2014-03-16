@@ -24,7 +24,7 @@ from __future__ import division
 
 from chemistry.amber.topologyobjects import (TrackedList, UreyBradley, Improper,
             Cmap, UreyBradleyTypeList, ImproperTypeList, CmapTypeList)
-from chemistry.amber._amberparm import AmberParm
+from chemistry.amber._amberparm import AmberParm, _zeros
 
 class ChamberParm(AmberParm):
    """
@@ -209,8 +209,8 @@ class ChamberParm(AmberParm):
 
       # Urey-Bradley
       ub_num = ub_type_num = 0
-      self.parm_data['CHARMM_UREY_BRADLEY'] = [0 for i in
-                        range(len(self.urey_bradley) * 3)]
+      self.urey_bradley_type_list.deindex()
+      self.parm_data['CHARMM_UREY_BRADLEY'] = _zeros(len(self.urey_bradley)*3)
       for i, ub in enumerate(self.urey_bradley):
          if -1 in (ub.atom1.idx, ub.atom2.idx):
             continue
@@ -221,18 +221,17 @@ class ChamberParm(AmberParm):
          ub_num += 1
       # Truncate our list to only include those Urey-Bradleys that remain
       self.parm_data['CHARMM_UREY_BRADLEY_COUNT'] = [ub_num, ub_type_num]
-      self.parm_data['CHARMM_UREY_BRADLEY'] = \
-            self.parm_data['CHARMM_UREY_BRADLEY'][:3*ub_num]
+      self._truncate_array('CHARMM_UREY_BRADLEY', 3*ub_num)
       # type parameters
       for key in ('CHARMM_UREY_BRADLEY_FORCE_CONSTANT',
                   'CHARMM_UREY_BRADLEY_EQUIL_VALUE'):
-         self.parm_data[key] = [0.0 for i in range(ub_type_num)]
+         self.parm_data[key] = _zeros(ub_type_num)
       self.urey_bradley_type_list.write_to_parm()
 
       # Impropers
       imp_num = imp_type_num = 0
-      self.parm_data['CHARMM_IMPROPERS'] = [0 for i in 
-                     range(len(self.improper) * 5)]
+      self.improper_type_list.deindex()
+      self.parm_data['CHARMM_IMPROPERS'] = _zeros(len(self.improper) * 5)
       for i, imp in enumerate(self.improper):
          if -1 in (imp.atom1.idx, imp.atom2.idx, imp.atom3.idx, imp.atom4.idx):
             continue
@@ -243,12 +242,11 @@ class ChamberParm(AmberParm):
          imp_num += 1
       # Truncate our list to only include those impropers that remain
       self.parm_data['CHARMM_NUM_IMPROPERS'] = [imp_num]
-      self.parm_data['CHARMM_IMPROPERS'] = \
-               self.parm_data['CHARMM_IMPROPERS'][:5*imp_num]
+      self._truncate_array('CHARMM_IMPROPERS', 5*imp_num)
       # type parameters
       self.parm_data['CHARMM_NUM_IMPR_TYPES'] = [imp_type_num]
       for key in ('CHARMM_IMPROPER_FORCE_CONSTANT', 'CHARMM_IMPROPER_PHASE'):
-         self.parm_data[key] = [0.0 for i in range(imp_type_num)]
+         self.parm_data[key] = _zeros(imp_type_num)
       self.improper_type_list.write_to_parm()
 
       # These arrays should no longer appear changed
@@ -265,8 +263,7 @@ class ChamberParm(AmberParm):
       # If we are here, then we have CMAP terms to do
       cmap_num = 0
       cmap_types = []
-      self.parm_data['CHARMM_CMAP_INDEX'] = [0 for i in
-                  range(len(self.cmap) * 6)]
+      self.parm_data['CHARMM_CMAP_INDEX'] = _zeros(len(self.cmap)*6)
       for i, cm in enumerate(self.cmap):
          if -1 in (cm.atom1.idx, cm.atom2.idx, cm.atom3.idx, cm.atom4.idx,
                    cm.atom5.idx):
@@ -287,8 +284,7 @@ class ChamberParm(AmberParm):
          self.LoadPointers() # update CHARMM pointers
          return
       # Truncate our list to only include those cmaps that remain
-      self.parm_data['CHARMM_CMAP_INDEX'] = \
-               self.parm_data['CHARMM_CMAP_INDEX'][:6*cmap_num]
+      self._truncate_array('CHARMM_CMAP_INDEX', 6*cmap_num)
       self.parm_data['CHARMM_CMAP_COUNT'] = [cmap_num, len(cmap_types)]
 
       # Now comes the tricky part. We need to delete all of the
