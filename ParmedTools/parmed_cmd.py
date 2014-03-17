@@ -127,7 +127,7 @@ class ParmedCmd(cmd.Cmd):
          self.parmout = ParmedActions.parmout(self.parm, line)
       except ParmError, err:
          self.stdout.write('Action parmout failed.\n\t')
-         self.stdout.write('%s: %s\n' % type(err).__name__, err)
+         self.stdout.write('%s: %s\n' % (type(err).__name__, err))
          if self._exit_on_fatal:
             raise err
    

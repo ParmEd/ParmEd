@@ -79,6 +79,7 @@ Usages = {
                        'parm copy <filename>|<index> || parm select '
                        '<filename>|<index>',
                 'ls' : 'ls [Unix ls options]',
+                'cd' : 'cd <directory>',
          'listparms' : 'listParms',
            'timerge' : 'tiMerge <mol1mask> <mol2mask> <scmask1> <scmask2>'
                             ' [<scmask1N>] [<scmask2N>] [tol <tol>]',
@@ -132,6 +133,10 @@ class Action(lawsuit):
    needs_parm = True
    # Do we allow any action to overwrite existing files? Static variable.
    overwrite = True
+   # Set a list of which classes of topology files is supported by this action.
+   # Use class names rather than "isinstance" since ChamberParm and AmoebaParm
+   # both inherit from AmberParm
+   supported_classes = ('AmberParm', 'AmoebaParm', 'ChamberParm')
    def __init__(self, input_parm, arg_list=None, *args, **kwargs):
       """ Constructor """
       # Is this action 'valid' (i.e., can we run 'execute')?
@@ -190,6 +195,13 @@ class Action(lawsuit):
                warnings.warn('Cannot find parm %s. Skipping this action' % parm,
                              SeriousParmWarning)
                return
+
+      # Make sure our topology file type is supported. OpenMM* classes should be
+      # treated the same as their non-OpenMM counterparts
+      typename = type(self.parm).__name__.replace('OpenMM', '')
+      if self.needs_parm and typename not in self.supported_classes:
+         raise ParmError('%s topologies are not supported by this action' %
+                         type(self.parm).__name__)
       try:
          self.init(arg_list)
       except NoArgument:
@@ -203,6 +215,8 @@ class Action(lawsuit):
          self.__str__ = Action.__str__
          self.execute = Action.execute
          return
+
+      # Check any unmarked commands
       unmarked_cmds = arg_list.unmarked()
       if len(unmarked_cmds) > 0:
          warnings.warn(' '.join(unmarked_cmds), UnhandledArgumentWarning)
@@ -282,6 +296,7 @@ class writefrcmod(Action):
    """
    Writes an frcmod file from all of the parameters in the topology file.
    """
+   supported_classes = ('AmberParm',)
    def init(self, arg_list):
       self.frcmod_name = arg_list.get_next_string(optional=True)
       if self.frcmod_name is None: self.frcmod_name = 'frcmod'
@@ -333,6 +348,7 @@ class writeoff(Action):
    """
    Writes an Amber OFF Library with all of the residues found in the topology
    """
+   supported_classes = ('AmberParm',)
    def init(self, arg_list):
       self.off_file = arg_list.get_next_string()
 
@@ -356,6 +372,7 @@ class changeradii(Action):
    Changes intrinsic GB radii to the specified set: bondi, mbondi, amber6,
    mbondi2, or mbondi3
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.radii = arg_list.get_next_string()
 
@@ -383,6 +400,7 @@ class changeljpair(Action):
    Changes a particular Lennard Jones pair based on a given (pre-combined)
    epsilon/Rmin
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
       self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -428,6 +446,7 @@ class changelj14pair(Action):
    Changes a particular 1-4 Lennard Jones pair based on a given (pre-combined)
    epsilon/Rmin. Only valid for CHAMBER prmtops
    """
+   supported_classes = ('ChamberParm',)
    def init(self, arg_list):
       # Make sure this is a chamber prmtop
       if not self.parm.chamber:
@@ -482,6 +501,7 @@ class checkvalidity(Action):
    Basic checks for prmtop validity.
    """
    output = sys.stdout
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       pass
@@ -599,6 +619,7 @@ class addljtype(Action):
    Turns given mask into a new LJ atom type. It uses the radius and Rmin from
    the first atom type in <mask> if new_radius or new_epsilon aren't provided
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.new_radius_14 = arg_list.get_key_float('radius_14', None)
       self.new_epsilon_14 = arg_list.get_key_float('epsilon_14', None)
@@ -660,6 +681,7 @@ class printljtypes(Action):
    Prints the Lennard Jones type index for the given atom mask or, if no value
    is given, the LJ type index for each atom.
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       # Compile the list of indices
       try:
@@ -724,6 +746,7 @@ class scee(Action):
    """
    Sets the 1-4 EEL scaling factor in the prmtop
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.scee_value = arg_list.get_next_float()
 
@@ -750,6 +773,7 @@ class scnb(Action):
    """
    Sets the 1-4 VDW scaling factor in the prmtop
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.scnb_value = arg_list.get_next_float()
 
@@ -777,6 +801,7 @@ class changeljsingletype(Action):
    Allows you to change the radius/well depth of a single LJ type specified by
    <mask>
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.mask = AmberMask(self.parm, arg_list.get_next_mask())
       self.radius = arg_list.get_next_float()
@@ -1026,6 +1051,7 @@ class changeprotstate(Action):
    treated via constant pH MD in Amber. This corresponds to all residues found
    in $AMBERHOME/AmberTools/src/etc/cpin_data.py
    """
+   supported_classes = ('AmberParm',)
    def init(self, arg_list):
       self.state = arg_list.get_next_int()
       self.mask = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1116,6 +1142,7 @@ class netcharge(Action):
    Prints the total charge of all of the atoms given by the mask. Defaults to
    all atoms
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    outfile = sys.stdout
    def init(self, arg_list):
       mask = arg_list.get_next_mask(optional=True)
@@ -1371,6 +1398,7 @@ class setbond(Action):
    from mask2 and another bond between atom2 from mask1 and atom2 from mask2,
    etc.)
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       self.k = arg_list.get_next_float()
@@ -1446,6 +1474,7 @@ class setangle(Action):
    from mask2, and atom1 from mask3, another angle between atom2 from mask1,
    atom2 from mask2, and atom2 from mask3, etc.)
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       self.k = arg_list.get_next_float()
@@ -1533,6 +1562,7 @@ class adddihedral(Action):
    default for GLYCAM is 1.0), and <scnb> is the 1-4 VDW scaling factor for this
    dihedral (default for AMBER is 2.0, default for GLYCAM is 1.0)
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       self.phi_k = arg_list.get_next_float()
@@ -1658,6 +1688,7 @@ class deletedihedral(Action):
    Deletes the dihedral around <mask2> and <mask3> in which the end-groups are
    <mask1> and <mask4>. For multi-term dihedrals, it removes each term.
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
       self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1763,6 +1794,7 @@ class printljmatrix(Action):
    one atom with the Lennard Jones index given in square brackets at the end.
    Alternatively, you can request a particular atom type index
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       self.idx = arg_list.get_next_int(optional=True)
       self.mask = None
@@ -1843,6 +1875,7 @@ class timerge(Action):
    This is used when the atoms in molecules 1/2 are not in the same order and
    for checking the input coordinates.
    """
+   supported_classes = ('AmberParm',)
 
    def init(self, arg_list):
       self.tol = arg_list.get_key_float('tol', 0.0001)
@@ -2293,6 +2326,41 @@ class ls(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+class cd(Action):
+   """
+   Changes to a new directory like UNIX 'cd'
+   """
+   needs_parm = False
+   def init(self, arg_list):
+      from glob import glob
+      mydir = os.path.expanduser(os.path.expandvars(arg_list.get_next_string()))
+      self.directory = glob(mydir)
+
+   def __str__(self):
+      if len(self.directory) != 1:
+         return 'Change directory failed'
+      if not os.path.isdir(self.directory[0]):
+         return '%s does not exist. cd failed.' % self.directory[0]
+      return 'New working directory: %s' % self.directory[0]
+
+   def execute(self):
+      if len(self.directory) < 1:
+         warnings.warn('No recognized directories given to cd',
+                       SeriousParmWarning)
+         return
+      elif len(self.directory) > 1:
+         warnings.warn('More than one file/directory given to cd',
+                       SeriousParmWarning)
+         return
+      if not os.path.isdir(self.directory[0]):
+         warnings.warn('%s is not a directory' % sefl.directory[0],
+                       SeriousParmWarning)
+         return
+      # If we've gotten this far, go ahead and change to the directory
+      os.chdir(self.directory[0])
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 class listparms(Action):
    """
    Lists all of the loaded topology files
@@ -2324,6 +2392,7 @@ class interpolate(Action):
    end-points). The second prmtop must be specified if there are more than 2 in
    the list.
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    def init(self, arg_list):
       # Make sure we have at least 2 prmtops
       if len(self.parm_list) < 2:
@@ -2519,6 +2588,7 @@ class lmod(Action):
    Adjusts Lennard Jones parameters to work with the LMOD code in Amber (changes
    LJ A coefficients that are 0 to 1000).
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       pass
@@ -2673,6 +2743,7 @@ class add12_6_4(Action):
    [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
        289-297
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
    
    _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
@@ -2805,6 +2876,7 @@ class openmm(Action):
    will prevent anything from actually being run and can only be used when a
    script file is provided.
    """
+   supported_classes = ('AmberParm',)
 
    def init(self, arg_list):
       parm = arg_list.get_key_string('-p', default=None)
@@ -2870,6 +2942,7 @@ class energy(Action):
    decompose : Print bond, angle, dihedral, and nonbonded energies separately
    applayer : Use OpenMM's class to compute the energy
    """
+   supported_classes = ('AmberParm',)
 
    output = sys.stdout
 
@@ -2902,6 +2975,7 @@ class deletebond(Action):
    (like angles and dihedrals) that would get severed by the deletion of one of
    the bonds.
    """
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())

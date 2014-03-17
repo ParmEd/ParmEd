@@ -14,7 +14,7 @@ BPR = 3 # Buttons Per Row
 class ParmedApp(Frame):
    """ Main Parmed App Window """
    skipped_actions = ('parmout', 'go', 'quit', 'help', 'setoverwrite', 'ls',
-                      'interpolate', 'listparms', 'parm', 'source')
+                      'interpolate', 'listparms', 'parm', 'source', 'cd')
    def __init__(self, master, amber_prmtop):
       """ Instantiates the window """
       import math

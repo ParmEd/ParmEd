@@ -13,7 +13,7 @@ import ParmedTools.ParmedActions as _PA
 
 for key in _PA.Usages:
    # Skip actions that only make sense for the ParmEd interpreter
-   if key in ('help', 'go', 'quit', 'source', 'ls'): continue
+   if key in ('help', 'go', 'quit', 'source', 'ls', 'cd'): continue
    name = _PA.Usages[key].split()[0]
    exec('%s = _PA.%s' % (name, key))
    __all__.append(name)
