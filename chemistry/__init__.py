@@ -10,6 +10,7 @@ __all__ = ('amber',
            'system',
 )
 
-__version__ = '14.0'
+__version__ = '1.0 dev'
+__date__ = 'Mar. 28, 2014'
 __author__ = 'Jason Swails'
 

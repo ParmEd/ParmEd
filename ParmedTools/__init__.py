@@ -1,7 +1,9 @@
 """ A list of all of the tools used by parmed """
 
-__version__ = '14.0'
+__version__ = '1.0 dev'
+__date__ = 'Mar. 28, 2014'
 __author__ = 'Jason Swails'
+
 __all__ = [] # This is populated with the ParmEd Actions below
 
 # For the purposes of the API, all of the actions from ParmedActions will be
