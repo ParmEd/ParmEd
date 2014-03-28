@@ -1,6 +1,7 @@
 """
 This module contains classes for reading various TINKER-style files
 """
+from compat24 import all
 from chemistry.exceptions import TinkerKeyFileError, TinkerDynFileError
 
 class KeywordControlFile(object):
@@ -60,15 +61,22 @@ class XyzFile(object):
       self.natom = 0
       # Create the list of atoms
       self.atom_list = XyzFile._AtomList()
-      for line in open(fname, 'r'):
+      f = open(fname, 'r')
+      for line in f:
          if self.natom == 0:
             self.natom = int(line.strip())
             # Set up blank positions and connections arrays
             self.connections = [[] for i in xrange(self.natom)]
             continue
          words = line.split()
+         if len(words) == 6 and all([is_float(x) for x in words]):
+            # The first line after the number of atoms _could_ be the box
+            # information. So capture that here and store the info
+            self.box = [float(x) for x in words]
+            continue
          self.atom_list.add(words[1], words[2], words[3], words[4], words[5],
                words[6:])
+      f.close()
 
 class DynFile(object):
    """ Reads and processes a Tinker DYN file """
@@ -148,3 +156,10 @@ class DynFile(object):
             container[i][2] = float(words[2].replace('D', 'E'))
          except (IndexError, ValueError):
             raise TinkerDynFileError('Could not parse values from dyn file')
+
+def is_float(thing):
+   try:
+      float(thing)
+      return True
+   except ValueError:
+      return False

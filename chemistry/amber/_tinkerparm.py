@@ -296,6 +296,16 @@ class AmoebaParm(AmberParm):
       # refresh it to make sure we get the exclusions right
       for atm in self.atom_list: atm.reset_topology()
       for bnd in self.bond_list: bnd.register()
+      # Reset all of the type lists
+      self.bond_type_list.reset()
+      self.urey_bradley_type_list.reset()
+      self.angle_type_list.reset()
+      self.trigonal_angle_type_list.reset()
+      self.oopbend_type_list.reset()
+      self.dihedral_type_list.reset()
+      self.pitorsion_type_list.reset()
+      self.stretch_bend_type_list.reset()
+      self.torsion_torsion_type_list.reset()
       # Shortcut here -- for each atom now just determine the angle/dihedral
       # partners directly from the bonded network
       for atm in self.atom_list: atm.determine_exclusions_from_bonds()
@@ -329,7 +339,6 @@ class AmoebaParm(AmberParm):
       # list, which will be reduced in size of not every bond is actually added
       bond_num = typenum = 0
       self.parm_data['AMOEBA_REGULAR_BOND_LIST'] = _zeros(len(self.bond_list)*3)
-      self.bond_type_list.deindex()
       for i, bnd in enumerate(self.bond_list):
          if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
          if bnd.bond_type.idx == -1:
@@ -352,7 +361,6 @@ class AmoebaParm(AmberParm):
       ub_num = typenum = 0
       self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = \
                                  _zeros(len(self.urey_bradley_list)*3)
-      self.urey_bradley_type_list.deindex()
       for i, ub in enumerate(self.urey_bradley_list):
          if -1 in (ub.atom1, ub.atom2): continue
          if ub.ub_type.idx == -1:
@@ -371,7 +379,6 @@ class AmoebaParm(AmberParm):
       # Now time for angles
       ang_num = typenum = 0
       self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'] = _zeros(len(self.angle_list)*4)
-      self.angle_type_list.deindex()
       for i, ang in enumerate(self.angle_list):
          if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx): continue
          if ang.angle_type.idx == -1:
@@ -391,7 +398,6 @@ class AmoebaParm(AmberParm):
       ang_num = typenum = 0
       self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'] = \
                         _zeros(len(self.trigonal_angle_list)*5)
-      self.trigonal_angle_type_list.deindex()
       for i, ang in enumerate(self.trigonal_angle_list):
          if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx):
             continue
@@ -412,7 +418,6 @@ class AmoebaParm(AmberParm):
       oop_num = typenum = 0
       self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'] = \
                                              _zeros(len(self.oopbend_list)*5)
-      self.oopbend_type_list.deindex()
       for i, oop in enumerate(self.oopbend_list):
          if -1 in (oop.atom1.idx, oop.atom2.idx, oop.atom3.idx, oop.atom4.idx):
             continue
@@ -432,7 +437,6 @@ class AmoebaParm(AmberParm):
       # Now time for torsions
       dih_num = typenum = 0
       self.parm_data['AMOEBA_TORSION_LIST'] = _zeros(len(self.dihedral_list)*5)
-      self.dihedral_type_list.deindex()
       for i, dih in enumerate(self.dihedral_list):
          if -1 in (oop.atom1.idx, oop.atom2.idx, oop.atom3.idx, oop.atom4.idx):
             continue
@@ -454,7 +458,6 @@ class AmoebaParm(AmberParm):
       tor_num = typenum = 0
       self.parm_data['AMOEBA_PI_TORSION_LIST'] = \
                            _zeros(len(self.pitorsion_list)*7)
-      self.pitorsion_type_list.deindex()
       for i, tor in enumerate(self.pitorsion_list):
          if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                    tor.atom4.idx, tor.atom5.idx, tor.atom6.idx):
@@ -477,7 +480,6 @@ class AmoebaParm(AmberParm):
       strb_num = typenum = 0
       self.parm_data['AMOEBA_STRETCH_BEND_LIST'] = \
                                  _zeros(len(self.stretch_bend_list)*4)
-      self.stretch_bend_type_list.deindex()
       for i, strb in enumerate(self.stretch_bend_list):
          if -1 in (strb.atom1.idx, strb.atom2.idx, strb.atom3.idx): continue
          if strb.strbnd_type.idx == -1:
@@ -500,7 +502,6 @@ class AmoebaParm(AmberParm):
       typelist = []
       self.parm_data['AMOEBA_TORSION_TORSION_LIST'] = \
                                  _zeros(len(self.torsion_torsion_list)*6)
-      self.torsion_torsion_type_list.deindex()
       for i, tor in enumerate(self.torsion_torsion_list):
          if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                    tor.atom4.idx, tor.atom5.idx):

@@ -2,6 +2,8 @@
 Contains all of the class objects for the Tinker topology
 """
 from __future__ import division
+import compat24
+from collections import OrderedDict
 
 class Atom(object):
    """ An atom in the system """
@@ -294,6 +296,42 @@ class TorsionTorsion(object):
 
 class TorsionTorsionList(_ParamTypeList):
    typeclass = TorsionTorsion
+
+class TorsionTorsionGrid(OrderedDict):
+   """
+   The interpolation grid of a coupled-torsion correction map. Every unique
+   grid is cached and if a duplicate grid is instantiated, a reference to the
+   original grid is returned. As a result, all unique TorsionTorsionGrid
+   instances are singletons and should be compared for equality with "is"
+   """
+   # Because these grids are space-consuming, we only hold onto unique grids
+   _typelist = list()
+
+   @classmethod
+   def new(cls, data):
+      inst = cls()
+      for d in data:
+         inst[tuple(d[:2])] = d[2]
+      # Potentially expensive comparison of all grids.
+      for ttg in TorsionTorsionGrid._typelist:
+         if ttg == inst:
+            return ttg
+      TorsionTorsionGrid._typelist.append(inst)
+      return inst
+   
+   def __eq__(self, other):
+      if self.keys() != other.keys(): return False
+      for key in self:
+         if abs(self[key] - other[key]) > 1e-8: return False
+      return True
+   
+   def __ne__(self, other):
+      return not self == other
+
+   # No comparisons are implemented
+   def __gt__(self, other):
+      raise NotImplemented('TorsionTorsionGrid instances are not well-ordered')
+   __lt__ = __ge__ = __le__ = __gt__
 
 class AtomicMultipole(object):
    """ Atomic multipole parameter """

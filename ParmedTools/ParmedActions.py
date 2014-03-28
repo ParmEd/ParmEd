@@ -100,6 +100,7 @@ Usages = {
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
                        '[Ewald]] [nodisper] [applayer] [platform <platform>] '
                        '[precision <precision model>] [decompose]',
+       'fixtopology' : 'fixTopology',
 #         'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] '
 #                      '| [Ewald]] [[restrain <mask>] [weight <k>]] [norun] '
 #                      '[script <script_file.py>] [platform <platform>] '
@@ -1125,11 +1126,6 @@ class changeprotstate(Action):
          if sel[i] != 1:
             raise ChangeStateError('You must select 1 and only 1 entire '
                                    'residue to change the protonation state of')
-         # Print some info about the change we're making
-         print ('  Changing state of atom %-4s (residue %-4s) from %8.4f to ' +
-                '%8.4f') % ( self.parm.parm_data['ATOM_NAME'][i], resname, 
-                             self.parm.parm_data['CHARGE'][i],
-                             res.states[self.state].charges[chgnum])
          # Actually make the change
          self.parm.parm_data['CHARGE'][i] = \
                res.states[self.state].charges[chgnum]
@@ -1800,7 +1796,6 @@ class printljmatrix(Action):
       self.mask = None
       if self.idx is None:
          self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-      print 'Index is %s; mask is %s' % (self.idx, self.mask)
    
    def __str__(self):
       ntypes = self.parm.ptr('NTYPES')
@@ -2827,7 +2822,7 @@ class hmassrepartition(Action):
             continue
          heteroatom = None
          heteroidx = 0
-         bondeds = list(atom.bonds())
+         bondeds = list(atom.bond_partners)
          while heteroidx < len(bondeds):
             if bondeds[heteroidx].atomic_number != 1:
                heteroatom = bondeds[heteroidx]
@@ -2876,7 +2871,7 @@ class openmm(Action):
    will prevent anything from actually being run and can only be used when a
    script file is provided.
    """
-   supported_classes = ('AmberParm',)
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    def init(self, arg_list):
       parm = arg_list.get_key_string('-p', default=None)
@@ -2942,7 +2937,7 @@ class energy(Action):
    decompose : Print bond, angle, dihedral, and nonbonded energies separately
    applayer : Use OpenMM's class to compute the energy
    """
-   supported_classes = ('AmberParm',)
+   supported_classes = ('AmberParm', 'ChamberParm')
 
    output = sys.stdout
 
@@ -3109,4 +3104,96 @@ class deletebond(Action):
          if self.del_cmap:
             self._dfl(self.del_cmap, self.parm.cmap)
       # If we had anything to do, remake the parm
+      self.parm.remake_parm()
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class fixtopology(Action):
+   """
+   This action will look through the lists of bonds, angles, and dihedrals both
+   with and without hydrogen and make sure that all of the parameters are
+   assigned to the correct lists. LEaP is known in certain cases to misassign
+   angles and torsions if dummy atoms are involved. This action will correct the
+   parameter assignments if any mistake was made
+   """
+
+   def init(self, arg_list):
+      # First check to see if there is any problem
+      self.needs_fixing = False
+      # Bond Fix, Angle Fix, Dihedral Fix -- variables to determine which
+      # specific lists need fixing
+      self.bf = self.af = self.df = False
+      for bnd in self.parm.bonds_inc_h:
+         if bnd.atom1.element != 1 and bnd.atom2.element != 1:
+            self.needs_fixing = self.bf = True
+            break
+      for bnd in self.parm.bonds_without_h:
+         if bnd.atom1.element == 1 or bnd.atom2.element == 1:
+            self.needs_fixing = self.bf = True
+            break
+      for ang in self.parm.angles_inc_h:
+         if (ang.atom1.element != 1 and ang.atom2.element != 1 and
+             ang.atom3.element != 1):
+            self.needs_fixing = self.af = True
+            break
+      for ang in self.parm.angles_without_h:
+         if (ang.atom1.element == 1 or ang.atom2.element == 1 or
+             ang.atom3.element == 1):
+            self.needs_fixing = self.af = True
+            break
+      for dih in self.parm.dihedrals_inc_h:
+         if (dih.atom1.element != 1 and dih.atom2.element != 1 and
+             dih.atom3.element != 1 and dih.atom4.element != 1):
+            self.needs_fixing = self.df = True
+            break
+      for dih in self.parm.dihedrals_without_h:
+         if (dih.atom1.element == 1 or dih.atom2.element == 1 or
+             dih.atom3.element == 1 or dih.atom4.element == 1):
+            self.needs_fixing = self.df = True
+            break
+
+   def __str__(self):
+      if self.needs_fixing:
+         return 'Fixing bond/angle/dihedral list assignments'
+      return 'No bond/angle/dihedral list problems detected. Doing nothing.'
+
+   def execute(self):
+      if not self.needs_fixing: return
+      # This is the tracked list type we're using
+      listtype = type(self.parm.bonds_inc_h)
+      if self.bf:
+         # Need to fix bonds
+         bonds_inc_h = listtype()
+         bonds_without_h = listtype()
+         for bnd in self.parm.bonds_inc_h + self.parm.bonds_without_h:
+            if bnd.atom1.element == 1 or bnd.atom2.element == 1:
+               bonds_inc_h.append(bnd)
+            else:
+               bonds_without_h.append(bnd)
+         self.parm.bonds_inc_h = bonds_inc_h
+         self.parm.bonds_without_h = bonds_without_h
+      if self.af:
+         # Need to fix angles
+         angles_inc_h = listtype()
+         angles_without_h = listtype()
+         for ang in self.parm.angles_inc_h + self.parm.angles_without_h:
+            if (ang.atom1.element == 1 or ang.atom2.element == 1 or
+                  ang.atom3.element == 1):
+               angles_inc_h.append(ang)
+            else:
+               angles_without_h.append(ang)
+         self.parm.angles_inc_h = angles_inc_h
+         self.parm.angles_without_h = angles_without_h
+      if self.df:
+         # Need to fix dihedrals
+         dihedrals_inc_h = listtype()
+         dihedrals_without_h = listtype()
+         for dih in self.parm.dihedrals_inc_h + self.parm.dihedrals_without_h:
+            if (dih.atom1.element == 1 or dih.atom2.element == 1 or
+                  dih.atom3.element == 1 or dih.atom4.element == 1):
+               dihedrals_inc_h.append(dih)
+            else:
+               dihedrals_without_h.append(dih)
+         self.parm.dihedrals_inc_h = dihedrals_inc_h
+         self.parm.dihedrals_without_h = dihedrals_without_h
       self.parm.remake_parm()

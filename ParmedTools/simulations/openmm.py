@@ -14,7 +14,7 @@ from chemistry.amber.openmmreporters import (AmberStateDataReporter,
                EnergyMinimizerReporter)
 from math import sqrt
 from chemistry.amber.mdin import mdin as Mdin
-from MMPBSA_mods.timer import Timer
+from timer import Timer
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
 import os
@@ -1015,24 +1015,44 @@ def energy(parm, args, output=sys.stdout):
       state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
                                groups=2**parm.DIHEDRAL_FORCE_GROUP)
       dihedral = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
+      # Now the CHARMM-specific terms
+      if parm.chamber:
+         # Now Urey-Bradley energy
+         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
+                                  groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
+         ub = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
+         # Now improper
+         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
+                                  groups=2**parm.IMPROPER_FORCE_GROUP)
+         imp = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
+         # Now cmap
+         if parm.has_cmap:
+            state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
+                                    groups=2**parm.CMAP_FORCE_GROUP)
+            cmap = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
+         else:
+            cmap = 0
+
       # Now non-bonded. No real way to decompose this.
       state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
                                groups=2**parm.NONBONDED_FORCE_GROUP)
       nonbond = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
 
-      # Now the GB term if not has_pbc
-      if not has_pbc:
-         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
-                                 groups=2**parm.GB_FORCE_GROUP)
-         egb = state.getPotentialEnergy().value_in_unit(u.kilocalories/u.mole)
-
-
-      output.write('Bond     = %20.7f     Angle    = %20.7f\n'
-                   'Dihedral = %20.7f     Nonbond  = %20.7f\n'
-                   'TOTAL    = %20.7f\n' % (bond, angle, dihedral,
-                   nonbond, (bond+angle+dihedral+nonbond)))
-      if not has_pbc:
-         output.write('EGB      = %.7f\n' % egb)
+      if parm.chamber:
+         output.write('Bond         = %20.7f     Angle        = %20.7f\n'
+                      'Dihedral     = %20.7f     Urey-Bradley = %20.7f\n'
+                      'Improper     = %20.7f     ' % (bond, angle, dihedral,
+                      ub, imp))
+         if parm.has_cmap:
+            output.write('CMAP         = %20.7f\n' % cmap)
+         output.write('Nonbond      = %20.7f\n'
+                      'TOTAL        = %20.7f\n' % (nonbond,
+                      bond+angle+dihedral+ub+imp+cmap+nonbond))
+      else:
+         output.write('Bond     = %20.7f     Angle    = %20.7f\n'
+                      'Dihedral = %20.7f     Nonbond  = %20.7f\n'
+                      'TOTAL    = %20.7f\n' % (bond, angle, dihedral,
+                       nonbond, (bond+angle+dihedral+nonbond)))
 
    else:
       state = context.getState(getEnergy=True,

@@ -359,11 +359,6 @@ class PythonCmd(cmd.Cmd):
       if line.strip() == '!!': return True
       self.command_string += line + '\n'
 
-   def __del__(self):
-      """ Destructor -- make sure the log file is closed if it has one """
-      if self._logfile is not None: 
-         self._logfile.close()
-
 # To pretty-print usage statements. Some are getting long, so they need to be
 # shortened and printed in a helpfully formatted way
 def _fmt_usage(usage):

@@ -11,6 +11,7 @@ Designed so it can be used like:
 
 by Jason Swails
 """
+from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, AmberParmError,
             CmapError)
@@ -31,37 +32,44 @@ class Atom(object):
 
    def __init__(self, parm, starting_index):
       self.atomic_number = 0
-      self.bond_partners = set()
-      self.angle_partners = set()
-      self.dihedral_partners = set()
-      self.exclusion_partners = set() # For arbitrary exclusions
+      self._bond_partners = set()
+      self._angle_partners = set()
+      self._dihedral_partners = set()
+      self._exclusion_partners = set() # For arbitrary exclusions
       self.parm = parm
       self.idx = -1
       self.starting_index = starting_index
       self.load_from_parm()
       self.residue = None
       self.marked = 0 # For setting molecules
+      self.bonds, self.angles, self.dihedrals = [], [], []
+      # Chamber properties
+      self.urey_bradleys, self.impropers, self.cmaps = [], [], []
       self.deleted = False
    
    #===================================================
-   
-   def bonds(self):
+
+   @property
+   def bond_partners(self):
       """ Go through all bonded partners """
-      return sorted(list(self.bond_partners))
+      return sorted(list(self._bond_partners))
 
-   def angles(self):
+   @property
+   def angle_partners(self):
       """ List of all angle partners that are NOT bond partners """
-      return sorted(list(self.angle_partners - self.bond_partners))
+      return sorted(list(self._angle_partners - self._bond_partners))
 
-   def dihedrals(self):
+   @property
+   def dihedral_partners(self):
       """ List of all dihedral partners that are NOT angle or bond partners """
-      return sorted(list(self.dihedral_partners - self.angle_partners -
-                         self.bond_partners))
+      return sorted(list(self._dihedral_partners - self._angle_partners -
+                         self._bond_partners))
 
-   def exclusions(self):
+   @property
+   def exclusion_partners(self):
       " List of all exclusions not otherwise excluded by bonds/angles/torsions "
-      return sorted(list(self.exclusion_partners - self.dihedral_partners -
-                         self.angle_partners - self.bond_partners))
+      return sorted(list(self._exclusion_partners - self._dihedral_partners -
+                         self._angle_partners - self._bond_partners))
 
    #===================================================
 
@@ -73,13 +81,13 @@ class Atom(object):
       # Determine how many excluded atoms we have. The only ones that count are
       # those with a smaller index (to avoid double-counting)
       numex = 0
-      for atm in self.bonds():
+      for atm in self.bond_partners:
          if atm.idx > self.idx: numex += 1
-      for atm in self.angles():
+      for atm in self.angle_partners:
          if atm.idx > self.idx: numex += 1
-      for atm in self.dihedrals():
+      for atm in self.dihedral_partners:
          if atm.idx > self.idx: numex += 1
-      for atm in self.exclusions():
+      for atm in self.exclusion_partners:
          if atm.idx > self.idx: numex += 1
       # For some reason, existing topology files follow the convention that
       # atoms with no exclusions (because all bonded partners have atom #s lower
@@ -161,7 +169,7 @@ class Atom(object):
       """
       if self is other:
          raise BondError("Cannot bond atom to itself!")
-      self.bond_partners.add(other)
+      self._bond_partners.add(other)
 
    #===================================================
       
@@ -172,7 +180,7 @@ class Atom(object):
       """
       if self is other:
          raise BondError("Cannot angle an atom with itself!")
-      self.angle_partners.add(other)
+      self._angle_partners.add(other)
    
    #===================================================
 
@@ -183,7 +191,7 @@ class Atom(object):
       """
       if self is other:
          raise BondError("Cannot dihedral an atom with itself!")
-      self.dihedral_partners.add(other)
+      self._dihedral_partners.add(other)
       
    #===================================================
 
@@ -194,9 +202,9 @@ class Atom(object):
       """
       if self is other:
          raise BondError("Cannot exclude an atom from itself")
-      self.exclusion_partners.add(other)
+      self._exclusion_partners.add(other)
       # If he is excluded from me, then I am excluded from him
-      other.exclusion_partners.add(self)
+      other._exclusion_partners.add(self)
 
    #===================================================
 
@@ -205,9 +213,9 @@ class Atom(object):
       Deletes all of the bond, angle, and dihedral partners so they can be set
       up again with updated data. Keep the arbitrary exclusions, though
       """
-      self.bond_partners = set()
-      self.angle_partners = set()
-      self.dihedral_partners = set()
+      self._bond_partners = set()
+      self._angle_partners = set()
+      self._dihedral_partners = set()
 
    #===================================================
 
@@ -246,6 +254,9 @@ class Bond(object):
       # Order the atoms so the lowest atom # is first
       self.atom1 = atom1
       self.atom2 = atom2
+      # Load this struct into the atoms
+      self.atom1.bonds.append(self)
+      self.atom2.bonds.append(self)
       # Load the force constant and equilibrium distance
       self.bond_type = bond_type
       self.register()
@@ -313,6 +324,10 @@ class Angle(object):
       self.atom1 = atom1
       self.atom2 = atom2
       self.atom3 = atom3
+      # Log these angles in each atom
+      atom1.angles.append(self)
+      atom2.angles.append(self)
+      atom3.angles.append(self)
       # Load the force constant and equilibrium angle
       self.angle_type = angle_type
       self.register()
@@ -393,6 +408,11 @@ class Dihedral(object):
       self.atom2 = atom2
       self.atom3 = atom3
       self.atom4 = atom4
+      # Log these dihedrals in each atom
+      atom1.dihedrals.append(self)
+      atom2.dihedrals.append(self)
+      atom3.dihedrals.append(self)
+      atom4.dihedrals.append(self)
       # Load the force constant and equilibrium angle
       self.dihed_type = dihed_type
       self.signs = signs # is our 3rd or 4th term negative?
@@ -540,6 +560,9 @@ class UreyBradley(object):
       # Order the atoms so the lowest atom # is first
       self.atom1 = atom1
       self.atom2 = atom2
+      # Log this urey-bradley in the atoms
+      atom1.urey_bradleys.append(self)
+      atom2.urey_bradleys.append(self)
       # Load the force constant and equilibrium distance
       self.ub_type = ub_type
 
@@ -634,6 +657,11 @@ class Improper(object):
       self.atom2 = atom2
       self.atom3 = atom3
       self.atom4 = atom4
+      # Log these impropers in each atom
+      atom1.dihedrals.append(self)
+      atom2.dihedrals.append(self)
+      atom3.dihedrals.append(self)
+      atom4.dihedrals.append(self)
       # Load the force constant and equilibrium angle
       self.improp_type = improp_type
 
@@ -748,6 +776,12 @@ class Cmap(object):
       self.atom3 = atom3
       self.atom4 = atom4
       self.atom5 = atom5
+      # Log these cmaps in each atom
+      atom1.cmaps.append(self)
+      atom2.cmaps.append(self)
+      atom3.cmaps.append(self)
+      atom4.cmaps.append(self)
+      atom4.cmaps.append(self)
       # Load the CMAP interpolation table
       self.cmap_type = cmap_type
 
@@ -824,7 +858,7 @@ class CmapType(object):
 
    def __init__(self, resolution, grid, cmts, idx):
       self.resolution = resolution
-      self.grid = grid
+      self.grid = _CmapGrid(resolution, grid)
       self.comments = cmts # To avoid losing any comments in the chamber prmtop
       if len(grid) != self.resolution * self.resolution:
          raise CmapError('CMAP grid does not match expected resolution')
@@ -840,10 +874,119 @@ class CmapType(object):
       parm.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (self.idx+1)] = self.grid[:]
 
    #===================================================
-   
+
    def __eq__(self, other):
       return (self.resolution == other.resolution and
               all([abs(i - j) < TINY for i, j in zip(self.grid, other.grid)]))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _CmapGrid(object):
+   """
+   A grid object for storing Correction map data. Data can be accessed in one of
+   two ways; either with 1 or 2 indexes. If 2 indexes are given, the index into
+   the flattened array is i*resolution+j. Indexing starts from 0.
+
+   The _CmapGrid is assumed to have ranges for the two angles from -180 to 180.
+   Some places will expect the range to be 0-360 degrees (e.g., OpenMM). The
+   switch_range method returns a _CmapGrid with this range. This method will
+   also work to go backwards.
+
+   Example:
+   >>> g = _CmapGrid(2, [0, 1, 2, 3])
+   >>> print g[0], g[0,0]
+   0 0
+   >>> print g[1], g[0,1]
+   1 1
+   >>> print g[1,0]
+   2
+   >>> g[1,1] = 10
+   >>> print g[3]
+   10
+   >>> print g.switch_range()
+   [1.0000, 0.0000,
+    3.0000, 2.0000]
+   """
+
+   def __init__(self, resolution, data=None):
+      self.resolution = resolution
+      if data is None:
+         self._data = [0 for i in range(self.resolution*self.resolution)]
+      else:
+         self._data = data
+
+   @property
+   def transpose(self):
+      """ Returns the transpose of the grid """
+      try:
+         return self._transpose
+      except AttributeError:
+         pass
+      _transpose = []
+      size = len(self._data)
+      for i in range(self.resolution):
+         piece = [self[j] for j in range(i, size, self.resolution)]
+         _transpose += piece
+      self._transpose = _CmapGrid(self.resolution, _transpose)
+      return self._transpose
+
+   T = transpose
+
+   def __getitem__(self, idx):
+      if isinstance(idx, tuple):
+         return self._data[idx[0]+self.resolution*idx[1]]
+      return self._data[idx]
+
+   def __setitem__(self, idx, val):
+      if isinstance(idx, tuple):
+         self._data[idx[0]+self.resolution*idx[1]] = val
+      else:
+         self._data[idx] = val
+
+   def __len__(self):
+      return len(self._data)
+
+   def __iter__(self):
+      return iter(self._data)
+
+   def __repr__(self):
+      return '<_CmapGrid: %dx%d>' % (self.resolution, self.resolution)
+
+   def __str__(self):
+      retstr = '[%.4f,' % self._data[0]
+      fmt = ' %.4f'
+      for i, val in enumerate(self):
+         if i == 0: continue
+         retstr += fmt % val
+         if (i+1) % self.resolution == 0 and i != len(self._data) - 1:
+            retstr += '\n '
+      return retstr + ']'
+
+   def __eq__(self, other):
+      try:
+         if self.resolution != other.resolution:
+            return False
+         for x, y in zip(self, other):
+            if abs(x - y) > TINY:
+               return False
+         return True
+      except AttributeError:
+         return TypeError('Bad type comparison with _CmapGrid')
+
+   def switch_range(self):
+      """
+      Returns a grid object whose range is 0 to 360 degrees in both dimensions
+      instead of -180 to 180 degrees (or -180 to 180 degrees if the range is
+      already 0 to 360 degrees)
+      """
+      res = self.resolution
+      mid = res // 2
+      newgrid = _CmapGrid(res)
+      for i in range(res):
+         for j in range(res):
+            # Start from the middle
+            newgrid[i, j] = self[(i+mid)%res, (j+mid)%res]
+      return newgrid
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -970,31 +1113,31 @@ class AtomList(list):
       # other atom my bonded pair is excluded from:
       for atm in self:
          if not atm.attype[:2] in ['EP', 'LP']: continue
-         partner = atm.bonds()[0]
+         partner = atm.bond_partners[0]
          # Now add all bond partners
-         for patm in partner.bonds():
+         for patm in partner.bond_partners:
             # Don't add myself
             if patm is atm: continue
             atm.exclude(patm)
          # Now add all angle partners
-         for patm in partner.angles(): atm.exclude(patm)
+         for patm in partner.angle_partners: atm.exclude(patm)
          # Now add all dihedral partners
-         for patm in partner.dihedrals(): atm.exclude(patm)
+         for patm in partner.dihedral_partners: atm.exclude(patm)
          # Now add all other arbitrary exclusions
-         for patm in partner.exclusions():
+         for patm in partner.exclusion_partners:
             if patm is atm: continue
             atm.exclude(patm)
 
       for atm in self:
          vals_to_add = []
-         for member in atm.bonds():
+         for member in atm.bond_partners:
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-         for member in atm.angles():
+         for member in atm.angle_partners:
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-         for member in atm.dihedrals():
+         for member in atm.dihedral_partners:
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
          # Enable additional (arbitrary) exclusions
-         for member in atm.exclusions():
+         for member in atm.exclusion_partners:
             if member.idx > atm.idx: vals_to_add.append(member.idx+1)
          vals_to_add.sort()
          # See comment above about numex = 0 --> numex = 1
@@ -1039,7 +1182,7 @@ class TrackedList(list):
 
    __delitem__ = _tracking(list.__delitem__)
    append = _tracking(list.append)
-   extend = _tracking(list.append)
+   extend = _tracking(list.extend)
    __delslice__ = _tracking(list.__delslice__)
    __setitem__ = _tracking(list.__setitem__)
 
@@ -1073,9 +1216,9 @@ class _TypeList(TrackedList):
 
    #===================================================
 
-   def deindex(self):
-      """ Resets all of the type indexes to -1 """
-      for item in self: item.idx = -1
+   def reset(self):
+      """ Reset indexes to -1 to allow multiple remake_parm calls """
+      for thing in self: thing.idx = -1
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

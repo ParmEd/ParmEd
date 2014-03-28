@@ -5,12 +5,13 @@ loaded.
 """
 
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.amber.readparm import ChamberParm, AmoebaParm
+from chemistry.amber.readparm import AmoebaParm
 try:
-   from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
+   from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
+               OpenMMChamberParm as ChamberParm)
    _HAS_OPENMM = True
 except ImportError:
-   from chemistry.amber.readparm import AmberParm
+   from chemistry.amber.readparm import AmberParm, ChamberParm
    _HAS_OPENMM = False
 from ParmedTools.exceptions import DuplicateParm, ParmIndexError
 
@@ -35,7 +36,7 @@ class ParmList(object):
       self.current_index = self.index(idx)
       self.parm = self[self.current_index]
 
-   def add_parm(self, parm):
+   def add_parm(self, parm, rst7=None):
       """ Add a parm to the list """
       # Make sure this parm is not part of the list already
       if str(parm) in self._parm_names:
@@ -58,6 +59,9 @@ class ParmList(object):
       # A newly added topology file is the currently active parm
       self.current_index = len(self._parm_instances) - 1
       self.parm = parm
+      # If we have a restart file, load it
+      if rst7 is not None:
+         parm.LoadRst7(rst7)
 
    def index(self, idx):
       """ See what the index of the requested parm is (can be int or str) """

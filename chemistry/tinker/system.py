@@ -9,7 +9,7 @@ from chemistry.exceptions import TinkerAnaloutError
 from chemistry.tinker.topologyobjects import (AtomList, BondList, AngleList,
       StretchBendList, UreyBradleyList, OutOfPlaneBendList, OutOfPlaneDistList,
       TorsionAngleList, PiTorsionList, TorsionTorsionList, AtomicMultipoleList,
-      DipolePolarizabilityList)
+      DipolePolarizabilityList, TorsionTorsionGrid)
 
 class TinkerAnalout(object):
    """ Reads the output of "analyze" to determine system parameters """
@@ -324,12 +324,23 @@ class TinkerAnalout(object):
             at3 = int(line[21:27]) - 1
             at4 = int(line[27:33]) - 1
             at5 = int(line[33:39]) - 1
+            dim1 = int(line[49:55])
+            dim2 = int(line[55:61])
             self.tortor_list.add(self.atom_list[at1], self.atom_list[at2],
                   self.atom_list[at3], self.atom_list[at4], self.atom_list[at5],
-                  line[49:55], line[55:61])
+                  dim1, dim2)
          except ValueError:
             raise TinkerAnaloutError('Error parsing torsion-torsion term')
          line = f.readline()
+         # The CMAP section was adjusted to print out the entire torsion grid
+         # under each tor-tor definition. If this line has 3 words, we need to
+         # eat the next dim1*dim2 lines
+         if len(line.split()) == 3:
+            gridvals = []
+            for j in range(dim1*dim2):
+               gridvals.append(tuple([float(x) for x in line.split()]))
+               line = f.readline()
+            self.tortor_list[-1].type = TorsionTorsionGrid.new(gridvals)
 
    def _read_multipoles(self, f):
       """ Read the atomic multipoles """

@@ -81,7 +81,7 @@ def use(package=None):
 
    Parameters:
     - package (string): This specifies which package to use, and may be either
-         netCDF4, Scientific/ScientificPython, scipy, pynetcdf, or None.  If
+         scipy, netCDF4, Scientific/ScientificPython, pynetcdf, or None.  If
          None, it chooses the first available implementation from the above list
          (in that order).
    
@@ -120,16 +120,16 @@ def use(package=None):
       return
 
    if package is None:
-      if _HAS_NC4:
-         open_netcdf = nc4open_netcdf
-         get_int_dimension = nc4get_int_dimension
-         get_float = nc4get_float
-         SELECTED_NETCDF = 'netCDF4'
-      elif _HAS_SCIPY_NETCDF:
+      if _HAS_SCIPY_NETCDF:
          open_netcdf = spopen_netcdf
          get_int_dimension = spget_int_dimension
          get_float = spget_float
          SELECTED_NETCDF = 'scipy'
+      elif _HAS_NC4:
+         open_netcdf = nc4open_netcdf
+         get_int_dimension = nc4get_int_dimension
+         get_float = nc4get_float
+         SELECTED_NETCDF = 'netCDF4'
       elif _HAS_SCIENTIFIC_PYTHON:
          open_netcdf = sciopen_netcdf
          get_int_dimension = sciget_int_dimension

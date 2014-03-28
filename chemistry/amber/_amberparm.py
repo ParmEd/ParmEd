@@ -103,12 +103,7 @@ class AmberParm(AmberFormat):
 
       # Load the structure arrays
       if self.valid:
-         try:
-            self._load_structure()
-         except (KeyError, IndexError, AttributeError):
-            warn('Error loading molecule topology. Cannot use delete_mask',
-                 AmberParmWarning)
-            self.valid = False
+         self._load_structure()
       
       # We now have the following instance arrays: All arrays are dynamic such
       # that removing an item propagates the indices if applicable. bond has
@@ -402,6 +397,10 @@ class AmberParm(AmberFormat):
       for ang in self.angles_without_h: ang.register()
       for dih in self.dihedrals_inc_h: dih.register()
       for dih in self.dihedrals_without_h: dih.register()
+      # Reset all type lists
+      self.bond_type_list.reset()
+      self.angle_type_list.reset()
+      self.dihedral_type_list.reset()
       # Fill up the atom arrays. This will also adjust NATOM for us if 
       # we've deleted atoms
       self.atom_list.write_to_parm()
@@ -442,7 +441,6 @@ class AmberParm(AmberFormat):
       # which will be reduced in size if not every bond is actually added
       bond_num = 0
       bond_type_num = 0
-      self.bond_type_list.deindex()
       self.parm_data['BONDS_INC_HYDROGEN'] = _zeros(len(self.bonds_inc_h)*3)
       for i, bnd in enumerate(self.bonds_inc_h):
          if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
@@ -480,7 +478,6 @@ class AmberParm(AmberFormat):
       # Now do all of the angle arrays
       angle_num = 0
       angle_type_num = 0
-      self.angle_type_list.deindex()
       # Make sure we have enough ANGLES_INC_HYDROGEN
       self.parm_data['ANGLES_INC_HYDROGEN'] = _zeros(len(self.angles_inc_h)*4)
       for i, ang in enumerate(self.angles_inc_h):
@@ -518,7 +515,6 @@ class AmberParm(AmberFormat):
       # Now do all of the dihedral arrays
       dihedral_num = 0
       dihedral_type_num = 0
-      self.dihedral_type_list.deindex()
       self.parm_data['DIHEDRALS_INC_HYDROGEN'] = \
                                           _zeros(len(self.dihedrals_inc_h)*5)
       for i, dih in enumerate(self.dihedrals_inc_h):
@@ -1151,7 +1147,7 @@ def set_molecules(parm):
 def _set_owner(parm, owner_array, atm, mol_id):
    """ Recursively sets ownership of given atom and all bonded partners """
    parm.atom_list[atm].marked = mol_id
-   for partner in parm.atom_list[atm].bonds():
+   for partner in parm.atom_list[atm].bond_partners:
       if not partner.marked:
          owner_array.append(partner.starting_index)
          _set_owner(parm, owner_array, partner.starting_index, mol_id)

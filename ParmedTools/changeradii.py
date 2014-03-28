@@ -35,7 +35,7 @@ def amber6(parm):
    """ Sets the amber6 radii """
    for i, atom in enumerate(parm.atom_list):
       # Radius of H atom depends on element it is bonded to
-      bondeds = list(atom.bonds())
+      bondeds = list(atom.bond_partners)
       if atom.atomic_number == 1:
          if bondeds[0].atomic_number == 6: # carbon
             parm.parm_data['RADII'][i] = 1.3
@@ -73,7 +73,7 @@ def mbondi(parm):
    for i, atom in enumerate(parm.atom_list):
       # Radius of H atom depends on element it is bonded to
       if atom.atomic_number == 1:
-         bondeds = list(atom.bonds())
+         bondeds = list(atom.bond_partners)
          if bondeds[0].atomic_number in (6, 7): # C or N
             parm.parm_data['RADII'][i] = 1.3
          elif bondeds[0].atomic_number in (8, 16): # O or S
@@ -110,7 +110,7 @@ def mbondi2(parm):
    for i, atom in enumerate(parm.atom_list):
       # Radius of H atom depends on element it is bonded to
       if atom.atomic_number == 1:
-         if atom.bonds()[0].atomic_number == 7:
+         if atom.bond_partners[0].atomic_number == 7:
             parm.parm_data['RADII'][i] = 1.3
          else:
             parm.parm_data['RADII'][i] = 1.2

@@ -15,9 +15,10 @@ from math import sqrt
 def check_validity(parm, warnings):
 
    # local shortcut for _check_exist_nvals
-   checkme = lambda *args, **kwargs: _check_exist_nvals(parm, *args,
-                                                        warnings=warnings,
-                                                         **kwargs)
+   def checkme(*args, **kwargs):
+      kwargs['warnings'] = warnings
+      return _check_exist_nvals(parm, *args, **kwargs)
+
    if not parm.valid:
       warnings.warn('AmberParm detects invalid prmtop file',
                     BadParmWarning)
@@ -195,11 +196,48 @@ def check_validity(parm, warnings):
       if not sel: continue
       atm = parm.atom_list[i]
       # We expect 2 bonds
-      bondedatms = [a.atname for a in atm.bonds()]
+      bondedatms = [a.atname for a in atm.bond_partners]
       if len(bondedatms) != 2 or 'SG' not in bondedatms:
          warnings.warn('Detected CYX residue with a Sulfur atom not bonded '
                        'to another CYX Sulfur! Did you forget to make the '
                        'disulfide bond?', MissingDisulfide)
+         break
+
+   # Check that our bonds/angles/dihedrals with and without hydrogen ACTUALLY
+   # have hydrogen or not hydrogen
+   for bond in parm.bonds_inc_h:
+      if bond.atom1.element != 1 and bond.atom2.element != 1:
+         warnings.warn('Bond with hydrogen has no hydrogen atom! Use '
+               '"fixTopology" to fix this issue.', BadParmWarning)
+         break
+   for bond in parm.bonds_without_h:
+      if bond.atom1.element == 1 or bond.atom2.element == 1:
+         warnings.warn('Bond without hydrogen has a hydrogen atom! Use '
+               '"fixTopology" to fix this issue.', BadParmWarning)
+         break
+   for angle in parm.angles_inc_h:
+      if (angle.atom1.element != 1 and angle.atom2.element != 1 and
+          angle.atom3.element != 1):
+         warnings.warn('Angle with hydrogen has no hydrogen atom! Use '
+               '"fixTopology to fix this issue.', BadParmWarning)
+         break
+   for angle in parm.angles_without_h:
+      if (angle.atom1.element == 1 or angle.atom2.element == 1 or
+          angle.atom3.element == 1):
+         warnings.warn('Angle without hydrogen has a hydrogen atom! Use '
+               '"fixTopology" to fix this issue.', BadParmWarning)
+         break
+   for dihed in parm.dihedrals_inc_h:
+      if (dihed.atom1.element != 1 and dihed.atom2.element != 1 and
+          dihed.atom3.element != 1 and dihed.atom4.element != 1):
+         warnings.warn('Dihedral with hydrogen has no hydrogen atom! Use '
+               '"fixTopology" to fix this issue.', BadParmWarning)
+         break
+   for dihed in parm.dihedrals_without_h:
+      if (dihed.atom1.element == 1 or dihed.atom2.element == 1 or
+          dihed.atom3.element == 1 or dihed.atom4.element == 1):
+         warnings.warn('Dihedral without hydrogen has a hydrogen atom! Use '
+               '"fixTopology" to fix this issue.', BadParmWarning)
          break
 
    if hasattr(parm, 'coords'):

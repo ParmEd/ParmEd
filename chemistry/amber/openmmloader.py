@@ -9,7 +9,7 @@ file.
 from __future__ import division
 
 from chemistry.amber.constants import TINY
-from chemistry.amber.readparm import AmberParm, Rst7
+from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
 from chemistry.exceptions import APIError, OpenMMError
 import chemistry.periodic_table as pt
 from math import asin, cos, sin, sqrt, pi
@@ -23,6 +23,8 @@ from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
 
 WATNAMES = ('WAT', 'HOH')
 EPNAMES = ('EP', 'LP')
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class OpenMMAmberParm(AmberParm):
    """
@@ -44,6 +46,10 @@ class OpenMMAmberParm(AmberParm):
       """
       Same as fill_LJ, except it uses 0.5 for the LJ radius for H-atoms with no
       vdW parameters (per OpenMM's standard)
+
+      Returns:
+         list, list : The first list is the list of all Rmin/2 terms. The second
+                      is the list of all epsilon (or well depth) terms.
       """
       LJ_radius = []  # empty LJ_radii so it can be re-filled
       LJ_depth = []   # empty LJ_depths so it can be re-filled
@@ -76,12 +82,23 @@ class OpenMMAmberParm(AmberParm):
                if acoef != 0 or bcoef != 0 or (wdij != 0 and rij != 0):
                   raise OpenMMError('Off-diagonal LJ modifications detected. '
                            'These are incompatible with the OpenMM API')
-            elif (abs((acoef - (wdij * rij**12)) / acoef) > TINY or
-                  abs((bcoef - (2 * wdij * rij**6)) / bcoef) > TINY):
+            elif (abs((acoef - (wdij * rij**12)) / acoef) > 1e-6 or
+                  abs((bcoef - (2 * wdij * rij**6)) / bcoef) > 1e-6):
                raise OpenMMError('Off-diagonal LJ modifications detected. '
-                        'These are incompatible with the OpenMM API')
+                        'These are incompatible with the OpenMM API. '
+                        'Acoef=%s; computed=%s. Bcoef=%s; computed=%s' % (acoef,
+                           wdij*rij**12, bcoef, 2*wdij*rij**6))
 
       return LJ_radius, LJ_depth
+
+   def openmm_14_LJ(self):
+      """
+      Returns the radii and depths for the LJ interactions between 1-4 pairs.
+      For Amber topology files this is the same as the normal LJ parameters, but
+      is done here so that OpenMMChamberParm can inherit and override this
+      behavior without having to duplicate all of the system creation code.
+      """
+      return self.openmm_LJ()
 
    @property
    def topology(self):
@@ -249,6 +266,7 @@ class OpenMMAmberParm(AmberParm):
       else:
          self.atom_list.refresh_data()
       LJ_radius, LJ_depth = self.openmm_LJ() # Get our LJ parameters
+      LJ_14_radius, LJ_14_depth = self.openmm_14_LJ()
 
       # Set the cutoff distance in nanometers
       cutoff = None
@@ -440,11 +458,11 @@ class OpenMMAmberParm(AmberParm):
       for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
          if min(tor.signs) < 0: continue # multi-terms and impropers
          charge_prod = tor.atom1.charge * tor.atom4.charge / tor.dihed_type.scee
-         epsilon = sqrt(LJ_depth[tor.atom1.nb_idx-1] * ene_conv *
-                        LJ_depth[tor.atom4.nb_idx-1] * ene_conv) / \
+         epsilon = sqrt(LJ_14_depth[tor.atom1.nb_idx-1] * ene_conv *
+                        LJ_14_depth[tor.atom4.nb_idx-1] * ene_conv) / \
                         tor.dihed_type.scnb
-         sigma = (LJ_radius[tor.atom1.nb_idx-1] +
-                 LJ_radius[tor.atom4.nb_idx-1]) * length_conv * sigma_scale
+         sigma = (LJ_14_radius[tor.atom1.nb_idx-1] +
+                 LJ_14_radius[tor.atom4.nb_idx-1]) * length_conv * sigma_scale
          force.addException(tor.atom1.starting_index, tor.atom4.starting_index,
                             charge_prod, sigma, epsilon)
          excluded_atom_pairs.add(
@@ -455,19 +473,19 @@ class OpenMMAmberParm(AmberParm):
       # Add excluded atoms
       for atom in self.atom_list:
          # Exclude all bonds and angles
-         for atom2 in atom.bonds():
+         for atom2 in atom.bond_partners:
             if atom2.starting_index > atom.starting_index:
                force.addException(atom.starting_index,
                                   atom2.starting_index, 0.0, 0.1, 0.0)
-         for atom2 in atom.angles():
+         for atom2 in atom.angle_partners:
             if atom2.starting_index > atom.starting_index:
                force.addException(atom.starting_index,
                                   atom2.starting_index, 0.0, 0.1, 0.0)
-         for atom2 in atom.exclusions():
+         for atom2 in atom.exclusion_partners:
             if atom2.starting_index > atom.starting_index:
                force.addException(atom.starting_index,
                                   atom2.starting_index, 0.0, 0.1, 0.0)
-         for atom2 in atom.dihedrals():
+         for atom2 in atom.dihedral_partners:
             if atom2.starting_index <= atom.starting_index: continue
             if ((atom.starting_index, atom2.starting_index) in
                 excluded_atom_pairs):
@@ -681,6 +699,207 @@ class OpenMMAmberParm(AmberParm):
       else:
          box = [x*u.angstrom for x in self.parm_data['BOX_DIMENSIONS'][1:]]
       return tuple(box)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
+   """
+   OpenMM-compatible subclass of AmberParm. This object should still work with
+   the ParmEd API while also being compatible with OpenMM's environment
+   """
+   
+   # Define default force groups for all of the bonded terms. This allows them
+   # to be turned on and off selectively. This is a way to implement per-term
+   # energy decomposition to compare individual components
+
+   BOND_FORCE_GROUP = 0
+   ANGLE_FORCE_GROUP = 1
+   DIHEDRAL_FORCE_GROUP = 2
+   UREY_BRADLEY_FORCE_GROUP = 3
+   IMPROPER_FORCE_GROUP = 4
+   CMAP_FORCE_GROUP = 5
+   NONBONDED_FORCE_GROUP = 6
+   GB_FORCE_GROUP = 6
+
+   def openmm_14_LJ(self):
+      """
+      Same as fill_14_LJ, except it uses 0.5 for the LJ radius for H-atoms with
+      no vdW parameters (per OpenMM's standard)
+
+      Returns:
+         list, list : The first list is the list of all Rmin/2 terms. The second
+                      is the list of all epsilon (or well depth) terms.
+      """
+      LJ_radius = []  # empty LJ_radii so it can be re-filled
+      LJ_depth = []   # empty LJ_depths so it can be re-filled
+      one_sixth = 1 / 6    # we need to raise some numbers to the 1/6th power
+
+      for i in range(self.pointers["NTYPES"]):
+         lj_index = self.parm_data["NONBONDED_PARM_INDEX"][
+                     self.pointers["NTYPES"] * i + i] - 1
+         if self.parm_data["LENNARD_JONES_14_ACOEF"][lj_index] < 1.0e-10:
+            LJ_radius.append(0.5)
+            LJ_depth.append(0)
+         else:
+            factor = (2 * self.parm_data["LENNARD_JONES_14_ACOEF"][lj_index] /
+                        self.parm_data["LENNARD_JONES_14_BCOEF"][lj_index])
+            LJ_radius.append(pow(factor, one_sixth) * 0.5)
+            LJ_depth.append(self.parm_data["LENNARD_JONES_14_BCOEF"][lj_index]
+                                    / 2 / factor)
+
+      # Now check that we haven't modified any off-diagonals, since that will
+      # not work with OpenMM
+      ntyp = self.ptr('ntypes')
+      for i in range(ntyp):
+         for j in range(ntyp):
+            idx = self.parm_data['NONBONDED_PARM_INDEX'][ntyp * i + j] - 1
+            rij = LJ_radius[i] + LJ_radius[j]
+            wdij = sqrt(LJ_depth[i] * LJ_depth[j])
+            acoef = self.parm_data['LENNARD_JONES_14_ACOEF'][idx]
+            bcoef = self.parm_data['LENNARD_JONES_14_BCOEF'][idx]
+            if acoef == 0 or bcoef == 0:
+               if acoef != 0 or bcoef != 0 or (wdij != 0 and rij != 0):
+                  raise OpenMMError('Off-diagonal LJ modifications detected. '
+                           'These are incompatible with the OpenMM API')
+            elif (abs((acoef - (wdij * rij**12)) / acoef) > 1e-6 or
+                  abs((bcoef - (2 * wdij * rij**6)) / bcoef) > 1e-6):
+               raise OpenMMError('Off-diagonal LJ modifications detected. '
+                        'These are incompatible with the OpenMM API. '
+                        'Acoef=%s; computed=%s. Bcoef=%s; computed=%s' % (acoef,
+                           wdij*rij**12, bcoef, 2*wdij*rij**6))
+
+      return LJ_radius, LJ_depth
+
+   def createSystem(self, nonbondedMethod=ff.NoCutoff,
+                    nonbondedCutoff=1.0*u.nanometer,
+                    constraints=None,
+                    rigidWater=True,
+                    implicitSolvent=None,
+                    implicitSolventKappa=None,
+                    implicitSolventSaltConc=0.0*u.moles/u.liter,
+                    temperature=298.15*u.kelvin,
+                    soluteDielectric=1.0,
+                    solventDielectric=78.5,
+                    removeCMMotion=True,
+                    hydrogenMass=None,
+                    ewaldErrorTolerance=0.0005,
+                    flexibleConstraints=True,
+                    verbose=False):
+      """
+      Construct an OpenMM System representing the topology described by the
+      prmtop file.
+
+      Parameters:
+         -  nonbondedMethod (object=NoCutoff) The method to use for nonbonded
+               interactions. Allowed values are NoCutoff, CutoffNonPeriodic,
+               CutoffPeriodic, Ewald, or PME.
+         -  nonbondedCutoff (distance=1*nanometer) The cutoff distance to use
+               for nonbonded interactions.
+         -  constraints (object=None) Specifies which bonds or angles should be
+               implemented with constraints. Allowed values are None, HBonds,
+               AllBonds, or HAngles.
+         -  rigidWater (boolean=True) If true, water molecules will be fully
+               rigid regardless of the value passed for the constraints argument
+         -  implicitSolvent (object=None) If not None, the implicit solvent
+               model to use. Allowed values are HCT, OBC1, OBC2, or GBn
+         -  implicitSolventKappa (float=None): Debye screening parameter to
+               model salt concentrations in GB solvent.
+         -  implicitSolventSaltConc (float=0.0*u.moles/u.liter): Salt
+               concentration for GB simulations. Converted to Debye length
+               `kappa'
+         -  temperature (float=298.15*u.kelvin): Temperature used in the salt
+               concentration-to-kappa conversion for GB salt concentration term
+         -  soluteDielectric (float=1.0) The solute dielectric constant to use
+               in the implicit solvent model.
+         -  solventDielectric (float=78.5) The solvent dielectric constant to
+               use in the implicit solvent model.
+         -  removeCMMotion (boolean=True) If true, a CMMotionRemover will be
+               added to the System.
+         -  hydrogenMass (mass=None) The mass to use for hydrogen atoms bound to
+               heavy atoms. Any mass added to a hydrogen is subtracted from the
+               heavy atom to keep their total mass the same.
+         -  ewaldErrorTolerance (float=0.0005) The error tolerance to use if the
+               nonbonded method is Ewald or PME.
+         -  flexibleConstraints (bool=True) Are our constraints flexible or not?
+         -  verbose (bool=False) Optionally prints out a running progress report
+      """
+      # Start from the system created by the AmberParm class
+      system = super(OpenMMChamberParm, self).createSystem(
+                        nonbondedMethod, nonbondedCutoff, constraints,
+                        rigidWater, implicitSolvent, implicitSolventKappa,
+                        implicitSolventSaltConc, temperature, soluteDielectric,
+                        solventDielectric, removeCMMotion, hydrogenMass,
+                        ewaldErrorTolerance, flexibleConstraints, verbose)
+
+      # Define conversion factors
+      length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+      _ambfrc = u.kilocalorie_per_mole/(u.angstrom*u.angstrom)
+      _openmmfrc = u.kilojoule_per_mole/(u.nanometer*u.nanometer)
+      bond_frc_conv = _ambfrc.conversion_factor_to(_openmmfrc)
+      _ambfrc = u.kilocalorie_per_mole/(u.radians*u.radians)
+      _openmmfrc = u.kilojoule_per_mole/(u.radians*u.radians)
+      angle_frc_conv = _ambfrc.conversion_factor_to(_openmmfrc)
+      dihe_frc_conv = u.kilocalorie_per_mole.conversion_factor_to(
+                           u.kilojoule_per_mole)
+      ene_conv = dihe_frc_conv
+
+      # Add the urey-bradley terms
+      if verbose: print('Adding Urey-Bradley terms')
+      force = mm.HarmonicBondForce()
+      force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
+      for ub in self.urey_bradley:
+         force.addBond(ub.atom1.starting_index, ub.atom2.starting_index,
+                       ub.ub_type.req*length_conv, 2*ub.ub_type.k*bond_frc_conv)
+      system.addForce(force)
+
+      if verbose: print('Adding impropers...')
+      # Ick. OpenMM does not have an improper torsion class. Need to construct
+      # one from CustomTorsionForce
+      force = mm.CustomTorsionForce('k*(theta-theta0)^2')
+      force.addPerTorsionParameter('k')
+      force.addPerTorsionParameter('theta0')
+      force.setForceGroup(self.IMPROPER_FORCE_GROUP)
+      for imp in self.improper:
+         force.addTorsion(imp.atom1.starting_index, imp.atom2.starting_index,
+                          imp.atom3.starting_index, imp.atom4.starting_index,
+                          (imp.improp_type.psi_k*dihe_frc_conv,
+                           imp.improp_type.psi_eq)
+         )
+      system.addForce(force)
+
+      if self.has_cmap:
+         if verbose: print('Adding CMAP coupled torsions...')
+         force = mm.CMAPTorsionForce()
+         force.setForceGroup(self.CMAP_FORCE_GROUP)
+         # First get the list of cmap maps we're going to use. Just store the
+         # IDs so we have simple integer comparisons to do later
+         cmap_type_list = []
+         cmap_map = dict()
+         for cmap in self.cmap:
+            if not id(cmap.cmap_type) in cmap_type_list:
+               ct = cmap.cmap_type
+               cmap_type_list.append(id(ct))
+               # Our torsion correction maps need to go from 0 to 360 degrees
+               grid = ct.grid.switch_range().T
+               m = force.addMap(ct.resolution, [x*ene_conv for x in grid])
+               cmap_map[id(ct)] = m
+         # Now add in all of the cmaps
+         for cmap in self.cmap:
+            force.addTorsion(cmap_map[id(cmap.cmap_type)],
+                             cmap.atom1.starting_index,
+                             cmap.atom2.starting_index,
+                             cmap.atom3.starting_index,
+                             cmap.atom4.starting_index, # end of 1st torsion
+                             cmap.atom2.starting_index,
+                             cmap.atom3.starting_index,
+                             cmap.atom4.starting_index,
+                             cmap.atom5.starting_index  # end of 2nd torsion
+            )
+         system.addForce(force)
+
+      return system
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class OpenMMRst7(Rst7):
    """

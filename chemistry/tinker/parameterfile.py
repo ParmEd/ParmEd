@@ -4,6 +4,8 @@ TINKER-based parameter file.
 """
 from chemistry.exceptions import (AmoebaParamFileError, APIError,
             AmoebaParamFileWarning)
+import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
+from collections import OrderedDict
 import re
 import warnings
 
@@ -232,7 +234,7 @@ class _TorsionTorsionType(_ParamType):
       indexes = (int(i) for i in indexes)
       key = '%d-%d-%d-%d-%d' % tuple(indexes)
       self.nx, self.ny = int(nx), int(ny)
-      self.potential_grid = dict()
+      self.potential_grid = OrderedDict()
       self.register(self, key)
 
    def add_point(self, x, y, potential):

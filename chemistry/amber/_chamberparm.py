@@ -101,12 +101,9 @@ class ChamberParm(AmberParm):
       self.pointers['NIMPHI'] = self.parm_data['CHARMM_NUM_IMPROPERS'][0]
       self.pointers['NIMPRTYPES']=self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
       # If CMAP is not present, don't load the pointers
-      try:
+      if self.has_cmap:
          self.pointers['CMAP'] = self.parm_data['CHARMM_CMAP_COUNT'][0]
          self.pointers['CMAP_TYPES'] = self.parm_data['CHARMM_CMAP_COUNT'][1]
-      except KeyError:
-         # CMAP does not exist in this parm
-         pass
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -202,6 +199,12 @@ class ChamberParm(AmberParm):
       Re-fills the topology file arrays if we have changed the underlying
       structure
       """
+      # Reset the chamber-specific type lists
+      self.urey_bradley_type_list.reset()
+      self.improper_type_list.reset()
+      if self.has_cmap:
+         self.cmap_type_list.reset()
+
       # Handle all parts that are common with Amber via AmberParm
       AmberParm.remake_parm(self)
 
@@ -209,7 +212,6 @@ class ChamberParm(AmberParm):
 
       # Urey-Bradley
       ub_num = ub_type_num = 0
-      self.urey_bradley_type_list.deindex()
       self.parm_data['CHARMM_UREY_BRADLEY'] = _zeros(len(self.urey_bradley)*3)
       for i, ub in enumerate(self.urey_bradley):
          if -1 in (ub.atom1.idx, ub.atom2.idx):
@@ -230,7 +232,6 @@ class ChamberParm(AmberParm):
 
       # Impropers
       imp_num = imp_type_num = 0
-      self.improper_type_list.deindex()
       self.parm_data['CHARMM_IMPROPERS'] = _zeros(len(self.improper) * 5)
       for i, imp in enumerate(self.improper):
          if -1 in (imp.atom1.idx, imp.atom2.idx, imp.atom3.idx, imp.atom4.idx):
@@ -256,7 +257,7 @@ class ChamberParm(AmberParm):
       self.improper_type_list.changed = False
 
       # If we have no CMAP, we are done. Otherwise, press on
-      if not 'CHARMM_CMAP_COUNT' in self.flag_list:
+      if not self.has_cmap:
          self.LoadPointers() # update CHARMM pointers
          return
 
@@ -282,6 +283,7 @@ class ChamberParm(AmberParm):
             if flag.startswith('CHARMM_CMAP_PARAMETER'):
                self.deleteFlag(flag)
          self.LoadPointers() # update CHARMM pointers
+         del self.cmap, self.cmap_type_list
          return
       # Truncate our list to only include those cmaps that remain
       self._truncate_array('CHARMM_CMAP_INDEX', 6*cmap_num)
@@ -307,6 +309,8 @@ class ChamberParm(AmberParm):
          self.addFlag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt, data=ct.grid,
                       comments=ct.comments)
       self.LoadPointers() # update CHARMM pointers
+      self.cmap.changed = False
+      self.cmap_type_list.changed = False
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    
@@ -318,7 +322,7 @@ class ChamberParm(AmberParm):
       tc = (AmberParm._topology_changed(self) or self.urey_bradley.changed or
             self.urey_bradley_type_list.changed or self.improper.changed or
             self.improper_type_list.changed)
-      if 'CHARMM_CMAP_COUNT' in self.flag_list:
+      if self.has_cmap:
          return tc or self.cmap.changed or self.cmap_type_list.changed
       return tc
 
@@ -386,6 +390,12 @@ class ChamberParm(AmberParm):
    @property
    def amoeba(self):
       return False
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   @property
+   def has_cmap(self):
+      return 'CHARMM_CMAP_COUNT' in self.flag_list
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
