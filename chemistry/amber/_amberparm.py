@@ -107,6 +107,8 @@ class AmberParm(AmberFormat):
         # Load the structure arrays
         if self.valid:
             self._load_structure()
+            # Find any extra exclusion rules that may be defined
+            self.atom_list.find_extra_exclusions()
 
         # We now have the following instance arrays: All arrays are dynamic such
         # that removing an item propagates the indices if applicable. bond has
