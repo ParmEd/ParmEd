@@ -204,8 +204,8 @@ ParmEd: a Parameter file Editor
 
 """]
 
-class Logo:
-   
-   def __str__(self):
-      from random import choice
-      return choice(logos)
+class Logo(object):
+
+    def __str__(self):
+        from random import choice
+        return choice(logos)

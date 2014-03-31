@@ -1,24 +1,28 @@
 """ Creates a leaprc file for use in amberParm-created OFF and frcmod files """
 
-from sys import stderr
+from warnings import warn
 
-def MakeLeaprc(frcmod, off, leaprc, radius_set = 'modified Bondi radii (mbondi)', 
+def MakeLeaprc(frcmod, off, leaprc, radius_set='modified Bondi radii (mbondi)',
                logfile = 'leap.log'):
-   """ Writes out the leaprc file from the given parm, OFF files """
+    """ Writes out the leaprc file from the given parm, OFF files """
 
-   file = open(leaprc,'w',0)
+    file = open(leaprc,'w',0)
 
-   if radius_set.strip() == "Bondi radii (bondi)": radii = "bondi"
-   elif radius_set.strip() == "amber6 modified Bondi radii (amber6)": radii = "amber6"
-   elif radius_set.strip() == "modified Bondi radii (mbondi)": radii = 'mbondi'
-   elif radius_set.strip() == "H(N)-modified Bondi radii (mbondi2)": radii = 'mbondi2'
-   else:
-      print >> stderr, 'Error: Unknown GB Radius set! [ %s ]' % radius_set
-      print >> stderr, '       GB radii will not be reliable unless they are default mbondi'
-      radii = 'mbondi'
+    if radius_set.strip() == "Bondi radii (bondi)":
+        radii = "bondi"
+    elif radius_set.strip() == "amber6 modified Bondi radii (amber6)":
+        radii = "amber6"
+    elif radius_set.strip() == "modified Bondi radii (mbondi)":
+        radii = 'mbondi'
+    elif radius_set.strip() == "H(N)-modified Bondi radii (mbondi2)":
+        radii = 'mbondi2'
+    else:
+        warn('Unknown GB Radius set! [ %s ]; GB radii are assigned a default '
+             'of mbondi' % radius_set)
+        radii = 'mbondi'
 
 
-   file.write("""logFile %s
+    file.write("""logFile %s
 #
 # ----- leaprc for loading the prmtop-based force field
 # ----- NOTE: this is designed for PDB format 3!
@@ -79,4 +83,4 @@ addPdbResMap {
 set default PBRadii %s
 """ % (logfile, frcmod, off, radii))
 
-   file.close()
+    file.close()

@@ -33,39 +33,39 @@ __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 
 # For backwards compatibility, but this will be eliminated
 class rst7(Rst7):
-   """ Amber input coordinate (or restart coordinate) file format """
+    """ Amber input coordinate (or restart coordinate) file format """
 
-   def __init__(self, filename=None):
-      _warn('rst7 is deprecated. Use Rst7 instead.', DeprecationWarning)
-      super(rst7, self).__init__(filename=filename)
+    def __init__(self, filename=None):
+        _warn('rst7 is deprecated. Use Rst7 instead.', DeprecationWarning)
+        super(rst7, self).__init__(filename=filename)
    
 
-# Supply a factory function to load a topology file in the 'correct' format
+# Supply a function to load a topology file in the 'correct' format
 def LoadParm(parmname, rst7name=None):
-   """
-   Loads a topology file using the correct class.
+    """
+    Loads a topology file using the correct class.
 
-   Parameters:
-      parmname (str): The name of the topology file to load
-      rst7name (str): The (optional) name of the restart file to load
+    Parameters:
+        parmname (str): The name of the topology file to load
+        rst7name (str): The (optional) name of the restart file to load
 
-   Returns:
-      AmberParm or ChamberParm instance, depending on whether it is an Amber
-      topology (i.e., created with LEaP) or a Chamber topology (i.e., created
-      with chamber), respectively. If the restart file is not None, it will load
-      the restart file into the parameter file
-   """
-   parm = AmberFormat(parmname)
-   if 'CTITLE' in parm.flag_list:
-      parm = parm.view(ChamberParm)
-   elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
-      parm = parm.view(AmoebaParm)
-   else:
-      parm = parm.view(AmberParm)
+    Returns:
+        AmberParm or ChamberParm instance, depending on whether it is an Amber
+        topology (i.e., created with LEaP) or a Chamber topology (i.e., created
+        with chamber), respectively. If the restart file is not None, it will
+        load the restart file into the parameter file
+    """
+    parm = AmberFormat(parmname)
+    if 'CTITLE' in parm.flag_list:
+        parm = parm.view(ChamberParm)
+    elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
+        parm = parm.view(AmoebaParm)
+    else:
+        parm = parm.view(AmberParm)
 
-   # Now load the restart file
-   if rst7name is not None:
-      rst = Rst7.open(rst7name)
-      parm.LoadRst7(rst)
+    # Now load the restart file
+    if rst7name is not None:
+        rst = Rst7.open(rst7name)
+        parm.LoadRst7(rst)
 
-   return parm
+    return parm

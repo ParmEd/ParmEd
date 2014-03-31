@@ -27,70 +27,72 @@ from ParmedTools.parmlist import ParmList
 debug = False
 
 def excepthook(exception_type, exception_value, tb):
-   """ Default exception handler """
-   import traceback
-   if debug: traceback.print_tb(tb)
-   showerror('Fatal Error','%s: %s' % (exception_type.__name__,exception_value))
-   sys.exit(1)
+    """ Default exception handler """
+    import traceback
+    if debug: traceback.print_tb(tb)
+    showerror('Fatal Error','%s: %s' % (exception_type.__name__,
+                                        exception_value))
+    sys.exit(1)
 
 def main():
-   """ The main function """
-   global excepthook, debug
-   # Launch the root window
-   root = tk.Tk()
-   root.resizable(True, True)
+    """ The main function """
+    global excepthook, debug
+    # Launch the root window
+    root = tk.Tk()
+    root.resizable(True, True)
 
-   # Replace the default excepthook with mine
-   sys.excepthook = excepthook
+    # Replace the default excepthook with mine
+    sys.excepthook = excepthook
 
-   # See if we were provided a topology file on the command-line
-   parser = OptionParser(usage = '%prog [<prmtop>]')
-   parser.add_option('-d', '--debug', dest='debug', default=False, 
-                     action='store_true', help='Show detailed tracebacks ' +
-                     'when an error is detected.')
-   opt, args = parser.parse_args()
+    # See if we were provided a topology file on the command-line
+    parser = OptionParser(usage = '%prog [<prmtop>]')
+    parser.add_option('-d', '--debug', dest='debug', default=False, 
+                      action='store_true', help='Show detailed tracebacks ' +
+                      'when an error is detected.')
+    opt, args = parser.parse_args()
 
-   debug = opt.debug
+    debug = opt.debug
 
-   # If the user provided a CL argument, that is the prmtop_name. Otherwise,
-   # open up a file choosing dialog box to get the input from the user
-   if len(args) == 0:
-      prmtop_name = file_chooser('Topology')
-   elif len(args) == 1:
-      prmtop_name = args[0]
-   else:
-      print >> sys.stderr, 'Unknown command-line options. Ignoring'
-      prmtop_name = file_chooser('Topology')
+    # If the user provided a CL argument, that is the prmtop_name. Otherwise,
+    # open up a file choosing dialog box to get the input from the user
+    if len(args) == 0:
+        prmtop_name = file_chooser('Topology')
+    elif len(args) == 1:
+        prmtop_name = args[0]
+    else:
+        print >> sys.stderr, 'Unknown command-line options. Ignoring'
+        prmtop_name = file_chooser('Topology')
 
-   # If we chose no prmtop file, 
-   if not prmtop_name: raise ParmError('No prmtop chosen!')
+    # If we chose no prmtop file, 
+    if not prmtop_name: raise ParmError('No prmtop chosen!')
 
-   # Load the amber prmtop and check for errors
-   amber_prmtop = ParmList()
-   parm = AmberFormat(prmtop_name)
-   if 'CTITLE' in parm.flag_list:
-      parm = parm.view(ChamberParm)
-   else:
-      parm = parm.view(AmberParm)
-   amber_prmtop.add_parm(parm)
+    # Load the amber prmtop and check for errors
+    amber_prmtop = ParmList()
+    parm = AmberFormat(prmtop_name)
+    if 'CTITLE' in parm.flag_list:
+        parm = parm.view(ChamberParm)
+    else:
+        parm = parm.view(AmberParm)
+    amber_prmtop.add_parm(parm)
 
-   # Make this overwritable -- the all of the file save boxes will ask the user
-   # for verification before saving over an existing file. There's no need for
-   # the AmberParm security layer.
-   Action.overwrite = True
+    # Make this overwritable -- the all of the file save boxes will ask the user
+    # for verification before saving over an existing file. There's no need for
+    # the AmberParm security layer.
+    Action.overwrite = True
 
-   fname = split(prmtop_name)[1]
-   root.title('xParmED: Editing/viewing [%s] Choose an operation' % fname)
+    fname = split(prmtop_name)[1]
+    root.title('xParmED: Editing/viewing [%s] Choose an operation' % fname)
 
-   # Make sure our topology file is valid
-   if not amber_prmtop.parm.valid:
-      raise ParmError('Bad (or non-existent) topology file [%s]' % prmtop_name)
+    # Make sure our topology file is valid
+    if not amber_prmtop.parm.valid:
+        raise ParmError('Bad (or non-existent) topology file [%s]' %
+                        prmtop_name)
 
-   # Now build the action list on root
-   app = ParmedApp(root, amber_prmtop)
-   app.pack(fill=tk.BOTH, expand=1)
-   root.mainloop()
+    # Now build the action list on root
+    app = ParmedApp(root, amber_prmtop)
+    app.pack(fill=tk.BOTH, expand=1)
+    root.mainloop()
 
-   print 'Thank you for using xParmEd!\n%s' % Logo()
+    print 'Thank you for using xParmEd!\n%s' % Logo()
 
 if __name__ == '__main__': main()

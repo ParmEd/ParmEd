@@ -2,173 +2,172 @@
 from sys import stderr
 
 class ParmError(Exception):
-   """ Base parmed error """
-   def __init__(self, msg='parmed error'):
-      self.msg = msg
-   def __str__(self):
-      return self.msg
+    """ Base parmed error """
+    def __init__(self, msg='parmed error'):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
 
 class ParmWarning(Warning, ParmError):
-   """ Base parmed warning """
-   def __init__(self, msg='parmed warning'):
-      self.msg = msg
-   def __str__(self):
-      return self.msg
+    """ Base parmed warning """
+    def __init__(self, msg='parmed warning'):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
 
 class SeriousParmWarning(ParmWarning):
-   """ These warnings are more serious, and are fatal in strict operation """
+    """ These warnings are more serious, and are fatal in strict operation """
 
 class ChangeRadiiError(ParmError):
-   pass
+    pass
 
 class WriteOFFError(ParmError):
-   pass
+    pass
 
 class ParmedUtilsError(ParmError):
-   pass
+    pass
 
 class ParmedChangeError(ParmError):
-   pass
+    pass
 
 class ParmedAddLJTypeError(ParmError):
-   pass
+    pass
 
 class ChangeLJPairError(ParmError):
-   pass
+    pass
 
 class LJ_TypeError(ParmError):
-   pass
+    pass
 
 class ParmedMoleculeError(ParmError):
-   pass
+    pass
 
 class CoarseGrainError(ParmError):
-   pass
+    pass
 
 class ChangeStateError(ParmError):
-   pass
+    pass
 
 class SetParamError(ParmError):
-   pass
+    pass
 
 class DeleteDihedralError(ParmError):
-   pass
+    pass
 
 class ArgumentError(ParmError):
-   pass
+    pass
 
 class NoArgument(ParmError):
-   pass
+    pass
 
 class InterpreterError(ParmError):
-   pass
+    pass
 
 class AmberIncompatibleWarning(ParmWarning):
-   pass
+    pass
 
 class BadParmWarning(ParmWarning):
-   pass
+    pass
 
 class FixableParmWarning(ParmWarning):
-   pass
+    pass
 
 class NonfatalWarning(ParmWarning):
-   pass
+    pass
 
 class NonUniversalWarning(ParmWarning):
-   pass
+    pass
 
 class MissingDisulfide(ParmWarning):
-   pass
+    pass
 
 class LongBondWarning(ParmWarning):
-   pass
+    pass
 
 class NonexistentParm(ParmError):
-   pass
+    pass
 
 class NonexistentParmWarning(SeriousParmWarning):
-   pass
+    pass
 
 class DuplicateParm(ParmError):
-   pass
+    pass
 
 class AmbiguousParmError(ParmError):
-   pass
+    pass
 
 class IncompatibleParmsError(ParmError):
-   pass
+    pass
 
 class AddPDBWarning(ParmWarning):
-   pass
+    pass
 
 class AddPDBError(ParmError):
-   pass
+    pass
 
 class LJ12_6_4Error(ParmError):
-   pass
+    pass
 
 class DuplicateParamWarning(SeriousParmWarning):
-   pass
+    pass
 
 class HMassRepartitionError(ParmError):
-   pass
+    pass
 
 class SimulationError(ParmError):
-   pass
+    pass
 
 class SimulationWarning(ParmWarning):
-   pass
+    pass
 
 class UnhandledArgumentWarning(SeriousParmWarning):
-   pass
+    pass
 
 class InputError(ParmError):
-   pass
+    pass
 
 class ParmIndexError(ParmError):
-   pass
+    pass
 
 class FileExists(ParmError):
-   pass
+    pass
 
 class WarningList(list):
-   """ List of warnings """
+    """ List of warnings """
    
-   def __init__(self, empty_msg='No warnings found'):
-      self._empty_msg = empty_msg
-      list.__init__(self)
+    def __init__(self, empty_msg='No warnings found'):
+        self._empty_msg = empty_msg
+        list.__init__(self)
 
-   def append(self, *args):
-      raise NotImplemented('Cannot append to WarningList -- use warn() instead!')
+    def append(self, *args):
+        raise NotImplemented('Use warn() to add to WarningList!')
 
-   def extend(self, *args):
-      raise NotImplemented('Cannot extend a WarningList -- use warn() instead!')
+    extend = append
 
-   def warn(self, msg, exc_type=ParmWarning):
-      """ Adds a warning to the list """
-      list.append(self, (exc_type,msg))
+    def warn(self, msg, exc_type=ParmWarning):
+        """ Adds a warning to the list """
+        list.append(self, (exc_type, msg))
 
-   def dump(self, dest=stderr, ncols=80):
-      """ Dump a list of all warnings to the destination """
-      if len(self) == 0:
-         dest.write(self._empty_msg + '\n')
-         return
+    def dump(self, dest=stderr, ncols=80):
+        """ Dump a list of all warnings to the destination """
+        if len(self) == 0:
+            dest.write(self._empty_msg + '\n')
+            return
 
-      dest.write('%d total warnings\n\n' % len(self))
+        dest.write('%d total warnings\n\n' % len(self))
 
-      for w in self:
-         words = ('%s: %s' % (w[0].__name__, w[1])).split()
-         prstr = words[0] + ' '
-         indent_chars = len(words[0]) + 1
-         i = 1
-         while i < len(words):
-            if prstr and len(prstr) + len(words[i]) > ncols:
-               dest.write(prstr + '\n')
-               prstr = ' ' * indent_chars
-            prstr += words[i] + ' '
-            i += 1
-         if prstr:
-            dest.write(prstr + '\n')
-         dest.write('\n')
-#        dest.write('%s: %s\n' % (w[0].__name__, w[1]))
+        for w in self:
+            words = ('%s: %s' % (w[0].__name__, w[1])).split()
+            prstr = words[0] + ' '
+            indent_chars = len(words[0]) + 1
+            i = 1
+            while i < len(words):
+                if prstr and len(prstr) + len(words[i]) > ncols:
+                    dest.write(prstr + '\n')
+                    prstr = ' ' * indent_chars
+                prstr += words[i] + ' '
+                i += 1
+            if prstr:
+                dest.write(prstr + '\n')
+            dest.write('\n')
+#           dest.write('%s: %s\n' % (w[0].__name__, w[1]))

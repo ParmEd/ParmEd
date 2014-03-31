@@ -45,148 +45,149 @@ import collections as _collections
 
 # Support "any" and "all" functions
 if not hasattr(__builtin__, 'any'):
-   def any(iterable):
-      for it in iterable:
-         if it: return True
-      return False
-   def all(iterable):
-      for it in iterable:
-         if not it: return False
-      return True
+    def any(iterable):
+        for it in iterable:
+            if it: return True
+        return False
+    def all(iterable):
+        for it in iterable:
+            if not it: return False
+        return True
 else:
-   any = __builtin__.any
-   all = __builtin__.all
+    any = __builtin__.any
+    all = __builtin__.all
 
 # Support property.setter
 if not hasattr(__builtin__.property, 'setter'):
-   # Taken from https://gist.github.com/romuald/1104222
-   class property(__builtin__.property):
-      __metaclass__ = type
+    # Taken from https://gist.github.com/romuald/1104222
+    class property(__builtin__.property):
+        __metaclass__ = type
 
-      def setter(self, method):
-         return property(self.fget, method, self.fdel)
+        def setter(self, method):
+            return property(self.fget, method, self.fdel)
 
-      def deleter(self, method):
-         return property(self.fget, self.fset, method)
+        def deleter(self, method):
+            return property(self.fget, self.fset, method)
 
-      @__builtin__.property
-      def __doc__(self):
-         """ Set doc correctly for subclass """
-         return self.fget.__doc__
+        @__builtin__.property
+        def __doc__(self):
+            """ Set doc correctly for subclass """
+            return self.fget.__doc__
 else:
-   property = __builtin__.property
+    property = __builtin__.property
 
 # Support collections.OrderedDict
 if 'OrderedDict' not in dir(_collections):
-   # This class is taken from Raymond Hettinger's ordereddict package on PyPI
-   # Clever use of sentinels. It maintains dict lookup performance with a slight
-   # increase in required memory and marginally lower performance for some basic
-   # tasks. The OrderedDict implementation in Python 2.7 is also pure-python, so
-   # it has similar performance as the one implemented here.
-   from UserDict import DictMixin
-   class OrderedDict(dict):
+    # This class is taken from Raymond Hettinger's ordereddict package on PyPI
+    # Clever use of sentinels. It maintains dict lookup performance with a
+    # slight increase in required memory and marginally lower performance for
+    # some basic tasks. The OrderedDict implementation in Python 2.7 is also
+    # pure-python, so it has similar performance as the one implemented here.
+    from UserDict import DictMixin
+    class OrderedDict(dict):
+
+        def __init__(self, *args, **kwargs):
+            if len(args) > 1:
+                raise TypeError('expected at most 1 arguments, got %d' %
+                                len(args))
+            try:
+                self.__end
+            except AttributeError:
+                self.clear()
+            self.update(*args, **kwargs)
+
+        def clear(self):
+            self.__end = end = []
+            end += [None, end, end]     # sentinel node for doubly linked list
+            self.__map = {}             # key --> [key, prev, next]
+            dict.clear(self)
+
+        def __setitem__(self, key, value):
+            if key not in self:
+                end = self.__end
+                curr = end[1]
+                curr[2] = end[1] = self.__map[key] = [key, curr, end]
+            dict.__setitem__(self, key, value)
       
-      def __init__(self, *args, **kwargs):
-         if len(args) > 1:
-            raise TypeError('expected at most 1 arguments, got %d' % len(args))
-         try:
-            self.__end
-         except AttributeError:
-            self.clear()
-         self.update(*args, **kwargs)
+        def __delitem__(self, key):
+            dict.__delitem__(self, key)
+            key, prev, next = self.__map.pop(key)
+            prev[2] = next
+            next[1] = prev
 
-      def clear(self):
-         self.__end = end = []
-         end += [None, end, end]       # sentinel node for doubly linked list
-         self.__map = {}               # key --> [key, prev, next]
-         dict.clear(self)
+        def __iter__(self):
+            end = self.__end
+            curr = end[2]
+            while curr is not end:
+                yield curr[0]
+                curr = curr[2]
 
-      def __setitem__(self, key, value):
-         if key not in self:
+        def __reversed__(self):
             end = self.__end
             curr = end[1]
-            curr[2] = end[1] = self.__map[key] = [key, curr, end]
-         dict.__setitem__(self, key, value)
-      
-      def __delitem__(self, key):
-         dict.__delitem__(self, key)
-         key, prev, next = self.__map.pop(key)
-         prev[2] = next
-         next[1] = prev
+            while curr is not end:
+                yield curr[0]
+                curr = curr[1]
 
-      def __iter__(self):
-         end = self.__end
-         curr = end[2]
-         while curr is not end:
-            yield curr[0]
-            curr = curr[2]
+        def popitem(self, last=True):
+            if not self:
+                raise KeyError('dictionary is empty')
+            if last:
+                key = reversed(self).next()
+            else:
+                key = iter(self).next()
+            value = self.pop(key)
+            return key, value
 
-      def __reversed__(self):
-         end = self.__end
-         curr = end[1]
-         while curr is not end:
-            yield curr[0]
-            curr = curr[1]
+        def __reduce__(self):
+            items = [[k, self[k]] for k in self]
+            tmp = self.__map, self.__end
+            del self.__map, self.__end
+            inst_dict = vars(self).copy()
+            self.__map, self.__end = tmp
+            if inst_dict:
+                return (self.__class__, (items,), inst_dict)
+            return self.__class__, (items,)
 
-      def popitem(self, last=True):
-         if not self:
-            raise KeyError('dictionary is empty')
-         if last:
-            key = reversed(self).next()
-         else:
-            key = iter(self).next()
-         value = self.pop(key)
-         return key, value
+        def keys(self):
+            return list(self)
 
-      def __reduce__(self):
-         items = [[k, self[k]] for k in self]
-         tmp = self.__map, self.__end
-         del self.__map, self.__end
-         inst_dict = vars(self).copy()
-         self.__map, self.__end = tmp
-         if inst_dict:
-            return (self.__class__, (items,), inst_dict)
-         return self.__class__, (items,)
+        setdefault = DictMixin.setdefault
+        update = DictMixin.update
+        pop = DictMixin.pop
+        values = DictMixin.values
+        items = DictMixin.items
+        iterkeys = DictMixin.iterkeys
+        itervalues = DictMixin.itervalues
+        iteritems = DictMixin.iteritems
 
-      def keys(self):
-         return list(self)
+        def __repr__(self):
+            if not self:
+                return '%s()' % self.__class__.__name__
+            return '%s(%r)' % (self.__class__.__name__, self.items())
 
-      setdefault = DictMixin.setdefault
-      update = DictMixin.update
-      pop = DictMixin.pop
-      values = DictMixin.values
-      items = DictMixin.items
-      iterkeys = DictMixin.iterkeys
-      itervalues = DictMixin.itervalues
-      iteritems = DictMixin.iteritems
+        def copy(self):
+            return self.__class__(self)
 
-      def __repr__(self):
-         if not self:
-            return '%s()' % self.__class__.__name__
-         return '%s(%r)' % (self.__class__.__name__, self.items())
+        @classmethod
+        def fromkeys(cls, iterable, value=None):
+            d = cls()
+            for key in iterable:
+                d[key] = value
+            return d
 
-      def copy(self):
-         return self.__class__(self)
+        def __eq__(self, other):
+            if isinstance(other, OrderedDict):
+                if len(self) != len(other):
+                    return False
+                for p, q, in zip(self.items(), other.items()):
+                    if p != q:
+                        return False
+                    return True
+            return dict.__eq__(self, other)
 
-      @classmethod
-      def fromkeys(cls, iterable, value=None):
-         d = cls()
-         for key in iterable:
-            d[key] = value
-         return d
+        def __ne__(self, other):
+            return not self == other
 
-      def __eq__(self, other):
-         if isinstance(other, OrderedDict):
-            if len(self) != len(other):
-               return False
-            for p, q, in zip(self.items(), other.items()):
-               if p != q:
-                  return False
-            return True
-         return dict.__eq__(self, other)
-
-      def __ne__(self, other):
-         return not self == other
-
-   _collections.OrderedDict = OrderedDict
-   del OrderedDict, DictMixin
+    _collections.OrderedDict = OrderedDict
+    del OrderedDict, DictMixin

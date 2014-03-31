@@ -9,7 +9,6 @@ import warnings
 
 # Load custom modules
 from ParmedTools.logos import Logo
-from ParmedTools import parmed_cmd
 from ParmedTools.exceptions import (ParmError, SeriousParmWarning,
                                     InterpreterError)
 from ParmedTools.parmed_cmd import ParmedCmd
@@ -19,20 +18,20 @@ from ParmedTools import __version__
 
 # Set up new excepthook to clean up fatal exception printouts
 def interrupted(*args, **kwargs):
-   """ Handle interruptions gracefully """
-   sys.stdout.write('Interrupted\n')
-   sys.exit(1)
+    """ Handle interruptions gracefully """
+    sys.stdout.write('Interrupted\n')
+    sys.exit(1)
 
 signal.signal(signal.SIGINT, interrupted)
 
 # Define our own custom warning printer
 def _print_warnings(message, category, filename, lineno, file=None, line=None):
-   """ Override the default showwarning method """
-   if file is None: file = sys.stderr
-   try:
-      file.write('%s: %s\n' % (category.__name__, message))
-   except IOError:
-      pass
+    """ Override the default showwarning method """
+    if file is None: file = sys.stderr
+    try:
+        file.write('%s: %s\n' % (category.__name__, message))
+    except IOError:
+        pass
 
 warnings.showwarning = _print_warnings
 
@@ -49,6 +48,10 @@ group.add_argument('-p', '--parm', dest='prmtop', default=[],
          metavar='<prmtop>', action='append', help='''List of topology files to
          load into ParmEd. Can be specified multiple times to process multiple
          topologies.''')
+group.add_argument('-c', '--inpcrd', dest='inpcrd', default=[],
+         metavar='<inpcrd>', action='append', help='''List of inpcrd files to
+         load into ParmEd. They are paired with the topology files in the same
+         order that each set of files is specified on the command-line.''')
 group = parser.add_argument_group('Output Files')
 group.add_argument('-O', '--overwrite', dest='overwrite', default=False,
          help='Allow ParmEd to overwrite existing files.', action='store_true')
@@ -90,78 +93,77 @@ opt = parser.parse_args()
 # If the user specified a prmtop and script in the 'old' way, append them to the
 # list constructed via the --parm and -i flags -- they come at the end
 if opt.script_cl is not None:
-   opt.script.append(opt.script_cl)
+    opt.script.append(opt.script_cl)
 
 if opt.prmtop_cl is not None:
-   opt.prmtop.append(opt.prmtop_cl)
+    opt.prmtop.append(opt.prmtop_cl)
 
 # Load the splash screen
 if opt.printlogo:
-   splash = Logo()
-   print splash
+    splash = Logo()
+    print splash
 
 # Set our warning filter
 if opt.strict:
-   warnings.filterwarnings('error', category=SeriousParmWarning)
+    warnings.filterwarnings('error', category=SeriousParmWarning)
 
 # Set our overwrite preferences
 Action.overwrite = opt.overwrite
 
 amber_prmtop = ParmList()
-for parm in opt.prmtop:
-   amber_prmtop.add_parm(parm)
-   print 'Loaded Amber topology file %s\n' % parm
-
-try:
-   # Clear this out of the namespace for scripting purposes (if present)
-   del parm
-except NameError:
-   pass
+for i, parm in enumerate(opt.prmtop):
+    if i < len(opt.inpcrd):
+        amber_prmtop.add_parm(parm, opt.inpcrd[i])
+        print 'Loaded Amber topology file %s with coordinates from %s\n' % (
+                    parm, opt.inpcrd[i])
+    else:
+        amber_prmtop.add_parm(parm)
+        print 'Loaded Amber topology file %s' % parm
 
 if len(opt.script) > 0:
-   # Read from the list of scripts
-   print opt.script
-   # Make sure that all scripts exist, quitting if we are strict and not all
-   # scripts exist. Don't do anything until we know that all scripts exist.
-   for script in opt.script:
-      if not os.path.exists(script):
-         warnings.warn('Script file %s cannot be found.' % script,
-                       SeriousParmWarning)
+    # Read from the list of scripts
+    print opt.script
+    # Make sure that all scripts exist, quitting if we are strict and not all
+    # scripts exist. Don't do anything until we know that all scripts exist.
+    for script in opt.script:
+        if not os.path.exists(script):
+            warnings.warn('Script file %s cannot be found.' % script,
+                          SeriousParmWarning)
 
-   # We have already pre-screened the scripts.
-   for script in opt.script:
-      if not os.path.exists(script): continue
-      print 'Reading actions from %s\n' % script
-      parmed_commands = ParmedCmd(amber_prmtop, stdin=open(script, 'r'))
-      parmed_commands.use_rawinput = 0
-      parmed_commands.interpreter = opt.interpreter
-      parmed_commands.prompt = ''
-      # Loop through all of the commands
-      try:
-         parmed_commands.cmdloop()
-      except InterpreterError, err:
-         sys.exit('%s: %s' % (type(err).__name__, err))
-      except ParmError:
-         # This has already been caught and printed. If it was re-raised, then
-         # that means we wanted to exit
-         sys.exit(1)
+    # We have already pre-screened the scripts.
+    for script in opt.script:
+        if not os.path.exists(script): continue
+        print 'Reading actions from %s\n' % script
+        parmed_commands = ParmedCmd(amber_prmtop, stdin=open(script, 'r'))
+        parmed_commands.use_rawinput = 0
+        parmed_commands.interpreter = opt.interpreter
+        parmed_commands.prompt = ''
+        # Loop through all of the commands
+        try:
+            parmed_commands.cmdloop()
+        except InterpreterError, err:
+            sys.exit('%s: %s' % (type(err).__name__, err))
+        except ParmError:
+            # This has already been caught and printed. If it was re-raised,
+            # then that means we wanted to exit
+            sys.exit(1)
 
 else:
-   parmed_commands = ParmedCmd(amber_prmtop)
-   parmed_commands.intro = "Reading input from STDIN..."
-   parmed_commands.interpreter = opt.interpreter
-   parmed_commands.prompt = opt.prompt.strip() + ' '
-   # Set the log file and logging, but only if interactive
-   if os.isatty(sys.stdin.fileno()):
-      parmed_commands.setlog(open(opt.logfile, 'w'))
-   # Loop through all of the commands
-   try:
-      parmed_commands.cmdloop()
-   except InterpreterError, err:
-      sys.exit('%s: %s' % (type(err).__name__, err))
-   except ParmError:
-      # This has already been caught and printed. If it was re-raised, then that
-      # means we wanted to exit
-      sys.exit(1)
+    parmed_commands = ParmedCmd(amber_prmtop)
+    parmed_commands.intro = "Reading input from STDIN..."
+    parmed_commands.interpreter = opt.interpreter
+    parmed_commands.prompt = opt.prompt.strip() + ' '
+    # Set the log file and logging, but only if interactive
+    if os.isatty(sys.stdin.fileno()):
+        parmed_commands.setlog(open(opt.logfile, 'w'))
+    # Loop through all of the commands
+    try:
+        parmed_commands.cmdloop()
+    except InterpreterError, err:
+        sys.exit('%s: %s' % (type(err).__name__, err))
+    except ParmError:
+        # This has already been caught and printed. If it was re-raised, then
+        # that means we wanted to exit
+        sys.exit(1)
 
 print 'Done!'
