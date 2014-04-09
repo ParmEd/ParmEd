@@ -29,7 +29,6 @@ from chemistry.amber.mdin.ewald import ewald
 from chemistry.amber.mdin.pb import pb
 from chemistry.amber.mdin.qmmm import qmmm
 from chemistry.exceptions import CreateInputError
-from sys import stderr
 
 # For Python3 support: unicode and str are the same in Python3, so make that
 # name available here

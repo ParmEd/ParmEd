@@ -1,7 +1,5 @@
 """ 
-All of the prmtop actions used in PARMED. Each class is a separate action. You
-MUST assume that each argument comes into the action's __init__ as a string,
-except parm, which is passed as an amberParm object!
+All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division
 
@@ -12,15 +10,17 @@ from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               NonexistentParm, AmbiguousParmError, IncompatibleParmsError,
               ArgumentError, AddPDBError, AddPDBWarning, HMassRepartitionError,
               SimulationError, UnhandledArgumentWarning, SeriousParmWarning,
-              FileExists, NonexistentParmWarning, LJ12_6_4Error,
+              FileExists, NonexistentParmWarning, LJ12_6_4Error, ChamberError,
+              FileDoesNotExist, InputError,
 #             CoarseGrainError,
                                    )
 from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.parmlist import ParmList
+from ParmedTools.parmlist import ParmList, ChamberParm
 from chemistry.amber.mask import AmberMask
 from chemistry.amber.readparm import AmberFormat
 from chemistry.amber.topologyobjects import (Bond, BondType, Angle, AngleType,
                                              Dihedral, DihedralType)
+from chemistry.exceptions import ChemError
 from chemistry.periodic_table import Element as _Element
 from compat24 import any
 import math
@@ -101,6 +101,9 @@ Usages = {
                        '[Ewald]] [nodisper] [applayer] [platform <platform>] '
                        '[precision <precision model>] [decompose]',
        'fixtopology' : 'fixTopology',
+           'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
+                       '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
+                       '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]',
 #         'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] '
 #                      '| [Ewald]] [[restrain <mask>] [weight <k>]] [norun] '
 #                      '[script <script_file.py>] [platform <platform>] '
@@ -262,10 +265,10 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.writeParm(self.filename)
         if self.rst_name is not None:
-            try:
-                self.parm.writeRst7(self.rst_name, netcdf=self.netcdf)
-            except AttributeError:
-                raise ParmError('You must load coordinates to write a restart')
+#           try:
+            self.parm.writeRst7(self.rst_name, netcdf=self.netcdf)
+#           except AttributeError:
+#               raise ParmError('You must load coordinates to write a restart')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3267,3 +3270,208 @@ class fixtopology(Action):
             self.parm.dihedrals_inc_h = dihedrals_inc_h
             self.parm.dihedrals_without_h = dihedrals_without_h
         self.parm.remake_parm()
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class chamber(Action):
+    """
+    This action will read CHARMM parameter, topology (RTF), and stream (STR)
+    files and apply those parameters to a structure defined in a CHARMM PSF
+    (protein structure file). XPLOR, CHARMM, and VMD-generated PSF files are all
+    supported. You may specify -top, -param, and -str as many times as you want
+    to provide multiple parameter files. All topology files are read first (in
+    the order they are specified), followed by all parameter files, and finally
+    all stream files are read in.  Topology files are only necessary if the
+    parameter files do not define the atom types (newer CHARMM force fields
+    define atom types directly in the parameter file.
+
+    Options:
+        -top        CHARMM topology, or Residue Topology File (RTF) file
+        -param      CHARMM parameter file
+        -str        CHARMM stream file. Only RTF and parameter sections are read
+        -psf        CHARMM PSF file
+        -crd        Input coordinate file (must be PDB file currently)
+        -nocmap     Do not use any CMAP parameters
+        usechamber  Use the 'chamber' program to write a topology file instead
+        -box        Box dimensions. If no angles are defined, they are assumed
+                    to be 90 degrees (orthorhombic box)
+
+    If the PDB file has a CRYST1 record, the box information will be set from
+    there. Any box info given on the command-line will override the box found in
+    the crd file.
+    """
+    needs_parm = False
+
+    def init(self, arg_list):
+        from os.path import expandvars, expanduser
+        # First get all of the topology files
+        self.topfiles, self.paramfiles, self.streamfiles = [], [], []
+        while arg_list.has_key('-top', mark=False):
+            topfile = expanduser(arg_list.get_key_string('-top', None))
+            topfile = expandvars(topfile)
+            if not os.path.exists(topfile):
+                raise FileDoesNotExist('CHARMM RTF file %s does not exist' %
+                                       topfile)
+            self.topfiles.append(topfile)
+        while arg_list.has_key('-param', mark=False):
+            param = expanduser(arg_list.get_key_string('-param', None))
+            param = expandvars(param)
+            if not os.path.exists(param):
+                raise FileDoesNotExist('CHARMM parameter file %s does not exist'
+                                       % param)
+            self.paramfiles.append(param)
+        while arg_list.has_key('-str', mark=False):
+            stream = expanduser(arg_list.get_key_string('-str', None))
+            stream = expandvars(stream)
+            if not os.path.exists(stream):
+                raise FileDoesNotExist('CHARMM stream file %s does not exist' %
+                                       stream)
+            self.streamfiles.append(stream)
+        crdfile = arg_list.get_key_string('-crd', None)
+        if crdfile is not None:
+            self.crdfile = expanduser(expandvars(crdfile))
+            if not os.path.exists(self.crdfile):
+                raise FileDoesNotExist('Coordinate file %s does not exist' %
+                                       self.crdfile)
+        else:
+            self.crdfile = None
+        self.cmap = not arg_list.has_key('-nocmap')
+        self.usechamber = arg_list.has_key('usechamber')
+        psf = arg_list.get_key_string('-psf', None)
+        if psf is None:
+            raise InputError('chamber requires a PSF file')
+        self.psf = expanduser(expandvars(psf))
+        if not os.path.exists(self.psf):
+            raise InputError('chamber PSF file %s cannot be found' % self.psf)
+        box = arg_list.get_key_string('-box', None)
+
+        if box is not None:
+            try:
+                self.box = [float(w) for w in box.replace(',', ' ').split()]
+            except ValueError:
+                raise InputError('Box info must be comma-delimited floats')
+            if len(self.box) == 3:
+                self.box += [90.0, 90.0, 90.0]
+            elif len(self.box) != 6:
+                raise InputError('Box must be 3 lengths or 3 lengths and 3 '
+                                 'angles!')
+        else:
+            self.box = None
+
+        # Make sure we have legal input
+        if not self.paramfiles and not self.streamfiles:
+            raise InputError('No parameter files were provided!')
+        if self.usechamber:
+            # We need a topfile, paramfile, and crd file for chamber
+            if not self.topfiles or not self.paramfiles:
+                raise InputError('The chamber program requires both RTF '
+                                 '(topology) and PAR (parameter) files.')
+            if not self.crdfile:
+                raise InputError('The chamber program requires a CRD file.')
+
+    def __str__(self):
+        retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
+        if self.topfiles:
+            retstr += 'RTF files [%s], ' % (', '.join(self.topfiles))
+            if not self.streamfiles or not self.paramfiles:
+                retstr += 'and '
+        if self.paramfiles:
+            retstr += 'PAR files [%s]' % (', '.join(self.paramfiles))
+            if self.streamfiles:
+                retstr += ', and '
+        if self.streamfiles:
+            retstr += 'STR files [%s].' % (', '.join(self.streamfiles))
+        if self.crdfile is not None:
+            retstr += ' Coords from %s.' % self.crdfile
+        if self.cmap:
+            retstr += ' Using CMAP.'
+        else:
+            retstr += ' NO CMAP.'
+        if self.box is not None:
+            retstr += ' Box info %s.' % (self.box)
+        if self.usechamber:
+            retstr += ' Using chamber program.'
+        return retstr
+
+    def execute(self):
+        from chemistry.amber._chamberparm import ConvertFromPSF
+        from chemistry.charmm.parameters import ParameterSet
+        from chemistry.charmm.psf import ChemicalStructure
+        from chemistry.system import ChemicalSystem
+        from subprocess import Popen
+        import tempfile
+        if self.usechamber:
+            tmpprm = tempfile.mktemp(suffix='.parm7')
+            tmpcrd = tempfile.mktemp(suffix='.rst7')
+            args = ['chamber', '-top', self.topfiles[0], '-param',
+                    self.paramfiles[0], '-psf', self.psf, '-str',
+                    '-crd', self.crdfile]
+            args += self.topfiles[1:] + self.paramfiles[1:]
+            args += self.streamfiles[:]
+            args += ['-p', tmpprm, '-inpcrd', tmpcrd]
+            if self.cmap:
+                args.append('-cmap')
+            else:
+                args.append('-nocmap')
+            if self.box is not None:
+                args += ['-box'] + self.box[:3]
+            process = Popen(args)
+            if process.wait() != 0:
+                raise ChamberError('chamber failed with command\n\t' +
+                                   ' '.join(args))
+            # Now we have created a topology file
+            self.parm_list.add_parm(tmpprm, tmpcrd)
+            return
+        # We're not using chamber, do the conversion in-house
+        try:
+            parmset = ParameterSet()
+            for tfile in self.topfiles:
+                parmset.read_topology_file(tfile)
+            for pfile in self.paramfiles:
+                parmset.read_parameter_file(pfile)
+            for sfile in self.streamfiles:
+                parmset.read_stream_file(sfile)
+            # All parameters are loaded, now condense the types
+            parmset.condense()
+        except ChemError:
+            raise ChamberError('Problem reading CHARMM parameter sets')
+
+        # Now read the PSF
+        try:
+            psf = ChemicalStructure.load_from_psf(self.psf)
+        except ChemError:
+            raise ChamberError('Problem reading CHARMM PSF')
+
+        # Read the PDB and set the box information
+        if self.crdfile is not None:
+            crd = ChemicalSystem.load_from_pdb(self.crdfile)
+            # Set the box info from self.box if set
+            if self.box is None and crd.box is not None:
+                psf.set_box(crd.box[:])
+            elif self.box is not None:
+                psf.set_box(self.box[:])
+            else:
+                psf.set_box(None)
+        else:
+            # Set the box information
+            psf.set_box(self.box)
+
+        nsets = len(parmset.parametersets)
+        frcfield = '%2d' % nsets
+        frcfield += ('\n%2d' % nsets).join(parmset.parametersets)
+        # Delete the CMAP list if requested
+        if not self.cmap:
+            try:
+                del psf.cmap_list
+            except AttributeError:
+                pass
+        # Now load the parameters
+        try:
+            psf.load_parameters(parmset)
+        except ChemError:
+            raise ChamberError('Problem assigning parameters to PSF')
+        parm = ConvertFromPSF(psf, frcfield).view(ChamberParm)
+        if self.crdfile is not None:
+            parm.load_coordinates(crd.positions())
+        parm.prm_name = self.psf
+        self.parm_list.add_parm(parm)

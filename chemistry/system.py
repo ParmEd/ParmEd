@@ -1,6 +1,10 @@
 """
 This is a series of classes representing a particle or collection of particles
 for general use in the chemistry package
+
+Author: Jason M. Swails
+Contributors:
+Date: April 5, 2014
 """
 
 from chemistry.periodic_table import Element as _Element
@@ -27,7 +31,7 @@ class _BaseParticle(object):
         for key in kwargs:
             # Skip over blank kwargs
             try:
-                if not arg.strip(): continue
+                if not key.strip(): continue
             except AttributeError:
                 pass
             if key in self._ordered_args:
@@ -102,9 +106,9 @@ class Atom(_BaseParticle):
 class Residue(_BaseParticle, list):
     """ A collection of atoms in a single 'residue' """
 
-    _ordered_args = ['name', 'number', 'insertion_code', 'chain', 'models']
+    _ordered_args = ['name', 'number', 'insertion_code', 'chain', 'model']
     _types = dict(name=str, number=int, insertion_code=str,
-                  chain=str, models=int)
+                  chain=str, model=int)
 
     def __init__(self, *args, **kwargs):
         self.name = ''
@@ -161,6 +165,7 @@ class ChemicalSystem(list):
         self.models = 0
         self.respermodel = None
         super(ChemicalSystem, self).__init__(*args, **kwargs)
+        self.box = None # [a, b, c, alpha, beta, gamma] or None
 
     @classmethod
     def load_from_pdb(cls, pdb):
@@ -196,6 +201,18 @@ class ChemicalSystem(list):
                 if inst.respermodel is None and len(inst) > 0:
                     inst.respermodel = len(inst)
                 inst.models += 1
+            if rec == 'CRYST1':
+                a = float(line[6:15])
+                b = float(line[15:24])
+                c = float(line[24:33])
+                try:
+                    A = float(line[33:40])
+                    B = float(line[40:47])
+                    C = float(line[47:54])
+                except (IndexError, ValueError):
+                    # Default to orthorhombic box
+                    A = B = C = 90.0
+                inst.box = [a, b, c, A, B, C]
         return inst
    
     @classmethod
@@ -234,7 +251,21 @@ class ChemicalSystem(list):
         for res in self:
             for atom in res:
                 yield atom
-   
+
+    def positions(self, model=1):
+        """
+        Returns a list of the coordinates in the form [x1, y1, z1, x2, ...] for
+        the requested model number. Model numbers start from 1
+        """
+        crds = []
+        for res in self:
+            if res.model != model: continue
+            for atom in res:
+                crds.extend([atom.x, atom.y, atom.z])
+        if not crds:
+            raise IndexError('Model %d out of range' % model)
+        return crds
+
     @property
     def unique_atoms(self):
         """ Generator that iterates through only "unique" atoms """

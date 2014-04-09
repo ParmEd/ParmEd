@@ -169,6 +169,8 @@ class AmberFormat(object):
     about Amber topology files specifically
     """
    
+    CHARGE_SCALE = AMBER_ELECTROSTATIC # chamber uses a SLIGHTLY diff value
+
     #===================================================
 
     def __init__(self, fname=None):
@@ -217,8 +219,15 @@ class AmberFormat(object):
                 object to be converted into
 
         Returns:
-            instance of cls initialized from data in this object
+            instance of cls initialized from data in this object. This is NOT a
+            deep copy, so modifying the original object may modify this. The
+            copy function will create a deep copy of any AmberFormat-derived
+            object
         """
+        # If these are the same classes, just return the original instance,
+        # since there's nothing to do. Classes are singletons, so use "is"
+        if type(self) is cls:
+            return self
         if hasattr(cls, 'load_from_rawdata'):
             return cls.load_from_rawdata(self)
         raise ValueError('Cannot instantiate %s from AmberFormat' %
@@ -273,7 +282,7 @@ class AmberFormat(object):
         # convert charges to fraction-electrons
         try:
             for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                self.parm_data[self.charge_flag][i] = chg / AMBER_ELECTROSTATIC
+                self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
         except KeyError:
             pass
         self.valid = True
@@ -381,7 +390,7 @@ class AmberFormat(object):
         # Next read the charges
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natom)
         # Divide by the electrostatic constant
-        tmp_data = [x / AMBER_ELECTROSTATIC for x in tmp_data]
+        tmp_data = [x / self.CHARGE_SCALE for x in tmp_data]
         self.addFlag('CHARGE', '5E16.8', data=tmp_data)
 
         # Next read the masses
@@ -541,9 +550,6 @@ class AmberFormat(object):
         Writes the current data in parm_data into a new topology file with
         the given name
         """
-        # global variable(s)
-        global AMBER_ELECTROSTATIC
-
         # now that we know we will write the new prmtop file, open the new file
         new_prm = open(name, 'w')
 
@@ -553,7 +559,7 @@ class AmberFormat(object):
         # convert charges back to amber charges...
         if self.charge_flag in self.parm_data.keys():
             for i in range(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] *= AMBER_ELECTROSTATIC
+                self.parm_data[self.charge_flag][i] *= self.CHARGE_SCALE
 
         # write version to top of prmtop file
         new_prm.write('%s\n' % self.version)
@@ -576,7 +582,7 @@ class AmberFormat(object):
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
             for i in range(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] /= AMBER_ELECTROSTATIC
+                self.parm_data[self.charge_flag][i] /= self.CHARGE_SCALE
 
     #===================================================
 

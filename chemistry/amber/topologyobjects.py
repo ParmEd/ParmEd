@@ -487,6 +487,11 @@ class Dihedral(object):
         """
         if isinstance(thing, Bond):
             # A dihedral is made up of 3 bonds
+            if self.signs[1] == -1:
+                # An improper is different... Atom 3 is the central atom
+                return ((self.atom1 in thing and self.atom3 in thing) or
+                        (self.atom2 in thing and self.atom3 in thing) or
+                        (self.atom4 in thing and self.atom3 in thing))
             return ((self.atom1 in thing and self.atom2 in thing) or
                     (self.atom2 in thing and self.atom3 in thing) or
                     (self.atom3 in thing and self.atom4 in thing))
@@ -683,10 +688,10 @@ class Improper(object):
         self.atom3 = atom3
         self.atom4 = atom4
         # Log these impropers in each atom
-        atom1.dihedrals.append(self)
-        atom2.dihedrals.append(self)
-        atom3.dihedrals.append(self)
-        atom4.dihedrals.append(self)
+        atom1.impropers.append(self)
+        atom2.impropers.append(self)
+        atom3.impropers.append(self)
+        atom4.impropers.append(self)
         # Load the force constant and equilibrium angle
         self.improp_type = improp_type
 
@@ -934,8 +939,8 @@ class _CmapGrid(object):
     >>> print g[3]
     10
     >>> print g.switch_range()
-    [1.0000, 0.0000,
-     3.0000, 2.0000]
+    [10.0000, 2.0000
+     1.0000, 0.0000]
     """
 
     def __init__(self, resolution, data=None):
@@ -964,12 +969,12 @@ class _CmapGrid(object):
 
     def __getitem__(self, idx):
         if isinstance(idx, tuple):
-            return self._data[idx[0]+self.resolution*idx[1]]
+            return self._data[self.resolution*idx[0]+idx[1]]
         return self._data[idx]
 
     def __setitem__(self, idx, val):
         if isinstance(idx, tuple):
-            self._data[idx[0]+self.resolution*idx[1]] = val
+            self._data[self.resolution*idx[0]+idx[1]] = val
         else:
             self._data[idx] = val
 
@@ -989,7 +994,9 @@ class _CmapGrid(object):
             if i == 0: continue
             retstr += fmt % val
             if (i+1) % self.resolution == 0 and i != len(self._data) - 1:
-                retstr += '\n '
+                retstr += '\n'
+            elif i != len(self) - 1:
+                retstr += ','
         return retstr + ']'
 
     def __eq__(self, other):
@@ -1103,7 +1110,7 @@ class AtomList(list):
    
     def _index_us(self):
         """ We have deleted an atom, so now we have to re-index everybody """
-        for i in range(len(self)): self[i].idx = self[i].starting_index = i
+        for i, atom in enumerate(self): atom.idx = atom.starting_index = i
 
     #===================================================
 
@@ -1373,3 +1380,7 @@ def Element(mass):
     return best_guess
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

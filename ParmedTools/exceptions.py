@@ -132,6 +132,12 @@ class ParmIndexError(ParmError):
 class FileExists(ParmError):
     pass
 
+class FileDoesNotExist(ParmError):
+    pass
+
+class ChamberError(ParmError):
+    pass
+
 class WarningList(list):
     """ List of warnings """
    

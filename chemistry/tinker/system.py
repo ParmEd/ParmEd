@@ -144,7 +144,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['natom']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 atnum = int(line[9:15])
                 self.atom_list[i].add_vdw(
                     line[22:32], line[32:42], line[43:53],
@@ -165,7 +165,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nbond']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 self.bond_list.add(self.atom_list[at1], self.atom_list[at2],
@@ -182,7 +182,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nangle']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -201,7 +201,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nstrbnd']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -222,7 +222,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nurey']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 # Support older-style analyze output that had all 3 atoms
@@ -247,7 +247,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nopbend']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -268,7 +268,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['nopdist']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -289,7 +289,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['ntors']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -312,7 +312,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['npitors']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 self.pitors_list.add(self.atom_list[at1], self.atom_list[at2],
@@ -329,7 +329,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['ntortor']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
@@ -361,7 +361,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['npole']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at = int(line[9:15]) - 1
                 # Collect the rest of the arguments, kept as strings
                 frame = [line[16:23], line[23:30], line[30:37]]
@@ -390,7 +390,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['npole']):
             try:
-                termnum = int(line[0:6])
+                int(line[0:6])
                 at = int(line[9:15]) - 1
                 self.dipole_list.add(self.atom_list[at], line[25:35],
                     line[40:].split())

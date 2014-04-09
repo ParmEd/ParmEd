@@ -1085,7 +1085,7 @@ def summary(root, amber_prmtop, messages):
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
-def hmasschange(root, amber_prmtop, messages):
+def hmassrepartition(root, amber_prmtop, messages):
     """
     Repartitions mass by making H-atoms heavier and attached heteroatoms
     lighter by the same amount to preserve the same total mass
@@ -1108,8 +1108,14 @@ def hmasschange(root, amber_prmtop, messages):
     if not vars_found: return
     # If we did, store them and pass it to the class
     var_list = [v.get() for v in var_list]
+    # Convert the check button into the correct keyword
+    if var_list[1] == 'yes':
+        var_list[1] = 'dowater'
+    else:
+        var_list[1] = ''
     try:
-        action = ParmedActions.hmasschange(amber_prmtop, ArgumentList(var_list))
+        action = ParmedActions.hmassrepartition(amber_prmtop,
+                                                ArgumentList(var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return

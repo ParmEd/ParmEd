@@ -887,7 +887,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                              imp.atom3.starting_index,
                              imp.atom4.starting_index,
                              (imp.improp_type.psi_k*dihe_frc_conv,
-                              imp.improp_type.psi_eq)
+                              imp.improp_type.psi_eq*pi/180)
             )
         system.addForce(force)
 
@@ -1000,7 +1000,7 @@ def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
 
     Returns:
         Tuple of box vectors (as Vec3 instances)
-   """
+    """
     if not (u.is_quantity(a) and u.is_quantity(b) and u.is_quantity(c)):
         raise TypeError('a, b, and c must be units of dimension length')
     if u.is_quantity(alpha): alpha = alpha.value_in_unit(u.degree)

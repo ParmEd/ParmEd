@@ -86,3 +86,21 @@ class AmoebaError(ChemError):
 
 class CreateInputError(ChemError):
     """ If there's a problem making a mdin input file """
+
+class CharmmPSFError(ChemError):
+    """ If there is a problem parsing CHARMM PSF files """
+
+class SplitResidueWarning(ChemWarning):
+    """ For if a residue with the same number but different names is split """
+
+class ResidueError(ChemError):
+    """ For when there are problems defining a residue """
+
+class CharmmPSFWarning(ChemWarning):
+    """ For non-fatal PSF parsing issues """
+
+class CharmmFileError(ChemError):
+    """ If there is a problem parsing CHARMM files """
+
+class MissingParameter(ChemError):
+    """ If a parameter is missing from a database """

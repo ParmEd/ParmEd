@@ -128,6 +128,17 @@ class AmberParm(AmberFormat):
         # dihedrals_inc_h
         # dihedrals_without_h
 
+        # If we have coordinates or velocities, load them into the atom list
+        if hasattr(self, 'coords'):
+            for i, atom in enumerate(self.atom_list):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = self.coords[i3:i3+3]
+        if hasattr(self, 'vels'):
+            for i, atom in enumerate(self.atom_list):
+                i3 = i * 3
+                atom.vx, atom.vy, atom.vz = self.coords[i3:i3+3]
+
+        self.hasvels = self.hasbox = False
         if rst7_name is not None:
             self.LoadRst7(rst7_name)
 
@@ -154,6 +165,21 @@ class AmberParm(AmberFormat):
         inst.flag_list = rawdata.flag_list
         inst.valid = True
         inst.initialize_topology()
+        # Convert charges if necessary due to differences in electrostatic
+        # scaling factors
+        chgscale = rawdata.CHARGE_SCALE / cls.CHARGE_SCALE
+        for i in range(len(inst.parm_data['CHARGE'])):
+            inst.parm_data['CHARGE'][i] *= chgscale
+        # See if the rawdata has any kind of structural attributes, like rst7
+        # (coordinates) and an atom list with positions and/or velocities
+        if hasattr(rawdata, 'rst7'):
+            inst.rst7 = rawdata.rst7
+        if hasattr(rawdata, 'coords'):
+            inst.load_coordinates(rawdata.coords)
+        if hasattr(rawdata, 'vels'):
+            inst.load_velocities(rawdata.vels)
+        if hasattr(rawdata, 'box'):
+            inst.box = rawdata.box
         return inst
    
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -324,7 +350,9 @@ class AmberParm(AmberFormat):
 
     def __str__(self):
         " Returns the name of the topology file as its string representation "
-        return self.prm_name
+        if self.prm_name is not None:
+            return self.prm_name
+        return repr(self)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -348,7 +376,8 @@ class AmberParm(AmberFormat):
         # Check that we have a rst7 loaded, then overwrite it with a new one if
         # necessary
         if not hasattr(self, 'rst7'):
-            raise AmberParmError('No coordinates loaded. Cannot write restart')
+#           raise AmberParmError('No coordinates loaded. Cannot write restart')
+            self.rst7 = Rst7()
 
         # Now fill in the rst7 coordinates
         self.rst7.natom = len(self.atom_list)
@@ -888,24 +917,36 @@ class AmberParm(AmberFormat):
             self.rst7 = Rst7.open(rst7)
         if not self.rst7.valid:
             raise AmberParmError("Invalid restart file!")
-        self.coords = self.rst7.coordinates
+        self.load_coordinates(self.rst7.coordinates)
         self.hasvels = self.rst7.hasvels
         self.hasbox = self.rst7.hasbox
         if self.hasbox:
             self.box = self.rst7.box
         if self.hasvels:
-            self.vels = self.rst7.velocities
-        # Bail if we have no atom list
-        if not hasattr(self, 'atom_list'): return
-        # Load all of the coordinates and velocities into the atoms
-        for i in range(len(self.atom_list)):
-            self.atom_list[i].xx = self.coords[3*i  ]
-            self.atom_list[i].xy = self.coords[3*i+1]
-            self.atom_list[i].xz = self.coords[3*i+2]
-            if self.hasvels:
-                self.atom_list[i].vx = self.vels[3*i  ]
-                self.atom_list[i].vy = self.vels[3*i+1]
-                self.atom_list[i].vz = self.vels[3*i+2]
+            self.load_velocities(self.rst7.velocities)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    def load_coordinates(self, coords):
+        """ Loads the coordinates into the atom list """
+        self.coords = coords
+        for i, atom in enumerate(self.atom_list):
+            i3 = 3 * i
+            atom.xx = coords[i3  ]
+            atom.xy = coords[i3+1]
+            atom.xz = coords[i3+2]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    def load_velocities(self, vels):
+        """ Loads the coordinates into the atom list """
+        self.hasvels = True
+        self.vels = vels
+        for i, atom in enumerate(self.atom_list):
+            i3 = 3 * i
+            atom.vx = vels[i3  ]
+            atom.vy = vels[i3+1]
+            atom.vz = vels[i3+2]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

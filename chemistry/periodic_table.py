@@ -40,7 +40,8 @@ AtomicNum = { 'H'  :  1, 'He' :  2, 'Li' :  3, 'Be' :  4, 'B'  :  5, 'C'  :  6,
               'Bk' : 97, 'Cf' : 98, 'Es' : 99, 'Fm' :100, 'Md' :101, 'No' :102,
               'Lr' :103, 'Rf' :104, 'Db' :105, 'Sg' :106, 'Bh' :107, 'Hs' :108,
               'Mt' :109, 'Ds' :110, 'Rg' :111, 'Cn' :112, 'Uut':113, 'Uuq':114,
-              'Uup':115, 'Uuh':116, 'Uus':117, 'Uuo':118, 'EP' : 0 }
+              'Uup':115, 'Uuh':116, 'Uus':117, 'Uuo':118, 'EP' : 0 , 'LP' :  0,
+              'Lp' :  0, 'Ep' :  0}
 
 Element = [ 'EP',
             'H' ,'He','Li','Be','B' ,'C' ,'N' ,'O' ,'F' ,'Ne','Na','Mg',
@@ -134,7 +135,8 @@ Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Mt' : 'Meitnerium'   ,'Ds' : 'Darmstadtium' ,'Rg' : 'Roentgenium'  ,
          'Cn' : 'Copernicium'  ,'Uut': 'Ununtrium'    ,'Uuq': 'Ununquadium'  ,
          'Uup': 'Ununpentium'  ,'Uuh': 'Ununhexium'   ,'Uus': 'Ununseptium'  ,
-         'Uuo': 'Ununoctium'   ,'EP' : 'Extra Point' }
+         'Uuo': 'Ununoctium'   ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
+         'Ep' : 'Extra Point'  ,'Lp' : 'Extra Point'}
 
 OriginName = {
         'H'  : 'Hydrogen'   ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
@@ -176,7 +178,8 @@ OriginName = {
         'Mt' : 'Meitnerium' ,'Ds' : 'Darmstadtium' ,'Rg' : 'Roentgenium'  ,
         'Cn' : 'Copernicium','Uut': 'Ununtrium'    ,'Uuq': 'Ununquadium'  ,
         'Uup': 'Ununpentium','Uuh': 'Ununhexium'   ,'Uus': 'Ununseptium'  ,
-        'Uuo': 'Ununoctium' ,'EP' : 'Extra Point'
+        'Uuo': 'Ununoctium' ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
+        'Ep' : 'Extra Point','Lp' : 'Extra Point'
 }
 
 Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
@@ -218,5 +221,6 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'Mt' : 'Unknown'      ,'Ds' : 'Unknown'      ,'Rg' : 'Unknown'      ,
           'Cn' : 'Unknown'      ,'Uut': 'Unknown'      ,'Uuq': 'Unknown'      ,
           'Uup': 'Unknown'      ,'Uuh': 'Unknown'      ,'Uus': 'Unknown'      ,
-          'Uuo': 'Unknown'      ,'EP' : 'N/A'
+          'Uuo': 'Unknown'      ,'EP' : 'N/A'          ,'Ep' : 'N/A'          ,
+          'LP' : 'N/A'          ,'Lp' : 'N/A'
 }

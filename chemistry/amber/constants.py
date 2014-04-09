@@ -5,7 +5,7 @@ Can be used like:
    from chemistry.amber.constants import *
 """
 from __future__ import division
-from math import pi as _pi
+from math import pi as _pi, sqrt as _sqrt
 
 __all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH',
            'MBONA', 'NTHETH', 'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM',
@@ -15,6 +15,7 @@ __all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH',
            'NCOPY', 'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD']
 
 AMBER_ELECTROSTATIC = 18.2223
+CHARMM_ELECTROSTATIC = _sqrt(332.0716)
 
 AMBER_POINTERS = """
 NATOM  : total number of atoms 
