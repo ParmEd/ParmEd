@@ -413,7 +413,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     instantiated by a CHARMM PSF.
 
     Parameters:
-        - struct (ChemicalStructure) : The structure loaded from a PSF file.
+        - struct (ProteinStructure) : The structure loaded from a PSF file.
         - frcfield (str) : The name of the CHARMM force field being used
         - vmd (bool) : Print a VMD-compatible topology file
         - title (str) : The title of the topology file

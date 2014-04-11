@@ -8,7 +8,7 @@ Date: April 5, 2014
 from __future__ import division
 
 from chemistry.charmm.parameters import element_by_mass
-from chemistry.charmm.psf import ChemicalStructure
+from chemistry.charmm.psf import ProteinStructure
 from chemistry.exceptions import APIError
 from math import sqrt, cos, pi, sin
 import simtk.openmm as mm
@@ -22,8 +22,8 @@ from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
 TINY = 1e-8
 WATNAMES = ('WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
-class OpenMMChemicalStructure(ChemicalStructure):
-    """ Same as ChemicalStructure but implements OpenMM functionality on top """
+class OpenMMProteinStructure(ProteinStructure):
+    """ Same as ProteinStructure but implements OpenMM functionality on top """
 
     # Define default force groups for all of the bonded terms. This allows them
     # to be turned on and off selectively. This is a way to implement per-term
@@ -78,7 +78,9 @@ class OpenMMChemicalStructure(ChemicalStructure):
 
     def _get_gb_params(self, gb_model=HCT):
         """ Gets the GB parameters. Need this method to special-case GB neck """
+        screen = [0 for atom in self.atom_list]
         if gb_model is GBn:
+            radii = _bondi_radii(self.atom_list)
             screen = [0.5 for atom in self.atom_list]
             for i, atom in enumerate(self.atom_list):
                 if atom.type.atomic_number == 6:
@@ -92,6 +94,7 @@ class OpenMMChemicalStructure(ChemicalStructure):
                 elif atom.type.atomic_number == 16:
                     screen[i] = 0.602256336067
         elif gb_model is GBn2:
+            radii = _mbondi3_radii(self.atom_list)
             # Add non-optimized values as defaults
             alpha = [1.0 for i in self.atom_list]
             beta = [0.8 for i in self.atom_list]
@@ -142,9 +145,13 @@ class OpenMMChemicalStructure(ChemicalStructure):
                     screen[i] = 0.96
                 else:
                     screen[i] = 0.8
+            # Determine which radii set we need
+            if gb_model is OBC1 or gb_model is OBC2:
+                radii = _mbondi2_radii(self.atom_list)
+            elif gb_model is HCT:
+                radii = _mbondi_radii(self.atom_list)
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
-        radii = [rad * length_conv for rad in self.parm_data['RADII']]
 
         if gb_model is GBn2:
             return zip(radii, screen, alpha, beta, gamma)
@@ -651,27 +658,156 @@ class OpenMMChemicalStructure(ChemicalStructure):
         return self._velocities
 
     @property
-    def box_vectors(self):
-        """ Return tuple of box vectors """
-        if hasattr(self, 'rst7'):
-            box = [x*u.angstrom for x in self.rst7.box[:3]]
-            ang = [self.rst7.box[3], self.rst7.box[4], self.rst7.box[5]]
-            return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
-                                                    ang[0], ang[1], ang[2])
-        else:
-            box = [x*u.angstrom for x in self.parm_data['BOX_DIMENSIONS'][1:]]
-            ang = [self.parm_data['BOX_DIMENSIONS'][0]] * 3
-            return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
-                                                    ang[0], ang[1], ang[2])
-
-    @property
     def box_lengths(self):
         """ Return tuple of 3 units """
-        if hasattr(self, 'rst7'):
-            box = [x*u.angstrom for x in self.rst7.box[:3]]
+        if self.box_vectors is None:
+            return None
+        return (self.box_vectors[0][0], self.box_vectors[1][1],
+                self.box_vectors[2][2])
+
+    def set_box(self, lengths, angles=None):
+        """
+        Sets the periodic box boundary conditions.
+
+        Parameters:
+            - lengths (3 floats) : Lengths of the periodic box (units of
+                    distance). None means no box.
+            - angles (3 floats) : Angles between box vectors (units of angle
+                    measure). Default is 90 degrees if lengths is not None
+        """
+        if lengths is None:
+            self.box_vectors = None
+        elif angles is None:
+            self.box_vectors = _box_vectors_from_lengths_angles(
+                            lengths[0], lengths[1], lengths[2],
+                            90*u.degrees, 90*u.degrees, 90*u.degrees,
+            )
         else:
-            box = [x*u.angstrom for x in self.parm_data['BOX_DIMENSIONS'][1:]]
-        return tuple(box)
+            self.box_vectors = _box_vectors_from_lengths_angles(
+                            lengths[0], lengths[1], lengths[2],
+                            angles[0], angles[1], angles[2],
+            )
+        # If we already have a _topology instance, then we have possibly changed
+        # the existence of box information (whether or not this is a periodic
+        # system), so delete any cached reference to a topology so it's
+        # regenerated with updated information
+        if hasattr(self, '_topology'):
+            del self._topology
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Routines that set the necessary radii lists based on a list of atoms with
+# their connectivities
+
+def _bondi_radii(atom_list):
+    """ Sets the bondi radii """
+    radii = [0.0 for atom in atom_list]
+    for i, atom in enumerate(atom_list):
+        if atom.type.atomic_number == 6:
+            radii[i] = 1.7
+        elif atom.type.atomic_number == 1:
+            radii[i] = 1.2
+        elif atom.type.atomic_number == 7:
+            radii[i] = 1.55
+        elif atom.type.atomic_number == 8:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 9:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 14:
+            radii[i] = 2.1
+        elif atom.type.atomic_number == 15:
+            radii[i] = 1.85
+        elif atom.type.atomic_number == 16:
+            radii[i] = 1.8
+        elif atom.type.atomic_number == 17:
+            radii[i] = 1.5
+        else:
+            radii[i] = 1.5
+    return radii  # converted to nanometers above
+
+def _mbondi_radii(atom_list):
+    """ Sets the mbondi radii """
+    radii = [0.0 for atom in atom_list]
+    for i, atom in enumerate(atom_list):
+        # Radius of H atom depends on element it is bonded to
+        if atom.type.atomic_number == 1:
+            bondeds = list(atom.bond_partners)
+            if bondeds[0].type.atomic_number in (6, 7): # C or N
+                radii[i] = 1.3
+            elif bondeds[0].type.atomic_number in (8, 16): # O or S
+                radii[i] = 0.8
+            else:
+                radii[i] = 1.2
+        # Radius of C atom depends on what type it is
+        elif atom.atomic_number == 6:
+            radii[i] = 1.7
+        # All other elements have fixed radii for all types/partners
+        elif atom.type.atomic_number == 7:
+            radii[i] = 1.55
+        elif atom.type.atomic_number == 8:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 9:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 14:
+            radii[i] = 2.1
+        elif atom.type.atomic_number == 15:
+            radii[i] = 1.85
+        elif atom.type.atomic_number == 16:
+            radii[i] = 1.8
+        elif atom.type.atomic_number == 17:
+            radii[i] = 1.5
+        else:
+            radii[i] = 1.5
+    return radii  # converted to nanometers above
+
+def _mbondi2_radii(atom_list):
+    """ Sets the mbondi2 radii """
+    radii = [0.0 for atom in atom_list]
+    for i, atom in enumerate(atom_list):
+        # Radius of H atom depends on element it is bonded to
+        if atom.type.atomic_number == 1:
+            if atom.bond_partners[0].type.atomic_number == 7:
+                radii[i] = 1.3
+            else:
+                radii[i] = 1.2
+        # Radius of C atom depends on what type it is
+        elif atom.type.atomic_number == 6:
+            radii[i] = 1.7
+        # All other elements have fixed radii for all types/partners
+        elif atom.type.atomic_number == 7:
+            radii[i] = 1.55
+        elif atom.type.atomic_number == 8:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 9:
+            radii[i] = 1.5
+        elif atom.type.atomic_number == 14:
+            radii[i] = 2.1
+        elif atom.type.atomic_number == 15:
+            radii[i] = 1.85
+        elif atom.type.atomic_number == 16:
+            radii[i] = 1.8
+        elif atom.type.atomic_number == 17:
+            radii[i] = 1.5
+        else:
+            radii[i] = 1.5
+    return radii  # Converted to nanometers above
+
+def _mbondi3_radii(atom_list):
+    """ Sets the mbondi3 radii """
+    radii = _mbondi2_radii(atom_list)
+    for i, atom in enumerate(atom_list):
+        # Adjust OE (GLU), OD (ASP) and HH/HE (ARG)
+        if atom.residue.resname in ('GLU', 'ASP'):
+            if atom.name.startswith('OE') or atom.name.startswith('OD'):
+                radii[i] = 1.4
+        elif atom.residue.resname == 'ARG':
+            if atom.name.startswith('HH') or atom.name.startswith('HE'):
+                radii[i] = 1.17
+        # Adjust carboxylate O radii on C-termini
+        if atom.name == 'OXT':
+            radii[i] = 1.4
+    return radii  # Converted to nanometers above
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
     """

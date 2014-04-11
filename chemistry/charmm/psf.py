@@ -35,13 +35,13 @@ def _catchindexerror(func):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class ChemicalStructure(object):
+class ProteinStructure(object):
     """
     A chemical structure instantiated from CHARMM files. You can instantiate a
-    ChemicalStructure from a PSF file using the load_from_psf constructor
+    ProteinStructure from a PSF file using the load_from_psf constructor
 
     Example:
-    >>> cs = ChemicalStructure.load_from_psf("testfiles/test.psf")
+    >>> cs = ProteinStructure.load_from_psf("testfiles/test.psf")
     
     This structure has numerous attributes that are lists of the elements of
     this structure, including atoms, bonds, torsions, etc. The attributes are
@@ -65,7 +65,7 @@ class ChemicalStructure(object):
     etc.)
 
     Example:
-    >>> cs = ChemicalStructure.load_from_psf("testfiles/test.psf")
+    >>> cs = ProteinStructure.load_from_psf("testfiles/test.psf")
     >>> len(cs.atom_list)
     33
     >>> len(cs.bond_list)
@@ -125,7 +125,7 @@ class ChemicalStructure(object):
             - data (list) : A list of all data in the parsed section converted
                     to `dtype'
         """
-        conv = ChemicalStructure._convert
+        conv = ProteinStructure._convert
         words = psf.readline().split()
         if len(words) == 1:
             pointers = conv(words[0], int, 'pointer')
@@ -147,7 +147,7 @@ class ChemicalStructure(object):
     @_catchindexerror
     def load_from_psf(cls, psf_name):
         """
-        Opens and parses a PSF file, then instantiates a ChemicalStructure
+        Opens and parses a PSF file, then instantiates a ProteinStructure
         instance from the data.
             
         Parameters:
@@ -157,7 +157,7 @@ class ChemicalStructure(object):
             IOError : If file "psf_name" does not exist
             CharmmPSFError: If any parsing errors are encountered
         """
-        conv = ChemicalStructure._convert
+        conv = ProteinStructure._convert
         # Make sure the file exists
         if not os.path.exists(psf_name):
             raise IOError('Could not find PSF file %s' % psf_name)
@@ -209,7 +209,7 @@ class ChemicalStructure(object):
         # Eat the next line
         psf.readline()
         # Now get the number of bonds
-        nbond, holder = ChemicalStructure._parse_psf_section(psf, int)
+        nbond, holder = ProteinStructure._parse_psf_section(psf, int)
         bond_list = TrackedList()
         if len(holder) != nbond * 2:
             raise CharmmPSFError('Got %d indexes for %d bonds' %
@@ -220,7 +220,7 @@ class ChemicalStructure(object):
             bond_list.append(Bond(atom_list[id1], atom_list[id2]))
         bond_list.changed = False
         # Now get the number of angles and the angle list
-        ntheta, holder = ChemicalStructure._parse_psf_section(psf, int)
+        ntheta, holder = ProteinStructure._parse_psf_section(psf, int)
         angle_list = TrackedList()
         if len(holder) != ntheta * 3:
             raise CharmmPSFError('Got %d indexes for %d angles' %
@@ -234,7 +234,7 @@ class ChemicalStructure(object):
             )
         angle_list.changed = False
         # Now get the number of torsions and the torsion list
-        nphi, holder = ChemicalStructure._parse_psf_section(psf, int)
+        nphi, holder = ProteinStructure._parse_psf_section(psf, int)
         dihedral_list = TrackedList()
         if len(holder) != nphi * 4:
             raise CharmmPSFError('Got %d indexes for %d torsions' %
@@ -250,7 +250,7 @@ class ChemicalStructure(object):
             )
         dihedral_list.changed = False
         # Now get the number of improper torsions
-        nimphi, holder = ChemicalStructure._parse_psf_section(psf, int)
+        nimphi, holder = ProteinStructure._parse_psf_section(psf, int)
         improper_list = TrackedList()
         if len(holder) != nimphi * 4:
             raise CharmmPSFError('Got %d indexes for %d impropers' %
@@ -266,7 +266,7 @@ class ChemicalStructure(object):
             )
         improper_list.changed = False
         # Now handle the donors (what is this used for??)
-        ndon, holder = ChemicalStructure._parse_psf_section(psf, int)
+        ndon, holder = ProteinStructure._parse_psf_section(psf, int)
         donor_list = TrackedList()
         if len(holder) != ndon * 2:
             raise CharmmPSFError('Got %d indexes for %d donors' %
@@ -277,7 +277,7 @@ class ChemicalStructure(object):
             donor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
         donor_list.changed = False
         # Now handle the acceptors (what is this used for??)
-        nacc, holder = ChemicalStructure._parse_psf_section(psf, int)
+        nacc, holder = ProteinStructure._parse_psf_section(psf, int)
         acceptor_list = TrackedList()
         if len(holder) != nacc * 2:
             raise CharmmPSFError('Got %d indexes for %d acceptors' %
@@ -289,9 +289,9 @@ class ChemicalStructure(object):
         acceptor_list.changed = False
         # Now get the NNB section. Not sure what this section is for or what it
         # does...
-        nnb, holder = ChemicalStructure._parse_psf_section(psf, int)
+        nnb, holder = ProteinStructure._parse_psf_section(psf, int)
         # Now get the group sections
-        pointers, holder = ChemicalStructure._parse_psf_section(psf, int)
+        pointers, holder = ProteinStructure._parse_psf_section(psf, int)
         group_list = TrackedList()
         try:
             ngrp, nst2 = pointers
@@ -318,7 +318,7 @@ class ChemicalStructure(object):
         # and the number of entries in the group. If the # of entries is
         # NATOM, assume we have MOLNT section. Warn if the MOLNT section is
         # 'wrong'...
-        pointer, holder = ChemicalStructure._parse_psf_section(psf, int)
+        pointer, holder = ProteinStructure._parse_psf_section(psf, int)
 
         # Assign all of the atoms to molecules recursively
         set_molecules(atom_list)
@@ -337,7 +337,7 @@ class ChemicalStructure(object):
                                      'section.')
             psf.readline() # blank
             # Now we get to the cross-term section
-            ncrterm, holder = ChemicalStructure._parse_psf_section(psf, int)
+            ncrterm, holder = ProteinStructure._parse_psf_section(psf, int)
         else:
             ncrterm = pointer
         # At this point, ncrterm and holder are both set to the CMAP list for
@@ -383,7 +383,7 @@ class ChemicalStructure(object):
             - vmd (bool) : If True, it will write out a PSF in the format that
                     VMD prints it in (i.e., no NUMLP/NUMLPH or MOLNT sections)
         Example:
-            >>> cs = ChemicalStructure.load_from_psf('testfiles/test.psf')
+            >>> cs = ProteinStructure.load_from_psf('testfiles/test.psf')
             >>> cs.write_psf('testfiles/test2.psf')
         """
         # See if this is an extended format
@@ -727,12 +727,6 @@ class ChemicalStructure(object):
         else:
             raise ValueError('set_box requires 3 box lengths, 3 box lengths '
                              'and 3 angles, or None for no box')
-        # If we already have a _topology instance, then we have possibly changed
-        # the existence of box information (whether or not this is a periodic
-        # system), so delete any cached reference to a topology so it's
-        # regenerated with updated information
-        if hasattr(self, '_topology'):
-            del self._topology
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

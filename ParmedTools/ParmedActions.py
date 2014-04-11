@@ -3396,7 +3396,7 @@ class chamber(Action):
     def execute(self):
         from chemistry.amber._chamberparm import ConvertFromPSF
         from chemistry.charmm.parameters import ParameterSet
-        from chemistry.charmm.psf import ChemicalStructure
+        from chemistry.charmm.psf import ProteinStructure
         from chemistry.system import ChemicalSystem
         from subprocess import Popen
         import tempfile
@@ -3438,7 +3438,7 @@ class chamber(Action):
 
         # Now read the PSF
         try:
-            psf = ChemicalStructure.load_from_psf(self.psf)
+            psf = ProteinStructure.load_from_psf(self.psf)
         except ChemError:
             raise ChamberError('Problem reading CHARMM PSF')
 
