@@ -809,6 +809,10 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             parm.parm_data['ATOMS_PER_MOLECULE'][atom.marked-1] += 1
         box_info = [struct.box[3]] + struct.box[:3]
         parm.addFlag('BOX_DIMENSIONS', '5E16.8', data=box_info)
+        parm.hasbox = True
+        parm.box = struct.box[:]
+    else:
+        parm.hasbox = False
 
     # See if we need to set a rst7 attribute (if coordinates are set)
     if hasattr(struct.atom_list[0], 'xx'):
@@ -820,9 +824,6 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             crds += [atom.xx, atom.xy, atom.xz]
         parm.coords = crds
         parm.hasvels = False
-        parm.hasbox = struct.box is not None
-        if parm.hasbox:
-            parm.box = struct.box[:]
     # The topology file still is an AmberFormat instance -- it needs to be cast
     # in order to be useful as a structure type
     return parm

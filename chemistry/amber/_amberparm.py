@@ -180,6 +180,10 @@ class AmberParm(AmberFormat):
             inst.load_velocities(rawdata.vels)
         if hasattr(rawdata, 'box'):
             inst.box = rawdata.box
+        if hasattr(rawdata, 'hasbox'):
+            inst.hasbox = rawdata.hasbox
+        if hasattr(rawdata, 'hasvels'):
+            inst.hasvels = rawdata.hasvels
         return inst
    
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -377,7 +381,9 @@ class AmberParm(AmberFormat):
         # necessary
         if not hasattr(self, 'rst7'):
 #           raise AmberParmError('No coordinates loaded. Cannot write restart')
-            self.rst7 = Rst7()
+            self.rst7 = Rst7(hasbox=self.hasbox)
+            if self.hasbox:
+                self.rst7.box = self.box
 
         # Now fill in the rst7 coordinates
         self.rst7.natom = len(self.atom_list)
@@ -1075,6 +1081,7 @@ class Rst7(object):
         self.valid = True
         self.time = 0
         if filename is not None:
+            self.filename = filename
             warn('Use Rst7.open() constructor instead of default constructor '
                  'to parse restart files.', DeprecationWarning)
             self._read(filename)
@@ -1085,6 +1092,7 @@ class Rst7(object):
         Constructor that opens and parses an input coordinate file
         """
         inst = cls()
+        inst.filename = filename
         inst._read(filename)
         return inst
 

@@ -14,7 +14,7 @@ from chemistry.amber.openmmreporters import (AmberStateDataReporter,
                EnergyMinimizerReporter)
 from math import sqrt
 from chemistry.amber.mdin import mdin as Mdin
-from MMPBSA_mods.timer import Timer
+from timer import Timer
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
 import os
@@ -1086,3 +1086,127 @@ def energy(parm, args, output=sys.stdout):
 
         output.write('Potential Energy = %.7f kcal/mol\n' %
                      state.getPotentialEnergy().value_in_unit(nrg))
+
+def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
+             script, platform, precision, norun):
+    """ Minimizes a snapshot. Use the existing System if it exists """
+    global HAS_OPENMM
+    if not HAS_OPENMM:
+        raise SimulationError('Could not import OpenMM!')
+
+    # Open the script file
+    if script is not None:
+        scriptfile = open(script, 'w')
+        scriptfile.write(_SCRIPT_HEADER % (parm, parm.rst7.filename))
+    else:
+        scriptfile = None
+
+    gbmeth, kappa = None, 0.0
+    if parm.ptr('ifbox') == 0:
+        if cutoff is None or cutoff >= 500:
+            nbmeth = ff.NoCutoff
+            cutoff = 1000.0
+        else:
+            nbmeth = ff.CutoffNonPeriodic
+        if not igb in (0, 1, 2, 5, 6, 7, 8):
+            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, '
+                                  '6, 7, or 8')
+        if igb == 1:
+            gbmeth = HCT
+        elif igb == 2:
+            gbmeth = OBC1
+        elif igb == 5:
+            gbmeth = OBC2
+        elif igb == 7:
+            gbmeth = GBn
+        elif igb == 8:
+            gbmeth = GBn2
+        # Other choices are vacuum
+        kappa = 0.73 * sqrt(saltcon * 0.10806)
+    elif parm.ptr('ifbox') == 1:
+        if cutoff is None: cutoff = 8.0
+        nbmeth = ff.PME
+    else:
+        raise SimulationError('Only orthorhombic boxes currently supported in '
+                              'OpenMM')
+
+    # Time to create the OpenMM system
+    system = parm.createSystem(nonbondedMethod=nbmeth,
+                               nonbondedCutoff=cutoff*u.angstrom,
+                               constraints=None, rigidWater=True,
+                               removeCMMotion=False, implicitSolvent=gbmeth,
+                               implicitSolventKappa=kappa*(1.0/u.angstrom),
+                               soluteDielectric=1.0, solventDielectric=78.5,
+                               ewaldErrorTolerance=5e-5,
+    )
+
+    if script is not None:
+        scriptfile.write('# Create the system\n'
+                'system = parm.createSystem(nonbondedMethod=%s,\n'
+                '                   nonbondedCutoff=%s*u.angstrom,\n'
+                '                   constraints=None, rigidWater=True,\n'
+                '                   removeCMMotion=False, implicitSolvent=%s,\n'
+                '                   implicitSolventKappa=%s*(1.0/u.angstrom),\n'
+                '                   soluteDielectric=1.0,\n'
+                '                   solventDielectric=78.5,\n'
+                '                   ewaldErrorTolerance=5e-5\n'
+                ')\n\n'
+                '# Create a dummy integrator\n'
+                'integrator = VerletIntegrator(2.0*u.femtoseconds)\n\n' %
+                (nbmeth, cutoff, gbmeth, kappa)
+        )
+
+    # See if we need to add restraints
+    if restraintmask is not None:
+        mask = AmberMask(parm, restraintmask)
+        system.addForce(positional_restraints(mask,
+                            u.kilocalorie_per_mole/u.angstrom/u.angstrom,
+                            parm.rst7, scriptfile=scriptfile,)
+        )
+
+    if script is not None:
+        scriptfile.write('system.addForce(frc)\n\n')
+
+    # Create a dummy integrator and the simulation
+    integrator = mm.VerletIntegrator(2.0*u.femtoseconds)
+    if platform is not None:
+        plat = mm.Platform.getPlatformByName(platform)
+        simulation = Simulation(parm.topology, system, integrator, plat)
+        if script is not None:
+            scriptfile.write('# Create the platform\n'
+                    'plat = Platform.getPlatformByName(%s)\n\n'
+                    '# Create the simulation\n'
+                    'simulation = Simulation(parm.topology, system, '
+                    'integrator, plat)\n\n'
+                    % (platform)
+            )
+    else:
+        simulation = Simulation(parm.topology, system, integrator)
+        if script is not None:
+            scriptfile.write('# Create the simulation\n'
+                    'simulation = Simulation(parm.topology, system, '
+                    'integrator)\n\n')
+
+    # Now assign the coordinates
+    simulation.context.setPositions(parm.positions)
+    if script is not None:
+        scriptfile.write('# Setting the positions\n'
+                'simulation.context.setPositions(parm.positions)\n\n'
+                '# Minimize the energy\n'
+                'simulation.minimizeEnergy()\n'
+                '# Store the positions back in the parmtop\n'
+                'state = simulation.context.getState(getPositions=True\n'
+                '                                    enforcePeriodicBox=%s)\n'
+                'parm.positions = state.getPositions()\n' %
+                bool(parm.ptr('ifbox') > 0)
+        )
+        scriptfile.close()
+
+    # Go ahead and minimize now and set the coordinates from the results of this
+    # minimization if we wanted to run the calculation
+    if not norun:
+        simulation.minimizeEnergy(tolerance=0.001)
+        # Now get the coordinates
+        state = simulation.context.getState(getPositions=True,
+                                enforcePeriodicBox=parm.ptr('ifbox')>0)
+        parm.positions = state.getPositions()

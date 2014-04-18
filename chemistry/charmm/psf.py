@@ -35,13 +35,12 @@ def _catchindexerror(func):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class ProteinStructure(object):
+class CharmmPsfFile(object):
     """
-    A chemical structure instantiated from CHARMM files. You can instantiate a
-    ProteinStructure from a PSF file using the load_from_psf constructor
+    A chemical structure instantiated from CHARMM files.
 
     Example:
-    >>> cs = ProteinStructure.load_from_psf("testfiles/test.psf")
+    >>> cs = CharmmPsfFile("testfiles/test.psf")
     
     This structure has numerous attributes that are lists of the elements of
     this structure, including atoms, bonds, torsions, etc. The attributes are
@@ -56,8 +55,8 @@ class ProteinStructure(object):
         - acceptor_list # hbond acceptors?
         - group_list    # list of nonbonded interaction groups
 
-    Additional attribute is available if a ParameterSet is loaded into this
-    structure.
+    Additional attribute is available if a CharmmParameterSet is loaded into
+    this structure.
         
         - urey_bradley_list
 
@@ -65,28 +64,12 @@ class ProteinStructure(object):
     etc.)
 
     Example:
-    >>> cs = ProteinStructure.load_from_psf("testfiles/test.psf")
+    >>> cs = CharmmPsfFile("testfiles/test.psf")
     >>> len(cs.atom_list)
     33
     >>> len(cs.bond_list)
     32
     """
-
-    def __init__(self, residues, atoms, bonds=None, angles=None,
-                 dihedrals=None, impropers=None, cmaps=None, donors=None,
-                 acceptors=None, groups=None, title=None, flags=None):
-        self.residue_list = residues
-        self.atom_list = atoms
-        self.bond_list = bonds
-        self.angle_list = angles
-        self.dihedral_list = dihedrals
-        self.improper_list = impropers
-        self.cmap_list = cmaps
-        self.donor_list = donors
-        self.acceptor_list = acceptors
-        self.group_list = groups
-        self.title = title
-        self.flags = flags
 
     @staticmethod
     def _convert(string, type, message):
@@ -125,7 +108,7 @@ class ProteinStructure(object):
             - data (list) : A list of all data in the parsed section converted
                     to `dtype'
         """
-        conv = ProteinStructure._convert
+        conv = CharmmPsfFile._convert
         words = psf.readline().split()
         if len(words) == 1:
             pointers = conv(words[0], int, 'pointer')
@@ -143,11 +126,10 @@ class ProteinStructure(object):
             line = psf.readline().strip()
         return pointers, data
 
-    @classmethod
     @_catchindexerror
-    def load_from_psf(cls, psf_name):
+    def __init__(self, psf_name):
         """
-        Opens and parses a PSF file, then instantiates a ProteinStructure
+        Opens and parses a PSF file, then instantiates a CharmmPsfFile
         instance from the data.
             
         Parameters:
@@ -157,7 +139,7 @@ class ProteinStructure(object):
             IOError : If file "psf_name" does not exist
             CharmmPSFError: If any parsing errors are encountered
         """
-        conv = ProteinStructure._convert
+        conv = CharmmPsfFile._convert
         # Make sure the file exists
         if not os.path.exists(psf_name):
             raise IOError('Could not find PSF file %s' % psf_name)
@@ -209,7 +191,7 @@ class ProteinStructure(object):
         # Eat the next line
         psf.readline()
         # Now get the number of bonds
-        nbond, holder = ProteinStructure._parse_psf_section(psf, int)
+        nbond, holder = CharmmPsfFile._parse_psf_section(psf, int)
         bond_list = TrackedList()
         if len(holder) != nbond * 2:
             raise CharmmPSFError('Got %d indexes for %d bonds' %
@@ -220,7 +202,7 @@ class ProteinStructure(object):
             bond_list.append(Bond(atom_list[id1], atom_list[id2]))
         bond_list.changed = False
         # Now get the number of angles and the angle list
-        ntheta, holder = ProteinStructure._parse_psf_section(psf, int)
+        ntheta, holder = CharmmPsfFile._parse_psf_section(psf, int)
         angle_list = TrackedList()
         if len(holder) != ntheta * 3:
             raise CharmmPSFError('Got %d indexes for %d angles' %
@@ -234,7 +216,7 @@ class ProteinStructure(object):
             )
         angle_list.changed = False
         # Now get the number of torsions and the torsion list
-        nphi, holder = ProteinStructure._parse_psf_section(psf, int)
+        nphi, holder = CharmmPsfFile._parse_psf_section(psf, int)
         dihedral_list = TrackedList()
         if len(holder) != nphi * 4:
             raise CharmmPSFError('Got %d indexes for %d torsions' %
@@ -250,7 +232,7 @@ class ProteinStructure(object):
             )
         dihedral_list.changed = False
         # Now get the number of improper torsions
-        nimphi, holder = ProteinStructure._parse_psf_section(psf, int)
+        nimphi, holder = CharmmPsfFile._parse_psf_section(psf, int)
         improper_list = TrackedList()
         if len(holder) != nimphi * 4:
             raise CharmmPSFError('Got %d indexes for %d impropers' %
@@ -266,7 +248,7 @@ class ProteinStructure(object):
             )
         improper_list.changed = False
         # Now handle the donors (what is this used for??)
-        ndon, holder = ProteinStructure._parse_psf_section(psf, int)
+        ndon, holder = CharmmPsfFile._parse_psf_section(psf, int)
         donor_list = TrackedList()
         if len(holder) != ndon * 2:
             raise CharmmPSFError('Got %d indexes for %d donors' %
@@ -277,7 +259,7 @@ class ProteinStructure(object):
             donor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
         donor_list.changed = False
         # Now handle the acceptors (what is this used for??)
-        nacc, holder = ProteinStructure._parse_psf_section(psf, int)
+        nacc, holder = CharmmPsfFile._parse_psf_section(psf, int)
         acceptor_list = TrackedList()
         if len(holder) != nacc * 2:
             raise CharmmPSFError('Got %d indexes for %d acceptors' %
@@ -289,9 +271,9 @@ class ProteinStructure(object):
         acceptor_list.changed = False
         # Now get the NNB section. Not sure what this section is for or what it
         # does...
-        nnb, holder = ProteinStructure._parse_psf_section(psf, int)
+        nnb, holder = CharmmPsfFile._parse_psf_section(psf, int)
         # Now get the group sections
-        pointers, holder = ProteinStructure._parse_psf_section(psf, int)
+        pointers, holder = CharmmPsfFile._parse_psf_section(psf, int)
         group_list = TrackedList()
         try:
             ngrp, nst2 = pointers
@@ -318,7 +300,7 @@ class ProteinStructure(object):
         # and the number of entries in the group. If the # of entries is
         # NATOM, assume we have MOLNT section. Warn if the MOLNT section is
         # 'wrong'...
-        pointer, holder = ProteinStructure._parse_psf_section(psf, int)
+        pointer, holder = CharmmPsfFile._parse_psf_section(psf, int)
 
         # Assign all of the atoms to molecules recursively
         set_molecules(atom_list)
@@ -337,7 +319,7 @@ class ProteinStructure(object):
                                      'section.')
             psf.readline() # blank
             # Now we get to the cross-term section
-            ncrterm, holder = ProteinStructure._parse_psf_section(psf, int)
+            ncrterm, holder = CharmmPsfFile._parse_psf_section(psf, int)
         else:
             ncrterm = pointer
         # At this point, ncrterm and holder are both set to the CMAP list for
@@ -362,14 +344,19 @@ class ProteinStructure(object):
                          atom_list[id7], atom_list[id8])
             )
         cmap_list.changed = False
-        # Now instantiate the object and return it
-        inst = cls(residues=residue_list, atoms=atom_list, bonds=bond_list,
-                   angles=angle_list, dihedrals=dihedral_list,
-                   impropers=improper_list, donors=donor_list,
-                   acceptors=acceptor_list, groups=group_list, cmaps=cmap_list,
-                   title=title, flags=psf_flags)
-        # Assign some potentially useful attributes
-        return inst
+
+        self.residue_list = residue_list
+        self.atom_list = atom_list
+        self.bond_list = bond_list
+        self.angle_list = angle_list
+        self.dihedral_list = dihedral_list
+        self.improper_list = improper_list
+        self.cmap_list = cmap_list
+        self.donor_list = donor_list
+        self.acceptor_list = acceptor_list
+        self.group_list = group_list
+        self.title = title
+        self.flags = psf_flags
 
     def write_psf(self, dest, vmd=False):
         """
@@ -383,7 +370,7 @@ class ProteinStructure(object):
             - vmd (bool) : If True, it will write out a PSF in the format that
                     VMD prints it in (i.e., no NUMLP/NUMLPH or MOLNT sections)
         Example:
-            >>> cs = ProteinStructure.load_from_psf('testfiles/test.psf')
+            >>> cs = CharmmPsfFile('testfiles/test.psf')
             >>> cs.write_psf('testfiles/test2.psf')
         """
         # See if this is an extended format
@@ -606,6 +593,7 @@ class ProteinStructure(object):
         # longer one that has only one Fourier term per Dihedral instance.
         dihedral_list = self.dihedral_list
         self.dihedral_list = TrackedList()
+        active_dih_list = set()
         for dih in dihedral_list:
             # Store the atoms
             a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
@@ -624,10 +612,15 @@ class ProteinStructure(object):
                 # See if we include the end-group interactions for this
                 # dihedral. We do IFF it is the last or only dihedral term and
                 # it is NOT in the angle/bond partners
+                pair = tuple(sorted([a1.idx, a4.idx]))
                 if i != len(dtlist) - 1:
                     self.dihedral_list[-1].end_groups_active = False
                 elif a1 in a4.bond_partners or a1 in a4.angle_partners:
                     self.dihedral_list[-1].end_groups_active = False
+                elif pair in active_dih_list:
+                    self.dihedral_list[-1].end_groups_active = False
+                else:
+                    active_dih_list.add(pair)
         # Now do the impropers
         for imp in self.improper_list:
             # Store the atoms
@@ -732,8 +725,7 @@ class ProteinStructure(object):
 
 def set_molecules(atom_list):
     """
-    Correctly sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the
-    topology file.
+    Correctly sets the molecularity of the system based on connectivity.
     """
     from sys import setrecursionlimit, getrecursionlimit
     # Since we use a recursive function here, we make sure that the recursion

@@ -683,6 +683,18 @@ class OpenMMAmberParm(AmberParm):
                                for a in self.atom_list]) * u.angstroms
         return self._positions
 
+    @positions.setter
+    def positions(self, stuff):
+        """
+        Update the cached positions and assign the coordinates to the atoms
+        """
+        self._positions = stuff
+        for i, pos in enumerate(stuff.value_in_unit(u.angstroms)):
+            i3 = i * 3
+            atom = self.atom_list[i]
+            atom.xx, atom.xy, atom.xz = pos
+            self.coords[i3], self.coords[i3+1], self.coords[i3+2] = pos
+
     @property
     def velocities(self):
         """ Same as for positions, but for velocities """
@@ -695,6 +707,13 @@ class OpenMMAmberParm(AmberParm):
         self._velocities = tuple([Vec3(a.vx, a.vy, a.vz)
                     for a in self.atom_list]) * (u.angstroms/u.picosecond) 
         return self._velocities
+
+    @velocities.setter
+    def velocities(self, stuff):
+        self._velocities = stuff
+        for atom, vel in zip(self.atom_list, stuff):
+            atom.vx, atom.vy, atom.vz = vel.value_in_unit(
+                    u.angstroms/u.picoseconds)
 
     @property
     def box_vectors(self):

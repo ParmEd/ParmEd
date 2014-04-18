@@ -7,8 +7,10 @@ Date: April 5, 2014
 """
 from __future__ import division
 
+from compat24 import property
+from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
 from chemistry.charmm.parameters import element_by_mass
-from chemistry.charmm.psf import ProteinStructure
+from chemistry.charmm.psf import CharmmPsfFile
 from chemistry.exceptions import APIError
 from math import sqrt, cos, pi, sin
 import simtk.openmm as mm
@@ -22,8 +24,8 @@ from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
 TINY = 1e-8
 WATNAMES = ('WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
-class OpenMMProteinStructure(ProteinStructure):
-    """ Same as ProteinStructure but implements OpenMM functionality on top """
+class OpenMMCharmmPsfFile(CharmmPsfFile):
+    """ Same as CharmmPsfFile but implements OpenMM functionality on top """
 
     # Define default force groups for all of the bonded terms. This allows them
     # to be turned on and off selectively. This is a way to implement per-term
@@ -152,12 +154,13 @@ class OpenMMProteinStructure(ProteinStructure):
                 radii = _mbondi_radii(self.atom_list)
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        radii = [x * length_conv for x in radii]
 
         if gb_model is GBn2:
             return zip(radii, screen, alpha, beta, gamma)
         return zip(radii, screen)
 
-    def createSystem(self, nonbondedMethod=ff.NoCutoff,
+    def createSystem(self, params, nonbondedMethod=ff.NoCutoff,
                      nonbondedCutoff=1.0*u.nanometer,
                      switchDistance=0.0*u.nanometer,
                      constraints=None,
@@ -178,6 +181,7 @@ class OpenMMProteinStructure(ProteinStructure):
         prmtop file.
 
         Parameters:
+         -  params (CharmmParameterSet) All of the parameters for the system
          -  nonbondedMethod (object=NoCutoff) The method to use for nonbonded
                interactions. Allowed values are NoCutoff, CutoffNonPeriodic,
                CutoffPeriodic, Ewald, or PME.
@@ -216,6 +220,11 @@ class OpenMMProteinStructure(ProteinStructure):
          -  flexibleConstraints (bool=True) Are our constraints flexible or not?
          -  verbose (bool=False) Optionally prints out a running progress report
         """
+        # back up the dihedral list
+        dihedral_list = self.dihedral_list
+        # Load the parameter set
+        self.load_parameters(params.condense())
+
         hasbox = self.topology.getUnitCellDimensions() is not None
         # Set the cutoff distance in nanometers
         cutoff = None
@@ -615,6 +624,9 @@ class OpenMMProteinStructure(ProteinStructure):
         # Cache our system for easy access
         self._system = system
 
+        # Restore the dihedral list to allow reparametrization later
+        self.dihedral_list = dihedral_list
+
         return system
 
     @property
@@ -643,6 +655,24 @@ class OpenMMProteinStructure(ProteinStructure):
         self._positions = tuple([Vec3(a.xx, a.xy, a.xz)
                                for a in self.atom_list]) * u.angstroms
         return self._positions
+
+    @positions.setter
+    def positions(self, stuff):
+        """
+        Replace the cached positions and the positions of each atom. If no units
+        are applied to "stuff", it is assumed to be Angstroms.
+        """
+        if not u.is_quantity(stuff):
+            # Assume this is Angstroms
+            stuff *= u.angstroms
+
+        # If we got a 1-D array, reshape it into an natom list of Vec3's
+        if len(stuff) == len(self.atom_list) * 3:
+            stuff = [Vec3(stuff[i*3], stuff[i*3+1], stuff[i*3+2])
+                     for i in range(len(self.atom_list))]
+        self._positions = stuff
+        for atom, pos in zip(self.atom_list, stuff):
+            atom.xx, atom.xy, atom.xz = pos.value_in_unit(u.angstrom)
 
     @property
     def velocities(self):
@@ -693,6 +723,7 @@ class OpenMMProteinStructure(ProteinStructure):
         # regenerated with updated information
         if hasattr(self, '_topology'):
             del self._topology
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Routines that set the necessary radii lists based on a list of atoms with
@@ -860,3 +891,57 @@ def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
     cv = Vec3(cx, cy, cz) * u.angstrom
 
     return (av, bv, cv)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class OpenMMCharmmCrdFile(CharmmCrdFile):
+    """ An OpenMM-enabled version of CharmmCrdFile """
+
+    @property
+    def positions(self):
+        try:
+            return self._positions
+        except AttributeError:
+            pass
+        self._positions = self.coords[:] * u.angstroms
+        return self._positions
+    
+    @positions.setter
+    def positions(self, stuff):
+        self._positions = stuff
+        self.coords = [x.value_in_unit(u.angstroms) for x in stuff]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class OpenMMCharmmRstFile(CharmmRstFile):
+    """ An OpenMM-enabled version of CharmmRstFile """
+
+    @property
+    def positions(self):
+        try:
+            return self._positions
+        except AttributeError:
+            pass
+        self._positions = self.coords[:] * u.angstroms
+        return self._positions
+
+    @positions.setter
+    def positions(self, stuff):
+        self._positions = stuff
+        self.coords = [x.value_in_unit(u.angstroms) for x in stuff]
+
+    @property
+    def velocities(self):
+        try:
+            return self._velocities
+        except AttributeError:
+            pass
+        self._velocities = self.vels[:] * u.angstroms / u.picoseconds
+        return self._velocities
+
+    @velocities.setter
+    def velocities(self, stuff):
+        self._velocities = stuff
+        self.vels = [x.value_in_unit(u.angstroms/u.picoseconds) for x in stuff]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

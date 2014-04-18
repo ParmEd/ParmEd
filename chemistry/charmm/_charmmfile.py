@@ -85,6 +85,7 @@ class CharmmStreamFile(object):
         end
     This object provides iterators over those sections and a file-like API for
     dealing with the text.
+
     """
     def __init__(self, fname):
         self.lines = CharmmFile(fname, 'r').readlines()
@@ -126,5 +127,7 @@ class CharmmStreamFile(object):
         # No sections left
         return None, None
 
-    def __del__(self):
+
+    def __del__(self): 
+
         pass

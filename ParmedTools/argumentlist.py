@@ -172,6 +172,10 @@ class ArgumentList(object):
     def _get_key_arg(self, key, argtype):
         """ Gets a key with a given argument type """
         for i, token in enumerate(self.tokenlist):
+            # Skip all marked tokens. This allows us to allow users to specify
+            # a token numerous times (useful if you want to enable an
+            # arbitrary-length list of arguments
+            if token.marked: continue
             if token == key:
                 if self.tokenlist[i+1].marked:
                     raise RuntimeError("Expected token already marked! Should "

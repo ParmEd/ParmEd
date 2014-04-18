@@ -104,13 +104,13 @@ Usages = {
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
                        '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]',
-#         'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] '
-#                      '| [Ewald]] [[restrain <mask>] [weight <k>]] [norun] '
-#                      '[script <script_file.py>] [platform <platform>] '
-#                      '[precision <precision model>]',
-#             'heat' : 'heat [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-#                      '[Ewald]] [[restrain <mask>] [weight <k>]] [langevin | '
-#                      'anderson] [npt | npt] [anisotropic] [norun] [script '
+          'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
+                       '[[restrain <mask>] [weight <k>]] [norun] '
+                       '[script <script_file.py>] [platform <platform>] '
+                       '[precision <precision model>]',
+#             'heat' : 'heat [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
+#                      '[[restrain <mask>] [weight <k>]] [langevin | '
+#                      'anderson] [nvt | npt] [anisotropic] [norun] [script '
 #                      '<script_file.py>] [platform <platform>] '
 #                      '[precision <precision model>]',
 #               'md' : 'MD [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
@@ -265,10 +265,7 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.writeParm(self.filename)
         if self.rst_name is not None:
-#           try:
             self.parm.writeRst7(self.rst_name, netcdf=self.netcdf)
-#           except AttributeError:
-#               raise ParmError('You must load coordinates to write a restart')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3189,6 +3186,7 @@ class fixtopology(Action):
     angles and torsions if dummy atoms are involved. This action will correct
     the parameter assignments if any mistake was made
     """
+    supported_classes = ('ChamberParm', 'AmberParm')
 
     def init(self, arg_list):
         # First check to see if there is any problem
@@ -3395,8 +3393,8 @@ class chamber(Action):
 
     def execute(self):
         from chemistry.amber._chamberparm import ConvertFromPSF
-        from chemistry.charmm.parameters import ParameterSet
-        from chemistry.charmm.psf import ProteinStructure
+        from chemistry.charmm.parameters import CharmmParameterSet
+        from chemistry.charmm.psf import CharmmPsfFile
         from chemistry.system import ChemicalSystem
         from subprocess import Popen
         import tempfile
@@ -3424,7 +3422,7 @@ class chamber(Action):
             return
         # We're not using chamber, do the conversion in-house
         try:
-            parmset = ParameterSet()
+            parmset = CharmmParameterSet()
             for tfile in self.topfiles:
                 parmset.read_topology_file(tfile)
             for pfile in self.paramfiles:
@@ -3438,7 +3436,7 @@ class chamber(Action):
 
         # Now read the PSF
         try:
-            psf = ProteinStructure.load_from_psf(self.psf)
+            psf = CharmmPsfFile(self.psf)
         except ChemError:
             raise ChamberError('Problem reading CHARMM PSF')
 
@@ -3475,3 +3473,104 @@ class chamber(Action):
             parm.load_coordinates(crd.positions())
         parm.prm_name = self.psf
         self.parm_list.add_parm(parm)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class minimize(Action):
+    """
+    This action takes a structure and minimizes the energy using OpenMM.
+    Following this action, the coordinates stored in the topology will be the
+    minimized structure
+    
+    General Options:
+        cutoff <cutoff>     Nonbonded cutoff in Angstroms
+        restrain <mask>     Selection of atoms to restrain
+        weight <k>          Weight of positional restraints (kcal/mol/A^2)
+        norun               Do not run the calculation
+        script <script>     Name of the Python script to write to run this
+                            calculation
+
+    Implicit Solvent options:
+        igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
+                            Amber models)
+        saltcon <conc>      Salt concentration for GB in Molarity
+
+    The implicit solvent options will be ignored for systems with periodic
+    boundary conditions
+    """
+    supported_classes = ('ChamberParm', 'AmberParm')
+
+    def init(self, arg_list):
+        self.cutoff = arg_list.get_key_float('cutoff', None)
+        mask = arg_list.get_key_mask('restrain', None)
+        self.igb = arg_list.get_key_int('igb', 0)
+        self.saltcon = arg_list.get_key_float('saltcon', 0.0)
+        self.weight = arg_list.get_key_float('weight', 0.0)
+        self.norun = arg_list.has_key('norun')
+        self.script = arg_list.get_key_string('script', None)
+        self.platform = arg_list.get_key_string('platform', None)
+        self.precision = arg_list.get_key_string('precision', 'mixed')
+        # Check for legal values
+        if self.parm.ptr('ifbox') == 0:
+            if self.cutoff is None or self.cutoff > 500:
+                self.cutoff = None # no cutoff
+        elif self.cutoff is None:
+            self.cutoff = 8.0
+        elif self.cutoff < 7:
+            raise InputError('Cutoff unreasonably small.')
+        if self.parm.ptr('ifbox') == 0 and self.saltcon < 0:
+            raise InputError('Salt concentration must be non-negative')
+        if mask is not None:
+            self.restrain = AmberMask(self.parm, mask)
+            if self.weight <= 0:
+                raise InputError('Restraints require a restraint stiffness '
+                                 'larger than 0 kcal/mol/A^2')
+        else:
+            self.restrain = None
+        if self.platform not in ('CUDA', 'OpenCL', 'CPU', 'Reference', None):
+            raise InputError('platform must be CUDA, OpenCL, CPU or Reference '
+                             '(NOT %s)' % self.platform)
+        if self.precision not in ('mixed', 'single', 'double'):
+            raise InputError('precision must be single, double, or mixed.')
+        if self.parm.ptr('ifbox') == 0 and not self.igb in (0, 1, 2, 5, 7, 8):
+            raise InputError('Illegal igb value (%d). Must be 0, 1, 2, 5, 7, '
+                             'or 8' % self.igb)
+
+    def __str__(self):
+        retstr = 'Minimizing %s ' % self.parm
+        if self.parm.ptr('ifbox'):
+            retstr += 'with PME '
+        elif self.igb == 0:
+            retstr += 'in gas phase '
+        elif self.igb == 1:
+            retstr += 'with GB(HCT) '
+        elif self.igb == 2:
+            retstr += 'with GB(OBC1) '
+        elif self.igb == 5:
+            retstr += 'with GB(OBC2) '
+        elif self.igb == 7:
+            retstr += 'with GB(GBneck) '
+        elif self.igb == 8:
+            retstr += 'with GB(GBneck2) '
+        if self.cutoff is None:
+            retstr += 'and no cutoff. '
+        else:
+            retstr += 'and a cutoff of %.2f Angstroms. ' % self.cutoff
+        if self.restrain is not None:
+            retstr += 'Restraining %s with weights %f. ' % (self.restrain,
+                                                            self.weight)
+        return retstr.strip()
+
+    def execute(self):
+        from ParmedTools.simulations.openmm import minimize, HAS_OPENMM
+        if not HAS_OPENMM:
+            raise SimulationError('OpenMM could not be imported. Skipping.')
+
+        if not hasattr(self.parm, 'coords'):
+            raise SimulationError('You must load coordinates before "minimize"')
+        minimize(self.parm, self.igb, self.saltcon, self.cutoff,
+                 self.restrain, self.weight, self.script, self.platform,
+                 self.precision, self.norun)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
