@@ -695,34 +695,37 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         return (self.box_vectors[0][0], self.box_vectors[1][1],
                 self.box_vectors[2][2])
 
-    def set_box(self, lengths, angles=None):
+    def setBox(self, a, b, c, alpha=90.0*u.degrees, beta=90.0*u.degrees,
+               gamma=90.0*u.degrees):
         """
         Sets the periodic box boundary conditions.
 
         Parameters:
-            - lengths (3 floats) : Lengths of the periodic box (units of
-                    distance). None means no box.
-            - angles (3 floats) : Angles between box vectors (units of angle
-                    measure). Default is 90 degrees if lengths is not None
+            - a, b, c (float) : Lengths of the unit cell
+            - alpha, beta, gamma (float) : Angles between the unit cell vectors
         """
-        if lengths is None:
-            self.box_vectors = None
-        elif angles is None:
-            self.box_vectors = _box_vectors_from_lengths_angles(
-                            lengths[0], lengths[1], lengths[2],
-                            90*u.degrees, 90*u.degrees, 90*u.degrees,
-            )
-        else:
-            self.box_vectors = _box_vectors_from_lengths_angles(
-                            lengths[0], lengths[1], lengths[2],
-                            angles[0], angles[1], angles[2],
-            )
+        self.box_vectors = _box_vectors_from_lengths_angles(a, b, c,
+                                                            alpha, beta, gamma)
         # If we already have a _topology instance, then we have possibly changed
         # the existence of box information (whether or not this is a periodic
         # system), so delete any cached reference to a topology so it's
         # regenerated with updated information
         if hasattr(self, '_topology'):
             del self._topology
+
+    @property
+    def boxVectors(self):
+        return self.box_vectors
+
+    @boxVectors.setter
+    def boxVectors(self, stuff):
+        self.box_vectors = stuff
+
+    # For consistency with OpenMM's API
+    set_box = setBox
+    boxLengths = box_lengths
+    def loadParameters(self, parmset):
+        super(OpenMMCharmmPsfFile, self).load_parameters(parmset)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -849,12 +852,18 @@ def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
         - a (unit, dimension length): Length of the first vector
         - b (unit, dimension length): Length of the second vector
         - c (unit, dimension length): Length of the third vector
-        - alpha (float): Angle between b and c in degrees
-        - beta (float): Angle between a and c in degrees
-        - gamma (float): Angle between a and b in degrees
+        - alpha (float): Angle between b and c
+        - beta (float): Angle between a and c
+        - gamma (float): Angle between a and b
 
     Returns:
         Tuple of box vectors (as Vec3 instances)
+
+    Notes:
+        If all angles given are less than 6.28 (2*pi), we assume the angles are
+        given in radians since a unit cell with ALL 3 angles < 2 pi is HIGHLY
+        unusual.  If, however, you want a box whose angles are all smaller than
+        2 pi degrees, first convert to radians.
    """
     if not (u.is_quantity(a) and u.is_quantity(b) and u.is_quantity(c)):
         raise TypeError('a, b, and c must be units of dimension length')
@@ -865,12 +874,11 @@ def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
     b = b.value_in_unit(u.angstrom)
     c = c.value_in_unit(u.angstrom)
 
-    if alpha <= 2 * pi and beta <= 2 * pi and gamma <= 2 * pi:
-        raise ValueError('box angles must be given in degrees')
-
-    alpha *= pi / 180
-    beta *= pi / 180
-    gamma *= pi / 180
+    # Convert to radians if it's not already there
+    if not (alpha <= 2 * pi and beta <= 2 * pi and gamma <= 2 * pi):
+        alpha *= pi / 180
+        beta *= pi / 180
+        gamma *= pi / 180
 
     av = Vec3(a, 0.0, 0.0) * u.angstrom
     bx = b * cos(gamma)

@@ -696,30 +696,16 @@ class CharmmPsfFile(object):
 
         self.positions = positions
 
-    def set_box(self, box):
+    def set_box(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
         """
         Sets the periodic box boundary conditions.
 
         Parameters:
-            - box (list of 6 floats) : A list of 6 numbers representing a, b, c,
-                alpha, beta, and gamma, respectively (box lengths and angles).
-                If None, the system is assumed to be aperiodic
-        Notes:
-            The box can alternatively be a list of 3 numbers representing the
-            box lengths. In this case, the angles are assumed to be 90 degrees
-
-            The box here is copied via slicing, so changing the box that was
-            passed in will have no effect after set_box is called.
+            - a, b, c (float) : Unit cell lengths (in angstroms)
+            - alpha, beta, gamma (float) : Angles between unit cell vectors in
+                                           degrees
         """
-        if box is None:
-            self.box = None
-        elif len(box) == 6:
-            self.box = list(box[:])
-        elif len(box) == 3:
-            self.box = list(box[:]) + [90.0, 90.0, 90.0]
-        else:
-            raise ValueError('set_box requires 3 box lengths, 3 box lengths '
-                             'and 3 angles, or None for no box')
+        self.box = [a, b, c, alpha, beta, gamma]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
