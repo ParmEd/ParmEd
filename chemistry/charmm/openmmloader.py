@@ -706,6 +706,13 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         """
         self.box_vectors = _box_vectors_from_lengths_angles(a, b, c,
                                                             alpha, beta, gamma)
+        # Now call "set_box" for the non-OpenMM object
+        self.set_box(a.value_in_unit(u.angstroms),
+                     b.value_in_unit(u.angstroms),
+                     c.value_in_unit(u.angstroms),
+                     alpha.value_in_unit(u.degrees),
+                     beta.value_in_unit(u.degrees),
+                     gamma.value_in_unit(u.degrees))
         # If we already have a _topology instance, then we have possibly changed
         # the existence of box information (whether or not this is a periodic
         # system), so delete any cached reference to a topology so it's
@@ -722,7 +729,6 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         self.box_vectors = stuff
 
     # For consistency with OpenMM's API
-    set_box = setBox
     boxLengths = box_lengths
     def loadParameters(self, parmset):
         super(OpenMMCharmmPsfFile, self).load_parameters(parmset)
