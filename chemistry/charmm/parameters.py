@@ -13,6 +13,7 @@ from chemistry.charmm.topologyobjects import (AtomType, BondType, AngleType,
                     NoUreyBradley)
 from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
+import os
 import warnings
 
 class CharmmParameterSet(object):
@@ -90,9 +91,12 @@ class CharmmParameterSet(object):
             elif arg.endswith('.str'):
                 strs.append(arg)
             elif arg.endswith('.inp'):
-                if 'par' in arg:
+                # Only consider the file name (since the directory is likely
+                # "toppar" and will screw up file type detection)
+                fname = os.path.split(arg)[1]
+                if 'par' in fname:
                     pars.append(arg)
-                elif 'top' in arg:
+                elif 'top' in fname:
                     tops.append(arg)
                 else:
                     raise TypeError('Unrecognized file type: %s' % arg)
