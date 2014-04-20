@@ -11,6 +11,6 @@ __all__ = ('amber',
            'system',
 )
 
-__version__ = '14.0'
+__version__ = '1.0'
 __author__ = 'Jason Swails'
 

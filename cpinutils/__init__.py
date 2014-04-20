@@ -2,4 +2,4 @@
 
 __all__ = ['utilities', 'residues', 'exceptions']
 __author__ = 'Jason Swails'
-__version__ = '13.0'
+__version__ = '1.0'
