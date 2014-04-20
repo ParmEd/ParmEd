@@ -911,13 +911,21 @@ class OpenMMCharmmCrdFile(CharmmCrdFile):
             return self._positions
         except AttributeError:
             pass
-        self._positions = self.coords[:] * u.angstroms
+        self._positions = []
+        for i in range(self.natom):
+            i3 = i * 3
+            crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
+            self._positions.append(crd * u.angstrom)
         return self._positions
     
     @positions.setter
     def positions(self, stuff):
         self._positions = stuff
-        self.coords = [x.value_in_unit(u.angstroms) for x in stuff]
+        for i, crd in enumerate(stuff.value_in_unit(u.angstroms)):
+            i3 = i * 3
+            self.coords[i3  ] = crd[0]
+            self.coords[i3+1] = crd[1]
+            self.coords[i3+2] = crd[2]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -930,13 +938,21 @@ class OpenMMCharmmRstFile(CharmmRstFile):
             return self._positions
         except AttributeError:
             pass
-        self._positions = self.coords[:] * u.angstroms
+        self._positions = []
+        for i in range(self.natom):
+            i3 = i * 3
+            crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
+            self._positions.append(crd * u.angstrom)
         return self._positions
 
     @positions.setter
     def positions(self, stuff):
         self._positions = stuff
-        self.coords = [x.value_in_unit(u.angstroms) for x in stuff]
+        for i, crd in enumerate(stuff.value_in_unit(u.angstroms)):
+            i3 = i * 3
+            self.coords[i3  ] = crd[0]
+            self.coords[i3+1] = crd[1]
+            self.coords[i3+2] = crd[2]
 
     @property
     def velocities(self):
@@ -944,12 +960,20 @@ class OpenMMCharmmRstFile(CharmmRstFile):
             return self._velocities
         except AttributeError:
             pass
-        self._velocities = self.vels[:] * u.angstroms / u.picoseconds
+        self._velocities = []
+        for i in range(self.natom):
+            i3 = i * 3
+            vel = Vec3(self.vels[i3], self.vels[i3+1], self.vels[i3+2])
+            self._velocities.append(vel * u.angstroms / u.picoseconds)
         return self._velocities
 
     @velocities.setter
     def velocities(self, stuff):
         self._velocities = stuff
-        self.vels = [x.value_in_unit(u.angstroms/u.picoseconds) for x in stuff]
+        for i, vel in enumerate(stuff.value_in_unit(u.angstroms/u.picoseconds)):
+            i3 = i * 3
+            self.vels[i3  ] = vel[0]
+            self.vels[i3+1] = vel[1]
+            self.vels[i3+2] = vel[2]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
