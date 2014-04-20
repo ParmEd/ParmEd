@@ -241,6 +241,10 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                                               ff.Ewald, ff.PME):
             raise ValueError('Illegal nonbonded method for a '
                              'non-periodic system')
+        if nonbondedMethod is not ff.NoCutoff:
+            if cutoff is None or cutoff <= 0:
+                raise ValueError('Illegal cutoff value [%s] when cutoff is '
+                                 'employed' % (nonbondedMethod))
         if implicitSolvent not in (HCT, OBC1, OBC2, GBn, GBn2, None):
             raise ValueError('Illegal implicit solvent model choice.')
         if not constraints in (None, ff.HAngles, ff.HBonds, ff.AllBonds):

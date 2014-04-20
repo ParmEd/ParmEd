@@ -4,7 +4,7 @@ structure for it
 
 Author: Jason M. Swails
 Contributors:
-Date: April 18, 2014
+Date: April 20, 2014
 """
 from __future__ import division
 

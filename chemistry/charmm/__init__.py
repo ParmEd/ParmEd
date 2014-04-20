@@ -25,7 +25,7 @@ __all__ = ['psf', 'parameters', 'openmmloader', 'charmmcrds']
 __authors__ = 'Jason Swails'
 __contributors__ = ''
 __license__ = 'GPL v.3'
-__date__ = 'Apr. 21, 2014'
+__date__ = 'Apr. 20, 2014'
 
 
 __private__ = ['topologyobjects', '_charmmfile']
