@@ -3,7 +3,7 @@ This module contains OpenMM-enabled components of the CHARMM classes
 
 Author: Jason M. Swails
 Contributors:
-Date: April 5, 2014
+Date: April 20, 2014
 """
 from __future__ import division
 
@@ -12,7 +12,7 @@ from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
 from chemistry.charmm.parameters import element_by_mass
 from chemistry.charmm.psf import CharmmPsfFile
 from chemistry.exceptions import APIError
-from math import sqrt, cos, pi, sin
+from math import sqrt, cos, pi, sin, acos
 import simtk.openmm as mm
 from simtk.openmm.vec3 import Vec3
 import simtk.unit as u
@@ -454,7 +454,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         else: # periodic
             # Set up box vectors (from inpcrd if available, or fall back to
             # prmtop definitions
-            system.setDefaultPeriodicBoxVectors(*self.box_vectors)
+            system.setDefaultPeriodicBoxVectors(*self.boxVectors)
 
             # Set cutoff
             if cutoff is None:
@@ -727,11 +727,18 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
     @boxVectors.setter
     def boxVectors(self, stuff):
         self.box_vectors = stuff
+        # Now set the box
+        lengths, angles = _box_vectors_to_lengths_angles(*stuff)
+        self.box = [lengths[0], lengths[1], lengths[2],
+                    angles[0], angles[1], angles[2]]
 
     # For consistency with OpenMM's API
     boxLengths = box_lengths
     def loadParameters(self, parmset):
         super(OpenMMCharmmPsfFile, self).load_parameters(parmset)
+    def deleteCmap(self):
+        """ Deletes the CMAP terms """
+        self.cmap_list = TrackedList()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -983,3 +990,24 @@ class OpenMMCharmmRstFile(CharmmRstFile):
             self.vels[i3+2] = vel[2]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _box_vectors_to_lengths_angles(a, b, c):
+    """
+    This converts 3 periodic box vectors, converting to units of angstroms,
+    and returns a 2-element tuple of box lengths and box angles. Both will be
+    3-element tuples themselves
+    """
+    RADDEG = 180.0 / pi
+    a = a.value_in_unit(u.angstrom)
+    b = b.value_in_unit(u.angstrom)
+    c = c.value_in_unit(u.angstrom)
+    # Get the lengths of the unit vectors (now in angstroms)
+    la = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
+    lb = sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2])
+    lc = sqrt(c[0] * c[0] + c[1] * c[1] + c[2] * c[2])
+    # Angles
+    alpha = acos((b[0]*c[0] + b[1]*c[1] + b[2]*c[2]) / (lb * lc)) * RADDEG
+    beta = acos((a[0]*c[0] + a[1]*c[1] + a[2]*c[2]) / (la * lc)) * RADDEG
+    gamma = acos((a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) / (la * lb)) * RADDEG
+
+    return ( (la, lb, lc), (alpha, beta, gamma) )

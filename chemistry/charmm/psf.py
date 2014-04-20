@@ -4,7 +4,7 @@ structure for it
 
 Author: Jason M. Swails
 Contributors:
-Date: April 5, 2014
+Date: April 18, 2014
 """
 from __future__ import division
 
@@ -188,6 +188,7 @@ class CharmmPsfFile(object):
                                          attype, charge, mass, props)
             atom_list.append(atom)
         atom_list.assign_indexes()
+        atom_list.changed = False
         # Eat the next line
         psf.readline()
         # Now get the number of bonds

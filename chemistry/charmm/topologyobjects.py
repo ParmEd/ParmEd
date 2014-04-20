@@ -14,6 +14,29 @@ TINY = 1e-8
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def _tracking(fcn):
+    """ Decorator to indicate the list has changed """
+    def new_fcn(self, *args):
+        self.changed = True
+        return fcn(self, *args)
+    return new_fcn
+
+class TrackedList(list):
+    """
+    This creates a list type that allows you to see if anything has changed
+    """
+    def __init__(self, arg=[]):
+        self.changed = False
+        list.__init__(self, arg)
+
+    __delitem__ = _tracking(list.__delitem__)
+    append = _tracking(list.append)
+    extend = _tracking(list.extend)
+    __delslice__ = _tracking(list.__delslice__)
+    __setitem__ = _tracking(list.__setitem__)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class AtomType(object):
     """
     Atom types can either be compared by indexes or names. Can be assigned with
@@ -283,7 +306,7 @@ class Atom(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class AtomList(list):
+class AtomList(TrackedList):
     """ A list of Atom instances.  """
 
     def unmark(self):
@@ -1014,29 +1037,6 @@ class _CmapGrid(object):
                 # Start from the middle
                 newgrid[i, j] = self[(i+mid)%res, (j+mid)%res]
         return newgrid
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def _tracking(fcn):
-    """ Decorator to indicate the list has changed """
-    def new_fcn(self, *args):
-        self.changed = True
-        return fcn(self, *args)
-    return new_fcn
-
-class TrackedList(list):
-    """
-    This creates a list type that allows you to see if anything has changed
-    """
-    def __init__(self, arg=[]):
-        self.changed = False
-        list.__init__(self, arg)
-
-    __delitem__ = _tracking(list.__delitem__)
-    append = _tracking(list.append)
-    extend = _tracking(list.extend)
-    __delslice__ = _tracking(list.__delslice__)
-    __setitem__ = _tracking(list.__setitem__)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
