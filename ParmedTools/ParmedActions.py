@@ -20,7 +20,7 @@ from chemistry.amber.mask import AmberMask
 from chemistry.amber.readparm import AmberFormat
 from chemistry.amber.topologyobjects import (Bond, BondType, Angle, AngleType,
                                              Dihedral, DihedralType)
-from chemistry.exceptions import ChemError
+from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.periodic_table import Element as _Element
 from compat24 import any
 import math
@@ -1652,7 +1652,15 @@ class adddihedral(Action):
         # Create the new dihedral type
         new_dih_typ = DihedralType(self.phi_k, self.per, self.phase, self.scee,
                                    self.scnb, -1)
-        self.parm.dihedral_type_list.append(new_dih_typ)
+        exists = False
+        # Do not add a duplicate dihedral type
+        for dih_typ in self.parm.dihedral_type_list:
+            if new_dih_typ == dih_typ:
+                new_dih_typ = dih_typ
+                exists = True
+                break
+        if not exists:
+            self.parm.dihedral_type_list.append(new_dih_typ)
 
         # Loop through all of the atoms
         atnum1, atnum2, atnum3, atnum4 = -1, -1, -1, -1
@@ -3288,7 +3296,7 @@ class chamber(Action):
         -param      CHARMM parameter file
         -str        CHARMM stream file. Only RTF and parameter sections are read
         -psf        CHARMM PSF file
-        -crd        Input coordinate file (must be PDB file currently)
+        -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
         -nocmap     Do not use any CMAP parameters
         usechamber  Use the 'chamber' program to write a topology file instead
         -box        Box dimensions. If no angles are defined, they are assumed
@@ -3395,6 +3403,7 @@ class chamber(Action):
         from chemistry.amber._chamberparm import ConvertFromPSF
         from chemistry.charmm.parameters import CharmmParameterSet
         from chemistry.charmm.psf import CharmmPsfFile
+        from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
         from chemistry.system import ChemicalSystem
         from subprocess import Popen
         import tempfile
@@ -3442,27 +3451,39 @@ class chamber(Action):
 
         # Read the PDB and set the box information
         if self.crdfile is not None:
-            crd = ChemicalSystem.load_from_pdb(self.crdfile)
+            crdbox = None # Really only ever available in a VMD-created PDB
+            # Automatic format determination
+            try:
+                crd = CharmmCrdFile(self.crdfile)
+                coords = crd.coords
+            except CharmmFileError:
+                try:
+                    crd = CharmmRstFile(self.crdfile)
+                    coords = crd.coords
+                except CharmmFileError:
+                    crd = ChemicalSystem.load_from_pdb(self.crdfile)
+                    if not crd:
+                        raise ChamberError('Could not determine coordinate'
+                                           'file type')
+                    crdbox = crd.box
+                    coords = crd.positions()
             # Set the box info from self.box if set
-            if self.box is None and crd.box is not None:
-                psf.set_box(crd.box[:])
+            if self.box is None and crdbox is not None:
+                psf.set_box(*crdbox[:])
             elif self.box is not None:
-                psf.set_box(self.box[:])
+                psf.set_box(*self.box[:])
             else:
-                psf.set_box(None)
+                psf.box = None
         else:
             # Set the box information
-            psf.set_box(self.box)
+            psf.set_box(*self.box)
 
         nsets = len(parmset.parametersets)
         frcfield = '%2d' % nsets
         frcfield += ('\n%2d' % nsets).join(parmset.parametersets)
         # Delete the CMAP list if requested
         if not self.cmap:
-            try:
-                del psf.cmap_list
-            except AttributeError:
-                pass
+            psf.clear_cmap()
         # Now load the parameters
         try:
             psf.load_parameters(parmset)
@@ -3470,7 +3491,7 @@ class chamber(Action):
             raise ChamberError('Problem assigning parameters to PSF')
         parm = ConvertFromPSF(psf, frcfield).view(ChamberParm)
         if self.crdfile is not None:
-            parm.load_coordinates(crd.positions())
+            parm.load_coordinates(coords)
         parm.prm_name = self.psf
         self.parm_list.add_parm(parm)
 
