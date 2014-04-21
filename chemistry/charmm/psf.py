@@ -708,6 +708,10 @@ class CharmmPsfFile(object):
         """
         self.box = [a, b, c, alpha, beta, gamma]
 
+    def clear_cmap(self):
+        " Clear the cmap list to prevent any CMAP parameters from being used "
+        self.cmap_list = TrackedList()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def set_molecules(atom_list):
