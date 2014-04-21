@@ -3402,8 +3402,8 @@ class chamber(Action):
             tmpprm = tempfile.mktemp(suffix='.parm7')
             tmpcrd = tempfile.mktemp(suffix='.rst7')
             args = ['chamber', '-top', self.topfiles[0], '-param',
-                    self.paramfiles[0], '-psf', self.psf, '-str',
-                    '-crd', self.crdfile]
+                    self.paramfiles[0], '-psf', self.psf, '-crd', self.crdfile,
+                    '-str']
             args += self.topfiles[1:] + self.paramfiles[1:]
             args += self.streamfiles[:]
             args += ['-p', tmpprm, '-inpcrd', tmpcrd]
@@ -3412,7 +3412,7 @@ class chamber(Action):
             else:
                 args.append('-nocmap')
             if self.box is not None:
-                args += ['-box'] + self.box[:3]
+                args += ['-box'] + [str(x) for x in self.box[:3]]
             process = Popen(args)
             if process.wait() != 0:
                 raise ChamberError('chamber failed with command\n\t' +
