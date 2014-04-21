@@ -17,7 +17,7 @@ scripts = ['parmed.py', 'xparmed.py']
 if __name__ == '__main__':
 
    setup(name='ParmEd',
-         version='14.5', # Corresponds to Amber release; between Amber 14 and 15
+         version='SA_1.0', # standalone release version
          description='Amber parameter file editor',
          author='Jason Swails',
          author_email='jason.swails -at- gmail.com',
