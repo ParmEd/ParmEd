@@ -22,6 +22,14 @@ params = CharmmParameterSet('toppar/par_all36_prot.prm',
 ala2_solv = CharmmPsfFile('ala2_charmmgui.psf')
 ala2_crds = CharmmCrdFile('ala2_charmmgui.crd')
 
+# NOTE NOTE
+# The parameter set we used here is the CHARMM 36 force field, but this is
+# strictly an example. It is important that you use the most accurate (typically
+# most up-to-date) force fields for your own simulation. See the CHARMM
+# parameter web page for updates:
+# http://mackerell.umaryland.edu/CHARMM_ff_params.html
+# END NOTE
+
 # Compute the box dimensions from the coordinates and set the box lengths (only
 # orthorhombic boxes are currently supported in OpenMM)
 coords = ala2_crds.positions

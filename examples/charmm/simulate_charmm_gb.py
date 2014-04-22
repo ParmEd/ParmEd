@@ -21,6 +21,14 @@ params = CharmmParameterSet('toppar/par_all36_prot.prm')
 ala5_gas = CharmmPsfFile('ala5_autopsf.psf')
 ala5_crds = app.PDBFile('ala5_autopsf.pdb')
 
+# NOTE NOTE
+# The parameter set we used here is the CHARMM 36 force field, but this is
+# strictly an example. It is important that you use the most accurate (typically
+# most up-to-date) force fields for your own simulation. See the CHARMM
+# parameter web page for updates:
+# http://mackerell.umaryland.edu/CHARMM_ff_params.html
+# END NOTE
+
 # Create the OpenMM system
 print('Creating OpenMM System')
 system = ala5_gas.createSystem(params, nonbondedMethod=app.NoCutoff,
