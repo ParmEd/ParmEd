@@ -49,8 +49,7 @@ sim.minimizeEnergy(maxIterations=500)
 # Set up the reporters to report energies and coordinates every 100 steps
 sim.reporters.append(
         AmberStateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
-                               kineticEnergy=True, temperature=True,
-                               volume=True, density=True)
+                               kineticEnergy=True, temperature=True)
 )
 sim.reporters.append(
         NetCDFReporter('ala5_gb.nc', 100, atom=ala5_gas.ptr('natom'),
