@@ -44,7 +44,7 @@ ala2_solv.setBox(max_crds[0]-min_crds[0],
 # Create the OpenMM system
 print('Creating OpenMM System')
 system = ala2_solv.createSystem(params, nonbondedMethod=app.PME,
-                                nonbondedCutoff=6.0*u.angstroms,
+                                nonbondedCutoff=10.0*u.angstroms,
                                 constraints=app.HBonds,
 )
 
