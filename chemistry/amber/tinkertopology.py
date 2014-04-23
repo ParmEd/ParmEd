@@ -12,7 +12,7 @@ Designed so it can be used like:
 by Jason Swails
 """
 
-from compat24 import property
+from compat24 import property, wraps
 from chemistry.amber.constants import NATOM
 from chemistry.exceptions import (BondError, AmberParmError, AmoebaError)
 from chemistry.amber.topologyobjects import (_TypeList, TrackedList,
@@ -23,6 +23,20 @@ from chemistry.amber.topologyobjects import (_TypeList, TrackedList,
             UreyBradleyType as _UreyBradleyType,
             AngleType as _AngleType,
             Cmap as _Cmap)
+
+def _protector(func):
+    """
+    Decorator to make sure that when a section of the prmtop is not present,
+    instead of raising a KeyError, the *TypeList instances instead instantiate
+    an "empty" list
+    """
+    @wraps(func)
+    def wrapper(self):
+        try:
+            return func(self)
+        except KeyError:
+            return list.__init__(self)
+    return wrapper
 
 class Atom(object):
     """
@@ -448,6 +462,7 @@ class BondTypeList(_TypeList):
             raise AmoebaError('Bond degree (%d) does not make sense with %d '
                               'coefficients.' % (self.degree, len(self.coeffs)))
 
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT']
         eql = self.parm.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE']
@@ -492,6 +507,7 @@ class UreyBradleyTypeList(_TypeList):
                               'with %d coefficients.' %
                               (self.degree, len(self.coeffs)))
 
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT']
         eql = self.parm.parm_data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE']
@@ -542,6 +558,7 @@ class AngleTypeList(_TypeList):
             raise AmoebaError('Angle degree (%d) does not make sense with %d '
                               'coefficients.' % (self.degree, len(self.coeffs)))
 
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT']
         eql = self.parm.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE']
@@ -632,6 +649,7 @@ class TrigonalAngleTypeList(_TypeList):
                               'with %d coefficients.' %
                               (self.degree, len(self.coeffs)))
    
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT']
         eql = self.parm.parm_data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE']
@@ -701,6 +719,7 @@ class OutOfPlaneBendTypeList(_TypeList):
                               'with %d coefficients.' %
                               (self.degree, len(self.coeffs)))
    
+    @_protector
     def _make_array(self):
         klist = self.parm.parm_data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT']
         list.__init__(self, [OutOfPlaneBendType(k, -1) for k in klist])
@@ -776,6 +795,7 @@ class DihedralType(object):
 
 class DihedralTypeList(_TypeList):
 
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_TORSION_FORCE_CONSTANT']
         perl = self.parm.parm_data['AMOEBA_TORSION_PERIODICITY']
@@ -832,6 +852,7 @@ class PiTorsionType(DihedralType):
 
 class PiTorsionTypeList(_TypeList):
 
+    @_protector
     def _make_array(self):
         kl = self.parm.parm_data['AMOEBA_PI_TORSION_FORCE_CONSTANT']
         perl = self.parm.parm_data['AMOEBA_PI_TORSION_PERIODICITY']
@@ -890,13 +911,14 @@ class StretchBendType(object):
 
 class StretchBendTypeList(_TypeList):
 
-   def _make_array(self):
-      kl = self.parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']
-      eql = self.parm.parm_data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']
-      eq1l = self.parm.parm_data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE']
-      eq2l = self.parm.parm_data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE']
-      list.__init__(self, [StretchBendType(k, eq, eq1, eq2, -1)
-                           for k, eq, eq1, eq2 in zip(kl, eql, eq1l, eq2l)])
+    @_protector
+    def _make_array(self):
+        kl = self.parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']
+        eql = self.parm.parm_data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']
+        eq1l = self.parm.parm_data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE']
+        eq2l = self.parm.parm_data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE']
+        list.__init__(self, [StretchBendType(k, eq, eq1, eq2, -1)
+                            for k, eq, eq1, eq2 in zip(kl, eql, eq1l, eq2l)])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1048,6 +1070,7 @@ class TorsionTorsionType(object):
 
 class TorsionTorsionTypeList(_TypeList):
 
+    @_protector
     def _make_array(self):
         ntab = self.parm.parm_data['AMOEBA_TORSION_TORSION_NUM_PARAMS'][0]
         list.__init__(self)

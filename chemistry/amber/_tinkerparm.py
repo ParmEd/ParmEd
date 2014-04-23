@@ -105,172 +105,208 @@ class AmoebaParm(AmberParm):
         self.bond_type_list = BondTypeList(self)
         self.bond_list = TrackedList()
         # Add all of our bonds
-        for i in range(self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i  ] - 1
-            id2 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+1] - 1
-            typ = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+2] - 1
-            self.bond_list.append(
-                    Bond(self.atom_list[id1], self.atom_list[id2],
-                         self.bond_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i  ] - 1
+                id2 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+1] - 1
+                typ = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+2] - 1
+                self.bond_list.append(
+                        Bond(self.atom_list[id1], self.atom_list[id2],
+                             self.bond_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.bond_list.changed = False
         self.bond_type_list.changed = False
         ##### Next create our list of urey-bradleys #####
         self.urey_bradley_type_list = UreyBradleyTypeList(self)
         self.urey_bradley_list = TrackedList()
         # Add all of our urey-bradley terms
-        for i in range(self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i  ] - 1
-            id2 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+1] - 1
-            typ = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+2] - 1
-            self.urey_bradley_list.append(
-                    UreyBradley(self.atom_list[id1], self.atom_list[id2],
-                                self.urey_bradley_type_list[typ])
-            )
+        try:
+            nub = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'][0]
+            for i in range(nub):
+                id1 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i  ] - 1
+                id2 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+1] - 1
+                typ = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+2] - 1
+                self.urey_bradley_list.append(
+                        UreyBradley(self.atom_list[id1], self.atom_list[id2],
+                                    self.urey_bradley_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.urey_bradley_type_list.changed = False
         self.urey_bradley_list.changed = False
         ##### Next create our list of angles #####
         self.angle_type_list = AngleTypeList(self)
         self.angle_list = TrackedList()
         # Add all of our angles
-        for i in range(self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i  ] - 1
-            id2 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+1] - 1
-            id3 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+2] - 1
-            typ = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+3] - 1
-            self.angle_list.append(
-                    Angle(self.atom_list[id1], self.atom_list[id2],
-                          self.atom_list[id3], self.angle_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i  ] - 1
+                id2 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+1] - 1
+                id3 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+2] - 1
+                typ = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+3] - 1
+                self.angle_list.append(
+                        Angle(self.atom_list[id1], self.atom_list[id2],
+                              self.atom_list[id3], self.angle_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.angle_type_list.changed = False
         self.angle_list.changed = False
         ##### Next create our list of trigonal angles (in-plane)
         self.trigonal_angle_type_list = TrigonalAngleTypeList(self)
         self.trigonal_angle_list = TrackedList()
         # Add all trigonal angles
-        for i in range(self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i  ] - 1
-            id2 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+1] - 1
-            id3 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+2] - 1
-            id4 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+3] - 1
-            typ = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+4] - 1
-            self.trigonal_angle_list.append(
-                    TrigonalAngle(self.atom_list[id1], self.atom_list[id2],
-                                  self.atom_list[id3], self.atom_list[id4],
-                                  self.trigonal_angle_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i  ] - 1
+                id2 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+1] - 1
+                id3 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+2] - 1
+                id4 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+3] - 1
+                typ = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+4] - 1
+                self.trigonal_angle_list.append(
+                        TrigonalAngle(self.atom_list[id1], self.atom_list[id2],
+                                      self.atom_list[id3], self.atom_list[id4],
+                                      self.trigonal_angle_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.trigonal_angle_type_list.changed = False
         self.trigonal_angle_list.changed = False
         ##### Next create our list of out-of-plane bending terms #####
         self.oopbend_type_list = OutOfPlaneBendTypeList(self)
         self.oopbend_list = TrackedList()
         # Add the out-of-plane bending terms
-        for i in range(self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i  ] - 1
-            id2 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+1] - 1
-            id3 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+2] - 1
-            id4 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+3] - 1
-            typ = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+4] - 1
-            self.oopbend_list.append(
-                    OutOfPlaneBend(self.atom_list[id1], self.atom_list[id2],
-                                   self.atom_list[id3], self.atom_list[id4],
-                                   self.oopbend_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i  ] - 1
+                id2 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+1] - 1
+                id3 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+2] - 1
+                id4 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+3] - 1
+                typ = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+4] - 1
+                self.oopbend_list.append(
+                        OutOfPlaneBend(self.atom_list[id1], self.atom_list[id2],
+                                       self.atom_list[id3], self.atom_list[id4],
+                                       self.oopbend_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.oopbend_type_list.changed = False
         self.oopbend_list.changed = False
         ##### Next create our list of normal dihedrals #####
         self.dihedral_type_list = DihedralTypeList(self)
         self.dihedral_list = TrackedList()
         # Add the dihedrals
-        for i in range(self.parm_data['AMOEBA_TORSION_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_TORSION_LIST'][5*i  ] - 1
-            id2 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+1] - 1
-            id3 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+2] - 1
-            id4 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+3] - 1
-            typ = self.parm_data['AMOEBA_TORSION_LIST'][5*i+4] - 1
-            self.dihedral_list.append(
-                    Dihedral(self.atom_list[id1], self.atom_list[id2],
-                             self.atom_list[id3], self.atom_list[id4],
-                             self.dihedral_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_TORSION_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_TORSION_LIST'][5*i  ] - 1
+                id2 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+1] - 1
+                id3 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+2] - 1
+                id4 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+3] - 1
+                typ = self.parm_data['AMOEBA_TORSION_LIST'][5*i+4] - 1
+                self.dihedral_list.append(
+                        Dihedral(self.atom_list[id1], self.atom_list[id2],
+                                 self.atom_list[id3], self.atom_list[id4],
+                                 self.dihedral_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.dihedral_type_list.changed = False
         self.dihedral_list.changed = False
         ##### Next create our list of pi-torsions #####
         self.pitorsion_type_list = PiTorsionTypeList(self)
         self.pitorsion_list = TrackedList()
         # Add the pi-torsions
-        for i in range(self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i  ] - 1
-            id2 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+1] - 1
-            id3 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+2] - 1
-            id4 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+3] - 1
-            id5 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+4] - 1
-            id6 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+5] - 1
-            typ = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+6] - 1
-            self.pitorsion_list.append(
-                    PiTorsion(self.atom_list[id1], self.atom_list[id2],
-                              self.atom_list[id3], self.atom_list[id4],
-                              self.atom_list[id5], self.atom_list[id6],
-                              self.pitorsion_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i  ] - 1
+                id2 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+1] - 1
+                id3 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+2] - 1
+                id4 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+3] - 1
+                id5 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+4] - 1
+                id6 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+5] - 1
+                typ = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+6] - 1
+                self.pitorsion_list.append(
+                        PiTorsion(self.atom_list[id1], self.atom_list[id2],
+                                  self.atom_list[id3], self.atom_list[id4],
+                                  self.atom_list[id5], self.atom_list[id6],
+                                  self.pitorsion_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.pitorsion_type_list.changed = False
         self.pitorsion_list.changed = False
         ##### Next create stretch-bend terms #####
         self.stretch_bend_type_list = StretchBendTypeList(self)
         self.stretch_bend_list = TrackedList()
         # Add the stretch-bends
-        for i in range(self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i  ] - 1
-            id2 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+1] - 1
-            id3 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+2] - 1
-            typ = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+3] - 1
-            self.stretch_bend_list.append(
-                    StretchBend(self.atom_list[id1], self.atom_list[id2],
-                                self.atom_list[id3],
-                                self.stretch_bend_type_list[typ])
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i  ] - 1
+                id2 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+1] - 1
+                id3 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+2] - 1
+                typ = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+3] - 1
+                self.stretch_bend_list.append(
+                        StretchBend(self.atom_list[id1], self.atom_list[id2],
+                                    self.atom_list[id3],
+                                    self.stretch_bend_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.stretch_bend_type_list.changed = False
         self.stretch_bend_list.changed = False
         ##### Next create the torsion-torsion parameters #####
         self.torsion_torsion_type_list = TorsionTorsionTypeList(self)
         self.torsion_torsion_list = TrackedList()
         # Add the torsion-torsions
-        for i in range(self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i  ] - 1
-            id2 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+1] - 1
-            id3 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+2] - 1
-            id4 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+3] - 1
-            id5 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+4] - 1
-            typ = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+5] - 1
-            self.torsion_torsion_list.append(
-                    TorsionTorsion(self.atom_list[id1], self.atom_list[id2],
-                                   self.atom_list[id3], self.atom_list[id4],
-                                   self.atom_list[id5],
-                                   self.torsion_torsion_type_list[typ])
-            )
+        try:
+            ntt = self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]
+            for i in range(ntt):
+                id1 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i  ] - 1
+                id2 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+1] - 1
+                id3 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+2] - 1
+                id4 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+3] - 1
+                id5 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+4] - 1
+                typ = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+5] - 1
+                self.torsion_torsion_list.append(
+                        TorsionTorsion(self.atom_list[id1], self.atom_list[id2],
+                                       self.atom_list[id3], self.atom_list[id4],
+                                       self.atom_list[id5],
+                                       self.torsion_torsion_type_list[typ])
+                )
+        except KeyError:
+            pass
         self.torsion_torsion_type_list.changed = False
         self.torsion_torsion_list.changed = False
         ##### Next create the chiral frame list #####
         self.chiral_frame_list = TrackedList()
-        for i in range(self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i  ] - 1
-            id2 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+1] - 1
-            chi = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+2]
-            self.chiral_frame_list.append(
-                    ChiralFrame(self.atom_list[id1], self.atom_list[id2], chi)
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i  ] - 1
+                id2 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+1] - 1
+                chi = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+2]
+                self.chiral_frame_list.append(
+                        ChiralFrame(self.atom_list[id1],
+                                    self.atom_list[id2], chi)
+                )
+        except KeyError:
+            pass
         self.chiral_frame_list.changed = False
         ##### Create the multipole frame list #####
         self.multipole_frame_list = TrackedList()
-        for i in range(self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i  ] - 1
-            fpn = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+1]
-            vct = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+2]
-            vch = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+3]
-            nvc = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+4]
-            self.multipole_frame_list.append(
-                    MultipoleFrame(self.atom_list[id1], fpn, vct, vch, nvc)
-            )
+        try:
+            for i in range(self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'][0]):
+                id1 = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i  ] - 1
+                fpn = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+1]
+                vct = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+2]
+                vch = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+3]
+                nvc = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+4]
+                self.multipole_frame_list.append(
+                        MultipoleFrame(self.atom_list[id1], fpn, vct, vch, nvc)
+                )
+        except KeyError:
+            pass
         self.multipole_frame_list.changed = False
         ##### Create the "adjust" (detailed exclusion) list #####
         self.adjust_list = TrackedList()
@@ -343,237 +379,327 @@ class AmoebaParm(AmberParm):
         # array is at least large enough, so give it enough elements to cover
         # every bond in the list, which will be reduced in size of not every
         # bond is actually added
-        bond_num = typenum = 0
-        self.parm_data['AMOEBA_REGULAR_BOND_LIST'] = \
-                                        _zeros(len(self.bond_list)*3)
-        for i, bnd in enumerate(self.bond_list):
-            if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
-            if bnd.bond_type.idx == -1:
-                bnd.bond_type.idx = typenum
-                typenum += 1
-            bnd.write_info(self, bond_num)
-            bond_num += 1
-        # At this point, bond_num is one past the last index used, but since
-        # Python indexes from 0 bond_num is actually now equal to the total
-        # number of bonds that were written
-        self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'] = [bond_num]
-        self._truncate_array('AMOEBA_REGULAR_BOND_LIST', bond_num*3)
-        # Now write the types
-        self.parm_data['AMOEBA_REGULAR_BOND_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = _zeros(typenum)
-        self.bond_type_list.write_to_parm()
+        if self.bond_list:
+            bond_num = typenum = 0
+            self.parm_data['AMOEBA_REGULAR_BOND_LIST'] = \
+                                            _zeros(len(self.bond_list)*3)
+            for i, bnd in enumerate(self.bond_list):
+                if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
+                if bnd.bond_type.idx == -1:
+                    bnd.bond_type.idx = typenum
+                    typenum += 1
+                bnd.write_info(self, bond_num)
+                bond_num += 1
+            # At this point, bond_num is one past the last index used, but since
+            # Python indexes from 0 bond_num is actually now equal to the total
+            # number of bonds that were written
+            self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'] = [bond_num]
+            self._truncate_array('AMOEBA_REGULAR_BOND_LIST', bond_num*3)
+            # Now write the types
+            self.parm_data['AMOEBA_REGULAR_BOND_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = \
+                                                _zeros(typenum)
+            self.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = _zeros(typenum)
+            self.bond_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_REGULAR_BOND_LIST')
+            self.deleteFlag('AMOEBA_REGULAR_BOND_NUM_LIST')
+            self.deleteFlag('AMOEBA_REGULAR_BOND_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_REGULAR_BOND_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_REGULAR_BOND_EQUIL_VALUE')
 
         # Now time for urey-bradleys
-        ub_num = typenum = 0
-        self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = \
+        if self.urey_bradley_list:
+            ub_num = typenum = 0
+            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = \
                                         _zeros(len(self.urey_bradley_list)*3)
-        for i, ub in enumerate(self.urey_bradley_list):
-            if -1 in (ub.atom1, ub.atom2): continue
-            if ub.ub_type.idx == -1:
-                ub.ub_type.idx = typenum
-                typenum += 1
-            ub.write_info(self, ub_num)
-            ub_num += 1
-        self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'] = [ub_num]
-        self._truncate_array('AMOEBA_UREY_BRADLEY_BOND_LIST', ub_num*3)
-        # Now the types
-        self.parm_data['AMOEBA_UREY_BRADLEY_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = \
-                                        _zeros(typenum)
-        self.parm_data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = _zeros(typenum)
-        self.urey_bradley_type_list.write_to_parm()
+            for i, ub in enumerate(self.urey_bradley_list):
+                if -1 in (ub.atom1, ub.atom2): continue
+                if ub.ub_type.idx == -1:
+                    ub.ub_type.idx = typenum
+                    typenum += 1
+                ub.write_info(self, ub_num)
+                ub_num += 1
+            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'] = [ub_num]
+            self._truncate_array('AMOEBA_UREY_BRADLEY_BOND_LIST', ub_num*3)
+            # Now the types
+            self.parm_data['AMOEBA_UREY_BRADLEY_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = \
+                                            _zeros(typenum)
+            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = \
+                                            _zeros(typenum)
+            self.urey_bradley_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST')
+            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_LIST')
+            self.deleteFlag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE')
 
         # Now time for angles
-        ang_num = typenum = 0
-        self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'] = \
-                                        _zeros(len(self.angle_list)*4)
-        for i, ang in enumerate(self.angle_list):
-            if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx): continue
-            if ang.angle_type.idx == -1:
-                ang.angle_type.idx = typenum
-                typenum += 1
-            ang.write_info(self, ang_num)
-            ang_num += 1
-        self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'] = [ang_num]
-        self._truncate_array('AMOEBA_REGULAR_ANGLE_LIST', ang_num*4)
-        # Now the types
-        self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
-        self.angle_type_list.write_to_parm()
+        if self.angle_list:
+            ang_num = typenum = 0
+            self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'] = \
+                                            _zeros(len(self.angle_list)*4)
+            for i, ang in enumerate(self.angle_list):
+                if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx): continue
+                if ang.angle_type.idx == -1:
+                    ang.angle_type.idx = typenum
+                    typenum += 1
+                ang.write_info(self, ang_num)
+                ang_num += 1
+            self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'] = [ang_num]
+            self._truncate_array('AMOEBA_REGULAR_ANGLE_LIST', ang_num*4)
+            # Now the types
+            self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = \
+                                                _zeros(typenum)
+            self.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
+            self.angle_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_REGULAR_ANGLE_NUM_LIST')
+            self.deleteFlag('AMOEBA_REGULAR_ANGLE_LIST')
+            self.deleteFlag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
 
         # Now time for the trigonal angles
-        ang_num = typenum = 0
-        self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'] = \
+        if self.trigonal_angle_list:
+            ang_num = typenum = 0
+            self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'] = \
                                         _zeros(len(self.trigonal_angle_list)*5)
-        for i, ang in enumerate(self.trigonal_angle_list):
-            if -1 in (ang.atom1.idx, ang.atom2.idx,
-                      ang.atom3.idx, ang.atom4.idx):
-                continue
-            if ang.trigang_type.idx == -1:
-                ang.trigang_type.idx = typenum
-                typenum += 1
-            ang.write_info(self, ang_num)
-            ang_num += 1
-        self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'] = [ang_num]
-        self._truncate_array('AMOEBA_TRIGONAL_ANGLE_LIST', ang_num*5)
-        # Now the types
-        self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
-        self.trigonal_angle_type_list.write_to_parm()
+            for i, ang in enumerate(self.trigonal_angle_list):
+                if -1 in (ang.atom1.idx, ang.atom2.idx,
+                          ang.atom3.idx, ang.atom4.idx):
+                    continue
+                if ang.trigang_type.idx == -1:
+                    ang.trigang_type.idx = typenum
+                    typenum += 1
+                ang.write_info(self, ang_num)
+                ang_num += 1
+            self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'] = [ang_num]
+            self._truncate_array('AMOEBA_TRIGONAL_ANGLE_LIST', ang_num*5)
+            # Now the types
+            self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = \
+                                        _zeros(typenum)
+            self.parm_data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = \
+                                        _zeros(typenum)
+            self.trigonal_angle_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_NUM_LIST')
+            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_LIST')
+            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE')
 
         # Now time for the out-of-plane bending terms
-        oop_num = typenum = 0
-        self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'] = \
-                                        _zeros(len(self.oopbend_list)*5)
-        for i, oop in enumerate(self.oopbend_list):
-            if -1 in (oop.atom1.idx, oop.atom2.idx,
-                      oop.atom3.idx, oop.atom4.idx):
-                continue
-            if oop.oopbend_type.idx == -1:
-                oop.oopbend_type.idx = typenum
-                typenum += 1
-            oop.write_info(self, oop_num)
-            oop_num += 1
-        self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'] = [oop_num]
-        self._truncate_array('AMOEBA_OPBEND_ANGLE_LIST', oop_num*5)
-        # Now the types
-        self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_OPBEND_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
-        self.oopbend_type_list.write_to_parm()
+        if self.oopbend_list:
+            oop_num = typenum = 0
+            self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'] = \
+                                            _zeros(len(self.oopbend_list)*5)
+            for i, oop in enumerate(self.oopbend_list):
+                if -1 in (oop.atom1.idx, oop.atom2.idx,
+                          oop.atom3.idx, oop.atom4.idx):
+                    continue
+                if oop.oopbend_type.idx == -1:
+                    oop.oopbend_type.idx = typenum
+                    typenum += 1
+                oop.write_info(self, oop_num)
+                oop_num += 1
+            self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'] = [oop_num]
+            self._truncate_array('AMOEBA_OPBEND_ANGLE_LIST', oop_num*5)
+            # Now the types
+            self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = \
+                                            _zeros(typenum)
+            self.parm_data['AMOEBA_OPBEND_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
+            self.oopbend_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_OPBEND_ANGLE_NUM_LIST')
+            self.deleteFlag('AMOEBA_OPBEND_ANGLE_LIST')
+            self.deleteFlag('AMOEBA_OPBEND_ANGLE_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_OPBEND_ANGLE_EQUIL_VALUE')
 
         # Now time for torsions
-        dih_num = typenum = 0
-        self.parm_data['AMOEBA_TORSION_LIST'] = \
-                                        _zeros(len(self.dihedral_list)*5)
-        for i, dih in enumerate(self.dihedral_list):
-            if -1 in (dih.atom1.idx, dih.atom2.idx,
-                      dih.atom3.idx, dih.atom4.idx):
-                continue
-            if dih.dihedral_type.idx == -1:
-                dih.dihedral_type.idx = typenum
-                typenum += 1
-            dih.write_info(self, dih_num)
-            dih_num += 1
-        self.parm_data['AMOEBA_TORSION_NUM_LIST'] = [dih_num]
-        self._truncate_array('AMOEBA_TORSION_LIST', dih_num*5)
-        # Now the types
-        self.parm_data['AMOEBA_TORSION_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_TORSION_PERIODICITY'] = _zeros(typenum)
-        self.parm_data['AMOEBA_TORSION_PHASE'] = _zeros(typenum)
-        self.dihedral_type_list.write_to_parm()
+        if self.dihedral_list:
+            dih_num = typenum = 0
+            self.parm_data['AMOEBA_TORSION_LIST'] = \
+                                            _zeros(len(self.dihedral_list)*5)
+            for i, dih in enumerate(self.dihedral_list):
+                if -1 in (dih.atom1.idx, dih.atom2.idx,
+                          dih.atom3.idx, dih.atom4.idx):
+                    continue
+                if dih.dihedral_type.idx == -1:
+                    dih.dihedral_type.idx = typenum
+                    typenum += 1
+                dih.write_info(self, dih_num)
+                dih_num += 1
+            self.parm_data['AMOEBA_TORSION_NUM_LIST'] = [dih_num]
+            self._truncate_array('AMOEBA_TORSION_LIST', dih_num*5)
+            # Now the types
+            self.parm_data['AMOEBA_TORSION_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
+            self.parm_data['AMOEBA_TORSION_PERIODICITY'] = _zeros(typenum)
+            self.parm_data['AMOEBA_TORSION_PHASE'] = _zeros(typenum)
+            self.dihedral_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_TORSION_NUM_LIST')
+            self.deleteFlag('AMOEBA_TORSION_LIST')
+            self.deleteFlag('AMOEBA_TORSION_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_TORSION_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_TORSION_PERIODICITY')
+            self.deleteFlag('AMOEBA_TORSION_PHASE')
 
         # Now time for pi-torsions
-        tor_num = typenum = 0
-        self.parm_data['AMOEBA_PI_TORSION_LIST'] = \
-                                        _zeros(len(self.pitorsion_list)*7)
-        for i, tor in enumerate(self.pitorsion_list):
-            if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                    tor.atom4.idx, tor.atom5.idx, tor.atom6.idx):
-                continue
-            if tor.pitor_type.idx == -1:
-                tor.pitor_type.idx = typenum
-                typenum += 1
-            tor.write_info(self, tor_num)
-            tor_num += 1
-        self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'] = [tor_num]
-        self._truncate_array('AMOEBA_PI_TORSION_LIST', tor_num*7)
-        # Now the types
-        self.parm_data['AMOEBA_PI_TORSION_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_PI_TORSION_PERIODICITY'] = _zeros(typenum)
-        self.parm_data['AMOEBA_PI_TORSION_PHASE'] = _zeros(typenum)
-        self.pitorsion_type_list.write_to_parm()
+        if self.pitorsion_list:
+            tor_num = typenum = 0
+            self.parm_data['AMOEBA_PI_TORSION_LIST'] = \
+                                            _zeros(len(self.pitorsion_list)*7)
+            for i, tor in enumerate(self.pitorsion_list):
+                if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                        tor.atom4.idx, tor.atom5.idx, tor.atom6.idx):
+                    continue
+                if tor.pitor_type.idx == -1:
+                    tor.pitor_type.idx = typenum
+                    typenum += 1
+                tor.write_info(self, tor_num)
+                tor_num += 1
+            self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'] = [tor_num]
+            self._truncate_array('AMOEBA_PI_TORSION_LIST', tor_num*7)
+            # Now the types
+            self.parm_data['AMOEBA_PI_TORSION_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
+            self.parm_data['AMOEBA_PI_TORSION_PERIODICITY'] = _zeros(typenum)
+            self.parm_data['AMOEBA_PI_TORSION_PHASE'] = _zeros(typenum)
+            self.pitorsion_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_PI_TORSION_NUM_LIST')
+            self.deleteFlag('AMOEBA_PI_TORSION_LIST')
+            self.deleteFlag('AMOEBA_PI_TORSION_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_PI_TORSION_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_PI_TORSION_PERIODICITY')
+            self.deleteFlag('AMOEBA_PI_TORSION_PHASE')
 
         # Now time for the stretch-bends
-        strb_num = typenum = 0
-        self.parm_data['AMOEBA_STRETCH_BEND_LIST'] = \
+        if self.stretch_bend_list:
+            strb_num = typenum = 0
+            self.parm_data['AMOEBA_STRETCH_BEND_LIST'] = \
                                         _zeros(len(self.stretch_bend_list)*4)
-        for i, strb in enumerate(self.stretch_bend_list):
-            if -1 in (strb.atom1.idx, strb.atom2.idx, strb.atom3.idx): continue
-            if strb.strbnd_type.idx == -1:
-                strb.strbnd_type.idx = typenum
-                typenum += 1
-            strb.write_info(self, strb_num)
-            strb_num += 1
-        self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'] = [strb_num]
-        self._truncate_array('AMOEBA_STRETCH_BEND_LIST', strb_num*4)
-        # Now the types
-        self.parm_data['AMOEBA_STRETCH_BEND_NUM_PARAMS'] = [typenum]
-        self.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'] = _zeros(typenum)
-        self.parm_data['AMOEBA_STRETCH_BEND_EQUIL_VALUE'] = _zeros(typenum)
-        self.parm_data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'] = \
+            for i, strb in enumerate(self.stretch_bend_list):
+                if -1 in (strb.atom1.idx, strb.atom2.idx, strb.atom3.idx):
+                    continue
+                if strb.strbnd_type.idx == -1:
+                    strb.strbnd_type.idx = typenum
+                    typenum += 1
+                strb.write_info(self, strb_num)
+                strb_num += 1
+            self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'] = [strb_num]
+            self._truncate_array('AMOEBA_STRETCH_BEND_LIST', strb_num*4)
+            # Now the types
+            self.parm_data['AMOEBA_STRETCH_BEND_NUM_PARAMS'] = [typenum]
+            self.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'] = \
                                         _zeros(typenum)
-        self.parm_data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'] = \
+            self.parm_data['AMOEBA_STRETCH_BEND_EQUIL_VALUE'] = _zeros(typenum)
+            self.parm_data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'] = \
                                         _zeros(typenum)
-        self.stretch_bend_type_list.write_to_parm()
+            self.parm_data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'] = \
+                                        _zeros(typenum)
+            self.stretch_bend_type_list.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_STRETCH_BEND_NUM_LIST')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_LIST')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_NUM_PARAMS')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_EQUIL_VALUE')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE')
+            self.deleteFlag('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE')
 
         # Now time for the coupled torsions
-        tor_num = 0
-        typelist = []
-        self.parm_data['AMOEBA_TORSION_TORSION_LIST'] = \
-                                        _zeros(len(self.torsion_torsion_list)*6)
-        for i, tor in enumerate(self.torsion_torsion_list):
-            if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                      tor.atom4.idx, tor.atom5.idx):
-                continue
-            if tor.tortor_type.idx == -1:
-                tor.tortor_type.idx = len(typelist)
-                typelist.append(tor.tortor_type)
-            tor.write_info(self, tor_num)
-            tor_num += 1
-        self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'] = [tor_num]
-        self._truncate_array('AMOEBA_TORSION_TORSION_LIST', tor_num*6)
-        # Now the types
-        self.parm_data['AMOEBA_TORSION_TORSION_NUM_PARAMS'] = [len(typelist)]
-        # We have to delete all of the 'old' types
-        for flag in self.flag_list:
-            if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
-                self.deleteFlag(flag)
-        # Now add them back for all of the types
-        after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
-        for tortype in typelist:
-            tortype.write_info(self, after)
-            after = ('AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_D2FUNC_DANGLE1_'
-                     'DANGLE2' % (tortype.idx+1))
+        if self.torsion_torsion_list:
+            tor_num = 0
+            typelist = []
+            self.parm_data['AMOEBA_TORSION_TORSION_LIST'] = \
+                                    _zeros(len(self.torsion_torsion_list)*6)
+            for i, tor in enumerate(self.torsion_torsion_list):
+                if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                          tor.atom4.idx, tor.atom5.idx):
+                    continue
+                if tor.tortor_type.idx == -1:
+                    tor.tortor_type.idx = len(typelist)
+                    typelist.append(tor.tortor_type)
+                tor.write_info(self, tor_num)
+                tor_num += 1
+            self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'] = [tor_num]
+            self._truncate_array('AMOEBA_TORSION_TORSION_LIST', tor_num*6)
+            # Now the types
+            self.parm_data['AMOEBA_TORSION_TORSION_NUM_PARAMS'] = \
+                                    [len(typelist)]
+            # We have to delete all of the 'old' types
+            for flag in self.flag_list:
+                if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
+                    self.deleteFlag(flag)
+            # Now add them back for all of the types
+            after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
+            for tortype in typelist:
+                tortype.write_info(self, after)
+                after = ('AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_'
+                         'D2FUNC_DANGLE1_DANGLE2' % (tortype.idx+1))
+        else:
+            self.deleteFlag('AMOEBA_TORSION_TORSION_NUM_LIST')
+            self.deleteFlag('AMOEBA_TORSION_TORSION_LIST')
+            self.deleteFlag('AMOEBA_TORSION_TORSION_NUM_PARAMS')
+            for flag in self.flag_list:
+                if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
+                    self.deleteFlag(flag)
 
         # Now time for the chiral frames
-        chi_num = 0
-        self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'] = \
+        if self.chiral_frame_list:
+            chi_num = 0
+            self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'] = \
                                         _zeros(len(self.chiral_frame_list)*3)
-        for i, chi in enumerate(self.chiral_frame_list):
-            if -1 in (chi.atom1, chi.atom2): continue
-            chi.write_info(self, chi_num)
-            chi_num += 1
-        self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'] = [chi_num]
-        self._truncate_array('AMOEBA_CHIRAL_FRAME_LIST', chi_num*3)
+            for i, chi in enumerate(self.chiral_frame_list):
+                if -1 in (chi.atom1, chi.atom2): continue
+                chi.write_info(self, chi_num)
+                chi_num += 1
+            self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'] = [chi_num]
+            self._truncate_array('AMOEBA_CHIRAL_FRAME_LIST', chi_num*3)
+        else:
+            self.deleteFlag('AMOEBA_CHIRAL_FRAME_NUM_LIST')
+            self.deleteFlag('AMOEBA_CHIRAL_FRAME_LIST')
 
         # Now time for the multipole frames
-        mul_num = 0
-        self.parm_data['AMOEBA_FRAME_DEF_LIST'] = \
-                                        _zeros(len(self.multipole_frame_list)*5)
-        for i, mul in enumerate(self.multipole_frame_list):
-            if mul.atom.idx == -1: continue
-            mul.write_info(self, mul_num)
-            mul_num += 1
-        self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'] = [mul_num]
-        self._truncate_array('AMOEBA_FRAME_DEF_NUM_LIST', mul_num*5)
+        if self.multipole_frame_list:
+            mul_num = 0
+            self.parm_data['AMOEBA_FRAME_DEF_LIST'] = \
+                                    _zeros(len(self.multipole_frame_list)*5)
+            for i, mul in enumerate(self.multipole_frame_list):
+                if mul.atom.idx == -1: continue
+                mul.write_info(self, mul_num)
+                mul_num += 1
+            self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'] = [mul_num]
+            self._truncate_array('AMOEBA_FRAME_DEF_NUM_LIST', mul_num*5)
+        else:
+            self.deleteFlag('AMOEBA_FRAME_DEF_NUM_LIST')
+            self.deleteFlag('AMOEBA_FRAME_DEF_LIST')
 
         # Now time for the adjust array
-        adj_num = 0
-        self.parm_data['AMOEBA_ADJUST_LIST'] = _zeros(len(self.adjust_list)*3)
-        for i, adj in enumerate(self.adjust_list):
-            if -1 in (adj.atom1.idx, adj.atom2.idx): continue
-            adj.write_info(self, adj_num)
-            adj_num += 1
-        self.parm_data['AMOEBA_ADJUST_NUM_LIST'] = [adj_num]
-        self._truncate_array('AMOEBA_ADJUST_LIST', adj_num*3)
-        # Now for the weights
-        self.adjust_weights.write_to_parm()
+        if self.adjust_list:
+            adj_num = 0
+            self.parm_data['AMOEBA_ADJUST_LIST'] = \
+                                    _zeros(len(self.adjust_list)*3)
+            for i, adj in enumerate(self.adjust_list):
+                if -1 in (adj.atom1.idx, adj.atom2.idx): continue
+                adj.write_info(self, adj_num)
+                adj_num += 1
+            self.parm_data['AMOEBA_ADJUST_NUM_LIST'] = [adj_num]
+            self._truncate_array('AMOEBA_ADJUST_LIST', adj_num*3)
+            # Now for the weights
+            self.adjust_weights.write_to_parm()
+        else:
+            self.deleteFlag('AMOEBA_ADJUST_NUM_LIST')
+            self.deleteFlag('AMOEBA_ADJUST_LIST')
 
         # Mark all lists as *not* changed
         self.bond_type_list.changed = False
@@ -623,6 +749,45 @@ class AmoebaParm(AmberParm):
                 self.chiral_frame_list.changed or
                 self.adjust_weights.changed or
                 self.adjust_list.changed)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    def mdin_skeleton(self):
+        """
+        Returns the skeleton of an mdin file with the &amoeba namelist set up
+        correctly for the potential terms that are present in this topology
+        file.
+
+        Returns
+        -------
+        str
+            A skeleton MDIN file with all of the do_* variables in the &amoeba
+            section set correctly. It is commented for easy editing
+        """
+        return ('Input file for AMOEBA simulations.\n'
+                ' &cntrl\n'
+                '     ! Add whatever variables you need here\n'
+                '     ntb=1, ntt=1, ntp=0, ! PBC, thermostat, barostat\n'
+                '     irest=0, ntx=1,      ! restart flags\n'
+                ' /\n'
+                ' &amoeba\n'
+                '     ! Some basic potential parameters. For better\n'
+                '     ! energy conservation you need to adjust these\n'
+                '     ! defaults\n'
+                '     beeman_integrator=1,   ! Use Beeman integrator\n'
+                '     dipole_scf_tol=0.01,   ! 10e-6 gives good NVE\n'
+                '\n'
+                '     ! You should not generally modify these variables:\n'
+                '     do_valence=1, do_bond=%d, do_ureyb=%d,\n'
+                '     do_reg_angle=%d, do_trig_angle=%d, do_opbend=%d,\n'
+                '     do_torsion=%d, do_pi_torsion=%d, do_strbend=%d,\n'
+                '     do_torsion_torsion=%d,\n'
+                ' /\n' % (bool(self.bond_list), bool(self.urey_bradley_list),
+                bool(self.angle_list), bool(self.trigonal_angle_list),
+                bool(self.oopbend_list), bool(self.dihedral_list),
+                bool(self.pitorsion_list), bool(self.stretch_bend_list),
+                bool(self.torsion_torsion_list))
+        )
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
