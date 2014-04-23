@@ -52,8 +52,9 @@ ala2_solv.setBox(max_crds[0]-min_crds[0],
 # Create the OpenMM system
 print('Creating OpenMM System')
 system = ala2_solv.createSystem(params, nonbondedMethod=app.PME,
-                                nonbondedCutoff=10.0*u.angstroms,
+                                nonbondedCutoff=12.0*u.angstroms,
                                 constraints=app.HBonds,
+                                switchDistance=10.0*u.angstroms,
 )
 
 # Create the integrator to do Langevin dynamics
