@@ -22,6 +22,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
+from compat24 import property
 from chemistry.amber._amberparm import AmberParm, _zeros
 from chemistry.amber.constants import NRES, NNB, NMXRS
 from chemistry.amber.tinkertopology import (AtomList, ResidueList, TrackedList,

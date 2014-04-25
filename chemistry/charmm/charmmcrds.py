@@ -90,7 +90,7 @@ class CharmmCrdFile(object):
                                        len(self.coords))
                 )
 
-        except (ValueError, IndexError), e:
+        except (ValueError, IndexError):
             raise CharmmFileError('Error parsing CHARMM coordinate file')
 
 class CharmmRstFile(object):
@@ -166,7 +166,7 @@ class CharmmRstFile(object):
                         self.jhstrt = int(line[5])    # Num total steps?
                         break
                    
-                    except (ValueError, IndexError), e:
+                    except (ValueError, IndexError):
                         raise CharmmFileError('Problem parsing CHARMM restart')
 
         self.scan(crdfile, '!XOLD')

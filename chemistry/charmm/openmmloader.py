@@ -11,8 +11,10 @@ from compat24 import property
 from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
 from chemistry.charmm.parameters import element_by_mass
 from chemistry.charmm.psf import CharmmPsfFile
+from chemistry.charmm.topologyobjects import TrackedList
 from chemistry.exceptions import APIError
 from math import sqrt, cos, pi, sin, acos
+import re
 import simtk.openmm as mm
 from simtk.openmm.vec3 import Vec3
 import simtk.unit as u
@@ -1015,3 +1017,159 @@ def _box_vectors_to_lengths_angles(a, b, c):
     gamma = acos((a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) / (la * lb)) * RADDEG
 
     return ( (la, lb, lc), (alpha, beta, gamma) )
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _OpenMMRestartFile(object):
+    """
+    This is a private class that is basically a container for a standardized
+    "Restart" file for OpenMM simulations.  Basically, it stores the
+    coordinates, velocities, and box vectors if present and loads it into this
+    data structure if they're present
+
+    Attributes
+    ----------
+        - boxVectors (tuple of 3 Vec3's) : The periodic box vectors
+        - positions (natom-length list of Vec3's) : The coordinates
+        - velocities (natom-length list of Vec3's) : The velocities
+
+    The format of the file is:
+
+    - BEGIN -
+    OpenMM Restart File
+    natom=# vels=[True|False] box=[True|False]
+    <x1> <y1> <z1>
+    <x2> <y2> <z2>
+    ...
+    <vx1> <vy1> <vz1>
+    <vx2> <vy2> <vz2>
+    ...
+    <boxx1> <boxy1> <boxz1>
+    <boxx2> <boxy2> <boxz2>
+    <boxx3> <boxy3> <boxz3>
+    - END -
+
+    The velocities and box are only present if vels=True and box=True is found
+    on the second line of the file. The units are nanometers for distance and
+    nanometers/picosecond for velocities
+    """
+    infolinere = re.compile(r'natom=(\d+) vels=(True|False) box=(True|False)')
+    tagline = 'OpenMM Restart File\n'
+
+    @classmethod
+    def read(cls, fname):
+        """ Read a restart file """
+        positions = []
+        velocities = []
+        boxVectors = None
+        with open(fname, 'r') as f:
+            if f.readline() != cls.tagline:
+                raise ValueError('%s is not a recognized OpenMM Restart' %
+                                 fname)
+            rematch = cls.infolinere.match(f.readline())
+            if not rematch:
+                raise RuntimeError('Corrupt or incompatible OpenMM Restart '
+                                   'file. Cannot parse header.')
+            natom, hasvels, hasbox = rematch.groups()
+            # Because the infolinere is strict about matching, the following is
+            # safe
+            natom = int(natom)
+            hasvels = eval(hasvels)
+            hasbox = eval(hasbox)
+
+            i = 0
+            while i < natom:
+                i += 1
+                line = f.readline()
+                if not line:
+                    raise RuntimeError('Unexpected EOF in restart file!')
+                x, y, z = line.split()
+                positions.append(Vec3(float(x), float(y), float(z)) *
+                                      u.nanometers)
+            if hasvels:
+                i = 0
+                while i < natom:
+                    i += 1
+                    line = f.readline()
+                    if not line:
+                        raise RuntimeError('Unexpected EOF in restart file!')
+                    x, y, z = line.split()
+                    velocities.append(Vec3(float(x), float(y), float(z)) *
+                                           u.nanometers / u.picoseconds)
+            if hasbox:
+                box1 = f.readline().split()
+                box2 = f.readline().split()
+                box3 = f.readline().split()
+                boxVectors = (Vec3(float(box1[0]), float(box1[1]),
+                                   float(box1[2])),
+                              Vec3(float(box2[0]), float(box2[1]),
+                                   float(box2[2])),
+                              Vec3(float(box3[0]), float(box3[1]),
+                                   float(box3[2]))
+                )
+            return cls(positions, velocities, boxVectors)
+
+        def __init__(self, positions, velocities, boxVectors):
+            self.natom = len(positions)
+            self.positions = positions
+            if self.velocities and len(self.velocities) != self.natom:
+                raise ValueError('Bad number of velocities')
+            self.velocities = velocities
+            if boxVectors is not None and len(boxVectors) != 3:
+                raise ValueError('Bad number of box vectors')
+            self.boxVectors = boxVectors
+        
+        def write(self, fname):
+            """ Writes the information to a new restart file """
+            with open(fname, 'w') as f:
+                f.write(self.tagline)
+                f.write('natom=%d ' % self.natom)
+                if self.velocities:
+                    f.write('vels=True ')
+                else:
+                    f.write('vels=False ')
+                if self.boxVectors:
+                    f.write('box=True')
+                else:
+                    f.write('box=False')
+                for crd in self.positions:
+                    crd = crd.value_in_unit(u.nanometers)
+                    f.write('%s %s %s\n' % tuple(crd))
+                if self.velocities:
+                    for vel in self.velocities:
+                        vel = vel.value_in_unit(u.nanometers/u.picoseconds)
+                        f.write('%s %s %s\n' % tuple(vel))
+                if self.boxVectors:
+                    for box in self.boxVectors:
+                        box = box.value_in_unit(u.nanometers)
+                        f.write('%s %s %s\n' % tuple(box))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def read_restart(fname):
+    """ Reads a restart file.
+
+    Returns
+    -------
+        restart object with the following properties:
+            - positions
+            - velocities (empty list if no velocities are present)
+            - boxVectors (None if box is not present)
+    """
+    return _OpenMMRestartFile.read(fname)
+
+def write_restart(fname, sim):
+    """ Writes an OpenMM Restart file
+
+    Parameters
+    ----------
+        - fname (str) : File name of restart file to write
+        - sim (Simulation) : OpenMM Simulation object
+    """
+    hasbox = sim.topology.getUnitCellDimensions() is not None
+    state = sim.context.getState(getPositions=True, getVelocities=True,
+                                 enforcePeriodicBox=hasbox)
+    _OpenMMRestartFile(state.getPositions(), state.getVelocities(),
+                       state.getPeriodicBoxVectors()).write(fname)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
