@@ -1101,48 +1101,48 @@ class _OpenMMRestartFile(object):
                 box2 = f.readline().split()
                 box3 = f.readline().split()
                 boxVectors = (Vec3(float(box1[0]), float(box1[1]),
-                                   float(box1[2])),
+                                   float(box1[2])) * u.nanometers,
                               Vec3(float(box2[0]), float(box2[1]),
-                                   float(box2[2])),
+                                   float(box2[2])) * u.nanometers,
                               Vec3(float(box3[0]), float(box3[1]),
-                                   float(box3[2]))
+                                   float(box3[2])) * u.nanometers
                 )
             return cls(positions, velocities, boxVectors)
 
-        def __init__(self, positions, velocities, boxVectors):
-            self.natom = len(positions)
-            self.positions = positions
-            if self.velocities and len(self.velocities) != self.natom:
-                raise ValueError('Bad number of velocities')
-            self.velocities = velocities
-            if boxVectors is not None and len(boxVectors) != 3:
-                raise ValueError('Bad number of box vectors')
-            self.boxVectors = boxVectors
-        
-        def write(self, fname):
-            """ Writes the information to a new restart file """
-            with open(fname, 'w') as f:
-                f.write(self.tagline)
-                f.write('natom=%d ' % self.natom)
-                if self.velocities:
-                    f.write('vels=True ')
-                else:
-                    f.write('vels=False ')
-                if self.boxVectors:
-                    f.write('box=True')
-                else:
-                    f.write('box=False')
-                for crd in self.positions:
-                    crd = crd.value_in_unit(u.nanometers)
-                    f.write('%s %s %s\n' % tuple(crd))
-                if self.velocities:
-                    for vel in self.velocities:
-                        vel = vel.value_in_unit(u.nanometers/u.picoseconds)
-                        f.write('%s %s %s\n' % tuple(vel))
-                if self.boxVectors:
-                    for box in self.boxVectors:
-                        box = box.value_in_unit(u.nanometers)
-                        f.write('%s %s %s\n' % tuple(box))
+    def __init__(self, positions, velocities, boxVectors):
+        self.natom = len(positions)
+        self.positions = positions
+        if velocities and len(velocities) != self.natom:
+            raise ValueError('Bad number of velocities')
+        self.velocities = velocities
+        if boxVectors is not None and len(boxVectors) != 3:
+            raise ValueError('Bad number of box vectors')
+        self.boxVectors = boxVectors
+
+    def write(self, fname):
+        """ Writes the information to a new restart file """
+        with open(fname, 'w') as f:
+            f.write(self.tagline)
+            f.write('natom=%d ' % self.natom)
+            if self.velocities:
+                f.write('vels=True ')
+            else:
+                f.write('vels=False ')
+            if self.boxVectors:
+                f.write('box=True\n')
+            else:
+                f.write('box=False\n')
+            for crd in self.positions:
+                crd = crd.value_in_unit(u.nanometers)
+                f.write('%s %s %s\n' % tuple(crd))
+            if self.velocities:
+                for vel in self.velocities:
+                    vel = vel.value_in_unit(u.nanometers/u.picoseconds)
+                    f.write('%s %s %s\n' % tuple(vel))
+            if self.boxVectors:
+                for box in self.boxVectors:
+                    box = box.value_in_unit(u.nanometers)
+                    f.write('%s %s %s\n' % tuple(box))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
