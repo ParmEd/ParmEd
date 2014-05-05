@@ -181,7 +181,7 @@ class AmberMask(object):
 
     def _isOperand(self, char):
         """ Determines if a character is an operand """
-        return len(char) == 1 and (char in "*/%-?,'.=+" or char.isalnum())
+        return len(char) == 1 and (char in "\\*/%-?,'.=+" or char.isalnum())
    
     #======================================================
 
@@ -332,13 +332,13 @@ class AmberMask(object):
                 p = ptoken[pos]
                 buffer += p
                 buffer_p += 1
-                if p == '*':
+                if p == '*' and ptoken[pos-1] != '\\':
                     if buffer_p == 1 and (pos == len(ptoken) - 1 or 
                                           ptoken[pos+1] == ','):
                         reslist = ALL
                     elif reslist == NUMLIST:
                         reslist = NAMELIST
-                elif p.isalpha() or p == '?':
+                elif p.isalpha() or p in '?*':
                     reslist = NAMELIST
                 if pos == len(ptoken) - 1:
                     buffer_p = 0
@@ -358,13 +358,13 @@ class AmberMask(object):
                 p = ptoken[pos]
                 buffer += p
                 buffer_p += 1
-                if p == '*':
+                if p == '*' and ptoken[pos-1] != "\\":
                     if buffer_p == 0 and (pos == len(ptoken) - 1 or
                                           ptoken[pos+1] == ','):
                         atomlist = ALL
                     elif atomlist == NUMLIST:
                         atomlist = NAMELIST
-                elif p.isalpha() or p == '?':
+                elif p.isalpha() or p in '?*':
                     if atomlist == NUMLIST:
                         atomlist = NAMELIST
                 elif p == '%':
@@ -432,7 +432,7 @@ class AmberMask(object):
         pos = 0
         while pos < len(instring):
             p = instring[pos]
-            if p.isalnum() or p in ['*','?','+',"'",'-']:
+            if p.isalnum() or p in "\\*?+'-":
                 buffer += p
             if p == ',' or pos == len(instring) - 1:
                 if '-' in buffer and buffer[0].isdigit():
@@ -440,7 +440,7 @@ class AmberMask(object):
                 else:
                     self._atname_select(buffer, mask, key)
                 buffer = ''
-            if not (p.isalnum() or p in ",?*'+-"):
+            if not (p.isalnum() or p in "\\,?*'+-"):
                 raise MaskError('Unrecognized symbol in atom name '
                                 'parsing [%s]' % p)
             pos += 1
@@ -590,17 +590,18 @@ def _nameMatch(atnam1, atnam2):
     atnam1 = str(atnam1).replace(' ','')
     atnam2 = str(atnam2).replace(' ','')
     # Replace amber mask wildcards with appropriate regex wildcards and protect
-    # the +
-    atnam1 = atnam1.replace('*',r'\S*')
-    atnam1 = atnam1.replace('?',r'\S')
-    atnam1 = atnam1.replace('+',r'\+')
+    # the + (but protect backslashes)
+    R = '<!PROTECT!>'
+    atnam1 = atnam1.replace('\\*', R).replace('*',r'\S*').replace(R, '*')
+    atnam1 = atnam1.replace('\\?', R).replace('?',r'\S').replace(R, '?')
+    atnam1 = atnam1.replace('\\+', R).replace('+',r'\+').replace(R, '+')
     # Now replace just the first instance of atnam2 in atnam2 with '', and
     # return *not* that
     # DEBUG:
 #   print 'Comparing ==%s== with ==%s==' % (atnam1, atnam2)
 #   print not bool(re.sub(atnam1, '', atnam2, 1))
     # END DEBUG
-    return not bool(re.sub(atnam1, '', atnam2, 1))
+    return atnam1 == atnam2 or not bool(re.sub(atnam1, '', atnam2, 1))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

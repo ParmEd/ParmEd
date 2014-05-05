@@ -24,6 +24,7 @@ from __future__ import division
 
 from compat24 import property
 from chemistry.amber._amberparm import AmberParm, _zeros
+from chemistry.amber.amberformat import AmberFormat
 from chemistry.amber.constants import NRES, NNB, NMXRS
 from chemistry.amber.tinkertopology import (AtomList, ResidueList, TrackedList,
         Bond, BondTypeList, PiTorsionTypeList, PiTorsion, UreyBradleyTypeList,
@@ -43,7 +44,7 @@ class AmoebaParm(AmberParm):
 
     solvent_residues = ['WAT', 'HOH']
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     def initialize_topology(self, rst7_name=None):
         """
@@ -91,7 +92,7 @@ class AmoebaParm(AmberParm):
         if rst7_name is not None:
             self.LoadRst7(rst7_name)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     def _load_structure(self):
         " Responsible for setting up the parameter and parameter type arrays "
@@ -325,7 +326,7 @@ class AmoebaParm(AmberParm):
         ##### Finally we can determine the full exclusion list #####
         for atom in self.atom_list: atom.determine_all_exclusion_partners()
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     def remake_parm(self):
         """ Recomputes the topology file parameters """
@@ -726,7 +727,7 @@ class AmoebaParm(AmberParm):
         self.adjust_weights.changed = False
         self.adjust_list.changed = False
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     def _topology_changed(self):
         return (self.bond_type_list.changed or
@@ -751,7 +752,7 @@ class AmoebaParm(AmberParm):
                 self.adjust_weights.changed or
                 self.adjust_list.changed)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     def mdin_skeleton(self):
         """
@@ -790,7 +791,7 @@ class AmoebaParm(AmberParm):
                 bool(self.torsion_torsion_list))
         )
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     @property
     def bonds_inc_h(self):
@@ -819,7 +820,7 @@ class AmoebaParm(AmberParm):
         raise NotImplemented('bonds_without_h is a generator property in '
                              'AmoebaParm')
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #=============================================
 
     @property
     def chamber(self):
@@ -828,3 +829,79 @@ class AmoebaParm(AmberParm):
     @property
     def amoeba(self):
         return True
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class BeemanRestart(AmberFormat):
+    """
+    The restart files written for/by the Beeman integrator has the same type of
+    format as the topology file
+    """
+
+    @property
+    def natom(self):
+        return self.parm_data['ATOMIC_COORDS_NUM_LIST'][0]
+
+    @natom.setter
+    def natom(self, value):
+        self.parm_data['ATOMIC_COORDS_NUM_LIST'][0] = value
+        self.parm_data['ATOMIC_VELOCITIES_NUM_LIST'][0] = value
+        self.parm_data['ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
+        self.parm_data['OLD_ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
+
+    @property
+    def coordinates(self):
+        return self.parm_data['ATOMIC_COORDS_LIST']
+
+    @coordinates.setter
+    def coordinates(self, value):
+        if len(value) != 3 * self.natom:
+            raise ValueError('Require %d-length sequence for coordinates' %
+                             (3*self.natom))
+        self.parm_data['ATOMIC_COORDS_LIST'] = value
+
+    @property
+    def velocities(self):
+        return self.parm_data['ATOMIC_VELOCITIES_LIST']
+
+    @velocities.setter
+    def velocities(self, value):
+        if len(value) != 3 * self.natom:
+            raise ValueError('Require %d-length sequence for velocities' %
+                             (3*self.natom))
+        self.parm_data['ATOMIC_VELOCITIES_LIST'] = value
+
+    @property
+    def accelerations(self):
+        return self.parm_data['ATOMIC_ACCELERATIONS_LIST']
+
+    @accelerations.setter
+    def accelerations(self, value):
+        if len(value) != 3 * self.natom:
+            raise ValueError('Require %d-length sequence for accelerations' %
+                             3*self.natom)
+        self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = value
+
+    @property
+    def old_accelerations(self):
+        return self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']
+
+    @old_accelerations.setter
+    def old_accelerations(self, value):
+        if len(value) != 3 * self.natom:
+            raise ValueError('Require %d-length sequence for accelerations' %
+                             3*self.natom)
+        self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = value
+
+    @property
+    def box(self):
+        try:
+            return self.parm_data['UNIT_CELL_PARAMETERS']
+        except KeyError:
+            raise AttributeError('No box dimensions available.')
+
+    @box.setter
+    def box(self, stuff):
+        if len(stuff) != 6:
+            raise ValueError('Expected 3 box lengths and 3 box angles')
+        self.parm_data['UNIT_CELL_PARAMETERS'] = stuff
