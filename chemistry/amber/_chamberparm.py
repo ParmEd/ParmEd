@@ -31,6 +31,7 @@ from chemistry.amber.topologyobjects import (TrackedList, UreyBradley, Improper,
             Cmap, UreyBradleyTypeList, ImproperTypeList, CmapTypeList)
 from chemistry.exceptions import CharmmPSFError
 from math import pi, sqrt
+import warnings
 
 class ChamberParm(AmberParm):
     """
@@ -325,7 +326,9 @@ class ChamberParm(AmberParm):
 
     def writeOFF(self, off_file='off.lib'):
         """ Writes an OFF file from all of the residues found in a prmtop """
-        raise NotImplemented('Cannot write OFF file from chamber topology')
+        warnings.warn('OFF files from chamber topologies should NOT be used '
+                      'in LEaP unless you KNOW what you are doing...')
+        return super(ChamberParm, self).writeOFF(off_file)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -396,12 +399,6 @@ class ChamberParm(AmberParm):
     @property
     def has_cmap(self):
         return 'CHARMM_CMAP_COUNT' in self.flag_list
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    def ToMolecule(self):
-        """ Translates an amber system into a molecule format """
-        raise NotImplemented('ToMolecule disabled for ChamberParm')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

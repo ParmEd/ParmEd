@@ -4,7 +4,7 @@ constructing chemical structures from those files
 
 Author: Jason M. Swails
 Contributors:
-Date: April 5, 2014
+Date: May 12, 2014
 """
 from chemistry.exceptions import (SplitResidueWarning, BondError, ResidueError,
                 CmapError, MissingParameter)
@@ -32,8 +32,11 @@ class TrackedList(list):
     __delitem__ = _tracking(list.__delitem__)
     append = _tracking(list.append)
     extend = _tracking(list.extend)
-    __delslice__ = _tracking(list.__delslice__)
     __setitem__ = _tracking(list.__setitem__)
+
+# Python 3 does not have __delslice__, but make sure we override it for Python 2
+if hasattr(TrackedList, '__delslice__'):
+    TrackedList.__delslice__ = _tracking(TrackedList.__delslice__)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
