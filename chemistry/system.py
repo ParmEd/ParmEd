@@ -4,11 +4,20 @@ for general use in the chemistry package
 
 Author: Jason M. Swails
 Contributors:
-Date: April 5, 2014
+Date: May 27, 2014
 """
 
+try:
+    import bz2
+except ImportError:
+    bz2 = None
 from chemistry.periodic_table import Element as _Element
 from chemistry.periodic_table import AtomicNum as _AtomicNum
+try:
+    import gzip
+except ImportError:
+    gzip = None
+import re
 
 __all__ = ['Atom', 'Residue']
 
@@ -161,6 +170,8 @@ class Residue(_BaseParticle, list):
 class ChemicalSystem(list):
     """ A list of residues (this is a full system) """
 
+    relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
+
     def __init__(self, *args, **kwargs):
         self.models = 0
         self.respermodel = None
@@ -169,6 +180,29 @@ class ChemicalSystem(list):
 
     @classmethod
     def load_from_pdb(cls, pdb):
+        """
+        Load a chemical system from a PDB file (filename provided). gzip or
+        bzip2 compression are detected based on filename extension (.gz implies
+        gzip and .bz2 implies bzip2). If either gzip or bz2 are unavailable,
+        ImportError is raised.
+
+        Parameters
+        ----------
+        pdb : str
+            Name of the PDB file to parse
+
+        Returns
+        -------
+        ChemicalSystem instance loaded from the PDB file
+        """
+        if pdb.endswith('.gz'):
+            if gzip is None:
+                raise ImportError('gzip not available for compressed PDB')
+            return cls.load_from_open_pdb(gzip.open(pdb, 'r'))
+        if pdb.endswith('.bz2'):
+            if bz2 is None:
+                raise ImportError('bzip is not available for compressed PDB')
+            return cls.load_from_open_pdb(bz2.BZ2File(pdb, 'r'))
         return cls.load_from_open_pdb(open(pdb, 'r'))
 
     @classmethod
@@ -176,6 +210,15 @@ class ChemicalSystem(list):
         inst = cls()
         last_resid = 1
         uses_hexadecimal = None
+        # Empty some information
+        inst.experimental = inst.journal = inst.authors = inst.keywords = ''
+        inst.doi = inst.pmid = inst.journal_authors = inst.volume_page = ''
+        inst.title = ''
+        inst.year = None
+        # related_entries is a list of tuples of the form (ID, Database) where
+        # both ID and Database are strings. Common values for Database are PDB,
+        # BMRB, and EMDB
+        inst.related_entries = []
         for line in pdb:
             rec = line[:6]
             if rec == 'ATOM  ' or rec == 'HETATM':
@@ -215,11 +258,11 @@ class ChemicalSystem(list):
                         Residue(resname, resid, inscode, chain,
                                 inst.models or 1),
                 )
-            if rec == 'MODEL ':
+            elif rec == 'MODEL ':
                 if inst.respermodel is None and len(inst) > 0:
                     inst.respermodel = len(inst)
                 inst.models += 1
-            if rec == 'CRYST1':
+            elif rec == 'CRYST1':
                 a = float(line[6:15])
                 b = float(line[15:24])
                 c = float(line[24:33])
@@ -231,6 +274,40 @@ class ChemicalSystem(list):
                     # Default to orthorhombic box
                     A = B = C = 90.0
                 inst.box = [a, b, c, A, B, C]
+            elif rec == 'EXPDTA':
+                inst.experimental = line[6:].strip()
+            elif rec == 'AUTHOR':
+                inst.authors += line[10:].strip()
+            elif rec == 'JRNL  ':
+                part = line[12:16]
+                if part == 'AUTH':
+                    inst.journal_authors += line[19:].strip()
+                elif part == 'TITL':
+                    inst.title += ' %s' % line[19:].strip()
+                elif part == 'REF ':
+                    inst.journal += ' %s' % line[19:47].strip()
+                    if not line[16:18].strip():
+                        inst.volume_page = line[50:61].strip()
+                        try:
+                            inst.year = int(line[62:66])
+                        except ValueError:
+                            pass
+                elif part == 'PMID':
+                    inst.pmid = line[19:].strip()
+                elif part == 'DOI ':
+                    inst.doi = line[19:].strip()
+            elif rec == 'KEYWDS':
+                inst.keywords += '%s ' % line[11:].replace(',', ' ')
+            elif rec == 'REMARK' and line[6:10] == ' 900':
+                # Related entries
+                rematch = ChemicalSystem.relatere.match(line[11:])
+                if rematch:
+                    inst.related_entries.append(rematch.groups())
+        # Make the keywords a list
+        inst.keywords = [x.strip() for x in inst.keywords.split(',')
+                                        if x.strip()]
+        # Strip off trailing and leading whitespace for some attributes
+        inst.title = inst.title.strip()
         return inst
    
     @classmethod
