@@ -441,7 +441,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         else:
             angles_without_h.append(angle)
     dihedrals_inc_h, dihedrals_without_h = [], []
-    for dihed in struct.dihedral_list:
+    for dihed in struct.dihedral_parameter_list:
         if (dihed.atom1.type.atomic_number == 1 or
             dihed.atom2.type.atomic_number == 1 or
             dihed.atom3.type.atomic_number == 1 or
@@ -612,8 +612,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     # Assign the dihedral constants
     nphi = 0
     dih_frc_cnst, dih_per, dih_phase = [], [], []
-    for dihed in struct.dihedral_list: dihed.dihedral_type.idx = -1
-    for dihed in struct.dihedral_list:
+    for dihed in struct.dihedral_parameter_list: dihed.dihedral_type.idx = -1
+    for dihed in struct.dihedral_parameter_list:
         if dihed.dihedral_type.idx == -1:
             dih_frc_cnst.append(dihed.dihedral_type.phi_k)
             dih_per.append(dihed.dihedral_type.per)

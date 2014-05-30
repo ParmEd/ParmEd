@@ -351,6 +351,7 @@ class CharmmPsfFile(object):
         self.bond_list = bond_list
         self.angle_list = angle_list
         self.dihedral_list = dihedral_list
+        self.dihedral_parameter_list = TrackedList()
         self.improper_list = improper_list
         self.cmap_list = cmap_list
         self.donor_list = donor_list
@@ -589,13 +590,10 @@ class CharmmPsfFile(object):
                     self.urey_bradley_list.append(ub)
             except KeyError:
                 raise MissingParameter('Missing angle type for %r' % ang)
-        # Next load all of the dihedrals. This is a little trickier since we
-        # need to back up the existing dihedral list and replace it with a
-        # longer one that has only one Fourier term per Dihedral instance.
-        dihedral_list = self.dihedral_list
-        self.dihedral_list = TrackedList()
+        # Next load all of the dihedrals.
+        self.dihedral_parameter_list = TrackedList()
         active_dih_list = set()
-        for dih in dihedral_list:
+        for dih in self.dihedral_list:
             # Store the atoms
             a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
             at1, at2, at3, at4 = a1.attype, a2.attype, a3.attype, a4.attype
@@ -609,17 +607,17 @@ class CharmmPsfFile(object):
                                            '%r' % dih)
             dtlist = parmset.dihedral_types[key]
             for i, dt in enumerate(dtlist):
-                self.dihedral_list.append(Dihedral(a1, a2, a3, a4, dt))
+                self.dihedral_parameter_list.append(Dihedral(a1,a2,a3,a4,dt))
                 # See if we include the end-group interactions for this
                 # dihedral. We do IFF it is the last or only dihedral term and
                 # it is NOT in the angle/bond partners
                 pair = tuple(sorted([a1.idx, a4.idx]))
                 if i != len(dtlist) - 1:
-                    self.dihedral_list[-1].end_groups_active = False
+                    self.dihedral_parameter_list[-1].end_groups_active = False
                 elif a1 in a4.bond_partners or a1 in a4.angle_partners:
-                    self.dihedral_list[-1].end_groups_active = False
+                    self.dihedral_parameter_list[-1].end_groups_active = False
                 elif pair in active_dih_list:
-                    self.dihedral_list[-1].end_groups_active = False
+                    self.dihedral_parameter_list[-1].end_groups_active = False
                 else:
                     active_dih_list.add(pair)
         # Now do the impropers

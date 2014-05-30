@@ -222,8 +222,6 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
          -  flexibleConstraints (bool=True) Are our constraints flexible or not?
          -  verbose (bool=False) Optionally prints out a running progress report
         """
-        # back up the dihedral list
-        dihedral_list = self.dihedral_list
         # Load the parameter set
         self.load_parameters(params.condense())
 
@@ -378,7 +376,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         if verbose: print('Adding torsions...')
         force = mm.PeriodicTorsionForce()
         force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
-        for tor in self.dihedral_list:
+        for tor in self.dihedral_parameter_list:
             force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                              tor.atom4.idx, tor.dihedral_type.per,
                              tor.dihedral_type.phase*pi/180,
@@ -510,7 +508,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add 1-4 interactions
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
         sigma_scale = 2**(-1/6)
-        for tor in self.dihedral_list:
+        for tor in self.dihedral_parameter_list:
             # First check to see if atoms 1 and 4 are already excluded because
             # they are 1-2 or 1-3 pairs (would happen in 6-member rings or
             # fewer). Then check that they're not already added as exclusions
@@ -629,9 +627,6 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
 
         # Cache our system for easy access
         self._system = system
-
-        # Restore the dihedral list to allow reparametrization later
-        self.dihedral_list = dihedral_list
 
         return system
 
