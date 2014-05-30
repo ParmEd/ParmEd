@@ -698,8 +698,19 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         """ Return tuple of 3 units """
         if self.box_vectors is None:
             return None
-        return (self.box_vectors[0][0], self.box_vectors[1][1],
-                self.box_vectors[2][2])
+        if u.is_quantity(self.box_vectors):
+            vecs = self.box_vectors.value_in_unit(u.nanometers)
+        elif u.is_quantity(self.box_vectors[0]):
+            vecs = [x.value_in_unit(u.nanometers) for x in self.box_vectors]
+        else:
+            vecs = self.box_vectors
+        a = sqrt(vecs[0][0]*vecs[0][0] + vecs[0][1]*vecs[0][1] +
+                 vecs[0][2]*vecs[0][2])
+        b = sqrt(vecs[1][0]*vecs[1][0] + vecs[1][1]*vecs[1][1] +
+                 vecs[1][2]*vecs[1][2])
+        c = sqrt(vecs[2][0]*vecs[2][0] + vecs[2][1]*vecs[2][1] +
+                 vecs[2][2]*vecs[2][2])
+        return (a, b, c) * u.nanometers
 
     def setBox(self, a, b, c, alpha=90.0*u.degrees, beta=90.0*u.degrees,
                gamma=90.0*u.degrees):
