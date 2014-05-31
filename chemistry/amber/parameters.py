@@ -152,7 +152,8 @@ class DihedralParam(list):
 
     def __eq__(self, other):
         sameatoms, sameorder = self.same_atoms((other.atype1, other.atype2,
-                                    other.atype3, other.atype4), reorder='none')
+                                                other.atype3, other.atype4),
+                                               self[0].dihtype=='improper')
         if not sameatoms:
             return False
         if len(self) != len(other):
@@ -162,14 +163,58 @@ class DihedralParam(list):
                 return False
         return True
 
-    def same_atoms(self, atomlist):
+    def same_atoms(self, atomlist, improper=False):
         """
-        Determine if two dihedrals affect the same atom types, re-ordering the
-        other if necessary. Improper will only match other impropers. Returns
-        <same_atoms>, <same_order>
+        Determine if two dihedrals are assigned to the same sets of atom types
+
+        Parameters
+        ----------
+        atomlist : list
+            4-element list of atom types to compare against this DihedralParam
+        improper : bool = False
+            If True, the third atom is stationary and the other 3 can be in any
+            order
+
+        Returns
+        -------
+        bool, bool
+            First bool is True if all atoms are the same; False otherwise
+            Second bool is True if atoms are in the same order; False otherwise
         """
+        if improper:
+            # For impropers, the third atom is the central atom and the other 3
+            # can be in any order
+            if self.atype3 != atomlist[2]: return False, False
+            if (self.atype1 == atomlist[0] and self.atype2 == atomlist[1] and
+                self.atype4 == atomlist[3]):
+                return True, True
+            # Make sure every atom type is unique so every atom type is added to
+            # the set (but we know it is NOT the same order now)
+            set1, set2 = set() , set()
+            for x, y in zip([atomlist[0], atomlist[1], atomlist[3]],
+                            [self.atype1, self.atype2, self.atype4]):
+                if x in set1:
+                    i = 0
+                    while '%s%d' % (x, i) in set1: i += 1
+                    set1.add('%s%d' % (x, i))
+                else:
+                    set1.add(x)
+                if y in set2:
+                    i = 0
+                    while '%s%d' % (y, i) in set2: i += 1
+                    set2.add('%s%d' % (y, i))
+                else:
+                    set2.add(y)
+            return set1 == set2, False
+        # If we reached here, this is a proper dihedral
         if self.atype2 == atomlist[1] and self.atype3 == atomlist[2]:
-            return self.atype1==atomlist[0] and self.atype4==atomlist[3], True
+            same = self.atype1 == atomlist[0] and self.atype4 == atomlist[3]
+            if not same:
+                # Check case when atype2 == atype3 and we're not the same --
+                # check for reversed order
+                eq = self.atype1 == atomlist[3] and self.atype4 == atomlist[0]
+                return eq, False
+            return same, same
         if self.atype3 == atomlist[1] and self.atype2 == atomlist[2]:
             return self.atype1==atomlist[3] and self.atype4==atomlist[0], False
         return False, False
@@ -254,15 +299,16 @@ class DihedralParamList(ParamList):
         # will be discarded.
         added = False
         for oparam in self:
-            if oparam.same_atoms((atype1, atype2, atype3, atype4))[0]:
-                # if one is an improper and the other is not, skip over this. If
-                # both are impropers, let it through to bre screened for
-                # equality If both are propers, also let them through.
-                if ((oparam[0].dihtype == 'improper' and
-                     param.dihtype == 'normal') or
-                    (oparam[0].dihtype == 'normal' and
-                    param.dihtype == 'improper')):
-                    continue
+            # if one is an improper and the other is not, skip over this. If
+            # both are impropers, let it through to be screened for equality
+            # If both are propers, also let them through.
+            if ((oparam[0].dihtype == 'improper' and
+                 param.dihtype == 'normal') or
+                (oparam[0].dihtype == 'normal' and
+                 param.dihtype == 'improper')):
+                continue
+            if oparam.same_atoms((atype1, atype2, atype3, atype4),
+                                 improper=param.dihtype=='improper')[0]:
                 added = True
                 oparam.add_term(param)
                 break
