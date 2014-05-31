@@ -1024,8 +1024,8 @@ class AmberParm(AmberFormat):
         # Put together the title
         title = ''
         try:
-        for i in range(len(self.parm_data['TITLE'])):
-            title += self.parm_data['TITLE'][i]
+            for i in range(len(self.parm_data['TITLE'])):
+                title += self.parm_data['TITLE'][i]
         except KeyError:
             for i in range(len(self.parm_data['CTITLE'])):
                 title += self.parm_data['CTITLE'][i]
