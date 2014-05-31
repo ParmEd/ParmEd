@@ -152,8 +152,7 @@ class DihedralParam(list):
 
     def __eq__(self, other):
         sameatoms, sameorder = self.same_atoms((other.atype1, other.atype2,
-                                                other.atype3, other.atype4),
-                                               self[0].dihtype=='improper')
+                                                other.atype3, other.atype4))
         if not sameatoms:
             return False
         if len(self) != len(other):
@@ -163,7 +162,7 @@ class DihedralParam(list):
                 return False
         return True
 
-    def same_atoms(self, atomlist, improper=False):
+    def same_atoms(self, atomlist):
         """
         Determine if two dihedrals are assigned to the same sets of atom types
 
@@ -171,17 +170,21 @@ class DihedralParam(list):
         ----------
         atomlist : list
             4-element list of atom types to compare against this DihedralParam
-        improper : bool = False
-            If True, the third atom is stationary and the other 3 can be in any
-            order
 
         Returns
         -------
         bool, bool
             First bool is True if all atoms are the same; False otherwise
             Second bool is True if atoms are in the same order; False otherwise
+
+        Notes
+        -----
+        If this torsion is an improper, the first atom is fixed and the other 3
+        atoms must be the same (but in any order). If this torsion is a proper,
+        then the torsions must match in either the forward or reverse
+        directions, only.
         """
-        if improper:
+        if self[0].dihtype == 'improper':
             # For impropers, the third atom is the central atom and the other 3
             # can be in any order
             if self.atype3 != atomlist[2]: return False, False
@@ -195,14 +198,14 @@ class DihedralParam(list):
                             [self.atype1, self.atype2, self.atype4]):
                 if x in set1:
                     i = 0
-                    while '%s%d' % (x, i) in set1: i += 1
-                    set1.add('%s%d' % (x, i))
+                    while '%s%d%d' % (x, i, i) in set1: i += 1
+                    set1.add('%s%d%d' % (x, i, i))
                 else:
                     set1.add(x)
                 if y in set2:
                     i = 0
-                    while '%s%d' % (y, i) in set2: i += 1
-                    set2.add('%s%d' % (y, i))
+                    while '%s%d%d' % (y, i, i) in set2: i += 1
+                    set2.add('%s%d%d' % (y, i, i))
                 else:
                     set2.add(y)
             return set1 == set2, False
@@ -307,8 +310,7 @@ class DihedralParamList(ParamList):
                 (oparam[0].dihtype == 'normal' and
                  param.dihtype == 'improper')):
                 continue
-            if oparam.same_atoms((atype1, atype2, atype3, atype4),
-                                 improper=param.dihtype=='improper')[0]:
+            if oparam.same_atoms((atype1, atype2, atype3, atype4)):
                 added = True
                 oparam.add_term(param)
                 break
