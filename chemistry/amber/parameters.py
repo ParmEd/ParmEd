@@ -310,7 +310,7 @@ class DihedralParamList(ParamList):
                 (oparam[0].dihtype == 'normal' and
                  param.dihtype == 'improper')):
                 continue
-            if oparam.same_atoms((atype1, atype2, atype3, atype4)):
+            if oparam.same_atoms((atype1, atype2, atype3, atype4))[0]:
                 added = True
                 oparam.add_term(param)
                 break
