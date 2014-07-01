@@ -530,24 +530,24 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             num_lj_types = 0
             lj_type_list = []
             for i, atom in enumerate(self.atom_list):
+                atom = atom.type
                 if lj_idx_list[i]: continue # already assigned
                 num_lj_types += 1
                 lj_idx_list[i] = num_lj_types
-                ljtype = (atom.type.rmin, atom.type.epsilon)
-                lj_type_list.append(atom.type)
-                lj_radii.append(atom.type.rmin)
-                lj_depths.append(atom.type.epsilon)
-                # Look through the rest of the atoms and assign any equivalent
-                # atom types as the same, but only if there are no nbfixes
-                # assigned to this atom type.  Do not attempt to condense
-                # nbfixed atom types...
-                if atom.type.nbfix: continue
+                ljtype = (atom.rmin, atom.epsilon)
+                lj_type_list.append(atom)
+                lj_radii.append(atom.rmin)
+                lj_depths.append(atom.epsilon)
                 for j in range(i+1, len(struct.atom_list)):
                     atom2 = self.atom_list[j].type
                     if lj_idx_list[j]: continue # already assigned
-                    ljtype2 = (atom2.rmin, atom2.epsilon)
-                    if ljtype == ljtype2:
+                    if atom2 is atom:
                         lj_idx_list[j] = num_lj_types
+                    elif not atom.nbfix:
+                        # Only non-NBFIXed atom types can be compressed
+                        ljtype2 = (atom2.rmin, atom2.epsilon)
+                        if ljtype == ljtype2:
+                            lj_idx_list[j] = num_lj_types
             # Now everything is assigned. Create the A-coefficient and
             # B-coefficient arrays
             acoef = [[0 for i in range(num_lj_types)]
