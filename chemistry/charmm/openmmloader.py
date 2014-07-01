@@ -262,11 +262,25 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                             u.kilojoule_per_mole)
         ene_conv = dihe_frc_conv
       
-        # Create the system
+        # Create the system and determine if any of our atoms have NBFIX (and
+        # therefore requires a CustomNonbondedForce instead)
+        typenames = set()
         system = mm.System()
         if verbose: print('Adding particles...')
         for atom in self.atom_list:
+            typenames.add(atom.type.name)
             system.addParticle(atom.mass)
+        has_nbfix_terms = False
+        typenames = list(typenames)
+        try:
+            for i, typename in enumerate(typenames):
+                typ = params.atom_types_str[typename]
+                for j in range(i, len(typenames)):
+                    if typenames[j] in typ.nbfix:
+                        has_nbfix_terms = True
+                        raise StopIteration
+        except StopIteration:
+            pass
         # Set up the constraints
         if verbose and (constraints is not None and not rigidWater):
             print('Adding constraints...')
@@ -501,9 +515,64 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
 
         # Add per-particle nonbonded parameters (LJ params)
         sigma_scale = 2**(-1/6) * 2
-        for i, atm in enumerate(self.atom_list):
-            force.addParticle(atm.charge, sigma_scale*atm.type.rmin*length_conv,
-                              abs(atm.type.epsilon*ene_conv))
+        if has_nbfix_terms:
+            for i, atm in enumerate(self.atom_list):
+                force.addParticle(atm.charge,
+                                  sigma_scale*atm.type.rmin*length_conv,
+                                  abs(atm.type.epsilon*ene_conv))
+        else:
+            for i, atm in enumerate(self.atom_list):
+                force.addParticle(atm.charge, 1.0, 0.0)
+            # Now add the custom nonbonded force that implements NBFIX. First
+            # thing we need to do is condense our number of types
+            lj_idx_list = [0 for atom in self.atom_list]
+            lj_radii, lj_depths = [], []
+            num_lj_types = 0
+            lj_type_list = []
+            for i, atom in enumerate(self.atom_list):
+                if lj_idx_list[i]: continue # already assigned
+                num_lj_types += 1
+                lj_idx_list[i] = num_lj_types
+                ljtype = (atom.type.rmin, atom.type.epsilon)
+                lj_type_list.append(atom.type)
+                lj_radii.append(atom.type.rmin)
+                lj_depths.append(atom.type.epsilon)
+                # Look through the rest of the atoms and assign any equivalent
+                # atom types as the same, but only if there are no nbfixes
+                # assigned to this atom type.  Do not attempt to condense
+                # nbfixed atom types...
+                if atom.type.nbfix: continue
+                for j in range(i+1, len(struct.atom_list)):
+                    atom2 = self.atom_list[j].type
+                    if lj_idx_list[j]: continue # already assigned
+                    ljtype2 = (atom2.rmin, atom2.epsilon)
+                    if ljtype == ljtype2:
+                        lj_idx_list[j] = num_lj_types
+            # Now everything is assigned. Create the A-coefficient and
+            # B-coefficient arrays
+            acoef = [[0 for i in range(num_lj_types)]
+                     for j in range(num_lj_types)]
+            bcoef = acoef[:] # slice to copy
+            for i in range(num_lj_types):
+                for j in range(num_lj_types):
+                    try:
+                        rij, wdij = lj_type_list[i].nbfix[lj_type_list[j].name]
+                    except KeyError:
+                        rij = lj_radii[i] + lj_radii[j]
+                        wdij = sqrt(lj_depths[i] * lj_depths[j])
+                    acoef[i][j] = wdij * rij**12
+                    bcoef[i][j] = 2 * wdij * rij**6
+            cforce = CustomNonbondedForce('a/r^12-b/r^6;'
+                                          'a=acoef(type1, type2);'
+                                          'b=bcoef(type1, type2)')
+            cforce.addTabulatedFunction('acoef',
+                    mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
+            cforce.addTabulatedFunction('bcoef',
+                    mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
+            cforce.addPerParticleParameter('type')
+            cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
+            for i in lj_idx_list:
+                cforce.addParticle(i - 1) # adjust for indexing from 0
 
         # Add 1-4 interactions
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
@@ -544,6 +613,13 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                     continue
                 force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
         system.addForce(force)
+        # If we needed a CustomNonbondedForce, map all of the exceptions from
+        # the NonbondedForce to the CustomNonbondedForce
+        if has_nbfix_terms:
+            for i in range(force.getNumExceptions()):
+                ii, jj, q, eps, sig = force.getExceptionParameters(i)
+                cforce.addExclusion(p1, p2)
+            system.addForce(cforce)
 
         # Add GB model if we're doing one
         if implicitSolvent is not None:
@@ -940,7 +1016,8 @@ class OpenMMCharmmCrdFile(CharmmCrdFile):
         for i in range(self.natom):
             i3 = i * 3
             crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
-            self._positions.append(crd * u.angstrom)
+            self._positions.append(crd)
+        self._positions = self._positions * u.angstroms
         return self._positions
     
     @positions.setter
@@ -967,7 +1044,8 @@ class OpenMMCharmmRstFile(CharmmRstFile):
         for i in range(self.natom):
             i3 = i * 3
             crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
-            self._positions.append(crd * u.angstrom)
+            self._positions.append(crd)
+        self._positions = self._positions * u.angstroms
         return self._positions
 
     @positions.setter
@@ -989,7 +1067,8 @@ class OpenMMCharmmRstFile(CharmmRstFile):
         for i in range(self.natom):
             i3 = i * 3
             vel = Vec3(self.vels[i3], self.vels[i3+1], self.vels[i3+2])
-            self._velocities.append(vel * u.angstroms / u.picoseconds)
+            self._velocities.append(vel)
+        self._velocities = self._velocities * u.angstroms / u.picoseconds
         return self._velocities
 
     @velocities.setter

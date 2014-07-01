@@ -49,6 +49,7 @@ class CharmmPsfFile(object):
         - bond_list
         - angle_list
         - dihedral_list
+        - dihedral_parameter_list
         - improper_list
         - cmap_list
         - donor_list    # hbonds donors?

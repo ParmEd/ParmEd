@@ -4,7 +4,7 @@ constructing chemical structures from those files
 
 Author: Jason M. Swails
 Contributors:
-Date: May 12, 2014
+Date: June 30, 2014
 """
 from chemistry.exceptions import (SplitResidueWarning, BondError, ResidueError,
                 CmapError, MissingParameter)
@@ -59,6 +59,9 @@ class AtomType(object):
         - _member_number (int, private) : The order in which this atom type
                 was 'added' this is used to make sure that atom types added
                 last have priority in assignment in the generated hash tables
+        - nbfix (dict) : Dictionary that maps nbfix terms with other atom types.
+                         Dict entries are (rmin, epsilon) -- precombined values
+                         for that particular atom pair
     Example:
     >>> at = AtomType('HA', 1, 1.008, 1)
     >>> at.name, at.number
@@ -91,6 +94,9 @@ class AtomType(object):
         self.atomic_number = atomic_number
         # We have no LJ parameters as of yet
         self.epsilon = self.rmin = self.epsilon_14 = self.rmin_14 = None
+        # Store each NBFIX term as a dict with the atom type string matching to
+        # a 2-element tuple that is rmin, epsilon
+        self.nbfix = dict()
 
     def __eq__(self, other):
         """
@@ -120,6 +126,10 @@ class AtomType(object):
     def __int__(self):
         """ The integer representation of an AtomType is its index """
         return self.number
+
+    def add_nbfix(self, typename, rmin, epsilon):
+        """ Adds a new NBFIX exclusion for this atom """
+        self.nbfix[typename] = (rmin, epsilon)
 
     def __str__(self):
         return self.name
@@ -419,8 +429,10 @@ class ResidueList(list):
         if self._last_residue is None:
             res = self._last_residue = Residue(resname, resnum)
             list.append(self, res)
-        elif self._last_residue != (resname, resnum):
-            if self._last_residue.idx == resnum:
+        elif (self._last_residue != (resname, resnum) or
+              system != self._last_residue.system):
+            if (self._last_residue.idx == resnum and
+                self._last_residue.system == system):
                 lresname = self._last_residue.resname
                 warnings.warn('Residue %d split into separate residues %s '
                               'and %s' % (resnum, lresname, resname),
