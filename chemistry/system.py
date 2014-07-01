@@ -173,7 +173,7 @@ class ChemicalSystem(list):
     relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
 
     def __init__(self, *args, **kwargs):
-        self.models = 0
+        self._models = 0
         self.respermodel = None
         super(ChemicalSystem, self).__init__(*args, **kwargs)
         self.box = None # [a, b, c, alpha, beta, gamma] or None
@@ -256,12 +256,12 @@ class ChemicalSystem(list):
                              occupancy=occupancy, bfactor=bfactor,
                              altloc=altloc),
                         Residue(resname, resid, inscode, chain,
-                                inst.models or 1),
+                                inst._models or 1),
                 )
             elif rec == 'MODEL ':
                 if inst.respermodel is None and len(inst) > 0:
                     inst.respermodel = len(inst)
-                inst.models += 1
+                inst._models += 1
             elif rec == 'CRYST1':
                 a = float(line[6:15])
                 b = float(line[15:24])
@@ -376,5 +376,13 @@ class ChemicalSystem(list):
         if self.respermodel is None or self.respermodel <= 0:
             return super(ChemicalSystem, self).__len__()
         return self.respermodel
+
+    @property
+    def models(self):
+        """
+        Hack to get PDBs with only 1 structure to return the correct number of
+        models (1)
+        """
+        return self._models or 1
 
 _DUMMY_ATOM = Atom()
