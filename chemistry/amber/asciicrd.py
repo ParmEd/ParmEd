@@ -107,7 +107,10 @@ class _AmberAsciiCoordinateFile(object):
 
     def __del__(self):
         """ Make sure the open file handler is closed """
-        self.closed or self._file.close()
+        try:
+            self.closed or self._file.close()
+        except AttributeError:
+            pass
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

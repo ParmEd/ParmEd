@@ -1,9 +1,9 @@
 """
 Tests the chemistry/system module
 """
+import chemistry.system as system
 import unittest
 from utils import get_fn
-import chemistry.system as system
 
 class TestChemistrySystem(unittest.TestCase):
     
