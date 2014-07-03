@@ -3,7 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm, asciicrd, mask
+from chemistry.amber import readparm, asciicrd, mask, topologyobjects as to
 import unittest
 from utils import get_fn, has_numpy
 
@@ -29,6 +29,7 @@ class TestReadParm(unittest.TestCase):
         
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
         self.assertFalse(parm.chamber)
         self.assertFalse(parm.amoeba)
         self.assertRaises(KeyError, lambda: parm.parm_data['BOX_DIMENSIONS'])
@@ -59,6 +60,7 @@ class TestReadParm(unittest.TestCase):
     def testChamberGasParm(self):
         parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
         self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
         self.assertTrue(parm.has_cmap)
         self.assertEqual(parm.ptr('ifbox'), 0)
@@ -121,6 +123,35 @@ class TestReadParm(unittest.TestCase):
                          len(parm.parm_data['ATOMS_PER_MOLECULE']))
         self.assertEqual(parm.ptr('natom'),
                          sum(parm.parm_data['ATOMS_PER_MOLECULE']))
+
+    def _extensive_checks(self, parm):
+        # Check the __contains__ methods of the various topologyobjects
+        atom_list = parm.atom_list
+        bond_list = parm.bonds_inc_h + parm.bonds_without_h
+        for bond in bond_list:
+            self.assertEqual(sum([a in bond for a in atom_list]), 2)
+        for angle in parm.angles_inc_h + parm.angles_without_h:
+            self.assertEqual(sum([a in angle for a in atom_list]), 3)
+            self.assertEqual(sum([b in angle for b in bond_list]), 2)
+        for dihedral in parm.dihedrals_inc_h + parm.dihedrals_without_h:
+            self.assertEqual(sum([a in dihedral for a in atom_list]), 4)
+            self.assertEqual(sum([b in dihedral for b in bond_list]), 3)
+        for residue in parm.residue_list:
+            self.assertTrue(all([a in residue for a in residue.atoms]))
+            self.assertEqual(sum([a in residue for a in atom_list]),
+                             len(residue))
+        if not parm.chamber: return
+        # Chamber tests now
+        for ub in parm.urey_bradley:
+            self.assertEqual(sum([a in ub for a in atom_list]), 2)
+            self.assertEqual(sum([b in ub for b in bond_list]), 2)
+        for imp in parm.improper:
+            self.assertEqual(sum([a in imp for a in atom_list]), 4)
+            self.assertEqual(sum([b in imp for b in bond_list]), 3)
+        if parm.has_cmap:
+            for cmap in parm.cmap:
+                self.assertEqual(sum([a in cmap for a in atom_list]), 5)
+                self.assertEqual(sum([b in cmap for b in bond_list]), 4)
 
 class TestCoordinateFiles(unittest.TestCase):
     

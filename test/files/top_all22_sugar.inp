@@ -1,0 +1,98 @@
+* Topology file for alpha-D-glucopyranose monomer.                    
+* 10/13/94 , Guyan Liang and John Brady
+*
+   22    1
+MASS     4 HT     1.00800  H ! TIP3P water hydrogen
+MASS    56 OT    15.99940  O ! TIP3P water oxygen
+MASS    73 HAS    1.00800  H ! sugar aliphatic hydrogen
+MASS    74 HOS    1.00800  H ! sugar hydroxyl hydrogen
+MASS    75 CTS   12.01100  C ! sugar aliphatic carbon
+MASS    78 CBS   12.01100  C ! C1 in beta sugars     
+MASS    76 OHS   15.99940  O ! sugar hydroxy oxygen
+MASS    77 OES   15.99940  O ! sugar ring oxygen
+
+AUTOGENERATE angles dihedrals
+! DEFAults for patching FIRSt and LAST residues
+DEFA FIRS NONE LAST NONE
+
+RESI AGLC         0.000  ! 4C1 alpha-D-glucopyranose monomer
+                         !
+GROU                     !                    
+ATOM C1   CTS     0.200  !                  O6-HO6
+ATOM H1   HAS     0.090  !                  |
+ATOM O1   OHS    -0.660  !              H61-C6-H62
+ATOM HO1  HOS     0.430  !                  |
+ATOM C5   CTS     0.250  !                  C5---O5
+ATOM H5   HAS     0.090  !            H4   /       \    O1-HO1
+ATOM O5   OES    -0.400  !              \ /     HO2 \  /
+GROU                     !               C4      |   C1
+ATOM C2   CTS     0.140  !              / \ H3   O2 /  \
+ATOM H2   HAS     0.090  !        HO4-O4   \|    | /    H1
+ATOM O2   OHS    -0.660  !                  C3---C2
+ATOM HO2  HOS     0.430  !                  |    |
+GROU                     !              HO3-O3   H2
+ATOM C3   CTS     0.140  !                  
+ATOM H3   HAS     0.090  !
+ATOM O3   OHS    -0.660  !
+ATOM HO3  HOS     0.430  !
+GROU
+ATOM C4   CTS     0.140
+ATOM H4   HAS     0.090
+ATOM O4   OHS    -0.660
+ATOM HO4  HOS     0.430
+GROU
+ATOM C6   CTS     0.050
+ATOM H61  HAS     0.090
+ATOM H62  HAS     0.090
+ATOM O6   OHS    -0.660
+ATOM HO6  HOS     0.430
+BOND C1   O1        C1   H1        O1   HO1       C1   O5        C1   C2
+BOND C2   H2        C2   O2        O2   HO2       C2   C3        C3   H3 
+BOND C3   O3        O3   HO3       C3   C4        C4   H4        C4   O4 
+BOND O4   HO4       C4   C5        C5   H5        C5   C6        C6   H61 
+BOND C6   H62       C6   O6        O6   HO6       C5   O5 
+DONO BLNK HO1
+DONO BLNK HO2
+DONO BLNK HO3
+DONO BLNK HO4
+DONO BLNK HO6
+ACCE O1
+ACCE O2
+ACCE O3
+ACCE O4
+ACCE O5
+ACCE O6
+!    I    J    K    L      R(IK)   T(IKJ)    PHI   T(JKL)   R(KL)
+IC   O1   C2  *C1   H1     1.3889  109.35 -122.69  108.98   1.0950 
+IC   O1   O5  *C1   C2     1.3889  111.55 -121.57  110.06   1.5340
+IC   O2   C3  *C2   H2     1.4154  112.27 -118.21  108.23   1.0919
+IC   O2   C1  *C2   C3     1.4154  110.87 -125.56  111.08   1.5253
+IC   O3   C4  *C3   H3     1.4157  110.61  120.65  108.81   1.1068
+IC   O3   C2  *C3   C4     1.4157  108.09  120.77  109.86   1.5177
+IC   O4   C5  *C4   H4     1.4252  110.90 -120.61  108.35   1.1024 
+IC   O4   C3  *C4   C5     1.4252  108.31 -122.08  111.17   1.5287
+IC   C6   O5  *C5   H5     1.5099  108.10  118.69  109.65   1.1042
+IC   C6   C4  *C5   O5     1.5099  111.57  119.10  108.69   1.4274
+IC   O6   H62 *C6   H61    1.4132  110.47 -120.32  107.85   1.0945
+IC   O6   C5  *C6   H62    1.4132  110.45 -121.53  108.99   1.0959
+IC   O5   C1   C2   C3     1.4254  110.06   54.09  111.08   1.5253
+IC   C1   C2   C3   C4     1.5340  111.08  -51.23  109.86   1.5177
+IC   C2   C3   C4   C5     1.5253  109.86   53.25  111.17   1.5288
+IC   C3   C4   C5   O5     1.5177  111.17  -57.46  108.69   1.4274
+IC   C4   C5   O5   C1     1.5288  108.69   62.25  113.77   1.4254
+IC   C5   O5   C1   C2     1.4274  113.77  -60.97  110.06   1.5340
+IC   C4   C5   C6   O6     1.5287  111.57 -170.28  110.45   1.4132 
+IC   O5   C1   O1   HO1    1.4254  111.55   74.87  107.83   0.9684
+IC   C1   C2   O2   HO2    1.5340  110.87 -100.51  112.13   0.9638
+IC   C2   C3   O3   HO3    1.5253  108.09 -165.88  112.08   0.9730
+IC   C3   C4   O4   HO4    1.5177  108.31  134.18  106.97   0.9713
+IC   C5   C6   O6   HO6    1.5099  110.44 -143.88  107.72   0.9641
+PATC FIRS NONE LAST NONE
+
+PRES BETA         0.200      ! patch to make the C1 group equitorial (beta)
+                             ! use in generate statement
+ATOM C1   CBS     0.200
+IC   O1   C2  *C1   H1     1.3890  105.75  114.54  108.17   1.0950
+IC   O1   O5  *C1   C2     1.3890  111.55  117.06  110.06   1.5340
+ 
+END

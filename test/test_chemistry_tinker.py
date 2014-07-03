@@ -111,5 +111,5 @@ class TestTinkerFiles(unittest.TestCase):
                      'velocities'):
             self.assertTrue(hasattr(dyn, attr))
 
-        self.assertAlmostEqual(l.positions[10], [-0.1099425448789507,
+        self.assertAlmostEqual(dyn.positions[10], [-0.1099425448789507,
                                -1.83499212341286, 6.089155631551154])
