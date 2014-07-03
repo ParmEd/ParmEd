@@ -4,6 +4,19 @@ Useful functions for the test cases
 import os
 from os.path import join, split, abspath
 import sys
+import unittest
+
+# Patches for older Ambers.
+
+if not hasattr(unittest.TestCase, 'assertIsInstance'):
+    class TestCase(unittest.TestCase):
+        
+        def assertIsInstance(self, thing, type):
+            if not isinstance(thing, type):
+                standardMsg = '%s is not an instance of %r' % (obj, type)
+                self.fail(self._formatMessage(msg, standardMsg))
+
+    unittest.TestCase = TestCase
 
 def get_fn(filename, written=False):
     """

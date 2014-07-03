@@ -3,8 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm
-from chemistry.amber import asciicrd
+from chemistry.amber import readparm, asciicrd, mask
 import unittest
 from utils import get_fn, has_numpy
 
@@ -175,3 +174,36 @@ class TestCoordinateFiles(unittest.TestCase):
             crdsum = sum(restart.coordinates)
         self.assertIsInstance(restart.coordinates, np.ndarray)
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
+
+class TestAmberMask(unittest.TestCase):
+    
+    def testMask(self):
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        mask_res1 = mask.AmberMask(parm, ':1')
+        mask_resala = mask.AmberMask(parm, ':ALA')
+        mask_atname = mask.AmberMask(parm, '@CA')
+        mask_resat = mask.AmberMask(parm, ':ALA@CA')
+        mask_attyp = mask.AmberMask(parm, '@%CT')
+
+        # Check all of the masks
+        self.assertEqual(sum(mask_res1.Selection()), 13)
+        for idx in mask_res1.Selected():
+            self.assertEqual(parm.atom_list[idx].residue.idx, 1)
+        self.assertEqual(range(13), list(mask_res1.Selected()))
+
+        self.assertEqual(sum(mask_resala.Selection()), 121)
+        for idx in mask_resala.Selected():
+            self.assertEqual(parm.atom_list[idx].residue.resname, 'ALA')
+        
+        self.assertEqual(sum(mask_atname.Selection()), 108)
+        for idx in mask_atname.Selected():
+            self.assertEqual(parm.atom_list[idx].atname, 'CA')
+
+        self.assertEqual(sum(mask_resat.Selection()), 12)
+        for idx in mask_resat.Selected():
+            self.assertEqual(parm.atom_list[idx].atname, 'CA')
+            self.assertEqual(parm.atom_list[idx].residue.resname, 'ALA')
+
+        self.assertEqual(sum(mask_attyp.Selection()), 341)
+        for idx in mask_attyp.Selected():
+            self.assertEqual(parm.atom_list[idx].attype, 'CT')
