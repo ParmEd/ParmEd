@@ -8,7 +8,7 @@ from chemistry.tinker import parameterfile, system, tinkerfiles
 
 get_fn = utils.get_fn
 
-class TestParameterFile(unittest.TestCase):
+class TestTinkerFiles(unittest.TestCase):
     
     def testParameterFile(self):
         param = parameterfile.AmoebaParameterSet(get_fn('amoeba09.prm'))
@@ -62,8 +62,6 @@ class TestParameterFile(unittest.TestCase):
         self.assertEqual(len(param.multipoles), 17)
         self.assertTrue(not any(param.multipoles['2-0-0'].potential_terms))
 
-class TestTinkerFiles(unittest.TestCase):
-    
     def testAnalout(self):
         analout = system.TinkerAnalout(get_fn('jac.analout'))
         self.assertEqual(len(analout.atom_list), 23558)
@@ -105,3 +103,13 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(len(xyz.atom_list[0].bonded_partners), 4)
         self.assertEqual(xyz.atom_list[-1].name, 'H')
         self.assertEqual(xyz.atom_list[-1].type, 248)
+
+    def testDyn(self):
+        dyn = tinkerfiles.DynFile(get_fn('nma.dyn'))
+        self.assertEqual(dyn.natom, 2466)
+        for attr in ('accelerations', 'old_accelerations', 'box', 'positions',
+                     'velocities'):
+            self.assertTrue(hasattr(dyn, attr))
+
+        self.assertAlmostEqual(l.positions[10], [-0.1099425448789507,
+                               -1.83499212341286, 6.089155631551154])
