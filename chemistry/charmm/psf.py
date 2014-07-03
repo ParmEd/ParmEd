@@ -85,8 +85,7 @@ class CharmmPsfFile(object):
         try:
             return type(string)
         except ValueError, e:
-            print e
-            raise CharmmPSFError('Could not convert %s' % message)
+            raise CharmmPSFError('Could not convert %s [%s]' % (message,string))
 
     @staticmethod
     def _parse_psf_section(psf, dtype):
@@ -159,10 +158,12 @@ class CharmmPsfFile(object):
         title = list()
         for i in range(ntitle):
             title.append(psf.readline().rstrip())
-        # Skip the blank line
-        psf.readline()
+        # Skip the blank line and any others that might be blank afterwards
+        line = psf.readline().strip()
+        while not line:
+            line = psf.readline().strip()
         # Next is the number of atoms
-        natom = conv(psf.readline().strip(), int, 'natom')
+        natom = conv(line, int, 'natom')
         # Parse all of the atoms
         residue_list = ResidueList()
         atom_list = AtomList()

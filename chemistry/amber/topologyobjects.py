@@ -627,7 +627,7 @@ class UreyBradley(object):
             # If we are here, end1 and cent are set. Look through the bond
             # partners of cent(er) and see if any of them is in this
             # Urey-Bradley (but ONLY if that atom is not the original end1)
-            for atm in cent.bonds():
+            for atm in cent.bond_partners:
                 if atm is end1: continue
                 if atm in self:
                 # If we got here, we found both atoms in this Urey-Bradley
