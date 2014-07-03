@@ -4,6 +4,7 @@ Tests for the chemistry/charmm subpackage
 
 from chemistry.charmm import charmmcrds, parameters, psf, topologyobjects as to
 from chemistry import exceptions
+import os
 import unittest
 import utils
 
@@ -387,3 +388,68 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(uniques(p.improper_types), 15)
         self.assertEqual(uniques(p.nbfix_types), 6)
         self.assertEqual(uniques(p.urey_bradley_types), 45)
+
+class TestFileWriting(unittest.TestCase):
+    """ Tests the various file writing capabilities """
+
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testWriteCharmm(self):
+        # Test writing CHARMM-style PSFs
+        cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
+        cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True))
+        cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
+        for attr in dir(cpsf):
+            if attr.startswith('_'): continue
+            if callable(getattr(cpsf, attr)): continue
+            if hasattr(getattr(cpsf, attr), '__len__'):
+                self.assertEqual(len(getattr(cpsf, attr)),
+                                 len(getattr(cpsf2, attr)))
+            else:
+                self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
+        f = open(get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
+        try:
+            has_key = False
+            for line in f:
+                if '!MOLNT' in line:
+                    has_key = True
+                    break
+        finally:
+            f.close()
+        self.assertTrue(has_key)
+
+    def testWriteVmd(self):
+        # Test writing VMD-style PSFs
+        cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
+        cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True), vmd=True)
+        cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
+        for attr in dir(cpsf):
+            if attr.startswith('_'): continue
+            if callable(getattr(cpsf, attr)): continue
+            if hasattr(getattr(cpsf, attr), '__len__'):
+                self.assertEqual(len(getattr(cpsf, attr)),
+                                 len(getattr(cpsf2, attr)))
+            else:
+                self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
+        f = open(get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
+        try:
+            has_key = False
+            for line in f:
+                if '!MOLNT' in line:
+                    has_key = True
+                    break
+        finally:
+            f.close()
+        self.assertFalse(has_key)
