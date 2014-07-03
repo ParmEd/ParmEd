@@ -34,7 +34,7 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(len(crd.coords), 3*crd.natom)
         self.assertEqual(len(crd.coordsold), 3*crd.natom)
         self.assertEqual(len(crd.vels), 3*crd.natom)
-        # Check variables whose meaning I cannot understand
+        # Check variables whose meaning I don't understand
         self.assertEqual(crd.jhstrt, 754200)
         self.assertEqual(crd.npriv, 754200)
         self.assertEqual(crd.nsavc, 100)
@@ -85,7 +85,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.residue), 12)
         self.assertEqual(len(a.system), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
-        # Check attributes of the PSF file
+        # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptor_list), 4)
         self.assertEqual(len(cpsf.angle_list), 57)
         self.assertEqual(len(cpsf.atom_list), 33)
@@ -122,11 +122,11 @@ class TestCharmmPsf(unittest.TestCase):
             else:
                 nat = sum([int(a in cmap) for a in atom_list])
                 nb = sum([int(b in cmap) for b in bond_list])
-                self.assertTrue(5 < nat <= 8)
-                self.assertTrue(4 < nb <= 6)
+                self.asserttrue(5 < nat <= 8)
+                self.asserttrue(4 < nb <= 6)
 
     def testXplorPsf(self):
-        # Atom types are strings, not integers like in CHARMM
+        # Atom types are strings, not integers like in charmm
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf.xplor'))
         self.assertEqual(len(cpsf.atom_list), 33)
         for i, atom in enumerate(cpsf.atom_list):
@@ -168,7 +168,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.residue), 12)
         self.assertEqual(len(a.system), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
-        # Check attributes of the PSF file
+        # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptor_list), 4)
         self.assertEqual(len(cpsf.angle_list), 57)
         self.assertEqual(len(cpsf.atom_list), 33)
@@ -205,8 +205,8 @@ class TestCharmmPsf(unittest.TestCase):
             else:
                 nat = sum([int(a in cmap) for a in atom_list])
                 nb = sum([int(b in cmap) for b in bond_list])
-                self.assertTrue(5 < nat <= 8)
-                self.assertTrue(4 < nb <= 6)
+                self.asserttrue(5 < nat <= 8)
+                self.asserttrue(4 < nb <= 6)
 
     def testCharmmGuiBuilder(self):
         cpsf = psf.CharmmPsfFile(get_fn('parv.psf'))
@@ -226,7 +226,7 @@ class TestCharmmPsf(unittest.TestCase):
     
     def testVmdPsf(self):
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
-        # Atom types are strings, not integers like in CHARMM
+        # Atom types are strings, not integers like in charmm
         self.assertEqual(len(cpsf.atom_list), 33)
         for i, atom in enumerate(cpsf.atom_list):
             self.assertEqual(atom.idx, i)
@@ -267,7 +267,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.residue), 12)
         self.assertEqual(len(a.system), 2)
         self.assertEqual(len(a.urey_bradleys), 0)
-        # Check attributes of the PSF file
+        # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptor_list), 0)
         self.assertEqual(len(cpsf.angle_list), 57)
         self.assertEqual(len(cpsf.atom_list), 33)
@@ -304,12 +304,12 @@ class TestCharmmPsf(unittest.TestCase):
             else:
                 nat = sum([int(a in cmap) for a in atom_list])
                 nb = sum([int(b in cmap) for b in bond_list])
-                self.assertTrue(5 < nat <= 8)
-                self.assertTrue(4 < nb <= 6)
+                self.asserttrue(5 < nat <= 8)
+                self.asserttrue(4 < nb <= 6)
 
 class TestCharmmParameters(unittest.TestCase):
     
-    def testSingleParameterSet(self):
+    def testSingleParameterset(self):
         self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
                                                 get_fn('par_all22_prot.inp')))
         params = parameters.CharmmParameterSet(
@@ -334,3 +334,56 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(len(params.nbfix_types), 0)
         self.assertEqual(len(params.parametersets), 1)
         self.assertEqual(len(params.urey_bradley_types), 356)
+        # Look at the number of unique terms
+        def uniques(stuff):
+            myset = set()
+            for key in stuff: myset.add(id(stuff[key]))
+            return len(myset)
+        self.assertEqual(uniques(params.angle_types), 356)
+        self.assertEqual(uniques(params.atom_types_int), 95)
+        self.assertEqual(uniques(params.atom_types_str), 95)
+        self.assertEqual(uniques(params.atom_types_tuple), 95)
+        self.assertEqual(uniques(params.bond_types), 140)
+        self.assertEqual(uniques(params.cmap_types), 5)
+        self.assertEqual(uniques(params.dihedral_types), 396)
+        self.assertEqual(uniques(params.improper_types), 33)
+        self.assertEqual(uniques(params.urey_bradley_types), 105)
+        obj = params.condense()
+        self.assertTrue(obj is params)
+        # Check that condensing happened
+        self.assertEqual(uniques(params.angle_types), 178)
+        self.assertEqual(uniques(params.atom_types_int), 95)
+        self.assertEqual(uniques(params.atom_types_str), 95)
+        self.assertEqual(uniques(params.atom_types_tuple), 95)
+        self.assertEqual(uniques(params.bond_types), 103)
+        self.assertEqual(uniques(params.cmap_types), 3)
+        self.assertEqual(uniques(params.dihedral_types), 396)
+        self.assertEqual(uniques(params.improper_types), 20)
+        self.assertEqual(uniques(params.urey_bradley_types), 42)
+
+    def testParamFileOnly(self):
+        p=parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
+
+    def testCollection(self):
+        p = parameters.CharmmParameterSet(
+                    get_fn('top_all36_prot.rtf'), 
+                    get_fn('top_all36_carb.rtf'),
+                    get_fn('par_all36_prot.prm'),
+                    get_fn('par_all36_carb.prm'),
+                    get_fn('toppar_water_ions.str'),
+        ).condense()
+        # Look at the number of unique terms
+        def uniques(stuff):
+            myset = set()
+            for key in stuff: myset.add(id(stuff[key]))
+            return len(myset)
+        self.assertEqual(uniques(p.angle_types), 206)
+        self.assertEqual(uniques(p.atom_types_int), 123)
+        self.assertEqual(uniques(p.atom_types_str), 123)
+        self.assertEqual(uniques(p.atom_types_tuple), 123)
+        self.assertEqual(uniques(p.bond_types), 114)
+        self.assertEqual(uniques(p.cmap_types), 3)
+        self.assertEqual(uniques(p.dihedral_types), 1290)
+        self.assertEqual(uniques(p.improper_types), 15)
+        self.assertEqual(uniques(p.nbfix_types), 6)
+        self.assertEqual(uniques(p.urey_bradley_types), 45)
