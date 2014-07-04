@@ -140,6 +140,36 @@ class TestWriteFiles(unittest.TestCase):
     def testBadFileUsage(self):
         Restart = asciicrd.AmberAsciiRestart
         Mdcrd = asciicrd.AmberMdcrd
+        box = [10, 10, 10, 90, 90, 90]
+        rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9,
+                      hasbox=True)
+        def assign(obj, stmnt):
+            rst = crd = obj
+            exec(stmnt)
+        try:
+            self.assertRaises(ValueError,
+                              lambda: assign(rst, 'rst.coordinates=range(20)'))
+            self.assertRaises(RuntimeError,
+                              lambda: assign(rst, 'rst.box=[10]*3+[90]*3'))
+            rst.coordinates = range(27)
+            rst.box = box
+            self.assertRaises(RuntimeError,
+                              lambda: assign(rst, 'rst.velocities=range(27)'))
+        finally:
+            rst.close()
+        crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=True,
+                    mode='w', title='Test file')
+        s = 'range(45)'
+        s2 = 'range(42)'
+        try:
+            crd.add_coordinates(eval(s))
+            self.assertRaises(RuntimeError,
+                              lambda: assign(crd, 'crd.add_coordinates(%s)'%s))
+            crd.add_box([10, 10, 10])
+            self.assertRaises(ValueError,
+                              lambda: assign(crd, 'crd.add_coordinates(%s)'%s2))
+        finally:
+            crd.close()
 
     def _check_written_restarts(self, box):
         # Now try to read them and verify the information (keep in mind that the
