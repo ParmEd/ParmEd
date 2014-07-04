@@ -3,7 +3,8 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm, asciicrd, mask, topologyobjects as to
+from chemistry.amber import readparm, asciicrd, mask
+import os
 import unittest
 from utils import get_fn, has_numpy
 
@@ -238,3 +239,82 @@ class TestAmberMask(unittest.TestCase):
         self.assertEqual(sum(mask_attyp.Selection()), 341)
         for idx in mask_attyp.Selected():
             self.assertEqual(parm.atom_list[idx].attype, 'CT')
+
+class TestWriteFiles(unittest.TestCase):
+    
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testWriteAmberParm(self):
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm.writeParm(get_fn('trx.prmtop', written=True))
+        f1 = open(get_fn('trx.prmtop'), 'r')
+        f2 = open(get_fn('trx.prmtop', written=True), 'r')
+        try:
+            for line1, line2 in zip(f1, f2):
+                self.assertEqual(line1.strip(), line2.strip())
+        finally:
+            f1.close()
+            f2.close()
+
+    def testAmberRestart(self):
+        Restart = asciicrd.AmberAsciiRestart
+        box = [10, 10, 10, 90, 90, 90]
+        rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
+        rst.coordinates = range(27)
+        rst.close()
+        rst = Restart(get_fn('testcv.rst7', written=True), 'w', natom=20)
+        rst.coordinates = range(60)
+        rst.velocities = reversed(range(60))
+        rst.close()
+        rst = Restart(get_fn('testcb.rst7', written=True), 'w', natom=7)
+        rst.coordinates = range(21)
+        rst.box = box[:]
+        rst.close()
+        rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
+        rst.coordinates = range(45)
+        rst.velocities = reversed(range(45))
+        rst.box = box[:]
+        rst.close()
+        # Now try to read them and verify the information
+        rst = readparm.Rst7.open(get_fn('testc.rst7', written=True))
+        self.assertFalse(rst.hasbox)
+        self.assertFalse(rst.hasvels)
+        for x1, x2 in zip(rst.coordinates, range(27)):
+            self.assertEqual(x1, x2)
+        rst = readparm.Rst7.open(get_fn('testcb.rst7', written=True))
+        self.assertTrue(rst.hasbox)
+        self.assertFalse(rst.hasvels)
+        for x1, x2 in zip(rst.coordinates, range(21)):
+            self.assertEqual(x1, x2)
+        for x1, x2 in zip(rst.box, box):
+            self.assertEqual(x1, x2)
+        rst = readparm.Rst7.open(get_fn('testcv.rst7', written=True))
+        self.assertTrue(rst.hasvels)
+        self.assertFalse(rst.hasbox)
+        for x1, x2 in zip(rst.coordinates, range(60)):
+            self.assertEqual(x1, x2)
+        for x1, x2 in zip(rst.velocities, reversed(range(60))):
+            self.assertEqual(x1, x2)
+        rst = readparm.Rst7.open(get_fn('testcvb', written=True))
+        self.assertTrue(rst.hasvels)
+        self.assertTrue(rst.hasbox)
+        for x1, x2 in zip(rst.coordinates, range(45)):
+            self.assertEqual(x1, x2)
+        for x1, x2 in zip(rst.velocities, reversed(range(45))):
+            self.assertEqual(x1, x2)
+        for x1, x2 in zip(rst.box, box):
+            self.assertEqual(x1, x2)
+
+#   def
