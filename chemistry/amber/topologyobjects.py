@@ -146,7 +146,7 @@ class Atom(object):
         if 'SCREEN' in parm_data:
             self.screen = parm_data['SCREEN'][si]
         else:
-            self.radii = 0.0 # dummy number
+            self.screen = 0.0 # dummy number
         if 'ATOMIC_NUMBER' in parm_data:
             self.atomic_number = parm_data['ATOMIC_NUMBER'][si]
         else:

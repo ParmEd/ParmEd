@@ -229,6 +229,7 @@ class AmberParm(AmberFormat):
         self.pointers["NHPARM"] = self.parm_data["POINTERS"][NHPARM]
         self.pointers["NPARM"] = self.parm_data["POINTERS"][NPARM]
         self.pointers["NEXT"] = self.parm_data["POINTERS"][NEXT]
+        self.pointers["NNB"] = self.parm_data["POINTERS"][NNB] # alias for above
         self.pointers["NRES"] = self.parm_data["POINTERS"][NRES]
         self.pointers["NBONA"] = self.parm_data["POINTERS"][NBONA]
         self.pointers["NTHETA"] = self.parm_data["POINTERS"][NTHETA]
