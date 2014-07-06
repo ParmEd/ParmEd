@@ -95,7 +95,7 @@ class TestReadParm(unittest.TestCase):
 
     def testAmoebaSmall(self):
         parm = readparm.AmoebaParm(get_fn('nma.parm7'))
-        rst7 = readparm.BeemanRestart(get_fn('nma.rst7'))
+        rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
         self.assertEqual(3*rst7.natom, len(rst7.coordinates))
         self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
         self.assertEqual(rst7.natom, parm.ptr('natom'))

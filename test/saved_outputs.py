@@ -362,7 +362,7 @@ Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  0
 Num. of unknown atoms: 17861
-Total charge (e-):     -11.0003
+Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
@@ -377,10 +377,91 @@ Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  17856
 Num. of unknown atoms: 5
-Total charge (e-):     -11.0003
+Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
 System volume (ang^3): 615109.338811
 System density (g/mL): 0.916989
+"""
+
+PRINT_DETAILSA = """
+The mask :1-2 matches 12 atoms:
+
+   ATOM    RES  RESNAME  NAME  TYPE      Mass
+      1      1      ACE   CH3     C   12.0110
+      2      1      ACE     C     C   12.0110
+      3      1      ACE     O     O   15.9990
+      4      1      ACE  H31H     H    1.0080
+      5      1      ACE  H32H     H    1.0080
+      6      1      ACE  H33H     H    1.0080
+      7      2      NME     N     N   14.0070
+      8      2      NME   CH3     C   12.0110
+      9      2      NME     H    HN    1.0080
+     10      2      NME  H31H     H    1.0080
+     11      2      NME  H32H     H    1.0080
+     12      2      NME  H33H     H    1.0080
+"""
+
+PRINT_BONDSA = """\
+Atom 1               Atom 2               R eq       Frc Cnst  
+      1  CH3 (   C)       2    C (   C)     1.5090   345.0000
+      1  CH3 (   C)       4 H31H (   H)     1.1120   341.0000
+      1  CH3 (   C)       5 H32H (   H)     1.1120   341.0000
+      1  CH3 (   C)       6 H33H (   H)     1.1120   341.0000
+"""
+
+PRINT_ANGLESA = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      2    C (   C)        1  CH3 (   C)        4 H31H (   H)    39.0000  6273.8879
+      2    C (   C)        1  CH3 (   C)        5 H32H (   H)    39.0000  6273.8879
+      2    C (   C)        1  CH3 (   C)        6 H33H (   H)    39.0000  6273.8879
+      4 H31H (   H)        1  CH3 (   C)        5 H32H (   H)    40.0000  6176.4850
+      4 H31H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000  6176.4850
+      5 H32H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000  6176.4850
+"""
+
+PRINT_DIHEDRALSA = """\
+Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)    -1.0000     1.0000     0.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     2.0000   180.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     3.0000     0.0000        N/A        N/A
+        4 H31H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
+        4 H31H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
+        5 H32H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
+        5 H32H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
+        6 H33H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
+        6 H33H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        9    H (  HN)     1.0000     2.0000   180.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        9    H (  HN)     0.8000     3.0000     0.0000        N/A        N/A
+"""
+
+SUMMARYA1 = """\
+Amino Acid Residues:   0
+Nucleic Acid Residues: 0
+Number of cations:     0
+Number of anions:      0
+Num. of solvent mols:  818
+Num. of unknown atoms: 2
+Total charge (e-):     0.0000
+Total mass (amu):      14809.3650
+Number of atoms:       2466
+Number of residues:    820
+System volume (ang^3): 1.000000
+System density (g/mL): 24591.940605
+"""
+
+SUMMARYA2 = """\
+Amino Acid Residues:   0
+Nucleic Acid Residues: 0
+Number of cations:     0
+Number of anions:      0
+Num. of solvent mols:  818
+Num. of unknown atoms: 2
+Total charge (e-):     0.0000
+Total mass (amu):      14809.3650
+Number of atoms:       2466
+Number of residues:    820
+System volume (ang^3): 27031.520402
+System density (g/mL): 0.909751
 """
