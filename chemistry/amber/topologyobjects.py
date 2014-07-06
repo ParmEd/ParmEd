@@ -260,6 +260,10 @@ class Atom(object):
     def __le__(self, other):
         return not Atom.__gt__(self, other)
 
+    def __repr__(self):
+        return "<Atom %s [%d]; In %s %d>" % (self.atname, self.starting_index+1,
+                self.residue.resname, self.residue.idx)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Bond(object):
@@ -532,6 +536,10 @@ class Dihedral(object):
 
         raise TypeError('Cannot compare Dihedral with %s' %
                         type(thing).__name__)
+
+    def __repr__(self):
+        return "<Dihedral %r--%r--%r--%r>" % (self.atom1, self.atom2,
+                self.atom3, self.atom4)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

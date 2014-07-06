@@ -15,7 +15,7 @@ from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
 #             CoarseGrainError,
                                    )
 from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.parmlist import ParmList, ChamberParm
+from ParmedTools.parmlist import ParmList, ChamberParm, AmoebaParm
 from chemistry.amber.mask import AmberMask
 from chemistry.amber.readparm import AmberFormat
 from chemistry.amber.topologyobjects import (Bond, BondType, Angle, AngleType,
@@ -564,6 +564,20 @@ class change(Action):
                         'You may only use "change" with CHARGE, MASS, RADII, '
                         'SCREEN, ATOM_NAME, AMBER_ATOM_TYPE, ATOM_TYPE_INDEX, '
                         'or ATOMIC_NUMBER!')
+        if 'AmoebaParm' in type(self.parm).__name__:
+            # Catch illegal values for Amoeba topologies
+            if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'ATOM_TYPE_INDEX'):
+                raise ParmedChangeError('You cannot change %s in Amoeba '
+                                        'topologies' % self.prop)
+            if self.prop == 'ATOMIC_NUMBER':
+                # AmoebaParm can have an AMOEBA_ATOMIC_NUMBER section instead of
+                # ATOMIC_NUMBER. So see which of them is available and change
+                # that one
+                if 'ATOMIC_NUMBER' not in self.parm.flag_list:
+                    if 'AMOEBA_ATOMIC_NUMBER' not in self.parm.flag_list:
+                        raise ParmedChangeError('Could not find %s in Amoeba '
+                                                'prmtop.' % self.prop)
+                    self.prop = 'AMOEBA_ATOMIC_NUMBER'
 
     def __str__(self):
         atnums = self.mask.Selection()
@@ -883,12 +897,24 @@ class printdetails(Action):
         selection = self.mask.Selection()
         retstr = "\nThe mask %s matches %d atoms:\n\n" % (
                         self.mask, sum(selection))
-        retstr += ("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
-                   ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'LJ Radius',
-                    'LJ Depth', 'Mass', 'Charge','GB Radius','GB Screen')
-        )
-        for i, atm in enumerate(self.parm.atom_list):
-            if selection[i] == 1:
+        # Separate printout for Amoeba-style prmtop files
+        if isinstance(self.parm, AmoebaParm):
+            retstr += '%7s%7s%9s%6s%6s%10s\n' % ('ATOM', 'RES', 'RESNAME',
+                                                 'NAME', 'TYPE', 'Mass')
+            for i, atm in enumerate(self.parm.atom_list):
+                if not selection[i]: continue
+                retstr += (
+                        '%7d%7d%9s%6s%6s%10.4f\n' %
+                            (i+1, atm.residue.idx, atm.residue.resname,
+                             atm.atname, atm.attype, atm.mass)
+                )
+        else:
+            retstr += ("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
+                       ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'LJ Radius',
+                        'LJ Depth', 'Mass', 'Charge','GB Radius','GB Screen')
+            )
+            for i, atm in enumerate(self.parm.atom_list):
+                if not selection[i]: continue
                 retstr += (
                         "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"
                         % (i+1, atm.residue.idx, atm.residue.resname,
@@ -1220,6 +1246,7 @@ class addexclusions(Action):
     For PME simulations, long-range electrostatics between these atom pairs are
     still computed (in different unit cells).
     """
+    supported_classes = ('AmberParm', 'ChamberParm')
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1359,20 +1386,28 @@ class printdihedrals(Action):
             atm3 = self.parm.atom_list[idx3]
             atm4 = self.parm.atom_list[idx4]
             # Determine if it's an Improper, Multiterm, or neither
-            if dihedral.signs[1] < 0:
+            if isinstance(self.parm, AmoebaParm):
+                char = ' '
+                scee = scnb = 'N/A'
+            elif dihedral.signs[1] < 0:
                 char = 'I'
+                scee = '%10.4f' % dihedral.dihed_type.scee
+                scnb = '%10.4f' % dihedral.dihed_type.scnb
             elif dihedral.signs[0] < 0:
                 char = 'M'
+                scee = '%10.4f' % dihedral.dihed_type.scee
+                scnb = '%10.4f' % dihedral.dihed_type.scnb
             else:
                 char = ' '
+                scee = '%10.4f' % dihedral.dihed_type.scee
+                scnb = '%10.4f' % dihedral.dihed_type.scnb
             retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10.4f %10.4f\n' %
+                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
                        (char, idx1+1, atm1.atname, atm1.attype, idx2+1,
                         atm2.atname, atm2.attype, idx3+1, atm3.atname,
                         atm3.attype, idx4+1, atm4.atname, atm4.attype,
                         dihedral.dihed_type.phi_k, dihedral.dihed_type.per,
-                        dihedral.dihed_type.phase*180/math.pi,
-                        dihedral.dihed_type.scee, dihedral.dihed_type.scnb)
+                        dihedral.dihed_type.phase*180/math.pi, scee, scnb)
             )
 
         for dihedral in self.parm.dihedrals_inc_h:
@@ -1388,20 +1423,26 @@ class printdihedrals(Action):
             atm2 = self.parm.atom_list[idx2]
             atm3 = self.parm.atom_list[idx3]
             atm4 = self.parm.atom_list[idx4]
-            if dihedral.signs[1] < 0:
+            if isinstance(self.parm, AmoebaParm):
+                char = ' '
+                scee = scnb = 'N/A'
+            elif dihedral.signs[1] < 0:
                 char = 'I'
+                scee = '%10.4f' % dihedral.dihed_type.scee
+                scnb = '%10.4f' % dihedral.dihed_type.scnb
             elif dihedral.signs[0] < 0:
                 char = 'M'
+                scee = '%10.4f' % dihedral.dihed_type.scee
+                scnb = '%10.4f' % dihedral.dihed_type.scnb
             else:
                 char = ' '
             retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10.4f %10.4f\n' %
+                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
                       (char, idx1+1, atm1.atname, atm1.attype, idx2+1,
                        atm2.atname, atm2.attype, idx3+1, atm3.atname,
                        atm3.attype, idx4+1, atm4.atname, atm4.attype,
                        dihedral.dihed_type.phi_k, dihedral.dihed_type.per,
-                       dihedral.dihed_type.phase*180/math.pi,
-                       dihedral.dihed_type.scee, dihedral.dihed_type.scnb)
+                       dihedral.dihed_type.phase*180/math.pi, scee, scnb)
             )
 
         return retstr
@@ -2878,9 +2919,10 @@ class hmassrepartition(Action):
     def execute(self):
         # Back up the masses in case something goes wrong
         original_masses = self.parm.parm_data['MASS'][:]
+        water = self.parm.solvent_residues
         for i, atom in enumerate(self.parm.atom_list):
             if atom.atomic_number != 1: continue
-            if not self.changewater and atom.residue.resname in ('WAT', 'HOH'):
+            if not self.changewater and atom.residue.resname in water:
                 continue
             heteroatom = None
             heteroidx = 0
@@ -3043,8 +3085,8 @@ class deletebond(Action):
         self.verbose = arg_list.has_key('verbose')
         # Go through each atom in mask1 and see if it forms a bond with any atom
         # in mask2.
-        self.del_h_bonds = set()
-        self.del_noh_bonds = set()
+        self.del_h_bonds = list()
+        self.del_noh_bonds = list()
         deleted_bond_list = set()
         for i in self.mask1.Selected():
             ai = self.parm.atom_list[i]
@@ -3059,13 +3101,13 @@ class deletebond(Action):
                     if 1 in (ai.atomic_number, aj.atomic_number):
                         for ii, bond in enumerate(self.parm.bonds_inc_h):
                             if ai in bond and aj in bond:
-                                self.del_h_bonds.add(ii)
+                                self.del_h_bonds.append(ii)
                                 deleted_bond_list.add(bond)
                                 break
                     else:
                         for ii, bond in enumerate(self.parm.bonds_without_h):
                             if ai in bond and aj in bond:
-                                self.del_noh_bonds.add(ii)
+                                self.del_noh_bonds.append(ii)
                                 deleted_bond_list.add(bond)
                                 break
         # Now go through all of our other valence terms and collect the terms
@@ -3073,38 +3115,38 @@ class deletebond(Action):
         if not deleted_bond_list:
             # Nothing to delete
             return
-        self.del_h_angles = set()
-        self.del_noh_angles = set()
-        self.del_h_dihedrals = set()
-        self.del_noh_dihedrals = set()
+        self.del_h_angles = list()
+        self.del_noh_angles = list()
+        self.del_h_dihedrals = list()
+        self.del_noh_dihedrals = list()
         if self.parm.chamber:
-            self.del_impropers = set()
-            self.del_ureybrad = set()
-            self.del_cmap = set()
+            self.del_impropers = list()
+            self.del_ureybrad = list()
+            self.del_cmap = list()
         for bond in deleted_bond_list:
             for i, angle in enumerate(self.parm.angles_inc_h):
                 if bond in angle:
-                    self.del_h_angles.add(i)
+                    self.del_h_angles.append(i)
             for i, angle in enumerate(self.parm.angles_without_h):
                 if bond in angle:
-                    self.del_noh_angles.add(i)
+                    self.del_noh_angles.append(i)
             for i, dihed in enumerate(self.parm.dihedrals_inc_h):
                 if bond in dihed:
-                    self.del_h_dihedrals.add(i)
+                    self.del_h_dihedrals.append(i)
             for i, dihed in enumerate(self.parm.dihedrals_without_h):
                 if bond in dihed:
-                    self.del_noh_dihedrals.add(i)
+                    self.del_noh_dihedrals.append(i)
             if self.parm.chamber:
                 for i, ureybrad in enumerate(self.parm.urey_bradley):
                     if bond in ureybrad:
-                        self.del_ureybrad.add(i)
+                        self.del_ureybrad.append(i)
                 for i, improper in enumerate(self.parm.improper):
                     if bond in improper:
-                        self.del_impropers.add(i)
-                if hasattr(self.parm, 'cmap'):
+                        self.del_impropers.append(i)
+                if self.parm.has_cmap:
                     for i, cmap in enumerate(self.parm.cmap):
                         if bond in cmap:
-                            self.del_cmap.add(i)
+                            self.del_cmap.append(i)
 
     def __str__(self):
         if not self.del_h_bonds and not self.del_noh_bonds:
@@ -3141,7 +3183,7 @@ class deletebond(Action):
                         len(self.del_cmap))
             )
         else:
-            retstr += ' and %d dihedrals' % (len(self.del_h_dihedrals) +
+            retstr += 'and %d dihedrals' % (len(self.del_h_dihedrals) +
                                             len(self.del_noh_dihedrals))
         return retstr
 
@@ -3149,7 +3191,7 @@ class deletebond(Action):
     def _dfl(selection, mylist):
         """ Delete From List """
         if not selection: return
-        for i in reversed(list(selection)):
+        for i in reversed(selection):
             del mylist[i]
 
     def execute(self):
@@ -3591,4 +3633,3 @@ class minimize(Action):
                  self.precision, self.norun)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-

@@ -739,6 +739,15 @@ class Dihedral(_FourAtomTerm):
         self.dihedral_type = dihedral_type
         self.register()
 
+    @property
+    def dihed_type(self):
+        """ For duck typing -- same name as the Amber/Chamber variants """
+        return self.dihedral_type
+
+    @dihed_type.setter
+    def dihed_type(self, thing):
+        self.dihedral_type = thing
+
     def write_info(self, parm, idx):
         # If unused, skip this parameter
         if idx == -1: return
