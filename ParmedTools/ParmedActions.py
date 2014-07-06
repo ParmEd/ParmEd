@@ -27,6 +27,8 @@ import math
 import os
 import warnings
 
+GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
+
 # Add a help dictionary entry for each additional Action added to this class!
 # Each help entry should be a list with 2 elements: [Usage, description]
 Usages = {
@@ -57,7 +59,6 @@ Usages = {
        'printangles' : 'printAngles <mask>',
     'printdihedrals' : 'printDihedrals <mask>',
       'setmolecules' : 'setMolecules [solute_ions True|False]',
-  'combinemolecules' : 'combineMolecules <mol_id1> [<mol_id2>]',
                 'go' : 'go',
               'quit' : 'quit',
 #   'addcoarsegrain' : 'addCoarseGrain <parameter_file>',
@@ -103,7 +104,8 @@ Usages = {
        'fixtopology' : 'fixTopology',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
-                       '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]',
+                       '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]'
+                       '[-radii <radiusset>]',
           'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
                        '[[restrain <mask>] [weight <k>]] [norun] '
                        '[script <script_file.py>] [platform <platform>] '
@@ -174,6 +176,8 @@ class Action(lawsuit):
         except AttributeError:
             if isinstance(arg_list, str):
                 arg_list = ArgumentList(arg_list)
+            else:
+                arg_list = ArgumentList(str(arg_list))
         # Now that we have the argument list, see if we have requested a
         # specific parm. If so, set self.parm equal to that object, instead
         parm = arg_list.get_key_string('parm', None)
@@ -273,6 +277,7 @@ class setoverwrite(Action):
     """
     Necessary to overwrite original topology file name.
     """
+    needs_parm = False
     def init(self, arg_list):
         # see if we got an argument
         arg = arg_list.get_next_string(optional=True)
@@ -370,8 +375,8 @@ class writeoff(Action):
 
 class changeradii(Action):
     """
-    Changes intrinsic GB radii to the specified set: bondi, mbondi, amber6,
-    mbondi2, or mbondi3
+    Changes intrinsic GB radii to the specified set: Allowed values are
+        amber6, bondi, mbondi, mbondi2, mbondi3
     """
     supported_classes = ('AmberParm', 'ChamberParm')
     def init(self, arg_list):
@@ -395,6 +400,7 @@ class changeradii(Action):
             self.parm.addFlag('SCREEN', '5E16.8',
                               num_items=self.parm.ptr('natom'))
         ChRad(self.parm, self.radii)
+        self.parm.atom_list.refresh_data()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -672,6 +678,7 @@ class addljtype(Action):
       
         AddLJType(self.parm, sel_atms, self.new_radius, self.new_epsilon, 
                   self.new_radius_14, self.new_epsilon_14)
+        self.parm.atom_list.refresh_data()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -975,16 +982,16 @@ class setmolecules(Action):
     Determines the molecularity of the system based on the bonding network and
     correctly determines the SOLVENT_POINTERS and ATOMS_PER_MOLECULE sections of
     the topology file. It will consider the ions to be part of the solute if
-    True is passed or not if False is passed. Defaults to False.
+    True is passed or not if False is passed. Defaults to True.
     """
     def init(self, arg_list):
         # Allow solute_ions to be a keyword argument or the only argument.
         # Default is True
         solute_ions = arg_list.get_key_string('solute_ions', None)
         if solute_ions is None:
-            solute_ions = arg_list.get_next_string(optional=True)
+            self.solute_ions = arg_list.get_next_string(optional=True)
         if solute_ions is None:
-            solute_ions = True
+            self.solute_ions = True
         elif solute_ions.lower() == 'true':
             self.solute_ions = True
         elif solute_ions.lower() == 'false':
@@ -1010,34 +1017,9 @@ class setmolecules(Action):
                         'loading a restart prior to using setMolecules' %
                         self.parm, ParmWarning
                 )
+        self.parm.remake_parm()
+        self.parm.LoadPointers()
    
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-class combinemolecules(Action):
-    """
-    Combines the molecule <mol_id1> with the adjacent molecule <mol_id2> to
-    ensure that those two molecules are imaged together. Most commonly used with
-    protein/small ligand systems to keep them together during wrapping.  This
-    will slightly affect the pressure calculation, but not by very much for
-    small ligands. Note that <mol_id1> and <mol_id2> must be sequential if
-    <mol_id2> is supplied
-    """
-    def init(self, arg_list):
-        self.mol_id = arg_list.get_next_int()
-        mol_id2 = arg_list.get_next_int(optional=True)
-        if mol_id2 is not None:
-            if self.mol_id + 1 != mol_id2:
-                raise ParmedMoleculeError('Can only combine adjacent '
-                                          'molecules!')
-
-    def __str__(self):
-        return "Combining molecules %d and %d into the same molecule" % (
-                                    self.mol_id, self.mol_id + 1)
-
-    def execute(self):
-        from ParmedTools.mod_molecules import combineMolecules as cm
-        cm(self.parm, self.mol_id)
-
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #
 #class addcoarsegrain(Action):
@@ -1174,17 +1156,14 @@ class netcharge(Action):
         if mask is None: mask = ':*'
         self.mask = AmberMask(self.parm, mask)
 
+    def __str__(self):
+        return 'The net charge of %s is %.4f' % (self.mask,
+            sum([self.parm.atom_list[i].charge for i in self.mask.Selected()]))
+
     def execute(self):
         """ Calculates the charge of all atoms selected in mask """
-        sel = self.mask.Selection()
-
-        netchg = 0.0
-        for i in range(len(sel)):
-            if sel[i]: netchg += self.parm.parm_data['CHARGE'][i]
-
-        self.outfile.write('  The net charge of %s is %.4f\n' % 
-                           (self.mask, netchg))
-        return netchg
+        return sum([self.parm.atom_list[i].charge
+                    for i in self.mask.Selected()])
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1215,8 +1194,10 @@ class definesolvent(Action):
     def init(self, arg_list):
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
-        if res_list.endswith(','): self.res_list = res_list[:len(res_list)-1]
-        else: self.res_list = res_list
+        if res_list.endswith(','):
+            self.res_list = res_list[:len(res_list)-1]
+        else:
+            self.res_list = res_list
         self.parm.solvent_residues = res_list.split(',')
 
     def __str__(self):
@@ -1242,23 +1223,17 @@ class addexclusions(Action):
             self.mask2, self.mask1)
    
     def execute(self):
-        sel1 = self.mask1.Selection()
-        sel2 = self.mask2.Selection()
         # Loop through both selections and add each selected atom in sel2 to
         # the exclusion list for selected atoms in sel1 (and vice-versa).
-        for i in range(len(sel1)):
-            if sel1[i]:
-                for j in range(len(sel2)):
-                    if sel2[j]:
-                        # Make sure that this atom isn't already in the
-                        # exclusion list by virtue of being a bonded partner.
-                        atm1 = self.parm.atom_list[i]
-                        atm2 = self.parm.atom_list[j]
-                        # Skip over atm1 == atm2
-                        if atm1 is atm2: continue
-                        # Add each other to each other's exclusion lists.
-                        atm1.exclude(atm2)
-                        self.parm.atom_list.changed = True
+        for i in self.mask1.Selected():
+            for j in self.mask2.Selected():
+                atm1 = self.parm.atom_list[i]
+                atm2 = self.parm.atom_list[j]
+                # Skip over atm1 == atm2
+                if atm1 is atm2: continue
+                # Add each other to each other's exclusion lists.
+                atm1.exclude(atm2)
+                self.parm.atom_list.changed = True
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1293,7 +1268,7 @@ class printbonds(Action):
 
             atm1 = self.parm.atom_list[idx1]
             atm2 = self.parm.atom_list[idx2]
-            retstr += '%7d %4s (%4s)  %7d %4s (%4s) %10.4f %10.4f\n' % (
+            retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
                         idx1+1, atm1.atname, atm1.attype, idx2+1, atm2.atname,
                         atm2.attype, bond.bond_type.req, bond.bond_type.k)
 
@@ -1434,6 +1409,10 @@ class setbond(Action):
     atoms in mask1 and mask2 (one bond between atom1 from mask1 and atom1
     from mask2 and another bond between atom2 from mask1 and atom2 from mask2,
     etc.)
+
+    When used through the API, the changes are not flushed to the actual data in
+    the prmtop unless you call remake_parm() on the object (this is done for
+    performance reasons)
     """
     supported_classes = ('AmberParm', 'ChamberParm')
 
@@ -1510,6 +1489,10 @@ class setangle(Action):
     atoms in mask1, mask2, and mask3 (one angle between atom1 from mask1, atom1
     from mask2, and atom1 from mask3, another angle between atom2 from mask1,
     atom2 from mask2, and atom2 from mask3, etc.)
+
+    When used through the API, the changes are not flushed to the actual data in
+    the prmtop unless you call remake_parm() on the object (this is done for
+    performance reasons)
     """
     supported_classes = ('AmberParm', 'ChamberParm')
 
@@ -1706,6 +1689,7 @@ class adddihedral(Action):
             dihed_list.append(
                     Dihedral(atm1, atm2, atm3, atm4, new_dih_typ, signs)
             )
+        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1766,11 +1750,11 @@ class deletedihedral(Action):
         )
 
     def execute(self):
+        """ Returns the total number of dihedrals deleted """
         sel1, sel2 = self.mask1.Selection(), self.mask2.Selection()
         sel3, sel4 = self.mask3.Selection(), self.mask4.Selection()
         # Bail out if we're deleting nothing
         if sum(sel1) == 0: return
-
         # Keep track of the dihedrals we want to delete from each
         # dihedral list (dihedrals_inc_h, dihedrals_without_h)
         deleting_dihedrals = [[],[]]
@@ -1815,20 +1799,12 @@ class deletedihedral(Action):
             for j, dihed in enumerate(dihed_list):
                 if dihed == proposed_dihedral:
                     if not found_this_dihedral:
-                        print 'Matched dihedral number %d' % j
                         found_this_dihedral = True
                         total_diheds += 1
-                    else:
-                        print '  Matched multi-term dihedral number %d' % j
                     deleting_dihedrals[dihed_list_idx].append(j)
 
         if not deleting_dihedrals[0] and not deleting_dihedrals[1]:
-            print 'No dihedrals matched -- not deleting any dihedrals'
             return
-
-        print 'Deleting %d dihedrals' % (len(deleting_dihedrals[0]) + 
-                                         len(deleting_dihedrals[1])),
-        print ' (%d distinct dihedrals)' % total_diheds
 
         # At this point, we've collected all of our dihedrals, now sort them
         if deleting_dihedrals[0]: deleting_dihedrals[0].sort()
@@ -1840,6 +1816,8 @@ class deletedihedral(Action):
         if deleting_dihedrals[1]:
             while deleting_dihedrals[1]:
                 del self.parm.dihedrals_without_h[deleting_dihedrals[1].pop()]
+        self.parm.remake_parm()
+        return total_diheds
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3065,7 +3043,7 @@ class deletebond(Action):
                 aj = self.parm.atom_list[j]
                 # Skip if these two atoms are identical
                 if ai is aj: continue
-                if aj in ai.bonds():
+                if any([aj in b for b in ai.bonds]):
                     # A bond exists here. Now find the bond in the appropriate
                     # list (is there a hydrogen or not?) and add its index to
                     # the relevant list.
@@ -3301,6 +3279,9 @@ class chamber(Action):
         usechamber  Use the 'chamber' program to write a topology file instead
         -box        Box dimensions. If no angles are defined, they are assumed
                     to be 90 degrees (orthorhombic box)
+        -radii      Implicit solvent solvation radii. <radiusset> can be
+                    amber6, bondi, mbondi, mbondi2, mbondi3
+                    Same effect as the changeRadii command. Default is mbondi.
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3363,10 +3344,14 @@ class chamber(Action):
                                  'angles!')
         else:
             self.box = None
+        self.radii = arg_list.get_key_string('-radii', 'mbondi')
 
         # Make sure we have legal input
         if not self.paramfiles and not self.streamfiles:
             raise InputError('No parameter files were provided!')
+        if not self.radii in GB_RADII:
+            raise InputError('Illegal radius set %s -- must be one of '
+                             '%s' % (self.radii, ', '.join(GB_RADII)))
         if self.usechamber:
             # We need a topfile, paramfile, and crd file for chamber
             if not self.topfiles or not self.paramfiles:
@@ -3395,6 +3380,7 @@ class chamber(Action):
             retstr += ' NO CMAP.'
         if self.box is not None:
             retstr += ' Box info %s.' % (self.box)
+        retstr += ' GB Radius set %s.' % self.radii
         if self.usechamber:
             retstr += ' Using chamber program.'
         return retstr
@@ -3493,7 +3479,9 @@ class chamber(Action):
         if self.crdfile is not None:
             parm.load_coordinates(coords)
         parm.prm_name = self.psf
+        changeradii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
+        self.parm = parm
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
