@@ -246,3 +246,141 @@ Number of residues:    725
 System volume (ang^3): 26461.483474
 System density (g/mL): 0.854596
 """
+
+PRINT_DETAILSC = """
+The mask @1 matches 1 atoms:
+
+   ATOM    RES  RESNAME  NAME  TYPE   LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
+      1      1      ALA     N   NH3      1.8500      0.2000   14.0070   -0.3000    1.5500    0.7900
+"""
+
+PRINT_BONDSC = """\
+Atom 1               Atom 2               R eq       Frc Cnst  
+      1    N ( NH3)       5   CA ( CT1)     1.4800   200.0000
+      2  HT1 (  HC)       1    N ( NH3)     1.0400   403.0000
+      3  HT2 (  HC)       1    N ( NH3)     1.0400   403.0000
+      4  HT3 (  HC)       1    N ( NH3)     1.0400   403.0000
+"""
+
+PRINT_ANGLESC = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)    67.7000   110.0000
+      1    N ( NH3)        5   CA ( CT1)       11    C (   C)    43.7000   110.0000
+      2  HT1 (  HC)        1    N ( NH3)        3  HT2 (  HC)    44.0000   109.5000
+      2  HT1 (  HC)        1    N ( NH3)        4  HT3 (  HC)    44.0000   109.5000
+      2  HT1 (  HC)        1    N ( NH3)        5   CA ( CT1)    30.0000   109.5000
+      3  HT2 (  HC)        1    N ( NH3)        4  HT3 (  HC)    44.0000   109.5000
+      3  HT2 (  HC)        1    N ( NH3)        5   CA ( CT1)    30.0000   109.5000
+      4  HT3 (  HC)        1    N ( NH3)        5   CA ( CT1)    30.0000   109.5000
+      1    N ( NH3)        5   CA ( CT1)        6   HA (  HB)    51.5000   107.5000
+"""
+
+PRINT_DIHEDRALSC = """\
+Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+        1    N ( NH3)        5   CA ( CT1)       11    C (   C)       12    O (   O)     0.0000     1.0000     0.0000     1.0000     1.0000
+        1    N ( NH3)        5   CA ( CT1)       11    C (   C)       13    N ( NH1)     0.6000     1.0000     0.0000     1.0000     1.0000
+        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)        8  HB1 (  HA)     0.2000     3.0000     0.0000     1.0000     1.0000
+        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)        9  HB2 (  HA)     0.2000     3.0000     0.0000     1.0000     1.0000
+        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)       10  HB3 (  HA)     0.2000     3.0000     0.0000     1.0000     1.0000
+        2  HT1 (  HC)        1    N ( NH3)        5   CA ( CT1)        6   HA (  HB)     0.1000     3.0000     0.0000     1.0000     1.0000
+        2  HT1 (  HC)        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)     0.1000     3.0000     0.0000     1.0000     1.0000
+        2  HT1 (  HC)        1    N ( NH3)        5   CA ( CT1)       11    C (   C)     0.1000     3.0000     0.0000     1.0000     1.0000
+        3  HT2 (  HC)        1    N ( NH3)        5   CA ( CT1)        6   HA (  HB)     0.1000     3.0000     0.0000     1.0000     1.0000
+        3  HT2 (  HC)        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)     0.1000     3.0000     0.0000     1.0000     1.0000
+        3  HT2 (  HC)        1    N ( NH3)        5   CA ( CT1)       11    C (   C)     0.1000     3.0000     0.0000     1.0000     1.0000
+        4  HT3 (  HC)        1    N ( NH3)        5   CA ( CT1)        6   HA (  HB)     0.1000     3.0000     0.0000     1.0000     1.0000
+        4  HT3 (  HC)        1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)     0.1000     3.0000     0.0000     1.0000     1.0000
+        4  HT3 (  HC)        1    N ( NH3)        5   CA ( CT1)       11    C (   C)     0.1000     3.0000     0.0000     1.0000     1.0000
+"""
+
+SET_BONDC = """\
+Atom 1               Atom 2               R eq       Frc Cnst  
+      7   CB ( CT3)       5   CA ( CT1)     1.5000   300.0000
+      1    N ( NH3)       5   CA ( CT1)     1.4800   200.0000
+     11    C (   C)       5   CA ( CT1)     1.4900   250.0000
+     17   CB ( CT3)      15   CA ( CT1)     1.5000   300.0000
+     13    N ( NH1)      15   CA ( CT1)     1.4300   320.0000
+     21    C (   C)      15   CA ( CT1)     1.4900   250.0000
+     27   CB ( CT3)      25   CA ( CT1)     1.5000   300.0000
+     23    N ( NH1)      25   CA ( CT1)     1.4300   320.0000
+     31    C (  CC)      25   CA ( CT1)     1.5220   200.0000
+      5   CA ( CT1)       6   HA (  HB)     1.0800   330.0000
+     15   CA ( CT1)      16   HA (  HB)     1.0800   330.0000
+     25   CA ( CT1)      26   HA (  HB)     1.0800   330.0000
+"""
+
+SET_ANGLEC = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)    67.7000   110.0000
+      7   CB ( CT3)        5   CA ( CT1)       11    C (   C)    52.0000   108.0000
+     13    N ( NH1)       15   CA ( CT1)       17   CB ( CT3)    70.0000   113.5000
+     17   CB ( CT3)       15   CA ( CT1)       21    C (   C)    52.0000   108.0000
+     23    N ( NH1)       25   CA ( CT1)       27   CB ( CT3)    70.0000   113.5000
+     27   CB ( CT3)       25   CA ( CT1)       31    C (  CC)    52.0000   108.0000
+      6   HA (  HB)        5   CA ( CT1)        7   CB ( CT3)    35.0000   111.0000
+      5   CA ( CT1)        7   CB ( CT3)        8  HB1 (  HA)    40.0000   100.0000
+      5   CA ( CT1)        7   CB ( CT3)        9  HB2 (  HA)    33.4300   110.1000
+      5   CA ( CT1)        7   CB ( CT3)       10  HB3 (  HA)    33.4300   110.1000
+      8  HB1 (  HA)        7   CB ( CT3)        9  HB2 (  HA)    35.5000   108.4000
+      8  HB1 (  HA)        7   CB ( CT3)       10  HB3 (  HA)    35.5000   108.4000
+      9  HB2 (  HA)        7   CB ( CT3)       10  HB3 (  HA)    35.5000   108.4000
+     16   HA (  HB)       15   CA ( CT1)       17   CB ( CT3)    35.0000   111.0000
+     15   CA ( CT1)       17   CB ( CT3)       18  HB1 (  HA)    40.0000   100.0000
+     15   CA ( CT1)       17   CB ( CT3)       19  HB2 (  HA)    33.4300   110.1000
+     15   CA ( CT1)       17   CB ( CT3)       20  HB3 (  HA)    33.4300   110.1000
+     18  HB1 (  HA)       17   CB ( CT3)       19  HB2 (  HA)    35.5000   108.4000
+     18  HB1 (  HA)       17   CB ( CT3)       20  HB3 (  HA)    35.5000   108.4000
+     19  HB2 (  HA)       17   CB ( CT3)       20  HB3 (  HA)    35.5000   108.4000
+     26   HA (  HB)       25   CA ( CT1)       27   CB ( CT3)    35.0000   111.0000
+     25   CA ( CT1)       27   CB ( CT3)       28  HB1 (  HA)    40.0000   100.0000
+     25   CA ( CT1)       27   CB ( CT3)       29  HB2 (  HA)    33.4300   110.1000
+     25   CA ( CT1)       27   CB ( CT3)       30  HB3 (  HA)    33.4300   110.1000
+     28  HB1 (  HA)       27   CB ( CT3)       29  HB2 (  HA)    35.5000   108.4000
+     28  HB1 (  HA)       27   CB ( CT3)       30  HB3 (  HA)    35.5000   108.4000
+     29  HB2 (  HA)       27   CB ( CT3)       30  HB3 (  HA)    35.5000   108.4000
+"""
+
+PRINT_LJMATRIXC = """
+Atom Type 1 Atom Type 2   A coefficient   B coefficient      R i,j    Eps i,j
+------------------------------------------------------------------------------
+  NH3 [1]   NH3 [1]  1316590.401168     1026.290564   3.700000   0.200000
+  NH3 [1]  H,HC [2]      609.333680       15.289896   2.074500   0.095917
+  NH3 [1]   CT1 [3]  1535031.988974      623.165940   4.125000   0.063246
+  NH3 [1] HA,HB [4]    68302.639169      134.620719   3.170000   0.066332
+  NH3 [1]   CT3 [5]  1615031.807669      903.962743   3.910000   0.126491
+  NH3 [1]     C [6]  1573041.189142      966.063587   3.850000   0.148324
+  NH3 [1]     O [7]   620648.710655      620.162833   3.550000   0.154919
+  NH3 [1]   NH1 [8]  1316590.401168     1026.290564   3.700000   0.200000
+  NH3 [1]    CC [9]  1254852.764965      770.652143   3.850000   0.118322
+  NH3 [1]   OC [10]   620648.710655      620.162833   3.550000   0.154919
+"""
+
+SUMMARYC1 = """\
+Amino Acid Residues:   154
+Nucleic Acid Residues: 0
+Number of cations:     0
+Number of anions:      0
+Num. of solvent mols:  0
+Num. of unknown atoms: 17861
+Total charge (e-):     -11.0003
+Total mass (amu):      339672.2974
+Number of atoms:       56057
+Number of residues:    18015
+System volume (ang^3): 615109.338811
+System density (g/mL): 0.916989
+"""
+
+SUMMARYC2 = """\
+Amino Acid Residues:   154
+Nucleic Acid Residues: 0
+Number of cations:     0
+Number of anions:      0
+Num. of solvent mols:  17856
+Num. of unknown atoms: 5
+Total charge (e-):     -11.0003
+Total mass (amu):      339672.2974
+Number of atoms:       56057
+Number of residues:    18015
+System volume (ang^3): 615109.338811
+System density (g/mL): 0.916989
+"""

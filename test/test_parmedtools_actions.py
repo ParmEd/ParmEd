@@ -3,14 +3,17 @@ Tests for the various actions in ParmEd
 """
 from __future__ import division
 
+from chemistry import periodic_table
 from chemistry.amber.readparm import AmberParm, ChamberParm, AmoebaParm
 from chemistry.exceptions import MoleculeWarning
 from copy import copy
 import os
 from ParmedTools import exceptions as exc
 from ParmedTools import ParmedActions as PA
+from ParmedTools import parmlist
 import ParmedTools as PT
 import saved_outputs as saved
+import sys
 import unittest
 import utils
 import warnings
@@ -19,9 +22,9 @@ get_fn = utils.get_fn
 get_saved_fn = utils.get_saved_fn
 
 gasparm = AmberParm(get_fn('trx.prmtop'))
-#solvparm = AmberParm(get_fn('solv.prmtop'))
-gaschamber = ChamberParm(get_fn('ala_ala_ala.parm7')) # ignore the variable name
-#solvchamber = AmberParm(get_fn('dhfr_cmap_pbc.parm7'))
+solvparm = AmberParm(get_fn('solv.prmtop'))
+gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
+solvchamber = AmberParm(get_fn('dhfr_cmap_pbc.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 
 class TestNonParmActions(unittest.TestCase):
@@ -31,18 +34,16 @@ class TestNonParmActions(unittest.TestCase):
         self.parm = gasparm
 
     def testOverwrite(self):
-        self.assertFalse(PA.Action.overwrite)
-        a = PT.setOverwrite(self.parm)
-        self.assertFalse(PA.Action.overwrite)
-        a.execute()
         self.assertTrue(PA.Action.overwrite)
-        self.assertEqual(str(a), 'Files are overwritable')
         a = PT.setOverwrite(self.parm, False)
+        self.assertTrue(PA.Action.overwrite)
         a.execute()
         self.assertFalse(PA.Action.overwrite)
         self.assertEqual(str(a), 'Files are NOT overwritable')
-        PT.setOverwrite(self.parm, True).execute()
+        a = PT.setOverwrite(self.parm, True)
+        a.execute()
         self.assertTrue(PA.Action.overwrite)
+        self.assertEqual(str(a), 'Files are overwritable')
     
     def testListParms(self):
         a = PT.listParms(self.parm)
@@ -361,6 +362,11 @@ class TestAmberParmActions(unittest.TestCase):
                     self.assertEqual(acoef[idx-1], refa[idx-1])
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
 
+    def testChangeLJ14Pair(self):
+        parm = copy(gasparm)
+        self.assertRaises(exc.ParmError, lambda:
+            PT.changeLJ14Pair(parm, '@%N', '@%H', 1.0, 1.0).execute())
+
     def testChange(self):
         parm = copy(gasparm)
         PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
@@ -628,7 +634,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
-                       0.1556, 3, 0, 1.2, 2.0, type='normal').execute()
+                       0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
 
@@ -700,64 +706,875 @@ class TestAmberParmActions(unittest.TestCase):
         PT.lmod(parm).execute()
         self.assertTrue(all(parm.parm_data['LENNARD_JONES_ACOEF']))
 
+    def testProtStateInterpolate(self):
+        self._empty_writes()
+        parm = AmberParm(get_fn('ash.parm7'))
+        origparm = copy(parm)
+        origparm.prm_name = origparm.prm_name + '_copy1'
+        PT.changeProtState(parm, ':ASH', 0).execute()
+        self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
+        self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(atom.charge, parm.parm_data['CHARGE'][i])
+        for i, atom in enumerate(origparm.atom_list):
+            self.assertEqual(atom.charge, origparm.parm_data['CHARGE'][i])
+        # Now set up a ParmList so we can interpolate these topology files
+        parms = parmlist.ParmList()
+        parms.add_parm(parm)
+        parms.add_parm(origparm)
+        sys.stdout = open(os.devnull, 'w')
+        PT.interpolate(parms, 5, 'eleconly', startnum=2,
+                       prefix=get_fn('test.parm7', written=True)).execute()
+        sys.stdout = sys.__stdout__
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
+        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        # Now check them all
+        ladder = [origparm]
+        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(parm)
+        natom = parm.ptr('natom')
+        for i in range(1, 6):
+            before = ladder[i-1].parm_data['CHARGE']
+            after = ladder[i+1].parm_data['CHARGE']
+            this = ladder[i].parm_data['CHARGE']
+            for j in range(natom):
+                if before[j] < after[j]:
+                    self.assertTrue(before[j] <= this[j] <= after[j])
+                else:
+                    self.assertTrue(before[j] >= this[j] >= after[j])
+
+    def testAddDeletePDB(self):
+        parm = copy(gasparm)
+        PT.addPDB(parm, get_fn('trx.pdb'), 'elem', 'allicodes').execute()
+        self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
+        self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
+        self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
+        self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
+        self.assertTrue(len(parm.parm_data['RESIDUE_ICODE']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['ATOM_ELEMENT']), parm.ptr('natom'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_NUMBER']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_CHAINID']),parm.ptr('nres'))
+        for i in range(parm.ptr('nres')):
+            self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i + 21)
+            self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
+            if parm.parm_data['RESIDUE_NUMBER'][i] < 41:
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'A')
+            else:
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'B')
+        for i, atom in enumerate(parm.atom_list):
+            atnum = atom.atomic_number
+            elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
+            self.assertEqual(periodic_table.Element[atnum], elem)
+            self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+        PT.deletePDB(parm).execute()
+        self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
+        self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
+        self.assertFalse('RESIDUE_NUMBER' in parm.flag_list)
+        self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
+
+    def testHMassRepartition(self):
+        parm = copy(solvparm)
+        PT.HMassRepartition(parm, 2.0).execute()
+        for atom in parm.atom_list:
+            if atom.atomic_number == 1:
+                if atom.residue.resname == 'WAT':
+                    self.assertAlmostEqual(atom.mass, 1.008)
+                else:
+                    self.assertEqual(atom.mass, 2)
+        self.assertEqual(parm.parm_data['MASS'],
+                         [a.mass for a in parm.atom_list])
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
+                               sum(parm.parm_data['MASS']))
+        PT.HMassRepartition(parm, 3.0, 'dowater').execute()
+        for atom in parm.atom_list:
+            if atom.atomic_number == 1:
+                self.assertEqual(atom.mass, 3.0)
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
+                               sum(parm.parm_data['MASS']))
+
+class TestChamberParmActions(unittest.TestCase):
+    """ Tests actions on Amber prmtop files """
+    
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def assertRelativeEqual(self, val1, val2, places=7):
+        try:
+            ratio = val1 / val2
+        except ZeroDivisionError:
+            return self.assertAlmostEqual(val1, val2, places=places)
+        else:
+            return self.assertAlmostEqual(ratio, 1.0, places=places)
+
+    def _empty_writes(self):
+        """ Empty the "writes" directory """
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+        except OSError:
+            pass
+
+    def testParmoutOutparmLoadRestrt(self):
+        self._empty_writes()
+        parm = copy(gascham)
+        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        for atom in parm.atom_list:
+            self.assertTrue(hasattr(atom, 'xx'))
+            self.assertTrue(hasattr(atom, 'xy'))
+            self.assertTrue(hasattr(atom, 'xz'))
+        PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
+                                         get_fn('test.parm7', written=True)))
+        self._empty_writes()
+        PT.parmout(parm, get_fn('test.parm7', written=True),
+                         get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
+                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
+                                         get_fn('test.rst7', written=True)))
+        self._empty_writes()
+        PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
+                                         get_fn('test.parm7', written=True)))
+        self._empty_writes()
+        PT.outparm(parm, get_fn('test.parm7', written=True),
+                         get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
+                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
+                                         get_fn('test.rst7', written=True)))
+
+    def testWriteFrcmod(self):
+        parm = gascham
+        self.assertRaises(exc.ParmError, lambda:
+                PT.writeFrcmod(parm, get_fn('x', written=True)).execute())
+
+    def testWriteOffLoadRestrt(self):
+        parm = copy(gascham)
+        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        self.assertRaises(exc.ParmError, lambda:
+                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
+
+    def testChangeRadii(self):
+        parm = copy(gascham)
+        PT.changeRadii(parm, 'amber6').execute()
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
+                         'amber6 modified Bondi radii (amber6)')
+        for i, atom in enumerate(parm.atom_list):
+            radii, atomic_number = atom.radii, atom.atomic_number
+            self.assertEqual(parm.parm_data['RADII'][i], radii)
+            if atomic_number == 6:
+                self.assertEqual(radii, 1.7)
+            elif atomic_number == 7:
+                self.assertEqual(radii, 1.55)
+            elif atomic_number == 8 or atomic_number == 9:
+                self.assertEqual(radii, 1.5)
+            elif atomic_number == 14:
+                self.assertEqual(radii, 2.1)
+            elif atomic_number == 15:
+                self.assertEqual(radii, 1.85)
+            elif atomic_number == 16:
+                self.assertEqual(radii, 1.8)
+            elif atomic_number == 1:
+                if atom.bond_partners[0].atomic_number == 6:
+                    self.assertEqual(radii, 1.3)
+                elif atom.bond_partners[0].atomic_number in (8, 16):
+                    self.assertEqual(radii, 0.8)
+                else:
+                    self.assertEqual(radii, 1.2)
+            else:
+                self.assertEqual(radii, 1.5)
+
+        PT.changeRadii(parm, 'bondi').execute()
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'Bondi radii (bondi)')
+        for atom in parm.atom_list:
+            radii, atomic_number = atom.radii, atom.atomic_number
+            if atomic_number == 6:
+                self.assertEqual(radii, 1.7)
+            elif atomic_number == 7:
+                self.assertEqual(radii, 1.55)
+            elif atomic_number == 8 or atomic_number == 9:
+                self.assertEqual(radii, 1.5)
+            elif atomic_number == 14:
+                self.assertEqual(radii, 2.1)
+            elif atomic_number == 15:
+                self.assertEqual(radii, 1.85)
+            elif atomic_number == 16:
+                self.assertEqual(radii, 1.8)
+            elif atomic_number == 1:
+                self.assertEqual(radii, 1.2)
+            else:
+                self.assertEqual(radii, 1.5)
+
+        PT.changeRadii(parm, 'mbondi').execute()
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
+                         'modified Bondi radii (mbondi)')
+        for atom in parm.atom_list:
+            radii, atomic_number = atom.radii, atom.atomic_number
+            if atomic_number == 6:
+                self.assertEqual(radii, 1.7)
+            elif atomic_number == 7:
+                self.assertEqual(radii, 1.55)
+            elif atomic_number == 8 or atomic_number == 9:
+                self.assertEqual(radii, 1.5)
+            elif atomic_number == 14:
+                self.assertEqual(radii, 2.1)
+            elif atomic_number == 15:
+                self.assertEqual(radii, 1.85)
+            elif atomic_number == 16:
+                self.assertEqual(radii, 1.8)
+            elif atomic_number == 1:
+                if atom.bond_partners[0].atomic_number in (6, 7):
+                    self.assertEqual(radii, 1.3)
+                elif atom.bond_partners[0].atomic_number in (8, 16):
+                    self.assertEqual(radii, 0.8)
+                else:
+                    self.assertEqual(radii, 1.2)
+            else:
+                self.assertEqual(radii, 1.5)
+
+        PT.changeRadii(parm, 'mbondi2').execute()
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
+                         'H(N)-modified Bondi radii (mbondi2)')
+        for atom in parm.atom_list:
+            radii, atomic_number = atom.radii, atom.atomic_number
+            if atomic_number == 6:
+                self.assertEqual(radii, 1.7)
+            elif atomic_number == 7:
+                self.assertEqual(radii, 1.55)
+            elif atomic_number == 8 or atomic_number == 9:
+                self.assertEqual(radii, 1.5)
+            elif atomic_number == 14:
+                self.assertEqual(radii, 2.1)
+            elif atomic_number == 15:
+                self.assertEqual(radii, 1.85)
+            elif atomic_number == 16:
+                self.assertEqual(radii, 1.8)
+            elif atomic_number == 1:
+                if atom.bond_partners[0].atomic_number == 7:
+                    self.assertEqual(radii, 1.3)
+                else:
+                    self.assertEqual(radii, 1.2)
+            else:
+                self.assertEqual(radii, 1.5)
+
+        PT.changeRadii(parm, 'mbondi3').execute()
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
+                         'ArgH and AspGluO modified Bondi2 radii (mbondi3)')
+        for i, atom in enumerate(parm.atom_list):
+            radii, atomic_number = atom.radii, atom.atomic_number
+            if atomic_number == 6:
+                self.assertEqual(radii, 1.7)
+            elif atomic_number == 7:
+                self.assertEqual(radii, 1.55)
+            elif atomic_number == 8:
+                if atom.residue.resname in ('ASP,GLU') and (
+                            atom.atname.startswith('OD') or
+                            atom.atname.startswith('OE')):
+                    self.assertEqual(radii, 1.4)
+                elif atom.atname == 'OXT' or (i < parm.ptr('natom')-1 and
+                            parm.atom_list[i+1].atname == 'OXT'):
+                    self.assertEqual(radii, 1.4)
+                else:
+                    self.assertEqual(radii, 1.5)
+            elif atomic_number == 9:
+                self.assertEqual(radii, 1.5)
+            elif atomic_number == 14:
+                self.assertEqual(radii, 2.1)
+            elif atomic_number == 15:
+                self.assertEqual(radii, 1.85)
+            elif atomic_number == 16:
+                self.assertEqual(radii, 1.8)
+            elif atomic_number == 1:
+                if atom.residue.resname == 'ARG' and \
+                            atom.atname[:2] in ('HH', 'HE'):
+                    self.assertEqual(radii, 1.17)
+                elif atom.bond_partners[0].atomic_number == 7:
+                    self.assertEqual(radii, 1.3)
+                else:
+                    self.assertEqual(radii, 1.2)
+            else:
+                self.assertEqual(radii, 1.5)
+        # Now test bad input
+        self.assertRaises(exc.ChangeRadiiError, lambda:
+                          PT.changeRadii(parm, 'mbondi6').execute())
+
+    def testChangeLJPair(self):
+        parm = copy(gascham)
+        PT.changeLJPair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
+        # Figure out what type numbers each atom type belongs to
+        ntype = htype = 0
+        for atom in parm.atom_list:
+            if atom.attype == 'NH3':
+                ntype = atom.nb_idx
+            elif atom.attype == 'HC':
+                htype = atom.nb_idx
+        # Make sure the A and B coefficient matrices are what I expect them to
+        # be
+        indexes = sorted([ntype, htype])
+        acoef = parm.parm_data['LENNARD_JONES_ACOEF']
+        bcoef = parm.parm_data['LENNARD_JONES_BCOEF']
+        refa = gascham.parm_data['LENNARD_JONES_ACOEF']
+        refb = gascham.parm_data['LENNARD_JONES_BCOEF']
+        ntypes = parm.ptr('ntypes')
+        for i in range(ntypes):
+            for j in range(i, ntypes):
+                idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j]
+                if [i+1, j+1] == indexes:
+                    self.assertEqual(acoef[idx-1], 1.0)
+                    self.assertEqual(bcoef[idx-1], 2.0)
+                else:
+                    self.assertEqual(acoef[idx-1], refa[idx-1])
+                    self.assertEqual(bcoef[idx-1], refb[idx-1])
+
+    def testChangeLJ14Pair(self):
+        parm = copy(gascham)
+        PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
+        # Figure out what type numbers each atom type belongs to
+        ntype = htype = 0
+        for atom in parm.atom_list:
+            if atom.attype == 'NH3':
+                ntype = atom.nb_idx
+            elif atom.attype == 'HC':
+                htype = atom.nb_idx
+        # Make sure the A and B coefficient matrices are what I expect them to
+        # be
+        indexes = sorted([ntype, htype])
+        acoef = parm.parm_data['LENNARD_JONES_14_ACOEF']
+        bcoef = parm.parm_data['LENNARD_JONES_14_BCOEF']
+        refa = gascham.parm_data['LENNARD_JONES_14_ACOEF']
+        refb = gascham.parm_data['LENNARD_JONES_14_BCOEF']
+        ntypes = parm.ptr('ntypes')
+        for i in range(ntypes):
+            for j in range(i, ntypes):
+                idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j]
+                if [i+1, j+1] == indexes:
+                    self.assertEqual(acoef[idx-1], 1.0)
+                    self.assertEqual(bcoef[idx-1], 2.0)
+                else:
+                    self.assertEqual(acoef[idx-1], refa[idx-1])
+                    self.assertEqual(bcoef[idx-1], refb[idx-1])
+
+    def testChange(self):
+        parm = copy(gascham)
+        PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
+        for flag in parm.parm_data:
+            if flag != 'CHARGE':
+                self.assertEqual(parm.parm_data[flag], gascham.parm_data[flag])
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(parm.parm_data['CHARGE'][i], atom.charge)
+            if atom.residue.resname == 'ALA':
+                self.assertEqual(atom.charge, 0)
+            else:
+                self.assertEqual(atom.charge, gascham.parm_data['CHARGE'][i])
+        PT.change(parm, 'MASS', ':1', 10.0).execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(parm.parm_data['MASS'][i], atom.mass)
+            if atom.residue.idx == 1:
+                self.assertEqual(atom.mass, 10.0)
+            else:
+                self.assertEqual(atom.mass, gascham.parm_data['MASS'][i])
+            if atom.residue.resname == 'ALA':
+                self.assertEqual(atom.charge, 0.0)
+            else:
+                self.assertEqual(atom.charge, gascham.parm_data['CHARGE'][i])
+        PT.change(parm, 'ATOM_NAME', ':ALA@C', 'JMS').execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(parm.parm_data['ATOM_NAME'][i], atom.atname)
+            if atom.residue.resname == 'ALA' and \
+                        gascham.parm_data['ATOM_NAME'][i] == 'C':
+                self.assertEqual(atom.atname, 'JMS')
+            else:
+                self.assertEqual(atom.atname, gascham.parm_data['ATOM_NAME'][i])
+        PT.change(parm, 'AMBER_ATOM_TYPE', ':ALA@%NH3', 'RJLS').execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(parm.parm_data['AMBER_ATOM_TYPE'][i], atom.attype)
+            if atom.residue.resname == 'ALA' and \
+                        gascham.parm_data['AMBER_ATOM_TYPE'][i] == 'NH3':
+                self.assertEqual(atom.attype, 'RJLS')
+            else:
+                self.assertEqual(atom.attype,
+                                 gascham.parm_data['AMBER_ATOM_TYPE'][i])
+        PT.change(parm, 'ATOM_TYPE_INDEX', '@1', 4).execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(atom.nb_idx, parm.parm_data['ATOM_TYPE_INDEX'][i])
+            if i == 0:
+                self.assertEqual(atom.nb_idx, 4)
+            else:
+                self.assertEqual(atom.nb_idx,
+                                 gascham.parm_data['ATOM_TYPE_INDEX'][i])
+        PT.change(parm, 'RADII', ':1-2', 2.0, 'quiet').execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(atom.radii, parm.parm_data['RADII'][i])
+            if atom.residue.idx <= 2:
+                self.assertEqual(atom.radii, 2.0)
+            else:
+                self.assertEqual(atom.radii, gascham.parm_data['RADII'][i])
+        PT.change(parm, 'SCREEN', '*', 0.0).execute()
+        for i, atom in enumerate(parm.atom_list):
+            self.assertEqual(atom.screen, parm.parm_data['SCREEN'][i])
+            self.assertEqual(atom.screen, 0.0)
+        # Check bad input
+        self.assertRaises(exc.ParmedChangeError, lambda:
+                          PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
+
+    def testPrintInfo(self):
+        for flag in gascham.parm_data:
+            if flag == 'FORCE_FIELD_TYPE': continue
+            if flag == 'RADIUS_SET': continue
+            act = PT.printInfo(gascham, flag)
+            vals = []
+            for line in str(act).split('\n'):
+                vals += line.split()
+            self.assertEqual(len(vals), len(gascham.parm_data[flag]))
+            try:
+                datatype = type(gascham.parm_data[flag][0])
+            except IndexError:
+                continue
+            for i, j in zip(vals, gascham.parm_data[flag]):
+                # printInfo prints to 5 places for floats.
+                if datatype is float:
+                    self.assertAlmostEqual(datatype(i), j, places=4)
+                else:
+                    self.assertEqual(datatype(i), j)
+
+    def testAddChangeLJType(self):
+        parm = copy(gascham)
+        PT.addLJType(parm, '@1').execute()
+        self.assertEqual(parm.ptr('ntypes'), gascham.ptr('ntypes') + 1)
+        self.assertEqual(parm.atom_list[0].nb_idx, parm.ptr('ntypes'))
+        ntypes = parm.ptr('ntypes')
+        ntypes2 = ntypes - 1
+        orig_type = gascham.atom_list[0].nb_idx - 1
+        for i in range(ntypes):
+            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+ntypes-1]
+            if i == ntypes - 1:
+                idx2 = gascham.parm_data['NONBONDED_PARM_INDEX'][
+                                                ntypes2*orig_type+orig_type]
+            else:
+                ii, jj = sorted([orig_type, i])
+                idx2 = gascham.parm_data['NONBONDED_PARM_INDEX'][ntypes2*ii+jj]
+            self.assertRelativeEqual(
+                            parm.parm_data['LENNARD_JONES_ACOEF'][idx-1],
+                            gascham.parm_data['LENNARD_JONES_ACOEF'][idx2-1],
+                            places=7)
+            self.assertRelativeEqual(
+                            parm.parm_data['LENNARD_JONES_BCOEF'][idx-1],
+                            gascham.parm_data['LENNARD_JONES_BCOEF'][idx2-1],
+                            places=7)
+        # Ensure that the rest of the values are unchanged (exactly equal)
+        for i in range(ntypes2):
+            for j in range(ntypes2):
+                idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j]
+                idx2 = gascham.parm_data['NONBONDED_PARM_INDEX'][ntypes2*i+j]
+                self.assertEqual(
+                            parm.parm_data['LENNARD_JONES_ACOEF'][idx-1],
+                            gascham.parm_data['LENNARD_JONES_ACOEF'][idx2-1])
+                self.assertEqual(
+                            parm.parm_data['LENNARD_JONES_BCOEF'][idx-1],
+                            gascham.parm_data['LENNARD_JONES_BCOEF'][idx2-1])
+        # Now supply keywords
+        parm2 = copy(gascham)
+        PT.addLJType(parm2, '@1', radius=1.0, epsilon=1.0).execute()
+        PT.changeLJSingleType(parm, '@1', 1.0, 1.0).execute()
+        for x, y in zip(parm.parm_data['LENNARD_JONES_ACOEF'],
+                        parm2.parm_data['LENNARD_JONES_ACOEF']):
+            self.assertRelativeEqual(x, y)
+        for x, y in zip(parm.parm_data['LENNARD_JONES_BCOEF'],
+                        parm2.parm_data['LENNARD_JONES_BCOEF']):
+            self.assertRelativeEqual(x, y)
+        # Now use addLJType to hack a way to turn off LJ interactions
+        PT.addLJType(parm, '*', radius=0.0, epsilon=0.0).execute()
+        ntypes = parm.ptr('ntypes')
+        for atom in parm.atom_list:
+            self.assertEqual(atom.nb_idx, ntypes)
+        idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(ntypes-1)+ntypes-1]
+        self.assertEqual(parm.parm_data['LENNARD_JONES_ACOEF'][idx-1], 0.0)
+        self.assertEqual(parm.parm_data['LENNARD_JONES_BCOEF'][idx-1], 0.0)
+
+    def testPrintLJTypes(self):
+        # Simple test
+        act = PT.printLJTypes(gascham, '@1')
+        for line in str(act).split('\n'):
+            if not line.startswith('ATOM'):
+                continue
+            words = line.split()
+            self.assertTrue(words[2].startswith('N'))
+            self.assertTrue(words[3].startswith('N'))
+            self.assertEqual(words[7], '1')
+
+    def testSceeScnb(self):
+        parm = copy(gascham)
+        PT.scee(parm, 10).execute()
+        PT.scnb(parm, 10).execute()
+        for dih in parm.dihedrals_inc_h + parm.dihedrals_without_h:
+            self.assertEqual(dih.dihed_type.scee, 10)
+            self.assertEqual(dih.dihed_type.scnb, 10)
+        for x, y in zip(parm.parm_data['SCEE_SCALE_FACTOR'],
+                        parm.parm_data['SCNB_SCALE_FACTOR']):
+            self.assertEqual(x, 10)
+            self.assertEqual(y, 10)
+
+    def testPrintDetails(self):
+        act = PT.printDetails(gascham, '@1')
+        self.assertEqual(str(act), saved.PRINT_DETAILSC)
+
+    def testPrintFlags(self):
+        act = PT.printFlags(gascham)
+        printed_flags = set()
+        for line in str(act).split('\n'):
+            if line.startswith('%FLAG'):
+                printed_flags.add(line.split()[1])
+        self.assertEqual(printed_flags, set(gascham.parm_data.keys()))
+
+    def testPrintPointers(self):
+        act = PT.printPointers(gascham)
+        printed_pointers = set(['NEXT', 'NIMPRTYPES', 'NUBTYPES', 'CMAP',
+                                'CMAP_TYPES', 'NIMPHI', 'NUB'])
+        for line in str(act).split('\n'):
+            try:
+                pointer = line.split()[0]
+                value = int(line[line.rfind('=')+1:].strip())
+            except (IndexError, ValueError):
+                continue
+            self.assertEqual(gascham.ptr(pointer), value)
+            printed_pointers.add(pointer)
+        self.assertEqual(printed_pointers, set(gascham.pointers.keys()))
+
+    def testPrintBonds(self):
+        act = PT.printBonds(gascham, '@1')
+        self.assertEqual(str(act), saved.PRINT_BONDSC)
+
+    def testPrintAngles(self):
+        act = PT.printAngles(gascham, '@1')
+        self.assertEqual(str(act), saved.PRINT_ANGLESC)
+
+    def testPrintDihedrals(self):
+        act = PT.printDihedrals(gascham, '@1')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALSC)
+
+    def testSetMolecules(self):
+        parm = copy(solvchamber)
+        atom_list = [atom for atom in parm.atom_list] # shallow copy!
+        self.assertTrue(all([x is y for x,y in zip(parm.atom_list,atom_list)]))
+        self.assertEqual(parm.ptr('IPTRES'), 160)
+        self.assertEqual(parm.ptr('NSPM'), 17857)
+        self.assertEqual(parm.ptr('NSPSOL'), 2)
+        # To keep the output clean
+        PT.setMolecules(parm).execute()
+        self.assertTrue(all([x is y for x,y in zip(parm.atom_list, atom_list)]))
+        # Now check that setMolecules can apply another time. solute_ions seems
+        # to be broken, and I can't figure out why.
+        PT.setMolecules(parm).execute()
+
+    def testNetCharge(self):
+        act = PT.netCharge(gascham)
+        chg = act.execute() # check this part of the API
+        self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
+        self.assertAlmostEqual(chg, 0.0, places=6)
+        chg = PT.netCharge(gascham, ':1').execute()
+        self.assertAlmostEqual(chg, 1.0, places=6)
+        chg = PT.netCharge(gascham, ':3').execute()
+        self.assertAlmostEqual(chg, -1.0, places=6)
+
+    def testStrip(self):
+        parm = copy(gascham)
+        PT.strip(parm, ':1').execute()
+        self.assertEqual(parm.ptr('natom'), 21)
+        self.assertEqual(len(parm.atom_list), 21)
+        # Good enough for here. The strip action is repeatedly tested in the
+        # core Amber test suite as part of the MM/PBSA tests via ante-MMPBSA.py
+        # and that part also tests that the energies come out correct as well
+
+    def testDefineSolvent(self):
+        PT.defineSolvent(gascham, 'WAT,HOH,Na+,Cl-').execute()
+        self.assertEqual(gascham.solvent_residues, 'WAT HOH Na+ Cl-'.split())
+        PT.defineSolvent(gascham, 'WAT,HOH').execute()
+        self.assertEqual(gascham.solvent_residues, 'WAT HOH'.split())
+
+    def testAddExclusions(self):
+        parm = copy(gascham)
+        in_exclusions_before = []
+        for atom1 in parm.residue_list[0].atoms:
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+                             atom1.dihedral_partners + atom1.exclusion_partners)
+            for atom2 in parm.residue_list[0].atoms:
+                if atom1 is atom2: continue
+                in_exclusions_before.append(atom2 in all_exclusions)
+        self.assertFalse(all(in_exclusions_before))
+        PT.addExclusions(parm, ':1', ':1').execute()
+        in_exclusions_after = []
+        for atom1 in parm.residue_list[0].atoms:
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+                             atom1.dihedral_partners + atom1.exclusion_partners)
+            for atom2 in parm.residue_list[0].atoms:
+                if atom1 is atom2: continue
+                in_exclusions_after.append(atom2 in all_exclusions)
+                if not in_exclusions_after[-1]:
+                    print atom1, atom2, 'not excluded'
+        self.assertTrue(all(in_exclusions_after))
+
+    def testAddDeleteDihedral(self):
+        parm = copy(gascham)
+        n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
+                         parm.ptr('nphih') + parm.ptr('nphia') + n)
+        self.assertEqual(n, 3)
+        PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
+                       0.1556, 3, 0, 1.2, 2.0, type='multiterm').execute()
+        self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
+                         parm.ptr('nphih') + parm.ptr('nphia'))
+        PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
+                       0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
+        self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
+                         parm.ptr('nphih') + parm.ptr('nphia') - n)
+
+    def testSetBond(self):
+        parm = copy(gascham)
+        PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute()
+        act = PT.printBonds(parm, ':ALA@CA')
+        self.assertEqual(str(act), saved.SET_BONDC)
+
+    def testSetAngle(self):
+        parm = copy(gascham)
+        PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100).execute()
+        act = PT.printAngles(parm, ':ALA@CB')
+        self.assertEqual(str(act), saved.SET_ANGLEC)
+
+    def testAddAtomicNumber(self):
+        parm = copy(gascham)
+        self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
+        atomic_numbers = [atom.atomic_number for atom in parm.atom_list]
+        PT.addAtomicNumber(parm).execute()
+        self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
+
+    def testPrintLJMatrix(self):
+        act = PT.printLJMatrix(gascham, '@1')
+        self.assertEqual(str(act), saved.PRINT_LJMATRIXC)
+
+#   def testDeleteBond(self):
+#       parm = copy(gascham)
+#       # Pick the bond we plan to delete, pick out every angle and dihedral
+#       # that contains that bond, and then delete it. Then make sure none of
+#       # the valence terms that contained that bond remain afterwards. We
+#       # already have a test to make sure that the __contains__ method works
+#       # for atoms and bonds.
+#       for bond in parm.atom_list[0].bonds:
+#           if parm.atom_list[4] in bond: break
+#       deleted_angles = list()
+#       deleted_dihedrals = list()
+#       for angle in parm.angles_inc_h + parm.angles_without_h:
+#           if bond in angle: deleted_angles.append(angle)
+#       for dihedral in parm.dihedrals_inc_h + parm.dihedrals_without_h:
+#           if bond in dihedral: deleted_dihedrals.append(dihedral)
+#       PT.deleteBond(parm, '@1', '@5').execute()
+#       self.assertTrue(bond not in parm.bonds_without_h)
+#       all_angles = parm.angles_inc_h + parm.angles_without_h
+#       all_dihedrals = parm.dihedrals_inc_h + parm.dihedrals_without_h
+#       for angle in deleted_angles:
+#           self.assertTrue(angle not in all_angles)
+#       for dihedral in deleted_dihedrals:
+#           self.assertTrue(dihedral not in all_dihedrals)
+
+    def testSummary(self):
+        parm = copy(solvchamber)
+        act = PT.summary(parm)
+        self.assertEqual(str(act), saved.SUMMARYC1)
+        PT.defineSolvent(parm, 'TIP3').execute()
+        act = PT.summary(parm)
+        self.assertEqual(str(act), saved.SUMMARYC2)
+
+#   def testScale(self):
+#       parm = copy(gascham)
+#       PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 2.0).execute()
+#       self.assertEqual(
+#               [2*x for x in gascham.parm_data['DIHEDRAL_FORCE_CONSTANT']],
+#               parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])
+#       PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 0.0).execute()
+#       for val in parm.parm_data['DIHEDRAL_FORCE_CONSTANT']:
+#           self.assertEqual(val, 0)
+
+#   def testLmod(self):
+#       parm = copy(gascham)
+#       self.assertFalse(all(parm.parm_data['LENNARD_JONES_ACOEF']))
+#       PT.lmod(parm).execute()
+#       self.assertTrue(all(parm.parm_data['LENNARD_JONES_ACOEF']))
+
+#   def testProtStateInterpolate(self):
+#       self._empty_writes()
+#       parm = AmberParm(get_fn('ash.parm7'))
+#       origparm = copy(parm)
+#       origparm.prm_name = origparm.prm_name + '_copy1'
+#       PT.changeProtState(parm, ':ASH', 0).execute()
+#       self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
+#       self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
+#       for i, atom in enumerate(parm.atom_list):
+#           self.assertEqual(atom.charge, parm.parm_data['CHARGE'][i])
+#       for i, atom in enumerate(origparm.atom_list):
+#           self.assertEqual(atom.charge, origparm.parm_data['CHARGE'][i])
+#       # Now set up a ParmList so we can interpolate these topology files
+#       parms = parmlist.ParmList()
+#       parms.add_parm(parm)
+#       parms.add_parm(origparm)
+#       sys.stdout = open(os.devnull, 'w')
+#       PT.interpolate(parms, 5, 'eleconly', startnum=2,
+#                      prefix=get_fn('test.parm7', written=True)).execute()
+#       sys.stdout = sys.__stdout__
+#       self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
+#       self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
+#       self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
+#       self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
+#       self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
+#       self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+#       # Now check them all
+#       ladder = [origparm]
+#       ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
+#       ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
+#       ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
+#       ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
+#       ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+#       ladder.append(parm)
+#       natom = parm.ptr('natom')
+#       for i in range(1, 6):
+#           before = ladder[i-1].parm_data['CHARGE']
+#           after = ladder[i+1].parm_data['CHARGE']
+#           this = ladder[i].parm_data['CHARGE']
+#           for j in range(natom):
+#               if before[j] < after[j]:
+#                   self.assertTrue(before[j] <= this[j] <= after[j])
+#               else:
+#                   self.assertTrue(before[j] >= this[j] >= after[j])
+
+#   def testAddDeletePDB(self):
+#       parm = copy(gascham)
+#       PT.addPDB(parm, get_fn('trx.pdb'), 'elem', 'allicodes').execute()
+#       self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
+#       self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
+#       self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
+#       self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
+#       self.assertTrue(len(parm.parm_data['RESIDUE_ICODE']), parm.ptr('nres'))
+#       self.assertTrue(len(parm.parm_data['ATOM_ELEMENT']), parm.ptr('natom'))
+#       self.assertTrue(len(parm.parm_data['RESIDUE_NUMBER']), parm.ptr('nres'))
+#       self.assertTrue(len(parm.parm_data['RESIDUE_CHAINID']),parm.ptr('nres'))
+#       for i in range(parm.ptr('nres')):
+#           self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i + 21)
+#           self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
+#           if parm.parm_data['RESIDUE_NUMBER'][i] < 41:
+#               self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'A')
+#           else:
+#               self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'B')
+#       for i, atom in enumerate(parm.atom_list):
+#           atnum = atom.atomic_number
+#           elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
+#           self.assertEqual(periodic_table.Element[atnum], elem)
+#           self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+#       PT.deletePDB(parm).execute()
+#       self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
+#       self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
+#       self.assertFalse('RESIDUE_NUMBER' in parm.flag_list)
+#       self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
+
+#   def testHMassRepartition(self):
+#       parm = copy(solvparm)
+#       PT.HMassRepartition(parm, 2.0).execute()
+#       for atom in parm.atom_list:
+#           if atom.atomic_number == 1:
+#               if atom.residue.resname == 'WAT':
+#                   self.assertAlmostEqual(atom.mass, 1.008)
+#               else:
+#                   self.assertEqual(atom.mass, 2)
+#       self.assertEqual(parm.parm_data['MASS'],
+#                        [a.mass for a in parm.atom_list])
+#       self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
+#                              sum(parm.parm_data['MASS']))
+#       PT.HMassRepartition(parm, 3.0, 'dowater').execute()
+#       for atom in parm.atom_list:
+#           if atom.atomic_number == 1:
+#               self.assertEqual(atom.mass, 3.0)
+#       self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
+#                              sum(parm.parm_data['MASS']))
+
 #                       AmberParm    ChamberParm     AmoebaParm
-#           'parmout' : done
-#      'setoverwrite' : done
-#       'writefrcmod' : done
-#        'loadrestrt' : done
-#          'writeoff' : done
-#       'changeradii' : done
-#      'changeljpair' : done
-#    'changelj14pair' : N/A
-#     'checkvalidity' : N/A
-#            'change' : done
-#         'printinfo' : done
-#         'addljtype' : done
-#           'outparm' : done
-#      'printljtypes' : done
-#              'scee' : done
-#              'scnb' : done
-#'changeljsingletype' : done
-#      'printdetails' : done
-#        'printflags' : done
-#     'printpointers' : done
-#        'printbonds' : done
-#       'printangles' : done
-#    'printdihedrals' : done
-#      'setmolecules' : done
-#                'go' : N/A
-#              'quit' : N/A
-##   'addcoarsegrain' : N/A
-#   'changeprotstate' : 
-#         'netcharge' : done
-#             'strip' : done
-#     'definesolvent' : done
-#     'addexclusions' : done
-#       'adddihedral' : done
-#           'setbond' : done
-#          'setangle' : done
-#   'addatomicnumber' : done
-#    'deletedihedral' : done
+#           'parmout' : done                done
+#      'setoverwrite' : done                done
+#       'writefrcmod' : done                done
+#        'loadrestrt' : done                done
+#          'writeoff' : done                done
+#       'changeradii' : done                done
+#      'changeljpair' : done                done
+#    'changelj14pair' : done                done
+#     'checkvalidity' : N/A ----------------------------------------------------
+#            'change' : done                done
+#         'printinfo' : done                done
+#         'addljtype' : done                done
+#           'outparm' : done                done
+#      'printljtypes' : done                done
+#              'scee' : done                done
+#              'scnb' : done                done
+#'changeljsingletype' : done                done
+#      'printdetails' : done                done
+#        'printflags' : done                done
+#     'printpointers' : done                done
+#        'printbonds' : done                done
+#       'printangles' : done                done
+#    'printdihedrals' : done                done
+#      'setmolecules' : done                done
+#                'go' : N/A ----------------------------------------------------
+#              'quit' : N/A ----------------------------------------------------
+##   'addcoarsegrain' : N/A ----------------------------------------------------
+#   'changeprotstate' : done                N/A
+#         'netcharge' : done                done
+#             'strip' : done                done
+#     'definesolvent' : done                done
+#     'addexclusions' : done                done
+#       'adddihedral' : done                done
+#           'setbond' : done                done
+#          'setangle' : done                done
+#   'addatomicnumber' : done                done
+#    'deletedihedral' : done                done
 #        'deletebond' : done
-#     'printljmatrix' : done
-#            'source' : N/A
-#              'parm' : N/A
-#                'ls' : N/A
-#                'cd' : N/A
-#         'listparms' : done
+#     'printljmatrix' : done                done
+#            'source' : N/A ----------------------------------------------------
+#              'parm' : N/A ----------------------------------------------------
+#                'ls' : N/A ----------------------------------------------------
+#                'cd' : N/A ----------------------------------------------------
+#         'listparms' : done ---------------------------------------------------
 #           'timerge' : tested in Amber tests (amber only)
-#       'interpolate' : 
-#           'summary' : done
+#       'interpolate' : done
+#           'summary' : done                done
 #             'scale' : done
 #              'lmod' : done
-#            'addpdb' : 
-#         'deletepdb' : 
-#         'add12_6_4' : 
-#  'hmassrepartition' : 
-#            'openmm' : 
-#            'energy' : 
-#       'fixtopology' : 
-#           'chamber' : done
-#          'minimize' : 
-##             'heat' : 
-##               'md' : 
+#            'addpdb' : done
+#         'deletepdb' : done
+#         'add12_6_4' : tested in Amber tests (amber only)
+#  'hmassrepartition' : done
+#            'openmm' : N/A ----------------------------------------------------
+#            'energy' : -- done in the OpenMM tests --
+##      'fixtopology' : N/A ----------------------------------------------------
+#           'chamber' : done ---------------------------------------------------
+#          'minimize' : -- done in the OpenMM tests --
+##             'heat' : N/A ----------------------------------------------------
+##               'md' : N/A ----------------------------------------------------

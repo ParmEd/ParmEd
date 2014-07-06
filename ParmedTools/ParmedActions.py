@@ -101,7 +101,7 @@ Usages = {
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
                        '[Ewald]] [nodisper] [applayer] [platform <platform>] '
                        '[precision <precision model>] [decompose]',
-       'fixtopology' : 'fixTopology',
+#      'fixtopology' : 'fixTopology',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
                        '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]'
@@ -1063,7 +1063,7 @@ class changeprotstate(Action):
         sel = self.mask.Selection()
         if sum(sel) == 0:
             return "No residues selected for state change"
-        res = self.atom_list[self.index(1)].residue
+        res = self.parm.atom_list[sel.index(1)].residue
         return 'Changing protonation state of residue %d (%s) to %d' % (res.idx,
                             res.resname, self.state)
    
@@ -1074,33 +1074,38 @@ class changeprotstate(Action):
         there
         """
         if 'ASH' in residues.titratable_residues: return None
+        dummyrefene1 = residues._ReferenceEnergy()
+        dummyrefene1.set_pKa(1.0)
+        dummyrefene2 = residues._ReferenceEnergy()
         ash = residues.TitratableResidue('ASH',
                     ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                      'OD1', 'OD2', 'HD21', 'C', 'O'], pka=4.0)
-        ash.add_state(protcnt=0, refene=None,
+        ash.add_state(protcnt=0, refene=dummyrefene1,
                       charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.1783,
                                -0.0122, -0.0122, 0.7994, -0.8014, -0.8014, 0.0,
                                0.5973, -0.5679]
         )
-        ash.add_state(protcnt=1, refene=None,
+        ash.add_state(protcnt=1, refene=dummyrefene2,
                       charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488,
                                0.0488, 0.6462, -0.5554, -0.6376, 0.4747, 0.5973,
                                -0.5679]
         )
+        ash.check()
 
         glh = residues.TitratableResidue('GLH',
                     ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG', 'HG2',
                      'HG3', 'CD', 'OE1', 'OE2', 'HE21', 'C', 'O'], pka=4.4)
-        glh.add_state(protcnt=0, refene=None,
+        glh.add_state(protcnt=0, refene=dummyrefene1,
                       charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0398,
                                -0.0173, -0.0173, 0.0136, -0.0425, -0.0425,
                                0.8054, -0.8188, -0.8188, 0.0, 0.5973, -0.5679]
         )
-        glh.add_state(protcnt=1, refene=None,
+        glh.add_state(protcnt=1, refene=dummyrefene2,
                       charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256,
                                0.0256, -0.0174, 0.0430, 0.0430, 0.6801, -0.5838,
                                -0.6511, 0.4641, 0.5973, -0.5679]
         )
+        glh.check()
         residues.ASH, residues.GLH = ash, glh
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
@@ -1138,8 +1143,9 @@ class changeprotstate(Action):
                                        'residue to change the protonation '
                                        'state of')
             # Actually make the change
-            self.parm.parm_data['CHARGE'][i] = \
-                        res.states[self.state].charges[chgnum]
+            charge = res.states[self.state].charges[chgnum]
+            self.parm.parm_data['CHARGE'][i] = charge
+            self.parm.atom_list[i].charge = charge
             chgnum += 1
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2431,7 +2437,10 @@ class interpolate(Action):
     If [eleconly] is present, only the charges will be interpolated. <nparm> is
     the number of 'interpolated' topology files you want (in addition to the two
     end-points). The second prmtop must be specified if there are more than 2 in
-    the list.
+    the list. startnum has no effect on the generated prmtops, but it can be
+    used to control the names of the outputted topology files. The file names
+    will be <prefix>.# where # starts at <startnum> and increments by 1 for each
+    prmtop printed.
     """
     supported_classes = ('AmberParm', 'ChamberParm')
     def init(self, arg_list):
@@ -2441,7 +2450,7 @@ class interpolate(Action):
         parm2 = arg_list.get_key_string('parm2', None)
         if parm2 is None and len(self.parm_list) == 2:
             self.parm2 = self.parm_list[1]
-            if self.parm_list[0] != self.parm:
+            if self.parm_list[0] is not self.parm:
                 self.parm2 = self.parm_list[0]
         elif parm2 is None:
             raise AmbiguousParmError('You must identify parm2 if more than 2 '
@@ -2526,11 +2535,10 @@ class summary(Action):
              'ILE', 'LEU', 'LYN', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR',
              'TRP', 'TYR', 'VAL']
 
-    anions = ['Cl-', 'Br-', 'F-', 'I-']
+    anions = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']
 
-    cations = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+']
-
-    solvent = ['WAT', 'HOH']
+    cations = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
+               'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
 
     def init(self, arg_list):
         pass
@@ -2543,7 +2551,7 @@ class summary(Action):
                 nnuc += 1
             elif res in summary.amino:
                 namin += 1
-            elif res in summary.solvent:
+            elif res in self.parm.solvent_residues:
                 nwat += 1
             elif res in summary.anions:
                 naion += 1
@@ -2900,6 +2908,7 @@ class hmassrepartition(Action):
                 raise HMassRepartitionError('Too much mass removed from atom '
                                             '%d. Hydrogen masses must be '
                                             'smaller.' % i)
+        self.parm.atom_list.refresh_data()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3164,96 +3173,96 @@ class deletebond(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class fixtopology(Action):
-    """
-    This action will look through the lists of bonds, angles, and dihedrals both
-    with and without hydrogen and make sure that all of the parameters are
-    assigned to the correct lists. LEaP is known in certain cases to misassign
-    angles and torsions if dummy atoms are involved. This action will correct
-    the parameter assignments if any mistake was made
-    """
-    supported_classes = ('ChamberParm', 'AmberParm')
-
-    def init(self, arg_list):
-        # First check to see if there is any problem
-        self.needs_fixing = False
-        # Bond Fix, Angle Fix, Dihedral Fix -- variables to determine which
-        # specific lists need fixing
-        self.bf = self.af = self.df = False
-        for bnd in self.parm.bonds_inc_h:
-            if bnd.atom1.element != 1 and bnd.atom2.element != 1:
-                self.needs_fixing = self.bf = True
-                break
-        for bnd in self.parm.bonds_without_h:
-            if bnd.atom1.element == 1 or bnd.atom2.element == 1:
-                self.needs_fixing = self.bf = True
-                break
-        for ang in self.parm.angles_inc_h:
-            if (ang.atom1.element != 1 and ang.atom2.element != 1 and
-                ang.atom3.element != 1):
-                self.needs_fixing = self.af = True
-                break
-        for ang in self.parm.angles_without_h:
-            if (ang.atom1.element == 1 or ang.atom2.element == 1 or
-                ang.atom3.element == 1):
-                self.needs_fixing = self.af = True
-                break
-        for dih in self.parm.dihedrals_inc_h:
-            if (dih.atom1.element != 1 and dih.atom2.element != 1 and
-                dih.atom3.element != 1 and dih.atom4.element != 1):
-                self.needs_fixing = self.df = True
-                break
-        for dih in self.parm.dihedrals_without_h:
-            if (dih.atom1.element == 1 or dih.atom2.element == 1 or
-                dih.atom3.element == 1 or dih.atom4.element == 1):
-                self.needs_fixing = self.df = True
-                break
-
-    def __str__(self):
-        if self.needs_fixing:
-            return 'Fixing bond/angle/dihedral list assignments'
-        return 'No bond/angle/dihedral list problems detected. Doing nothing.'
-
-    def execute(self):
-        if not self.needs_fixing: return
-        # This is the tracked list type we're using
-        listtype = type(self.parm.bonds_inc_h)
-        if self.bf:
-            # Need to fix bonds
-            bonds_inc_h = listtype()
-            bonds_without_h = listtype()
-            for bnd in self.parm.bonds_inc_h + self.parm.bonds_without_h:
-                if bnd.atom1.element == 1 or bnd.atom2.element == 1:
-                    bonds_inc_h.append(bnd)
-                else:
-                    bonds_without_h.append(bnd)
-            self.parm.bonds_inc_h = bonds_inc_h
-            self.parm.bonds_without_h = bonds_without_h
-        if self.af:
-            # Need to fix angles
-            angles_inc_h = listtype()
-            angles_without_h = listtype()
-            for ang in self.parm.angles_inc_h + self.parm.angles_without_h:
-                if (ang.atom1.element == 1 or ang.atom2.element == 1 or
-                    ang.atom3.element == 1):
-                    angles_inc_h.append(ang)
-                else:
-                    angles_without_h.append(ang)
-            self.parm.angles_inc_h = angles_inc_h
-            self.parm.angles_without_h = angles_without_h
-        if self.df:
-            # Need to fix dihedrals
-            dihedrals_inc_h = listtype()
-            dihedrals_without_h = listtype()
-            for dih in self.parm.dihedrals_inc_h+self.parm.dihedrals_without_h:
-                if (dih.atom1.element == 1 or dih.atom2.element == 1 or
-                    dih.atom3.element == 1 or dih.atom4.element == 1):
-                    dihedrals_inc_h.append(dih)
-                else:
-                    dihedrals_without_h.append(dih)
-            self.parm.dihedrals_inc_h = dihedrals_inc_h
-            self.parm.dihedrals_without_h = dihedrals_without_h
-        self.parm.remake_parm()
+#class fixtopology(Action):
+#    """
+#    This action will look through the lists of bonds, angles, and dihedrals both
+#    with and without hydrogen and make sure that all of the parameters are
+#    assigned to the correct lists. LEaP is known in certain cases to misassign
+#    angles and torsions if dummy atoms are involved. This action will correct
+#    the parameter assignments if any mistake was made
+#    """
+#    supported_classes = ('ChamberParm', 'AmberParm')
+#
+#    def init(self, arg_list):
+#        # First check to see if there is any problem
+#        self.needs_fixing = False
+#        # Bond Fix, Angle Fix, Dihedral Fix -- variables to determine which
+#        # specific lists need fixing
+#        self.bf = self.af = self.df = False
+#        for bnd in self.parm.bonds_inc_h:
+#            if bnd.atom1.element != 1 and bnd.atom2.element != 1:
+#                self.needs_fixing = self.bf = True
+#                break
+#        for bnd in self.parm.bonds_without_h:
+#            if bnd.atom1.element == 1 or bnd.atom2.element == 1:
+#                self.needs_fixing = self.bf = True
+#                break
+#        for ang in self.parm.angles_inc_h:
+#            if (ang.atom1.element != 1 and ang.atom2.element != 1 and
+#                ang.atom3.element != 1):
+#                self.needs_fixing = self.af = True
+#                break
+#        for ang in self.parm.angles_without_h:
+#            if (ang.atom1.element == 1 or ang.atom2.element == 1 or
+#                ang.atom3.element == 1):
+#                self.needs_fixing = self.af = True
+#                break
+#        for dih in self.parm.dihedrals_inc_h:
+#            if (dih.atom1.element != 1 and dih.atom2.element != 1 and
+#                dih.atom3.element != 1 and dih.atom4.element != 1):
+#                self.needs_fixing = self.df = True
+#                break
+#        for dih in self.parm.dihedrals_without_h:
+#            if (dih.atom1.element == 1 or dih.atom2.element == 1 or
+#                dih.atom3.element == 1 or dih.atom4.element == 1):
+#                self.needs_fixing = self.df = True
+#                break
+#
+#    def __str__(self):
+#        if self.needs_fixing:
+#            return 'Fixing bond/angle/dihedral list assignments'
+#        return 'No bond/angle/dihedral list problems detected. Doing nothing.'
+#
+#    def execute(self):
+#        if not self.needs_fixing: return
+#        # This is the tracked list type we're using
+#        listtype = type(self.parm.bonds_inc_h)
+#        if self.bf:
+#            # Need to fix bonds
+#            bonds_inc_h = listtype()
+#            bonds_without_h = listtype()
+#            for bnd in self.parm.bonds_inc_h + self.parm.bonds_without_h:
+#                if bnd.atom1.element == 1 or bnd.atom2.element == 1:
+#                    bonds_inc_h.append(bnd)
+#                else:
+#                    bonds_without_h.append(bnd)
+#            self.parm.bonds_inc_h = bonds_inc_h
+#            self.parm.bonds_without_h = bonds_without_h
+#        if self.af:
+#            # Need to fix angles
+#            angles_inc_h = listtype()
+#            angles_without_h = listtype()
+#            for ang in self.parm.angles_inc_h + self.parm.angles_without_h:
+#                if (ang.atom1.element == 1 or ang.atom2.element == 1 or
+#                    ang.atom3.element == 1):
+#                    angles_inc_h.append(ang)
+#                else:
+#                    angles_without_h.append(ang)
+#            self.parm.angles_inc_h = angles_inc_h
+#            self.parm.angles_without_h = angles_without_h
+#        if self.df:
+#            # Need to fix dihedrals
+#            dihedrals_inc_h = listtype()
+#            dihedrals_without_h = listtype()
+#            for dih in self.parm.dihedrals_inc_h+self.parm.dihedrals_without_h:
+#                if (dih.atom1.element == 1 or dih.atom2.element == 1 or
+#                    dih.atom3.element == 1 or dih.atom4.element == 1):
+#                    dihedrals_inc_h.append(dih)
+#                else:
+#                    dihedrals_without_h.append(dih)
+#            self.parm.dihedrals_inc_h = dihedrals_inc_h
+#            self.parm.dihedrals_without_h = dihedrals_without_h
+#        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
