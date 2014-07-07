@@ -243,7 +243,7 @@ Total charge (e-):     -0.0000
 Total mass (amu):      13618.1680
 Number of atoms:       2174
 Number of residues:    725
-System volume (ang^3): 26461.483474
+System volume (ang^3): 26461.48
 System density (g/mL): 0.854596
 """
 
@@ -366,7 +366,7 @@ Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
-System volume (ang^3): 615109.338811
+System volume (ang^3): 615109.34
 System density (g/mL): 0.916989
 """
 
@@ -381,7 +381,7 @@ Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
-System volume (ang^3): 615109.338811
+System volume (ang^3): 615109.34
 System density (g/mL): 0.916989
 """
 
@@ -447,7 +447,7 @@ Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
 Number of residues:    820
-System volume (ang^3): 1.000000
+System volume (ang^3): 1.00
 System density (g/mL): 24591.940605
 """
 
@@ -462,6 +462,6 @@ Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
 Number of residues:    820
-System volume (ang^3): 27031.520402
+System volume (ang^3): 27031.52
 System density (g/mL): 0.909751
 """

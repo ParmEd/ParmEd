@@ -92,7 +92,8 @@ def has_numpy():
     except ImportError:
         return False
 
-def diff_files(file1, file2, ignore_whitespace=True):
+def diff_files(file1, file2, ignore_whitespace=True,
+               absolute_error=None, relative_error=None):
     """
     Compares 2 files line-by-line
 
@@ -104,6 +105,12 @@ def diff_files(file1, file2, ignore_whitespace=True):
         Name of the second file to compare or second file object to compare
     ignore_whitespace : bool=True
         If true, ignores differences in leading and trailing whitespace
+    absolute_error : float=None
+        If set, only differences greater than the absolute error will trigger
+        failures. Cannot be used with relative_error
+    relative_error : float=None
+        If set, only relative differences greater than the relative error will
+        trigger failures. Cannot be used with absolute_error
 
     Returns
     -------
@@ -115,6 +122,10 @@ def diff_files(file1, file2, ignore_whitespace=True):
     This routine is not protected against bad types of input. AttributeError may
     be raised if readline() is not implemented on any file-like object passed in
     """
+    if absolute_error is not None and relative_error is not None:
+        raise ValueError('Cannot specify absolute_error AND relative_error')
+    if absolute_error is not None: absolute_error = float(absolute_error)
+    if relative_error is not None: relative_error = float(relative_error)
     if isinstance(file1, str):
         try:
             f1 = open(file1, 'r')
@@ -145,7 +156,7 @@ def diff_files(file1, file2, ignore_whitespace=True):
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1, l2):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -158,7 +169,7 @@ def diff_files(file1, file2, ignore_whitespace=True):
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1, l2):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -178,7 +189,7 @@ def record_diffs(i, f1, f2, l1, l2):
     f.write('< %s> %s' % (l1, l2))
     f.close()
 
-def detailed_diff(l1, l2):
+def detailed_diff(l1, l2, absolute_error, relative_error):
     """
     Check individual fields to make sure numbers are numerically equal if the
     lines differ. Also ignore fields that appear to be a file name, since those
@@ -192,7 +203,14 @@ def detailed_diff(l1, l2):
         try:
             wx = float(wx)
             wy = float(wy)
-            if wx != wy: return False
+            if wx != wy:
+                if absolute_error is not None and abs(wx-wy) > absolute_error:
+                    return False
+                elif relative_error is not None:
+                    if wx == 0 or wy == 0 and abs(wx-wy) > relative_error:
+                        return False
+                    if abs((wx / wy) - 1) > relative_error:
+                        return False
         except ValueError:
             if wx != wy and not (wx.startswith(fdir) or wy.startswith(fdir)):
                 return False

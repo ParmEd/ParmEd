@@ -2625,7 +2625,7 @@ class summary(Action):
                 a, b, c = self.parm.parm_data['BOX_DIMENSIONS'][1:]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
-            retval += ('System volume (ang^3): %f\n' 
+            retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
                        (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
             )
@@ -2642,7 +2642,7 @@ class summary(Action):
             cosg = math.cos(gamma * math.pi / 180)
             v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg +
                                       2 * cosa*cosb*cosg)
-            retval += ('System volume (ang^3): %f\n' 
+            retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
                        (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
             )

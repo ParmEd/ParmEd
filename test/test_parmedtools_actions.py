@@ -162,7 +162,8 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertTrue(utils.diff_files(get_fn('trx.prmtop'),
                                          get_fn('test.parm7', written=True)))
         self.assertTrue(utils.diff_files(get_fn('trx.inpcrd'),
-                                         get_fn('test.rst7', written=True)))
+                                         get_fn('test.rst7', written=True),
+                                         absolute_error=0.0001))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
@@ -188,7 +189,8 @@ class TestAmberParmActions(unittest.TestCase):
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
         PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
         self.assertTrue(utils.diff_files(get_saved_fn('test.off'),
-                                         get_fn('test.off', written=True)))
+                                         get_fn('test.off', written=True),
+                                         absolute_error=0.0001))
 
     def testChangeRadii(self):
         parm = copy(gasparm)
