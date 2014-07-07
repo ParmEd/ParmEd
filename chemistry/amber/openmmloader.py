@@ -637,16 +637,18 @@ class OpenMMAmberParm(AmberParm):
 
         # See if we repartition the hydrogen masses
         if hydrogenMass is not None:
+            if not u.is_quantity(hydrogenMass):
+                hydrogenMass *= u.daltons
             for bond in self.bonds_inc_h:
                 atom1, atom2 = bond.atom1, bond.atom2
                 if atom1.element == 1:
                     atom1, atom2 = atom2, atom1 # now atom2 is hydrogen for sure
                 if atom1.element != 1:
-                    transfer_mass = hydrogenMass - atom2.mass
-                    new_mass1 = (system.getParticleMass(atom1.index) -
+                    transfer_mass = hydrogenMass - atom2.mass * u.daltons
+                    new_mass1 = (system.getParticleMass(atom1.starting_index) -
                                  transfer_mass)
-                    system.setParticleMass(atom2.index, hydrogenMass)
-                    system.setParticleMass(atom1.index, new_mass1)
+                    system.setParticleMass(atom2.starting_index, hydrogenMass)
+                    system.setParticleMass(atom1.starting_index, new_mass1)
         # See if we want to remove COM motion
         if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
@@ -812,6 +814,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
 
     def createSystem(self, nonbondedMethod=ff.NoCutoff,
                      nonbondedCutoff=1.0*u.nanometer,
+                     switchDistance=0.0*u.nanometer,
                      constraints=None,
                      rigidWater=True,
                      implicitSolvent=None,
@@ -835,6 +838,11 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                CutoffPeriodic, Ewald, or PME.
          -  nonbondedCutoff (distance=1*nanometer) The cutoff distance to use
                for nonbonded interactions.
+         -  switchDistance (distance=0*nanometer) The distance at which the
+               switching function is active for van der Waals interactions. If
+               the switchDistance evaluates to boolean False (e.g., if it is 0),
+               no switching function will be used. Illegal values raise a
+               ValueError
          -  constraints (object=None) Specifies which bonds or angles should be
                implemented with constraints. Allowed values are None, HBonds,
                AllBonds, or HAngles.
@@ -940,6 +948,19 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                                  cmap.atom5.starting_index  # end of 2nd torsion
                 )
             system.addForce(force)
+
+        # Now see if we need to toggle the switching function
+        if switchDistance and nonbondedMethod is not ff.NoCutoff:
+            for force in system.getForces():
+                if isinstance(force, mm.NonbondedForce): break
+            if switchDistance >= nonbondedCutoff:
+                raise ValueError('switchDistance must be smaller than the '
+                                 'cutoff!')
+            if abs(switchDistance) != switchDistance:
+                # Identifies negative floats and Quantity's
+                raise ValueError('switchDistance must be non-negative!')
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(switchDistance)
 
         return system
 
