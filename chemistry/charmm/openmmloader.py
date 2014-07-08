@@ -77,6 +77,8 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add the periodic box if there is one
         if hasattr(self, 'box') and self.box is not None:
             topology.setUnitCellDimensions(self.box[:3] * u.angstroms)
+        else:
+            self.box_vectors = self.box = None
 
         return topology
 

@@ -923,8 +923,6 @@ def energy(parm, args, output=sys.stdout):
             gbmeth = GBn
         elif igb == 8:
             gbmeth = GBn2
-        # Other choices are vacuum
-        kappa = 0.73 * sqrt(saltcon * 0.10806)
     elif parm.ptr('ifbox') == 1:
         if cutoff is None: cutoff = 8.0
         if do_ewald:
@@ -956,7 +954,7 @@ def energy(parm, args, output=sys.stdout):
                                 nonbondedCutoff=cutoff*u.angstrom,
                                 constraints=None, rigidWater=True,
                                 removeCMMotion=False, implicitSolvent=gbmeth,
-                                implicitSolventKappa=kappa*(1.0/u.angstrom),
+                                implicitSolventSaltConc=saltcon*u.molar,
                                 soluteDielectric=1.0, solventDielectric=78.5,
                                 ewaldErrorTolerance=5e-5,
     )
