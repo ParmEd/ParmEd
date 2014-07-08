@@ -305,9 +305,9 @@ class TestAmberParm(unittest.TestCase):
 #1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     11213.7649
 #EELEC  =   -113177.5977  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.2347E-02
-        self.assertRelativeEqual(energies['bond'], 495.0414)
-        self.assertRelativeEqual(energies['angle'], 1268.9447)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201)
+        self.assertRelativeEqual(energies['bond'], 495.0414, 4)
+        self.assertRelativeEqual(energies['angle'], 1268.9447, 5)
+        self.assertRelativeEqual(energies['dihedral'], 1764.7201, 5)
         self.assertRelativeEqual(energies['nonbond'], -95078.7346, 4)
 
     def testPME(self):
@@ -325,9 +325,9 @@ class TestAmberParm(unittest.TestCase):
 #1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     11213.7649
 #EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414)
-        self.assertRelativeEqual(energies['angle'], 1268.9447)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201)
+        self.assertRelativeEqual(energies['bond'], 495.0414, places=5)
+        self.assertRelativeEqual(energies['angle'], 1268.9447, places=5)
+        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=5)
         self.assertRelativeEqual(energies['nonbond'], -95073.5331, places=4)
 
     def testDispersionCorrection(self):
@@ -348,9 +348,9 @@ class TestAmberParm(unittest.TestCase):
 #1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     12135.2596
 #EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414)
-        self.assertRelativeEqual(energies['angle'], 1268.9447)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201)
+        self.assertRelativeEqual(energies['bond'], 495.0414, places=5)
+        self.assertRelativeEqual(energies['angle'], 1268.9447, places=5)
+        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=5)
         self.assertRelativeEqual(energies['nonbond'], -94152.0384, places=4)
 
     def testSHAKE(self):
@@ -368,7 +368,7 @@ class TestAmberParm(unittest.TestCase):
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-        self.assertRelativeEqual(bond, 494.5578)
+        self.assertRelativeEqual(bond, 494.5578, places=5)
         
     def testInterfacePBC(self):
         parm = amber_solv_system
@@ -732,12 +732,12 @@ class TestChamberParm(unittest.TestCase):
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =         0.0000  RESTRAINT  =         0.0000
         # Compare OpenMM energies with the Amber energies (above)
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
     def testGB1Energy(self): # HCT (igb=1)
@@ -753,12 +753,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -113.2014  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -103.9804, places=4)
         system = parm.createSystem(implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
@@ -772,12 +772,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -113.5439  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -104.3229, places=4)
 
     def testGB2Energy(self): # OBC1 (igb=2)
@@ -793,12 +793,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -117.0885  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -107.8675, places=4)
         system = parm.createSystem(implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
@@ -812,12 +812,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -117.4339  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -108.2129, places=4)
 
     def testGB5Energy(self): # OBC2 (igb=5)
@@ -833,12 +833,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -112.8396  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -103.6186, places=4)
         system = parm.createSystem(implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
@@ -852,12 +852,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -113.1813  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -103.9603, places=4)
 
     def testGB7Energy(self): # GBn (igb=7)
@@ -875,12 +875,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -114.1816  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -104.9606, places=4)
         system = parm.createSystem(implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
@@ -894,12 +894,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -114.5251  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -105.3041, places=4)
 
     def testGB8Energy(self): # GBn2 (igb=8)
@@ -917,12 +917,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -117.3606  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -108.1396, places=4)
         system = parm.createSystem(implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
@@ -936,12 +936,12 @@ class TestChamberParm(unittest.TestCase):
 #UB     =         0.3669  IMP     =         0.3344  CMAP       =        -0.5239
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =      -117.7068  RESTRAINT  =         0.0000
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], -108.4858, places=4)
 
     def testRst7(self):
@@ -959,12 +959,12 @@ class TestChamberParm(unittest.TestCase):
 #1-4 NB =         2.1041  1-4 EEL =       278.1614  VDWAALS    =        -1.3323
 #EELEC  =      -269.7122  EGB     =         0.0000  RESTRAINT  =         0.0000
         # Compare OpenMM energies with the Amber energies (above)
-        self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
-        self.assertAlmostEqual(energies['angle'], 14.1158, places=4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 14.2773, places=4)
-        self.assertAlmostEqual(energies['improper'], 0.3344, places=4)
-        self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
+        self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
+        self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
+        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
+        self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
+        self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
 # Ewald is WAYYY to slow for a ~60K atom system. So just do PME and assume the
@@ -987,11 +987,11 @@ class TestChamberParm(unittest.TestCase):
 #1-4 NB =       345.6860  1-4 EEL =      6475.4350  VDWAALS    =     28377.6578
 #EELEC  =   -277462.7684  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.3355E-03
-        self.assertAlmostEqual(energies['bond'], 8582.2932, places=4)
-        self.assertAlmostEqual(energies['angle'], 5019.3573, places=4)
-        self.assertAlmostEqual(energies['urey'], 29.6502, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 740.9529, places=4)
-        self.assertAlmostEqual(energies['improper'], 14.2581, places=4)
+        self.assertAlmostEqual(energies['bond'], 8582.2932, delta=5e-3)
+        self.assertAlmostEqual(energies['angle'], 5019.3573, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 29.6502, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
@@ -1014,11 +1014,11 @@ class TestChamberParm(unittest.TestCase):
 #1-4 NB =       345.6860  1-4 EEL =      6475.4350  VDWAALS    =     29959.9772
 #EELEC  =   -277462.7684  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.3355E-03
-        self.assertAlmostEqual(energies['bond'], 8582.2932, places=4)
-        self.assertAlmostEqual(energies['angle'], 5019.3573, places=4)
-        self.assertAlmostEqual(energies['urey'], 29.6502, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 740.9529, places=4)
-        self.assertAlmostEqual(energies['improper'], 14.2581, places=4)
+        self.assertAlmostEqual(energies['bond'], 8582.2932, delta=5e-3)
+        self.assertAlmostEqual(energies['angle'], 5019.3573, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 29.6502, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
@@ -1037,7 +1037,7 @@ class TestChamberParm(unittest.TestCase):
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-        self.assertAlmostEqual(bond, 139.2453, places=4)
+        self.assertAlmostEqual(bond, 139.2453, delta=5e-4)
         
     def testInterfacePBC(self):
         parm = chamber_solv_system
