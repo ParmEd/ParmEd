@@ -57,6 +57,14 @@ if has_openmm:
     param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
                                  get_fn('par_all22_prot.inp'))
 
+    # Make sure all precisions are double
+    for i in range(mm.Platform.getNumPlatforms()):
+        plat = mm.Platform.getPlatform(i)
+        if plat.getName() == 'CUDA':
+            plat.setPropertyDefaultValue('CudaPrecision', 'double')
+        if plat.getName() == 'OpenCL':
+            plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
+
 class TestCharmmFiles(unittest.TestCase):
 
     def setUp(self):

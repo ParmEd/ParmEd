@@ -30,6 +30,15 @@ if has_openmm:
     chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                                       get_fn('dhfr_cmap_pbc.rst7'))
 
+    # Make sure all precisions are double
+    for i in range(mm.Platform.getNumPlatforms()):
+        plat = mm.Platform.getPlatform(i)
+        if plat.getName() == 'CUDA':
+            plat.setPropertyDefaultValue('CudaPrecision', 'double')
+        if plat.getName() == 'OpenCL':
+            plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
+
+
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
 #   0 - NoCutoff
