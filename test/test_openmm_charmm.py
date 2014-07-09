@@ -46,15 +46,16 @@ import utils
     
 get_fn = utils.get_fn
 
-# System
-charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-charmm_gas_crds = PDBFile(get_fn('ala_ala_ala.pdb'))
-charmm_solv = CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
-charmm_solv_crds = CharmmCrdFile(get_fn('dhfr_min_charmm.crd'))
+if has_openmm:
+    # System
+    charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+    charmm_gas_crds = PDBFile(get_fn('ala_ala_ala.pdb'))
+    charmm_solv = CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
+    charmm_solv_crds = CharmmCrdFile(get_fn('dhfr_min_charmm.crd'))
 
-# Parameter sets
-param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                             get_fn('par_all22_prot.inp'))
+    # Parameter sets
+    param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                 get_fn('par_all22_prot.inp'))
 
 class TestCharmmFiles(unittest.TestCase):
 
@@ -301,3 +302,6 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
                          groups=2**parm.CMAP_FORCE_GROUP)
     energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
+
+if not has_openmm:
+    del TestCharmmFiles

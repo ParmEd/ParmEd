@@ -22,12 +22,13 @@ import utils
     
 get_fn = utils.get_fn
 
-amber_simple_gas_system = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
-amber_solv_system = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
-chamber_gas_system = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                                 get_fn('ala_ala_ala.rst7'))
-chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                                  get_fn('dhfr_cmap_pbc.rst7'))
+if has_openmm:
+    amber_simple_gas_system = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+    amber_solv_system = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+    chamber_gas_system = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                                     get_fn('ala_ala_ala.rst7'))
+    chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                                      get_fn('dhfr_cmap_pbc.rst7'))
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
