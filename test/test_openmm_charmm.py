@@ -250,13 +250,13 @@ class TestCharmmFiles(unittest.TestCase):
         sim = app.Simulation(parm.topology, system, integrator)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
-        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=6)
-        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=6)
-        self.assertRelativeEqual(energies['urey'], 29.6489539, places=6)
-        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=6)
-        self.assertRelativeEqual(energies['improper'], 14.2418054, places=6)
-        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=6)
-        self.assertRelativeEqual(energies['nonbond'], -242262.368372, places=6)
+        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
+        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=5)
+        self.assertRelativeEqual(energies['urey'], 29.6489539, places=5)
+        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=5)
+        self.assertRelativeEqual(energies['improper'], 14.2418054, places=5)
+        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
+        self.assertRelativeEqual(energies['nonbond'], -242262.368372, places=5)
 
     def testDispersionCorrection(self):
         parm = charmm_solv
@@ -269,13 +269,13 @@ class TestCharmmFiles(unittest.TestCase):
         sim = app.Simulation(parm.topology, system, integrator)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
-        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=6)
-        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=6)
-        self.assertRelativeEqual(energies['urey'], 29.6489539, places=6)
-        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=6)
-        self.assertRelativeEqual(energies['improper'], 14.2418054, places=6)
-        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=6)
-        self.assertRelativeEqual(energies['nonbond'], -240681.958902, places=6)
+        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
+        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=5)
+        self.assertRelativeEqual(energies['urey'], 29.6489539, places=5)
+        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=5)
+        self.assertRelativeEqual(energies['improper'], 14.2418054, places=5)
+        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
+        self.assertRelativeEqual(energies['nonbond'], -240681.958902, places=5)
 
 def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     """ Gets a decomposed energy for a given system """
