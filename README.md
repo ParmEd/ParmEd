@@ -29,11 +29,11 @@ Description
 This package is designed to make it safe and easy(er) to rapidly prototype
 changes to the underlying Hamiltonian in Amber as defined in the
 parameter-topology file. A full description of its capabilities is described in
-the accompanying manual (which is extracted from the full Amber manual that
-is/will be released with Amber 14). The program is comprised of a command
-interpreter (with full readline support), a GUI- frontend based on Tkinter with
-clickable buttons for each action, and a flexible Python API whose use follows
-naturally from the simple command interpreter syntax.
+in the Amber 14 manual (available at http://ambermd.org/doc12/Amber14.pdf).
+The program is comprised of a command interpreter (with readline support), a
+GUI-frontend based on Tkinter with clickable buttons for each action, and a
+flexible Python API whose use follows naturally from the simple command
+interpreter syntax.
 
 The underlying AmberParm class that ParmEd was built around was augmented with
 OpenMM support so that it is able to directly create an OpenMM System instance
@@ -72,8 +72,8 @@ chemistry.amber.openmmreporters module, including:
 
 The principle difference between the NetCDF support included here and that
 included in MDTraj is that the NetCDF parsing here is backend agnostic,
-supporting the implementations in the netCDF4, scipy, and ScientificPython
-packages (the second one is written in pure Python and does not require linking
+supporting the implementations in the scipy, netCDF4, and ScientificPython
+packages (the first one is written in pure Python and does not require linking
 to the NetCDF libraries). A default implementation is chosen if no explicit
 choice is made in the order listed above.
 
