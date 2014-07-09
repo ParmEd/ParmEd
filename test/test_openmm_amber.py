@@ -326,9 +326,9 @@ class TestAmberParm(unittest.TestCase):
 #1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     11213.7649
 #EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414, places=5)
-        self.assertRelativeEqual(energies['angle'], 1268.9447, places=5)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=5)
+        self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
+        self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
+        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
         self.assertRelativeEqual(energies['nonbond'], -95073.5331, places=4)
 
     def testDispersionCorrection(self):
@@ -349,9 +349,9 @@ class TestAmberParm(unittest.TestCase):
 #1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     12135.2596
 #EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414, places=5)
-        self.assertRelativeEqual(energies['angle'], 1268.9447, places=5)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=5)
+        self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
+        self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
+        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
         self.assertRelativeEqual(energies['nonbond'], -94152.0384, places=4)
 
     def testSHAKE(self):
@@ -369,7 +369,7 @@ class TestAmberParm(unittest.TestCase):
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-        self.assertRelativeEqual(bond, 494.5578, places=5)
+        self.assertRelativeEqual(bond, 494.5578, places=4)
         
     def testInterfacePBC(self):
         parm = amber_solv_system
