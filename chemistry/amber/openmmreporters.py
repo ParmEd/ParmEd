@@ -39,6 +39,46 @@ class AmberStateDataReporter(object):
 
     Most of this code is copied from the OpenMM StateDataReporter class, with
     the above-mentioned changes made.
+    
+    Parameters
+    ----------
+    f : str or file-like
+        Destination to write the state data (file name or file object)
+    reportInterval : int
+        Number of steps between state data reports
+    step : bool=True
+        Print out the step number
+    time : bool=True
+        Print out the simulation time
+    potentialEnergy : bool=True
+        Print out the potential energy of the structure
+    kineticEnergy : bool=True
+        Print out the kinetic energy of the structure
+    totalEnergy : bool=True
+        Print out the total energy of the system
+    temperature : bool=True
+        Print out the temperature of the system
+    volume : bool=False
+        Print out the volume of the unit cell. If the system is not periodic,
+        the value is meaningless
+    density : bool=False
+        Print out the density of the unit cell. If the system is not periodic,
+        the value is meaningless
+    separator : str=','
+        The string to separate data fields
+    systemMass : float=None
+        If not None, the density will be computed from this mass, since setting
+        a mass to 0 is used to constrain the position of that particle
+    energyUnit : unit=kilocalories_per_mole
+        The unit to print energies in
+    temperatureUnit : unit=kelvin
+        The unit to print temperature in
+    volumeUnit : unit=angstrom**3
+        The unit to print volumes in
+    densityUnit : unit=grams/item/milliliter
+        The unit to print densities in
+    timeUnit : unit=picosecond
+        The unit to print times in
     """
 
     @needs_openmm
@@ -50,29 +90,7 @@ class AmberStateDataReporter(object):
                  volumeUnit=u.angstrom**3,
                  densityUnit=u.grams/u.item/u.milliliter,
                  timeUnit=u.picosecond):
-        """
-        Create a StateDataReporter.
-        Parameters:
-            - f (string or writable object) The object to write to, specified as
-              a file name or writable object
-            - reportInterval (int) The interval (in time steps) at which to
-              write frames
-            - step (boolean=False) Write step index?
-            - time (boolean=False) Write time?
-            - potentialEnergy (boolean=False) Write potential energy?
-            - kineticEnergy (boolean=False) Write kinetic energy?
-            - totalEnergy (boolean=False) Write total energy?
-            - temperature (boolean=False) Write instantaneous temperature?
-            - volume (boolean=False) Write periodic box volume?
-            - density (boolean=False) Write the system density?
-            - separator (string=',') The separator to use between data columns
-            - systemMass (mass=None) The total mass to use for the system when
-              reporting density.  If this is None (default), the system mass is
-              computed by summing the masses of all particles.  This parameter
-              is useful when the particle masses do not reflect their actual
-              physical mass, such as when some particles have had their masses
-              set to 0 to immobilize them.
-        """
+        """ Create a StateDataReporter.  """
 
         self._reportInterval = reportInterval
         self._openedFile = not hasattr(f, 'write')
@@ -140,26 +158,33 @@ class AmberStateDataReporter(object):
 
         # Write the values.
         self._out.write(self._separator.join(str(v) for v in values) + '\n')
+        hasattr(self._out, 'flush') and self._out.flush()
 
     def _constructReportValues(self, simulation, state):
         """
         Query the simulation for the current state of our observables of
         interest.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
-            - state (State) The current state of the simulation
+        Parameters
+        ----------
+        simulation : Simulation
+            The Simulation object to generate a report for
+        state : State
+            The current state of the simulation object
 
         Returns: A list of values summarizing the current state of
         the simulation, to be printed or saved. Each element in the list
         corresponds to one of the columns in the resulting CSV file.
         """
         values = []
-        volume = state.getPeriodicBoxVolume()
+        if self._volume or self._density:
+            volume = state.getPeriodicBoxVolume()
+        if self._density:
+            density = self._totalMass / volume
         ke = state.getKineticEnergy()
         pe = state.getPotentialEnergy()
-        temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
-        density = self._totalMass / volume
+        if self._temperature:
+            temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
         time = state.getTime()
         if self._step:
             values.append(simulation.currentStep)
@@ -250,33 +275,46 @@ class AmberStateDataReporter(object):
                 raise ValueError('Energy is infinite')
 
     def __del__(self):
-        if self._openedFile:
+        if hasattr(self, '_openedFile') and self._openedFile:
             self._out.close()
+
+    def finalize(self):
+        """ Closes any open file """
+        try:
+            if self._out is not None and self._openedFile:
+                self._out.close()
+        except NameError:
+            pass
 
 class NetCDFReporter(object):
     """ NetCDFReporter prints a trajectory in NetCDF format """
 
     @needs_openmm
-    def __init__(self, file, reportInterval, atom, uses_pbc,
-                 crds=True, vels=False, frcs=False):
+    def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
         """
         Create a NetCDFReporter instance.
 
-        Parameters:
-            -  file (string): file name to write
-            -  reportInterval (int): time step interval b/w frame writes
-            -  atom (int): number of atoms in the system
-            -  uses_pbc (bool): uses periodic boundary conditions
-            -  crds (bool): Print coordinates?
-            -  vels (bool): Print velocities?
-            -  frcs (bool): Print forces?
+        Parameters
+        ----------
+        file : str
+            Name of the file to write the trajectory to
+        reportInterval : int
+            How frequently to write a frame to the trajectory
+        crds : bool=True
+            Should we write coordinates to this trajectory? (Default True)
+        vels : bool=False
+            Should we write velocities to this trajectory? (Default False)
+        frcs : bool=False
+            Should we write forces to this trajectory? (Default False)
         """
         if not crds and not vels and not frcs:
             raise ValueError('You must print either coordinates, velocities, '
                              'or forces in a NetCDFReporter')
         # Control flags
-        self.uses_pbc, self.atom = uses_pbc, atom
         self.crds, self.vels, self.frcs = crds, vels, frcs
+        if not (crds or vels or frcs):
+            raise ValueError('Cannot write a trajectory without coordinates, '
+                             'velocities, or forces! Pick at least one.')
         self._reportInterval = reportInterval
         self._out = None # not written yet
         self.fname = file
@@ -307,10 +345,23 @@ class NetCDFReporter(object):
             - state (State) The current state of the simulation
         """
         global RADDEG, VELUNIT, FRCUNIT
+        if self.crds:
+            crds = state.getPositions().value_in_unit(u.angstrom)
+        if self.vels:
+            vels = state.getVelocities().value_in_unit(VELUNIT)
+        if self.frcs:
+            frcs = state.getForces().value_in_unit(FRCUNIT)
         if self._out is None:
             # This must be the first frame, so set up the trajectory now
+            if self.crds:
+                atom = len(crds)
+            elif self.vels:
+                atom = len(vels)
+            elif self.frcs:
+                atom = len(frcs)
+            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
             self._out = NetCDFTraj.open_new(
-                    self.fname, self.atom, self.uses_pbc, self.crds, self.vels,
+                    self.fname, atom, self.uses_pbc, self.crds, self.vels,
                     self.frcs, title="ParmEd-created trajectory using OpenMM"
             )
         if self.uses_pbc:
@@ -320,22 +371,29 @@ class NetCDFReporter(object):
 
         # Add the coordinates, velocities, and/or forces as needed
         if self.crds:
-            self._out.add_coordinates(
-                    state.getPositions().value_in_unit(u.angstrom)
-            )
+            self._out.add_coordinates(crds)
         if self.vels:
-            vels = state.getVelocities().value_in_unit(VELUNIT)
-            # Divide by the scaling factor (works if vels is a list of Vec3's)
-            vels = [v / self._out.velocity_scale for v in vels]
+            # The velocities get scaled right before writing
             self._out.add_velocities(vels)
         if self.frcs:
-            frcs = state.getForces().value_in_unit(FRCUNIT)
             self._out.add_forces(frcs)
         # Now it's time to add the time.
         self._out.add_time(state.getTime().value_in_unit(u.picosecond))
 
     def __del__(self):
-        if self._out is not None: self._out.close()
+        try:
+            if self._out is not None:
+                self._out.close()
+        except NameError:
+            pass
+
+    def finalize(self):
+        """ Closes any open file """
+        try:
+            if self._out is not None:
+                self._out.close()
+        except NameError:
+            pass
 
 class MdcrdReporter(object):
     """
@@ -345,19 +403,27 @@ class MdcrdReporter(object):
     """
 
     @needs_openmm
-    def __init__(self, file, reportInterval, atom, uses_pbc,
-                 crds=True, vels=False, frcs=False):
+    def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
         """
         Create a MdcrdReporter instance.
 
-        Parameters:
-            -  file (string): file name to write
-            -  reportInterval (int): time step interval b/w frame writes
-            -  atom (int): number of atoms in the system
-            -  uses_pbc (bool): uses periodic boundary conditions
-            -  crds (bool): Print coordinates?
-            -  vels (bool): Print velocities?
-            -  frcs (bool): Print forces?
+        Parameters
+        ----------
+        file : str
+            Name of the file to write the trajectory to
+        reportInterval : int
+            Number of steps between writing trajectory frames
+        crds : bool=True
+            Write coordinates to this trajectory file?
+        vels : bool=False
+            Write velocities to this trajectory file?
+        frcs : bool=False
+            Write forces to this trajectory file?
+
+        Notes
+        -----
+        You can only write one of coordinates, forces, or velocities to a mdcrd
+        file.
         """
         # ASCII mdcrds can have either coordinates, forces, or velocities
         ntrue = 0
@@ -368,7 +434,6 @@ class MdcrdReporter(object):
             raise ValueError('MdcrdReporter must print exactly one of either '
                              'coordinates, velocities, or forces.')
         # Control flags
-        self.uses_pbc, self.atom = uses_pbc, atom
         self.crds, self.vels, self.frcs = crds, vels, frcs
         self._reportInterval = reportInterval
         self._out = None # not written yet
@@ -399,35 +464,48 @@ class MdcrdReporter(object):
             - simulation (Simulation) The Simulation to generate a report for
             - state (State) The current state of the simulation
         """
-        from chemistry.amber.mdcrd import VELSCALE
+        from chemistry.amber.asciicrd import VELSCALE
         global RADDEG, VELUNIT, FRCUNIT
+        if self.crds:
+            crds = state.getPositions().value_in_unit(u.angstrom)
+        elif self.vels: # crds/vels/frcs are exclusive, elif works
+            vels = state.getVelocities().value_in_unit(VELUNIT)
+        elif self.frcs:
+            frcs = state.getForces().value_in_unit(FRCUNIT)
         if self._out is None:
             # This must be the first frame, so set up the trajectory now
+            if self.crds:
+                self.atom = len(crds)
+            elif self.vels:
+                self.atom = len(vels)
+            elif self.frcs:
+                self.atom = len(frcs)
+            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
             self._out = AmberMdcrd(self.fname, self.atom, self.uses_pbc,
                     title="ParmEd-created trajectory using OpenMM", mode='w')
 
         # Add the coordinates, velocities, and/or forces as needed
         if self.crds:
-            crds = state.getPositions().value_in_unit(u.angstrom)
             flatcrd = [0 for i in range(self.atom*3)]
             for i in range(self.atom):
-                flatcrd[3*i], flatcrd[3*i+1], flatcrd[3*i+2] = crds[i]
+                i3 = i*3
+                flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
             self._out.add_coordinates(flatcrd)
         if self.vels:
-            vels = state.getVelocities().value_in_unit(VELUNIT)
             # Divide by the scaling factor (works if vels is a list of Vec3's)
             # This is necessary since AmberMdcrd does not scale before writing
             # (since it expects coordinates)
             vels = [v / VELSCALE for v in vels]
             flatvel = [0 for i in range(self.atom*3)]
             for i in range(self.atom):
-                flatvel[3*i], flatvel[3*i+1], flatvel[3*i+2] = vels[i]
+                i3 = i*3
+                flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
             self._out.add_coordinates(flatvel)
         if self.frcs:
-            frcs = state.getForces().value_in_unit(FRCUNIT)
             flatfrc = [0 for i in range(self.atom*3)]
             for i in range(self.atom):
-                flatfrc[3*i], flatfrc[3*i+1], flatfrc[3*i+2] = frcs[i]
+                i3 = i*3
+                flatfrc[i3], flatfrc[i3+1], flatfrc[i3+2] = frcs[i]
             self._out.add_coordinates(flatfrc)
         # Now it's time to add the box lengths
         if self.uses_pbc:
@@ -436,38 +514,50 @@ class MdcrdReporter(object):
             self._out.add_box(lengths)
 
     def __del__(self):
-        if self._out is not None: self._out.close()
+        try:
+            if self._out is not None:
+                self._out.close()
+        except NameError:
+            pass
+
+    def finalize(self):
+        """ Closes any open file """
+        try:
+            if self._out is not None:
+                self._out.close()
+        except NameError:
+            pass
 
 class RestartReporter(object):
     """
     Use a reporter to handle writing restarts at specified intervals.
+
+    Parameters
+    ----------
+    file : str
+        Name of the file to write the restart to.
+    reportInterval : int
+        Number of steps between writing restart files
+    write_multiple : bool=False
+        Either write a separate restart each time (appending the step number in
+        the format .# to the file name given above) if True, or overwrite the
+        same file each time if False
+    netcdf : bool=False
+        Use the Amber NetCDF restart file format
+    write_velocities : bool=True
+        Write velocities to the restart file. You can turn this off for passing
+        in, for instance, a minimized structure.
     """
    
     @needs_openmm
-    def __init__(self, file, reportInterval, natom, uses_pbc,
-                 write_multiple=False, netcdf=False, write_velocities=True):
-        """
-        Initializes a RestartReporter
-
-        Parameters:
-            -  file (string): Name of the restart file.
-            -  reportInterval (int): Number of steps between restart file writes
-            -  natom (int): Number of atoms in the system
-            -  uses_pbc (bool): System is periodic
-            -  write_multiple (bool): Write a new restart file (named with a .#
-               on top of the file name) each time a restart is written?
-            -  netcdf (bool): Use NetCDF format restarts?
-            -  write_velocities (bool): Write velocities to the restart file
-        """
+    def __init__(self, file, reportInterval, write_multiple=False, netcdf=False,
+                 write_velocities=True):
         self.fname = file
         self._reportInterval = reportInterval
-        self.atom = natom
-        self.uses_pbc = uses_pbc
         self.write_multiple = write_multiple
         self.netcdf = netcdf
         self.write_velocities = write_velocities
-        self.rst7 = Rst7(natom=natom, hasvels=write_velocities, hasbox=uses_pbc,
-                         title='Restart file written by ParmEd with OpenMM')
+        self.rst7 = None
 
     def describeNextReport(self, simulation):
         """
@@ -494,18 +584,27 @@ class RestartReporter(object):
             - state (State) The current state of the simulation
         """
         global VELUNIT
-        self.rst7.time = state.getTime().value_in_unit(u.picosecond)
         crds = state.getPositions().value_in_unit(u.angstrom)
+        if self.rst7 is None:
+            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
+            self.atom = len(crds)
+            # First time written
+            self.rst7 = Rst7(natom=self.atom, hasvels=self.write_velocities,
+                             hasbox=self.uses_pbc,
+                             title='Restart file written by ParmEd with OpenMM')
+        self.rst7.time = state.getTime().value_in_unit(u.picosecond)
         flatcrd = [0.0 for i in range(self.atom*3)]
         for i in range(self.atom):
-            flatcrd[3*i], flatcrd[3*i+1], flatcrd[3*i+2] = crds[i]
+            i3 = i*3
+            flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
         self.rst7.coordinates = flatcrd
 
         if self.write_velocities:
             vels = state.getVelocities().value_in_unit(VELUNIT)
             flatvel = [0.0 for i in range(self.atom*3)]
             for i in range(self.atom):
-                flatvel[3*i], flatvel[3*i+1], flatvel[3*i+2] = vels[i]
+                i3 = i*3
+                flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
             self.rst7.velocities = flatvel
 
         if self.uses_pbc:
@@ -520,6 +619,10 @@ class RestartReporter(object):
             fname = self.fname
 
         self.rst7.write(fname, self.netcdf)
+
+    def finalize(self):
+        """ No-op here """
+        pass
 
 def _process_box_vectors(a, b, c):
     """
@@ -577,15 +680,16 @@ class ProgressReporter(AmberStateDataReporter):
         # Make sure we got a file name rather than a file-like object.
         # Immediately close the file after opening. This erases it, which isn't
         # a bad thing, but also prepares it for reports
+        kwargs['time'] = kwargs['step'] = True
         super(ProgressReporter, self).__init__(
-                f, reportInterval, step=True, time=True,
-                potentialEnergy=potentialEnergy, kineticEnergy=kineticEnergy,
-                totalEnergy=totalEnergy, temperature=temperature,
-                volume=volume, density=density, systemMass=systemMass, **kwargs
+                f, reportInterval, potentialEnergy=potentialEnergy,
+                kineticEnergy=kineticEnergy, totalEnergy=totalEnergy,
+                temperature=temperature, volume=volume, density=density,
+                systemMass=systemMass, **kwargs
         )
         if not self._openedFile:
             raise ValueError('ProgressReporter requires a file name '
-                             '(not file object')
+                             '(not file object)')
         self._out.close()
         del self._out
         self.fname = f
@@ -786,3 +890,11 @@ class EnergyMinimizerReporter(AmberStateDataReporter):
         if has_pbc and self._volume:
             self._out.write('   Volume = %12.4f %s\n' % (vol, self.volumeUnit))
         self._out.write('\n')
+
+    def finalize(self):
+        """ Closes any open file """
+        try:
+            if self._out is not None:
+                self._out.close()
+        except NameError:
+            pass

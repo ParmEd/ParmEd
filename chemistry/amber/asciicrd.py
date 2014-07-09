@@ -506,6 +506,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             self._file.write('\n')
         # Now it's time to write the box info if necessary
         self._writebox = self.hasbox
+        self._file.flush()
 
     def add_box(self, stuff):
         """
@@ -522,5 +523,6 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
         self._file.write('%8.3f%8.3f%8.3f\n' % (stuff[0], stuff[1], stuff[2]))
         self._writebox = False
+        self._file.flush()
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
