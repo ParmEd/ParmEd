@@ -821,7 +821,6 @@ class ProgressReporter(AmberStateDataReporter):
         ke = state.getKineticEnergy()
         if self._temperature:
             temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
-        dens = self._totalMass / volume
         if self._potentialEnergy:
             values['potentialEnergy'] = pe.value_in_unit(self.energyUnit)
         if self._kineticEnergy:
@@ -833,6 +832,7 @@ class ProgressReporter(AmberStateDataReporter):
         if self._volume:
             values['volume'] = volume.value_in_unit(self.volumeUnit)
         if self._density:
+            dens = self._totalMass / volume
             values['density'] = dens.value_in_unit(self.densityUnit)
 
         return values
