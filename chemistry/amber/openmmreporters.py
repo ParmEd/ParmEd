@@ -819,7 +819,8 @@ class ProgressReporter(AmberStateDataReporter):
         volume = state.getPeriodicBoxVolume()
         pe = state.getPotentialEnergy()
         ke = state.getKineticEnergy()
-        temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
+        if self._temperature:
+            temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
         dens = self._totalMass / volume
         if self._potentialEnergy:
             values['potentialEnergy'] = pe.value_in_unit(self.energyUnit)
