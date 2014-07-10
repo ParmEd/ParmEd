@@ -107,7 +107,10 @@ class _AmberAsciiCoordinateFile(object):
 
     def __del__(self):
         """ Make sure the open file handler is closed """
-        self.closed or self._file.close()
+        try:
+            self.closed or self._file.close()
+        except AttributeError:
+            pass
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -116,7 +119,8 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     CRDS_PER_LINE = 6
     DEFAULT_TITLE = 'restart created by ParmEd'
 
-    def __init__(self, fname, mode='r', natom=0, hasbox=None, title=None):
+    def __init__(self, fname, mode='r', natom=0, hasbox=None, title=None,
+                 time=0.0):
         """
         For restart files, natom and hasbox are determined automatically for
         mode='r', and can be determined at write-time when the coordinates are
@@ -126,7 +130,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._cell_lengths_written = False
         self._cell_angles_written = False
         self._vels_written = False
-        self.time = 0.0
+        self.time = float(time)
         super(AmberAsciiRestart, self).__init__(fname, natom, hasbox,
                                                 mode, title)
 
@@ -397,6 +401,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         """
         self.frame = 0
         rawline = self._file.readline()
+        self.title = rawline.strip()
         self.data = list()
         self.cell_lengths = list()
         mainiter = range(0, 8 * self.CRDS_PER_LINE, 8)
@@ -501,6 +506,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             self._file.write('\n')
         # Now it's time to write the box info if necessary
         self._writebox = self.hasbox
+        self._file.flush()
 
     def add_box(self, stuff):
         """
@@ -517,5 +523,6 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
         self._file.write('%8.3f%8.3f%8.3f\n' % (stuff[0], stuff[1], stuff[2]))
         self._writebox = False
+        self._file.flush()
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

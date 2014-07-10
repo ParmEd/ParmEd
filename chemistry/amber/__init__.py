@@ -33,7 +33,10 @@ try:
     # bindings write out scalars in Amber files)
     def nc4get_float(obj, name):
         try:
-            return obj.variables[name].getValue()[0]
+            val = obj.variables[name].getValue()
+            if hasattr(val, '__iter__'):
+                return val[0]
+            return val
         except IndexError:
             return obj.variables[name][0]
         raise RuntimeError('Should not be here')

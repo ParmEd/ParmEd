@@ -35,9 +35,6 @@ _SCRIPT_HEADER = """\
 
 import os, sys
 
-# Add the Amber Python modules to the search path
-sys.path.append(os.path.join(os.getenv('AMBERHOME'), 'bin'))
-
 # Import the OpenMM modules that are necessary
 from simtk.openmm.app import *
 from simtk.openmm import *
@@ -586,10 +583,9 @@ def simulate(parm, args):
                 scriptfile.write('rep.report(simulation)\n\n')
                 scriptfile.write('# Write the restart file\n')
                 scriptfile.write(
-                    'restrt_reporter = RestartReporter("%s", 1, %s, %s,\n'
+                    'restrt_reporter = RestartReporter("%s", 1,\n'
                     '                       False, %s, write_velocities=False\n'
-                    ')\n' % (restart, "parm.ptr('natom')",
-                        mdin.cntrl_nml['ntb']>0, mdin.cntrl_nml['ntxo']==2)
+                    ')\n' % (restart, mdin.cntrl_nml['ntxo']==2)
                 )
                 scriptfile.write('restrt_reporter.report(simulation,\n'
                     '      simulation.context.getState(getPositions=True,\n'
@@ -605,8 +601,7 @@ def simulate(parm, args):
             rep.report(simulation)
             # Write a restart file with the new coordinates
             restrt_reporter = RestartReporter(restart, 1, parm.ptr('natom'),
-                    mdin.cntrl_nml['ntb'] > 0, False,
-                    mdin.cntrl_nml['ntxo'] == 2, write_velocities=False)
+                    False, mdin.cntrl_nml['ntxo'] == 2, write_velocities=False)
             restrt_reporter.report(simulation,
                 simulation.context.getState(getPositions=True,
                         enforcePeriodicBox=bool(mdin.cntrl_nml['ntb']))
@@ -635,36 +630,20 @@ def simulate(parm, args):
                     scriptfile.write('nframes = inptraj.frame\n')
             # Create a reporter to handle the minimized coordinates
             if mdin.cntrl_nml['ioutfm'] == 0:
-                crd_reporter = (
-                        MdcrdReporter(trajectory, 1, parm.ptr('natom'),
-                                      mdin.cntrl_nml['ntb'] > 0, crds=True,
-                                      vels=False, frcs=False)
-                )
+                crd_reporter = MdcrdReporter(trajectory, 1)
                 if scriptfile is not None:
-                    scriptfile.write('crd_reporter = (\n'
-                            '      MdcrdReporter("%s", 1, %s, %s, crds=True,\n'
-                            '         vels=False, frcs=False)\n)\n' %
-                            (trajectory, "parm.ptr('natom')",
-                             mdin.cntrl_nml['ntb']>0))
+                    scriptfile.write('crd_reporter = MdcrdReporter("%s", 1)\n'
+                                     % trajectory)
             elif dcd:
                 crd_reporter = DCDReporter(trajectory, 1)
                 if scriptfile is not None:
                     scriptfile.write('crd_reporter = DCDReporter("%s", 1)\n' %
                                      trajectory)
             else:
-                crd_reporter = (
-                        NetCDFReporter(trajectory, 1, parm.ptr('natom'),
-                                mdin.cntrl_nml['ntb'] > 0, crds=True,
-                                vels=False, frcs=False
-                        )
-                )
+                crd_reporter = NetCDFReporter(trajectory, 1)
                 if scriptfile is not None:
-                    scriptfile.write('crd_reporter = (\n'
-                            '      NetCDFReporter("%s", 1, %s, %s, crds=True,\n'
-                            '         vels=False, frcs=False,\n'
-                            '      )\n)\n' % (trajectory, "parm.ptr('natom')",
-                            mdin.cntrl_nml['ntb']>0)
-                    )
+                    scriptfile.write('crd_reporter = NetCDFReporter("%s", 1)\n'
+                                     % trajectory)
             if scriptfile is not None:
                 scriptfile.write('f = open("%s", "w", 0)\n'
                         'rep = EnergyMinimizerReporter(f, volume=%s)\n'
@@ -721,17 +700,12 @@ def simulate(parm, args):
         if mdin.cntrl_nml['ntwx'] > 0:
             if mdin.cntrl_nml['ioutfm'] == 0:
                 simulation.reporters.append(
-                        MdcrdReporter(trajectory, mdin.cntrl_nml['ntwx'],
-                            parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
-                            crds=True, vels=False, frcs=False)
+                        MdcrdReporter(trajectory, mdin.cntrl_nml['ntwx'])
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s, %s, %s, crds=True,\n'
-                        '         vels=False, frcs=False)\n'
-                        ')\n' %
-                        (trajectory, mdin.cntrl_nml['ntwx'],
-                        "parm.ptr('natom')", mdin.cntrl_nml['ntb'] > 0)
+                        '      MdcrdReporter("%s", %s)\n'
+                        ')\n' % (trajectory, mdin.cntrl_nml['ntwx'])
                     )
             elif dcd:
                 simulation.reporters.append(
@@ -745,18 +719,16 @@ def simulate(parm, args):
             else:
                 simulation.reporters.append(
                         NetCDFReporter(trajectory, mdin.cntrl_nml['ntwx'],
-                                parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
                                 crds=True, vels=mdin.cntrl_nml['ntwv'] < 0,
                                 frcs=mdin.cntrl_nml['ntwf'] < 0
                         )
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s, %s, %s,\n'
+                        '      NetCDFReporter("%s", %s,\n'
                         '          crds=True, vels=%s, frcs=%s\n'
                         '      )\n)\n' %
                         (trajectory, mdin.cntrl_nml['ntwx'],
-                        "parm.ptr('natom')", mdin.cntrl_nml['ntb'] > 0,
                         mdin.cntrl_nml['ntwv'] < 0, mdin.cntrl_nml['ntwf'] < 0)
                     )
         # Velocity trajectory reporters
@@ -764,16 +736,13 @@ def simulate(parm, args):
             if mdin.cntrl_nml['ioutfm'] == 0:
                 simulation.reporters.append(
                         MdcrdReporter(mdvel, mdin.cntrl_nml['ntwv'],
-                                parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
                                 crds=False, vels=True, frcs=False)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s, %s, %s, crds=False,\n'
+                        '      MdcrdReporter("%s", %s, crds=False,\n'
                         '         vels=True, frcs=False)\n'
-                        ')\n' %
-                        (trajectory, mdin.cntrl_nml['ntwv'],
-                         "parm.ptr('natom')", mdin.cntrl_nml['ntb'] > 0)
+                        ')\n' % (trajectory, mdin.cntrl_nml['ntwv'])
                     )
             elif dcd:
                 # Should never make it here due to earlier checks; catch anyway
@@ -785,16 +754,14 @@ def simulate(parm, args):
                 _frcs = mdin.cntrl_nml['ntwf']<0 and mdin.cntrl_nml['ntwx']==0
                 simulation.reporters.append(
                         NetCDFReporter(mdvel, mdin.cntrl_nml['ntwv'],
-                                parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
                                 crds=False, vels=True, frcs=_frcs)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s, %s, %s,\n'
+                        '      NetCDFReporter("%s", %s,\n'
                         '          crds=False, vels=True, frcs=%s\n'
                         '      )\n)\n' %
-                        (mdvel, mdin.cntrl_nml['ntwv'], "parm.ptr('natom')",
-                         mdin.cntrl_nml['ntb'] > 0,
+                        (mdvel, mdin.cntrl_nml['ntwv'],
                          mdin.cntrl_nml['ntwf']<0 and mdin.cntrl_nml['ntwx']==0)
                     )
         # Force trajectory reporters
@@ -802,16 +769,13 @@ def simulate(parm, args):
             if mdin.cntrl_nml['ioutfm'] == 0:
                 simulation.reporters.append(
                         MdcrdReporter(mdfrc, mdin.cntrl_nml['ntwf'],
-                                parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
-                                crds=False, vels=False, frcs=True)
+                                      crds=False, vels=False, frcs=True)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s, %s, %s, crds=False,\n'
+                        '      MdcrdReporter("%s", %s, crds=False,\n'
                         '         vels=False, frcs=True)\n'
-                        ')\n' %
-                        (trajectory, mdin.cntrl_nml['ntwf'],
-                         "parm.ptr('natom')", mdin.cntrl_nml['ntb'] > 0)
+                        ')\n' % (trajectory, mdin.cntrl_nml['ntwf'])
                     )
             elif dcd:
                 # Should never make it here due to earlier checks; catch anyway
@@ -819,27 +783,22 @@ def simulate(parm, args):
             else:
                 simulation.reporters.append(
                         NetCDFReporter(mdfrc, mdin.cntrl_nml['ntwf'],
-                                parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
                                 crds=False, vels=False, frcs=True)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s, %s, %s,\n'
+                        '      NetCDFReporter("%s", %s,\n'
                         '          crds=False, vels=False, frcs=True\n'
-                        '      )\n)\n' %
-                        (mdfrc, mdin.cntrl_nml['ntwv'], "parm.ptr('natom')",
-                         mdin.cntrl_nml['ntb'] > 0)
+                        '      )\n)\n' % (mdfrc, mdin.cntrl_nml['ntwv'])
                     )
         # Restart file reporter
         restrt_reporter = RestartReporter(restart, abs(mdin.cntrl_nml['ntwr']),
-                    parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
                     mdin.cntrl_nml['ntwr'] < 0, mdin.cntrl_nml['ntxo'] == 2)
         if scriptfile is not None:
             scriptfile.write('restrt_reporter = RestartReporter("%s", %s,\n'
-                    '      %s, %s, %s, %s)\n' %
-                    (restart, abs(mdin.cntrl_nml['ntwr']), "parm.ptr('natom')",
-                     mdin.cntrl_nml['ntb'] > 0, mdin.cntrl_nml['ntwr'] < 0,
-                     mdin.cntrl_nml['ntxo'] == 2)
+                    '      %s, %s)\n' %
+                    (restart, abs(mdin.cntrl_nml['ntwr']),
+                     mdin.cntrl_nml['ntwr'] < 0, mdin.cntrl_nml['ntxo'] == 2)
             )
         if mdin.cntrl_nml['ntwr'] != 0:
             simulation.reporters.append(restrt_reporter)
@@ -923,8 +882,6 @@ def energy(parm, args, output=sys.stdout):
             gbmeth = GBn
         elif igb == 8:
             gbmeth = GBn2
-        # Other choices are vacuum
-        kappa = 0.73 * sqrt(saltcon * 0.10806)
     elif parm.ptr('ifbox') == 1:
         if cutoff is None: cutoff = 8.0
         if do_ewald:
@@ -956,7 +913,7 @@ def energy(parm, args, output=sys.stdout):
                                 nonbondedCutoff=cutoff*u.angstrom,
                                 constraints=None, rigidWater=True,
                                 removeCMMotion=False, implicitSolvent=gbmeth,
-                                implicitSolventKappa=kappa*(1.0/u.angstrom),
+                                implicitSolventSaltConc=saltcon*u.molar,
                                 soluteDielectric=1.0, solventDielectric=78.5,
                                 ewaldErrorTolerance=5e-5,
     )
@@ -980,8 +937,10 @@ def energy(parm, args, output=sys.stdout):
 
     # Now see if we want to turn on or off the dispersion correction
     for force in system.getForces():
-        if isinstance(force, mm.NonbondedForce):
+        try:
             force.setUseDispersionCorrection(vdw_longrange)
+        except AttributeError:
+            pass
 
     # Create a dummy integrator
     integrator = mm.VerletIntegrator(2.0)

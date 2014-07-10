@@ -16,7 +16,7 @@ package does should be contained in this module.
 """
 
 from chemistry import amber, __version__
-from compat24 import property
+from compat24 import property, wraps
 try:
     import numpy as np
 except ImportError:
@@ -32,6 +32,7 @@ def needs_netcdf(fcn):
     Decorator to protect against functions that need NetCDF so we can provide
     a helpful error message
     """
+    @wraps(fcn)
     def new_fcn(*args, **kwargs):
         if not amber.HAS_NETCDF:
             raise ImportError('No NetCDF packages are available!')
@@ -209,6 +210,7 @@ class NetCDFRestart(object):
     def coordinates(self, stuff):
         self._ncfile.variables['coordinates'][:] = \
                                 np.reshape(stuff, (self.atom, 3))
+        self.flush()
 
     @property
     def velocities(self):
@@ -219,6 +221,7 @@ class NetCDFRestart(object):
     def velocities(self, stuff):
         self._ncfile.variables['velocities'][:] = \
                     np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
+        self.flush()
 
     @property
     def cell_lengths(self):
@@ -227,6 +230,7 @@ class NetCDFRestart(object):
     @cell_lengths.setter
     def cell_lengths(self, stuff):
         self._ncfile.variables['cell_lengths'][:] = np.asarray(stuff)
+        self.flush()
 
     @property
     def cell_angles(self):
@@ -235,6 +239,7 @@ class NetCDFRestart(object):
     @cell_angles.setter
     def cell_angles(self, stuff):
         self._ncfile.variables['cell_angles'][:] = np.asarray(stuff)
+        self.flush()
 
     @property
     def box(self):
@@ -253,6 +258,7 @@ class NetCDFRestart(object):
     @time.setter
     def time(self, stuff):
         self._ncfile.variables['time'][0] = float(stuff)
+        self.flush()
 
     @property
     def temp0(self):
@@ -261,6 +267,7 @@ class NetCDFRestart(object):
     @temp0.setter
     def temp0(self, stuff):
         self._ncfile.variables['temp0'][0] = float(stuff)
+        self.flush()
    
     @property
     def remd_indices(self):
@@ -269,6 +276,7 @@ class NetCDFRestart(object):
     @remd_indices.setter
     def remd_indices(self, stuff):
         self._ncfile.variables['remd_indices'][:] = np.asarray(stuff, dtype='i')
+        self.flush()
 
     @property
     def remd_groups(self):
@@ -277,6 +285,7 @@ class NetCDFRestart(object):
     @remd_groups.setter
     def remd_groups(self, stuff):
         self._ncfile.variables['remd_groups'][:] = np.asarray(stuff, dtype='i')
+        self.flush()
 
     @property
     def remd_dimtype(self):
@@ -285,6 +294,7 @@ class NetCDFRestart(object):
     @remd_dimtype.setter
     def remd_dimtype(self, stuff):
         self._ncfile.variables['remd_dimtype'][:] = np.asarray(stuff, dtype='i')
+        self.flush()
 
     def close(self):
         self.closed = True
@@ -292,6 +302,12 @@ class NetCDFRestart(object):
 
     def __del__(self):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
+
+    def flush(self):
+        try:
+            self._ncfile.flush()
+        except AttributeError:
+            pass
 
 class NetCDFTraj(object):
     """ Class to read or write NetCDF restart files """
@@ -391,6 +407,12 @@ class NetCDFTraj(object):
             v.units = 'angstrom/picosecond'
             inst.velocity_scale = v.scale_factor = 20.455
             inst._last_vel_frame = 0
+            try:
+                # Prevent NetCDF4 from trying to autoscale the values. Ugh.
+                v.set_auto_maskandscale(False)
+            except AttributeError:
+                # Other packages do not have this variable.
+                pass
         if inst.hasfrcs:
             v = ncfile.createVariable('forces', 'f',
                                             ('frame', 'atom', 'spatial'))
@@ -446,6 +468,12 @@ class NetCDFTraj(object):
                        'cell_angles' in ncfile.variables)
         if inst.hasvels:
             inst.velocity_scale = ncfile.variables['velocities'].scale_factor
+            try:
+                # Prevent NetCDF4 from trying to autoscale the values. Ugh.
+                ncfile.variables['velocities'].set_auto_maskandscale(False)
+            except AttributeError:
+                # Other packages do not have this variable.
+                pass
         if inst.frame is None:
             if 'time' in ncfile.variables:
                 inst.frame = len(ncfile.variables['time'][:])
@@ -485,6 +513,7 @@ class NetCDFTraj(object):
         self._ncfile.variables['coordinates'][self._last_crd_frame] = \
                 np.reshape(stuff, (self.atom, 3))
         self._last_crd_frame += 1
+        self.flush()
 
     def velocities(self, frame):
         """
@@ -516,6 +545,7 @@ class NetCDFTraj(object):
         self._ncfile.variables['velocities'][self._last_vel_frame] = \
                 np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
         self._last_vel_frame += 1
+        self.flush()
 
     def forces(self, frame):
         """
@@ -546,6 +576,7 @@ class NetCDFTraj(object):
         self._ncfile.variables['forces'][self._last_frc_frame] = \
                 np.reshape(stuff, (self.atom, 3))
         self._last_frc_frame += 1
+        self.flush()
 
     def cell_lengths_angles(self, frame):
         """
@@ -561,6 +592,21 @@ class NetCDFTraj(object):
         """
         return (self._ncfile.variables['cell_lengths'][frame][:],
                 self._ncfile.variables['cell_angles'][frame][:])
+
+    def box(self, frame):
+        """
+        Get the cell lengths and angles as one array
+
+        Parameters
+        ----------
+        frame : int
+            Frame to get the box from
+
+        Returns
+        -------
+            6-element array with 3 lengths followed by 3 angles (in degrees)
+        """
+        return np.concatenate(self.cell_lengths_angles(frame))
    
     def add_cell_lengths_angles(self, lengths, angles=None):
         """
@@ -591,6 +637,7 @@ class NetCDFTraj(object):
         self._ncfile.variables['cell_angles'][self._last_box_frame] = \
                 np.asarray(angles)
         self._last_box_frame += 1
+        self.flush()
 
     def time(self, frame):
         """
@@ -607,6 +654,7 @@ class NetCDFTraj(object):
     def add_time(self, stuff):
         self._ncfile.variables['time'][self._last_time_frame] = float(stuff)
         self._last_time_frame += 1
+        self.flush()
 
     def remd_indices(self, frame):
         return self._ncfile.variables['remd_indices'][frame][:]
@@ -615,6 +663,7 @@ class NetCDFTraj(object):
         self._ncfile.variables['remd_indices'][self._last_remd_frame] = \
                 np.asarray(stuff, dtype='i')
         self._last_remd_frame += 1
+        self.flush()
 
     def temp0(self, frame):
         return self._ncfile.variables['temp0'][frame]
@@ -622,6 +671,7 @@ class NetCDFTraj(object):
     def add_temp0(self, stuff):
         self._ncfile.variables['temp0'][self._last_remd_frame] = float(stuff)
         self._last_remd_frame += 1
+        self.flush()
 
     @property
     def remd_dimtype(self):
@@ -630,6 +680,7 @@ class NetCDFTraj(object):
     @remd_dimtype.setter
     def remd_dimtype(self, stuff):
         self._ncfile.variables['remd_dimtype'][:] = np.asarray(stuff, dtype='i')
+        self.flush()
 
     def close(self):
         """ Closes the NetCDF file """
@@ -638,3 +689,9 @@ class NetCDFTraj(object):
 
     def __del__(self):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
+
+    def flush(self):
+        try:
+            self._ncfile.flush()
+        except AttributeError:
+            pass

@@ -328,6 +328,10 @@ class AmoebaParm(AmberParm):
 
     #=============================================
 
+    flush_data_changes = _load_structure
+
+    #=============================================
+
     def remake_parm(self):
         """ Recomputes the topology file parameters """
         # First thing we have to do is load any of our old atom parameters into
@@ -818,6 +822,53 @@ class AmoebaParm(AmberParm):
     @bonds_without_h.setter
     def bonds_without_h(self, thing):
         raise NotImplemented('bonds_without_h is a generator property in '
+                             'AmoebaParm')
+
+    @property
+    def angles_inc_h(self):
+        for ang in self.angle_list:
+            if 1 in (ang.atom1.element, ang.atom2.element, ang.atom3.element):
+                yield ang
+
+    @angles_inc_h.setter
+    def angles_inc_h(self, thing):
+        raise NotImplemented('angles_inc_h is a generator property in '
+                             'AmoebaParm')
+
+    @property
+    def angles_without_h(self):
+        for ang in self.angle_list:
+            if not 1 in (ang.atom1.element, ang.atom2.element,
+                         ang.atom3.element):
+                yield ang
+
+    @angles_without_h.setter
+    def angles_without_h(self, thing):
+        raise NotImplemented('angles_without_h is a generator property in '
+                             'AmoebaParm')
+
+    @property
+    def dihedrals_inc_h(self):
+        for dih in self.dihedral_list:
+            if 1 in (dih.atom1.element, dih.atom2.element,
+                     dih.atom3.element, dih.atom4.element):
+                yield dih
+
+    @dihedrals_inc_h.setter
+    def dihedrals_inc_h(self, thing):
+        raise NotImplemented('dihedrals_inc_h is a generator property in '
+                             'AmoebaParm')
+
+    @property
+    def dihedrals_without_h(self):
+        for dih in self.dihedral_list:
+            if not 1 in (dih.atom1.element, dih.atom2.element,
+                         dih.atom3.element, dih.atom4.element):
+                yield dih
+
+    @dihedrals_without_h.setter
+    def dihedrals_without_h(self, thing):
+        raise NotImplemented('dihedrals_without_h is a generator property in '
                              'AmoebaParm')
 
     #=============================================

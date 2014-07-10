@@ -146,7 +146,7 @@ class Atom(object):
         if 'SCREEN' in parm_data:
             self.screen = parm_data['SCREEN'][si]
         else:
-            self.radii = 0.0 # dummy number
+            self.screen = 0.0 # dummy number
         if 'ATOMIC_NUMBER' in parm_data:
             self.atomic_number = parm_data['ATOMIC_NUMBER'][si]
         else:
@@ -259,6 +259,10 @@ class Atom(object):
 
     def __le__(self, other):
         return not Atom.__gt__(self, other)
+
+    def __repr__(self):
+        return "<Atom %s [%d]; In %s %d>" % (self.atname, self.starting_index+1,
+                self.residue.resname, self.residue.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -533,6 +537,10 @@ class Dihedral(object):
         raise TypeError('Cannot compare Dihedral with %s' %
                         type(thing).__name__)
 
+    def __repr__(self):
+        return "<Dihedral %r--%r--%r--%r>" % (self.atom1, self.atom2,
+                self.atom3, self.atom4)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralType(object):
@@ -627,7 +635,7 @@ class UreyBradley(object):
             # If we are here, end1 and cent are set. Look through the bond
             # partners of cent(er) and see if any of them is in this
             # Urey-Bradley (but ONLY if that atom is not the original end1)
-            for atm in cent.bonds():
+            for atm in cent.bond_partners:
                 if atm is end1: continue
                 if atm in self:
                 # If we got here, we found both atoms in this Urey-Bradley

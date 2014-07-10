@@ -1,0 +1,206 @@
+*  PARAMETER_4. New parameter file for sugars developed by fitting to small 
+*  molecules and sugars. These parameters are meant to be compatible with the
+*  Charmm23 force field, and were based upon Alex MacKerell's nucleic acid
+*  parameters; wherever possible, his basic parameters, atom types, charges,
+*  and van der Waals parameters have been retained. This set defines a 
+*  separate atom type CBS for the anomeric carbon C1 in beta sugar anomers. 
+*  Beta version; future revisions are still possible. 
+*  Guyan Liang and John Brady, Cornell University   09/08/95
+*
+
+BONDS
+HOS  OHS    546.4212              0.9595     
+HAS  CTS    335.6034              1.1000    
+HAS  CBS    335.6034              1.1052    
+CTS  OHS    384.0792              1.4066    
+CBS  OHS    384.0792              1.3932    
+CTS  CTS    325.5297              1.5066   
+CBS  CTS    325.5297              1.5074   
+CTS  OES    385.3133              1.4165
+CBS  OES    385.3133              1.4202
+HT   OT     450.0            0.9572       ! from TIPS3P geometry
+HT   HT       0.0            1.5139       ! from TIPS3P geometry (for SHAKE w/PARAM)
+THETAS
+HAS  CTS  CTS          42.9062            109.7502     
+HAS  CBS  CTS          42.9062            109.7502    
+HAS  CTS  CBS          42.9062            109.7502   
+OHS  CTS  CTS         112.2085            107.6019    
+OHS  CBS  CTS         112.2085            107.6019    
+OHS  CTS  CBS         112.2085            107.6019    
+HOS  OHS  CTS          57.5478            109.1722    
+HOS  OHS  CBS          57.5478            109.1722    
+HAS  CTS  HAS          36.8220            106.1784     
+HAS  CTS  OHS          52.5070            109.3850    
+HAS  CBS  OHS          52.5070            109.3850    
+HT   OT   HT           55.0               104.52         ! FROM TIPS3P GEOMETRY
+HAS  CTS  OES          62.2500            106.4025
+HAS  CBS  OES          62.2500            106.4025
+CTS  CTS  CTS         167.3535            110.6156
+CBS  CTS  CTS         167.3535            110.6156
+CTS  CTS  OES         169.0276            108.3759 
+CBS  CTS  OES         169.0276            108.3759 
+CTS  CBS  OES         169.0276            108.3759 
+CTS  OES  CTS          92.5892            111.5092 
+CBS  OES  CTS          92.5892            111.5092 
+OES  CTS  OHS          74.2586            115.7322 
+OES  CBS  OHS          74.2586            110.3385 
+OES  CTS  OES          37.4370            112.1882 
+OES  CBS  OES          37.4370            106.9160 
+PHI
+CTS  CTS  CTS  CTS     -1.0683    1      0.0
+CTS  CTS  CTS  CTS     -0.5605    2      0.0
+CTS  CTS  CTS  CTS      0.1955    3      0.0
+CBS  CTS  CTS  CTS     -1.0683    1      0.0
+CBS  CTS  CTS  CTS     -0.5605    2      0.0
+CBS  CTS  CTS  CTS      0.1955    3      0.0
+CTS  CTS  CTS  OES     -1.2007    1      0.0
+CTS  CTS  CTS  OES     -0.3145    2      0.0
+CTS  CTS  CTS  OES     -0.0618    3      0.0
+CBS  CTS  CTS  OES     -1.2007    1      0.0
+CBS  CTS  CTS  OES     -0.3145    2      0.0
+CBS  CTS  CTS  OES     -0.0618    3      0.0
+CTS  CTS  CBS  OES     -1.2007    1      0.0
+CTS  CTS  CBS  OES     -0.3145    2      0.0
+CTS  CTS  CBS  OES     -0.0618    3      0.0
+CTS  CTS  CTS  OHS     -1.9139    1      0.0
+CTS  CTS  CTS  OHS     -0.3739    2      0.0
+CTS  CTS  CTS  OHS     -0.0340    3      0.0
+CTS  CTS  CBS  OHS     -1.9139    1      0.0
+CTS  CTS  CBS  OHS     -0.3739    2      0.0
+CTS  CTS  CBS  OHS     -0.0340    3      0.0
+CBS  CTS  CTS  OHS     -1.9139    1      0.0
+CBS  CTS  CTS  OHS     -0.3739    2      0.0
+CBS  CTS  CTS  OHS     -0.0340    3      0.0
+CTS  OES  CTS  CTS     -0.8477    1      0.0
+CTS  OES  CTS  CTS     -0.3018    2      0.0
+CTS  OES  CTS  CTS      0.3763    3      0.0
+CBS  OES  CTS  CTS     -0.8477    1      0.0
+CBS  OES  CTS  CTS     -0.3018    2      0.0
+CBS  OES  CTS  CTS      0.3763    3      0.0
+CTS  OES  CBS  CTS     -0.8477    1      0.0
+CTS  OES  CBS  CTS     -0.3018    2      0.0
+CTS  OES  CBS  CTS      0.3763    3      0.0
+HAS  CTS  CTS  CTS      0.0000    1      0.0
+HAS  CTS  CTS  CTS      0.0000    2      0.0
+HAS  CTS  CTS  CTS      0.1441    3      0.0
+HAS  CBS  CTS  CTS      0.0000    1      0.0
+HAS  CBS  CTS  CTS      0.0000    2      0.0
+HAS  CBS  CTS  CTS      0.1441    3      0.0
+HAS  CTS  CTS  CBS      0.0000    1      0.0
+HAS  CTS  CTS  CBS      0.0000    2      0.0
+HAS  CTS  CTS  CBS      0.1441    3      0.0
+HAS  CTS  CTS  HAS      0.0000    1      0.0
+HAS  CTS  CTS  HAS      0.0000    2      0.0
+HAS  CTS  CTS  HAS      0.1595    3      0.0
+HAS  CBS  CTS  HAS      0.0000    1      0.0
+HAS  CBS  CTS  HAS      0.0000    2      0.0
+HAS  CBS  CTS  HAS      0.1595    3      0.0
+HAS  CTS  OES  CTS      0.0000    1      0.0
+HAS  CTS  OES  CTS      0.0000    2      0.0
+HAS  CTS  OES  CTS      0.2840    3      0.0
+HAS  CBS  OES  CTS      0.0000    1      0.0
+HAS  CBS  OES  CTS      0.0000    2      0.0
+HAS  CBS  OES  CTS      0.2840    3      0.0
+HAS  CTS  OES  CBS      0.0000    1      0.0
+HAS  CTS  OES  CBS      0.0000    2      0.0
+HAS  CTS  OES  CBS      0.2840    3      0.0
+HOS  OHS  CTS  CTS      1.0504    1      0.0
+HOS  OHS  CTS  CTS      0.1336    2      0.0
+HOS  OHS  CTS  CTS      0.3274    3      0.0
+HOS  OHS  CBS  CTS      1.0504    1      0.0
+HOS  OHS  CBS  CTS      0.1336    2      0.0
+HOS  OHS  CBS  CTS      0.3274    3      0.0
+HOS  OHS  CTS  CBS      1.0504    1      0.0
+HOS  OHS  CTS  CBS      0.1336    2      0.0
+HOS  OHS  CTS  CBS      0.3274    3      0.0
+HOS  OHS  CTS  HAS      0.0000    1      0.0
+HOS  OHS  CTS  HAS      0.0000    2      0.0
+HOS  OHS  CTS  HAS      0.1694    3      0.0
+HOS  OHS  CBS  HAS      0.0000    1      0.0
+HOS  OHS  CBS  HAS      0.0000    2      0.0
+HOS  OHS  CBS  HAS      0.1694    3      0.0
+OES  CTS  CTS  HAS      0.0000    1      0.0
+OES  CTS  CTS  HAS      0.0000    2      0.0
+OES  CTS  CTS  HAS      0.1686    3      0.0
+OES  CBS  CTS  HAS      0.0000    1      0.0
+OES  CBS  CTS  HAS      0.0000    2      0.0
+OES  CBS  CTS  HAS      0.1686    3      0.0
+OES  CTS  CBS  HAS      0.0000    1      0.0
+OES  CTS  CBS  HAS      0.0000    2      0.0
+OES  CTS  CBS  HAS      0.1686    3      0.0
+OES  CTS  CTS  OES     -2.6785    1      0.0
+OES  CTS  CTS  OES      0.7851    2      0.0
+OES  CTS  CTS  OES      0.2552    3      0.0
+OES  CBS  CTS  OES     -2.6785    1      0.0
+OES  CBS  CTS  OES      0.7851    2      0.0
+OES  CBS  CTS  OES      0.2552    3      0.0
+OES  CTS  CTS  OHS     -3.7993    1      0.0
+OES  CTS  CTS  OHS      0.5688    2      0.0
+OES  CTS  CTS  OHS      0.4204    3      0.0
+OES  CBS  CTS  OHS     -3.7993    1      0.0
+OES  CBS  CTS  OHS      0.5688    2      0.0
+OES  CBS  CTS  OHS      0.4204    3      0.0
+OES  CTS  CBS  OHS     -3.7993    1      0.0
+OES  CTS  CBS  OHS      0.5688    2      0.0
+OES  CTS  CBS  OHS      0.4204    3      0.0
+OES  CTS  OES  CTS      0.1948    1      0.0
+OES  CTS  OES  CTS      0.9778    2      0.0
+OES  CTS  OES  CTS      0.9115    3      0.0
+OES  CBS  OES  CTS      0.1948    1      0.0
+OES  CBS  OES  CTS      0.9778    2      0.0
+OES  CBS  OES  CTS      0.9115    3      0.0
+OHS  CTS  OES  CTS      1.9193    1      0.0
+OHS  CTS  OES  CTS      1.0102    2      0.0
+OHS  CTS  OES  CTS      0.7294    3      0.0
+OHS  CBS  OES  CTS      1.9193    1      0.0
+OHS  CBS  OES  CTS      1.0102    2      0.0
+OHS  CBS  OES  CTS      0.7294    3      0.0
+OES  CTS  OHS  HOS      1.2936    1      0.0
+OES  CTS  OHS  HOS      1.3295    2      0.0
+OES  CTS  OHS  HOS      0.4323    3      0.0
+OES  CBS  OHS  HOS      1.2936    1      0.0
+OES  CBS  OHS  HOS      1.3295    2      0.0
+OES  CBS  OHS  HOS      0.4323    3      0.0
+OHS  CTS  CTS  HAS      0.0000    1      0.0
+OHS  CTS  CTS  HAS      0.0000    2      0.0
+OHS  CTS  CTS  HAS      0.1472    3      0.0
+OHS  CBS  CTS  HAS      0.0000    1      0.0
+OHS  CBS  CTS  HAS      0.0000    2      0.0
+OHS  CBS  CTS  HAS      0.1472    3      0.0
+OHS  CTS  CBS  HAS      0.0000    1      0.0
+OHS  CTS  CBS  HAS      0.0000    2      0.0
+OHS  CTS  CBS  HAS      0.1472    3      0.0
+OHS  CTS  CTS  OHS     -4.9362    1      0.0
+OHS  CTS  CTS  OHS      0.2907    2      0.0
+OHS  CTS  CTS  OHS      0.4638    3      0.0
+OHS  CBS  CTS  OHS     -4.9362    1      0.0
+OHS  CBS  CTS  OHS      0.2907    2      0.0
+OHS  CBS  CTS  OHS      0.4638    3      0.0
+NONBONDED  NBXMOD 5  atom CDIEL shift vatom VDISTANCE VSWITCH -
+     CUTNB 14.0  CTOFNB 12.0  CTONNB 10.0  EPS 1.0  E14FAC 1.0  WMIN 1.5
+!
+!                  Emin       Rmin
+!                  (kcal/mol) (A)
+HOS         0.00      -0.0460    0.2245       ! from alex's para_na, hn5  
+HAS         0.00      -0.0220    1.3200       ! from alex's para_na, hn6   
+!
+CTS         0.00      -0.0200    2.2750    0.000   -0.01000     1.90000
+!                                      from alex's para_na, cn6   
+CBS         0.00      -0.0200    2.2750    0.000   -0.01000     1.90000
+!                                      from alex's para_na, cn6   
+OHS         0.00      -0.1521    1.7700       ! from para_na, on5         
+!
+OES         0.00      -0.1521    1.7700       ! from para_na, on6
+!
+HT          0.00      -0.046     0.2245    !TIP3P water hydrogen, from Alex' para_na      
+!
+OT          0.00      -0.1521    1.7682    !TIP3P water oxygen, from Alex' para_na     
+!
+NBFIX
+!
+
+HBOND CUTHB 0.5  ! If you want to do hbond analysis (only), then use
+                 ! READ PARAM APPEND CARD
+                 ! to append hbond parameters from the file: par_hbond.inp
+
+END
