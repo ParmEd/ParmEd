@@ -35,9 +35,6 @@ _SCRIPT_HEADER = """\
 
 import os, sys
 
-# Add the Amber Python modules to the search path
-sys.path.append(os.path.join(os.getenv('AMBERHOME'), 'bin'))
-
 # Import the OpenMM modules that are necessary
 from simtk.openmm.app import *
 from simtk.openmm import *
@@ -940,8 +937,10 @@ def energy(parm, args, output=sys.stdout):
 
     # Now see if we want to turn on or off the dispersion correction
     for force in system.getForces():
-        if isinstance(force, mm.NonbondedForce):
+        try:
             force.setUseDispersionCorrection(vdw_longrange)
+        except AttributeError:
+            pass
 
     # Create a dummy integrator
     integrator = mm.VerletIntegrator(2.0)
