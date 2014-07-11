@@ -47,8 +47,6 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                                 'with 2 columns: <Atom Element> '
                                 '<C4 Parameter>' % c4file)
 
-    if tunfactor is None:
-        tunfactor = 1.0
 
     print "***********************************************************"
     # Determine which atom type was treated as the center metal ion
@@ -70,16 +68,16 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 
     amberatomtypelist1 = []
     atomtypeindexlist1 = [] 
-    for i in range(0, parm.pointers['NATOM']):
+    for i in range(parm.pointers['NATOM']):
         amberatomtypelist1.append(parm.parm_data['AMBER_ATOM_TYPE'][i])
         atomtypeindexlist1.append(parm.parm_data['ATOM_TYPE_INDEX'][i])
 
-    # 2. Have the represetative AMBER_ATOM_TYPE for the each certain 
+    # 2. Have the representative AMBER_ATOM_TYPE for the each certain
     # ATOM_TYPE_INDEX
 
     amberatomtypelist2 = []
     atomtypeindexlist2 = []
-    for i in range(0, parm.pointers['NATOM']):
+    for i in range(parm.pointers['NATOM']):
         if not atomtypeindexlist1[i] in atomtypeindexlist2:
             amberatomtypelist2.append(amberatomtypelist1[i])
             atomtypeindexlist2.append(atomtypeindexlist1[i])
@@ -97,7 +95,7 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 #       print "***********************************************************"
 #       print "Here are the atom types which have been added C4 term:"
         # for the situation j < i
-        for j in range(0 , typ):
+        for j in range(typ):
             atomtypej = amberatomtypelist2[j]
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*j+i]-1
             try:

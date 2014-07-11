@@ -11,7 +11,7 @@ from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               ArgumentError, AddPDBError, AddPDBWarning, HMassRepartitionError,
               SimulationError, UnhandledArgumentWarning, SeriousParmWarning,
               FileExists, NonexistentParmWarning, LJ12_6_4Error, ChamberError,
-              FileDoesNotExist, InputError,
+              FileDoesNotExist, InputError, TiMergeError,
 #             CoarseGrainError,
                                    )
 from ParmedTools.argumentlist import ArgumentList
@@ -307,14 +307,19 @@ class writefrcmod(Action):
         self.frcmod_name = arg_list.get_next_string(optional=True)
         if self.frcmod_name is None: self.frcmod_name = 'frcmod'
         # Emit warnings about 10-12 prmtops if we detect any 10-12 parameters
+        hbond_indexes = set()
+        for idx in self.parm.parm_data['NONBONDED_PARM_INDEX']:
+            if idx < 0: hbond_indexes.add(abs(idx))
         try:
-            if (len(self.parm.parm_data['HBOND_ACOEF']) + 
-                len(self.parm.parm_data['HBOND_BCOEF']) +
-                len(self.parm.parm_data['HBCUT']) > 0):
-                warnings.warn('Frcmod dumping does not work with 10-12 prmtops',
-                              SeriousParmWarning)
-        except KeyError:
-            pass
+            for idx in hbond_indexes:
+                if (self.parm.parm_data['HBOND_ACOEF'][idx-1] > 0 or
+                    self.parm.parm_data['HBOND_BCOEF'][idx-1] > 0 or
+                    self.parm.parm_data['HBCUT'][idx-1] > 0):
+                    warnings.warn('Frcmod dumping does not work with 10-12 '
+                                  'prmtops', SeriousParmWarning)
+                    break
+        except IndexError:
+            pass # FIXME should we warn here, too?
 
     def __str__(self):
         return 'Dumping FRCMOD file %s with parameters from %s' % (
@@ -1953,14 +1958,14 @@ class timerge(Action):
     <scmask1>/<scmask2> represent the perturbed atoms. The output will give the
     scmask1/scmask2 flags, which can just be ignored.
 
-    <tol> is the tolerence to use when matching coordinates (default 0.0001).
+    <tol> is the tolerence to use when matching coordinates (default 0.01).
     This is used when the atoms in molecules 1/2 are not in the same order and
     for checking the input coordinates.
     """
     supported_classes = ('AmberParm',)
 
     def init(self, arg_list):
-        self.tol = arg_list.get_key_float('tol', 0.0001)
+        self.tol = arg_list.get_key_float('tol', 0.01)
         self.molmask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.molmask2 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1980,9 +1985,14 @@ class timerge(Action):
         else:
             self.molmask2N = None
 
-        self.err = None   
-
     def __str__(self):
+        if not self.molmask1 or not self.molmask2:
+            return 'No molecules specified to merge'
+        return ('Merging molecules [%s] [%s] with sc mask [%s] [%s]' % (
+               self.molmask1, self.molmask2, self.mask1, self.mask2 )
+        )
+
+    def execute(self):
         sel1 = self.mask1.Selection()
         sel2 = self.mask2.Selection()
         molsel1 = self.molmask1.Selection()
@@ -2002,18 +2012,21 @@ class timerge(Action):
 
         for i in range(natom):
             if sel1[i] and not molsel1[i]:
-                self.err = 'ERROR: scmask1 must be a subset of mol1mask'
-                return None
+                raise TiMergeError('scmask1 must be a subset of mol1mask.')
             if sel2[i] and not molsel2[i]:
-                self.err = 'ERROR: scmask2 must be a subset of mol2mask'
-                return None
+                raise TiMergeError('scmask2 must be a subset of mol2mask.')
             if molsel1[i] and molsel2[i]:
-                self.err = 'ERROR: mol1mask can not overlap with mol2mask.'
-                return None
+                raise TiMergeError('mol1mask can not overlap with mol2mask.')
+            if i < natom-1:
+                if molsel1[i] and not (molsel1[i+1] or molsel2[i+1]):
+                    raise TiMergeError(
+                            'mol1mask and mol2mask must be adjacent in '
+                            'topology. Recreate topology with the molecules '
+                            'to be merged adjacent in the PDB file.'
+                    )
 
         if not hasattr(self.parm, 'coords'):
-            self.err = 'ERROR: Load coordinates before merging topology.'
-            return None
+            raise TiMergeError('Load coordinates before merging topology.')
       
         # we now have enough info to remap the atom indicies if an atom in
         # molsel2 has no overlap (dihedrals, angles, bonds) with sel2 then we
@@ -2035,10 +2048,10 @@ class timerge(Action):
 
         nremove = sum(molsel2) - sum(sel2)
       
-        #We use an ambmask here to minimize changes to the code and
-        #not introduce extra maintenance issues
+        # We use an ambmask here to minimize changes to the code and
+        # not introduce extra maintenance issues
         remove_mask = []
-        #remove_map[old_atm_idx] = new_atm_idx
+        # remove_map[old_atm_idx] = new_atm_idx
         remove_map = [0 for i in range(natom)] 
 
         new_atm_idx = 0
@@ -2051,8 +2064,8 @@ class timerge(Action):
 
         remove_str = '@' + ','.join(remove_mask)
 
-        #However, if there is overlap, we need to re-index the atoms involved
-        #Create a map from molsel2 to molsel1 excluding sel2/sel1 respectively.
+        # However, if there is overlap, we need to re-index the atoms involved
+        # Create a map from molsel2 to molsel1 excluding sel2/sel1 respectively
 
         mol1common = []
         mol2common = []
@@ -2066,12 +2079,11 @@ class timerge(Action):
                 mol2common.append(i)
 
         if len(mol1common) != len(mol2common):
-            self.err = ('ERROR: The number of nonsoftcore atoms in mol1mask '
-                        'and mol2mask must be the same.')
-            return None
+            raise TiMergeError('The number of nonsoftcore atoms in '
+                               'mol1mask and mol2mask must be the same.')
 
         mol2common_sort = []
-        #reorder mol2common so that it matches mol1common
+        # reorder mol2common so that it matches mol1common
         for i in range(len(mol1common)):
             atm_i = mol1common[i]
             for j in range(len(mol2common)):
@@ -2088,11 +2100,12 @@ class timerge(Action):
 
         mol2common = mol2common_sort
 
-        #check again if we didn't match all coords
+        # check again if we didn't match all coords
         if len(mol1common) != len(mol2common):
-            self.err = ('ERROR: The number of nonsoftcore atoms in mol1mask '
-                        'and mol2mask must be the same.')
-            return None
+            raise TiMergeError('The number of nonsoftcore atoms in mol1mask '
+                               'and mol2mask must be the same. Check the '
+                               'masks. If these look correct try using a '
+                               'larger tolerance.')
 
         for i in range(len(mol1common)):
             atm_i = mol1common[i]
@@ -2101,9 +2114,8 @@ class timerge(Action):
                 diff = (self.parm.coords[3*atm_i + k] - 
                         self.parm.coords[3*atm_j + k])
                 if abs(diff) > self.tol:
-                    self.err = ('ERROR: Common (nonsoftcore) atoms must have'
-                                'the same coordinates.')
-                    return None
+                    raise TiMergeError('Common (nonsoftcore) atoms must have '
+                                       'the same coordinates.')
       
         for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
@@ -2114,8 +2126,8 @@ class timerge(Action):
                 for k in range(natom):
                     if sel2[k]:
                         atm2 = self.parm.atom_list[k]
-                        #update partners -- the exclusion list will be updated 
-                        #when the file is written out
+                        # update partners -- the exclusion list will be updated 
+                        # when the file is written out
                         if atm in atm2.bond_partners:
                             atm.bond_partners.remove(atm2)
                             atm2.bond_partners.remove(atm)
@@ -2134,9 +2146,9 @@ class timerge(Action):
                             atm2.dihedral_to(atm_new)
                             atm_new.dihedral_to(atm2)
 
-                        #Now go through each array re-indexing the atoms
-                        #Check to make sure that this is a bond/angle/dihed 
-                        #involving the common atom j and the softcore atom k
+                        # Now go through each array re-indexing the atoms
+                        # Check to make sure that this is a bond/angle/dihed 
+                        # involving the common atom j and the softcore atom k
                       
                         for bond in (self.parm.bonds_inc_h, 
                                      self.parm.bonds_without_h):
@@ -2234,32 +2246,26 @@ class timerge(Action):
                         atmi not in new_sc_atm2_int and 
                         atml not in new_sc_atm1_int and 
                         atml not in new_sc_atm2_int):
-                        self.err = (
-                                'ERROR: Can not have dihedral cross through '
-                                'softcore region. (DIHED : %d %d %d %d)\n '
-                                'Usually this means you have defined the '
-                                'softcore region in a way that breaks a '
-                                'ring.\n Try redefining your softcore region '
-                                'to include the ring or at least three '
-                                'consecutive atoms.' %
-                                (atmi+1, atmj+1, (atmk+1)*holder.signs[0], 
-                                 (atml+1) * holder.signs[1])
-                        )
-                        return
+                        raise TiMergeError('Cannot have dihedral cross through '
+                        'softcore region. (DIHED : %d %d %d %d)\n Usually this '
+                        'means you have defined the softcore region in a way '
+                        'that breaks a ring.\n Try redefining your softcore '
+                        'region to include the ring or at least three '
+                        'consecutive atoms.' % (atmi+1,
+                                                atmj+1, 
+                                               (atmk+1) * holder.signs[0], 
+                                               (atml+1) * holder.signs[1]))
                      
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
         self.sc_mask2 = '@' + ','.join(new_sc_atm2)
 
-        if self.err is not None:
-            return self.err
-        else:
-            ret_str = ("Merging molecules %s and %s into the same molecule.\n"
-                       % (self.molmask1, self.molmask2))
-            ret_str2 = ("Use softcore mask:\ntimask1=\'%s\',\ntimask2=\'%s\',"
-                        % (self.sc_mask1, self.sc_mask2))
-            ret_str3 = ("\nscmask1=\'%s\',\nscmask2=\'%s\',"
-                        % (self.sc_mask1, self.sc_mask2))
-            return ret_str + ret_str2 + ret_str3
+        ret_str = ("Merging molecules %s and %s into the same molecule.\n"
+                   % (self.molmask1, self.molmask2))
+        ret_str2 = ("Use softcore mask:\ntimask1=\'%s\',\ntimask2=\'%s\',"
+                   % (self.sc_mask1, self.sc_mask2))
+        ret_str3 = ("\nscmask1=\'%s\',\nscmask2=\'%s\',"
+                   % (self.sc_mask1, self.sc_mask2))
+        print ret_str + ret_str2 + ret_str3
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2854,7 +2860,7 @@ class add12_6_4(Action):
         self.polfile = arg_list.get_key_string('polfile',
                             os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
                             'parm', 'lj_1264_pol.dat'))
-        self.tunfactor = arg_list.get_key_float('tunfactor', None)
+        self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
 
         if self.c4file is None:
             if self.watermodel is None:

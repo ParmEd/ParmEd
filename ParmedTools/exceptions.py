@@ -138,6 +138,9 @@ class FileDoesNotExist(ParmError):
 class ChamberError(ParmError):
     pass
 
+class TiMergeError(ParmError):
+    pass
+
 class WarningList(list):
     """ List of warnings """
    

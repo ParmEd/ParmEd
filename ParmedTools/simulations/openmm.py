@@ -937,10 +937,8 @@ def energy(parm, args, output=sys.stdout):
 
     # Now see if we want to turn on or off the dispersion correction
     for force in system.getForces():
-        try:
+        if isinstance(force, mm.NonbondedForce):
             force.setUseDispersionCorrection(vdw_longrange)
-        except AttributeError:
-            pass
 
     # Create a dummy integrator
     integrator = mm.VerletIntegrator(2.0)
