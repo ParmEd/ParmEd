@@ -466,7 +466,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         excluded_atoms_list.extend(sorted(vals_to_add))
     # Determine the number of LJ atom types by condensing them into as few atom
     # types as possible
-    lj_idx_list = [0 for atom in self.atom_list]
+    lj_idx_list = [0 for atom in struct.atom_list]
     num_lj_types = 0
     lj_radii, lj_depths = [], []
     lj_radii14, lj_depths14 = [], []
@@ -534,8 +534,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
                                '(CCELEC)']
         )
     parm.addFlag('MASS', '5E16.8', data=[a.mass for a in struct.atom_list])
-    parm.addFlag('ATOM_TYPE_INDEX', '10I8',
-                 data=[a.ljidx for a in struct.atom_list])
+    parm.addFlag('ATOM_TYPE_INDEX', '10I8', data=lj_idx_list)
     parm.addFlag('NUMBER_EXCLUDED_ATOMS', '10I8', data=num_excluded_atoms)
     parm.addFlag('EXCLUDED_ATOMS_LIST', '10I8', data=excluded_atoms_list)
     # Assign the nonbonded parm index table

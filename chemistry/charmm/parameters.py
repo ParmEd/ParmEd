@@ -411,8 +411,19 @@ class CharmmParameterSet(object):
                         rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4')
                     except IndexError:
                         emin14 = rmin14 = None
-                    at1.add_nbfix(at2, emin, rmin, emin14, rmin14)
-                    at2.add_nbfix(at1, emin, rmin, emin14, rmin14)
+                    try:
+                        self.atom_types_str[at1].add_nbfix(at2, emin, rmin,
+                                                           emin14, rmin14)
+                        self.atom_types_str[at2].add_nbfix(at1, emin, rmin,
+                                                           emin14, rmin14)
+                    except KeyError:
+                        # Some stream files define NBFIX terms with an atom that
+                        # is defined in another toppar file that does not
+                        # necessarily have to be loaded. As a result, not every
+                        # NBFIX found here will necessarily need to be applied.
+                        # If we can't find a particular atom type, don't bother
+                        # adding that nbfix and press on
+                        pass
                 except IndexError:
                     raise CharmmFileError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
