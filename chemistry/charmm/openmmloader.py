@@ -517,7 +517,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
 
         # Add per-particle nonbonded parameters (LJ params)
         sigma_scale = 2**(-1/6) * 2
-        if has_nbfix_terms:
+        if not has_nbfix_terms:
             for i, atm in enumerate(self.atom_list):
                 force.addParticle(atm.charge,
                                   sigma_scale*atm.type.rmin*length_conv,
@@ -540,7 +540,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 lj_type_list.append(atom)
                 lj_radii.append(atom.rmin)
                 lj_depths.append(atom.epsilon)
-                for j in range(i+1, len(struct.atom_list)):
+                for j in range(i+1, len(self.atom_list)):
                     atom2 = self.atom_list[j].type
                     if lj_idx_list[j]: continue # already assigned
                     if atom2 is atom:
@@ -552,27 +552,38 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                             lj_idx_list[j] = num_lj_types
             # Now everything is assigned. Create the A-coefficient and
             # B-coefficient arrays
-            acoef = [[0 for i in range(num_lj_types)]
-                     for j in range(num_lj_types)]
-            bcoef = acoef[:] # slice to copy
+            acoef = [0 for i in range(num_lj_types*num_lj_types)]
+            bcoef = acoef[:]
             for i in range(num_lj_types):
                 for j in range(num_lj_types):
                     try:
                         rij, wdij = lj_type_list[i].nbfix[lj_type_list[j].name]
+                        rij *= length_conv
                     except KeyError:
-                        rij = lj_radii[i] + lj_radii[j]
-                        wdij = sqrt(lj_depths[i] * lj_depths[j])
-                    acoef[i][j] = wdij * rij**12
-                    bcoef[i][j] = 2 * wdij * rij**6
-            cforce = CustomNonbondedForce('a/r^12-b/r^6;'
-                                          'a=acoef(type1, type2);'
-                                          'b=bcoef(type1, type2)')
+                        rij = (lj_radii[i] + lj_radii[j]) * length_conv
+                        wdij = sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
+                    acoef[i+num_lj_types*j] = wdij * rij**12
+                    bcoef[i+num_lj_types*j] = 2 * wdij * rij**6
+            cforce = mm.CustomNonbondedForce('a/r^12-b/r^6;'
+                                             'a=acoef(type1, type2);'
+                                             'b=bcoef(type1, type2)')
             cforce.addTabulatedFunction('acoef',
                     mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
             cforce.addTabulatedFunction('bcoef',
                     mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
             cforce.addPerParticleParameter('type')
             cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
+            if (nonbondedMethod is ff.PME or nonbondedMethod is ff.Ewald or
+                        nonbondedMethod is ff.CutoffPeriodic):
+                cforce.setNonbondedMethod(cforce.CutoffPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+            elif nonbondedMethod is ff.NoCutoff:
+                cforce.setNonbondedMethod(cforce.NoCutoff)
+            elif nonbondedMethod is ff.CutoffNonPeriodic:
+                cforce.setNonbondedMethod(cforce.CutoffNonPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+            else:
+                raise ValueError('Unrecognized nonbonded method')
             for i in lj_idx_list:
                 cforce.addParticle(i - 1) # adjust for indexing from 0
 
@@ -620,7 +631,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         if has_nbfix_terms:
             for i in range(force.getNumExceptions()):
                 ii, jj, q, eps, sig = force.getExceptionParameters(i)
-                cforce.addExclusion(p1, p2)
+                cforce.addExclusion(ii, jj)
             system.addForce(cforce)
 
         # Add GB model if we're doing one

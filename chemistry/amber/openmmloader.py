@@ -222,7 +222,8 @@ class OpenMMAmberParm(AmberParm):
                      hydrogenMass=None,
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
-                     verbose=False):
+                     verbose=False,
+                     forceNBFIX=False):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -260,6 +261,9 @@ class OpenMMAmberParm(AmberParm):
                nonbonded method is Ewald or PME.
          -  flexibleConstraints (bool=True) Are our constraints flexible or not?
          -  verbose (bool=False) Optionally prints out a running progress report
+         -  forceNBFIX (bool=False) Debugging option used to force all systems
+               to follow the NBFIX code path. When NBFIX is not needed, the
+               resulting system will run significantly slower with this option
         """
         # Rebuild the topology file if necessary, and flush the atom property
         # data to the atom list
@@ -267,8 +271,12 @@ class OpenMMAmberParm(AmberParm):
             self.remake_parm()
         else:
             self.atom_list.refresh_data()
-        LJ_radius, LJ_depth = self.openmm_LJ() # Get our LJ parameters
-        LJ_14_radius, LJ_14_depth = self.openmm_14_LJ()
+        try:
+            LJ_radius, LJ_depth = self.openmm_LJ() # Get our LJ parameters
+            LJ_14_radius, LJ_14_depth = self.openmm_14_LJ()
+            has_nbfix = False
+        except OpenMMError:
+            has_nbfix = True
 
         # Set the cutoff distance in nanometers
         cutoff = None
@@ -456,31 +464,72 @@ class OpenMMAmberParm(AmberParm):
                 force.setEwaldErrorTolerance(ewaldErrorTolerance)
 
         # Add per-particle nonbonded parameters (LJ params)
-        sigma_scale = 2**(-1/6) * 2
-        for i, atm in enumerate(self.atom_list):
-            force.addParticle(atm.charge,
-                              sigma_scale*LJ_radius[atm.nb_idx-1]*length_conv,
-                              LJ_depth[atm.nb_idx-1]*ene_conv)
+        sigma_scale = 2**(-1/6) * 2 * length_conv
+        if not (has_nbfix or forceNBFIX):
+            for i, atm in enumerate(self.atom_list):
+                force.addParticle(atm.charge,
+                                  sigma_scale*LJ_radius[atm.nb_idx-1],
+                                  LJ_depth[atm.nb_idx-1]*ene_conv)
+        else:
+            for i, atm in enumerate(self.atom_list):
+                force.addParticle(atm.charge, 1.0, 0.0)
 
-        # Add 1-4 interactions
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
-        sigma_scale = 2**(-1/6)
-        for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
-            if min(tor.signs) < 0: continue # multi-terms and impropers
-            charge_prod = (tor.atom1.charge * tor.atom4.charge /
-                           tor.dihed_type.scee)
-            epsilon = (sqrt(LJ_14_depth[tor.atom1.nb_idx-1] * ene_conv *
-                            LJ_14_depth[tor.atom4.nb_idx-1] * ene_conv) /
-                            tor.dihed_type.scnb)
-            sigma = (LJ_14_radius[tor.atom1.nb_idx-1] +
-                     LJ_14_radius[tor.atom4.nb_idx-1])*length_conv*sigma_scale
-            force.addException(tor.atom1.starting_index,
-                               tor.atom4.starting_index,
-                               charge_prod, sigma, epsilon)
-            excluded_atom_pairs.add(
-                    min( (tor.atom1.starting_index, tor.atom4.starting_index),
-                         (tor.atom4.starting_index, tor.atom1.starting_index) )
-            )
+        sigma_scale = 2**(-1/6) * length_conv
+        if not (has_nbfix or forceNBFIX):
+            # Add 1-4 interactions
+            for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
+                if min(tor.signs) < 0: continue # multi-terms and impropers
+                charge_prod = (tor.atom1.charge * tor.atom4.charge /
+                               tor.dihed_type.scee)
+                epsilon = (sqrt(LJ_14_depth[tor.atom1.nb_idx-1] *
+                                LJ_14_depth[tor.atom4.nb_idx-1]) * ene_conv /
+                                tor.dihed_type.scnb)
+                sigma = (LJ_14_radius[tor.atom1.nb_idx-1] +
+                         LJ_14_radius[tor.atom4.nb_idx-1]) * sigma_scale
+                force.addException(tor.atom1.starting_index,
+                                   tor.atom4.starting_index,
+                                   charge_prod, sigma, epsilon)
+                excluded_atom_pairs.add(
+                        min( (tor.atom1.starting_index, tor.atom4.starting_index),
+                             (tor.atom4.starting_index, tor.atom1.starting_index) )
+                )
+        else:
+            # Add 1-4 interactions to the NonbondedForce object. Support both
+            # chamber and regular parms here (this way the ChamberParm
+            # createSystem call can still call this function)
+            try:
+                parm_acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
+                parm_bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
+            except KeyError:
+                parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
+                parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
+            nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+            ntypes = self.ptr('ntypes')
+            for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
+                if min(tor.signs) < 0: continue
+                charge_prod = (tor.atom1.charge * tor.atom4.charge /
+                               tor.dihed_type.scee)
+                typ1 = tor.atom1.nb_idx - 1
+                typ2 = tor.atom4.nb_idx - 1
+                idx = nbidx[ntypes*typ1+typ2] - 1
+                b = parm_bcoef[idx]
+                a = parm_acoef[idx]
+                try:
+                    epsilon = b * b / (4 * a) * ene_conv / tor.dihed_type.scnb
+                    sigma = (2*a/b)**(1/6) * sigma_scale
+                except ZeroDivisionError:
+                    if a != 0 or b != 0:
+                        raise RuntimeError('Cannot have only one of '
+                                    'A-coefficient or B-coefficient be 0.')
+                    epsilon = sigma = 0
+                force.addException(tor.atom1.starting_index,
+                                   tor.atom4.starting_index,
+                                   charge_prod, sigma, epsilon)
+                excluded_atom_pairs.add(
+                        min( (tor.atom1.starting_index, tor.atom4.starting_index),
+                             (tor.atom4.starting_index, tor.atom1.starting_index) )
+                )
 
         # Add excluded atoms
         for atom in self.atom_list:
@@ -505,6 +554,51 @@ class OpenMMAmberParm(AmberParm):
                 force.addException(atom.starting_index,
                                    atom2.starting_index, 0.0, 0.1, 0.0)
         system.addForce(force)
+
+        if has_nbfix or forceNBFIX:
+            # Now we need to add a CustomNonbondedForce to handle the vdW
+            # potential
+            parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
+            parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
+            acoef = [0 for i in range(ntypes*ntypes)]
+            bcoef = acoef[:]
+            # Take sqrt of A coefficient to reduce taxing single precision
+            # limits (since length_conv is 10, we don't want to needlessly
+            # multiply by 10^12 when 10^6 will do)
+            afac = sqrt(ene_conv) * length_conv**6
+            bfac = ene_conv * length_conv**6
+            for i in range(ntypes):
+                for j in range(ntypes):
+                    idx = nbidx[ntypes*i+j] - 1
+                    acoef[i*ntypes+j] = sqrt(parm_acoef[idx]) * afac
+                    bcoef[i*ntypes+j] = parm_bcoef[idx] * bfac
+            cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r^6;'
+                                             'a=acoef(type1, type2);'
+                                             'b=bcoef(type1, type2);')
+            cforce.addTabulatedFunction('acoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, acoef))
+            cforce.addTabulatedFunction('bcoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+            cforce.addPerParticleParameter('type')
+            cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
+            for atom in self.atom_list:
+                cforce.addParticle((atom.nb_idx - 1,)) # index from 0
+            # Now add the exclusions
+            for i in range(force.getNumExceptions()):
+                ii, jj, q, eps, sig = force.getExceptionParameters(i)
+                cforce.addExclusion(ii, jj)
+            if (nonbondedMethod is ff.PME or nonbondedMethod is ff.Ewald or
+                        nonbondedMethod is ff.CutoffPeriodic):
+                cforce.setNonbondedMethod(cforce.CutoffPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+            elif nonbondedMethod is ff.NoCutoff:
+                cforce.setNonbondedMethod(cforce.NoCutoff)
+            elif nonbondedMethod is ff.CutoffNonPeriodic:
+                cforce.setNonbondedMethod(cforce.CutoffNonPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+            else:
+                raise ValueError('Illegal nonbonded method')
+            system.addForce(cforce)
 
         # Add virtual sites for water
         # First tag the residues that have an extra point in them
@@ -827,7 +921,8 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                      hydrogenMass=None,
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
-                     verbose=False):
+                     verbose=False,
+                     forceNBFIX=False):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -870,6 +965,9 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                nonbonded method is Ewald or PME.
          -  flexibleConstraints (bool=True) Are our constraints flexible or not?
          -  verbose (bool=False) Optionally prints out a running progress report
+         -  forceNBFIX (bool=False) Debugging option used to force all systems
+               to follow the NBFIX code path. When NBFIX is not needed, the
+               resulting system will run significantly slower with this option
         """
         # Start from the system created by the AmberParm class
         system = super(OpenMMChamberParm, self).createSystem(
@@ -877,7 +975,8 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                         rigidWater, implicitSolvent, implicitSolventKappa,
                         implicitSolventSaltConc, temperature, soluteDielectric,
                         solventDielectric, removeCMMotion, hydrogenMass,
-                        ewaldErrorTolerance, flexibleConstraints, verbose)
+                        ewaldErrorTolerance, flexibleConstraints, verbose,
+                        forceNBFIX)
 
         # Define conversion factors
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)

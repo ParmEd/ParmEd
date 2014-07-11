@@ -85,7 +85,7 @@ class CharmmPsfFile(object):
         """
         try:
             return type(string)
-        except ValueError, e:
+        except ValueError:
             raise CharmmPSFError('Could not convert %s [%s]' % (message,string))
 
     @staticmethod
