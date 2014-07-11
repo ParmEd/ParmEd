@@ -466,31 +466,37 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         excluded_atoms_list.extend(sorted(vals_to_add))
     # Determine the number of LJ atom types by condensing them into as few atom
     # types as possible
-    for atom in struct.atom_list: atom.ljidx = 0
+    lj_idx_list = [0 for atom in self.atom_list]
     num_lj_types = 0
     lj_radii, lj_depths = [], []
     lj_radii14, lj_depths14 = [], []
+    lj_type_list = []
     for i, atom in enumerate(struct.atom_list):
+        atom = atom.type
         # If we have already assigned the LJ type, skip this one
-        if atom.ljidx > 0: continue
+        if lj_idx_list[i] > 0: continue
         # This is a NEW nonbonded LJ type
         num_lj_types += 1
-        atom.ljidx = num_lj_types
-        ljtype = (atom.type.rmin, atom.type.rmin_14,
-                  atom.type.epsilon, atom.type.epsilon_14)
-        lj_radii.append(atom.type.rmin)
-        lj_radii14.append(atom.type.rmin_14)
-        lj_depths.append(atom.type.epsilon)
-        lj_depths14.append(atom.type.epsilon_14)
+        lj_idx_list[i] = num_lj_types
+        ljtype = (atom.rmin, atom.rmin_14, atom.epsilon, atom.epsilon_14)
+        lj_type_list.append(atom)
+        lj_radii.append(atom.rmin)
+        lj_radii14.append(atom.rmin_14)
+        lj_depths.append(atom.epsilon)
+        lj_depths14.append(atom.epsilon_14)
         # Look through the rest of the atoms and assign any equivalent types as
         # the same
         for j in range(i+1, len(struct.atom_list)):
-            atom2 = struct.atom_list[j]
-            if atom2.ljidx > 0: continue
-            ljtype2 = (atom2.type.rmin, atom2.type.rmin_14,
-                       atom2.type.epsilon, atom2.type.epsilon_14)
-            if ljtype == ljtype2:
-                atom2.ljidx = num_lj_types
+            atom2 = struct.atom_list[j].type
+            if lj_idx_list[j] > 0: continue
+            elif atom2 is atom: # same exact type!
+                lj_idx_list[j] = num_lj_types
+            elif not atom.nbfix:
+                # Only non-NBFIXed atom types can be compressed
+                ljtype2 = (atom2.rmin, atom2.rmin_14,
+                           atom2.epsilon, atom2.epsilon_14)
+                if ljtype == ljtype2:
+                    lj_idx_list[j] = num_lj_types
     # Now we should be ready to set some of our pointers (not # of types yet)
     pointers[NATOM] = len(struct.atom_list)
     pointers[NTYPES] = pointers[NATYP] = num_lj_types
@@ -678,10 +684,16 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     for i in range(num_lj_types):
         for j in range(i, num_lj_types):
             index = parm.parm_data['NONBONDED_PARM_INDEX'][num_lj_types*i+j] - 1
-            rij = lj_radii[i] + lj_radii[j]
-            wdij = sqrt(lj_depths[i] * lj_depths[j])
-            rij14 = lj_radii14[i] + lj_radii14[j]
-            wdij14 = sqrt(lj_depths14[i] * lj_depths14[j])
+            typi = lj_type_list[i]
+            typj = lj_type_list[j]
+            # Get any NBFIXes we may have
+            try:
+                rij, wdij, rij14, wdij14 = typi.nbfix[typj.name]
+            except KeyError:
+                rij = lj_radii[i] + lj_radii[j]
+                wdij = sqrt(lj_depths[i] * lj_depths[j])
+                rij14 = lj_radii14[i] + lj_radii14[j]
+                wdij14 = sqrt(lj_depths14[i] * lj_depths14[j])
             a = wdij * rij**12
             a14 = wdij14 * rij14**12
             b = 2 * wdij * rij**6

@@ -542,7 +542,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 lj_depths.append(atom.epsilon)
                 for j in range(i+1, len(self.atom_list)):
                     atom2 = self.atom_list[j].type
-                    if lj_idx_list[j]: continue # already assigned
+                    if lj_idx_list[j] > 0: continue # already assigned
                     if atom2 is atom:
                         lj_idx_list[j] = num_lj_types
                     elif not atom.nbfix:

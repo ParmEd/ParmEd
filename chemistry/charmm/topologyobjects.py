@@ -127,9 +127,11 @@ class AtomType(object):
         """ The integer representation of an AtomType is its index """
         return self.number
 
-    def add_nbfix(self, typename, rmin, epsilon):
+    def add_nbfix(self, typename, rmin, epsilon, rmin14, epsilon14):
         """ Adds a new NBFIX exclusion for this atom """
-        self.nbfix[typename] = (rmin, epsilon)
+        if rmin14 is None: rmin14 = rmin
+        if epsilon14 is None: epsilon14 = epsilon
+        self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)
 
     def __str__(self):
         return self.name

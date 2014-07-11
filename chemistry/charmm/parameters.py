@@ -406,8 +406,13 @@ class CharmmParameterSet(object):
                     at2 = words[1]
                     emin = conv(words[2], float, 'NBFIX Emin')
                     rmin = conv(words[3], float, 'NBFIX Rmin')
-                    at1.add_nbfix(at2, emin, rmin)
-                    at2.add_nbfix(at1, emin, rmin)
+                    try:
+                        emin14 = conv(words[4], float, 'NBFIX Emin 1-4')
+                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4')
+                    except IndexError:
+                        emin14 = rmin14 = None
+                    at1.add_nbfix(at2, emin, rmin, emin14, rmin14)
+                    at2.add_nbfix(at1, emin, rmin, emin14, rmin14)
                 except IndexError:
                     raise CharmmFileError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
