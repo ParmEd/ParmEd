@@ -933,7 +933,7 @@ def energy(parm, args, output=sys.stdout):
                 force.setForceGroup(parm.NONBONDED_FORCE_GROUP)
         # For periodic simulations, we need to set the box info
         if parm.ptr('ifbox') > 0:
-            system.setPeriodicBoxVectors(*parm.box_vectors)
+            system.setDefaultPeriodicBoxVectors(*parm.box_vectors)
 
     # Now see if we want to turn on or off the dispersion correction
     for force in system.getForces():
