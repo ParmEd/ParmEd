@@ -1048,7 +1048,6 @@ class setmolecules(Action):
                         'loading a restart prior to using setMolecules' %
                         self.parm, ParmWarning
                 )
-        self.parm.remake_parm()
         self.parm.LoadPointers()
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
