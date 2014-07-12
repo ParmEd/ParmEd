@@ -324,7 +324,9 @@ class AmoebaParm(AmberParm):
         self.adjust_weights.changed = False
         self.adjust_list.changed = False
         ##### Finally we can determine the full exclusion list #####
-        for atom in self.atom_list: atom.determine_all_exclusion_partners()
+        first_atom = 0
+        for atom in self.atom_list:
+            first_atom += atom.determine_all_exclusion_partners(first_atom)
 
     #=============================================
 

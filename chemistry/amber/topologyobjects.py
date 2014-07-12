@@ -186,11 +186,10 @@ class Atom(object):
         if self._has_loaded_exclusions:
             return
         excset = set()
-        exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
         exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
-        nexcl = exclat[self.starting_index]
+        n = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS'][self.starting_index]
         atom_list = self.parm.atom_list
-        for i in xrange(nexcl):
+        for i in range(n):
             idx = exclist[first_excl+i] - 1
             # Skip over placeholders
             if idx < 0: continue
@@ -201,7 +200,7 @@ class Atom(object):
         for atm in excset:
             self.exclude(atm)
         self._has_loaded_exclusions = True
-        return nexcl
+        return n
 
     #===================================================
 

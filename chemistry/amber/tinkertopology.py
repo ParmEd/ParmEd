@@ -195,7 +195,7 @@ class Atom(object):
 
     #===================================================
    
-    def determine_all_exclusion_partners(self):
+    def determine_all_exclusion_partners(self, first_excl):
         """
         Amoeba topologies have complex exclusions due to the existence of
         polarization groups and the exclusions of 1-2, 1-3, 1-4, and 1-5 pairs.
@@ -205,11 +205,9 @@ class Atom(object):
         """
         self.determine_exclusions_from_bonds()
         excset = set()
-        exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
+        n = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS'][self.starting_index]
         exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
-        first_excl = sum(exclat[:self.starting_index])
-        nexcl = exclat[self.starting_index]
-        for i in range(nexcl):
+        for i in range(n):
             idx = exclist[first_excl+i] - 1
             excset.add(self.parm.atom_list[idx])
         # Now subtract off all of the bonds, angles, torsions, and tortors
@@ -217,6 +215,7 @@ class Atom(object):
                   self._dihedral_partners - self._tortor_partners)
         for atm in excset:
             self.exclude(atm)
+        return n
 
     #===================================================
    
