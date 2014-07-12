@@ -166,32 +166,42 @@ class Atom(object):
 
     #===================================================
       
-    def load_exclusions(self):
+    def load_exclusions(self, first_excl):
         """
         Looks at the NUMBER_EXCLUDED_ATOMS and EXCLUDED_ATOMS_LIST to determine
         if the topology file defines more atom exclusions than what is defined
         simply by the bonds, angles, and dihedrals. It then adds these atoms to
         the exclusion_partners array. Only allow this to occur once, though,
         since exclusions are remembered for the life of the object
+
+        Parameters
+        ----------
+        first_excl : int
+            Index of the first entry in the exclusion list for this atom
+
+        Returns
+        -------
+        int : The number of entries in the exclusion list belonging to this atom
         """
         if self._has_loaded_exclusions:
             return
         excset = set()
         exclat = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS']
         exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
-        first_excl = sum(exclat[:self.starting_index])
         nexcl = exclat[self.starting_index]
-        for i in range(nexcl):
+        atom_list = self.parm.atom_list
+        for i in xrange(nexcl):
             idx = exclist[first_excl+i] - 1
             # Skip over placeholders
             if idx < 0: continue
-            excset.add(self.parm.atom_list[idx])
+            excset.add(atom_list[idx])
         # Now subtract off all of the bonds, angles, and dihedrals
         excset = (excset - self._bond_partners - self._angle_partners -
                   self._dihedral_partners)
         for atm in excset:
             self.exclude(atm)
         self._has_loaded_exclusions = True
+        return nexcl
 
     #===================================================
 
@@ -1130,7 +1140,9 @@ class AtomList(list):
 
     def find_extra_exclusions(self):
         " Load all extra exclusions that may be stored in the topology file "
-        for atom in self: atom.load_exclusions()
+        first = 0
+        for atom in self:
+            first += atom.load_exclusions(first)
 
     #===================================================
 
