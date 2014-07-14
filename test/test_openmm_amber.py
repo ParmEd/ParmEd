@@ -101,6 +101,7 @@ class TestAmberParm(unittest.TestCase):
             return self.assertAlmostEqual(ratio, 1.0, places=places)
 
     def testGasEnergy(self):
+        """ Compare Amber and OpenMM gas phase energies """
         parm = amber_simple_gas_system
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -119,6 +120,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
     def testGB1Energy(self): # HCT (igb=1)
+        """ Compare Amber and OpenMM GB (igb=1) energies (w/ and w/out salt) """
         parm = amber_simple_gas_system
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -151,6 +153,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -56.7406, places=3)
 
     def testGB2Energy(self): # OBC1 (igb=2)
+        """ Compare Amber and OpenMM GB (igb=2) energies (w/ and w/out salt) """
         parm = amber_simple_gas_system
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -183,6 +186,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -58.4250, places=3)
 
     def testGB5Energy(self): # OBC2 (igb=5)
+        """ Compare Amber and OpenMM GB (igb=5) energies (w/ and w/out salt) """
         parm = amber_simple_gas_system
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -215,6 +219,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -55.7190, places=3)
 
     def testGB7Energy(self): # GBn (igb=7)
+        """ Compare Amber and OpenMM GB (igb=7) energies (w/ and w/out salt) """
         parm = copy(amber_simple_gas_system)
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
@@ -249,6 +254,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -51.3549, places=3)
 
     def testGB8Energy(self): # GBn2 (igb=8)
+        """ Compare Amber and OpenMM GB (igb=8) energies (w/ and w/out salt) """
         parm = copy(amber_simple_gas_system)
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
@@ -283,6 +289,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -53.7187, places=3)
 
     def testRst7(self):
+        """ Test loading coordinates via the OpenMMRst7 class """
         parm = amber_simple_gas_system
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -301,6 +308,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
     def testEwald(self):
+        """ Compare Amber and OpenMM Ewald energies """
         parm = amber_solv_system
         system = parm.createSystem(nonbondedMethod=app.Ewald,
                                    nonbondedCutoff=8*u.angstroms,
@@ -321,6 +329,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -95078.7346, 4)
 
     def testPME(self):
+        """ Compare Amber and OpenMM PME energies """
         parm = amber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -341,6 +350,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -95073.5331, places=4)
 
     def testDispersionCorrection(self):
+        """ Compare Amber and OpenMM PME energies w/out vdW correction """
         parm = amber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -364,6 +374,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -94152.0384, places=4)
 
     def testSHAKE(self):
+        """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
         parm = amber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -381,6 +392,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRelativeEqual(bond, 494.5578, places=4)
         
     def testInterfacePBC(self):
+        """ Testing all OpenMMAmberParm.createSystem options (periodic) """
         parm = amber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -482,6 +494,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
     def testInterfaceNoPBC(self):
+        """ Testing all OpenMMAmberParm.createSystem options (non-periodic) """
         parm = amber_simple_gas_system
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
@@ -729,6 +742,7 @@ class TestChamberParm(unittest.TestCase):
             return self.assertAlmostEqual(ratio, 1.0, places=places)
 
     def testGasEnergy(self):
+        """ Compare OpenMM and CHAMBER gas phase energies """
         parm = chamber_gas_system
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -751,6 +765,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
     def testGB1Energy(self): # HCT (igb=1)
+        """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""
         parm = chamber_gas_system
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -791,6 +806,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -104.3229, places=4)
 
     def testGB2Energy(self): # OBC1 (igb=2)
+        """Compare OpenMM and CHAMBER GB (igb=2) energies (w/ and w/out salt)"""
         parm = chamber_gas_system
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -831,6 +847,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -108.2129, places=4)
 
     def testGB5Energy(self): # OBC2 (igb=5)
+        """Compare OpenMM and CHAMBER GB (igb=5) energies (w/ and w/out salt)"""
         parm = chamber_gas_system
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -871,6 +888,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -103.9603, places=4)
 
     def testGB7Energy(self): # GBn (igb=7)
+        """Compare OpenMM and CHAMBER GB (igb=7) energies (w/ and w/out salt)"""
         parm = copy(chamber_gas_system)
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
@@ -913,6 +931,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -105.3041, places=4)
 
     def testGB8Energy(self): # GBn2 (igb=8)
+        """Compare OpenMM and CHAMBER GB (igb=8) energies (w/ and w/out salt)"""
         parm = copy(chamber_gas_system)
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
@@ -955,6 +974,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -108.4858, places=4)
 
     def testRst7(self):
+        """ Test using OpenMMRst7 to provide coordinates (CHAMBER) """
         parm = chamber_gas_system
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -982,6 +1002,7 @@ class TestChamberParm(unittest.TestCase):
 # requested
 
     def testPME(self):
+        """ Compare OpenMM and CHAMBER PME energies """
         parm = chamber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1006,6 +1027,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
     def testDispersionCorrection(self):
+        """ Compare OpenMM and CHAMBER energies without vdW correction """
         parm = chamber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1033,6 +1055,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
     def testSHAKE(self):
+        """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
         parm = chamber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1050,6 +1073,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertAlmostEqual(bond, 139.2453, delta=5e-4)
         
     def testInterfacePBC(self):
+        """ Testing all OpenMMChamberParm.createSystem options (periodic) """
         parm = chamber_solv_system
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -1168,6 +1192,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
     def testInterfaceNoPBC(self):
+        """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
         parm = chamber_gas_system
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,

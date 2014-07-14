@@ -8,12 +8,14 @@ import utils
 get_fn = utils.get_fn
 
 class TestNetCDF(unittest.TestCase):
+    """ Test NetCDF Functionality """
     
     def setUp(self):
         import chemistry.amber as amber
         amber.NETCDF_INITIALIZED = False
 
     def testScipy(self):
+        """ Test scipy NetCDF parsing """
         import chemistry.amber as amber
         if utils.has_scipy():
             amber.use('scipy')
@@ -26,6 +28,7 @@ class TestNetCDF(unittest.TestCase):
             self.assertRaises(ImportError, lambda: amber.use('scipy'))
 
     def testNetcdf4(self):
+        """ Test netCDF4 parsing """
         import chemistry.amber as amber
         if utils.has_netcdf4():
             amber.use('netCDF4')
@@ -38,6 +41,7 @@ class TestNetCDF(unittest.TestCase):
             self.assertRaises(ImportError, lambda: amber.use('netCDF4'))
 
     def testScientificPython(self):
+        """ Test ScientificPython parsing """
         import chemistry.amber as amber
         if utils.has_scientific():
             amber.use('Scientific')

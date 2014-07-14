@@ -11,6 +11,7 @@ get_fn = utils.get_fn
 class TestTinkerFiles(unittest.TestCase):
     
     def testParameterFile(self):
+        """ Tests parsing TINKER parameter files """
         param = parameterfile.AmoebaParameterSet(get_fn('amoeba09.prm'))
         attributes = {'angle-sextic': 2.2e-08, 'direct-13-scale': 1.0,
                       'radiustype': 'R-MIN', 'mpole-14-scale': 0.4,
@@ -63,6 +64,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertTrue(not any(param.multipoles['2-0-0'].potential_terms))
 
     def testAnalout(self):
+        """ Tests parsing Amber-style Tinker analout files """
         analout = system.TinkerAnalout(get_fn('jac.analout'))
         self.assertEqual(len(analout.atom_list), 23558)
         self.assertEqual(len(analout.angle_list), 11584)
@@ -94,6 +96,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(len(analout.pair12_list), 16569)
     
     def testXyz(self):
+        """ Tests parsing Tinker XYZ files """
         xyz = tinkerfiles.XyzFile(get_fn('nma.xyz'))
         self.assertEqual(xyz.box, [30.735, 30.876, 28.485, 90.0, 90.0, 90.0])
         self.assertEqual(xyz.natom, 2466)
@@ -105,6 +108,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(xyz.atom_list[-1].type, 248)
 
     def testDyn(self):
+        """ Tests parsing Tinker DYN files """
         dyn = tinkerfiles.DynFile(get_fn('nma.dyn'))
         self.assertEqual(dyn.natom, 2466)
         for attr in ('accelerations', 'old_accelerations', 'box', 'positions',

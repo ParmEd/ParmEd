@@ -88,6 +88,7 @@ class TestCharmmFiles(unittest.TestCase):
             return self.assertAlmostEqual(ratio, 1.0, places=places)
     
     def testGasEnergy(self):
+        """ Compare OpenMM and CHARMM gas phase energies """
         parm = charmm_gas
         system = parm.createSystem(param22)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -103,6 +104,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
     def testGB1Energy(self): # HCT (uses mbondi radii internally)
+        """ Compare OpenMM and CHARMM GB (igb=1) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -131,6 +133,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -102.5012873, places=5)
 
     def testGB2Energy(self): # OBC1 (uses mbondi2 radii internally)
+        """ Compare OpenMM and CHARMM GB (igb=2) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -159,6 +162,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -108.2129, places=4)
 
     def testGB5Energy(self): # OBC2 (uses mbondi2 radii internally)
+        """ Compare OpenMM and CHARMM GB (igb=5) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -187,6 +191,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -103.9603, places=4)
 
     def testGB7Energy(self): # GBn (uses bondi radii internally)
+        """ Compare OpenMM and CHARMM GB (igb=7) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -215,6 +220,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -109.8465917, places=5)
 
     def testGB8Energy(self): # GBn2 (uses mbondi3 radii internally)
+        """ Compare OpenMM and CHARMM GB (igb=8) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -243,6 +249,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -108.4858, places=4)
 
     def testPME(self):
+        """ Compare OpenMM and CHARMM PME energies """
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstrom)
@@ -259,6 +266,7 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['nonbond'], -242262.368372, places=5)
 
     def testDispersionCorrection(self):
+        """ Compare OpenMM and CHARMM PME energies w/out vdW correction """
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,)

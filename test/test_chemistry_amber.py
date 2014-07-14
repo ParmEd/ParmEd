@@ -9,14 +9,17 @@ import unittest
 from utils import get_fn, has_numpy
 
 class TestReadParm(unittest.TestCase):
+    """ Tests the various Parm file classes """
     
     def testLoadParm(self):
+        """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
 
     def testAmberGasParm(self):
+        """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
         gasparm.LoadRst7(get_fn('trx.inpcrd'))
@@ -50,6 +53,7 @@ class TestReadParm(unittest.TestCase):
             self.assertEqual(vels[i3+2], atom.vz)
 
     def testAmberSolvParm(self):
+        """ Test the AmberParm class with a periodic prmtop """
         parm = readparm.AmberParm(get_fn('solv.prmtop'),
                                   get_fn('solv.rst7'))
         self._standard_parm_tests(parm)
@@ -59,6 +63,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ifbox'), 1)
 
     def testChamberGasParm(self):
+        """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
         parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
@@ -67,6 +72,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ifbox'), 0)
 
     def testChamberSolvParm(self):
+        """ Test the ChamberParm class with a periodic prmtop """
         parm = readparm.ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
@@ -75,6 +81,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ifbox'), 1)
 
     def testAmoebaBig(self):
+        """ Test the AmoebaParm class with a large system """
         parm = readparm.AmoebaParm(get_fn('amoeba.parm7'))
         self.assertEqual(parm.ptr('natom'), len(parm.atom_list))
         self.assertEqual([a.atname for a in parm.atom_list],
@@ -94,6 +101,7 @@ class TestReadParm(unittest.TestCase):
             self.assertTrue(hasattr(parm, attr))
 
     def testAmoebaSmall(self):
+        """ Test the AmoebaParm class w/ small system (not all terms) """
         parm = readparm.AmoebaParm(get_fn('nma.parm7'))
         rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
         self.assertEqual(3*rst7.natom, len(rst7.coordinates))
@@ -155,8 +163,10 @@ class TestReadParm(unittest.TestCase):
                 self.assertEqual(sum([b in cmap for b in bond_list]), 4)
 
 class TestCoordinateFiles(unittest.TestCase):
+    """ Tests the various coordinate file classes """
     
     def testMdcrd(self):
+        """ Test the ASCII trajectory file parsing """
         mdcrd = asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'),
                                     natom=5827, hasbox=True, mode='r')
         self.assertEqual(mdcrd.frame, 10)
@@ -187,6 +197,7 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertAlmostEqual(runsum, 7049.817, places=3)
 
     def testRestart(self):
+        """ Test the ASCII restart file parsing """
         restart = asciicrd.AmberAsciiRestart(get_fn('tz2.ortho.rst7'), 'r')
         self.assertEqual(restart.natom, 5293)
         self.assertTrue(restart.hasbox)
@@ -208,8 +219,10 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
 class TestAmberMask(unittest.TestCase):
+    """ Test the Amber mask parser """
     
     def testMask(self):
+        """ Test the Amber mask parser """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         mask_res1 = mask.AmberMask(parm, ':1')
         mask_resala = mask.AmberMask(parm, ':ALA')
@@ -257,83 +270,7 @@ class TestWriteFiles(unittest.TestCase):
             pass
 
     def testWriteAmberParm(self):
-        parm = readparm.AmberParm(get_fn('trx.prmtop'))
-        parm.writeParm(get_fn('trx.prmtop', written=True))
-        f1 = open(get_fn('trx.prmtop'), 'r')
-        f2 = open(get_fn('trx.prmtop', written=True), 'r')
-        try:
-            for line1, line2 in zip(f1, f2):
-                self.assertEqual(line1.strip(), line2.strip())
-        finally:
-            f1.close()
-            f2.close()
-
-    def testAmberRestart(self):
-        Restart = asciicrd.AmberAsciiRestart
-        box = [10, 10, 10, 90, 90, 90]
-        rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
-        rst.coordinates = range(27)
-        rst.close()
-        rst = Restart(get_fn('testcv.rst7', written=True), 'w', natom=20)
-        rst.coordinates = range(60)
-        rst.velocities = reversed(range(60))
-        rst.close()
-        rst = Restart(get_fn('testcb.rst7', written=True), 'w', natom=7)
-        rst.coordinates = range(21)
-        rst.box = box[:]
-        rst.close()
-        rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
-        rst.coordinates = range(45)
-        rst.velocities = reversed(range(45))
-        rst.box = box[:]
-        rst.close()
-        # Now try to read them and verify the information
-        rst = readparm.Rst7.open(get_fn('testc.rst7', written=True))
-        self.assertFalse(rst.hasbox)
-        self.assertFalse(rst.hasvels)
-        for x1, x2 in zip(rst.coordinates, range(27)):
-            self.assertEqual(x1, x2)
-        rst = readparm.Rst7.open(get_fn('testcb.rst7', written=True))
-        self.assertTrue(rst.hasbox)
-        self.assertFalse(rst.hasvels)
-        for x1, x2 in zip(rst.coordinates, range(21)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.box, box):
-            self.assertEqual(x1, x2)
-        rst = readparm.Rst7.open(get_fn('testcv.rst7', written=True))
-        self.assertTrue(rst.hasvels)
-        self.assertFalse(rst.hasbox)
-        for x1, x2 in zip(rst.coordinates, range(60)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(60))):
-            self.assertEqual(x1, x2)
-        rst = readparm.Rst7.open(get_fn('testcvb', written=True))
-        self.assertTrue(rst.hasvels)
-        self.assertTrue(rst.hasbox)
-        for x1, x2 in zip(rst.coordinates, range(45)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(45))):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.box, box):
-            self.assertEqual(x1, x2)
-
-class TestWriteFiles(unittest.TestCase):
-    
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
-    def testWriteAmberParm(self):
+        """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         parm.writeParm(get_fn('trx.prmtop', written=True))
         f1 = open(get_fn('trx.prmtop'), 'r')
@@ -349,6 +286,7 @@ class TestWriteFiles(unittest.TestCase):
             f2.close()
 
     def testAmberRestart(self):
+        """ Test writing an ASCII Amber restart file """
         Restart = asciicrd.AmberAsciiRestart
         box = [10, 10, 10, 90, 90, 90]
         rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
@@ -370,6 +308,7 @@ class TestWriteFiles(unittest.TestCase):
         self._check_written_restarts(box)
     
     def testAmberRestartNumpy(self):
+        """ Test writing Amber restart file passing numpy arrays """
         import numpy as np
         Restart = asciicrd.AmberAsciiRestart
         box = np.asarray([10, 10, 10, 90, 90, 90])
@@ -392,6 +331,7 @@ class TestWriteFiles(unittest.TestCase):
         self._check_written_restarts(box)
 
     def testAmberMdcrd(self):
+        """ Test writing ASCII trajectory file """
         box = [15, 15, 15]
         Mdcrd = asciicrd.AmberMdcrd
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=False,
@@ -418,6 +358,7 @@ class TestWriteFiles(unittest.TestCase):
         self._check_written_mdcrds(box)
 
     def testAmberMdcrdNumpy(self):
+        """ Test writing ASCII trajectory file passing numpy arrays """
         import numpy as np
         box = np.asarray([15, 15, 15])
         Mdcrd = asciicrd.AmberMdcrd
@@ -447,6 +388,7 @@ class TestWriteFiles(unittest.TestCase):
         self._check_written_mdcrds(box)
 
     def testBadFileUsage(self):
+        """ Check that illegal file usage results in desired exceptions """
         Restart = asciicrd.AmberAsciiRestart
         Mdcrd = asciicrd.AmberMdcrd
         box = [10, 10, 10, 90, 90, 90]

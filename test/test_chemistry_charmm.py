@@ -11,8 +11,10 @@ import utils
 get_fn = utils.get_fn
 
 class TestCharmmCoords(unittest.TestCase):
+    """ Test CHARMM coordinate file parsers """
     
     def testCharmmCrd(self):
+        """ Test CHARMM coordinate file parser """
         crd = charmmcrds.CharmmCrdFile(get_fn('1tnm.crd'))
         self.assertEqual(crd.natom, 1414)
         self.assertEqual(max(crd.resno), 91)
@@ -25,6 +27,7 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(len(crd.weighting), crd.natom)
 
     def testCharmmRst(self):
+        """ Test CHARMM restart file parser """
         crd = charmmcrds.CharmmRstFile(get_fn('sample-charmm.rst'))
         self.assertEqual(crd.natom, 256)
         self.assertEqual(crd.nstep, 100)
@@ -43,8 +46,10 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(crd.nsavv, 10)
 
 class TestCharmmPsf(unittest.TestCase):
+    """ Test CHARMM PSF file capabilities """
     
     def testCharmmPsf(self):
+        """ Test CHARMM PSF file parsing """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         self.assertEqual(len(cpsf.atom_list), 33)
         for i, atom in enumerate(cpsf.atom_list):
@@ -127,6 +132,7 @@ class TestCharmmPsf(unittest.TestCase):
                 self.asserttrue(4 < nb <= 6)
 
     def testXplorPsf(self):
+        """ Test Xplor-format CHARMM PSF file parsing """
         # Atom types are strings, not integers like in charmm
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf.xplor'))
         self.assertEqual(len(cpsf.atom_list), 33)
@@ -210,6 +216,7 @@ class TestCharmmPsf(unittest.TestCase):
                 self.asserttrue(4 < nb <= 6)
 
     def testCharmmGuiBuilder(self):
+        """ Test parsing of CHARMM PSF from CHARMM-GUI """
         cpsf = psf.CharmmPsfFile(get_fn('parv.psf'))
         self.assertEqual(len(cpsf.acceptor_list), 0)
         self.assertEqual(len(cpsf.angle_list), 3004)
@@ -226,6 +233,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.title), 3)
     
     def testVmdPsf(self):
+        """ Test parsing of CHARMM PSF from VMD """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
         # Atom types are strings, not integers like in charmm
         self.assertEqual(len(cpsf.atom_list), 33)
@@ -309,8 +317,10 @@ class TestCharmmPsf(unittest.TestCase):
                 self.asserttrue(4 < nb <= 6)
 
 class TestCharmmParameters(unittest.TestCase):
+    """ Test CHARMM Parameter file parsing """
     
     def testSingleParameterset(self):
+        """ Test reading a single parameter set """
         self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
                                                 get_fn('par_all22_prot.inp')))
         params = parameters.CharmmParameterSet(
@@ -363,9 +373,11 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(uniques(params.urey_bradley_types), 42)
 
     def testParamFileOnly(self):
+        """ Test reading only a parameter file with no RTF (CHARMM36) """
         p=parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
 
     def testCollection(self):
+        """ Test reading a large number of parameter files """
         p = parameters.CharmmParameterSet(
                     get_fn('top_all36_prot.rtf'), 
                     get_fn('top_all36_carb.rtf'),
@@ -407,6 +419,7 @@ class TestFileWriting(unittest.TestCase):
             pass
 
     def testWriteCharmm(self):
+        """ Test writing CHARMM-style PSF files """
         # Test writing CHARMM-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
         cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True))
@@ -431,6 +444,7 @@ class TestFileWriting(unittest.TestCase):
         self.assertTrue(has_key)
 
     def testWriteVmd(self):
+        """ Test writing VMD-style PSF files """
         # Test writing VMD-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
         cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True), vmd=True)

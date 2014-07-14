@@ -14,6 +14,7 @@ class TestChemistrySystem(unittest.TestCase):
         self.models = get_fn('2koc.pdb')
 
     def testAscii(self):
+        """ Test PDB file parsing """
         self._check4lyt(system.ChemicalSystem.load_from_pdb(self.pdb))
         # The PDB file with multiple models
         pdbfile = system.ChemicalSystem.load_from_open_pdb(open(self.models))
@@ -22,9 +23,11 @@ class TestChemistrySystem(unittest.TestCase):
         self.assertEqual(pdbfile.positions(20)[-3:], [-12.051, 5.205, -2.146])
 
     def testGzip(self):
+        """ Test Gzipped-PDB file parsing """
         self._check4lyt(system.ChemicalSystem.load_from_pdb(self.pdbgz))
 
     def testBzip(self):
+        """ Test Bzipped-PDB file parsing """
         self._check4lyt(system.ChemicalSystem.load_from_pdb(self.pdbbz2))
 
     # Private helper test functions
