@@ -29,6 +29,7 @@ if has_openmm:
                                      get_fn('ala_ala_ala.rst7'))
     chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                                       get_fn('dhfr_cmap_pbc.rst7'))
+    amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -390,7 +391,30 @@ class TestAmberParm(unittest.TestCase):
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
         self.assertRelativeEqual(bond, 494.5578, places=4)
-        
+
+    def testNBFIX(self):
+        """ Compare Amber and OpenMM PME energies with NBFIX modifications """
+        # For now, long-range correction is not available
+        parm = copy(amber_ff14ipq)
+        PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(amber_ff14ipq.positions)
+        energies = decomposed_energy(sim.context, parm)
+#NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
+#Etot   =     -7042.2475  EKtot   =         0.0000  EPtot      =     -7042.2475
+#BOND   =         0.0654  ANGLE   =         0.9616  DIHED      =        -5.4917
+#1-4 NB =        12.4186  1-4 EEL =       258.8388  VDWAALS    =      1243.9393
+#EELEC  =     -8552.9795  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+#EKCMT  =         0.0000  VIRIAL  =      -178.4985  VOLUME     =     42712.9055
+#                                                   Density    =         0.6634
+        self.assertAlmostEqual(energies['bond'], 0.0654, 4)
+        self.assertAlmostEqual(energies['angle'], 0.9616, 4)
+        self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
+        self.assertAlmostEqual(energies['nonbond'], 1256.3579, 3)
+
     def testInterfacePBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (periodic) """
         parm = amber_solv_system
