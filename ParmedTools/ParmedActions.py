@@ -1048,6 +1048,8 @@ class setmolecules(Action):
                         'loading a restart prior to using setMolecules' %
                         self.parm, ParmWarning
                 )
+            # If we had to reorder our atoms, we need to remake our parm
+            self.parm.remake_parm()
         self.parm.LoadPointers()
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
