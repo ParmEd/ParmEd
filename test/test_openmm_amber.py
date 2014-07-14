@@ -399,6 +399,15 @@ class TestAmberParm(unittest.TestCase):
         PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
+        # Test without long-range correction, but check that the default value
+        # is to have the long-range correction turned on (at time of writing
+        # this test, the long-range correction segfaulted, but its cause is
+        # known and should be fixed soon -- but I don't want to update the test
+        # :-P).
+        for force in system.getForces():
+            if isinstance(force, mm.CustomNonbondedForce):
+                self.assertTrue(force.getUseLongRangeCorrection())
+                force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
         sim.context.setPositions(amber_ff14ipq.positions)
