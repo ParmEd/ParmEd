@@ -1209,8 +1209,9 @@ def set_molecules(parm):
     # (shallow) recursion, therefore, reducing the recursion limit too much here
     # could raise a recursion depth exceeded exception during a _Type/Atom/XList
     # creation. Therefore, set the recursion limit to the greater of the current
-    # limit or the number of atoms
-    setrecursionlimit(max(parm.ptr('natom'), getrecursionlimit()))
+    # limit or the number of atoms * 4 (since each atom can usually have at most
+    # 4 bonds)
+    setrecursionlimit(max(parm.ptr('natom')*4, getrecursionlimit()))
 
     # Unmark all atoms so we can track which molecule each goes into
     parm.atom_list.unmark()

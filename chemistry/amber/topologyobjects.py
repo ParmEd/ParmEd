@@ -53,6 +53,7 @@ class Atom(object):
     @property
     def bond_partners(self):
         """ Go through all bonded partners """
+        assert self not in self._bond_partners
         return sorted(list(self._bond_partners))
 
     @property

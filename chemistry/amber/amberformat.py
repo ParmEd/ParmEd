@@ -14,8 +14,10 @@ from math import ceil
 import re
 from warnings import warn
 
+# Some Py3 compatibility tweaks
 if not 'unicode' in dir(__builtins__): unicode = str
 if not 'basestring' in dir(__builtins__): basestring = str
+if not 'xrange' in dir(__builtins__): xrange = range
 
 class FortranFormat(object):
     """ Handles fortran formats """
@@ -140,11 +142,12 @@ class FortranFormat(object):
         may contain 'blank' data. ugh.
         """
         line = line.rstrip('\n')
-        ret = [0 for i in range(int(ceil(len(line) / self.itemlen)))]
+        nitems = int(ceil(len(line) / self.itemlen))
+        ret = [0 for i in xrange(nitems)]
         start, end = 0, self.itemlen
-        for i in range(len(ret)):
+        for i in xrange(nitems):
             ret[i] = self.process_method(self.type(line[start:end]))
-            start += self.itemlen
+            start = end
             end += self.itemlen
         return ret
 
@@ -153,11 +156,12 @@ class FortranFormat(object):
     def read(self, line):
         """ Reads the line and returns the converted data """
         line = line.rstrip()
-        ret = [0 for i in range(int(ceil(len(line) / self.itemlen)))]
+        nitems = int(ceil(len(line) / self.itemlen))
+        ret = [0 for i in xrange(nitems)]
         start, end = 0, self.itemlen
-        for i in range(len(ret)):
+        for i in xrange(nitems):
             ret[i] = self.process_method(self.type(line[start:end]))
-            start += self.itemlen
+            start = end
             end += self.itemlen
         return ret
 
@@ -558,14 +562,14 @@ class AmberFormat(object):
 
         # convert charges back to amber charges...
         if self.charge_flag in self.parm_data.keys():
-            for i in range(len(self.parm_data[self.charge_flag])):
+            for i in xrange(len(self.parm_data[self.charge_flag])):
                 self.parm_data[self.charge_flag][i] *= self.CHARGE_SCALE
 
         # write version to top of prmtop file
         new_prm.write('%s\n' % self.version)
 
         # write data to prmtop file, inserting blank line if it's an empty field
-        for i in range(len(self.flag_list)):
+        for i in xrange(len(self.flag_list)):
             flag = self.flag_list[i]
             new_prm.write('%%FLAG %s\n' % flag)
             # Insert any comments before the %FORMAT specifier
@@ -581,7 +585,7 @@ class AmberFormat(object):
 
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
-            for i in range(len(self.parm_data[self.charge_flag])):
+            for i in xrange(len(self.parm_data[self.charge_flag])):
                 self.parm_data[self.charge_flag][i] /= self.CHARGE_SCALE
 
     #===================================================
@@ -625,7 +629,7 @@ class AmberFormat(object):
             if num_items < 0:
                 raise FlagError("If you do not supply prmtop data, num_items "
                                 "must be non-negative!")
-            self.parm_data[flag_name.upper()] = [0 for i in range(num_items)]
+            self.parm_data[flag_name.upper()] = [0 for i in xrange(num_items)]
         if comments:
             if isinstance(comments, str) or isinstance(comments, unicode):
                 comments = [comments]

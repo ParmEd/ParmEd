@@ -34,6 +34,7 @@ class TestNonParmActions(unittest.TestCase):
         self.parm = gasparm
 
     def testOverwrite(self):
+        """ Test setting overwrite capabilities on ParmEd interpeter """
         self.assertTrue(PA.Action.overwrite)
         a = PT.setOverwrite(self.parm, False)
         self.assertTrue(PA.Action.overwrite)
@@ -46,6 +47,7 @@ class TestNonParmActions(unittest.TestCase):
         self.assertEqual(str(a), 'Files are overwritable')
     
     def testListParms(self):
+        """ Test listing of the prmtop files in the ParmEd interpreter """
         a = PT.listParms(self.parm)
         a.execute() # Should do nothing
         lines = str(a).split('\n')
@@ -53,6 +55,7 @@ class TestNonParmActions(unittest.TestCase):
         self.assertEqual(lines[1], '[0]\t%s (active)' % get_fn('trx.prmtop'))
 
     def testChamber(self):
+        """ Test the chamber action """
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
                        '-top %s' % get_fn('top_all22_prot.inp'),
                        '-param %s' % get_fn('par_all22_prot.inp'),
@@ -144,6 +147,7 @@ class TestAmberParmActions(unittest.TestCase):
             pass
 
     def testParmoutOutparmLoadRestrt(self):
+        """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
         parm = copy(gasparm)
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
@@ -179,12 +183,14 @@ class TestAmberParmActions(unittest.TestCase):
                                          get_fn('test.rst7', written=True)))
 
     def testWriteFrcmod(self):
+        """ Test writeFrcmod on AmberParm """
         parm = gasparm
         PT.writeFrcmod(parm, get_fn('test.frcmod', written=True)).execute()
         self.assertTrue(utils.diff_files(get_saved_fn('test.frcmod'),
                                          get_fn('test.frcmod', written=True)))
 
     def testWriteOffLoadRestrt(self):
+        """ Test writeOFF on AmberParm """
         parm = copy(gasparm)
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
         PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
@@ -193,6 +199,7 @@ class TestAmberParmActions(unittest.TestCase):
                                          absolute_error=0.0001))
 
     def testChangeRadii(self):
+        """ Test changeRadii on AmberParm """
         parm = copy(gasparm)
         PT.changeRadii(parm, 'amber6').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
@@ -337,6 +344,7 @@ class TestAmberParmActions(unittest.TestCase):
                           PT.changeRadii(parm, 'mbondi6').execute())
 
     def testChangeLJPair(self):
+        """ Test changeLJPair on AmberParm """
         parm = copy(gasparm)
         PT.changeLJPair(parm, '@%N', '@%H', 1.0, 1.0).execute()
         # Figure out what type numbers each atom type belongs to
@@ -365,11 +373,13 @@ class TestAmberParmActions(unittest.TestCase):
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
 
     def testChangeLJ14Pair(self):
+        """ Check that changeLJ14Pair fails on AmberParm """
         parm = copy(gasparm)
         self.assertRaises(exc.ParmError, lambda:
             PT.changeLJ14Pair(parm, '@%N', '@%H', 1.0, 1.0).execute())
 
     def testChange(self):
+        """ Test change on AmberParm with all properties """
         parm = copy(gasparm)
         PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
         for flag in parm.parm_data:
@@ -433,6 +443,7 @@ class TestAmberParmActions(unittest.TestCase):
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
 
     def testPrintInfo(self):
+        """ Test printInfo for all flags on AmberParm """
         for flag in gasparm.parm_data:
             act = PT.printInfo(gasparm, flag)
             vals = []
@@ -451,6 +462,7 @@ class TestAmberParmActions(unittest.TestCase):
                     self.assertEqual(datatype(i), j)
 
     def testAddChangeLJType(self):
+        """ Test addLJType and changeLJSingleType on AmberParm """
         parm = copy(gasparm)
         PT.addLJType(parm, '@1').execute()
         self.assertEqual(parm.ptr('ntypes'), gasparm.ptr('ntypes') + 1)
@@ -505,6 +517,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertEqual(parm.parm_data['LENNARD_JONES_BCOEF'][idx-1], 0.0)
 
     def testPrintLJTypes(self):
+        """ Test printLJTypes on AmberParm """
         # Simple test
         act = PT.printLJTypes(gasparm, '@1')
         for line in str(act).split('\n'):
@@ -516,6 +529,7 @@ class TestAmberParmActions(unittest.TestCase):
             self.assertEqual(words[7], '1')
 
     def testSceeScnb(self):
+        """ Test scee and scnb actions on AmberParm """
         parm = copy(gasparm)
         PT.scee(parm, 1.0).execute()
         PT.scnb(parm, 1.0).execute()
@@ -528,10 +542,12 @@ class TestAmberParmActions(unittest.TestCase):
             self.assertEqual(y, 1.0)
 
     def testPrintDetails(self):
+        """ Test printDetails on AmberParm """
         act = PT.printDetails(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DETAILS)
 
     def testPrintFlags(self):
+        """ Test printFlags on AmberParm """
         act = PT.printFlags(gasparm)
         printed_flags = set()
         for line in str(act).split('\n'):
@@ -540,6 +556,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertEqual(printed_flags, set(gasparm.parm_data.keys()))
 
     def testPrintPointers(self):
+        """ Test printPointers on AmberParm """
         act = PT.printPointers(gasparm)
         printed_pointers = set()
         printed_pointers.add('NEXT') # Not in printed list
@@ -554,18 +571,22 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertEqual(printed_pointers, set(gasparm.pointers.keys()))
 
     def testPrintBonds(self):
+        """ Test printBonds on AmberParm """
         act = PT.printBonds(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_BONDS)
 
     def testPrintAngles(self):
+        """ Test printAngles on AmberParm """
         act = PT.printAngles(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLES)
 
     def testPrintDihedrals(self):
+        """ Test printDihedrals on AmberParm """
         act = PT.printDihedrals(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALS)
 
     def testSetMolecules(self):
+        """ Test setMolecules on AmberParm """
         parm = AmberParm(get_fn('things.parm7'), get_fn('things.rst7'))
         atom_list = [atom for atom in parm.atom_list] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atom_list,atom_list)]))
@@ -581,6 +602,7 @@ class TestAmberParmActions(unittest.TestCase):
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
+        """ Test netCharge on AmberParm """
         act = PT.netCharge(gasparm)
         chg = act.execute() # check this part of the API
         self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
@@ -589,6 +611,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertAlmostEqual(chg, -10.0, places=6)
 
     def testStrip(self):
+        """ Test stripping of AmberParm """
         parm = copy(gasparm)
         PT.strip(parm, ':1').execute()
         self.assertEqual(parm.ptr('natom'), 1641)
@@ -598,12 +621,14 @@ class TestAmberParmActions(unittest.TestCase):
         # and that part also tests that the energies come out correct as well
 
     def testDefineSolvent(self):
+        """ Test defineSolvent on AmberParm """
         PT.defineSolvent(gasparm, 'WAT,HOH,Na+,Cl-').execute()
         self.assertEqual(gasparm.solvent_residues, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(gasparm, 'WAT,HOH').execute()
         self.assertEqual(gasparm.solvent_residues, 'WAT HOH'.split())
 
     def testAddExclusions(self):
+        """ Test addExclusions on AmberParm """
         parm = copy(gasparm)
         in_exclusions_before = []
         for atom1 in parm.residue_list[0].atoms:
@@ -626,6 +651,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertTrue(all(in_exclusions_after))
 
     def testAddDeleteDihedral(self):
+        """ Test addDihedral and deleteDihedral on AmberParm """
         parm = copy(gasparm)
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
@@ -641,18 +667,21 @@ class TestAmberParmActions(unittest.TestCase):
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
 
     def testSetBond(self):
+        """ Test setBond on AmberParm """
         parm = copy(gasparm)
         PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute()
         act = PT.printBonds(parm, ':ALA@CA')
         self.assertEqual(str(act), saved.SET_BOND)
 
     def testSetAngle(self):
+        """ Test setAngle on AmberParm """
         parm = copy(gasparm)
         PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100).execute()
         act = PT.printAngles(parm, ':ALA@CB')
         self.assertEqual(str(act), saved.SET_ANGLE)
 
     def testAddAtomicNumber(self):
+        """ Test addAtomicNumber on AmberParm """
         parm = copy(gasparm)
         self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atom_list]
@@ -660,10 +689,12 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
 
     def testPrintLJMatrix(self):
+        """ Test printLJMatrix on AmberParm """
         act = PT.printLJMatrix(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_LJMATRIX)
 
     def testDeleteBond(self):
+        """ Test deleteBond on AmberParm """
         parm = copy(gasparm)
         # Pick the bond we plan to delete, pick out every angle and dihedral
         # that contains that bond, and then delete it. Then make sure none of
@@ -688,11 +719,13 @@ class TestAmberParmActions(unittest.TestCase):
             self.assertTrue(dihedral not in all_dihedrals)
 
     def testSummary(self):
+        """ Test summary action on AmberParm """
         parm = AmberParm(get_fn('things.parm7'), get_fn('things.rst7'))
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARY)
 
     def testScale(self):
+        """ Test scale action on AmberParm """
         parm = copy(gasparm)
         PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 2.0).execute()
         self.assertEqual(
@@ -703,12 +736,14 @@ class TestAmberParmActions(unittest.TestCase):
             self.assertEqual(val, 0)
 
     def testLmod(self):
+        """ Test lmod action on AmberParm """
         parm = copy(gasparm)
         self.assertFalse(all(parm.parm_data['LENNARD_JONES_ACOEF']))
         PT.lmod(parm).execute()
         self.assertTrue(all(parm.parm_data['LENNARD_JONES_ACOEF']))
 
     def testProtStateInterpolate(self):
+        """ Test changeProtState and interpolate actions on AmberParm """
         self._empty_writes()
         parm = AmberParm(get_fn('ash.parm7'))
         origparm = copy(parm)
@@ -754,6 +789,7 @@ class TestAmberParmActions(unittest.TestCase):
                     self.assertTrue(before[j] >= this[j] >= after[j])
 
     def testAddDeletePDB(self):
+        """ Test addPDB and deletePDB actions on AmberParm """
         parm = copy(gasparm)
         PT.addPDB(parm, get_fn('trx.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
@@ -783,6 +819,7 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
 
     def testHMassRepartition(self):
+        """ Test HMassRepartition on AmberParm """
         parm = copy(solvparm)
         PT.HMassRepartition(parm, 2.0).execute()
         for atom in parm.atom_list:
@@ -836,6 +873,7 @@ class TestChamberParmActions(unittest.TestCase):
             pass
 
     def testParmoutOutparmLoadRestrt(self):
+        """ Test parmout, outparm, and loadRestrt actions for ChamberParm """
         self._empty_writes()
         parm = copy(gascham)
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
@@ -870,17 +908,20 @@ class TestChamberParmActions(unittest.TestCase):
                                          get_fn('test.rst7', written=True)))
 
     def testWriteFrcmod(self):
+        """ Check that writeFrcmod fails for ChamberParm """
         parm = gascham
         self.assertRaises(exc.ParmError, lambda:
                 PT.writeFrcmod(parm, get_fn('x', written=True)).execute())
 
     def testWriteOffLoadRestrt(self):
+        """ Check that writeOFF fails for ChamberParm """
         parm = copy(gascham)
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
 
     def testChangeRadii(self):
+        """ Test changeRadii for ChamberParm """
         parm = copy(gascham)
         PT.changeRadii(parm, 'amber6').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
@@ -1025,6 +1066,7 @@ class TestChamberParmActions(unittest.TestCase):
                           PT.changeRadii(parm, 'mbondi6').execute())
 
     def testChangeLJPair(self):
+        """ Test changeLJPair for ChamberParm """
         parm = copy(gascham)
         PT.changeLJPair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
         # Figure out what type numbers each atom type belongs to
@@ -1053,6 +1095,7 @@ class TestChamberParmActions(unittest.TestCase):
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
 
     def testChangeLJ14Pair(self):
+        """ Test changeLJ14Pair for ChamberParm """
         parm = copy(gascham)
         PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
         # Figure out what type numbers each atom type belongs to
@@ -1081,6 +1124,7 @@ class TestChamberParmActions(unittest.TestCase):
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
 
     def testChange(self):
+        """ Test change on ChamberParm with all properties """
         parm = copy(gascham)
         PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
         for flag in parm.parm_data:
@@ -1144,6 +1188,7 @@ class TestChamberParmActions(unittest.TestCase):
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
 
     def testPrintInfo(self):
+        """ Test printInfo on ChamberParm for all FLAGs """
         for flag in gascham.parm_data:
             if flag == 'FORCE_FIELD_TYPE': continue
             if flag == 'RADIUS_SET': continue
@@ -1164,6 +1209,7 @@ class TestChamberParmActions(unittest.TestCase):
                     self.assertEqual(datatype(i), j)
 
     def testAddChangeLJType(self):
+        """ Test addLJType and changeLJSingleType on ChamberParm """
         parm = copy(gascham)
         PT.addLJType(parm, '@1').execute()
         self.assertEqual(parm.ptr('ntypes'), gascham.ptr('ntypes') + 1)
@@ -1218,6 +1264,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertEqual(parm.parm_data['LENNARD_JONES_BCOEF'][idx-1], 0.0)
 
     def testPrintLJTypes(self):
+        """ Test printLJTypes for ChamberParm """
         # Simple test
         act = PT.printLJTypes(gascham, '@1')
         for line in str(act).split('\n'):
@@ -1229,6 +1276,7 @@ class TestChamberParmActions(unittest.TestCase):
             self.assertEqual(words[7], '1')
 
     def testSceeScnb(self):
+        """ Test scee and scnb for ChamberParm """
         parm = copy(gascham)
         PT.scee(parm, 10).execute()
         PT.scnb(parm, 10).execute()
@@ -1241,10 +1289,12 @@ class TestChamberParmActions(unittest.TestCase):
             self.assertEqual(y, 10)
 
     def testPrintDetails(self):
+        """ Test printDetails for ChamberParm """
         act = PT.printDetails(gascham, '@1')
         self.assertEqual(str(act), saved.PRINT_DETAILSC)
 
     def testPrintFlags(self):
+        """ Test printFlags for ChamberParm """
         act = PT.printFlags(gascham)
         printed_flags = set()
         for line in str(act).split('\n'):
@@ -1253,6 +1303,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertEqual(printed_flags, set(gascham.parm_data.keys()))
 
     def testPrintPointers(self):
+        """ Test printPointers for ChamberParm """
         act = PT.printPointers(gascham)
         printed_pointers = set(['NEXT', 'NIMPRTYPES', 'NUBTYPES', 'CMAP',
                                 'CMAP_TYPES', 'NIMPHI', 'NUB'])
@@ -1267,18 +1318,22 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertEqual(printed_pointers, set(gascham.pointers.keys()))
 
     def testPrintBonds(self):
+        """ Test printBonds for ChamberParm """
         act = PT.printBonds(gascham, '@1')
         self.assertEqual(str(act), saved.PRINT_BONDSC)
 
     def testPrintAngles(self):
+        """ Test printAngles for ChamberParm """
         act = PT.printAngles(gascham, '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLESC)
 
     def testPrintDihedrals(self):
+        """ Test printDihedrals for ChamberParm """
         act = PT.printDihedrals(gascham, '@1')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALSC)
 
     def testSetMolecules(self):
+        """ Test setMolecules for ChamberParm """
         parm = copy(solvchamber)
         atom_list = [atom for atom in parm.atom_list] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atom_list,atom_list)]))
@@ -1293,6 +1348,7 @@ class TestChamberParmActions(unittest.TestCase):
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
+        """ Test netCharge for ChamberParm """
         act = PT.netCharge(gascham)
         chg = act.execute() # check this part of the API
         self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
@@ -1303,6 +1359,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertAlmostEqual(chg, -1.0, places=6)
 
     def testStrip(self):
+        """ Test strip action for ChamberParm """
         parm = copy(gascham)
         PT.strip(parm, ':1').execute()
         self.assertEqual(parm.ptr('natom'), 21)
@@ -1312,12 +1369,14 @@ class TestChamberParmActions(unittest.TestCase):
         # and that part also tests that the energies come out correct as well
 
     def testDefineSolvent(self):
+        """ Test defineSolvent for ChamberParm """
         PT.defineSolvent(gascham, 'WAT,HOH,Na+,Cl-').execute()
         self.assertEqual(gascham.solvent_residues, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(gascham, 'WAT,HOH').execute()
         self.assertEqual(gascham.solvent_residues, 'WAT HOH'.split())
 
     def testAddExclusions(self):
+        """ Test addExclusions for ChamberParm """
         parm = copy(gascham)
         in_exclusions_before = []
         for atom1 in parm.residue_list[0].atoms:
@@ -1340,6 +1399,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertTrue(all(in_exclusions_after))
 
     def testAddDeleteDihedral(self):
+        """ Test the addDihedral and deleteDihedral actions for ChamberParm """
         parm = copy(gascham)
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
@@ -1355,18 +1415,21 @@ class TestChamberParmActions(unittest.TestCase):
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
 
     def testSetBond(self):
+        """ Test setBond for ChamberParm """
         parm = copy(gascham)
         PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute()
         act = PT.printBonds(parm, ':ALA@CA')
         self.assertEqual(str(act), saved.SET_BONDC)
 
     def testSetAngle(self):
+        """ Test setAngle for ChamberParm """
         parm = copy(gascham)
         PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100).execute()
         act = PT.printAngles(parm, ':ALA@CB')
         self.assertEqual(str(act), saved.SET_ANGLEC)
 
     def testAddAtomicNumber(self):
+        """ Test addAtomicNumber for ChamberParm """
         parm = copy(gascham)
         self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atom_list]
@@ -1374,10 +1437,12 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
 
     def testPrintLJMatrix(self):
+        """ Test printLJMatrix for ChamberParm """
         act = PT.printLJMatrix(gascham, '@1')
         self.assertEqual(str(act), saved.PRINT_LJMATRIXC)
 
     def testDeleteBond(self):
+        """ Test deleteBond for ChamberParm """
         parm = copy(gascham)
         # Pick the bond we plan to delete, pick out every angle and dihedral
         # that contains that bond, and then delete it. Then make sure none of
@@ -1417,6 +1482,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertFalse(parm.has_cmap)
 
     def testSummary(self):
+        """ Test summary action for ChamberParm """
         parm = copy(solvchamber)
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARYC1)
@@ -1425,6 +1491,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertEqual(str(act), saved.SUMMARYC2)
 
     def testScale(self):
+        """ Test scale action for ChamberParm """
         parm = copy(gascham)
         PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 2.0).execute()
         self.assertEqual(
@@ -1435,6 +1502,7 @@ class TestChamberParmActions(unittest.TestCase):
             self.assertEqual(val, 0)
 
     def testInterpolate(self):
+        """ Test interpolate action for ChamberParm """
         self._empty_writes()
         parm = copy(gascham)
         origparm = copy(gascham)
@@ -1480,11 +1548,13 @@ class TestChamberParmActions(unittest.TestCase):
                     self.assertTrue(before[j] >= this[j] >= after[j])
 
     def testChangeProtState(self):
+        """ Check that changeProtState fails for ChamberParm """
         parm = copy(solvchamber)
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeProtState(parm, ':32', 0).execute())
 
     def testLmod(self):
+        """ Test lmod action for ChamberParm """
         parm = copy(gascham)
         parm.parm_data['LENNARD_JONES_ACOEF'][3] = 0.0
         self.assertFalse(all(parm.parm_data['LENNARD_JONES_ACOEF']))
@@ -1492,6 +1562,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertTrue(all(parm.parm_data['LENNARD_JONES_ACOEF']))
 
     def testAddDeletePDB(self):
+        """ Test addPDB and deletePDB actions for ChamberParm """
         parm = copy(gascham)
         PT.addPDB(parm, get_fn('ala_ala_ala.pdb'), 'elem allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
@@ -1523,6 +1594,7 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
 
     def testHMassRepartition(self):
+        """ Test HMassRepartition action for ChamberParm """
         parm = copy(solvchamber)
         PT.defineSolvent(parm, 'TIP3').execute()
         PT.HMassRepartition(parm, 2.0).execute()
@@ -1577,6 +1649,7 @@ class TestAmoebaParmActions(unittest.TestCase):
             pass
 
     def testParmoutOutparmLoadRestrt(self):
+        """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
         parm = copy(amoebaparm)
         PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
@@ -1611,31 +1684,37 @@ class TestAmoebaParmActions(unittest.TestCase):
                                          get_fn('test.rst7', written=True)))
 
     def testWriteFrcmod(self):
+        """ Check that writeFrcmod fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda:
                 PT.writeFrcmod(amoebaparm, get_fn('x', written=True)).execute())
 
     def testWriteOffLoadRestrt(self):
+        """ Check that writeOFF fails for AmoebaParm """
         parm = copy(amoebaparm)
         PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
 
     def testChangeRadii(self):
+        """ Check that changeRadii fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeRadii(parm, 'amber6').execute())
 
     def testChangeLJPair(self):
+        """ Check that changeLJPair fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeLJPair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute())
 
     def testChangeLJ14Pair(self):
+        """ Check that changeLJ14Pair fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute())
 
     def testChange(self):
+        """ Test the 'change' action for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmedChangeError, lambda:
                 PT.change(parm, 'CHARGE', ':ACE', 0, 'quiet').execute())
@@ -1675,6 +1754,7 @@ class TestAmoebaParmActions(unittest.TestCase):
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
 
     def testPrintInfo(self):
+        """ Test printInfo for all flags of AmoebaParm """
         for flag in amoebaparm.parm_data:
             if flag == 'TITLE': continue
             act = PT.printInfo(amoebaparm, flag)
@@ -1694,6 +1774,7 @@ class TestAmoebaParmActions(unittest.TestCase):
                     self.assertEqual(datatype(i), j)
 
     def testAddChangeLJType(self):
+        """ Check that addLJType and changeLJSingleType fail for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.addLJType(parm, '@1').execute())
@@ -1701,19 +1782,23 @@ class TestAmoebaParmActions(unittest.TestCase):
                 PT.changeLJSingleType(parm, '@1', 1.0, 1.0).execute())
 
     def testPrintLJTypes(self):
+        """ Check that printLJTypes fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda:
                 PT.printLJTypes(amoebaparm, '@1'))
 
     def testSceeScnb(self):
+        """ Check that scee and scnb fail for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda: PT.scee(parm, 10).execute())
         self.assertRaises(exc.ParmError, lambda: PT.scnb(parm, 10).execute())
 
     def testPrintDetails(self):
+        """ Test printDetails for AmoebaParm """
         act = PT.printDetails(amoebaparm, ':1-2')
         self.assertEqual(str(act), saved.PRINT_DETAILSA)
 
     def testPrintFlags(self):
+        """ Test printFlags for AmoebaParm """
         act = PT.printFlags(amoebaparm)
         printed_flags = set()
         for line in str(act).split('\n'):
@@ -1722,6 +1807,7 @@ class TestAmoebaParmActions(unittest.TestCase):
         self.assertEqual(printed_flags, set(amoebaparm.parm_data.keys()))
 
     def testPrintPointers(self):
+        """ Test printPointers for AmoebaParm """
         act = PT.printPointers(amoebaparm)
         printed_pointers = set(['NEXT'])
         for line in str(act).split('\n'):
@@ -1735,18 +1821,22 @@ class TestAmoebaParmActions(unittest.TestCase):
         self.assertEqual(printed_pointers, set(amoebaparm.pointers.keys()))
 
     def testPrintBonds(self):
+        """ Test printBonds for AmoebaParm """
         act = PT.printBonds(amoebaparm, '@1')
         self.assertEqual(str(act), saved.PRINT_BONDSA)
 
     def testPrintAngles(self):
+        """ Test printAngles for AmoebaParm """
         act = PT.printAngles(amoebaparm, '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLESA)
 
     def testPrintDihedrals(self):
+        """ Test printDihedrals for AmoebaParm """
         act = PT.printDihedrals(amoebaparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALSA)
 
     def testSetMolecules(self):
+        """ Test setMolecules for AmoebaParm """
         parm = copy(amoebaparm)
         atom_list = [atom for atom in parm.atom_list] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atom_list,atom_list)]))
@@ -1764,9 +1854,11 @@ class TestAmoebaParmActions(unittest.TestCase):
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
+        """ Check that netCharge fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda: PT.netCharge(amoebaparm))
 
 #   def testStrip(self):
+#       """ Test strip action for AmoebaParm """
 #       parm = copy(gascham)
 #       PT.strip(parm, ':1').execute()
 #       self.assertEqual(parm.ptr('natom'), 21)
@@ -1776,17 +1868,20 @@ class TestAmoebaParmActions(unittest.TestCase):
 #       # and that part also tests that the energies come out correct as well
 
     def testDefineSolvent(self):
+        """ Test defineSolvent for AmoebaParm """
         PT.defineSolvent(amoebaparm, 'WAT,HOH,Na+,Cl-').execute()
         self.assertEqual(amoebaparm.solvent_residues, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(amoebaparm, 'WAT,HOH').execute()
         self.assertEqual(amoebaparm.solvent_residues, 'WAT HOH'.split())
 
     def testAddExclusions(self):
+        """ Check that addExclusions fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.addExclusions(parm, ':*', ':*').execute())
 
     def testAddDeleteDihedral(self):
+        """ Check that addDihedral and deleteDihedral fail for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.deleteDihedral(parm, '@1 @2 @3 @4').execute())
@@ -1796,16 +1891,19 @@ class TestAmoebaParmActions(unittest.TestCase):
         )
 
     def testSetBond(self):
+        """ Check that setBond fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute())
 
     def testSetAngle(self):
+        """ Check that setAngle fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.setAngle(parm, ':ALA@CA :ALA@CB :ALA@HB1 40 100').execute())
 
     def testAddAtomicNumber(self):
+        """ Test addAtomicNumber for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atom_list]
@@ -1813,15 +1911,18 @@ class TestAmoebaParmActions(unittest.TestCase):
         self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
 
     def testPrintLJMatrix(self):
+        """ Check that printLJMatrix fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda:
                 PT.printLJMatrix(amoebaparm, '@1'))
 
     def testDeleteBond(self):
+        """ Check that deleteBond fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.deleteBond(parm, '@1 @2').execute())
 
     def testSummary(self):
+        """ Test summary action for AmoebaParm """
         parm = copy(amoebaparm)
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARYA1)
@@ -1830,6 +1931,7 @@ class TestAmoebaParmActions(unittest.TestCase):
         self.assertEqual(str(act), saved.SUMMARYA2)
 
     def testScale(self):
+        """ Test scale action for AmoebaParm """
         parm = copy(amoebaparm)
         flag = 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT'
         PT.scale(parm, flag, 2.0).execute()
@@ -1840,18 +1942,22 @@ class TestAmoebaParmActions(unittest.TestCase):
             self.assertEqual(val, 0)
 
     def testInterpolate(self):
+        """ Check that interpolate action fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda:
                 PT.interpolate(amoebaparm).execute())
 
     def testChangeProtState(self):
+        """ Check that changeProtState fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeProtState(parm, ':32', 0).execute())
 
     def testLmod(self):
+        """ Check that lmod fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda: PT.lmod(amoebaparm).execute())
 
     def testAddDeletePDB(self):
+        """ Test addPDB and deletePDB for AmoebaParm """
         parm = copy(amoebaparm)
         PT.addPDB(parm, get_fn('nma.pdb'), 'elem allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
@@ -1886,6 +1992,7 @@ class TestAmoebaParmActions(unittest.TestCase):
         self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
 
     def testHMassRepartition(self):
+        """ Test HMassRepartition action for AmoebaParm """
         parm = copy(amoebaparm)
         PT.HMassRepartition(parm, 2.0).execute()
         for atom in parm.atom_list:
