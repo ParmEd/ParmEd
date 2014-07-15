@@ -333,13 +333,20 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ntb'] > 0 and mdin.ewald_nml['vdwmeth'] == 0:
         # Disable the long-range vdW correction
         for i, frc in enumerate(system.getForces()):
-            if (isinstance(frc, mm.NonbondedForce) or
-                isinstance(frc, mm.CustomNonbondedForce)):
+            if (isinstance(frc, mm.NonbondedForce)):
                 frc.setUseDispersionCorrection(False)
                 if scriptfile is not None:
                     scriptfile.write('# Disable long-range vdW correction\n')
                     scriptfile.write('system.getForces()[%d].' % i +
-                                     'setUseDispersionCorrection(False)\n\n')
+                                     'setUseDispersionCorrection(False)\n')
+            if isinstance(frc, mm.CustomNonbondedForce):
+                frc.setUseLongRangeCorrection(False)
+                if scriptfile is not None:
+                    scriptfile.write('# Disable long-range vdW correction\n')
+                    scriptfile.write('system.getForces()[%d].' % i +
+                                     'setUseLongRangeCorrection(False)\n')
+        if scriptfile is not None:
+            scriptfile.write('\n')
 
     timer.stop_timer('system')
    
@@ -939,6 +946,8 @@ def energy(parm, args, output=sys.stdout):
     for force in system.getForces():
         if isinstance(force, mm.NonbondedForce):
             force.setUseDispersionCorrection(vdw_longrange)
+        if isinstance(force, mm.CustomNonbondedForce):
+            force.setUseLongRangeCorrection(vdw_longrange)
 
     # Create a dummy integrator
     integrator = mm.VerletIntegrator(2.0)
