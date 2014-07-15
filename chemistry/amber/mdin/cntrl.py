@@ -81,7 +81,7 @@ class cntrl:
              'idssp' : 0, 'irism' : 0, 'restart_cmd' : '.false.', 
              'eq_cmd' : '.false.', 'adiab_param' : 1.0, 'dec_verbose' : 3,
              'mccycles' : 1, 'ifcr' : 0, 'iamd' : 0, 'barostat' : 1,
-             'mcbarint' : 100}
+             'mcbarint' : 100, 'lj1264' : 0}
 
       self.pmemd  = {'imin' : 0, 'nmropt' : 0, 'ntx' : 1, 'irest' : 0, 
              'ntrx' : 1, 'ntxo' : 1, 'ntpr' : 50, 'ntave' : 0, 'ntwr' : 500, 
@@ -105,4 +105,5 @@ class cntrl:
              'dbg_atom_redistribution' : 0, 'loadbal_verbose' : 0,
              'es_cutoff' : 0.0, 'vdw_cutoff' : 0.0, 'ntwf' : 0,
              'dtemp' : 0, 'dxm' : 0, 'heat' : 0, 'alpb' : 0, 'arad' : 15.0,
-             'iamd' : 0, 'restraintwt' : 0.0, 'barostat' : 1, 'mcbarint' : 100}
+             'iamd' : 0, 'restraintwt' : 0.0, 'barostat' : 1, 'mcbarint' : 100,
+             'lj1264' : 0}
