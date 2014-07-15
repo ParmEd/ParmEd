@@ -277,6 +277,7 @@ class OpenMMAmberParm(AmberParm):
             has_nbfix = False
         except OpenMMError:
             has_nbfix = True
+        has_1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
 
         # Set the cutoff distance in nanometers
         cutoff = None
@@ -562,23 +563,79 @@ class OpenMMAmberParm(AmberParm):
             parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
             acoef = [0 for i in range(ntypes*ntypes)]
             bcoef = acoef[:]
+            if has_1264:
+                ccoef = acoef[:]
+                parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
             # Take sqrt of A coefficient to reduce taxing single precision
             # limits (since length_conv is 10, we don't want to needlessly
             # multiply by 10^12 when 10^6 will do)
             afac = sqrt(ene_conv) * length_conv**6
             bfac = ene_conv * length_conv**6
+            cfac = ene_conv * length_conv**4
             for i in range(ntypes):
                 for j in range(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
-                    acoef[i*ntypes+j] = sqrt(parm_acoef[idx]) * afac
-                    bcoef[i*ntypes+j] = parm_bcoef[idx] * bfac
-            cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r^6;'
-                                             'a=acoef(type1, type2);'
-                                             'b=bcoef(type1, type2);')
+                    acoef[i+ntypes*j] = sqrt(parm_acoef[idx]) * afac
+                    bcoef[i+ntypes*j] = parm_bcoef[idx] * bfac
+            if has_1264:
+                for i in range(ntypes):
+                    for j in range(ntypes):
+                        idx = nbidx[ntypes*i+j] - 1
+                        ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+                cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r^4; r6=r^6;'
+                                                 'a=acoef(type1, type2);'
+                                                 'b=bcoef(type1, type2);'
+                                                 'c=ccoef(type1, type2);')
+            else:
+                cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r^6;'
+                                                 'a=acoef(type1, type2);'
+                                                 'b=bcoef(type1, type2);')
             cforce.addTabulatedFunction('acoef',
                     mm.Discrete2DFunction(ntypes, ntypes, acoef))
             cforce.addTabulatedFunction('bcoef',
                     mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+            if has_1264:
+                cforce.addTabulatedFunction('ccoef',
+                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+            cforce.addPerParticleParameter('type')
+            cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
+            for atom in self.atom_list:
+                cforce.addParticle((atom.nb_idx - 1,)) # index from 0
+            # Now add the exclusions
+            for i in range(force.getNumExceptions()):
+                ii, jj, q, eps, sig = force.getExceptionParameters(i)
+                cforce.addExclusion(ii, jj)
+            if (nonbondedMethod is ff.PME or nonbondedMethod is ff.Ewald or
+                        nonbondedMethod is ff.CutoffPeriodic):
+                cforce.setNonbondedMethod(cforce.CutoffPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+                cforce.setUseLongRangeCorrection(True)
+            elif nonbondedMethod is ff.NoCutoff:
+                cforce.setNonbondedMethod(cforce.NoCutoff)
+            elif nonbondedMethod is ff.CutoffNonPeriodic:
+                cforce.setNonbondedMethod(cforce.CutoffNonPeriodic)
+                cforce.setCutoffDistance(nonbondedCutoff)
+            else:
+                raise ValueError('Illegal nonbonded method')
+            system.addForce(cforce)
+
+        if has_1264 and not (has_nbfix or forceNBFIX):
+            # We need a custom nonbonded force to handle the 1/r^4 part of the
+            # 12-6-4 potential. If we followed the NBFIX code path, the 1/r^4
+            # part was grouped into that custom force, so this is only needed if
+            # we only used the normal NonbondedForce
+            parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+            nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+            ntypes = self.ptr('ntypes')
+            ccoef = [0 for atom in range(ntypes*ntypes)]
+            cfac = ene_conv * length_conv**4
+            for i in range(ntypes):
+                for j in range(ntypes):
+                    idx = nbidx[ntypes*i+j] - 1
+                    ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+            cforce = mm.CustomNonbondedForce('-c/r^4; c=ccoef(type1, type2);')
+            cforce.addTabulatedFunction('ccoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             cforce.addPerParticleParameter('type')
             cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
             for atom in self.atom_list:
