@@ -585,6 +585,13 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 cforce.setCutoffDistance(nonbondedCutoff)
             else:
                 raise ValueError('Unrecognized nonbonded method')
+            if switchDistance and nonbondedMethod is not ff.NoCutoff:
+                # make sure it's legal
+                if switchDistance >= nonbondedCutoff:
+                    raise ValueError('switchDistance is too large compared '
+                                     'to the cutoff!')
+                    cforce.setUseSwitchingFunction(True)
+                    cforce.setSwitchingDistance(switchDistance)
             for i in lj_idx_list:
                 cforce.addParticle(i - 1) # adjust for indexing from 0
 
