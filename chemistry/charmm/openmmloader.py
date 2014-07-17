@@ -562,9 +562,9 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                     except KeyError:
                         rij = (lj_radii[i] + lj_radii[j]) * length_conv
                         wdij = sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
-                    acoef[i+num_lj_types*j] = wdij * rij**12
+                    acoef[i+num_lj_types*j] = sqrt(wdij) * rij**6
                     bcoef[i+num_lj_types*j] = 2 * wdij * rij**6
-            cforce = mm.CustomNonbondedForce('a/r^12-b/r^6;'
+            cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r^6;'
                                              'a=acoef(type1, type2);'
                                              'b=bcoef(type1, type2)')
             cforce.addTabulatedFunction('acoef',
@@ -577,6 +577,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                         nonbondedMethod is ff.CutoffPeriodic):
                 cforce.setNonbondedMethod(cforce.CutoffPeriodic)
                 cforce.setCutoffDistance(nonbondedCutoff)
+                cforce.setLongRangeCorrection(True)
             elif nonbondedMethod is ff.NoCutoff:
                 cforce.setNonbondedMethod(cforce.NoCutoff)
             elif nonbondedMethod is ff.CutoffNonPeriodic:
