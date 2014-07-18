@@ -5,7 +5,7 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 Contributors:
-Date: April 5, 2014
+Date: July 17, 2014
 """
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.charmm.topologyobjects import (AtomType, BondType, AngleType,
@@ -21,6 +21,17 @@ class CharmmParameterSet(object):
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
     (TOP/RTF) and all of the information in the parameter files (PAR)
+
+    Parameters:
+        - filenames : List of topology, parameter, and stream files to load into
+          the parameter set. The following file type suffixes are recognized.
+          Unrecognized file types raise a TypeError
+            .rtf, .top -- Residue topology file
+            .par, .prm -- Parameter file
+            .str -- Stream file
+            .inp -- If "par" is in the file name, it is a parameter file. If
+                    "top" is in the file name, it is a topology file. Otherwise,
+                    raise TypeError
 
     Attributes:
         All type lists are dictionaries whose keys are tuples (with however
@@ -45,15 +56,6 @@ class CharmmParameterSet(object):
         when only the integer or string is available the other dictionaries are
         helpful
 
-    Parameters:
-        - filenames : Load all of the parameter, topology, and stream files
-            into the parameter set. The following file type suffixes are
-            recognized. Unrecognized file types raise a TypeError
-            .rtf, .top -- Residue Topology file
-            .par, .prm -- Parameter file
-            .str -- stream file
-            .inp -- If "par" is in the file name, it is a parameter file. If
-                    "top" is in the file name, it is a topology file
     """
 
     @staticmethod
@@ -523,7 +525,7 @@ class CharmmParameterSet(object):
             time.
 
         Example:
-        >>> params = CharmmParameterSet.load_set(pfile='charmm.prm').condense()
+        >>> params = CharmmParameterSet('charmm.prm').condense()
         """
         # First scan through all of the bond types
         self._condense_types(self.bond_types)

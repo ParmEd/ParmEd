@@ -71,7 +71,11 @@ class CharmmFile(object):
         self._handle.seek(0)
 
     def __del__(self):
-        self.closed or self._handle.close()
+        try:
+            self.closed or self._handle.close()
+        except AttributeError:
+            # It didn't make it out of the constructor
+            pass
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

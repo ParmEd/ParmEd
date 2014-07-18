@@ -518,12 +518,12 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add per-particle nonbonded parameters (LJ params)
         sigma_scale = 2**(-1/6) * 2
         if not has_nbfix_terms:
-            for i, atm in enumerate(self.atom_list):
+            for atm in self.atom_list:
                 force.addParticle(atm.charge,
                                   sigma_scale*atm.type.rmin*length_conv,
                                   abs(atm.type.epsilon*ene_conv))
         else:
-            for i, atm in enumerate(self.atom_list):
+            for atm in self.atom_list:
                 force.addParticle(atm.charge, 1.0, 0.0)
             # Now add the custom nonbonded force that implements NBFIX. First
             # thing we need to do is condense our number of types
@@ -580,7 +580,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                         nonbondedMethod is ff.CutoffPeriodic):
                 cforce.setNonbondedMethod(cforce.CutoffPeriodic)
                 cforce.setCutoffDistance(nonbondedCutoff)
-                cforce.setLongRangeCorrection(True)
+                cforce.setUseLongRangeCorrection(True)
             elif nonbondedMethod is ff.NoCutoff:
                 cforce.setNonbondedMethod(cforce.NoCutoff)
             elif nonbondedMethod is ff.CutoffNonPeriodic:
