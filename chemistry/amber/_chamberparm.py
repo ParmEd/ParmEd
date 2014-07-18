@@ -687,7 +687,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             typj = lj_type_list[j]
             # Get any NBFIXes we may have
             try:
-                rij, wdij, rij14, wdij14 = typi.nbfix[typj.name]
+                wdij, rij, wdij14, rij14 = typi.nbfix[typj.name]
             except KeyError:
                 rij = lj_radii[i] + lj_radii[j]
                 wdij = sqrt(lj_depths[i] * lj_depths[j])

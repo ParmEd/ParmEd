@@ -114,7 +114,7 @@ def check_validity(parm, warnings):
         hk = checkme('CHARMM_NUM_IMPR_TYPES', 1, True, False, None, int)
         hasallkeys = hasallkeys and hk
         if has_cmap:
-            hk = checkme('CHARMM_CMAP_COUNT', 1, True, False, None, int)
+            hk = checkme('CHARMM_CMAP_COUNT', 2, True, False, None, int)
             hasallkeys = hasallkeys and hk
      
         if hasallkeys:

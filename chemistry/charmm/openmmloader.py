@@ -556,12 +556,15 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             bcoef = acoef[:]
             for i in range(num_lj_types):
                 for j in range(num_lj_types):
+                    namej = lj_type_list[j].name
                     try:
-                        rij, wdij = lj_type_list[i].nbfix[lj_type_list[j].name]
-                        rij *= length_conv
+                        wdij, rij, wdij14, rij14 = lj_type_list[i].nbfix[namej]
                     except KeyError:
                         rij = (lj_radii[i] + lj_radii[j]) * length_conv
                         wdij = sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
+                    else:
+                        rij *= length_conv
+                        wdij *= ene_conv
                     acoef[i+num_lj_types*j] = sqrt(wdij) * rij**6
                     bcoef[i+num_lj_types*j] = 2 * wdij * rij**6
             cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r^6;'

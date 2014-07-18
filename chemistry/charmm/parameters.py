@@ -404,10 +404,10 @@ class CharmmParameterSet(object):
                 try:
                     at1 = words[0]
                     at2 = words[1]
-                    emin = conv(words[2], float, 'NBFIX Emin')
+                    emin = abs(conv(words[2], float, 'NBFIX Emin'))
                     rmin = conv(words[3], float, 'NBFIX Rmin')
                     try:
-                        emin14 = conv(words[4], float, 'NBFIX Emin 1-4')
+                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4'))
                         rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4')
                     except IndexError:
                         emin14 = rmin14 = None
