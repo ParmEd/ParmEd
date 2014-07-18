@@ -414,10 +414,10 @@ class CharmmParameterSet(object):
                     except IndexError:
                         emin14 = rmin14 = None
                     try:
-                        self.atom_types_str[at1].add_nbfix(at2, emin, rmin,
-                                                           emin14, rmin14)
-                        self.atom_types_str[at2].add_nbfix(at1, emin, rmin,
-                                                           emin14, rmin14)
+                        self.atom_types_str[at1].add_nbfix(at2, rmin, emin,
+                                                           rmin14, emin14)
+                        self.atom_types_str[at2].add_nbfix(at1, rmin, emin,
+                                                           rmin14, emin14)
                     except KeyError:
                         # Some stream files define NBFIX terms with an atom that
                         # is defined in another toppar file that does not
