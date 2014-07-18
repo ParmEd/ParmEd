@@ -3336,7 +3336,9 @@ class chamber(Action):
         -nocmap     Do not use any CMAP parameters
         usechamber  Use the 'chamber' program to write a topology file instead
         -box        Box dimensions. If no angles are defined, they are assumed
-                    to be 90 degrees (orthorhombic box)
+                    to be 90 degrees (orthorhombic box). Alternatively, you can
+                    use the word 'bounding' to define a box that encloses the
+                    centers of all atoms.
         -radii      Implicit solvent solvation radii. <radiusset> can be
                     amber6, bondi, mbondi, mbondi2, mbondi3
                     Same effect as the changeRadii command. Default is mbondi.
@@ -3390,7 +3392,9 @@ class chamber(Action):
             raise InputError('chamber PSF file %s cannot be found' % self.psf)
         box = arg_list.get_key_string('-box', None)
 
-        if box is not None:
+        if box is None:
+            self.box = None
+        elif box.lower() != 'bounding':
             try:
                 self.box = [float(w) for w in box.replace(',', ' ').split()]
             except ValueError:
@@ -3401,7 +3405,9 @@ class chamber(Action):
                 raise InputError('Box must be 3 lengths or 3 lengths and 3 '
                                  'angles!')
         else:
-            self.box = None
+            if self.usechamber:
+                raise InputError('Bounding box not supported with usechamber.')
+            self.box = 'bounding'
         self.radii = arg_list.get_key_string('-radii', 'mbondi')
 
         # Make sure we have legal input
@@ -3436,7 +3442,9 @@ class chamber(Action):
             retstr += ' Using CMAP.'
         else:
             retstr += ' NO CMAP.'
-        if self.box is not None:
+        if self.box == 'bounding':
+            retstr += ' Defining a bounding box.'
+        elif self.box is not None:
             retstr += ' Box info %s.' % (self.box)
         retstr += ' GB Radius set %s.' % self.radii
         if self.usechamber:
@@ -3511,9 +3519,26 @@ class chamber(Action):
                                            'file type')
                     crdbox = crd.box
                     coords = crd.positions()
+            if len(coords) != len(psf.atom_list) * 3:
+                raise ChamberError('Mismatch in number of coordinates (%d) and '
+                                   '3*number of atoms (%d)' % (len(coords),
+                                   3*len(psf.atom_list)))
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
                 psf.set_box(*crdbox[:])
+            elif self.box == 'bounding':
+                # Define the bounding box
+                xmin, ymin, zmin = coords[:3]
+                xmax, ymax, zmax = xmin, ymin, zmin
+                for i in range(1, len(psf.atom_list)):
+                    i3 = i * 3
+                    xmin = min(xmin, coords[i3  ])
+                    xmax = max(xmax, coords[i3  ])
+                    ymin = min(ymin, coords[i3+1])
+                    ymax = max(ymax, coords[i3+1])
+                    zmin = min(zmin, coords[i3+2])
+                    zmax = max(zmax, coords[i3+2])
+                psf.set_box(xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0)
             elif self.box is not None:
                 psf.set_box(*self.box[:])
             else:
