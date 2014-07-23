@@ -6,37 +6,12 @@ Author: Jason M. Swails
 Contributors:
 Date: June 30, 2014
 """
+from chemistry.amber.topologyobjects import TrackedList
 from chemistry.exceptions import (SplitResidueWarning, BondError, ResidueError,
                 CmapError, MissingParameter)
 import warnings
 
 TINY = 1e-8
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def _tracking(fcn):
-    """ Decorator to indicate the list has changed """
-    def new_fcn(self, *args):
-        self.changed = True
-        return fcn(self, *args)
-    return new_fcn
-
-class TrackedList(list):
-    """
-    This creates a list type that allows you to see if anything has changed
-    """
-    def __init__(self, arg=[]):
-        self.changed = False
-        list.__init__(self, arg)
-
-    __delitem__ = _tracking(list.__delitem__)
-    append = _tracking(list.append)
-    extend = _tracking(list.extend)
-    __setitem__ = _tracking(list.__setitem__)
-
-# Python 3 does not have __delslice__, but make sure we override it for Python 2
-if hasattr(TrackedList, '__delslice__'):
-    TrackedList.__delslice__ = _tracking(TrackedList.__delslice__)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
