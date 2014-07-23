@@ -1255,10 +1255,30 @@ class TrackedList(list):
     append = _tracking(list.append)
     extend = _tracking(list.extend)
     __setitem__ = _tracking(list.__setitem__)
+    __iadd__ = _tracking(list.__iadd__)
+    __imul__ = _tracking(list.__imul__)
+    pop = _tracking(list.pop)
+
+    # Type-safe methods that return another instance
+    def __add__(self, other):
+        return TrackedList(list.__add__(self, other))
+
+    def __mul__(self, fac):
+        return TrackedList(list.__mul__(self, fac))
+
+    def __getitem__(self, thing):
+        retval = list.__getitem__(self, thing)
+        try:
+            return TrackedList(retval)
+        except TypeError:
+            return retval
 
 # Python 3 does not have __delslice__, but make sure we override it for Python 2
 if hasattr(TrackedList, '__delslice__'):
     TrackedList.__delslice__ = _tracking(TrackedList.__delslice__)
+    TrackedList.__getslice__ = lambda self, start, end: \
+                               TrackedList(list.__getslice__(self, start, end))
+    TrackedList.__setslice__ = _tracking(TrackedList.__setslice__)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

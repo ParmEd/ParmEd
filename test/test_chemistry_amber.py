@@ -3,7 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm, asciicrd, mask
+from chemistry.amber import readparm, asciicrd, mask, topologyobjects
 import os
 import unittest
 from utils import get_fn, has_numpy
@@ -483,6 +483,47 @@ class TestWriteFiles(unittest.TestCase):
                 self.assertEqual(x1, x2)
             for x1, x2 in zip(mybox, box):
                 self.assertEqual(x1, x2)
+
+class TestObjectAPIs(unittest.TestCase):
+    """ Tests various object APIs """
+
+    def testTrackedList(self):
+        """ Tests the TrackedList object """
+        mylist = topologyobjects.TrackedList(range(20))
+        mylist2 = topologyobjects.TrackedList(reversed(range(20)))
+        self.assertFalse(mylist.changed)
+        self.assertIsInstance(mylist[0], int)
+        self.assertIsInstance(mylist[0:5], topologyobjects.TrackedList)
+        self.assertIsInstance(mylist + mylist2, topologyobjects.TrackedList)
+        self.assertIsInstance(mylist * 2, topologyobjects.TrackedList)
+        mylist += mylist2
+        self.assertTrue(mylist.changed)
+        self.assertFalse(mylist2.changed)
+        for i in range(20):
+            self.assertEqual(i, mylist[i])
+            self.assertEqual(i, mylist[39-i])
+        mylist.changed = False
+        mylist.append(10)
+        self.assertTrue(mylist.changed)
+        mylist.changed = False
+        mylist.extend(mylist2)
+        self.assertTrue(mylist.changed)
+        self.assertIsInstance(mylist, topologyobjects.TrackedList)
+        mylist.changed = False
+        mylist.pop()
+        self.assertTrue(mylist.changed)
+        mylist.changed = False
+        mylist[5] = 8
+        self.assertTrue(mylist.changed)
+        mylist.changed = False
+        del mylist[20:]
+        self.assertTrue(mylist.changed)
+        mylist.changed = False
+        del mylist[0]
+        self.assertTrue(mylist.changed)
+        mylist.changed = False
+        mylist *= 2
+        self.assertTrue(mylist.changed)
 
 if not has_numpy():
     del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
