@@ -54,8 +54,7 @@ sim.reporters.append(
                               volume=True, density=True)
 )
 sim.reporters.append(
-        NetCDFReporter('ala2_solv.nc', 100, atom=ala2_solv.ptr('natom'),
-                       uses_pbc=True, crds=True)
+        NetCDFReporter('ala2_solv.nc', 100, crds=True)
 )
 
 # Run dynamics

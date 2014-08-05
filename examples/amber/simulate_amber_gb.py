@@ -52,8 +52,7 @@ sim.reporters.append(
                                kineticEnergy=True, temperature=True)
 )
 sim.reporters.append(
-        NetCDFReporter('ala5_gb.nc', 100, atom=ala5_gas.ptr('natom'),
-                       uses_pbc=False, crds=True)
+        NetCDFReporter('ala5_gb.nc', 100, crds=True)
 )
 
 # Run dynamics
