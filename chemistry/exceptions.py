@@ -102,5 +102,8 @@ class CharmmPSFWarning(ChemWarning):
 class CharmmFileError(ChemError):
     """ If there is a problem parsing CHARMM files """
 
+class CharmmPsfEOF(ChemError):
+    """ If we hit an end-of-file in parsing CHARMM files """
+
 class MissingParameter(ChemError):
     """ If a parameter is missing from a database """
