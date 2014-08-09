@@ -1,0 +1,253 @@
+*>>>>> Topology for Cystein-attach psudo nitroxyde spin labels <<<<<<<
+* Shahidul M. Islam, University of Chicago
+*
+
+! please reference the following:
+!Islam, S. M., Stein, A. R., Mchaourab, H. and Roux, B. “Structural refinement from
+!Restrained-Ensemble simulations based on EPR/DEER data: application to T4 Lysozyme” J.
+!Phys. Chem. B, 2013, 117(7), 4740-4754
+
+!Islam, S. M., and Roux, B. “Parameterization and molecular dynamics simulations of a
+!conformationally constrained double linked spin label constrained by EPR/DEER data”
+!(planed submission to J journal)
+
+
+!test "append" to determine if previous toppar files have been read and
+!add append to "read rtf card" if true
+set nat ?NATC
+set app
+!We're exploiting what is arguably a bug in the parser. On the left hand side,
+!the quotes have proirity, so NAT is correctly substituted. On the right hand
+!side, the ? has priority and NATC" (sic) is not a valid substitution...
+if "@NAT" ne "?NATC" if @nat ne 0 set app append
+
+
+read rtf card @app
+* Topology for dummy spin 
+*
+31 1
+
+! C-beta for the patch only to GLY
+MASS -1  CBD   12.01100 ! spin label CB
+! Cystein-attach psudo nitroxyde spin label
+!
+MASS -1  OND   15.999400 O ! spin label O
+!
+! Cystein-attach psudo nitroxyde spin label linked at i and i+3
+!
+MASS -1  OND3   15.999400 O ! spin label  O
+!
+! Cystein-attach psudo nitroxyde spin label linked at i and i+4
+!
+MASS -1  OND4   15.999400 O ! spin label  O
+!
+!! PATCH the psudo nitroxyde spin label !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! link psudo nitroxyde spin label OND
+PRES ONDUM        0.00
+GROUP
+ATOM ON  OND      0.0
+BOND CA  ON
+ANGLE CB CA ON
+DIHE N CA CB ON
+!    I    J    K    L      R(IK)   T(IKJ)    PHI      T(JKL)   R(KL)
+IC   N    CA   CB   ON    1.4603  110.28   -137.00    124.91    7.02
+
+! link psudo carbon-beta CBD
+PRES CBDUM        0.00
+GROUP
+ATOM CB2  CBD      0.0  
+BOND CA  CB2
+ANGLE N CA CB2
+DIHE HN  N  CA  CB2
+!    I    J    K    L      R(IK)   T(IKJ)    PHI      T(JKL)   R(KL)
+IC   HN   N    CA   CB2    0.9970  117.00    0.0      113.50   1.538
+
+! link psudo nitroxyde spin label OND which needs CBD
+PRES ONCB        0.00
+GROUP
+ATOM ON  OND      0.0  
+BOND CA  ON
+ANGLE CB2 CA ON
+DIHE N CA CB2 ON
+!    I    J    K    L      R(IK)   T(IKJ)    PHI      T(JKL)   R(KL)
+IC   N    CA   CB2  ON    1.4603  110.28   -137.00    124.91    7.02
+
+! link psudo nitroxyde spin label OND3 at position i
+PRES ONDUM2        0.00
+GROUP
+ATOM ON  OND3      0.0
+BOND CA  ON
+ANGLE CB CA ON
+DIHE N CA CB ON
+!    I    J    K    L      R(IK)   T(IKJ)    PHI      T(JKL)   R(KL)
+IC   N    CA   CB   ON     1.47   113.71   -128.36    92.18    8.34
+
+! link psudo nitroxyde spin label OND3 at position i+3
+PRES ONDUM3       -0.33
+GROUP
+ATOM 1CA CT1    0.07
+ATOM 1ON OND3   0.00
+GROUP
+ATOM 2N  NH1   -0.47
+ATOM 2CA CT1    0.07
+BOND  1ON  2N
+!    I    J    K    L      R(IK)   T(IKJ)     PHI       T(JKL)    R(KL)
+IC  1N   1CA  1ON  2N     1.4700  130.0800  -128.9630   34.2400   8.0000
+IC  1CA  1ON  2N   2CA    8.8070   34.2400  -127.4290   99.1020   1.4700
+IC  1ON  2N   2CA  2CB    8.0000   99.102     92.5530   111.8260  1.5400
+
+! link psudo nitroxyde spin label OND4 at position i
+PRES ONDUM4        0.00
+GROUP
+ATOM ON  OND4      0.0  ! dummy ON
+BOND CA  ON
+ANGLE CB CA ON
+DIHE N CA CB ON
+!    I    J    K    L      R(IK)   T(IKJ)     PHI       T(JKL)    R(KL)
+IC   N    CA   CB   ON     1.47    113.71    -128.36    92.18     8.34
+
+! link psudo nitroxyde spin label OND4 at position i+4
+PRES ONDUM5       -0.33
+GROUP
+ATOM 1CA CT1    0.07
+ATOM 1ON OND4   0.00
+GROUP
+ATOM 2N  NH1   -0.47
+ATOM 2CA CT1    0.07
+BOND  1ON  2N
+!    I    J    K    L      R(IK)   T(IKJ)     PHI        T(JKL)    R(KL)
+IC   1N   1CA  1ON  2N     1.4700  130.0800  -128.9630   34.2400   8.0000
+IC   1CA  1ON  2N   2CA    8.8070   34.2400  -127.4290   99.1020   1.4700
+IC   1ON  2N   2CA  2CB    8.0000   99.102     92.5530  111.8260   1.5400
+
+END
+
+
+
+read para card flex @app
+* Parameters for spin label
+*
+
+ATOMS
+MASS    -1  CBD     12.01100  ! spin label CB
+MASS    -1  OND      15.999400 ! spin label O
+MASS    -1  OND3     15.999400 ! spin label O linked to i and i+3
+MASS    -1  OND4     15.999400 ! spin label O linked to i and i+4
+
+BONDS
+!
+!V(bond) = Kb(b - b0)**2
+!
+!Kb: kcal/mole/A**2
+!b0: A
+!
+!atom type Kb          b0
+!
+CT1   OND     0.5      7.9  ! CA - ON
+CP1   OND     0.5      7.9  ! proline CA - ON
+CT2   OND     0.5      7.9  ! CA - ON for Isoleucine
+CBD   CT1   222.500    1.5000
+CBD   CT2   222.500    1.5380
+CBD   CP    222.500    1.5270
+CT1   OND3    4.8      8.55 ! CA - ON linked to i and i+3
+CP1   OND3    4.8      8.55 ! proline CA - ON linked to i and i+3
+OND3  NH1     3.78    10.52 ! Second NH1 - ON linked to i and i+3
+CT1   OND4    3.35     8.84 ! CA - ON linked to i and i+4
+CP1   OND4    3.35     8.84 ! proline CA - ON linked to i and i+4
+OND4  NH1     3.35    7.90 ! Second NH1 - ON linked to i and i+4
+
+ANGLES
+!
+!V(angle) = Ktheta(Theta - Theta0)**2
+!
+!Ktheta: kcal/mole/rad**2
+!Theta0: degrees
+!
+!atom types     Ktheta    Theta0
+!
+CT2   CT1     OND     1.0      46.0
+CT3   CT1     OND     1.0      46.0
+CP2   CP1     OND     1.0      46.0 ! proline
+CT1   CT1     OND     1.0      46.0 ! Isoleucine
+CT2A  CT1     OND     1.0      46.0
+CBD   CT1     OND     1.0      46.0
+CBD   CP1     OND     1.0      46.0 ! proline
+CBD   CT2     OND     1.0      46.0 ! Isoleucine chamm 36
+NH1   CT1     CBD    70.000    113.5000
+NH1   CT2     CBD    70.000    113.5000
+NH1   CT2A    CBD    70.000    113.5000
+N     CP1     CBD    70.000    110.8000
+CT2   CT1     OND3   13.90     91.30
+CT3   CT1     OND3   13.90     91.30
+CP2   CP1     OND3   13.90     91.30 !proline
+CP2   CT1     OND3   13.90     91.30 !Isoleucine 
+CT1   CT1     OND3   13.90     91.30 !Isoleucine charmm 36
+CT2A  CT1     OND3   13.90     91.30
+CT2   CT1     OND4   15.21     71.40
+CT3   CT1     OND4   15.21     71.40
+CP2   CP1     OND4   15.21     71.40 !proline
+CP2   CT1     OND4   15.21     71.40 !Isoleucine
+CT1   CT1     OND4   15.21     71.40 !Isoleucine  charmm 36
+CT2A  CT1     OND4   15.21     71.40
+! for dummy
+HB1   CT1     OND    0.0       0.0
+HB1   CT1     OND3   0.0       0.0
+HB1   CT1     OND4   0.0       0.0
+H     NH1     OND3   0.0       0.0
+H     NH1     OND4   0.0       0.0
+
+DIHEDRALS
+!
+!V(dihedral) = Kchi(1 + cos(n(chi) - delta))
+!
+!Kchi: kcal/mole
+!n: multiplicity
+!delta: degrees
+!
+!atom types             Kchi    n   delta
+!
+NH1   CT1    CT2    OND     1.9    1    43.0
+NH1   CT1    CT3    OND     1.9    1    43.0
+NH1   CP1    CP2    OND     1.9    1    43.0 ! Prolein
+NH1   CT1    CT2A   OND     1.9    1    43.0
+NH1   CT1    CT1    OND     1.9    1    43.0 
+NH1   CT1    CBD    OND     1.9    1    43.0
+NH1   CP1    CBD    OND     1.9    1    43.0 ! Prolein
+NH1   CT2    CBD    OND     1.9    1    43.0 ! Isoleucine
+H     NH1    CT1    CBD     0.00   1     0.00
+H     NH1    CT2    CBD     0.00   1     0.00
+H     NH1    CT2A   CBD     0.00   1     0.00
+H     NH1    CP1    CBD     0.00   1     0.00
+OND3  CT2    CT1    NH1    29.60   1    87.53
+OND3  CT3    CT1    NH1    29.60   1    87.53
+OND3  CP2    CP1    NH1    29.60   1    87.53  ! Prolein
+OND3  CT2A   CT1    NH1    29.60   1    87.53
+OND3  CT1    CT1    NH1    29.60   1    87.53
+OND4  CT2    CT1    NH1    21.00   1    42.5
+OND4  CT3    CT1    NH1    21.00   1    42.5
+OND4  CP2    CP1    NH1    21.00   1    42.5  !Prolein
+OND4  CT2A   CT1    NH1    21.00   1    42.5
+OND4  CT1    CT1    NH1    21.00   1    42.5
+
+
+NONBONDED
+CBD    0.0   0.00  0.0
+OND    0.0  -0.05  2.0
+OND3   0.0  -0.05  2.0
+OND4   0.0  -0.05  2.0
+
+NBFIX
+OND    OT    0.0  0.0 ! No interaction with water
+OND    HT    0.0  0.0 ! No interaction with water
+OND    OND   0.0  0.0 ! No ON ON interaction
+OND3   OT    0.0  0.0 ! No interaction with water
+OND3   HT    0.0  0.0 ! No interaction with water
+OND3   OND3  0.0  0.0 ! No ON ON interaction
+OND4   OT    0.0  0.0 ! No interaction with water
+OND4   HT    0.0  0.0 ! No interaction with water
+OND4   OND4  0.0  0.0 ! No ON ON interaction
+
+END
+
+return
