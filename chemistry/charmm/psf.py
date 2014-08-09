@@ -109,7 +109,13 @@ class CharmmPsfFile(object):
                     to `dtype'
         """
         conv = CharmmPsfFile._convert
-        words = psf.readline().split()
+        line = psf.readline()
+        while not line.strip():
+            if not line:
+                raise CharmmPSFError('Unexpected EOF in PSF file')
+            else:
+                line = psf.readline()
+        words = line.split()
         if len(words) == 1:
             pointers = conv(words[0], int, 'pointer')
         else:
