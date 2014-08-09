@@ -395,6 +395,9 @@ class CharmmParameterSet(object):
                     # soldier on
                     if not read_first_nonbonded: continue
                     raise CharmmFileError('Could not parse nonbonded terms.')
+                except CharmmFileError, e:
+                    if not read_first_nonbonded: continue
+                    raise CharmmFileError(str(e))
                 else:
                     # OK, we've read our first nonbonded section for sure now
                     read_first_nonbonded = True
