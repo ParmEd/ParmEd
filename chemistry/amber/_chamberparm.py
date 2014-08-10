@@ -524,7 +524,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         parm.addFlag('CTITLE', 'a80', data=[title])
     parm.addFlag('POINTERS', '10I8', data=pointers)
     parm.addFlag('FORCE_FIELD_TYPE', 'i2,a78', data=[frcfield])
-    parm.addFlag('ATOM_NAME', '20a4', data=[a.name for a in struct.atom_list])
+    parm.addFlag('ATOM_NAME','20a4',data=[a.name[:4] for a in struct.atom_list])
     chgdat = [a.charge for a in struct.atom_list]
     if vmd:
         parm.addFlag('CHARGE', '5E16.8', data=chgdat)
@@ -554,7 +554,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     del holder
     parm.addFlag('NONBONDED_PARM_INDEX', '10I8', data=holder2)
     parm.addFlag('RESIDUE_LABEL', '20a4',
-                 data=[res.resname for res in struct.residue_list])
+                 data=[res.resname[:4] for res in struct.residue_list])
     resptr = [0 for i in range(len(struct.residue_list))]
     n = 1
     for i, res in enumerate(struct.residue_list):
@@ -755,7 +755,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     parm.addFlag('HBOND_BCOEF', '5E16.8', num_items=0)
     parm.addFlag('HBCUT', '5E16.8', num_items=0)
     parm.addFlag('AMBER_ATOM_TYPE', '20a4',
-                 data=[a.type.name for a in struct.atom_list])
+                 data=[a.type.name[:4] for a in struct.atom_list])
     parm.addFlag('TREE_CHAIN_CLASSIFICATION', '20a4',
                  data=['BLA' for a in struct.atom_list])
     parm.addFlag('JOIN_ARRAY', '10I8', data=[0 for a in struct.atom_list])
