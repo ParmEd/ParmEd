@@ -23,7 +23,6 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from chemistry.amber._amberparm import AmberParm, Rst7, _zeros
-from chemistry.amber.amberformat import AmberFormat
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
                 MTHETA, NPHIH, MPHIA, NNB, NRES, NBONA, NTHETA, NPHIA, NUMBND,
                 NUMANG, NPTRA, NATYP, IFBOX, NMXRS, CHARMM_ELECTROSTATIC)
@@ -807,6 +806,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+3] = cmap.atom4.idx + 1
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+4] = cmap.atom5.idx + 1
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+5] = cmap.cmap_type.idx + 1
+    parm.initialize_topology()
     if struct.box is not None:
         nspm = max([atom.marked for atom in struct.atom_list])
         iptres = len(struct.residue_list)
@@ -840,6 +840,4 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             crds += [atom.xx, atom.xy, atom.xz]
         parm.coords = crds
         parm.hasvels = False
-    # The topology file still is an AmberFormat instance -- it needs to be cast
-    # in order to be useful as a structure type
     return parm

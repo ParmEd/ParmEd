@@ -419,7 +419,7 @@ class TestAmberParm(unittest.TestCase):
 #EELEC  =     -8552.9795  EHBOND  =         0.0000  RESTRAINT  =         0.0000
 #EKCMT  =         0.0000  VIRIAL  =      -178.4985  VOLUME     =     42712.9055
 #                                                   Density    =         0.6634
-        self.assertAlmostEqual(energies['bond'], 0.0654, 4)
+        self.assertAlmostEqual(energies['bond'], 0.0654, delta=0.0002)
         self.assertAlmostEqual(energies['angle'], 0.9616, 4)
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
         self.assertAlmostEqual(energies['nonbond'], 1256.3579, 3)
