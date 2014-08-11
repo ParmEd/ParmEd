@@ -40,7 +40,6 @@ in later Python versions.
 
 __all__ = ['any', 'all', 'property', 'wraps']
 
-import __builtin__
 import collections as _collections
 try:
     from functools import wraps
@@ -48,7 +47,7 @@ except ImportError:
     wraps = None # Define this later
 
 # Support "any" and "all" functions
-if not hasattr(__builtin__, 'any'):
+if not hasattr(__builtins__, 'any'):
     def any(iterable):
         for it in iterable:
             if it: return True
@@ -58,13 +57,13 @@ if not hasattr(__builtin__, 'any'):
             if not it: return False
         return True
 else:
-    any = __builtin__.any
-    all = __builtin__.all
+    any = __builtins__.any
+    all = __builtins__.all
 
 # Support property.setter
-if not hasattr(__builtin__.property, 'setter'):
+if not hasattr(__builtins__.property, 'setter'):
     # Taken from https://gist.github.com/romuald/1104222
-    class property(__builtin__.property):
+    class property(__builtins__.property):
         __metaclass__ = type
 
         def setter(self, method):
@@ -73,12 +72,12 @@ if not hasattr(__builtin__.property, 'setter'):
         def deleter(self, method):
             return property(self.fget, self.fset, method)
 
-        @__builtin__.property
+        @__builtins__.property
         def __doc__(self):
             """ Set doc correctly for subclass """
             return self.fget.__doc__
 else:
-    property = __builtin__.property
+    property = __builtins__.property
 
 # Support collections.OrderedDict
 if 'OrderedDict' not in dir(_collections):
