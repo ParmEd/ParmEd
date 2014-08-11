@@ -734,22 +734,30 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     parm.addFlag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8',
                  num_items=len(dihedrals_without_h)*5)
     for i, dih in enumerate(dihedrals_inc_h):
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i  ] = dih.atom1.idx * 3
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i+1] = dih.atom2.idx * 3
-        if not dih.end_groups_active:
-            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = -dih.atom3.idx * 3
+        if dih.atom3.idx == 0 or dih.atom4.idx == 0:
+            a1, a2, a3, a4 = dih.atom4, dih.atom3, dih.atom2, dih.atom1
         else:
-            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = dih.atom3.idx * 3
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i+3] = dih.atom4.idx * 3
+            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+        pd['DIHEDRALS_INC_HYDROGEN'][5*i  ] = a1.idx * 3
+        pd['DIHEDRALS_INC_HYDROGEN'][5*i+1] = a2.idx * 3
+        if not dih.end_groups_active:
+            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = -a3.idx * 3
+        else:
+            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = a3.idx * 3
+        pd['DIHEDRALS_INC_HYDROGEN'][5*i+3] = a4.idx * 3
         pd['DIHEDRALS_INC_HYDROGEN'][5*i+4] = dih.dihedral_type.idx + 1
     for i, dih in enumerate(dihedrals_without_h):
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i  ] = dih.atom1.idx * 3
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+1] = dih.atom2.idx * 3
-        if not dih.end_groups_active:
-            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = -dih.atom3.idx * 3
+        if dih.atom3.idx == 0 or dih.atom4.idx == 0:
+            a1, a2, a3, a4 = dih.atom4, dih.atom3, dih.atom2, dih.atom1
         else:
-            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = dih.atom3.idx * 3
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+3] = dih.atom4.idx * 3
+            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i  ] = a1.idx * 3
+        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+1] = a2.idx * 3
+        if not dih.end_groups_active:
+            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = -a3.idx * 3
+        else:
+            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = a3.idx * 3
+        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+3] = a4.idx * 3
         pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+4] = dih.dihedral_type.idx + 1
     parm.addFlag('HBOND_ACOEF', '5E16.8', num_items=0)
     parm.addFlag('HBOND_BCOEF', '5E16.8', num_items=0)
