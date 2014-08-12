@@ -647,7 +647,7 @@ class TestAmberParmActions(unittest.TestCase):
                 if atom1 is atom2: continue
                 in_exclusions_after.append(atom2 in all_exclusions)
                 if not in_exclusions_after[-1]:
-                    print atom1, atom2, 'not excluded'
+                    print('%s %s not excluded' % (atom1, atom2))
         self.assertTrue(all(in_exclusions_after))
 
     def testAddDeleteDihedral(self):
@@ -1395,7 +1395,7 @@ class TestChamberParmActions(unittest.TestCase):
                 if atom1 is atom2: continue
                 in_exclusions_after.append(atom2 in all_exclusions)
                 if not in_exclusions_after[-1]:
-                    print atom1, atom2, 'not excluded'
+                    print('%s %s not excluded' % (atom1, atom2))
         self.assertTrue(all(in_exclusions_after))
 
     def testAddDeleteDihedral(self):

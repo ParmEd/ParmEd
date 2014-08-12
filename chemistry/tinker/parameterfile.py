@@ -7,7 +7,12 @@ from chemistry.exceptions import (AmoebaParamFileError, APIError,
 import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
 from collections import OrderedDict
 import re
+import sys
 import warnings
+
+# Python-3 compatibility
+if sys.version_info[0] == 3:
+    from io import FileIO as file
 
 warnings.filterwarnings('always', category=AmoebaParamFileWarning)
 
