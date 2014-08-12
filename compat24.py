@@ -45,6 +45,10 @@ try:
     from functools import wraps
 except ImportError:
     wraps = None # Define this later
+try:
+    import __builtin__ as __builtins__
+except ImportError:
+    pass
 
 # Support "any" and "all" functions
 if not hasattr(__builtins__, 'any'):

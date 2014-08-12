@@ -234,7 +234,7 @@ class TestAmberMask(unittest.TestCase):
         self.assertEqual(sum(mask_res1.Selection()), 13)
         for idx in mask_res1.Selected():
             self.assertEqual(parm.atom_list[idx].residue.idx, 1)
-        self.assertEqual(range(13), list(mask_res1.Selected()))
+        self.assertEqual(list(range(13)), list(mask_res1.Selected()))
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
@@ -290,18 +290,18 @@ class TestWriteFiles(unittest.TestCase):
         Restart = asciicrd.AmberAsciiRestart
         box = [10, 10, 10, 90, 90, 90]
         rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
-        rst.coordinates = range(27)
+        rst.coordinates = list(range(27))
         rst.close()
         rst = Restart(get_fn('testcv.rst7', written=True), 'w', natom=20)
-        rst.coordinates = range(60)
+        rst.coordinates = list(range(60))
         rst.velocities = list(reversed(range(60)))
         rst.close()
         rst = Restart(get_fn('testcb.rst7', written=True), 'w', natom=7)
-        rst.coordinates = range(21)
+        rst.coordinates = list(range(21))
         rst.box = box[:]
         rst.close()
         rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
-        rst.coordinates = range(45)
+        rst.coordinates = list(range(45))
         rst.velocities = list(reversed(range(45)))
         rst.box = box[:]
         rst.close()
@@ -336,7 +336,7 @@ class TestWriteFiles(unittest.TestCase):
         Mdcrd = asciicrd.AmberMdcrd
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=False,
                     mode='w', title='Test file')
-        crd.add_coordinates(range(45))
+        crd.add_coordinates(list(range(45)))
         crd.add_coordinates([x+1 for x in range(45)])
         crd.add_coordinates([x+2 for x in range(45)])
         crd.add_coordinates([x+3 for x in range(45)])
@@ -344,7 +344,7 @@ class TestWriteFiles(unittest.TestCase):
         crd.close()
         crd = Mdcrd(get_fn('testcb.mdcrd', written=True), natom=18, hasbox=True,
                     mode='w', title='Test file')
-        crd.add_coordinates(range(54))
+        crd.add_coordinates(list(range(54)))
         crd.add_box(box)
         crd.add_coordinates([x+1 for x in range(54)])
         crd.add_box(box)                          
@@ -402,16 +402,16 @@ class TestWriteFiles(unittest.TestCase):
                               lambda: assign(rst, 'rst.coordinates=range(20)'))
             self.assertRaises(RuntimeError,
                               lambda: assign(rst, 'rst.box=[10]*3+[90]*3'))
-            rst.coordinates = range(27)
+            rst.coordinates = list(range(27))
             rst.box = box
-            self.assertRaises(RuntimeError,
-                              lambda: assign(rst, 'rst.velocities=range(27)'))
+            self.assertRaises(RuntimeError, lambda:
+                              assign(rst, 'rst.velocities=list(range(27))'))
         finally:
             rst.close()
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=True,
                     mode='w', title='Test file')
-        s = 'range(45)'
-        s2 = 'range(42)'
+        s = 'list(range(45))'
+        s2 = 'list(range(42))'
         try:
             crd.add_coordinates(eval(s))
             self.assertRaises(RuntimeError,
