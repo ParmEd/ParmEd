@@ -101,7 +101,7 @@ if opt.prmtop_cl is not None:
 # Load the splash screen
 if opt.printlogo:
     splash = Logo()
-    print splash
+    print(splash)
 
 # Set our warning filter
 if opt.strict:
@@ -114,15 +114,15 @@ amber_prmtop = ParmList()
 for i, parm in enumerate(opt.prmtop):
     if i < len(opt.inpcrd):
         amber_prmtop.add_parm(parm, opt.inpcrd[i])
-        print 'Loaded Amber topology file %s with coordinates from %s\n' % (
-                    parm, opt.inpcrd[i])
+        print('Loaded Amber topology file %s with coordinates from %s\n' %
+              (parm, opt.inpcrd[i]))
     else:
         amber_prmtop.add_parm(parm)
-        print 'Loaded Amber topology file %s' % parm
+        print('Loaded Amber topology file %s' % parm)
 
 if len(opt.script) > 0:
     # Read from the list of scripts
-    print opt.script
+    print(opt.script)
     # Make sure that all scripts exist, quitting if we are strict and not all
     # scripts exist. Don't do anything until we know that all scripts exist.
     for script in opt.script:
@@ -133,7 +133,7 @@ if len(opt.script) > 0:
     # We have already pre-screened the scripts.
     for script in opt.script:
         if not os.path.exists(script): continue
-        print 'Reading actions from %s\n' % script
+        print('Reading actions from %s\n' % script)
         parmed_commands = ParmedCmd(amber_prmtop, stdin=open(script, 'r'))
         parmed_commands.use_rawinput = 0
         parmed_commands.interpreter = opt.interpreter
@@ -141,7 +141,8 @@ if len(opt.script) > 0:
         # Loop through all of the commands
         try:
             parmed_commands.cmdloop()
-        except InterpreterError, err:
+        except InterpreterError:
+            err = sys.exc_info()[1]
             sys.exit('%s: %s' % (type(err).__name__, err))
         except ParmError:
             # This has already been caught and printed. If it was re-raised,
@@ -159,11 +160,12 @@ else:
     # Loop through all of the commands
     try:
         parmed_commands.cmdloop()
-    except InterpreterError, err:
+    except InterpreterError:
+        err = sys.exc_info()[1]
         sys.exit('%s: %s' % (type(err).__name__, err))
     except ParmError:
         # This has already been caught and printed. If it was re-raised, then
         # that means we wanted to exit
         sys.exit(1)
 
-print 'Done!'
+print('Done!')
