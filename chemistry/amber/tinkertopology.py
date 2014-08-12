@@ -276,12 +276,6 @@ class Atom(object):
 
     #===================================================
 
-    def __eq__(self, other):
-        return id(self) == id(other)
-
-    def __ne__(self, other):
-        return not Atom.__eq__(self, other)
-
     def __gt__(self, other):
         return self.starting_index > other.starting_index
 
