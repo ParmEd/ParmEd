@@ -252,8 +252,8 @@ if wraps is None:
         return wrapper
 
     def wraps(wrapped,
-            assigned = WRAPPER_ASSIGNMENTS,
-            updated = WRAPPER_UPDATES):
+              assigned=WRAPPER_ASSIGNMENTS,
+              updated=WRAPPER_UPDATES):
         """Decorator factory to apply update_wrapper() to a wrapper function
     
            Returns a decorator that invokes update_wrapper() with the decorated
@@ -263,4 +263,4 @@ if wraps is None:
            update_wrapper().
         """
         return partial(update_wrapper, wrapped=wrapped,
-                    assigned=assigned, updated=updated)
+                       assigned=assigned, updated=updated)
