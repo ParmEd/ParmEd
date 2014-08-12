@@ -187,7 +187,7 @@ class AmberFormat(object):
         self.version = None
         self.prm_name = fname
         self.charge_flag = 'CHARGE'
-        self.valid = False
+        self.valid = True
 
         if fname is not None:
             self.rdparm(fname)

@@ -285,39 +285,40 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
         self.assertRelativeEqual(energies['nonbond'], -240681.958902, places=5)
 
-def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
-    """ Gets a decomposed energy for a given system """
-    energies = {}
-    # Get energy components
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.BOND_FORCE_GROUP)
-    energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.ANGLE_FORCE_GROUP)
-    energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.DIHEDRAL_FORCE_GROUP)
-    energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.NONBONDED_FORCE_GROUP)
-    energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
-    energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.IMPROPER_FORCE_GROUP)
-    energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.boxVectors is not None,
-                         groups=2**parm.CMAP_FORCE_GROUP)
-    energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    return energies
+if has_openmm:
+    def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
+        """ Gets a decomposed energy for a given system """
+        energies = {}
+        # Get energy components
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.BOND_FORCE_GROUP)
+        energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.ANGLE_FORCE_GROUP)
+        energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.DIHEDRAL_FORCE_GROUP)
+        energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.NONBONDED_FORCE_GROUP)
+        energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
+        energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.IMPROPER_FORCE_GROUP)
+        energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        s = context.getState(getEnergy=True,
+                             enforcePeriodicBox=parm.boxVectors is not None,
+                             groups=2**parm.CMAP_FORCE_GROUP)
+        energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+        return energies
 
 if not has_openmm:
     del TestCharmmFiles
