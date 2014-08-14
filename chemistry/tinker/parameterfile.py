@@ -10,20 +10,22 @@ import re
 import sys
 import warnings
 
-# Python-3 compatibility
-if sys.version_info[0] == 3:
-    from io import FileIO as file
-
 warnings.filterwarnings('always', category=AmoebaParamFileWarning)
 
-class BookmarkedFile(file):
+class BookmarkedFile(object):
     """ Allows setting a bookmark and rewinding to that bookmark """
+
+    def __init__(self, *args, **kwargs):
+        self._stream = open(*args, **kwargs)
 
     def mark(self):
         self.bookmark = self.tell()
 
     def rewind(self):
         self.seek(self.bookmark)
+
+    def __getattr__(self, attr):
+        return getattr(self._stream, attr)
 
 def _IS_INT(thing):
     try:
