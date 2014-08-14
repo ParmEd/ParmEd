@@ -294,6 +294,15 @@ class Atom(object):
             retstr += '; %s> ' % (self.name)
         return retstr
 
+    def __lt__(self, other):
+        return self.idx < other.idx
+    def __gt__(self, other):
+        return self.idx > other.idx
+    def __le__(self, other):
+        return not self > other
+    def __ge__(self, other):
+        return not self < other
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AtomList(TrackedList):

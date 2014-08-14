@@ -141,8 +141,7 @@ if len(opt.script) > 0:
         # Loop through all of the commands
         try:
             parmed_commands.cmdloop()
-        except InterpreterError:
-            err = sys.exc_info()[1]
+        except InterpreterError, err:
             sys.exit('%s: %s' % (type(err).__name__, err))
         except ParmError:
             # This has already been caught and printed. If it was re-raised,
@@ -160,8 +159,7 @@ else:
     # Loop through all of the commands
     try:
         parmed_commands.cmdloop()
-    except InterpreterError:
-        err = sys.exc_info()[1]
+    except InterpreterError, err:
         sys.exit('%s: %s' % (type(err).__name__, err))
     except ParmError:
         # This has already been caught and printed. If it was re-raised, then

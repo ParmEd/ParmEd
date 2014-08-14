@@ -766,7 +766,7 @@ class AmberParm(AmberFormat):
         """ Writes an OFF file from all of the residues found in a prmtop """
         from chemistry.amber.residue import ToResidue
    
-        off_file = open(off_file,'w',0)
+        off_file = open(off_file, 'w')
    
         # keep track of all the residues we have to print to the OFF file
         residues = []
