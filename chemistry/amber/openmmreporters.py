@@ -95,7 +95,7 @@ class AmberStateDataReporter(object):
         self._reportInterval = reportInterval
         self._openedFile = not hasattr(f, 'write')
         if self._openedFile:
-            self._out = open(f, 'w', 0)
+            self._out = open(f, 'w')
         else:
             self._out = f
         self._step = step
@@ -869,7 +869,7 @@ class EnergyMinimizerReporter(AmberStateDataReporter):
             self._out = f
         else:
             self._openedFile = True
-            self._out = open(f, 'w', 0)
+            self._out = open(f, 'w')
 
     def describeNextReport(self, *args, **kwargs):
         """ Disable this reporter inside MD """

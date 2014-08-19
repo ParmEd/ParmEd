@@ -220,6 +220,11 @@ class ChemicalSystem(list):
         # BMRB, and EMDB
         inst.related_entries = []
         for line in pdb:
+            try:
+                line = line.decode('ascii') # In case we are parsing bytes (Py3)
+            except AttributeError:
+                # Assume this is a string in Py3 which doesn't have 'decode'
+                pass
             rec = line[:6]
             if rec == 'ATOM  ' or rec == 'HETATM':
                 atnum, atname, altloc = line[6:11], line[12:16], line[16]

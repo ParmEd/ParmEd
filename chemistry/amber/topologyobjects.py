@@ -251,12 +251,6 @@ class Atom(object):
 
     # Comparisons are done by comparing the starting indexes
 
-    def __eq__(self, other):
-        return self.starting_index == other.starting_index
-      
-    def __ne__(self, other):
-        return not Atom.__eq__(self, other)
-
     def __gt__(self, other):
         return self.starting_index > other.starting_index
 

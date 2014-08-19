@@ -7,18 +7,25 @@ from chemistry.exceptions import (AmoebaParamFileError, APIError,
 import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
 from collections import OrderedDict
 import re
+import sys
 import warnings
 
 warnings.filterwarnings('always', category=AmoebaParamFileWarning)
 
-class BookmarkedFile(file):
+class BookmarkedFile(object):
     """ Allows setting a bookmark and rewinding to that bookmark """
+
+    def __init__(self, *args, **kwargs):
+        self._stream = open(*args, **kwargs)
 
     def mark(self):
         self.bookmark = self.tell()
 
     def rewind(self):
         self.seek(self.bookmark)
+
+    def __getattr__(self, attr):
+        return getattr(self._stream, attr)
 
 def _IS_INT(thing):
     try:

@@ -177,12 +177,12 @@ class NetCDFRestart(object):
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
-        inst.Conventions = ncfile.Conventions
-        inst.ConventionVersion = ncfile.ConventionVersion
-        inst.application = ncfile.application
-        inst.program = ncfile.program
-        inst.programVersion = ncfile.programVersion
-        inst.title = ncfile.title
+        inst.Conventions = ncfile.Conventions.decode('ascii')
+        inst.ConventionVersion = ncfile.ConventionVersion.decode('ascii')
+        inst.application = ncfile.application.decode('ascii')
+        inst.program = ncfile.program.decode('ascii')
+        inst.programVersion = ncfile.programVersion.decode('ascii')
+        inst.title = ncfile.title.decode('ascii')
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
@@ -452,12 +452,12 @@ class NetCDFTraj(object):
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
-        inst.Conventions = ncfile.Conventions
-        inst.ConventionVersion = ncfile.ConventionVersion
-        inst.application = ncfile.application
-        inst.program = ncfile.program
-        inst.programVersion = ncfile.programVersion
-        inst.title = ncfile.title
+        inst.Conventions = ncfile.Conventions.decode('ascii')
+        inst.ConventionVersion = ncfile.ConventionVersion.decode('ascii')
+        inst.application = ncfile.application.decode('ascii')
+        inst.program = ncfile.program.decode('ascii')
+        inst.programVersion = ncfile.programVersion.decode('ascii')
+        inst.title = ncfile.title.decode('ascii')
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             setattr(inst, dim, amber.get_int_dimension(ncfile, dim))
