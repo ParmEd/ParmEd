@@ -806,7 +806,6 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+3] = cmap.atom4.idx + 1
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+4] = cmap.atom5.idx + 1
             parm.parm_data['CHARMM_CMAP_INDEX'][6*i+5] = cmap.cmap_type.idx + 1
-    parm.initialize_topology()
     if struct.box is not None:
         nspm = max([atom.marked for atom in struct.atom_list])
         iptres = len(struct.residue_list)
@@ -826,8 +825,10 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         box_info = [struct.box[3]] + struct.box[:3]
         parm.addFlag('BOX_DIMENSIONS', '5E16.8', data=box_info)
         parm.hasbox = True
+        parm.initialize_topology()
         parm.box = struct.box[:]
     else:
+        parm.initialize_topology()
         parm.hasbox = False
 
     # See if we need to set a rst7 attribute (if coordinates are set)

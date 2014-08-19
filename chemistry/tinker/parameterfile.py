@@ -7,7 +7,6 @@ from chemistry.exceptions import (AmoebaParamFileError, APIError,
 import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
 from collections import OrderedDict
 import re
-import sys
 import warnings
 
 warnings.filterwarnings('always', category=AmoebaParamFileWarning)
@@ -26,6 +25,12 @@ class BookmarkedFile(object):
 
     def __getattr__(self, attr):
         return getattr(self._stream, attr)
+
+    def __del__(self):
+        try:
+            self._stream.close()
+        except:
+            pass
 
 def _IS_INT(thing):
     try:
