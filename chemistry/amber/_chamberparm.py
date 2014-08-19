@@ -824,8 +824,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             parm.parm_data['ATOMS_PER_MOLECULE'][atom.marked-1] += 1
         box_info = [struct.box[3]] + struct.box[:3]
         parm.addFlag('BOX_DIMENSIONS', '5E16.8', data=box_info)
-        parm.hasbox = True
         parm.initialize_topology()
+        parm.hasbox = True
         parm.box = struct.box[:]
     else:
         parm.initialize_topology()
