@@ -61,9 +61,9 @@ class ParmedApp(Frame):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
         # Control expandability of action frame
-        for i in range(int(math.ceil(len(action_keys)/BPR)) + 1):
+        for i in xrange(int(math.ceil(len(action_keys)/BPR)) + 1):
             action_frame.rowconfigure(i+1, weight=1)
-        for i in range(BPR):
+        for i in xrange(BPR):
             action_frame.columnconfigure(i, weight=1)
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~

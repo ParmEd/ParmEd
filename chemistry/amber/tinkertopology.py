@@ -142,7 +142,7 @@ class Atom(object):
         data['AMOEBA_VDW_ATOM_PARENT_LIST'][idx] = self.vdw_par.idx+1
         data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'][idx] = self.vdw_par_wt
         key = 'AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'
-        for i in range(10):
+        for i in xrange(10):
             _idx = 10 * idx + i
             data[key][_idx] = self.multipoles[i]
         data['AMOEBA_POLARIZABILITY_LIST'][idx] = self.polar
@@ -207,7 +207,7 @@ class Atom(object):
         excset = set()
         n = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS'][self.starting_index]
         exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
-        for i in range(n):
+        for i in xrange(n):
             idx = exclist[first_excl+i] - 1
             excset.add(self.parm.atom_list[idx])
         # Now subtract off all of the bonds, angles, torsions, and tortors
@@ -298,9 +298,9 @@ class AtomList(list):
         self.parm = parm
         natom = self.parm.parm_data['POINTERS'][NATOM]
         if fill_from is None:
-            list.__init__(self, [Atom(self.parm, i) for i in range(natom)])
+            list.__init__(self, [Atom(self.parm, i) for i in xrange(natom)])
         else:
-            list.__init__(self, [0 for i in range(natom)])
+            list.__init__(self, [0 for i in xrange(natom)])
             for i, atm in enumerate(fill_from): self[i] = atm
         self.changed = False
         # Register the vdW parent atom here, since we have to make sure that
@@ -327,7 +327,7 @@ class AtomList(list):
    
     def _index_us(self):
         """ We have deleted an atom, so now we have to re-index everybody """
-        for i in range(len(self)): self[i].idx = i
+        for i in xrange(len(self)): self[i].idx = i
 
     #===================================================
 
@@ -343,7 +343,7 @@ class AtomList(list):
         self.parm.parm_data['POINTERS'][NATOM] = len(self)
         # Array slices are faster than copy() and creating new arrays
         # each time
-        zeros = [0 for i in range(self.parm.parm_data['POINTERS'][NATOM])]
+        zeros = [0 for i in xrange(self.parm.parm_data['POINTERS'][NATOM])]
         self.parm.parm_data['ATOM_NAME'] = zeros[:]
         self.parm.parm_data['CHARGE'] = zeros[:]
         self.parm.parm_data['MASS'] = zeros[:]
@@ -1076,7 +1076,7 @@ class TorsionTorsionTypeList(_TypeList):
     def _make_array(self):
         ntab = self.parm.parm_data['AMOEBA_TORSION_TORSION_NUM_PARAMS'][0]
         list.__init__(self)
-        for i in range(ntab):
+        for i in xrange(ntab):
             prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_' % (i + 1)
             dims = tuple(self.parm.parm_data[prefix + 'DIMS'])
             ang1 = self.parm.parm_data[prefix + 'ANGLE1']

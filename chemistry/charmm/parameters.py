@@ -549,10 +549,10 @@ class CharmmParameterSet(object):
         # to condense _within_ a single list of torsions assigned to the same
         # key (they're guaranteed to be different)
         keylist = self.dihedral_types.keys()
-        for i in range(len(keylist) - 1):
+        for i in xrange(len(keylist) - 1):
             key1 = keylist[i]
             for dihedral in self.dihedral_types[key1]:
-                for j in range(i+1, len(keylist)):
+                for j in xrange(i+1, len(keylist)):
                     key2 = keylist[j]
                     for jj, dihedral2 in enumerate(self.dihedral_types[key2]):
                         if dihedral2 == dihedral:
@@ -568,9 +568,9 @@ class CharmmParameterSet(object):
             - typedict : Type dictionary to condense
         """
         keylist = typedict.keys()
-        for i in range(len(keylist) - 1):
+        for i in xrange(len(keylist) - 1):
             key1 = keylist[i]
-            for j in range(i+1, len(keylist)):
+            for j in xrange(i+1, len(keylist)):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]

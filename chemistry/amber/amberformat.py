@@ -17,7 +17,6 @@ from warnings import warn
 # Some Py3 compatibility tweaks
 if not 'unicode' in dir(__builtins__): unicode = str
 if not 'basestring' in dir(__builtins__): basestring = str
-if not 'xrange' in dir(__builtins__): xrange = range
 
 class FortranFormat(object):
     """ Handles fortran formats """

@@ -28,7 +28,7 @@ class NumberArray(list):
     __rmul__ = __mul__
 
     def __imul__(self, scalar):
-        for i in range(len(self)): self[i] *= scalar
+        for i in xrange(len(self)): self[i] *= scalar
         return self
    
     @_same_len('addition')

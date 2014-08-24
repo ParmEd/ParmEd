@@ -68,7 +68,7 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 
     amberatomtypelist1 = []
     atomtypeindexlist1 = [] 
-    for i in range(parm.pointers['NATOM']):
+    for i in xrange(parm.pointers['NATOM']):
         amberatomtypelist1.append(parm.parm_data['AMBER_ATOM_TYPE'][i])
         atomtypeindexlist1.append(parm.parm_data['ATOM_TYPE_INDEX'][i])
 
@@ -77,13 +77,13 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 
     amberatomtypelist2 = []
     atomtypeindexlist2 = []
-    for i in range(parm.pointers['NATOM']):
+    for i in xrange(parm.pointers['NATOM']):
         if not atomtypeindexlist1[i] in atomtypeindexlist2:
             amberatomtypelist2.append(amberatomtypelist1[i])
             atomtypeindexlist2.append(atomtypeindexlist1[i])
 
     #3.Generate the C4 term for each atom type
-    result = [0.0 for i in range(len(parm.parm_data['LENNARD_JONES_ACOEF']))]
+    result = [0.0 for i in xrange(len(parm.parm_data['LENNARD_JONES_ACOEF']))]
 
  
     ntypes = parm.pointers['NTYPES']
@@ -95,7 +95,7 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 #       print "***********************************************************"
 #       print "Here are the atom types which have been added C4 term:"
         # for the situation j < i
-        for j in range(typ):
+        for j in xrange(typ):
             atomtypej = amberatomtypelist2[j]
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*j+i]-1
             try:
@@ -113,7 +113,7 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                 result[idx] = c4 / WATER_POL * pol * tunfactor 
                
             # for the situation i =< j 
-        for j in range(typ, parm.ptr('ntypes')):
+        for j in xrange(typ, parm.ptr('ntypes')):
             atomtypej = amberatomtypelist2[j]
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
             try:

@@ -654,22 +654,22 @@ def simulate(parm, args):
             if scriptfile is not None:
                 scriptfile.write('f = open("%s", "w", 0)\n'
                         'rep = EnergyMinimizerReporter(f, volume=%s)\n'
-                        'for frame in range(nframes)\n'
+                        'for frame in xrange(nframes)\n'
                         '    crds = inptraj.coordinates(frame)\n'
                         '    simulation.context.setPositions(\n'
                         '         tuple([Vec3(crds[3*i], crds[3*i+1], '
                         'crds[3*i+2])\n'
-                        '           for i in range(parm.ptr("natom"))]) * '
+                        '           for i in xrange(parm.ptr("natom"))]) * '
                         'u.angstroms\n'
                         '    )\n' % outputfile
                 )
             f = open(outputfile, 'w', 0)
             rep = EnergyMinimizerReporter(f, volume=parm.ptr('ifbox') > 0)
-            for frame in range(nframes):
+            for frame in xrange(nframes):
                 crds = inptraj.coordinates(frame)
                 simulation.context.setPositions(
                         tuple([Vec3(crds[3*i], crds[3*i+1], crds[3*i+2])
-                        for i in range(parm.ptr('natom'))]) * u.angstroms
+                        for i in xrange(parm.ptr('natom'))]) * u.angstroms
                 )
                 rep.report(simulation, frame=frame+1)
                 if mdin.cntrl_nml['maxcyc'] > 1:

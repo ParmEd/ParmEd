@@ -436,7 +436,7 @@ class changeljpair(Action):
         # Make sure we only selected 1 atom type in each mask
         attype1 = None
         attype2 = None
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if selection1[i] == 1:
                 if not attype1:
                     attype1 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
@@ -489,7 +489,7 @@ class changelj14pair(Action):
         # Make sure we only selected 1 atom type, and figure out what it is
         attype1 = None
         attype2 = None
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if selection1[i] == 1:
                 if not attype1:
                     attype1 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
@@ -592,7 +592,7 @@ class change(Action):
             return "Changing %s of %s to %s" % (self.prop, self.mask,
                                                 self.new_val)
         string = '\n'
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if atnums[i] == 1:
                 string += "Changing %s of atom # %d (%s) from %s to %s\n" % (
                         self.prop, i+1, self.parm.parm_data['ATOM_NAME'][i],
@@ -605,7 +605,7 @@ class change(Action):
             warnings.warn('change %s: %s matches no atoms' %
                           (self.prop,self.mask), ParmWarning)
             return
-        for i in range(len(atnums)):
+        for i in xrange(len(atnums)):
             if atnums[i] == 1:
                 self.parm.parm_data[self.prop][i] = self.new_val
         # Update the atom properties in the atom list
@@ -667,7 +667,7 @@ class addljtype(Action):
         # Find the first atom that's selected in this selection. We've
         # already made sure that at least one atom was selected
         sel_atms = self.mask.Selection()
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if sel_atms[i] == 1: 
                 first_atm = i
                 break
@@ -741,7 +741,7 @@ class printljtypes(Action):
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
                     if begin < 0 or end < begin: 
                         raise ParmError('printLJTypes: Bad atom type range')
-                    self.type_list.extend([i for i in range(begin, end+1)])
+                    self.type_list.extend([i for i in xrange(begin, end+1)])
                 else:
                     self.type_list.append(int(field))
 
@@ -750,7 +750,7 @@ class printljtypes(Action):
         if self.mask:
             selection = self.mask.Selection()
         elif self.type_list:
-            selection = [0 for i in range(self.parm.ptr('natom'))]
+            selection = [0 for i in xrange(self.parm.ptr('natom'))]
             for item in self.type_list:
                 selection[item-1] = 1
         else:
@@ -758,14 +758,14 @@ class printljtypes(Action):
 
         self.idx = []
 
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if selection[i] == 1:
                 if not self.parm.parm_data['ATOM_TYPE_INDEX'][i] in self.idx:
                     self.idx.append(self.parm.parm_data['ATOM_TYPE_INDEX'][i])
 
         string = '\n%15s %4s %4s\n' % ("  ATOM NUMBER  ", 'NAME', 'TYPE')
         string += '---------------------------------------------\n'
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if self.parm.parm_data['ATOM_TYPE_INDEX'][i] in self.idx:
                 string += 'ATOM %-10d %-4s %-4s: Type index: %d\n' % (
                                       i+1, self.parm.parm_data['ATOM_NAME'][i],
@@ -792,11 +792,11 @@ class scee(Action):
         if not 'SCEE_SCALE_FACTOR' in self.parm.flag_list:
             self.parm.addFlag('SCEE_SCALE_FACTOR', '5E16.8',
                               data=[self.scee_value
-                                    for i in range(self.parm.ptr('nptra'))]
+                                    for i in xrange(self.parm.ptr('nptra'))]
             )
         else:
             self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
-                                for i in range(self.parm.ptr('nptra'))]
+                                for i in xrange(self.parm.ptr('nptra'))]
         # Now add it to each of the torsions
         for dih in self.parm.dihedrals_inc_h:
             dih.dihed_type.scee = self.scee_value
@@ -820,10 +820,10 @@ class scnb(Action):
     def execute(self):
       if not 'SCNB_SCALE_FACTOR' in self.parm.flag_list:
          self.parm.addFlag('SCNB_SCALE_FACTOR','5E16.8', data=[self.scnb_value 
-                                        for i in range(self.parm.ptr('nptra'))])
+                                    for i in xrange(self.parm.ptr('nptra'))])
       else:
          self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
-                                         for i in range(self.parm.ptr('nptra'))]
+                                    for i in xrange(self.parm.ptr('nptra'))]
       # Now add it to each of the torsions
       for dih in self.parm.dihedrals_inc_h:
          dih.dihed_type.scnb = self.scnb_value
@@ -879,7 +879,7 @@ class changeljsingletype(Action):
         self.parm.LJ_radius[attype-1] = self.radius
         self.parm.LJ_depth[attype-1] = self.depth
 
-        for i in range(self.parm.ptr('ntypes')):
+        for i in xrange(self.parm.ptr('ntypes')):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][
                                     self.parm.ptr('ntypes')*i+attype-1] - 1
             rij = self.parm.LJ_radius[i] + self.radius
@@ -1168,8 +1168,8 @@ class changeprotstate(Action):
                                    'titratable residue')
       
         chgnum = 0
-        for i in range(self.parm.parm_data['RESIDUE_POINTER'][resnum-1]-1,
-                       self.parm.parm_data['RESIDUE_POINTER'][resnum]-1):
+        for i in xrange(self.parm.parm_data['RESIDUE_POINTER'][resnum-1]-1,
+                        self.parm.parm_data['RESIDUE_POINTER'][resnum]-1):
             if sel[i] != 1:
                 raise ChangeStateError('You must select 1 and only 1 entire '
                                        'residue to change the protonation '
@@ -1507,7 +1507,7 @@ class setbond(Action):
 
         atnum1, atnum2 = -1, -1
         # Loop through all of the selected atoms
-        for it in range(sum(sel1)):
+        for it in xrange(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1589,7 +1589,7 @@ class setangle(Action):
         atnum1, atnum2, atnum3 = -1, -1, -1
 
         # Loop through all of the selections
-        for it in range(sum(sel1)):
+        for it in xrange(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1701,7 +1701,7 @@ class adddihedral(Action):
         # Loop through all of the atoms
         atnum1, atnum2, atnum3, atnum4 = -1, -1, -1, -1
 
-        for it in range(sum(sel1)):
+        for it in xrange(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1815,7 +1815,7 @@ class deletedihedral(Action):
         # Now, loop through the atoms and see if any dihedrals match that spec
         atnum1 = atnum2 = atnum3 = atnum4 = -1
         total_diheds = 0
-        for i in range(sum(sel1)):
+        for i in xrange(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1900,7 +1900,7 @@ class printljmatrix(Action):
         # If we selected no atoms, bail out
         if sum(sel) == 0: return ''
         # Figure out which types correspond to which names
-        typenames = [set() for i in range(self.parm.ptr('NTYPES'))]
+        typenames = [set() for i in xrange(self.parm.ptr('NTYPES'))]
         for i, ty in enumerate(self.parm.parm_data['ATOM_TYPE_INDEX']):
             typenames[ty-1].add(self.parm.parm_data['AMBER_ATOM_TYPE'][i])
         # Otherwise, collect our list of atom types that we selected
@@ -1921,7 +1921,7 @@ class printljmatrix(Action):
                     'B coefficient', 'R i,j', 'Eps i,j')
         ret_str += '\n' + '-'*len(ret_str) + '\n'
         for ty in sel_types:
-            for ty2 in range(1,ntypes+1):
+            for ty2 in xrange(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
                 idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][
                             ntypes*(type1-1)+type2-1]
@@ -2004,14 +2004,14 @@ class timerge(Action):
         if self.molmask1N is not None:
             molsel1N = self.molmask1N.Selection()
         else:
-            molsel1N = [0 for i in range(natom)]
+            molsel1N = [0 for i in xrange(natom)]
 
         if self.molmask2N is not None:
             molsel2N = self.molmask2N.Selection()
         else:
-            molsel2N = [0 for i in range(natom)]
+            molsel2N = [0 for i in xrange(natom)]
 
-        for i in range(natom):
+        for i in xrange(natom):
             if sel1[i] and not molsel1[i]:
                 raise TiMergeError('scmask1 must be a subset of mol1mask.')
             if sel2[i] and not molsel2[i]:
@@ -2033,11 +2033,11 @@ class timerge(Action):
         # molsel2 has no overlap (dihedrals, angles, bonds) with sel2 then we
         # can just delete it (it is redundant).
 
-        keep_mask = [0 for i in range(natom)]
+        keep_mask = [0 for i in xrange(natom)]
 
-        for i in range(natom):
+        for i in xrange(natom):
             if molsel2[i]:
-                for j in range(natom):
+                for j in xrange(natom):
                     if sel2[j]:
                         atm1 = self.parm.atom_list[i]
                         atm2 = self.parm.atom_list[j]
@@ -2053,10 +2053,10 @@ class timerge(Action):
         # not introduce extra maintenance issues
         remove_mask = []
         # remove_map[old_atm_idx] = new_atm_idx
-        remove_map = [0 for i in range(natom)] 
+        remove_map = [0 for i in xrange(natom)] 
 
         new_atm_idx = 0
-        for i in range(natom):
+        for i in xrange(natom):
             if molsel2[i] == 1 and sel2[i] == 0:
                 remove_mask.append('%d' % (i+1))
             else:
@@ -2071,11 +2071,11 @@ class timerge(Action):
         mol1common = []
         mol2common = []
 
-        for i in range(natom):
+        for i in xrange(natom):
             if molsel1[i] == 1 and sel1[i] == 0:                  
                 mol1common.append(i)
 
-        for i in range(natom):
+        for i in xrange(natom):
             if molsel2[i] == 1 and sel2[i] == 0:                  
                 mol2common.append(i)
 
@@ -2085,12 +2085,12 @@ class timerge(Action):
 
         mol2common_sort = []
         # reorder mol2common so that it matches mol1common
-        for i in range(len(mol1common)):
+        for i in xrange(len(mol1common)):
             atm_i = mol1common[i]
-            for j in range(len(mol2common)):
+            for j in xrange(len(mol2common)):
                 atm_j = mol2common[j]
                 diff_count = 0
-                for k in range(3):
+                for k in xrange(3):
                     diff = (self.parm.coords[3*atm_i + k] - 
                             self.parm.coords[3*atm_j + k])
                     if abs(diff) < self.tol:
@@ -2108,23 +2108,23 @@ class timerge(Action):
                                'masks. If these look correct try using a '
                                'larger tolerance.')
 
-        for i in range(len(mol1common)):
+        for i in xrange(len(mol1common)):
             atm_i = mol1common[i]
             atm_j = mol2common[i]               
-            for k in range(3):
+            for k in xrange(3):
                 diff = (self.parm.coords[3*atm_i + k] - 
                         self.parm.coords[3*atm_j + k])
                 if abs(diff) > self.tol:
                     raise TiMergeError('Common (nonsoftcore) atoms must have '
                                        'the same coordinates.')
       
-        for j in range(natom):
+        for j in xrange(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
                 atm = self.parm.atom_list[j]
                 idx = mol1common[mol2common.index(j)]
                 atm_new = self.parm.atom_list[idx]
 
-                for k in range(natom):
+                for k in xrange(natom):
                     if sel2[k]:
                         atm2 = self.parm.atom_list[k]
                         # update partners -- the exclusion list will be updated 
@@ -2153,7 +2153,7 @@ class timerge(Action):
                       
                         for bond in (self.parm.bonds_inc_h, 
                                      self.parm.bonds_without_h):
-                            for i in range(len(bond)):
+                            for i in xrange(len(bond)):
                                 holder = bond[i]
                                 if (holder.atom1.starting_index == j and 
                                     holder.atom2.starting_index == k):
@@ -2164,7 +2164,7 @@ class timerge(Action):
 
                         for angle in (self.parm.angles_inc_h, 
                                       self.parm.angles_without_h):
-                            for i in range(len(angle)):
+                            for i in xrange(len(angle)):
                                 holder = angle[i]
                                 if holder.atom1.starting_index == j:
                                     if (holder.atom2.starting_index == k or 
@@ -2181,7 +2181,7 @@ class timerge(Action):
                   
                         for dihed in (self.parm.dihedrals_inc_h, 
                                       self.parm.dihedrals_without_h):
-                            for i in range(len(dihed)):
+                            for i in xrange(len(dihed)):
                                 holder = dihed[i]
                                 if holder.atom1.starting_index == j:
                                     if (holder.atom2.starting_index == k or 
@@ -2213,7 +2213,7 @@ class timerge(Action):
         new_sc_atm2 = []
         new_sc_atm1_int = []
         new_sc_atm2_int = []
-        for i in range(natom):
+        for i in xrange(natom):
             if sel1[i] or molsel1N[i]:
                 new_sc_atm1_int.append(remove_map[i])
                 new_sc_atm1.append('%d' % (remove_map[i]+1))
@@ -2227,7 +2227,7 @@ class timerge(Action):
         # This can be worked-around: 
         # Define your softcore region so that it includes the ring.        
         for dihed in (self.parm.dihedrals_inc_h,self.parm.dihedrals_without_h):
-            for i in range(len(dihed)):
+            for i in xrange(len(dihed)):
                 holder = dihed[i]
                 # skip impropers, these are not used to define 1-4 interactions
                 # so these can cross through the softcore region
@@ -2559,7 +2559,7 @@ class interpolate(Action):
         chg2 = NumberArray(parm2.parm_data['CHARGE'])
         diff = chg2 - chg1
         diff *= 1 / (self.nparm + 1)
-        for i in range(self.nparm):
+        for i in xrange(self.nparm):
             new_chg = chg1 + diff * (i + 1)
             parm1.parm_data['CHARGE'] = [c for c in new_chg]
             newname = '%s.%d' % (self.prefix, i+self.startnum)
@@ -2674,7 +2674,7 @@ class scale(Action):
 
     def execute(self):
         try:
-            for i in range(len(self.parm.parm_data[self.flag])):
+            for i in xrange(len(self.parm.parm_data[self.flag])):
                 self.parm.parm_data[self.flag][i] *= self.factor
             self.parm.flush_data_changes()
         except TypeError:
@@ -2750,9 +2750,9 @@ class addpdb(Action):
         from chemistry.system import ChemicalSystem
         if self.pdbpresent: return
         pdb = ChemicalSystem.load_from_pdb(self.pdbfile)
-        resnums = [0 for i in range(self.parm.ptr('nres'))]
-        chainids = ['*' for i in range(self.parm.ptr('nres'))]
-        icodes = ['' for i in range(self.parm.ptr('nres'))]
+        resnums = [0 for i in xrange(self.parm.ptr('nres'))]
+        chainids = ['*' for i in xrange(self.parm.ptr('nres'))]
+        icodes = ['' for i in xrange(self.parm.ptr('nres'))]
         for i, res in enumerate(pdb):
             try:
                 reslab = self.parm.parm_data['RESIDUE_LABEL'][i].strip()
@@ -3530,7 +3530,7 @@ class chamber(Action):
                 # Define the bounding box
                 xmin, ymin, zmin = coords[:3]
                 xmax, ymax, zmax = xmin, ymin, zmin
-                for i in range(1, len(psf.atom_list)):
+                for i in xrange(1, len(psf.atom_list)):
                     i3 = i * 3
                     xmin = min(xmin, coords[i3  ])
                     xmax = max(xmax, coords[i3  ])

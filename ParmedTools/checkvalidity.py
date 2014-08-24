@@ -142,7 +142,7 @@ def check_validity(parm, warnings):
                         False, None,int)
                 if checkme('CHARMM_CMAP_RESOLUTION', cmap_type_cnt, True,
                      False, True, int):
-                    for i in range(cmap_type_cnt):
+                    for i in xrange(cmap_type_cnt):
                         checkme('CHARMM_CMAP_PARAMETER_%s' % (str(i).zfill(2)),
                                 parm.parm_data['CHARMM_CMAP_RESOLUTION'][i],
                                 True, False, True, float)
@@ -173,8 +173,8 @@ def check_validity(parm, warnings):
     parm.fill_LJ()
     ntypes = parm.ptr('ntypes')
     try:
-        for i in range(ntypes):
-            for j in range(ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
                 idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = parm.LJ_radius[i] + parm.LJ_radius[j]
                 wdij = sqrt(parm.LJ_depth[i] * parm.LJ_depth[j])
@@ -254,8 +254,8 @@ def check_validity(parm, warnings):
             if not sel: continue
             s_atms.append(parm.atom_list[i])
         try:
-            for i in range(len(s_atms)-1):
-                for j in range(i, len(s_atms)):
+            for i in xrange(len(s_atms)-1):
+                for j in xrange(i, len(s_atms)):
                     dx = s_atms[i].xx - s_atms[j].xx
                     dy = s_atms[i].xy - s_atms[j].xy
                     dz = s_atms[i].xz - s_atms[j].xz

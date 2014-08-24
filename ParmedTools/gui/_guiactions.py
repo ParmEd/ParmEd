@@ -835,7 +835,7 @@ def adddihedral(root, amber_prmtop, messages):
             ('Spinbox', 'Dihedral type', 'normal', 'multiterm', 'improper')
     ]
     # We need 10 variables
-    var_list = [StringVar() for i in range(10)]
+    var_list = [StringVar() for i in xrange(10)]
     description = ('Adds a dihedral in the topology file with the given Phi '
                    'Force constant in kcal/mol the\ngiven phase in Degrees '
                    'and the given periodicity. All masks must specify only \n'
@@ -886,7 +886,7 @@ def deletedihedral(root, amber_prmtop, messages):
                    ('MaskEntry', 'Third (middle) atom in dihedral'),
                    ('MaskEntry', 'Fourth (end) atom in dihedral')]
     # We need 4 variables
-    var_list = [StringVar() for i in range(4)]
+    var_list = [StringVar() for i in xrange(4)]
     description = ('Deletes dihedrals between the atoms specified in mask1, ' +
                    'mask2, mask3, and mask4.\nIt will try to match dihedrals ' +
                    'only in the order given or reverse order. Dihedrals are\n' +
@@ -961,7 +961,7 @@ def timerge(root, amber_prmtop, messages):
                    ('MaskEntry', 'Softcore Mols NOT to Merge (Lambda=1)'),
                    ('Entry', 'Tolerance')]
     # We need 4 variables
-    var_list = [StringVar() for i in range(7)]
+    var_list = [StringVar() for i in xrange(7)]
     var_list[6].set('0.0001')
     description = 'Merges 2 molecules inside a prmtop for use with softcore TI'
     # Create the window, open it, then wait for it to close
@@ -999,7 +999,7 @@ def addpdb(root, amber_prmtop, messages):
                    ('Checkbutton', 'Print all insertion codes, even if all are '
                                    'blank.')]
    
-    var_list = [StringVar(value='no') for i in range(3)]
+    var_list = [StringVar(value='no') for i in xrange(3)]
     description = ('Adds information from the PDB file (e.g., CHAIN IDs) to '
                    'the topology file')
     # Create the window, open it, then wait for it to close

@@ -277,7 +277,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         try:
             for i, typename in enumerate(typenames):
                 typ = params.atom_types_str[typename]
-                for j in range(i, len(typenames)):
+                for j in xrange(i, len(typenames)):
                     if typenames[j] in typ.nbfix:
                         has_nbfix_terms = True
                         raise StopIteration
@@ -333,7 +333,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         if constraints is ff.HAngles:
             num_constrained_bonds = system.getNumConstraints()
             atom_constraints = [[]] * system.getNumParticles()
-            for i in range(num_constrained_bonds):
+            for i in xrange(num_constrained_bonds):
                 c = system.getConstraintParameters(i)
                 dist = c[2].value_in_unit(u.nanometer)
                 atom_constraints[c[0]].append((c[1], dist))
@@ -540,7 +540,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 lj_type_list.append(atom)
                 lj_radii.append(atom.rmin)
                 lj_depths.append(atom.epsilon)
-                for j in range(i+1, len(self.atom_list)):
+                for j in xrange(i+1, len(self.atom_list)):
                     atom2 = self.atom_list[j].type
                     if lj_idx_list[j] > 0: continue # already assigned
                     if atom2 is atom:
@@ -552,10 +552,10 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                             lj_idx_list[j] = num_lj_types
             # Now everything is assigned. Create the A-coefficient and
             # B-coefficient arrays
-            acoef = [0 for i in range(num_lj_types*num_lj_types)]
+            acoef = [0 for i in xrange(num_lj_types*num_lj_types)]
             bcoef = acoef[:]
-            for i in range(num_lj_types):
-                for j in range(num_lj_types):
+            for i in xrange(num_lj_types):
+                for j in xrange(num_lj_types):
                     namej = lj_type_list[j].name
                     try:
                         rij, wdij, rij14, wdij14 = lj_type_list[i].nbfix[namej]
@@ -640,7 +640,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # If we needed a CustomNonbondedForce, map all of the exceptions from
         # the NonbondedForce to the CustomNonbondedForce
         if has_nbfix_terms:
-            for i in range(force.getNumExceptions()):
+            for i in xrange(force.getNumExceptions()):
                 ii, jj, q, eps, sig = force.getExceptionParameters(i)
                 cforce.addExclusion(ii, jj)
             system.addForce(cforce)
@@ -770,7 +770,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # If we got a 1-D array, reshape it into an natom list of Vec3's
         if len(stuff) == len(self.atom_list) * 3:
             stuff = [Vec3(stuff[i*3], stuff[i*3+1], stuff[i*3+2])
-                     for i in range(len(self.atom_list))]
+                     for i in xrange(len(self.atom_list))]
         self._positions = stuff
         for atom, pos in zip(self.atom_list, stuff):
             atom.xx, atom.xy, atom.xz = pos.value_in_unit(u.angstrom)
@@ -1037,7 +1037,7 @@ class OpenMMCharmmCrdFile(CharmmCrdFile):
         except AttributeError:
             pass
         self._positions = []
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             i3 = i * 3
             crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
             self._positions.append(crd)
@@ -1065,7 +1065,7 @@ class OpenMMCharmmRstFile(CharmmRstFile):
         except AttributeError:
             pass
         self._positions = []
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             i3 = i * 3
             crd = Vec3(self.coords[i3], self.coords[i3+1], self.coords[i3+2])
             self._positions.append(crd)
@@ -1088,7 +1088,7 @@ class OpenMMCharmmRstFile(CharmmRstFile):
         except AttributeError:
             pass
         self._velocities = []
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             i3 = i * 3
             vel = Vec3(self.vels[i3], self.vels[i3+1], self.vels[i3+2])
             self._velocities.append(vel)

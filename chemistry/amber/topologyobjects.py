@@ -189,7 +189,7 @@ class Atom(object):
         exclist = self.parm.parm_data['EXCLUDED_ATOMS_LIST']
         n = self.parm.parm_data['NUMBER_EXCLUDED_ATOMS'][self.starting_index]
         atom_list = self.parm.atom_list
-        for i in range(n):
+        for i in xrange(n):
             idx = exclist[first_excl+i] - 1
             # Skip over placeholders
             if idx < 0: continue
@@ -429,8 +429,8 @@ class Dihedral(object):
         """ Dihedral constructor. idx must start from 0!!! """
         # Make sure we're not dihedraling me to myself
         atmlist = [atom1, atom2, atom3, atom4]
-        for i in range(len(atmlist)):
-            for j in range(i+1, len(atmlist)):
+        for i in xrange(len(atmlist)):
+            for j in xrange(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
                     raise BondError('Cannot dihedral atom to itself!')
         # Set up instances
@@ -689,8 +689,8 @@ class Improper(object):
         """ Dihedral constructor. idx must start from 0!!! """
         # Make sure we're not dihedraling me to myself
         atmlist = [atom1, atom2, atom3, atom4]
-        for i in range(len(atmlist)):
-            for j in range(i+1, len(atmlist)):
+        for i in xrange(len(atmlist)):
+            for j in xrange(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
                     raise BondError('Cannot improper atom to itself!')
         # Set up instances
@@ -809,8 +809,8 @@ class Cmap(object):
         """ Takes a coupled-torsion (5 atoms) """
         # Make sure we're not CMAPping me to myself
         atmlist = [atom1, atom2, atom3, atom4, atom5]
-        for i in range(len(atmlist)):
-            for j in range(i+1, len(atmlist)):
+        for i in xrange(len(atmlist)):
+            for j in xrange(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
                     raise BondError('Cannot cmap atom to itself!')
         # Set up instances
@@ -957,7 +957,7 @@ class _CmapGrid(object):
     def __init__(self, resolution, data=None):
         self.resolution = resolution
         if data is None:
-            self._data = [0 for i in range(self.resolution*self.resolution)]
+            self._data = [0 for i in xrange(self.resolution*self.resolution)]
         else:
             self._data = data
 
@@ -970,8 +970,8 @@ class _CmapGrid(object):
             pass
         _transpose = []
         size = len(self._data)
-        for i in range(self.resolution):
-            piece = [self[j] for j in range(i, size, self.resolution)]
+        for i in xrange(self.resolution):
+            piece = [self[j] for j in xrange(i, size, self.resolution)]
             _transpose += piece
         self._transpose = _CmapGrid(self.resolution, _transpose)
         return self._transpose
@@ -1030,8 +1030,8 @@ class _CmapGrid(object):
         res = self.resolution
         mid = res // 2
         newgrid = _CmapGrid(res)
-        for i in range(res):
-            for j in range(res):
+        for i in xrange(res):
+            for j in xrange(res):
                 # Start from the middle
                 newgrid[i, j] = self[(i+mid)%res, (j+mid)%res]
         return newgrid
@@ -1074,14 +1074,14 @@ class ResidueList(list):
 
     def __init__(self, parm):
         list.__init__(self, [Residue(parm.parm_data['RESIDUE_LABEL'][i], i+1)
-                             for i in range(parm.ptr('nres'))])
+                             for i in xrange(parm.ptr('nres'))])
         for i, val in enumerate(parm.parm_data['RESIDUE_POINTER']):
             start = val - 1
             try:
                 end = parm.parm_data['RESIDUE_POINTER'][i+1] - 1
             except IndexError:
                 end = parm.parm_data['POINTERS'][NATOM]
-            for j in range(start, end):
+            for j in xrange(start, end):
                 self[i].add_atom(parm.atom_list[j])
         self.parm = parm
    
@@ -1095,9 +1095,9 @@ class AtomList(list):
         self.parm = parm
         if fill_from is None:
             list.__init__(self, [Atom(self.parm, i) for i in
-                                range(self.parm.ptr('natom'))])
+                                xrange(self.parm.ptr('natom'))])
         else:
-            list.__init__(self, [0 for i in range(self.parm.ptr('natom'))])
+            list.__init__(self, [0 for i in xrange(self.parm.ptr('natom'))])
             for i, atm in enumerate(fill_from): self[i] = atm
         self.changed = False
 
@@ -1145,7 +1145,7 @@ class AtomList(list):
         self.parm.parm_data['POINTERS'][NATOM] = len(self)
         # Array slices are faster than copy() and creating new arrays
         # each time
-        zeros = [0 for i in range(self.parm.parm_data['POINTERS'][NATOM])]
+        zeros = [0 for i in xrange(self.parm.parm_data['POINTERS'][NATOM])]
         self.parm.parm_data['ATOM_NAME'] = zeros[:]
         self.parm.parm_data['CHARGE'] = zeros[:]
         self.parm.parm_data['MASS'] = zeros[:]
@@ -1394,7 +1394,7 @@ class CmapTypeList(_TypeList):
         # Need to get all of the CMAP types
         ncmaps = self.parm.parm_data['CHARMM_CMAP_COUNT'][1]
         list.__init__(self)
-        for i in range(ncmaps):
+        for i in xrange(ncmaps):
             res = self.parm.parm_data['CHARMM_CMAP_RESOLUTION'][i]
             grid = self.parm.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
             cmts = self.parm.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]

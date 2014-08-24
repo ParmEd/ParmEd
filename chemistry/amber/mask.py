@@ -44,7 +44,7 @@ class AmberMask(object):
 
         # 0) See if we got the default "all" mask(*) and return accordingly
         if self.mask.strip() == '*':
-            return [1 for i in range(self.parm.ptr('natom'))]
+            return [1 for i in xrange(self.parm.ptr('natom'))]
 
         # 1) preprocess input expression
         infix = AmberMask._tokenize(self, prnlev)
@@ -274,7 +274,7 @@ class AmberMask(object):
                         pmask2 = stack.pop()
                         pmask = self._selectDistd(pmask1, pmask2)
                     except IndexError:
-                        return [0 for i in range(self.parm.ptr('natom'))]
+                        return [0 for i in xrange(self.parm.ptr('natom'))]
                     stack.append(pmask)
             elif p == '!':
                 try:
@@ -514,13 +514,13 @@ class AmberMask(object):
    
     def _atnum_select(self, at1, at2, mask):
         """ Fills a _mask array between atom numbers at1 and at2 """
-        for i in range(at1-1, at2): mask[i] = 1
+        for i in xrange(at1-1, at2): mask[i] = 1
 
     #======================================================
    
     def _resnum_select(self, res1, res2, mask):
         """ Fills a _mask array between residues res1 and res2 """
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             res = self.parm.atom_list[i].residue.idx
             if res >= res1 and res <= res2: mask[i] = 1
 
@@ -528,7 +528,7 @@ class AmberMask(object):
    
     def _atname_select(self, atname, mask, key='ATOM_NAME'):
         """ Fills a _mask array with all atom names of a given name """
-        for i in range(self.parm.ptr('natom')):
+        for i in xrange(self.parm.ptr('natom')):
             if _nameMatch(atname, self.parm.parm_data[key][i]):
                 mask[i] = 1
             elif atname.isdigit():
@@ -610,7 +610,7 @@ class _mask(list):
 
     def __init__(self, natom):
         self.natom = natom
-        list.__init__(self, [0 for i in range(natom)])
+        list.__init__(self, [0 for i in xrange(natom)])
 
     def append(self, *args, **kwargs):
         raise MaskError('_mask is a fixed-length array!')
@@ -628,7 +628,7 @@ class _mask(list):
         if self.natom != other.natom: 
             raise MaskError("_mask: and() requires another mask of equal size!")
         new_mask = _mask(self.natom)
-        for i in range(len(self)):
+        for i in xrange(len(self)):
             new_mask[i] = int(self[i] and other[i])
         return new_mask
 
@@ -636,18 +636,18 @@ class _mask(list):
         if self.natom != other.natom:
             raise MaskError('_mask: or() requires another mask of equal size!')
         new_mask = _mask(self.natom)
-        for i in range(len(self)):
+        for i in xrange(len(self)):
             new_mask[i] = int(self[i] or other[i])
         return new_mask
    
     def Not(self):
         new_mask = _mask(self.natom)
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             new_mask[i] = int(not self[i])
         return new_mask
 
     def select_all(self):
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             self[i] = 1
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

@@ -964,7 +964,7 @@ class _CmapGrid(object):
     def __init__(self, resolution, data=None):
         self.resolution = resolution
         if data is None:
-            self._data = [0 for i in range(self.resolution*self.resolution)]
+            self._data = [0 for i in xrange(self.resolution*self.resolution)]
         else:
             self._data = data
 
@@ -977,8 +977,8 @@ class _CmapGrid(object):
             pass
         _transpose = []
         size = len(self._data)
-        for i in range(self.resolution):
-            piece = [self[j] for j in range(i, size, self.resolution)]
+        for i in xrange(self.resolution):
+            piece = [self[j] for j in xrange(i, size, self.resolution)]
             _transpose += piece
         self._transpose = _CmapGrid(self.resolution, _transpose)
         return self._transpose
@@ -1037,8 +1037,8 @@ class _CmapGrid(object):
         res = self.resolution
         mid = res // 2
         newgrid = _CmapGrid(res)
-        for i in range(res):
-            for j in range(res):
+        for i in xrange(res):
+            for j in xrange(res):
                 # Start from the middle
                 newgrid[i, j] = self[(i+mid)%res, (j+mid)%res]
         return newgrid

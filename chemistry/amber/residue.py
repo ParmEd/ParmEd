@@ -29,7 +29,7 @@ def ToResidue(molecule, resnum):
     bonds = []
     connects = [0,0]
     head = tail = 0
-    for i in range(begin, end):
+    for i in xrange(begin, end):
         bonds.append([])
         for j in molecule.bonds[i]:
             if j < begin and head == 0:
@@ -111,7 +111,7 @@ class Residue(object):
                 "int resx  int flags  int seq  int elmnt  dbl chg\n"
                 % self.name
         )
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             ret_string += ' "%s" "%s" 0 1 %d %d %s %.6f\n' % (
                     self.atoms[i], self.atom_types[i], 0x20000, i+1,
                     periodic_table.AtomicNum[self.elements[i]], self.charges[i]
@@ -122,7 +122,7 @@ class Residue(object):
                 "!entry.%s.unit.atomspertinfo table  str pname  str ptype  "
                 "int ptypex  int pelmnt  dbl pchg\n" % self.name
         )
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             ret_string += ' "%s" "%s" 0 -1 0.0\n' % (self.atoms[i],
                                                      self.atom_types[i])
 
@@ -141,7 +141,7 @@ class Residue(object):
         # Write out connectivity table
         ret_string += ("!entry.%s.unit.connectivity table  int atom1x  "
                        "int atom2x  int flags\n" % self.name)
-        for i in range(len(self.bonds)):
+        for i in xrange(len(self.bonds)):
             for partner in self.bonds[i]:
                 if partner > i+1:
                     ret_string += " %d %d 1\n" % (i+1, partner)
@@ -151,7 +151,7 @@ class Residue(object):
                        'int abovex  str belowtype  int belowx\n "U" 0 "R" 1\n'
                        % self.name
         )
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             ret_string += ' "R" 1 "A" %d\n' % (i+1)
          
         # Write out unit name
@@ -161,7 +161,7 @@ class Residue(object):
         # Write out positions table
         ret_string += ('!entry.%s.unit.positions table  dbl x  dbl y  '
                        'dbl z\n' % self.name)
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             index = i * 3
             ret_string += " %.6g %.6g %.6g\n" % (self.coords[index],
                                                  self.coords[index+1],
@@ -172,7 +172,7 @@ class Residue(object):
                        "int c2x  int c3x  int c4x  int c5x  int c6x\n"
                        % self.name
         )
-        for i in range(6):
+        for i in xrange(6):
             try:
                 ret_string += ' %d' % self.connects[i]
             except IndexError:
@@ -205,7 +205,7 @@ class Residue(object):
         # Write out velocities table
         ret_string += ("!entry.%s.unit.velocities table  dbl x  dbl y  dbl z\n"
                         % self.name)
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             ret_string += " 0.0 0.0 0.0\n"
 
         # Done writing this entry

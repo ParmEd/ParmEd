@@ -215,7 +215,7 @@ class _DihedralType(_ParamType):
         elif idx2 > idx3 or (idx2 == idx3 and idx1 > idx4):
             key = '%d-%d-%d-%d' % (idx4, idx3, idx2, idx1)
         self.k, self.phase, self.periodicity = [], [], []
-        for i in range(len(args)//3):
+        for i in xrange(len(args)//3):
             self.k.append(float(args[i*3]))
             self.phase.append(float(args[i*3+1]))
             self.periodicity.append(float(args[i*3+2]))

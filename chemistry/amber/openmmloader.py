@@ -59,7 +59,7 @@ class OpenMMAmberParm(AmberParm):
         acoef = self.parm_data['LENNARD_JONES_ACOEF']
         bcoef = self.parm_data['LENNARD_JONES_BCOEF']
 
-        for i in range(ntypes):
+        for i in xrange(ntypes):
             lj_index = self.parm_data["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if acoef[lj_index] < 1.0e-10:
                 LJ_radius.append(0.5)
@@ -71,8 +71,8 @@ class OpenMMAmberParm(AmberParm):
       
         # Now check that we haven't modified any off-diagonals, since that will
         # not work with OpenMM
-        for i in range(ntypes):
-            for j in range(ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
                 idx = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = LJ_radius[i] + LJ_radius[j]
                 wdij = sqrt(LJ_depth[i] * LJ_depth[j])
@@ -361,7 +361,7 @@ class OpenMMAmberParm(AmberParm):
         if constraints is ff.HAngles:
             num_constrained_bonds = system.getNumConstraints()
             atom_constraints = [[]] * system.getNumParticles()
-            for i in range(num_constrained_bonds):
+            for i in xrange(num_constrained_bonds):
                 c = system.getConstraintParameters(i)
                 dist = c[2].value_in_unit(u.nanometer)
                 atom_constraints[c[0]].append((c[1], dist))
@@ -561,7 +561,7 @@ class OpenMMAmberParm(AmberParm):
             # potential
             parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
             parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
-            acoef = [0 for i in range(ntypes*ntypes)]
+            acoef = [0 for i in xrange(ntypes*ntypes)]
             bcoef = acoef[:]
             if has_1264:
                 ccoef = acoef[:]
@@ -572,14 +572,14 @@ class OpenMMAmberParm(AmberParm):
             afac = sqrt(ene_conv) * length_conv**6
             bfac = ene_conv * length_conv**6
             cfac = ene_conv * length_conv**4
-            for i in range(ntypes):
-                for j in range(ntypes):
+            for i in xrange(ntypes):
+                for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
                     acoef[i+ntypes*j] = sqrt(parm_acoef[idx]) * afac
                     bcoef[i+ntypes*j] = parm_bcoef[idx] * bfac
             if has_1264:
-                for i in range(ntypes):
-                    for j in range(ntypes):
+                for i in xrange(ntypes):
+                    for j in xrange(ntypes):
                         idx = nbidx[ntypes*i+j] - 1
                         ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
                 cforce = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r^4; r6=r^6;'
@@ -602,7 +602,7 @@ class OpenMMAmberParm(AmberParm):
             for atom in self.atom_list:
                 cforce.addParticle((atom.nb_idx - 1,)) # index from 0
             # Now add the exclusions
-            for i in range(force.getNumExceptions()):
+            for i in xrange(force.getNumExceptions()):
                 ii, jj, q, eps, sig = force.getExceptionParameters(i)
                 cforce.addExclusion(ii, jj)
             if (nonbondedMethod is ff.PME or nonbondedMethod is ff.Ewald or
@@ -627,10 +627,10 @@ class OpenMMAmberParm(AmberParm):
             parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             ntypes = self.ptr('ntypes')
-            ccoef = [0 for atom in range(ntypes*ntypes)]
+            ccoef = [0 for atom in xrange(ntypes*ntypes)]
             cfac = ene_conv * length_conv**4
-            for i in range(ntypes):
-                for j in range(ntypes):
+            for i in xrange(ntypes):
+                for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
                     ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
             cforce = mm.CustomNonbondedForce('-c/r^4; c=ccoef(type1, type2);')
@@ -641,7 +641,7 @@ class OpenMMAmberParm(AmberParm):
             for atom in self.atom_list:
                 cforce.addParticle((atom.nb_idx - 1,)) # index from 0
             # Now add the exclusions
-            for i in range(force.getNumExceptions()):
+            for i in xrange(force.getNumExceptions()):
                 ii, jj, q, eps, sig = force.getExceptionParameters(i)
                 cforce.addExclusion(ii, jj)
             if (nonbondedMethod is ff.PME or nonbondedMethod is ff.Ewald or
@@ -665,9 +665,9 @@ class OpenMMAmberParm(AmberParm):
         for atom in ep: atom.residue.has_ep = True
         if len(ep) > 0:
             numRes = ep[-1].residue.idx + 1
-            waterO = [[] for i in range(numRes)]
-            waterH = [[] for i in range(numRes)]
-            waterEP = [[] for i in range(numRes)]
+            waterO = [[] for i in xrange(numRes)]
+            waterH = [[] for i in xrange(numRes)]
+            waterEP = [[] for i in xrange(numRes)]
             for atom in self.atom_list:
                 if atom.residue.has_ep:
                     if atom.element == 8:
@@ -929,7 +929,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
         ntypes = self.pointers['NTYPES']
         acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
         bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
-        for i in range(ntypes):
+        for i in xrange(ntypes):
             lj_index = self.parm_data["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if acoef[lj_index] < 1.0e-10:
                 LJ_radius.append(0.5)
@@ -941,8 +941,8 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
 
         # Now check that we haven't modified any off-diagonals, since that will
         # not work with OpenMM
-        for i in range(ntypes):
-            for j in range(ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
                 idx = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = LJ_radius[i] + LJ_radius[j]
                 wdij = sqrt(LJ_depth[i] * LJ_depth[j])

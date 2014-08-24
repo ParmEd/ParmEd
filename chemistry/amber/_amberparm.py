@@ -168,7 +168,7 @@ class AmberParm(AmberFormat):
         # Convert charges if necessary due to differences in electrostatic
         # scaling factors
         chgscale = rawdata.CHARGE_SCALE / cls.CHARGE_SCALE
-        for i in range(len(inst.parm_data['CHARGE'])):
+        for i in xrange(len(inst.parm_data['CHARGE'])):
             inst.parm_data['CHARGE'][i] *= chgscale
         # See if the rawdata has any kind of structural attributes, like rst7
         # (coordinates) and an atom list with positions and/or velocities
@@ -276,7 +276,7 @@ class AmberParm(AmberFormat):
         self.bond_type_list = BondTypeList(self)
         self.bonds_inc_h, self.bonds_without_h = TrackedList(), TrackedList()
         # Array of bonds with hydrogen
-        for i in range(self.ptr('nbonh')):
+        for i in xrange(self.ptr('nbonh')):
             blist = self.parm_data['BONDS_INC_HYDROGEN']
             self.bonds_inc_h.append(
                     Bond(self.atom_list[blist[3*i  ]//3],
@@ -284,7 +284,7 @@ class AmberParm(AmberFormat):
                          self.bond_type_list[blist[3*i+2]-1])
             )
         # Array of bonds without hydrogen
-        for i in range(self.ptr('mbona')):
+        for i in xrange(self.ptr('mbona')):
             blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
             self.bonds_without_h.append(
                     Bond(self.atom_list[blist[3*i  ]//3],
@@ -297,7 +297,7 @@ class AmberParm(AmberFormat):
         self.angle_type_list = AngleTypeList(self)
         self.angles_inc_h, self.angles_without_h = TrackedList(), TrackedList()
         # Array of angles with hydrogen
-        for i in range(self.ptr('ntheth')):
+        for i in xrange(self.ptr('ntheth')):
             alist = self.parm_data['ANGLES_INC_HYDROGEN']
             self.angles_inc_h.append(
                     Angle(self.atom_list[alist[4*i  ]//3],
@@ -306,7 +306,7 @@ class AmberParm(AmberFormat):
                           self.angle_type_list[alist[4*i+3]-1])
             )
         # Array of angles without hydrogen
-        for i in range(self.ptr('mtheta')):
+        for i in xrange(self.ptr('mtheta')):
             alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
             self.angles_without_h.append(
                     Angle(self.atom_list[alist[4*i  ]//3],
@@ -321,7 +321,7 @@ class AmberParm(AmberFormat):
         self.dihedrals_inc_h = TrackedList()
         self.dihedrals_without_h = TrackedList()
         # Array of dihedrals with hydrogen
-        for i in range(self.ptr('nphih')):
+        for i in xrange(self.ptr('nphih')):
             dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
             signs = [1,1]
             if dlist[5*i+2] < 0: signs[0] = -1
@@ -335,7 +335,7 @@ class AmberParm(AmberFormat):
                              signs)
             )
         # Array of dihedrals without hydrogen
-        for i in range(self.ptr('mphia')):
+        for i in xrange(self.ptr('mphia')):
             dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
             signs = [1,1]
             if dlist[5*i+2] < 0: signs[0] = -1
@@ -388,9 +388,9 @@ class AmberParm(AmberFormat):
 
         # Now fill in the rst7 coordinates
         self.rst7.natom = len(self.atom_list)
-        self.rst7.coordinates = [0.0 for i in range(len(self.atom_list) * 3)]
+        self.rst7.coordinates = [0.0 for i in xrange(len(self.atom_list)*3)]
         if self.rst7.hasvels:
-            self.rst7.velocities = [0.0 for i in range(len(self.atom_list) * 3)]
+            self.rst7.velocities = [0.0 for i in xrange(len(self.atom_list)*3)]
 
         for i, at in enumerate(self.atom_list):
             self.rst7.coordinates[3*i  ] = at.xx
@@ -465,8 +465,7 @@ class AmberParm(AmberFormat):
         for res in self.residue_list: res.idx = -1
         # Write the residue arrays
         num_res = 0
-        for i in range(len(self.atom_list)):
-            atm = self.atom_list[i]
+        for i, atm in enumerate(self.atom_list):
             if atm.residue.idx == -1:
                 self.parm_data['RESIDUE_LABEL'][num_res] = atm.residue.resname
                 self.parm_data['RESIDUE_POINTER'][num_res] = i+1
@@ -740,7 +739,7 @@ class AmberParm(AmberFormat):
         # re-order atoms if they're not
         try:
             for mol in owner:
-                for i in range(1, len(mol)):
+                for i in xrange(1, len(mol)):
                     if mol[i] != mol[i-1] + 1:
                         raise StopIteration()
         except StopIteration:
@@ -776,7 +775,7 @@ class AmberParm(AmberFormat):
    
         # Now loop through all of the residues in the Molecule object and add
         # unique ones to the list of residues to print
-        for i in range(len(mol.residues)):
+        for i in xrange(len(mol.residues)):
             res = ToResidue(mol, i)
             present = False
             for compres in residues:
@@ -816,10 +815,10 @@ class AmberParm(AmberFormat):
         bcoef = pd['LENNARD_JONES_BCOEF']
         natom = self.pointers['NATOM']
         ntypes = self.pointers['NTYPES']
-        for i in range(natom): # fill the LJ_types array
+        for i in xrange(natom): # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
          
-        for i in range(ntypes):
+        for i in xrange(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
                 self.LJ_radius.append(0)
@@ -849,7 +848,7 @@ class AmberParm(AmberFormat):
         self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
         one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
 
-        for i in range(ntypes):
+        for i in xrange(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if acoef[lj_index] < 1.0e-6:
                 self.LJ_14_radius.append(0)
@@ -869,8 +868,8 @@ class AmberParm(AmberFormat):
         """
         pd = self.parm_data
         ntypes = self.pointers['NYTPES']
-        for i in range(ntypes):
-            for j in range(i, ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = self.combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
                 wdij = self.combine_epsilon(self.LJ_depth[i], self.LJ_depth[j])
@@ -890,8 +889,8 @@ class AmberParm(AmberFormat):
 
         pd = self.parm_data
         ntypes = self.pointers['NYTPES']
-        for i in range(ntypes):
-            for j in range(i, ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = self.combine_rmin(
                         self.LJ_14_radius[i],self.LJ_14_radius[j]
@@ -993,29 +992,29 @@ class AmberParm(AmberFormat):
         radii = []
 
         # Set up initial, blank, bond array
-        for i in range(self.pointers['NATOM']):
+        for i in xrange(self.pointers['NATOM']):
             all_bonds.append([])
       
         # Fill up bond arrays with bond partners excluding H atoms
-        for i in range(self.pointers['MBONA']):
+        for i in xrange(self.pointers['MBONA']):
             atom1 = self.parm_data['BONDS_WITHOUT_HYDROGEN'][3*i  ]//3
             atom2 = self.parm_data['BONDS_WITHOUT_HYDROGEN'][3*i+1]//3
             all_bonds[atom1].append(atom2)
             all_bonds[atom2].append(atom1)
 
         # Fill up bond arrays with bond partners including H atoms
-        for i in range(self.pointers['NBONH']):
+        for i in xrange(self.pointers['NBONH']):
             atom1 = self.parm_data['BONDS_INC_HYDROGEN'][3*i  ]//3
             atom2 = self.parm_data['BONDS_INC_HYDROGEN'][3*i+1]//3
             all_bonds[atom1].append(atom2)
             all_bonds[atom2].append(atom1)
 
         # Sort bond arrays
-        for i in range(len(all_bonds)):
+        for i in xrange(len(all_bonds)):
             all_bonds[i].sort()
 
         # Adjust RESIDUE_POINTER for indexing from 0
-        for i in range(len(self.parm_data['RESIDUE_POINTER'])):
+        for i in xrange(len(self.parm_data['RESIDUE_POINTER'])):
             residue_pointers.append(self.parm_data['RESIDUE_POINTER'][i]-1)
 
         # Determine which element each atom is
@@ -1025,10 +1024,10 @@ class AmberParm(AmberFormat):
         # Put together the title
         title = ''
         try:
-            for i in range(len(self.parm_data['TITLE'])):
+            for i in xrange(len(self.parm_data['TITLE'])):
                 title += self.parm_data['TITLE'][i]
         except KeyError:
-            for i in range(len(self.parm_data['CTITLE'])):
+            for i in xrange(len(self.parm_data['CTITLE'])):
                 title += self.parm_data['CTITLE'][i]
 
         # Fill the VDW radii array
@@ -1056,7 +1055,7 @@ class AmberParm(AmberFormat):
                                 residues=self.parm_data['RESIDUE_LABEL'][:], 
                                 bonds=all_bonds,
                                 residue_pointers=residue_pointers,
-                                coords=list(range(self.pointers['NATOM']*3)),
+                                coords=list(xrange(self.pointers['NATOM']*3)),
                                 elements=elements,
                                 title=title,
                                 radii=radii
@@ -1225,7 +1224,7 @@ def set_molecules(parm):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in range(parm.ptr('natom')):
+    for i in xrange(parm.ptr('natom')):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)

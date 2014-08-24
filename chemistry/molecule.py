@@ -58,8 +58,8 @@ class Molecule:
 
         # Remove atomno from all of the bonds
         self.bonds.pop(atomno)
-        for i in range(len(self.bonds)):
-            for j in range(len(self.bonds[i])):
+        for i in xrange(len(self.bonds)):
+            for j in xrange(len(self.bonds[i])):
                 k = len(self.bonds[i]) - 1 - j # go in reverse order
                 if self.bonds[i][k] == atomno:
                     self.bonds[i].pop(k)
@@ -67,7 +67,7 @@ class Molecule:
                     self.bonds[i][k] -= 1
       
         # Adjust residue_pointers
-        for i in range(self.residue_container[atomno] + 1,
+        for i in xrange(self.residue_container[atomno] + 1,
                        len(self.residue_pointers)):
             self.residue_pointers[i] -= 1
 
@@ -89,7 +89,7 @@ class Molecule:
             raise(MoleculeError('len(atoms) != len(atom_types)'))
 
         if len(self.charges) == 0:
-            for i in range(len(self.atoms)):
+            for i in xrange(len(self.atoms)):
                 self.charges.append(0.0)
 
         if len(self.charges) != len(self.atoms):
@@ -113,13 +113,13 @@ class Molecule:
         """ Fills residue_container so we know what residue each atom is in """
         self.residue_container = []
         # Fill residues 1 - nres-1
-        for i in range(len(self.residues)-1):
+        for i in xrange(len(self.residues)-1):
             curres = self.residue_pointers[i]
             nextres = self.residue_pointers[i+1]
-            for j in range(curres, nextres):
+            for j in xrange(curres, nextres):
                 self.residue_container.append(i)
         # Fill the last residue
-        for i in range(self.residue_pointers[len(self.residue_pointers)-1],
-                       len(self.atoms)):
+        for i in xrange(self.residue_pointers[len(self.residue_pointers)-1],
+                        len(self.atoms)):
             self.residue_container.append(len(self.residues)-1)
 

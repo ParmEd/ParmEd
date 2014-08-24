@@ -190,7 +190,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         startline = 2
         endline = startline + int(ceil(self.natom / 2.0))
         idx = 0
-        for i in range(startline, endline):
+        for i in xrange(startline, endline):
             line = lines[i]
             x1 = float(line[ 0:12])
             y1 = float(line[12:24])
@@ -209,7 +209,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self.hasvels:
             endline = startline + int(ceil(self.natom / 2.0))
             idx = 0
-            for i in range(startline, endline):
+            for i in xrange(startline, endline):
                 line = lines[i]
                 x1 = float(line[ 0:12]) * VELSCALE
                 y1 = float(line[12:24]) * VELSCALE
@@ -265,7 +265,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._file.write('%5d%15.7e\n' % (self.natom, self.time))
         numwrit = 0
         fmt = '%12.7f%12.7f%12.7f'
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3], stuff[i3 + 1], stuff[i3 + 2]))
             numwrit += 1
@@ -302,7 +302,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._velocities = stuff
         fmt = '%12.7f%12.7f%12.7f'
         numwrit = 0
-        for i in range(self.natom):
+        for i in xrange(self.natom):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3  ] * ONEVELSCALE,
                                     stuff[i3+1] * ONEVELSCALE,
@@ -423,7 +423,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 idx = 0
                 rawline = self._file.readline()
                 if not rawline: raise StopIteration()
-                for i in range(self._full_lines_per_frame):
+                for i in xrange(self._full_lines_per_frame):
                     if not rawline: raise ReadError()
                     frame[idx:idx+10] = converter([float(rawline[j:j+8]) 
                                                    for j in mainiter])
@@ -494,8 +494,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                              'natom*3')
 
         # If we can, write the coordinates
-        for i in range(self._full_lines_per_frame):
-            for j in range(10):
+        for i in xrange(self._full_lines_per_frame):
+            for j in xrange(10):
                 self._file.write('%8.3f' % stuff[i*10+j])
             self._file.write('\n')
         if self._nextras:

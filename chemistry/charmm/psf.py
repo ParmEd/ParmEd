@@ -240,7 +240,7 @@ class CharmmPsfFile(object):
         if len(holder) != nbond * 2:
             raise CharmmPSFError('Got %d indexes for %d bonds' %
                                  (len(holder), nbond))
-        for i in range(nbond):
+        for i in xrange(nbond):
             id1 = holder[2*i  ] - 1
             id2 = holder[2*i+1] - 1
             bond_list.append(Bond(atom_list[id1], atom_list[id2]))
@@ -252,7 +252,7 @@ class CharmmPsfFile(object):
         if len(holder) != ntheta * 3:
             raise CharmmPSFError('Got %d indexes for %d angles' %
                                  (len(holder), ntheta))
-        for i in range(ntheta):
+        for i in xrange(ntheta):
             id1 = holder[3*i  ] - 1
             id2 = holder[3*i+1] - 1
             id3 = holder[3*i+2] - 1
@@ -267,7 +267,7 @@ class CharmmPsfFile(object):
         if len(holder) != nphi * 4:
             raise CharmmPSFError('Got %d indexes for %d torsions' %
                                  (len(holder), nphi))
-        for i in range(nphi):
+        for i in xrange(nphi):
             id1 = holder[4*i  ] - 1
             id2 = holder[4*i+1] - 1
             id3 = holder[4*i+2] - 1
@@ -284,7 +284,7 @@ class CharmmPsfFile(object):
         if len(holder) != nimphi * 4:
             raise CharmmPSFError('Got %d indexes for %d impropers' %
                                  (len(holder), nimphi))
-        for i in range(nimphi):
+        for i in xrange(nimphi):
             id1 = holder[4*i  ] - 1
             id2 = holder[4*i+1] - 1
             id3 = holder[4*i+2] - 1
@@ -301,7 +301,7 @@ class CharmmPsfFile(object):
         if len(holder) != ndon * 2:
             raise CharmmPSFError('Got %d indexes for %d donors' %
                                  (len(holder), ndon))
-        for i in range(ndon):
+        for i in xrange(ndon):
             id1 = holder[2*i  ] - 1
             id2 = holder[2*i+1] - 1
             donor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
@@ -313,7 +313,7 @@ class CharmmPsfFile(object):
         if len(holder) != nacc * 2:
             raise CharmmPSFError('Got %d indexes for %d acceptors' %
                                  (len(holder), ndon))
-        for i in range(nacc):
+        for i in xrange(nacc):
             id1 = holder[2*i  ] - 1
             id2 = holder[2*i+1] - 1
             acceptor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
@@ -330,7 +330,7 @@ class CharmmPsfFile(object):
         if len(holder) != ngrp * 3:
             raise CharmmPSFError('Got %d indexes for %d groups' %
                                  (len(holder), ngrp))
-        for i in range(ngrp):
+        for i in xrange(ngrp):
             i1 = holder[3*i  ]
             i2 = holder[3*i+1]
             i3 = holder[3*i+2]
@@ -357,7 +357,7 @@ class CharmmPsfFile(object):
         if len(holder) != ncrterm * 8:
             raise CharmmPSFError('Got %d CMAP indexes for %d cmap terms' %
                                  (len(holder), ncrterm))
-        for i in range(ncrterm):
+        for i in xrange(ncrterm):
             id1 = holder[8*i  ] - 1
             id2 = holder[8*i+1] - 1
             id3 = holder[8*i+2] - 1
@@ -507,7 +507,7 @@ class CharmmPsfFile(object):
         dest.write('\n')
         # NNB section ??
         dest.write(intfmt % 0 + ' !NNB\n\n')
-        for i in range(len(self.atom_list)):
+        for i in xrange(len(self.atom_list)):
             dest.write(intfmt % 0)
             if i % 8 == 7: # Write 8 0's per line
                 dest.write('\n')
@@ -764,7 +764,7 @@ def set_molecules(atom_list):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in range(len(atom_list)):
+    for i in xrange(len(atom_list)):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)

@@ -216,7 +216,7 @@ class AmberStateDataReporter(object):
         if self._temperature:
             # Compute the number of degrees of freedom.
             dof = 0
-            for i in range(system.getNumParticles()):
+            for i in xrange(system.getNumParticles()):
                 if system.getParticleMass(i) > 0*u.dalton:
                     dof += 3
             dof -= system.getNumConstraints()
@@ -227,7 +227,7 @@ class AmberStateDataReporter(object):
             if self._totalMass is None:
                 # Compute the total system mass.
                 self._totalMass = 0*u.dalton
-                for i in range(system.getNumParticles()):
+                for i in xrange(system.getNumParticles()):
                     self._totalMass += system.getParticleMass(i)
             elif not u.is_quantity(self._totalMass):
                 self._totalMass = self._totalMass*u.dalton
@@ -486,8 +486,8 @@ class MdcrdReporter(object):
 
         # Add the coordinates, velocities, and/or forces as needed
         if self.crds:
-            flatcrd = [0 for i in range(self.atom*3)]
-            for i in range(self.atom):
+            flatcrd = [0 for i in xrange(self.atom*3)]
+            for i in xrange(self.atom):
                 i3 = i*3
                 flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
             self._out.add_coordinates(flatcrd)
@@ -496,14 +496,14 @@ class MdcrdReporter(object):
             # This is necessary since AmberMdcrd does not scale before writing
             # (since it expects coordinates)
             vels = [v / VELSCALE for v in vels]
-            flatvel = [0 for i in range(self.atom*3)]
-            for i in range(self.atom):
+            flatvel = [0 for i in xrange(self.atom*3)]
+            for i in xrange(self.atom):
                 i3 = i*3
                 flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
             self._out.add_coordinates(flatvel)
         if self.frcs:
-            flatfrc = [0 for i in range(self.atom*3)]
-            for i in range(self.atom):
+            flatfrc = [0 for i in xrange(self.atom*3)]
+            for i in xrange(self.atom):
                 i3 = i*3
                 flatfrc[i3], flatfrc[i3+1], flatfrc[i3+2] = frcs[i]
             self._out.add_coordinates(flatfrc)
@@ -593,16 +593,16 @@ class RestartReporter(object):
                              hasbox=self.uses_pbc,
                              title='Restart file written by ParmEd with OpenMM')
         self.rst7.time = state.getTime().value_in_unit(u.picosecond)
-        flatcrd = [0.0 for i in range(self.atom*3)]
-        for i in range(self.atom):
+        flatcrd = [0.0 for i in xrange(self.atom*3)]
+        for i in xrange(self.atom):
             i3 = i*3
             flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
         self.rst7.coordinates = flatcrd
 
         if self.write_velocities:
             vels = state.getVelocities().value_in_unit(VELUNIT)
-            flatvel = [0.0 for i in range(self.atom*3)]
-            for i in range(self.atom):
+            flatvel = [0.0 for i in xrange(self.atom*3)]
+            for i in xrange(self.atom):
                 i3 = i*3
                 flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
             self.rst7.velocities = flatvel

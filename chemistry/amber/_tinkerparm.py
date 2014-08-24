@@ -108,7 +108,7 @@ class AmoebaParm(AmberParm):
         self.bond_list = TrackedList()
         # Add all of our bonds
         try:
-            for i in range(self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i  ] - 1
                 id2 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+1] - 1
                 typ = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+2] - 1
@@ -126,7 +126,7 @@ class AmoebaParm(AmberParm):
         # Add all of our urey-bradley terms
         try:
             nub = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'][0]
-            for i in range(nub):
+            for i in xrange(nub):
                 id1 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i  ] - 1
                 id2 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+1] - 1
                 typ = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+2] - 1
@@ -143,7 +143,7 @@ class AmoebaParm(AmberParm):
         self.angle_list = TrackedList()
         # Add all of our angles
         try:
-            for i in range(self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i  ] - 1
                 id2 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+1] - 1
                 id3 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+2] - 1
@@ -161,7 +161,7 @@ class AmoebaParm(AmberParm):
         self.trigonal_angle_list = TrackedList()
         # Add all trigonal angles
         try:
-            for i in range(self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i  ] - 1
                 id2 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+1] - 1
                 id3 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+2] - 1
@@ -181,7 +181,7 @@ class AmoebaParm(AmberParm):
         self.oopbend_list = TrackedList()
         # Add the out-of-plane bending terms
         try:
-            for i in range(self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i  ] - 1
                 id2 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+1] - 1
                 id3 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+2] - 1
@@ -201,7 +201,7 @@ class AmoebaParm(AmberParm):
         self.dihedral_list = TrackedList()
         # Add the dihedrals
         try:
-            for i in range(self.parm_data['AMOEBA_TORSION_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_TORSION_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_TORSION_LIST'][5*i  ] - 1
                 id2 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+1] - 1
                 id3 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+2] - 1
@@ -221,7 +221,7 @@ class AmoebaParm(AmberParm):
         self.pitorsion_list = TrackedList()
         # Add the pi-torsions
         try:
-            for i in range(self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i  ] - 1
                 id2 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+1] - 1
                 id3 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+2] - 1
@@ -244,7 +244,7 @@ class AmoebaParm(AmberParm):
         self.stretch_bend_list = TrackedList()
         # Add the stretch-bends
         try:
-            for i in range(self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i  ] - 1
                 id2 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+1] - 1
                 id3 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+2] - 1
@@ -264,7 +264,7 @@ class AmoebaParm(AmberParm):
         # Add the torsion-torsions
         try:
             ntt = self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]
-            for i in range(ntt):
+            for i in xrange(ntt):
                 id1 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i  ] - 1
                 id2 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+1] - 1
                 id3 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+2] - 1
@@ -284,7 +284,7 @@ class AmoebaParm(AmberParm):
         ##### Next create the chiral frame list #####
         self.chiral_frame_list = TrackedList()
         try:
-            for i in range(self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i  ] - 1
                 id2 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+1] - 1
                 chi = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+2]
@@ -298,7 +298,7 @@ class AmoebaParm(AmberParm):
         ##### Create the multipole frame list #####
         self.multipole_frame_list = TrackedList()
         try:
-            for i in range(self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'][0]):
+            for i in xrange(self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'][0]):
                 id1 = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i  ] - 1
                 fpn = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+1]
                 vct = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+2]
@@ -312,7 +312,7 @@ class AmoebaParm(AmberParm):
         self.multipole_frame_list.changed = False
         ##### Create the "adjust" (detailed exclusion) list #####
         self.adjust_list = TrackedList()
-        for i in range(self.parm_data['AMOEBA_ADJUST_NUM_LIST'][0]):
+        for i in xrange(self.parm_data['AMOEBA_ADJUST_NUM_LIST'][0]):
             id1 = self.parm_data['AMOEBA_ADJUST_LIST'][3*i  ] - 1
             id2 = self.parm_data['AMOEBA_ADJUST_LIST'][3*i+1] - 1
             wt = self.parm_data['AMOEBA_ADJUST_LIST'][3*i+2]

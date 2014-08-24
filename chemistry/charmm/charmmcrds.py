@@ -70,7 +70,7 @@ class CharmmCrdFile(object):
         try:
             self.natom = int(line.strip().split()[0])
             
-            for row in range(self.natom):
+            for row in xrange(self.natom):
                 line = crdfile.readline().strip().split()
                 self.atomno.append(int(line[0]))
                 self.resno.append(int(line[1]))
@@ -152,7 +152,7 @@ class CharmmRstFile(object):
             else:
                 self.header.append(line.strip())
 
-        for row in range(len(self.header)):
+        for row in xrange(len(self.header)):
             if len(self.header[row].strip()) != 0:
                 line = self.header[row].strip().split()
                 if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
@@ -197,7 +197,7 @@ class CharmmRstFile(object):
 
 
     def _get_formatted_crds(self, crdfile, crds):
-        for row in range(self.natom):
+        for row in xrange(self.natom):
             line = crdfile.readline()
 
             if not line:
@@ -218,7 +218,7 @@ class CharmmRstFile(object):
 
 
     def printcoords(self, crds):
-        for crd in range(len(crds)):
+        for crd in xrange(len(crds)):
             print crds[crd],
             if not (crd+1) % 3:
                 print '\n',

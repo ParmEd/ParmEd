@@ -140,7 +140,7 @@ class DihedralParam(list):
                     self.atype2.ljust(2), self.atype3.ljust(2),
                     self.atype4.ljust(2), self[0].parmline())
         retstr = ''
-        for i in range(len(self)-1):
+        for i in xrange(len(self)-1):
             retstr += '%s-%s-%s-%s %s\n' % (self.atype1.ljust(2),
                     self.atype2.ljust(2), self.atype3.ljust(2),
                     self.atype4.ljust(2), self[i].parmline(multiterm=True))
@@ -157,7 +157,7 @@ class DihedralParam(list):
             return False
         if len(self) != len(other):
             return False
-        for i in range(len(self)):
+        for i in xrange(len(self)):
             if self[i] != other[i]:
                 return False
         return True

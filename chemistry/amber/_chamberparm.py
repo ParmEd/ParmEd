@@ -130,7 +130,7 @@ class ChamberParm(AmberParm):
         # Do the Urey-Bradley terms now
         self.urey_bradley = TrackedList()
         self.urey_bradley_type_list = UreyBradleyTypeList(self)
-        for i in range(self.ptr('NUB')):
+        for i in xrange(self.ptr('NUB')):
             a1 = self.parm_data['CHARMM_UREY_BRADLEY'][3*i  ] - 1
             a2 = self.parm_data['CHARMM_UREY_BRADLEY'][3*i+1] - 1
             ty = self.parm_data['CHARMM_UREY_BRADLEY'][3*i+2] - 1
@@ -142,7 +142,7 @@ class ChamberParm(AmberParm):
         # Now do the improper torsion terms
         self.improper = TrackedList()
         self.improper_type_list = ImproperTypeList(self)
-        for i in range(self.ptr('NIMPHI')):
+        for i in xrange(self.ptr('NIMPHI')):
             a1 = self.parm_data['CHARMM_IMPROPERS'][5*i  ] - 1
             a2 = self.parm_data['CHARMM_IMPROPERS'][5*i+1] - 1
             a3 = self.parm_data['CHARMM_IMPROPERS'][5*i+2] - 1
@@ -164,7 +164,7 @@ class ChamberParm(AmberParm):
         if self.has_cmap:
             self.cmap = TrackedList()
             self.cmap_type_list = CmapTypeList(self)
-            for i in range(self.ptr('CMAP')):
+            for i in xrange(self.ptr('CMAP')):
                 a1 = self.parm_data['CHARMM_CMAP_INDEX'][6*i  ] - 1
                 a2 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+1] - 1
                 a3 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+2] - 1
@@ -347,7 +347,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
         one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
 
-        for i in range(ntypes):
+        for i in xrange(ntypes):
             lj_index = self.parm_data["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if acoef[lj_index] < 1.0e-6:
                 self.LJ_14_radius.append(0)
@@ -369,8 +369,8 @@ class ChamberParm(AmberParm):
         ntypes = self.pointers['NTYPES']
         acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
         bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
-        for i in range(ntypes):
-            for j in range(i, ntypes):
+        for i in xrange(ntypes):
+            for j in xrange(i, ntypes):
                 index = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = self.combine_rmin(self.LJ_14_radius[i],
                                         self.LJ_14_radius[j])
@@ -448,10 +448,10 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             dihedrals_inc_h.append(dihed)
         else:
             dihedrals_without_h.append(dihed)
-    pointers = [0 for i in range(32)]
+    pointers = [0 for i in xrange(32)]
     # Define the exclusion list from the 1-2, 1-3, and 1-4 partners
     excluded_atoms_list = []
-    num_excluded_atoms = [0 for i in range(len(struct.atom_list))]
+    num_excluded_atoms = [0 for i in xrange(len(struct.atom_list))]
     for i, atom in enumerate(struct.atom_list):
         vals_to_add = []
         for partner in atom.bond_partners:
@@ -485,7 +485,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         lj_depths14.append(atom.epsilon_14)
         # Look through the rest of the atoms and assign any equivalent types as
         # the same
-        for j in range(i+1, len(struct.atom_list)):
+        for j in xrange(i+1, len(struct.atom_list)):
             atom2 = struct.atom_list[j].type
             if lj_idx_list[j] > 0: continue
             elif atom2 is atom: # same exact type!
@@ -537,24 +537,24 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     parm.addFlag('NUMBER_EXCLUDED_ATOMS', '10I8', data=num_excluded_atoms)
     parm.addFlag('EXCLUDED_ATOMS_LIST', '10I8', data=excluded_atoms_list)
     # Assign the nonbonded parm index table
-    holder = [0 for i in range(num_lj_types*num_lj_types)]
+    holder = [0 for i in xrange(num_lj_types*num_lj_types)]
     idx = 0
-    for i in range(num_lj_types):
-        for j in range(i+1):
+    for i in xrange(num_lj_types):
+        for j in xrange(i+1):
             idx += 1
             holder[num_lj_types*i+j] = idx
             holder[num_lj_types*j+i] = idx
-    holder2 = [0 for i in range(num_lj_types*num_lj_types)]
+    holder2 = [0 for i in xrange(num_lj_types*num_lj_types)]
     idx = 0
-    for i in range(num_lj_types):
-        for j in range(num_lj_types):
+    for i in xrange(num_lj_types):
+        for j in xrange(num_lj_types):
             holder2[idx] = holder[i*num_lj_types+j]
             idx += 1
     del holder
     parm.addFlag('NONBONDED_PARM_INDEX', '10I8', data=holder2)
     parm.addFlag('RESIDUE_LABEL', '20a4',
                  data=[res.resname[:4] for res in struct.residue_list])
-    resptr = [0 for i in range(len(struct.residue_list))]
+    resptr = [0 for i in xrange(len(struct.residue_list))]
     n = 1
     for i, res in enumerate(struct.residue_list):
         resptr[i] = n
@@ -629,8 +629,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     parm.addFlag('DIHEDRAL_PERIODICITY', '5E16.8', data=dih_per)
     parm.addFlag('DIHEDRAL_PHASE', '5E16.8', data=dih_phase)
     # No 1-4 scaling 
-    parm.addFlag('SCEE_SCALE_FACTOR', '5E16.8', data=[1.0 for i in range(nphi)])
-    parm.addFlag('SCNB_SCALE_FACTOR', '5E16.8', data=[1.0 for i in range(nphi)])
+    parm.addFlag('SCEE_SCALE_FACTOR','5E16.8', data=[1.0 for i in xrange(nphi)])
+    parm.addFlag('SCNB_SCALE_FACTOR','5E16.8', data=[1.0 for i in xrange(nphi)])
     # Assign impropers
     nimpt = 0
     imp_frc_cnst, imp_equil = [], []
@@ -679,8 +679,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     parm.addFlag('LENNARD_JONES_BCOEF', fmt, num_items=nttyp)
     parm.addFlag('LENNARD_JONES_14_ACOEF', fmt, num_items=nttyp)
     parm.addFlag('LENNARD_JONES_14_BCOEF', fmt, num_items=nttyp)
-    for i in range(num_lj_types):
-        for j in range(i, num_lj_types):
+    for i in xrange(num_lj_types):
+        for j in xrange(i, num_lj_types):
             index = parm.parm_data['NONBONDED_PARM_INDEX'][num_lj_types*i+j] - 1
             typi = lj_type_list[i]
             typj = lj_type_list[j]

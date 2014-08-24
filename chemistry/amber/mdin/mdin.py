@@ -194,7 +194,7 @@ class Mdin(object):
             file.write('/\n')
 
       # Write the cards to the input file
-      for i in range(len(self.cards)):
+      for i in xrange(len(self.cards)):
          file.write(self.cards[i].strip() + '\n')
       if len(self.cards) != 0:
          file.write('END\n')
@@ -212,14 +212,14 @@ class Mdin(object):
                         # namelists found in "blocks" above
       inblock = False
       lead_comment = True
-      for i in range(len(lines)):
+      for i in xrange(len(lines)):
          if not inblock and not lines[i].strip().startswith('&') and \
                 lead_comment:
             continue
          elif not inblock and not lines[i].strip().startswith('&') and \
                 not lead_comment:
             final_ended = True
-            for j in range(i,len(lines)):
+            for j in xrange(i,len(lines)):
                if lines[j].strip().startswith('&'):
                   final_ended = False
             if final_ended and len(lines[i].strip()) != 0:
@@ -258,8 +258,8 @@ class Mdin(object):
 
       # combine any multi-element fields: e.g. rstwt=1,2,3,
       begin_field = -1
-      for i in range(len(block_fields)):
-         for j in range(len(block_fields[i])):
+      for i in xrange(len(block_fields)):
+         for j in xrange(len(block_fields[i])):
             if not '=' in block_fields[i][j]:
                if begin_field == -1:
                   raise CreateInputError('Invalid input file (%s).' % filename)
@@ -269,8 +269,8 @@ class Mdin(object):
                begin_field = j
 
       # now parse through the options and add them to the dictionaries
-      for i in range(len(block_fields)):
-         for j in range(len(block_fields[i])):
+      for i in xrange(len(block_fields)):
+         for j in xrange(len(block_fields[i])):
             if not '=' in block_fields[i][j]:
                continue
             else:
