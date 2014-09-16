@@ -128,7 +128,7 @@ class CharmmPsfFile(object):
                     it is a tuple with every pointer value defined in the first
                     line
             - data (list) : A list of all data in the parsed section converted
-                    to `dtype'
+                    to integers
         """
         conv = CharmmPsfFile._convert
         line = psf.readline()
@@ -152,7 +152,7 @@ class CharmmPsfFile(object):
         line = psf.readline().strip()
         if not line and title.startswith('NNB'):
             # This will correctly handle the NNB section (which has a spurious
-            # blank line) as well as any sections that have 0 members.
+            # blank line)
             line = psf.readline().strip()
         data = []
         if title == 'NATOM' or title == 'NTITLE':
