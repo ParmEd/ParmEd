@@ -3548,8 +3548,12 @@ class chamber(Action):
             psf.set_box(*self.box)
 
         nsets = len(parmset.parametersets)
-        frcfield = '%2d' % nsets
-        frcfield += ('\n%2d' % nsets).join(parmset.parametersets)
+        if nsets > 0:
+            frcfield = '%2d' % nsets
+            frcfield += ('\n%2d' % nsets).join(parmset.parametersets)
+        else:
+            frcfield = '%2d No FF information parsed...' % 1
+
         # Delete the CMAP list if requested
         if not self.cmap:
             psf.clear_cmap()
