@@ -5,14 +5,16 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 Contributors:
-Date: July 17, 2014
+Date: Sep. 17, 2014
 """
+import compat24
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.charmm.topologyobjects import (AtomType, BondType, AngleType,
                     DihedralType, ImproperType, CmapType, UreyBradleyType,
                     NoUreyBradley)
 from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
+from collections import OrderedDict
 import os
 import warnings
 
@@ -71,16 +73,16 @@ class CharmmParameterSet(object):
 
     def __init__(self, *args):
         # Instantiate the list types
-        self.atom_types_str = dict()
-        self.atom_types_int = dict()
-        self.atom_types_tuple = dict()
-        self.bond_types = dict()
-        self.angle_types = dict()
-        self.urey_bradley_types = dict()
-        self.dihedral_types = dict()
-        self.improper_types = dict()
-        self.cmap_types = dict()
-        self.nbfix_types = dict()
+        self.atom_types_str = OrderedDict()
+        self.atom_types_int = OrderedDict()
+        self.atom_types_tuple = OrderedDict()
+        self.bond_types = OrderedDict()
+        self.angle_types = OrderedDict()
+        self.urey_bradley_types = OrderedDict()
+        self.dihedral_types = OrderedDict()
+        self.improper_types = OrderedDict()
+        self.cmap_types = OrderedDict()
+        self.nbfix_types = OrderedDict()
         self.parametersets = []
 
         # Load all of the files
@@ -439,6 +441,11 @@ class CharmmParameterSet(object):
                 except IndexError:
                     raise CharmmFileError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
+        # If we had any CMAP terms, then the last one will not have been added
+        # yet. Add it here
+        if current_cmap is not None:
+            ty = CmapType(current_cmap_res, current_cmap_data)
+            self.cmap_types[current_cmap] = ty
         # Now we're done. Load the nonbonded types into the relevant AtomType
         # instances. In order for this to work, all keys in nonbonded_types
         # must be in the self.atom_types_str dict. Raise a RuntimeError if this
