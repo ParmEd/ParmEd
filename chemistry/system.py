@@ -209,7 +209,8 @@ class ChemicalSystem(list):
     def load_from_open_pdb(cls, pdb):
         inst = cls()
         last_resid = 1
-        uses_hexadecimal = None
+        uses_hexadecimal = False
+        atom_hexadecimal = False
         # Empty some information
         inst.experimental = inst.journal = inst.authors = inst.keywords = ''
         inst.doi = inst.pmid = inst.journal_authors = inst.volume_page = ''
@@ -243,18 +244,33 @@ class ChemicalSystem(list):
                 # Figure out what my residue number is and see if the PDB is
                 # outputting residue numbers in hexadecimal (VMD does this).
                 if last_resid >= 9999:
-                    if resid == '9999':
+                    if not uses_hexadecimal and resid == '9999':
                         resid = 9999
-                    elif uses_hexadecimal is None:
+                    elif not uses_hexadecimal:
                         uses_hexadecimal = int(resid, 16) == 10000
                     # So now we know if we use hexadecimal or not. If we do,
                     # convert. Otherwise, stay put
                     if uses_hexadecimal:
-                        resid = int(resid, 16)
+                        try:
+                            resid = int(resid, 16)
+                        except ValueError, e:
+                            if resid == '****':
+                                resid = last_resid
+                            else:
+                                raise e
                     else:
                         resid = int(resid)
                 else:
                     resid = int(resid)
+                # If the atom number has cycled, it too may be hexadecimal
+                if atom_hexadecimal:
+                    atnum = int(atnum, 16)
+                else:
+                    try:
+                        atnum = int(atnum)
+                    except ValueError:
+                        atnum = int(atnum, 16)
+                        atom_hexadecimal = True
                 last_resid = resid
                 inst.add_atom(
                         Atom(atnum, atname, atomic_number, chg, x=x, y=y, z=z,
