@@ -28,8 +28,11 @@ class BondParam(object):
 
     def __eq__(self, other):
         """ Two bonds are equal if their atom types and bond type is equal """
-        return (self.type == other.type and self.atype1 == other.atype1
-                and self.atype2 == other.atype2)
+        if self.type != other.type: return False
+        return (
+            (self.atype1 == other.atype1 and self.atype2 == other.atype2) or
+            (self.atype2 == other.atype1 and self.atype1 == other.atype2)
+        )
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
