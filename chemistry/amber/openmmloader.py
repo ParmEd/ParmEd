@@ -129,7 +129,10 @@ class OpenMMAmberParm(AmberParm):
                 last_residue = resnum
                 resname = atm.residue.resname
                 res = self._topology.addResidue(resname, chain)
-            elem = element.get_by_symbol(pt.Element[atm.element])
+            try:
+                elem = element.get_by_symbol(pt.Element[atm.element])
+            except KeyError:
+                elem = None
             self._topology.addAtom(atm.atname, elem, res)
 
         # Add bonds to the topology (both with and without hydrogen)
