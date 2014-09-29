@@ -30,6 +30,7 @@ if has_openmm:
     chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                                       get_fn('dhfr_cmap_pbc.rst7'))
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+    tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -1223,6 +1224,28 @@ class TestChamberParm(unittest.TestCase):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
+
+    def testEPEnergy(self):
+        """ Tests AmberParm handling of extra points in TIP4P water """
+        parm = tip4p_system
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+# Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
+# BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
+# 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
+# EELEC  =     -2511.3511  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+# EKCMT  =         0.0000  VIRIAL  =         0.0000  VOLUME     =      6514.3661
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 0)
+        self.assertAlmostEqual(energies['dihedral'], 0)
+        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
 
     def testInterfaceNoPBC(self):
         """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
