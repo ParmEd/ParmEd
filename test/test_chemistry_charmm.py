@@ -339,7 +339,7 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(len(params.atom_types_str), 95)
         self.assertEqual(len(params.atom_types_tuple), 95)
         self.assertEqual(len(params.bond_types), 140)
-        self.assertEqual(len(params.cmap_types), 5)
+        self.assertEqual(len(params.cmap_types), 6)
         self.assertEqual(len(params.dihedral_types), 396)
         self.assertEqual(len(params.improper_types), 33)
         self.assertEqual(len(params.nbfix_types), 0)
