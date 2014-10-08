@@ -152,7 +152,7 @@ class CharmmPsfFile(object):
         line = psf.readline().strip()
         if not line and title.startswith('NNB'):
             # This will correctly handle the NNB section (which has a spurious
-            # blank line)
+            # blank line) as well as any sections that have 0 members.
             line = psf.readline().strip()
         data = []
         if title == 'NATOM' or title == 'NTITLE':

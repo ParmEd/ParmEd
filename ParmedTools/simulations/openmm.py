@@ -1057,7 +1057,7 @@ def energy(parm, args, output=sys.stdout):
                      state.getPotentialEnergy().value_in_unit(nrg))
 
 def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
-             script, platform, precision, norun):
+             script, platform, precision, norun, tol, maxcyc):
     """ Minimizes a snapshot. Use the existing System if it exists """
     global HAS_OPENMM
     if not HAS_OPENMM:
@@ -1162,19 +1162,19 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
         scriptfile.write('# Setting the positions\n'
                 'simulation.context.setPositions(parm.positions)\n\n'
                 '# Minimize the energy\n'
-                'simulation.minimizeEnergy()\n'
+                'simulation.minimizeEnergy(tolerance=%s, maxIterations=%s)\n'
                 '# Store the positions back in the parmtop\n'
                 'state = simulation.context.getState(getPositions=True\n'
                 '                                    enforcePeriodicBox=%s)\n'
                 'parm.positions = state.getPositions()\n' %
-                bool(parm.ptr('ifbox') > 0)
+                (bool(parm.ptr('ifbox') > 0), tol, maxcyc or 0)
         )
         scriptfile.close()
 
     # Go ahead and minimize now and set the coordinates from the results of this
     # minimization if we wanted to run the calculation
     if not norun:
-        simulation.minimizeEnergy(tolerance=0.001)
+        simulation.minimizeEnergy(tolerance=tol, maxIterations=maxcyc or 0)
         # Now get the coordinates
         state = simulation.context.getState(getPositions=True,
                                 enforcePeriodicBox=parm.ptr('ifbox')>0)

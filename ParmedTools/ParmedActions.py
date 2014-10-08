@@ -99,8 +99,8 @@ Usages = {
                        '-platform <platform> -precision <precision model> '
                        '[dcd] [progress] [script <script_file.py>] [norun]',
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-                       '[Ewald]] [nodisper] [applayer] [platform <platform>] '
-                       '[precision <precision model>] [decompose]',
+                       '[Ewald]] [nodisper] [omm] [applayer] [platform '
+                       '<platform>] [precision <precision model>] [decompose]',
 #      'fixtopology' : 'fixTopology',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
@@ -109,7 +109,8 @@ Usages = {
           'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
                        '[[restrain <mask>] [weight <k>]] [norun] '
                        '[script <script_file.py>] [platform <platform>] '
-                       '[precision <precision model>]',
+                       '[precision <precision model>] [tol <tolerance>] '
+                       '[maxcyc <cycles>]',
 #             'heat' : 'heat [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
 #                      '[[restrain <mask>] [weight <k>]] [langevin | '
 #                      'anderson] [nvt | npt] [anisotropic] [norun] [script '
@@ -3019,18 +3020,12 @@ class openmm(Action):
 
 class energy(Action):
     """
-    This action will use OpenMM to compute a single-point energy for the loaded
-    structure (you must use 'loadRestart' prior to this command to load
-    coordinates). The following options and keywords are supported:
+    This action will compute a single-point energy for the loaded structure (you
+    must use 'loadRestart' prior to this command to load coordinates). The
+    following options and keywords are supported:
 
     The options are:
 
-    platform <platform> : OpenMM compute platform to use. Options are CUDA,
-            OpenCL, Reference, and CPU. Consult the OpenMM manual for details
-    precision <precision model> : Precision model to use. Options are single,
-         double, and mixed. Reference platform is always double and CPU platform
-         is always single. Mixed (default) uses single precision for
-         calculations and double for accumulation
     cutoff <cut> : The size of the non-bonded cutoff, in Angstroms. Default 8 A
          for periodic systems or infinite for nonperiodic systems
 
@@ -3046,8 +3041,18 @@ class energy(Action):
     Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME
     nodisper : Do not use a long-range vdW dispersion correction
 
-    Other options:
+    OpenMM-specific options:
 
+    omm : If present, this keyword will instruct ParmEd to use OpenMM to compute
+         the energies (and optionally forces) using OpenMM instead of sander.
+    platform <platform> : OpenMM compute platform to use. Options are CUDA,
+            OpenCL, Reference, and CPU. Consult the OpenMM manual for details
+            (only used if 'omm' is provided)
+    precision <precision model> : Precision model to use. Options are single,
+         double, and mixed. Reference platform is always double and CPU platform
+         is always single. Mixed (default) uses single precision for
+         calculations and double for accumulation (only used if 'omm' is
+         provided)
     decompose : Print bond, angle, dihedral, and nonbonded energies separately
     applayer : Use OpenMM's class to compute the energy
     """
@@ -3056,17 +3061,30 @@ class energy(Action):
     output = sys.stdout
 
     def init(self, arg_list):
+        self.use_openmm = arg_list.has_key('omm')
         self.arg_list = ArgumentList(arg_list)
 
     def __str__(self):
         return 'Computing a single-point energy for %s' % self.parm
 
     def execute(self):
-        from ParmedTools.simulations.openmm import energy, HAS_OPENMM
-        if not HAS_OPENMM:
-            raise SimulationError('OpenMM could not be imported. Skipping.')
+        if self.use_openmm:
+            from ParmedTools.simulations.openmm import energy, HAS_OPENMM
+            if not HAS_OPENMM:
+                raise SimulationError('OpenMM could not be imported. Skipping.')
 
-        energy(self.parm, self.arg_list, self.output)
+            energy(self.parm, self.arg_list, self.output)
+        else:
+            from ParmedTools.simulations.sanderapi import energy, HAS_SANDER
+            if not HAS_SANDER:
+                raise SimulationError('sander could not be imported. Skipping.')
+            # Consume the OMM-specific arguments so we don't have any apparently
+            # unused arguments
+            self.arg_list.get_key_string('platform', None)
+            self.arg_list.get_key_string('precision', None)
+            self.arg_list.has_key('decompose')
+            self.arg_list.has_key('applayer')
+            energy(self.parm, self.arg_list, self.output)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3585,6 +3603,12 @@ class minimize(Action):
         norun               Do not run the calculation
         script <script>     Name of the Python script to write to run this
                             calculation
+        tol <tolerance>     The largest energy difference between successive
+                            steps in the minimization allow the minimization to
+                            stop (Default 0.001)
+        maxcyc <cycles>     The maximum number of minimization cycles permitted.
+                            No limit by default (minimization stops when
+                            tolerance is satisfied)
 
     Implicit Solvent options:
         igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
@@ -3606,6 +3630,8 @@ class minimize(Action):
         self.script = arg_list.get_key_string('script', None)
         self.platform = arg_list.get_key_string('platform', None)
         self.precision = arg_list.get_key_string('precision', 'mixed')
+        self.tol = arg_list.get_key_float('tol', 0.001)
+        self.maxcyc = arg_list.get_key_float('maxcyc', None)
         # Check for legal values
         if self.parm.ptr('ifbox') == 0:
             if self.cutoff is None or self.cutoff > 500:
@@ -3628,15 +3654,21 @@ class minimize(Action):
                              '(NOT %s)' % self.platform)
         if self.precision not in ('mixed', 'single', 'double'):
             raise InputError('precision must be single, double, or mixed.')
-        if self.parm.ptr('ifbox') == 0 and not self.igb in (0, 1, 2, 5, 7, 8):
-            raise InputError('Illegal igb value (%d). Must be 0, 1, 2, 5, 7, '
-                             'or 8' % self.igb)
+        if self.parm.ptr('ifbox') == 0 and not self.igb in (0,1,2,5,6,7,8):
+            raise InputError('Illegal igb value (%d). Must be 0, 1, 2, 5, 6, '
+                             '7, or 8' % self.igb)
+        if self.maxcyc is not None and self.maxcyc <= 0:
+            raise InputError('maxcyc must be a positive integer')
+        if self.tol < 0:
+            raise InputError('tolerance must be positive')
+        if self.tol == 0 and self.maxcyc is None:
+            raise InputError('tolerance must be > 0 if maxcyc is not set.')
 
     def __str__(self):
         retstr = 'Minimizing %s ' % self.parm
         if self.parm.ptr('ifbox'):
             retstr += 'with PME '
-        elif self.igb == 0:
+        elif self.igb == 0 or self.igb == 6:
             retstr += 'in gas phase '
         elif self.igb == 1:
             retstr += 'with GB(HCT) '
@@ -3649,12 +3681,15 @@ class minimize(Action):
         elif self.igb == 8:
             retstr += 'with GB(GBneck2) '
         if self.cutoff is None:
-            retstr += 'and no cutoff. '
+            retstr += 'and no cutoff '
         else:
-            retstr += 'and a cutoff of %.2f Angstroms. ' % self.cutoff
+            retstr += 'and a cutoff of %.2f Angstroms ' % self.cutoff
+        retstr += 'to a tolerance of %s. ' % self.tol
         if self.restrain is not None:
             retstr += 'Restraining %s with weights %f. ' % (self.restrain,
                                                             self.weight)
+        if self.maxcyc is not None:
+            retstr += 'Using at most %d minimization steps.' % self.maxcyc
         return retstr.strip()
 
     def execute(self):
@@ -3666,6 +3701,6 @@ class minimize(Action):
             raise SimulationError('You must load coordinates before "minimize"')
         minimize(self.parm, self.igb, self.saltcon, self.cutoff,
                  self.restrain, self.weight, self.script, self.platform,
-                 self.precision, self.norun)
+                 self.precision, self.norun, self.tol, self.maxcyc)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
