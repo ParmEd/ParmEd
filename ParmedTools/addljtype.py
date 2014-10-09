@@ -1,16 +1,20 @@
 " This command adds a new Lennard Jones atom type from the selected atoms. "
 
 from math import sqrt
+from chemistry.amber.constants import NTYPES
 
-def AddLJType(parm, sel_atms, radius, epsilon, radius14=None, epsilon14=None):
+def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     """ Adds a new Lennard Jones type to a topology file """
     # Set the new atom type
+    old_type = None
     for i in xrange(len(sel_atms)):
         if sel_atms[i] == 1:
+            if old_type is None:
+                old_type = parm.parm_data['ATOM_TYPE_INDEX'][i]
             parm.parm_data['ATOM_TYPE_INDEX'][i] = parm.ptr('ntypes') + 1
 
     # Now increment NTYPES and reload the pointers
-    parm.parm_data['POINTERS'][1] += 1
+    parm.parm_data['POINTERS'][NTYPES] += 1
     parm.LoadPointers()
    
     # Now create a whole new array for NONBONDED_PARM_INDEX
@@ -62,3 +66,18 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14=None, epsilon14=None):
         parm.parm_data['LENNARD_JONES_14_BCOEF'].append(2 * depth * rad**6)
         parm.LJ_14_radius.append(radius14)
         parm.LJ_14_depth.append(epsilon14)
+
+    # If our prmtop had a C-coefficient array, just copy the terms from the old
+    # atom type to the new atom type, as defined by the type of the first atom
+    # that got assigned the "new" type.
+    if 'LENNARD_JONES_CCOEF' in parm.parm_data:
+        ccoeffs = parm.parm_data['LENNARD_JONES_CCOEF']
+        for i in xrange(old_ntypes):
+            nbi = parm.ptr('ntypes')*(old_type-1) + i
+            idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
+            ccoeffs.append(ccoeffs[idx])
+
+        # Now the last type interacting with itself
+        nbi = parm.ptr('ntypes')*(old_type-1) + old_type - 1
+        idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
+        ccoeffs.append(ccoeffs[idx])
