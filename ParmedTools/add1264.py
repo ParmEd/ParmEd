@@ -66,11 +66,8 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
     # 1. Get the list of AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all 
     # the atoms in prmtop file
 
-    amberatomtypelist1 = []
-    atomtypeindexlist1 = [] 
-    for i in xrange(parm.pointers['NATOM']):
-        amberatomtypelist1.append(parm.parm_data['AMBER_ATOM_TYPE'][i])
-        atomtypeindexlist1.append(parm.parm_data['ATOM_TYPE_INDEX'][i])
+    amberatomtypelist1 = parm.parm_data['AMBER_ATOM_TYPE']
+    atomtypeindexlist1 = parm.parm_data['ATOM_TYPE_INDEX']
 
     # 2. Have the representative AMBER_ATOM_TYPE for the each certain
     # ATOM_TYPE_INDEX
@@ -97,12 +94,13 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
         # for the situation j < i
         for j in xrange(typ):
             atomtypej = amberatomtypelist2[j]
-            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*j+i]-1
+            jj = atomtypeindexlist2[j] - 1
+            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*jj+i]-1
             try:
                 c4 = c4list[ pt.Element[typelist[typ]] ]
                 pol = pollist[atomtypej]
 #               print ('ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE=%s; '
-#                      'Polarizability=%s' %(j+1, atomtypej, pol))
+#                      'Polarizability=%s' %(jj+1, atomtypej, pol))
             except KeyError:
                 raise LJ12_6_4Error("Could not find parameters for "
                                     "ATOM_TYPE %s" % atomtypej )
@@ -115,12 +113,13 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
             # for the situation i =< j 
         for j in xrange(typ, parm.ptr('ntypes')):
             atomtypej = amberatomtypelist2[j]
-            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+            jj = atomtypeindexlist2[j] - 1
+            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+jj] - 1
             try:
                 c4 = c4list[ pt.Element[typelist[typ]] ]
                 pol = pollist[atomtypej]
 #               print ('ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE= %s; '
-#                      'Polarizability=%s' %(j+1, atomtypej, pol))
+#                      'Polarizability=%s' %(jj+1, atomtypej, pol))
             except KeyError:
                 raise LJ12_6_4Error("Could not find parameters for "
                                     "ATOM_TYPE %s" % atomtypej)
