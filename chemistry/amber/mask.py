@@ -308,7 +308,52 @@ class AmberMask(object):
 
     def _selectDistd(self, pmask1, pmask2):
         """ Selects atoms based on a distance criteria """
-        raise NotImplemented("Distance mask is not implemented yet!")
+        # pmask1 is either @<number> or :<number>, and represents the distance
+        # criteria. pmask2 is the selection of atoms from which the distance is
+        # evaluated.
+        pmask = _mask(self.parm.ptr('natom'))
+        # Determine if we want > or <
+        if pmask1[0] == '<':
+            cmp = float.__lt__
+        elif pmask1[0] == '>':
+            cmp = float.__gt__
+        else:
+            raise MaskError('Unknown comparison criteria for distance mask: %s'
+                            % pmask1[0])
+        pmask1 = pmask1[1:]
+        if pmask1[0] not in ':@':
+            raise MaskError('Bad distance criteria for mask: %s' % pmask1)
+        try:
+            distance = float(pmask1[1:])
+        except TypeError:
+            raise MaskError('Distance must be a number: %s' % pmask1[1:])
+        if not hasattr(self.parm.atom_list[0], 'xx'):
+            raise MaskError('Distance-based masks require loaded coordinates.')
+        distance *= distance # Faster to compare square of distance
+        # First select all atoms that satisfy the distance. If we ended up
+        # choosing residues, then we will go back through afterwards and select
+        # entire residues when one of the atoms in that residue is selected.
+        idxlist = [i for i, val in enumerate(pmask2) if val == 1]
+        for i, atomi in enumerate(self.parm.atom_list):
+            for j in idxlist:
+                atomj = self.parm.atom_list[j]
+                dx = atomi.xx - atomj.xx
+                dy = atomi.xy - atomj.xy
+                dz = atomi.xz - atomj.xz
+                d2 = dx*dx + dy*dy + dz*dz
+                if d2 < distance:
+                    pmask[i] = 1
+                    break
+        # Now see if we have to select all atoms in residues with any selected
+        # atoms
+        if pmask1[0] == ':':
+            for res in self.parm.residue_list:
+                for atom in res.atoms:
+                    if pmask[atom.starting_index] == 1:
+                        for atom in res.atoms:
+                            pmask[atom.starting_index] = 1
+                        break
+        return pmask
 
     #======================================================
 
@@ -389,7 +434,7 @@ class AmberMask(object):
         elif ptoken.strip() == '*':
             pmask.select_all()
         elif ptoken[0] in ['<','>']:
-            return _mask(self.parm.ptr('natom')) # empty mask; ignored anyway
+            return ptoken
         else:
             raise MaskError('Mask is missing : and @')
         # end if ':' in ptoken:
@@ -619,7 +664,7 @@ class _mask(list):
         raise MaskError('_mask is a fixed-length array!')
 
     def pop(self, *args, **kwargs):
-        return self[len(self)-1]
+        return self[-1]
 
     def remove(self, *args, **kwargs):
         raise MaskError('_mask is a fixed-length array!')
