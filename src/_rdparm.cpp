@@ -136,19 +136,20 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                         PyString_FromString(flag.c_str()));
     }
 
-    PyObject *ret = PyTuple_New(5);
+    PyObject *ret = PyTuple_New(1);
     PyTuple_SET_ITEM(ret, 0, parm_data);
     PyTuple_SET_ITEM(ret, 1, comments);
     PyTuple_SET_ITEM(ret, 2, formats);
     PyTuple_SET_ITEM(ret, 3, unknown_flags);
     PyTuple_SET_ITEM(ret, 4, flag_list);
+    PyTuple_SET_ITEM(ret, 5, PyString_FromString(version.c_str()));
 
     return ret;
 }
 
 static PyMethodDef
 optrdparmMethods[] = {
-    { "_rdparm", (PyCFunction) rdparm, METH_VARARGS,
+    { "rdparm", (PyCFunction) rdparm, METH_VARARGS,
             "Optimized prmtop file reading library written in C++"},
     { NULL },
 };
@@ -168,7 +169,7 @@ static struct PyModuleDef moduledef = {
 #endif
 
 PyMODINIT_FUNC
-initrdparm(void) {
+init_rdparm(void) {
     PyObject *m;
 
 #if PY_MAJOR_VERSION >= 3

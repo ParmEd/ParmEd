@@ -91,6 +91,9 @@ ExitStatus readparm(const string &fname, vector<string> &flagList,
     string word;
 
     while (!getline(parm, line).eof()) {
+        // RESIDUE_ICODE can have blank entries, so don't strip it...
+        if (curflag != "RESIDUE_ICODE")
+            line = rstrip(line);
         if (line.substr(0, FLAGLEN) == DATAFLAG) {
             // This is a new flag -- push the data back to 
             curflag = strip(line.substr(FLAGLEN));

@@ -238,22 +238,73 @@ class AmberFormat(object):
 
     #===================================================
 
-    def rdparm(self, fname):
+    def rdparm(self, fname, slow=False):
         """ Parses the Amber format file """
+        # See if we have the optimized parser available
 
         self.prm_name = fname
-        current_flag = ''
-        gathering_data = False
         self.version = None # reset all top info each time rdparm is called
         self.formats = {}
         self.parm_data = {}
         self.parm_comments = {}
         self.flag_list = []
+        self.valid = False
+
+        try:
+            from chemistry.amber import _rdparm
+        except ImportError:
+            raise
+            return self.rdparm_slow(fname)
+
+        if slow:
+            return self.rdparm_slow(fname)
+
+        # We have the optimized version
+        try:
+            ret = _rdparm.rdparm(fname)
+        except TypeError:
+            # This is raised if VERSION is not found
+            raise
+            return self.rdparm_old(open(fname, 'r').readlines())
+        else:
+            # Unpack returned contents
+            parm_data, parm_comments, formats, unkflg, flag_list, version = ret
+            # Now assign them to instance attributes and process where necessary
+            self.parm_data = parm_data
+            self.parm_comments = parm_comments
+            for key in formats:
+                self.formats[key] = FortranFormat(formats[key])
+            self.flag_list = flag_list
+            self.version = version
+            # Now we have to process all of those sections that the optimized
+            # parser couldn't figure out
+            for flag in unkflg:
+                rawdata = self.parm_data[flag]
+                self.parm_data[flag] = []
+                for line in rawdata:
+                    self.parm_data[flag].extend(self.formats[key].read(line))
+
+            try:
+                for i, chg in enumerate(self.parm_data[self.charge_flag]):
+                    self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
+            except KeyError:
+                pass
+            self.valid = True
+
+    #===================================================
+
+    def rdparm_slow(self, fname):
+        """
+        Parses the Amber format file. This parser is written in pure Python and
+        is therefore slower than the C++-optimized version
+        """
+
+        current_flag = ''
+        gathering_data = False
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
 
         # Open up the file and read the data into memory
         prm = open(self.prm_name, 'r')
-        self.valid = False
 
         for line in prm:
 
@@ -289,6 +340,8 @@ class AmberFormat(object):
         except KeyError:
             pass
         self.valid = True
+
+        prm.close()
 
         # If we don't have a version, then read in an old-file topology
         if self.version is None:

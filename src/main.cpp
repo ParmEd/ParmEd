@@ -10,9 +10,10 @@ int main() {
     ParmFormatMap parmFormats;
     string version;
     string fname = "trx.prmtop";
+    vector<string> flagList;
 
-    ExitStatus retval = readparm(fname, parmData, parmComments, unkParmData,
-                                 parmFormats, version);
+    ExitStatus retval = readparm(fname, flagList, parmData, parmComments,
+                                 unkParmData, parmFormats, version);
 
     cout << "My flags are:" << endl;
     for (ParmDataMap::const_iterator it=parmData.begin(); it!=parmData.end(); it++) {

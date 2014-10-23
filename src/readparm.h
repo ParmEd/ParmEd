@@ -31,6 +31,17 @@ inline std::string strip(const std::string &input) {
     return input.substr(first_char, last_char-first_char+1);
 }
 
+inline std::string rstrip(const std::string &input) {
+    size_t last_char = input.size();
+    for (size_t i = input.size() - 1; i >= 0; i--) {
+        char ci = input[i];
+        if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
+        last_char = i;
+        break;
+    }
+    return input.substr(0, last_char+1);
+}
+
 inline std::string upper(const std::string &input) {
     std::locale loc;
     std::string retval = input;
