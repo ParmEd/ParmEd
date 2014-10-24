@@ -8,6 +8,7 @@
 #include <cstring>    //< strncpy
 #include <fstream>
 #include "readparm.h"
+#include <iostream>
 
 using namespace std;
 
@@ -15,7 +16,8 @@ using namespace std;
 ParmDataType parseFormat(const string &fmt, int &ncols, int &width) {
     string up = upper(fmt);
     int i, j, k;
-    if (sscanf(fmt.c_str(), "%dA%d", &i, &j) == 2) {
+//  cout << "Processing format: " << up << endl;
+    if (sscanf(up.c_str(), "%dA%d", &i, &j) == 2) {
         // Must be characters, but in that case our data type only supports 4
         // characters, so mark it as unknown if the strings are longer
         if (j > 4) return UNKNOWN;
@@ -23,24 +25,25 @@ ParmDataType parseFormat(const string &fmt, int &ncols, int &width) {
         ncols = i;
         width = j;
         return HOLLERITH;
-    } else if (sscanf(fmt.c_str(), "%dE%d.%d", &i, &j, &k) == 3) {
+    } else if (sscanf(up.c_str(), "%dE%d.%d", &i, &j, &k) == 3) {
         // Floating point numbers
         ncols = i;
         width = j;
         return FLOAT;
-    } else if (sscanf(fmt.c_str(), "%dI%d", &i, &j) == 2) {
+    } else if (sscanf(up.c_str(), "%dI%d", &i, &j) == 2) {
         ncols = i;
         width = j;
         return INTEGER;
-    } else if (sscanf(fmt.c_str(), "%d(F%d.%d)", &i, &j, &k) == 3) {
+    } else if (sscanf(up.c_str(), "%d(F%d.%d)", &i, &j, &k) == 3) {
         ncols = i;
         width = j;
         return FLOAT;
-    } else if (sscanf(fmt.c_str(), "%dF%d.%d", &i, &j, &k) == 3) {
+    } else if (sscanf(up.c_str(), "%dF%d.%d", &i, &j, &k) == 3) {
         ncols = i;
         width = j;
         return FLOAT;
     }
+    cerr << "Did not recognize format " << fmt << endl;
     return UNKNOWN;
 }
 

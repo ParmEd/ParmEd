@@ -22,10 +22,11 @@ inline std::string strip(const std::string &input) {
         first_char = i;
         break;
     }
-    for (size_t i = input.size() - 1; i >= first_char; i--) {
-        char ci = input[i];
+    for (size_t i = input.size(); i > first_char; i--) {
+        size_t ii = i - 1;
+        char ci = input[ii];
         if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
-        last_char = i;
+        last_char = ii;
         break;
     }
     return input.substr(first_char, last_char-first_char+1);
@@ -33,10 +34,11 @@ inline std::string strip(const std::string &input) {
 
 inline std::string rstrip(const std::string &input) {
     size_t last_char = input.size();
-    for (size_t i = input.size() - 1; i >= 0; i--) {
-        char ci = input[i];
+    for (size_t i = input.size(); i > 0; i--) {
+        size_t ii = i - 1;
+        char ci = input[ii];
         if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
-        last_char = i;
+        last_char = ii;
         break;
     }
     return input.substr(0, last_char+1);

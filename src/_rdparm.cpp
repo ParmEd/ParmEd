@@ -136,7 +136,7 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                         PyString_FromString(flag.c_str()));
     }
 
-    PyObject *ret = PyTuple_New(1);
+    PyObject *ret = PyTuple_New(6);
     PyTuple_SET_ITEM(ret, 0, parm_data);
     PyTuple_SET_ITEM(ret, 1, comments);
     PyTuple_SET_ITEM(ret, 2, formats);
