@@ -16,7 +16,6 @@ using namespace std;
 ParmDataType parseFormat(const string &fmt, int &ncols, int &width) {
     string up = upper(fmt);
     int i, j, k;
-//  cout << "Processing format: " << up << endl;
     if (sscanf(up.c_str(), "%dA%d", &i, &j) == 2) {
         // Must be characters, but in that case our data type only supports 4
         // characters, so mark it as unknown if the strings are longer
@@ -43,7 +42,6 @@ ParmDataType parseFormat(const string &fmt, int &ncols, int &width) {
         width = j;
         return FLOAT;
     }
-    cerr << "Did not recognize format " << fmt << endl;
     return UNKNOWN;
 }
 
