@@ -282,7 +282,7 @@ class AmberFormat(object):
                 rawdata = self.parm_data[flag]
                 self.parm_data[flag] = []
                 for line in rawdata:
-                    self.parm_data[flag].extend(self.formats[key].read(line))
+                    self.parm_data[flag].extend(self.formats[flag].read(line))
 
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
