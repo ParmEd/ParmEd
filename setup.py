@@ -1,5 +1,6 @@
 
-from distutils.core import setup
+from distutils.core import setup, Extension
+import os
 
 # First the ParmedTools packages:
 packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
@@ -13,6 +14,14 @@ modules = ['compat24', 'timer']
 
 # Scripts
 scripts = ['parmed.py', 'xparmed.py']
+
+# Optimized readparm
+extensions = [Extension('chemistry.amber._rdparm',
+                        sources=['src/_rdparm.cpp', 'src/readparm.cpp'],
+                        include_dirs=[os.path.join(os.path.abspath('.'),'src')],
+                        extra_compile_args=['-g'],
+                        extra_link_args=['-g'],
+)]
 
 if __name__ == '__main__':
 
@@ -43,5 +52,6 @@ if __name__ == '__main__':
           license='GPL v2 or later',
           packages=packages,
           py_modules=modules,
+          ext_modules=extensions,
           cmdclass={'build_py': build_py, 'build_scripts': build_scripts},
           scripts=scripts)

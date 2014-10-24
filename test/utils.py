@@ -203,6 +203,11 @@ def detailed_diff(l1, l2, absolute_error, relative_error):
         try:
             wx = float(wx)
             wy = float(wy)
+        except ValueError:
+            if isinstance(wx, float) or (wx != wy and not
+                    (wx.startswith(fdir) or wy.startswith(fdir))):
+                return False
+        else:
             if wx != wy:
                 if absolute_error is not None and abs(wx-wy) > absolute_error:
                     return False
@@ -211,7 +216,4 @@ def detailed_diff(l1, l2, absolute_error, relative_error):
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False
-        except ValueError:
-            if wx != wy and not (wx.startswith(fdir) or wy.startswith(fdir)):
-                return False
     return True
