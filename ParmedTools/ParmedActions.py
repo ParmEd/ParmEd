@@ -836,7 +836,11 @@ class scnb(Action):
 class changeljsingletype(Action):
     """
     Allows you to change the radius/well depth of a single LJ type specified by
-    <mask>
+    <mask>. Note, this may change more than the atoms selected in just the mask!
+    To find out what else will be changed, look at the output of "printLJTypes".
+
+    Use addLJType to change the Lennard-Jones parameters on a set of specific
+    atoms.
     """
     supported_classes = ('AmberParm', 'ChamberParm')
     def init(self, arg_list):
