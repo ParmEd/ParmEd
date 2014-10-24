@@ -70,40 +70,44 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     PyObject *unknown_flags = PyList_New((Py_ssize_t) unkParmData.size());
     PyObject *flag_list = PyList_New((Py_ssize_t) flagList.size());
 
+    Py_ssize_t unkFlagNum = 0;
+
     for (size_t i = 0; i < flagList.size(); i++) {
         std::string flag = flagList[i];
+        Py_ssize_t listSize;
         PyObject *list;
         if (parmFormats[flag].dataType == UNKNOWN)
-            list = PyList_New((Py_ssize_t) unkParmData[flag].size());
+            listSize = (Py_ssize_t) unkParmData[flag].size();
         else
-            list = PyList_New((Py_ssize_t) parmData[flag].size());
+            listSize = (Py_ssize_t) parmData[flag].size();
+        list = PyList_New(listSize);
         // Now see what type this is and fill the list up accordingly
         switch (parmFormats[flag].dataType) {
             case INTEGER:
-                for (Py_ssize_t j = 0; j < parmData[flag].size(); j++) {
+                for (Py_ssize_t j = 0; j < listSize; j++) {
                     long val = (long) parmData[flag][(size_t)j].i;
                     PyList_SET_ITEM(list, j, PyInt_FromLong(val));
                 }
                 break;
             case FLOAT:
-                for (Py_ssize_t j = 0; j < parmData[flag].size(); j++) {
+                for (Py_ssize_t j = 0; j < listSize; j++) {
                     double val = parmData[flag][(size_t)j].f;
                     PyList_SET_ITEM(list, j, PyFloat_FromDouble(val));
                 }
                 break;
             case HOLLERITH:
-                for (Py_ssize_t j = 0; j < parmData[flag].size(); j++) {
+                for (Py_ssize_t j = 0; j < listSize; j++) {
                     PyList_SET_ITEM(list, j,
                             PyString_FromString(parmData[flag][(size_t)j].c));
                 }
                 break;
             case UNKNOWN:
-                for (Py_ssize_t j = 0; j < unkParmData[flag].size(); j++) {
+                for (Py_ssize_t j = 0; j < listSize; j++) {
                     std::string line = unkParmData[flag][(size_t) j];
                     PyList_SET_ITEM(list, j, PyString_FromString(line.c_str()));
                 }
                 // Add this to the list of unknown flags
-                PyList_SET_ITEM(unknown_flags, (Py_ssize_t)i,
+                PyList_SET_ITEM(unknown_flags, unkFlagNum++,
                                 PyString_FromString(flag.c_str()));
                 break;
             default:
