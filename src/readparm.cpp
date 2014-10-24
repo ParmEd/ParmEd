@@ -95,49 +95,54 @@ ExitStatus readparm(const string &fname, vector<string> &flagList,
 
     while (!getline(parm, line).eof()) {
         // RESIDUE_ICODE can have blank entries, so don't strip it...
-        if (curflag != "RESIDUE_ICODE")
-            line = rstrip(line);
-        if (line.substr(0, FLAGLEN) == DATAFLAG) {
-            // This is a new flag -- push the data back to 
-            curflag = strip(line.substr(FLAGLEN));
-            flagList.push_back(curflag);
-            continue;
-        }
-        if (line.substr(0, COMMENTLEN) == COMMENTFLAG) {
-            parmComments[curflag].push_back(strip(line.substr(COMMENTLEN)));
-            continue;
-        }
-        if (line.substr(0, FORMATLEN) == FORMATFLAG) {
-            size_t start = line.find_first_of('(') + 1;
-            size_t end = line.find_last_of(')');
-            string fmt = line.substr(start, end-start);
-            curtype = parseFormat(fmt, ncols, width);
-            ParmFormatType typ;
-            typ.dataType = curtype;
-            typ.fmt = fmt;
-            parmFormats[curflag] = typ;
-            linewidth = ncols * width;
+        if (line[0] == '%') {
+            if (line.substr(0, FLAGLEN) == DATAFLAG) {
+                // This is a new flag -- push the data back to
+                curflag = strip(line.substr(FLAGLEN));
+                flagList.push_back(curflag);
+            } else if (line.substr(0, COMMENTLEN) == COMMENTFLAG) {
+                parmComments[curflag].push_back(strip(line.substr(COMMENTLEN)));
+            } else if (line.substr(0, FORMATLEN) == FORMATFLAG) {
+                size_t start = line.find_first_of('(') + 1;
+                size_t end = line.find_last_of(')');
+                string fmt = line.substr(start, end-start);
+                curtype = parseFormat(fmt, ncols, width);
+                ParmFormatType typ;
+                typ.dataType = curtype;
+                typ.fmt = fmt;
+                parmFormats[curflag] = typ;
+                linewidth = ncols * width;
+            } else {
+                // No idea what this is if it starts with % and doesn't match
+                // any of these flags...
+                parm.close();
+                return ERR;
+            }
             continue;
         }
 
         // This is where the actual data processing occurs
         switch (curtype) {
             case UNKNOWN:
-                unkParmData[curflag].push_back(line);
+                unkParmData[curflag].push_back(rstrip(line));
                 break;
             case FLOAT:
+                line = rstrip(line);
                 for (size_t i = 0; i < line.size(); i += width) {
                     d.f = atof(line.substr(i, width).c_str());
                     parmData[curflag].push_back(d);
                 }
                 break;
             case INTEGER:
+                line = rstrip(line);
                 for (size_t i = 0; i < line.size(); i += width) {
                     d.i = atoi(line.substr(i, width).c_str());
                     parmData[curflag].push_back(d);
                 }
                 break;
             case HOLLERITH:
+                if (curflag != "RESIDUE_ICODE")
+                    line = rstrip(line);
                 for (size_t i = 0; i < line.size(); i += width) {
                     word = strip(line.substr(i, width));
                     strncpy(d.c, word.c_str(), MAX_HOLLERITH_SIZE);
