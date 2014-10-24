@@ -253,7 +253,6 @@ class AmberFormat(object):
         try:
             from chemistry.amber import _rdparm
         except ImportError:
-            raise
             return self.rdparm_slow(fname)
 
         if slow:
