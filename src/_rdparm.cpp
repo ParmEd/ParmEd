@@ -118,7 +118,7 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
         PyDict_SetItemString(parm_data, flag.c_str(), list);
 
         // Now comments
-        if (parmComments.count(flag) > 0) {
+        if (parmComments.count(flag) == 0) {
             PyDict_SetItemString(comments, flag.c_str(), PyList_New(0));
         } else {
             int ncom = parmComments[flag].size();

@@ -8,7 +8,6 @@
 #include <cstring>    //< strncpy
 #include <fstream>
 #include "readparm.h"
-#include <iostream>
 
 using namespace std;
 

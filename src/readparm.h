@@ -16,13 +16,15 @@ enum ExitStatus {OK=0, NOOPEN=1, EMPTY=2, NOVERSION=3, ERR=4};
 inline std::string strip(const std::string &input) {
     size_t first_char = input.size();
     size_t last_char = first_char;
-    for (size_t i = 0; i < input.size(); i++) {
+    size_t i;
+    for (i = 0; i < input.size(); i++) {
         char ci = input[i];
         if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
         first_char = i;
         break;
     }
-    for (size_t i = input.size(); i > first_char; i--) {
+    if (i == input.size()) return std::string(""); // Catch empty string case
+    for (i = input.size(); i > first_char; i--) {
         size_t ii = i - 1;
         char ci = input[ii];
         if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
@@ -34,13 +36,15 @@ inline std::string strip(const std::string &input) {
 
 inline std::string rstrip(const std::string &input) {
     size_t last_char = input.size();
-    for (size_t i = input.size(); i > 0; i--) {
+    size_t i;
+    for (i = input.size(); i > 0; i--) {
         size_t ii = i - 1;
         char ci = input[ii];
         if (ci == ' ' || ci == '\t' || ci == '\n' || ci == '\r') continue;
         last_char = ii;
         break;
     }
+    if (i == 0) return std::string("");
     return input.substr(0, last_char+1);
 }
 
