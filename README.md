@@ -23,6 +23,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
+The `fortranformat` package is released under the MIT license, Copyright (C)
+Brendan Arnold. See `fortranformat/__init__.py` for more information.
+
 Description
 ===========
 

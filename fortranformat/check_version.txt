@@ -1,0 +1,3 @@
+F95 - H edit descriptor no longer exists
+F95 - B, O, Z, QuoteMark edit descriptors introduced
+F95 - Slash is now repeatable

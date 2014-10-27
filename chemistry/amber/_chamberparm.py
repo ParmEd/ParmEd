@@ -417,6 +417,13 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     Returns:
         ChamberParm with all parameters loaded
     """
+    # Make sure that frcfield is the right type
+    if isinstance(frcfield, list):
+        for i, x in enumerate(frcfield):
+            if i % 2 == 0 and not isinstance(x, int):
+                raise TypeError('frcfield must be [int, str, [int, str, ...]]')
+            elif i % 2 == 1 and not isinstance(x, str):
+                raise TypeError('frcfield must be [int, str, [int, str, ...]]')
     # Make sure the structure has had its box info loaded
     if not hasattr(struct, 'box'):
         raise CharmmPSFError('Box and coordinate info must be set in the PSF '
@@ -522,7 +529,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     else:
         parm.addFlag('CTITLE', 'a80', data=[title])
     parm.addFlag('POINTERS', '10I8', data=pointers)
-    parm.addFlag('FORCE_FIELD_TYPE', 'i2,a78', data=[frcfield])
+    parm.addFlag('FORCE_FIELD_TYPE', 'i2,a78', data=frcfield)
     parm.addFlag('ATOM_NAME','20a4',data=[a.name[:4] for a in struct.atom_list])
     chgdat = [a.charge for a in struct.atom_list]
     if vmd:

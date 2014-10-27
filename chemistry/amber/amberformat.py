@@ -8,6 +8,7 @@ from chemistry.amber.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC)
 from chemistry.exceptions import AmberFormatWarning, FlagError
+from fortranformat import FortranRecordReader, FortranRecordWriter
 from copy import copy
 import datetime
 from math import ceil
@@ -20,6 +21,11 @@ if not 'basestring' in dir(__builtins__): basestring = str
 
 class FortranFormat(object):
     """ Handles fortran formats """
+
+    strre = re.compile(r'(\d+)?a(\d+)$', re.I)
+    intre = re.compile(r'(\d+)?i(\d+)$', re.I)
+    floatre = re.compile(r'(\d+)?[edf](\d+)\.(\d+)$', re.I)
+    floatre2 = re.compile(r'(\d+)?\([edf](\d+)\.(\d+)\)$', re.I)
 
     #===================================================
 
@@ -36,60 +42,61 @@ class FortranFormat(object):
         # optionally strip whitespace from strings.
         self.process_method = lambda x: x
 
-        if 'a' in format_string.lower():
+        if FortranFormat.strre.match(format_string):
+            rematch = FortranFormat.strre.match(format_string)
             # replace our write() method with write_string to force left-justify
             self.type, self.write = str, self.write_string
-            try:
-                self.nitems, self.itemlen = format_string.lower().split('a')
-                self.nitems, self.itemlen = int(self.nitems), int(self.itemlen)
-            except ValueError:
-                self.nitems, self.itemlen = 1, 80
+            nitems, itemlen = rematch.groups()
+            if nitems is None:
+                self.nitems = 1
+            else:
+                self.nitems = int(nitems)
+            self.itemlen = int(itemlen)
             self.fmt = '%s'
             # See if we want to strip the strings
             if strip_strings: self.process_method = lambda x: x.strip()
 
-        elif 'I' in format_string.upper():
+        elif FortranFormat.intre.match(format_string):
             self.type = int
-            if len(format_string.upper().split('I')[0]) == 0:
+            rematch = FortranFormat.intre.match(format_string)
+            nitems, itemlen = rematch.groups()
+            if nitems is None:
                 self.nitems = 1
             else:
-                self.nitems = int(format_string.upper().split('I')[0])
-            self.itemlen = int(format_string.upper().split('I')[1])
+                self.nitems = int(nitems)
+            self.itemlen = int(itemlen)
             self.fmt = '%%%dd' % self.itemlen
 
-        elif 'E' in format_string.upper():
+        elif FortranFormat.floatre.match(format_string):
             self.type = float
-            format_parts = format_string.upper().split('E')
-            if len(format_parts[0]) == 0:
+            rematch = FortranFormat.floatre.match(format_string)
+            nitems, itemlen, num_decimals = rematch.groups()
+            if nitems is None:
                 self.nitems = 1
             else:
-                self.nitems = int(format_parts[0])
-            self.itemlen = int(format_parts[1].split('.')[0])
-            self.num_decimals = int(format_parts[1].split('.')[1])
+                self.nitems = int(nitems)
+            self.itemlen = int(itemlen)
+            self.num_decimals = int(num_decimals)
             self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
 
-        elif 'F' in format_string.upper():
+        elif FortranFormat.floatre2.match(format_string):
             self.type = float
-            # Strip out any parentheses
-            format_string = format_string.replace('(', '').replace(')', '')
-            format_parts = format_string.upper().split('F')
-            if len(format_parts[0].strip()) == 0:
+            rematch = FortranFormat.floatre2.match(format_string)
+            nitems, itemlen, num_decimals = rematch.groups()
+            if nitems is None:
                 self.nitems = 1
             else:
-                self.nitems = int(format_parts[0])
-            self.itemlen = int(format_parts[1].split('.')[0])
-            self.num_decimals = int(format_parts[1].split('.')[1])
+                self.nitems = int(nitems)
+            self.itemlen = int(itemlen)
+            self.num_decimals = int(num_decimals)
             self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
 
         else:
-            # replace our write() method with write_string to force left-justify
-            self.type, self.write = str, self.write_string
-            warn('Unrecognized format "%s". Assuming string.' % format_string,
-                 AmberFormatWarning)
-            self.fmt = '%s'
-            self.nitems, self.itemlen = 1, 80
-            # See if we want to strip the strings
-            if strip_strings: self.process_method = lambda x: x.strip()
+            # We tried... now just use the fortranformat package
+            self._reader = FortranRecordReader(format_string)
+            self._writer = FortranRecordWriter(format_string)
+            self.write = self.write_ffwriter
+            self.read = self.read_ffreader
 
     #===================================================
 
@@ -163,6 +170,17 @@ class FortranFormat(object):
             start = end
             end += self.itemlen
         return ret
+
+    #===================================================
+
+    def read_ffreader(self, line):
+        """ Reads the line and returns the converted data """
+        return self._reader.read(line.rstrip())
+
+    #===================================================
+
+    def write_ffwriter(self, items, dest):
+        dest.write('%s\n' % self._writer.write(items))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
