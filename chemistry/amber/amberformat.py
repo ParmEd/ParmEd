@@ -263,7 +263,6 @@ class AmberFormat(object):
             ret = _rdparm.rdparm(fname)
         except TypeError:
             # This is raised if VERSION is not found
-            raise
             return self.rdparm_old(open(fname, 'r').readlines())
         else:
             # Unpack returned contents
