@@ -19,8 +19,7 @@ scripts = ['parmed.py', 'xparmed.py']
 extensions = [Extension('chemistry.amber._rdparm',
                         sources=['src/_rdparm.cpp', 'src/readparm.cpp'],
                         include_dirs=[os.path.join(os.path.abspath('.'),'src')],
-                        extra_compile_args=['-g'],
-                        extra_link_args=['-g'],
+                        depends=['src/CompatibilityMacros.h', 'src/readparm.h']
 )]
 
 if __name__ == '__main__':
