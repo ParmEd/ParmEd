@@ -195,6 +195,8 @@ class AmberParm(AmberFormat):
         other.LJ_types = {}
         other.LJ_radius = self.LJ_radius[:]
         other.LJ_depth = self.LJ_depth[:]
+        other.hasvels = self.hasvels
+        other.hasbox = self.hasbox
         # This is as far as we've gotten if the prm is invalid
         if not self.valid: return other
 
