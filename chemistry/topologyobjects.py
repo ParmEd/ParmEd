@@ -44,6 +44,9 @@ class _ListItem(object):
         except AttributeError:
             return -1
 
+        if mylist is None:
+            return -1
+
         try:
             list_changed = mylist.changed
         except AttributeError:
@@ -198,7 +201,7 @@ class Atom(_ListItem):
     >>> a1 = Atom(name='CO', type='C', charge=0.5, mass=12.01)
     >>> a2 = Atom(name='OC', type='O', charge=-0.5, mass=12.01)
     >>> a1.bond_to(a2)
-    >>> a1 is in a2.bond_partners and a2 is in a1.bond_partners
+    >>> a1 in a2.bond_partners and a2 in a1.bond_partners
     True
     >>> a1.idx # Not part of a container
     -1
@@ -319,6 +322,7 @@ class Atom(_ListItem):
         if self is other:
             raise BondError("Cannot bond atom to itself!")
         self._bond_partners.add(other)
+        other._bond_partners.add(self)
 
     #===================================================
       
@@ -339,6 +343,7 @@ class Atom(_ListItem):
         if self is other:
             raise BondError("Cannot angle an atom with itself!")
         self._angle_partners.add(other)
+        other._angle_partners.add(self)
    
     #===================================================
 
@@ -359,6 +364,7 @@ class Atom(_ListItem):
         if self is other:
             raise BondError("Cannot dihedral an atom with itself!")
         self._dihedral_partners.add(other)
+        other._dihedral_partners.add(self)
       
     #===================================================
 
@@ -379,7 +385,6 @@ class Atom(_ListItem):
         if self is other:
             raise BondError("Cannot exclude an atom from itself")
         self._exclusion_partners.add(other)
-        # If he is excluded from me, then I am excluded from him
         other._exclusion_partners.add(self)
 
     #===================================================
@@ -583,7 +588,7 @@ class Angle(object):
             return (thing is self.atom1 or thing is self.atom2 or
                     thing is self.atom3)
         return ((self.atom1 in thing and self.atom2 in thing) or
-                (self.atom2 in thing and self.atom1 in thing))
+                (self.atom2 in thing and self.atom3 in thing))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -679,7 +684,7 @@ class Dihedral(object):
     True
     >>> a1 in dihed and a2 in dihed and a3 in dihed and a4 in dihed
     True
-    >>> Bond(a1, a4) in angle # this is not part of the angle definition
+    >>> Bond(a1, a4) in dihed # this is not part of the angle definition
     False
 
     For improper torsions, the bond pattern is different
@@ -835,7 +840,7 @@ class DihedralType(_ListItem):
     False
     >>> dt1 == dt2
     True
-    >>> dt.idx # not part of any list or iterable
+    >>> dt1.idx # not part of any list or iterable
     -1
 
     As part of a list, they can be indexed
@@ -1155,14 +1160,14 @@ class ImproperType(_ListItem):
     False
     >>> it1 == it2
     True
-    >>> it.idx # Not part of any list or iterable
+    >>> it1.idx # Not part of any list or iterable
     -1
 
     As part of a list, they can be indexed
 
     >>> improper_list = []
-    >>> improper_list.append(ImproperType(10.0, 180.0, list=improper_type))
-    >>> improper_list.append(ImproperType(10.0, 180.0, list=improper_type))
+    >>> improper_list.append(ImproperType(10.0, 180.0, list=improper_list))
+    >>> improper_list.append(ImproperType(10.0, 180.0, list=improper_list))
     >>> improper_list[0].idx
     0
     >>> improper_list[1].idx
@@ -1208,7 +1213,7 @@ class Cmap(object):
 
     Examples
     --------
-    >>> at1, at2, at3, at4, at5 = Atom(), Atom(), Atom(), Atom(), Atom()
+    >>> a1, a2, a3, a4, a5 = Atom(), Atom(), Atom(), Atom(), Atom()
     >>> cmap = Cmap(a1, a2, a3, a4, a5)
     >>> Bond(a1, a2) in cmap and Bond(a2, a3) in cmap
     True
