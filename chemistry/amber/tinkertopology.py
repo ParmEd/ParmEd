@@ -751,10 +751,10 @@ class Dihedral(_FourAtomTerm):
     def __eq__(self, other):
         if (self.atom1 is other.atom1 and self.atom2 is other.atom2 and
             self.atom3 is other.atom3 and self.atom4 is other.atom4):
-            return self.trigang_type == other.trigang_type
+            return self.dihedral_type == other.dihedral_type
         if (self.atom3 is other.atom1 and self.atom2 is other.atom2 and
             self.atom3 is other.atom1 and self.atom4 is other.atom4):
-            return self.trigang_type == other.trigang_type
+            return self.dihedral_type == other.dihedral_type
         return False
 
     def register(self):
