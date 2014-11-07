@@ -6,16 +6,27 @@ by Jason Swails
 """
 from __future__ import division
 
-from chemistry.exceptions import (BondError, DihedralError, AmberParmError,
-                                  CmapError)
-from chemistry.amber.constants import NATOM, TINY
-from chemistry.periodic_table import AtomicNum, Mass, Element as _Element
+from chemistry.exceptions import (BondError, DihedralError, CmapError,
+                                  AmoebaError)
+from chemistry.amber.constants import TINY
+from chemistry.periodic_table import Mass, Element as _Element
 from compat24 import all, property
 import warnings
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass # Must be Python 3... zip _is_ izip
 
-__all__ = ['Atom', 'Bond', 'BondType', 'Angle', 'AngleType', 'Dihedral',
-           'DihedralType', 'Residue', 'ResidueList', 'AtomList', 'BondTypeList',
-           'AngleTypeList', 'DihedralTypeList', 'TrackedList']
+__all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Cmap',
+           'CmapType', 'Dihedral', 'DihedralType', 'Improper', 'ImproperType',
+           'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList',
+           'StretchBend', 'StretchBendType', 'TorsionTorsion',
+           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
+           'UreyBradleyType']
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Private classes
 
 class _ListItem(object):
     """
@@ -66,6 +77,42 @@ class _ListItem(object):
                     return -1
             else:
                 return self._idx
+
+class _FourAtomTerm(object):
+    """
+    A base class for a parameter that spans 4 atoms
+
+    Parameters
+    ----------
+    atom1 : Atom
+        The first atom in the term
+    atom2 : Atom
+        The second atom in the term
+    atom3 : Atom
+        The third atom in the term
+    atom4 : Atom
+        The fourth atom in the term
+
+    Notes
+    -----
+    This is a base class that should be overridden by terms consisting of 4
+    atoms (like torsions). There are a lot of such terms in the Amoeba force
+    field, so this functionality is broken out into a new form
+    """
+    def __init__(self, atom1, atom2, atom3, atom4):
+        if (atom1 is atom2 or atom1 is atom3 or atom1 is atom4 or
+            atom2 is atom3 or atom2 is atom4 or atom3 is atom4):
+            raise BondError('4-atom term cannot have duplicate atoms')
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.atom4 = atom4
+
+    def __contains__(self, thing):
+        return (self.atom1 is thing or self.atom2 is thing or
+                self.atom3 is thing or self.atom4 is thing)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Atom(_ListItem):
     """ 
@@ -140,11 +187,14 @@ class Atom(_ListItem):
     dihedrals : list of Dihedral instances
         list of Dihedral objects in which this atom is a member
     urey_bradleys : list of UreyBradley instances
-        list of UreyBradley objects in which this atom is a member
+        list of UreyBradley objects in which this atom is a member (CHARMM,
+        AMOEBA)
     impropers : list of Improper instances
-        list of Improper objects in which the atom is a member
+        list of Improper objects in which the atom is a member (CHARMM)
     cmaps : list of Cmap instances
-        list of Cmap objects in which the atom is a member
+        list of Cmap objects in which the atom is a member (CHARMM, AMOEBA)
+    tortors : list of TorsionTorsion instances
+        list of TorsionTorsion objects in which the atom is a member (AMOEBA)
     bond_partners : list of Atom instances
         list of Atoms to which this atom is bonded.
     angle_partners : list of Atom instances
@@ -152,6 +202,9 @@ class Atom(_ListItem):
     dihedral_partners : list of Atom instances
         list of Atoms to which this atom forms an dihedral, but not a bond or
         angle
+    tortor_partners : list of Atom instances
+        list of Atoms to which this atom forms a coupled Torsion-Torsion, but
+        not a bond or angle (AMOEBA)
     exclusion_partners : list of Atom instances
         list of Atoms with which this atom is excluded, but not bonded, angled,
         or dihedraled to
@@ -233,11 +286,13 @@ class Atom(_ListItem):
         self._bond_partners = set()
         self._angle_partners = set()
         self._dihedral_partners = set()
+        self._tortor_partners = set()
         self._exclusion_partners = set() # For arbitrary/other exclusions
         self.residue = None
         self.marked = 0 # For setting molecules
         self.bonds, self.angles, self.dihedrals = [], [], []
         self.urey_bradleys, self.impropers, self.cmaps = [], [], []
+        self.tortors = []
    
     #===================================================
 
@@ -283,6 +338,15 @@ class Atom(_ListItem):
         " List of all dihedral partners that are NOT angle or bond partners "
         return sorted(list(self._dihedral_partners - self._angle_partners -
                            self._bond_partners))
+
+    @property
+    def tortor_partners(self):
+        """
+        List of all 1-5 partners that are NOT in angle or bond partners. This is
+        _only_ used in the Amoeba force field
+        """
+        return sorted(list(self._tortor_partners - self._dihedral_partners -
+                           self._angle_partners - self._bond_partners))
 
     @property
     def exclusion_partners(self):
@@ -366,6 +430,27 @@ class Atom(_ListItem):
         self._dihedral_partners.add(other)
         other._dihedral_partners.add(self)
       
+    #===================================================
+
+    def tortor_to(self, other):
+        """
+        Log this atom as 1-5 partners to another atom
+
+        Parameters
+        ----------
+        other : Atom
+            An atom that will be added to `tortor_partners`
+
+        Notes
+        -----
+        This action adds `self` to `other.tortor_partners`. Raises `BondError`
+        if `other is self`
+        """
+        if self is other:
+            raise BondError('Cannot coupled-dihedral atom to itself')
+        self._tortor_partners.add(self)
+        other._tortor_partners.add(self)
+
     #===================================================
 
     def exclude(self, other):
@@ -582,6 +667,12 @@ class Angle(object):
         self.type = type
         atom1.angle_to(atom3)
 
+    @property
+    def angle_type(self):
+        warnings.warn("angle_type has been replaced with type",
+                      DeprecationWarning)
+        return self.type
+
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom or a Bond is in this Angle """
         if isinstance(thing, Atom):
@@ -646,7 +737,7 @@ class AngleType(_ListItem):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class Dihedral(object):
+class Dihedral(_FourAtomTerm):
     """
     A valence dihedral between 4 atoms separated by three covalent bonds.
 
@@ -701,17 +792,7 @@ class Dihedral(object):
       
     def __init__(self, atom1, atom2, atom3, atom4, improper=False,
                  ignore_end=False, type=None):
-        # Make sure we're not dihedraling me to myself
-        atmlist = [atom1, atom2, atom3, atom4]
-        for i in xrange(len(atmlist)):
-            for j in xrange(i+1, len(atmlist)):
-                if atmlist[i] is atmlist[j]:
-                    raise BondError('Cannot dihedral atom to itself!')
-        # Set up instances
-        self.atom1 = atom1
-        self.atom2 = atom2
-        self.atom3 = atom3
-        self.atom4 = atom4
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         # Log these dihedrals in each atom
         atom1.dihedrals.append(self)
         atom2.dihedrals.append(self)
@@ -724,6 +805,12 @@ class Dihedral(object):
         if ignore_end: self._signs[0] = -1
         if improper: self._signs[1] = -1
         atom1.dihedral_to(atom4)
+
+    @property
+    def dihed_type(self):
+        warnings.warn('dihed_type has been replaced by type',
+                      DeprecationWarning)
+        return self.type
 
     @property
     def signs(self):
@@ -743,8 +830,7 @@ class Dihedral(object):
         Quick and easy way to find out if an Atom or Bond is in this Dihedral
         """
         if isinstance(thing, Atom):
-            return (thing is self.atom1 or thing is self.atom2 or
-                    thing is self.atom3 or thing is self.atom4)
+            return _FourAtomTerm.__contains__(self, thing)
         # A dihedral is made up of 3 bonds
         if self.improper:
             # An improper is different... Atom 3 is the central atom
@@ -942,6 +1028,11 @@ class UreyBradley(object):
         # Load the force constant and equilibrium distance
         self.type = type
 
+    @property
+    def ub_type(self):
+        warnings.warn("ub_type has been replaced by type", DeprecationWarning)
+        return self.type
+
     def __contains__(self, thing):
         " Quick and easy way to see if an Atom or Bond is in this Urey-Bradley "
         if isinstance(thing, Atom):
@@ -1088,6 +1179,12 @@ class Improper(object):
         atom4.impropers.append(self)
         # Load the force constant and equilibrium angle
         self.type = type
+
+    @property
+    def improp_type(self):
+        warnings.warn('improp_type has been replaced by type',
+                      DeprecationWarning)
+        return self.type
 
     def __contains__(self, thing):
         """
@@ -1241,6 +1338,11 @@ class Cmap(object):
         atom4.cmaps.append(self)
         # Load the CMAP interpolation table
         self.type = type
+
+    @property
+    def cmap_type(self):
+        warnings.warn('cmap_type has been replaced by type', DeprecationWarning)
+        return self.type
 
     def __contains__(self, thing):
         """
@@ -1483,6 +1585,459 @@ class _CmapGrid(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class TrigonalAngle(_FourAtomTerm):
+    """
+    A trigonal-angle term in the AMOEBA force field. It exists in a pattern like
+    the one shown below
+
+                                A1
+                                |
+                                |
+                          A4----A2----A3
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        The first atom involved in the trigonal angle
+    atom2 : Atom
+        The central atom involved in the trigonal angle
+    atom3 : Atom
+        The third atom involved in the trigonal angle
+    atom4 : Atom
+        The fourth atom involved in the trigonal angle
+    type : AngleType=None
+        The angle type containing the parameters
+
+    Notes
+    -----
+    Either `Atom`s or `Bond`s can be contained within this trigonal angle
+    """
+    def __init__(self, atom1, atom2, atom3, atom4, type=None):
+        _FourAtomTerm.__init__(self)
+        self.type = type
+
+    @property
+    def trigang_type(self):
+        warnings.warn('trigang_type has been replaced with type',
+                      DeprecationWarning)
+        return type
+
+    def __contains__(self, thing):
+        if isinstance(thing, Atom):
+            return _FourAtomTerm.__contains(self, thing)
+        return ((self.atom1 in thing and self.atom2 in thing) or
+                (self.atom2 in thing and self.atom3 in thing) or
+                (self.atom2 in thing and self.atom4 in thing))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class OutOfPlaneBend(_FourAtomTerm):
+    """
+    Out-of-plane bending term in the AMOEBA force field. The bond pattern is the
+    same as `TrigonalAngle`
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        The first atom involved in the trigonal angle
+    atom2 : Atom
+        The central atom involved in the trigonal angle
+    atom3 : Atom
+        The third atom involved in the trigonal angle
+    atom4 : Atom
+        The fourth atom involved in the trigonal angle
+    type : AngleType=None
+        The angle type containing the parameters
+
+    Notes
+    -----
+    Either `Atom`s or `Bond`s can be contained within this trigonal angle
+    """
+    def __init__(self, atom1, atom2, atom3, atom4, type=None):
+        _FourAtomTerm.__init__(self)
+        self.type = type
+
+    @property
+    def oopbend_type(self):
+        warnings.warn('oopbend_type has been replaced with type',
+                      DeprecationWarning)
+        return type
+
+    def __contains__(self, thing):
+        if isinstance(thing, Atom):
+            return _FourAtomTerm.__contains(self, thing)
+        return ((self.atom1 in thing and self.atom2 in thing) or
+                (self.atom2 in thing and self.atom3 in thing) or
+                (self.atom2 in thing and self.atom4 in thing))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class PiTorsion(object):
+    r"""
+    Defines a pi-torsion term in the AMOEBA force field. The Pi-torsion is
+    defined around a sp2-hybridized pi-delocalized orbital (like an amide) by 6
+    atoms, as shown in the schematic below.
+
+
+         A2           A5-AAA
+           \         /
+            \       /
+             A3---A4
+            /       \
+           /         \
+     AAA-A1           A6
+
+    In the above schematic, A3 and A4 are sp2-hybridized, and atoms A2 and A6
+    are bonded _only_ to A3 and A4, respectively. Atoms A1 and A5 are each
+    bonded to 3 other atoms.
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        atom A1 in the schematic above
+    atom2 : Atom
+        atom A2 in the schematic above
+    atom3 : Atom
+        atom A3 in the schematic above
+    atom4 : Atom
+        atom A4 in the schematic above
+    atom5 : Atom
+        atom A5 in the schematic above
+    atom6 : Atom
+        atom A6 in the schematic above
+    type : DihedralType=None
+        The parameters for this Pi-torsion
+
+    Notes
+    -----
+    Both `Bond`s and `Atom`s can be contained in a pi-torsion
+    """
+    def __init__(self, atom1, atom2, atom3, atom4, atom5, atom6, type=None):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.atom4 = atom4
+        self.atom5 = atom5
+        self.atom6 = atom6
+        self.type = type
+
+    @property
+    def pitor_type(self):
+        warnings.warn("pitor_type has been replaced by type",
+                      DeprecationWarning)
+        return self.type
+
+    def __contains__(self, thing):
+        if isinstance(thing, Atom):
+            return (thing is self.atom1 or thing is self.atom2 or
+                    thing is self.atom3 or thing is self.atom4 or
+                    thing is self.atom5 or thing is self.atom5)
+        # Assume Bond
+        return ((self.atom2 in thing and self.atom3 in thing) or
+                (self.atom1 in thing and self.atom3 in thing) or
+                (self.atom3 in thing and self.atom4 in thing) or
+                (self.atom4 in thing and self.atom5 in thing) or
+                (self.atom4 in thing and self.atom6 in thing))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class StretchBend(object):
+    """
+    This term models the stretching and bending of a standard valence angle, and
+    is used in the AMOEBA force field
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        The first atom on one end of the angle
+    atom2 : Atom
+        The central atom in the angle
+    atom3 : Atom
+        The atom on the other end of the angle
+    type : StretchBendType=None
+        The type containing the stretch-bend parameters
+
+    Notes
+    -----
+    Both `Bond`s and `Atom`s can be contained in a stretch-bend term
+    """
+    def __init__(self, atom1, atom2, atom3, type=None):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.type = type
+
+    @property
+    def strbnd_type(self):
+        warnings.warn("strbnd_type has been replaced by type",
+                      DeprecationWarning)
+        return self.type
+
+    def __contains__(self, thing):
+        if isinstance(thing, Atom):
+            return (self.atom1 is thing or self.atom2 is thing or
+                    self.atom3 is thing)
+        return ((self.atom1 in thing and self.atom2 in thing) or
+                (self.atom2 in thing and self.atom3 in thing))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class StretchBendType(_ListItem):
+    """
+    A stretch-bend type with two distances and an angle in AMOEBA
+
+    Parameters (and Attributes)
+    ---------------------------
+    k : float
+        Force constant in kcal/mol/radians^2
+    req1 : float
+        Equilibrium bond distance for bond between the first and second atoms in
+        Angstroms
+    req2 : float
+        Equilibrium bond distance for bond between the second and third atoms in
+        Angstroms
+    theteq : float
+        Equilibrium angle in degrees
+    list : TrackedList=None
+        A list of `StretchBendType`s in which this is a member
+
+    Inherited Attributes
+    --------------------
+    idx : int
+        The index of this StretchBendType inside its containing list
+
+    Notes
+    -----
+    Two `StretchBendType`s are equal if their `psi_k` and `psi_eq` attributes
+    are equal
+
+    Examples
+    --------
+    >>> sbt1 = StretchBendType(10.0, 1.0, 1.0, 180.0)
+    >>> sbt2 = StretchBendType(10.0, 1.0, 1.0, 180.0)
+    >>> sbt1 is sbt2
+    False
+    >>> sbt1 == sbt2
+    True
+    >>> sbt1.idx # Not part of any list or iterable
+    -1
+
+    As part of a list, they can be indexed
+
+    >>> strbnd_list = []
+    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list[0].idx
+    0
+    >>> strbnd_list[1].idx
+    1
+    """
+    def __init__(self, k, req1, req2, theteq, list=None):
+        self.k = k
+        self.req1 = req1
+        self.req2 = req2
+        self.theteq = theteq
+        self._idx = -1
+        self.list = list
+
+    def __eq__(self, other):
+        return (self.k == other.k and self.req1 == other.req1 and
+                self.req2 == other.req2 and self.theteq == other.theteq)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TorsionTorsion(Cmap):
+    """
+    This is a coupled-torsion map used in the AMOEBA force field similar to the
+    correction-map (CMAP) potential used by the CHARMM force field
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        An atom on one end of the valence torsion-torsion bonded to atom2
+    atom2 : Atom
+        An atom in the middle of the torsion-torsion bonded to atoms 1 and 3
+    atom3 : Atom
+        An atom in the middle of the torsion-torsion bonded to atoms 2 and 4
+    atom4 : Atom
+        An atom in the middle of the torsion-torsion bonded to atoms 3 and 5
+    atom5 : Atom
+        An atom in the middle of the torsion-torsion bonded to atom 4
+    type : TorsionTorsionType=None
+        The TorsionTorsionType object containing the parameter map for this term
+
+    Notes
+    -----
+    A TorsionTorsion can contain bonds or atoms. A bond is contained if it
+    exists between atoms 1 and 2, between atoms 2 and 3, between atoms 3 and 4,
+    or between atoms 4 and 5.
+
+    Examples
+    --------
+    >>> a1, a2, a3, a4, a5 = Atom(), Atom(), Atom(), Atom(), Atom()
+    >>> tortor = TorsionTorsion(a1, a2, a3, a4, a5)
+    >>> Bond(a1, a2) in tortor and Bond(a2, a3) in tortor
+    True
+    >>> Bond(a1, a3) in tortor
+    False
+    """
+    def __init__(self, atom1, atom2, atom3, atom4, atom5, type=None):
+        Cmap.__init__(self, atom1, atom2, atom3, atom4, atom5, type)
+        atom1.tortor_to(atom5)
+
+    @property
+    def tortor_type(self):
+        warnings.warn("tortor_type has been replaced by type",
+                      DeprecationWarning)
+        return self.type
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _TorTorTable(object):
+    """
+    Contains an interpolating potential grid for a coupled-torsion in the AMOEBA
+    force field.
+
+    Parameters (and Attributes)
+    ---------------------------
+    ang1 : list of floats
+        Angles in the first dimension of the interpolation table
+    ang2 : list of floats
+        Angles in the second dimension of the interpolation table
+    data : list of floats
+        Value of the potential grid at each point (ang2 varies fastest)
+
+    Notes
+    -----
+    Raises `AmoebaError` if the dimension of the data array does not match the
+    number of data required by ang1 and ang2
+
+    Elements from the table are obtained and/or set by using angles as indexes.
+    If the pair of angles was not one of the original angles passed to this
+    table, a KeyError is raised.
+
+    Examples
+    --------
+    >>> table = _TorTorTable([1.0, 2.0], [1.0, 2.0, 3.0], [1, 2, 3, 4, 5, 6])
+    >>> table[1.0,1.0]
+    1
+    >>> table[1.0,2.0]
+    2
+    >>> table[2.0,2.0]
+    5
+    >>> table[2.0,2.0] = 10
+    >>> table.data
+    [1, 2, 3, 4, 10, 6]
+    """
+    def __init__(self, ang1, ang2, data):
+        if len(data) != len(ang1) * len(ang2):
+            raise AmoebaError('Coupled torsion parameter size mismatch. %dx%d '
+                              'grid expects %d elements (got %d)' % (len(ang1),
+                              len(ang2), len(ang1)*len(ang2), len(data)))
+        self.data = data
+        self._indexes = dict()
+        i = 0
+        for a1 in ang1:
+            for a2 in ang2:
+                self._indexes[(a1, a2)] = i
+                i += 1
+
+    def __getitem__(self, idx, idx2=None):
+        if idx2 is None:
+            return self.data[self._indexes[idx]]
+        return self.data[self._indexes[(idx, idx2)]]
+
+    def __setitem__(self, idx, second, third=None):
+        if third is not None:
+            idx = self._indexes[(idx, second)]
+            value = third
+        else:
+            idx = self._indexes[idx]
+            value = second
+        self.data[idx] = value
+
+    def __eq__(self, other):
+        for x, y in zip(self.data, other.data):
+            if x != y: return False
+        return True
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TorsionTorsionType(_ListItem):
+    """
+    The type containing the parameter maps for the Amoeba torsion-torsion
+    potentials. It contains the original potential as well as interpolated first
+    and second derivatives for the AMOEBA force field.
+
+    Parameters
+    ----------
+    dims : tuple of 2 ints
+        The table dimensions
+    ang1 : list of floats
+        The list of angles in the first dimension
+    ang2 : list of floats
+        The list of angles in the second dimension
+    f : list of floats
+        The interpolation table for the energy
+    dfda1 : list of floats
+        The interpolation table of the gradient w.r.t. angle 1
+    dfda2 : list of floats
+        The interpolation table of the gradient w.r.t. angle 2
+    d2fda1da2 : list of floats
+        The interpolation table of the 2nd derivative w.r.t. both angles
+    list : TrackedList=None
+        The list containing this coupled torsion-torsion map
+
+    Attributes
+    ----------
+    dims : tuple of 2 ints
+        The table dimensions
+    ang1 : list of floats
+        The list of angles in the first dimension
+    ang2 : list of floats
+        The list of angles in the second dimension
+    f : _TorTorTable
+        The interpolation table for the energy as a _TorTorTable
+    dfda1 : _TorTorTable
+        The interpolation table for the first gradient as a _TorTorTable
+    dfda2 : _TorTorTable
+        The interpolation table for the second gradient as a _TorTorTable
+    d2fda1da2 : _TorTorTable
+        The interpolation table for the second derivative as a _TorTorTable
+    list : TrackedList
+        The list that may, or may not, contain this TorsionTorsionType
+    idx : int
+        The index of this item in the list or iterable defined by `list`
+
+    Notes
+    -----
+    Since the derivatives are uniquely determined by the original potential,
+    equality between two coupled-coupled torsions can be uniquely determined by
+    comparing the energy table. The other tables are assumed to follow suit.
+    """
+    def __init__(self, dims, ang1, ang2, f, dfda1, dfda2, d2fda1da2, list=None):
+        if len(dims) != 2:
+            raise ValueError('dims must be a 2-dimensional iterable')
+        if len(ang1) != dims[0] or len(ang2) != dims[1]:
+            raise ValueError('dims does match the angle definitions')
+        self.dims = tuple(dims)
+        self.ang1 = ang1
+        self.ang2 = ang2
+        self.f = _TorTorTable(ang1, ang2, f)
+        self.dfda1 = _TorTorTable(ang1, ang2, dfda1)
+        self.dfda2 = _TorTorTable(ang1, ang2, dfda2)
+        self.d2fda1da2 = _TorTorTable(ang1, ang2, d2fda1da2)
+        self._idx = -1
+        self.list = None
+
+    def __eq__(self, other):
+        if self.dims != other.dims: return False
+        if self.ang1 != other.ang1: return False
+        if self.ang2 != other.ang2: return False
+        return self.f == other.f
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class Residue(_ListItem):
     """
     A single residue that is composed of a small number of atoms
@@ -1492,6 +2047,8 @@ class Residue(_ListItem):
     name : str
         Name of the residue. Typical convention is to choose a name that is 4
         characters or shorter
+    number : int
+        Residue number assigned in the input structure
     list : TrackedList=None
         List of residues in which this residue is a member
 
@@ -1499,6 +2056,8 @@ class Residue(_ListItem):
     ----------
     name : str
         The name of this residue
+    number : int=-1
+        The number of this residue in the input structure
     idx : int
         The index of this residue inside the container. If this residue has no
         container, or it is not present in the container, idx is -1
@@ -1515,8 +2074,9 @@ class Residue(_ListItem):
     - `len()` returns the number of atoms in this residue
     """
 
-    def __init__(self, name, list=None):
+    def __init__(self, name, number=-1, list=None):
         self.name = name
+        self.number = number
         self.list = list
         self._idx = -1
         self.atoms = []
@@ -1554,24 +2114,61 @@ class Residue(_ListItem):
     def __iter__(self):
         return iter(self.atoms)
 
+    def is_empty(self):
+        """
+        Determines if there are any atoms in this residue
+
+        Returns
+        -------
+        True if there are no atoms left. False if this residue still has atoms
+        """
+        return not bool(self.atoms)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _tracking(fcn):
+def _changes(func):
     """ Decorator to indicate the list has changed """
-    def new_fcn(self, *args):
+    def new_func(self, *args):
         self.changed = True
-        return fcn(self, *args)
-    return new_fcn
+        self.needs_indexing = True
+        return func(self, *args)
+    return new_func
 
 class TrackedList(list):
     """
     This creates a list type that allows you to see if anything has changed
+
+    Attributes
+    ----------
+    changed : bool
+        Determines if something has been done to fundamentally change the
+        underlying topology defined by this list such that the topology needs to
+        be rebuilt
+    needs_indexing : bool
+        A flag to determine whether or not the items in a tracked list need to
+        be indexed or not.
+
+    Examples
+    --------
+    >>> tl = TrackedList()
+    >>> tl.append(Atom())
+    >>> tl.append(Atom())
+    >>> tl.append(Atom())
+    >>> tl.needs_indexing, tl.changed
+    (True, True)
+    >>> tl.index_members()
+    >>> tl.needs_indexing, tl.changed
+    (False, True)
+    >>> tl.changed = False # Must do when changes have been incorporated
+    >>> tl.needs_indexing, tl.changed
+    (False, False)
     """
     def __init__(self, arg=[]):
-        self.changed = True
+        self.changed = False
+        self.needs_indexing = False
         list.__init__(self, arg)
 
-    @_tracking
+    @_changes
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
         try:
@@ -1579,20 +2176,24 @@ class TrackedList(list):
         except AttributeError:
             indices = [item]
 
-        try:
-            for index in indices:
+        for index in indices:
+            try:
                 self[index]._idx = -1
-        except AttributeError:
-            pass
+            except AttributeError:
+                pass
+            try:
+                self[index].list = None
+            except AttributeError:
+                pass
 
         list.__delitem__(self, item)
 
-    append = _tracking(list.append)
-    extend = _tracking(list.extend)
-    __setitem__ = _tracking(list.__setitem__)
-    __iadd__ = _tracking(list.__iadd__)
-    __imul__ = _tracking(list.__imul__)
-    pop = _tracking(list.pop)
+    append = _changes(list.append)
+    extend = _changes(list.extend)
+    __setitem__ = _changes(list.__setitem__)
+    __iadd__ = _changes(list.__iadd__)
+    __imul__ = _changes(list.__imul__)
+    pop = _changes(list.pop)
 
     # Type-safe methods that return another instance
     def __add__(self, other):
@@ -1613,300 +2214,110 @@ class TrackedList(list):
         Assigns the idx variable for every member of this list to its place in
         the list, if the members of this list permit
         """
-        try:
-            for i, item in enumerate(self):
+        for i, item in enumerate(self):
+            try:
                 item._idx = i
-            self.changed = False
-        except AttributeError:
-            # This must be some kind of immutable type, so don't worry about it
-            self.changed = False
+            except AttributeError:
+                # Must be some kind of immutable type... don't worry
+                pass
+        self.needs_indexing = False
+
+    def claim(self):
+        """
+        This method causes this list to "claim" all of the items it contains and
+        subsequently indexes all of its items.
+        """
+        for i, item in enumerate(self):
+            try:
+                item.list = self
+            except AttributeError:
+                # Must be some kind of immutable type... don't worry
+                pass
+        self.index_members()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ResidueList(TrackedList):
-    """ Array of Residues. """
+    """ Array of `Residue` instances """
 
-    def __init__(self, parm):
-        list.__init__(self, [Residue(parm.parm_data['RESIDUE_LABEL'][i], i+1)
-                             for i in xrange(parm.ptr('nres'))])
-        for i, val in enumerate(parm.parm_data['RESIDUE_POINTER']):
-            start = val - 1
-            try:
-                end = parm.parm_data['RESIDUE_POINTER'][i+1] - 1
-            except IndexError:
-                end = parm.parm_data['POINTERS'][NATOM]
-            for j in xrange(start, end):
-                self[i].add_atom(parm.atom_list[j])
-        self.parm = parm
-   
+    def add_atom(self, atom, resname, resnum):
+        """
+        Adds a new atom to the ResidueList, adding a new residue to this list if
+        it has a different name or number as the last residue
+
+        Parameters
+        ----------
+        atom : Atom
+            The atom to add to this residue list
+        resname : str
+            The name of the residue this atom belongs to
+        resnum : int
+            The number of the residue this atom belongs to
+
+        Notes
+        -----
+        If the residue name and number differ from the last residue in this
+        list, a new residue is added and the atom is added to that residue
+        """
+        try:
+            last = self[-1]
+        except IndexError:
+            # Empty list -- add our first residue
+            new_res = Residue(resname, resnum, list=self)
+            new_res.add_atom(atom)
+            self.append(new_res)
+        else:
+            if last.number != resnum or last.name != resname:
+                new_res = Residue(resname, resnum, list=self)
+                new_res.add_atom(atom)
+                self.append(new_res)
+            else:
+                last.add_atom(atom)
+
+    def prune(self):
+        """
+        This function goes through the residue list and removes all empty
+        residues from the list. This isn't done automatically when atoms are
+        deleted, since it will become very slow. You must remember to do this to
+        avoid including empty residues
+        """
+        # Delete from the back to avoid indexes changing as we iterate
+        for i in xrange(len(self)-1, -1, -1):
+            res = self[i]
+            if res.empty(): del self[i]
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class AtomList(list):
-    """ Array of Atoms """
-    #===================================================
+class AtomList(TrackedList):
+    """
+    Array of Atoms
 
-    def __init__(self, parm, fill_from=None):
-        self.parm = parm
-        if fill_from is None:
-            list.__init__(self, [Atom(self.parm, i) for i in
-                                xrange(self.parm.ptr('natom'))])
-        else:
-            list.__init__(self, [0 for i in xrange(self.parm.ptr('natom'))])
-            for i, atm in enumerate(fill_from): self[i] = atm
-        self.changed = False
+    Notes
+    -----
+    Deleting an atom from the AtomList also deletes that atom from the residue
+    it belongs to.
+    """
 
-    #===================================================
-
+    @_changes
     def __delitem__(self, idx):
-        """ Deletes this atom then re-indexes everybody else """
-        self[idx].idx = -1
-        # Delete this atom from its residue as well
-        self[idx].residue.delete_atom(self[idx])
-        list.__delitem__(self, idx)
-        self.changed = True
+        """ Deleting an atom also needs to delete it from the residue """
+        try:
+            indices = idx.indices(len(self))
+        except AttributeError:
+            indices = [idx]
 
-    #===================================================
-   
+        for index in indices:
+            atom = self[index]
+            atom._idx = -1
+            atom.list = None
+            # Make sure we delete this atom from its respective residue
+            atom.residue.delete_atom(atom)
+
+        list.__delitem__(self, idx)
+
     def unmark(self):
         """ Unmark all atoms in this list """
         for atm in self: atm.marked = 0
-
-    #===================================================
-   
-    def _index_us(self):
-        """ We have deleted an atom, so now we have to re-index everybody """
-        for i, atom in enumerate(self): atom.idx = atom.starting_index = i
-
-    #===================================================
-
-    def append(self, item):
-        """ Don't allow this! """
-        raise AmberParmError("Cannot add to an AtomList!")
-
-    #===================================================
-
-    def find_extra_exclusions(self):
-        " Load all extra exclusions that may be stored in the topology file "
-        first = 0
-        for atom in self:
-            first += atom.load_exclusions(first)
-
-    #===================================================
-
-    def write_to_parm(self):
-        """ Writes all of the atom data to the topology file """
-        # Write all of the arrays here
-        self.parm.parm_data['POINTERS'][NATOM] = len(self)
-        # Array slices are faster than copy() and creating new arrays
-        # each time
-        zeros = [0 for i in xrange(self.parm.parm_data['POINTERS'][NATOM])]
-        self.parm.parm_data['ATOM_NAME'] = zeros[:]
-        self.parm.parm_data['CHARGE'] = zeros[:]
-        self.parm.parm_data['MASS'] = zeros[:]
-        self.parm.parm_data['ATOM_TYPE_INDEX'] = zeros[:]
-        self.parm.parm_data['NUMBER_EXCLUDED_ATOMS'] = zeros[:]
-        self.parm.parm_data['AMBER_ATOM_TYPE'] = zeros[:]
-        self.parm.parm_data['JOIN_ARRAY'] = zeros[:]
-        self.parm.parm_data['TREE_CHAIN_CLASSIFICATION'] = zeros[:]
-        self.parm.parm_data['IROTAT'] = zeros[:]
-        self.parm.parm_data['RADII'] = zeros[:]
-        self.parm.parm_data['SCREEN'] = zeros[:]
-        self._index_us()
-        self._determine_exclusions()
-        for atm in self: 
-            atm.add_data()
-            atm.starting_index = atm.idx # arrays are updated...
-
-    #===================================================
-
-    def _determine_exclusions(self):
-        """
-        Figures out the EXCLUDED_ATOMS_LIST. Only do this right before you write
-        the topology file, since it's expensive
-        """
-        self.parm.parm_data['EXCLUDED_ATOMS_LIST'] = []
-        # We have to do something different for extra points. See the top of
-        # extra_pts.f in the sander src/ directory. Effectively, the EP is
-        # excluded from every atom that the atom it's attached to is excluded
-        # from. So here we go through and exclude every extra point from every
-        # other atom my bonded pair is excluded from:
-        for atm in self:
-            if not atm.attype[:2] in ['EP', 'LP']: continue
-            partner = atm.bond_partners[0]
-            # Now add all bond partners
-            for patm in partner.bond_partners:
-                # Don't add myself
-                if patm is atm: continue
-                atm.exclude(patm)
-            # Now add all angle partners
-            for patm in partner.angle_partners: atm.exclude(patm)
-            # Now add all dihedral partners
-            for patm in partner.dihedral_partners: atm.exclude(patm)
-            # Now add all other arbitrary exclusions
-            for patm in partner.exclusion_partners:
-                if patm is atm: continue
-                atm.exclude(patm)
-
-        for atm in self:
-            vals_to_add = []
-            for member in atm.bond_partners:
-                if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-            for member in atm.angle_partners:
-                if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-            for member in atm.dihedral_partners:
-                if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-            # Enable additional (arbitrary) exclusions
-            for member in atm.exclusion_partners:
-                if member.idx > atm.idx: vals_to_add.append(member.idx+1)
-            vals_to_add.sort()
-            # See comment above about numex = 0 --> numex = 1
-            if not vals_to_add: vals_to_add = [0]
-            self.parm.parm_data['EXCLUDED_ATOMS_LIST'].extend(vals_to_add)
-
-    #===================================================
-
-    def refresh_data(self):
-        """
-        Re-loads all data in parm.parm_data for each atom in case we changed
-        any of it
-        """
-        for atm in self:
-            atm.load_from_parm()
-
-    #===================================================
-
-    def __setitem__(self, idx, thing):
-        """
-        This means we changed things...
-        """
-        self.changed = True
-        list.__setitem__(self, idx, thing)
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class _TypeList(TrackedList):
-    """ Base class for all type lists """
-
-    #===================================================
-
-    def __init__(self, parm):
-        """ Constructs a list of bond types from the topology file """
-        self.parm = parm
-        self._make_array()
-        self.changed = False
-
-    #===================================================
-
-    def _make_array(self):
-        """ 
-        This method fills self with whichever element we need. This MUST be
-        overwritten, so I force it here
-        """
-        raise NotImplemented('Subclasses must implement _make_array')
-
-    #===================================================
-
-    def write_to_parm(self):
-        """ Writes the data here to the parm data """
-        for item in self: item.write_info(self.parm)
-
-    #===================================================
-
-    def reset(self):
-        """ Reset indexes to -1 to allow multiple remake_parm calls """
-        for thing in self: thing.idx = -1
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class BondTypeList(_TypeList):
-    """ Bond type list """
-
-    #===================================================
-
-    def _make_array(self):
-        kl = self.parm.parm_data['BOND_FORCE_CONSTANT']
-        eql = self.parm.parm_data['BOND_EQUIL_VALUE']
-        list.__init__(self, [BondType(k, eq, -1) for k, eq in zip(kl, eql)])
-      
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class AngleTypeList(_TypeList):
-    """ Angle type list """
-
-    #===================================================
-
-    def _make_array(self):
-        kl = self.parm.parm_data['ANGLE_FORCE_CONSTANT']
-        eql = self.parm.parm_data['ANGLE_EQUIL_VALUE']
-        list.__init__(self, [AngleType(k, eq, -1) for k, eq in zip(kl, eql)])
-      
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class DihedralTypeList(_TypeList):
-    """ Dihedral type list """
-
-    #===================================================
-
-    def _make_array(self):
-        kl = self.parm.parm_data['DIHEDRAL_FORCE_CONSTANT']
-        pel = self.parm.parm_data['DIHEDRAL_PERIODICITY']
-        phl = self.parm.parm_data['DIHEDRAL_PHASE']
-        if (not 'SCEE_SCALE_FACTOR' in self.parm.parm_data.keys() or
-            not 'SCNB_SCALE_FACTOR' in self.parm.parm_data.keys()):
-            list.__init__(self,
-                    [DihedralType(k, pe, ph, 1.2, 2.0, -1)
-                     for k, pe, ph in zip(kl, pel, phl)]
-            )
-        else:
-            scel = self.parm.parm_data['SCEE_SCALE_FACTOR']
-            scnl = self.parm.parm_data['SCNB_SCALE_FACTOR']
-            list.__init__(self,
-                    [DihedralType(k, pe, ph, sce, scn, -1)
-                     for k, pe, ph, sce, scn in zip(kl, pel, phl, scel, scnl)]
-            )
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class UreyBradleyTypeList(_TypeList):
-    """ Urey-Bradley type list """
-
-    #===================================================
-
-    def _make_array(self):
-        kl = self.parm.parm_data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT']
-        eql = self.parm.parm_data['CHARMM_UREY_BRADLEY_EQUIL_VALUE']
-        list.__init__(self,
-                [UreyBradleyType(k, eq, -1) for k, eq in zip(kl, eql)]
-        )
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class ImproperTypeList(_TypeList):
-    """ CHARMM Improper torsion type list """
-
-    #===================================================
-
-    def _make_array(self):
-        kl = self.parm.parm_data['CHARMM_IMPROPER_FORCE_CONSTANT']
-        pl = self.parm.parm_data['CHARMM_IMPROPER_PHASE']
-        list.__init__(self, [ImproperType(k, p, -1) for k, p in zip(kl, pl)])
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class CmapTypeList(_TypeList):
-    """ CHARMM correction-map type list """
-
-    #===================================================
-
-    def _make_array(self):
-        # Need to get all of the CMAP types
-        ncmaps = self.parm.parm_data['CHARMM_CMAP_COUNT'][1]
-        list.__init__(self)
-        for i in xrange(ncmaps):
-            res = self.parm.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-            grid = self.parm.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            cmts = self.parm.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            list.append(self, CmapType(res, grid, cmts, -1))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
