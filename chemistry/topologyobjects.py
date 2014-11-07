@@ -2038,6 +2038,61 @@ class TorsionTorsionType(_ListItem):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class ChiralFrame(object):
+    """
+    A chiral frame as defined in the AMOEBA force field. It defines the frame of
+    reference for a chiral center
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        The first atom defined in the chiral frame
+    atom2 : Atom
+        The second atom defined in the chiral frame
+    chirality : int
+        Either 1 or -1 to identify directionality
+
+    Notes
+    -----
+    A chiral frame can only contain atoms
+    """
+    def __init__(self, atom1, atom2, chirality):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.chirality = chirality
+
+    def __contains__(self, thing):
+        return thing is self.atom1 or thing is self.atom2
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class MultipoleFrame(object):
+    """
+    This defines the frame of reference for computing multipole interactions in
+    the AMOEBA force field.
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom : Atom
+        The atom for which the frame of reference is defined
+    frame_pt_num : int
+        The frame point number
+    vectail : int
+        The vector tail index
+    vechead : int
+        The vector head index
+    nvec : int
+        The number of vectors
+    """
+    def __init__(self, atom, frame_pt_num, vectail, vechead, nvec):
+        self.atom = atom
+        self.frame_pt_num = frame_pt_num
+        self.vectail = vectail
+        self.vechead = vechead
+        self.nvec = nvec
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class Residue(_ListItem):
     """
     A single residue that is composed of a small number of atoms
