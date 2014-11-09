@@ -540,8 +540,10 @@ class Atom(_ListItem):
         return not self > other
 
     def __repr__(self):
-        return "<Atom %s [%d]; In %s %d>" % (self.atname, self.starting_index+1,
-                self.residue.resname, self.residue.idx)
+        start = '<Atom %s [%d]' % (self.name, self.idx)
+        if self.residue is not None:
+            return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
+        return start + '>'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -873,12 +875,13 @@ class Dihedral(_FourAtomTerm):
         self._signs = [1, 1]
         if ignore_end: self._signs[0] = -1
         if improper: self._signs[1] = -1
-        atom1.dihedral_to(atom2)
-        atom1.dihedral_to(atom3)
-        atom1.dihedral_to(atom4)
-        atom2.dihedral_to(atom3)
-        atom2.dihedral_to(atom4)
-        atom3.dihedral_to(atom4)
+        if not improper:
+            atom1.dihedral_to(atom2)
+            atom1.dihedral_to(atom3)
+            atom1.dihedral_to(atom4)
+            atom2.dihedral_to(atom3)
+            atom2.dihedral_to(atom4)
+            atom3.dihedral_to(atom4)
 
     @property
     def dihed_type(self):
@@ -973,18 +976,19 @@ class Dihedral(_FourAtomTerm):
         _delete_from_list(self.atom3.dihedrals, self)
         _delete_from_list(self.atom4.dihedrals, self)
 
-        _delete_from_list(self.atom1._dihedral_partners, self.atom2)
-        _delete_from_list(self.atom1._dihedral_partners, self.atom3)
-        _delete_from_list(self.atom1._dihedral_partners, self.atom4)
-        _delete_from_list(self.atom2._dihedral_partners, self.atom1)
-        _delete_from_list(self.atom2._dihedral_partners, self.atom3)
-        _delete_from_list(self.atom2._dihedral_partners, self.atom4)
-        _delete_from_list(self.atom3._dihedral_partners, self.atom1)
-        _delete_from_list(self.atom3._dihedral_partners, self.atom2)
-        _delete_from_list(self.atom3._dihedral_partners, self.atom4)
-        _delete_from_list(self.atom4._dihedral_partners, self.atom1)
-        _delete_from_list(self.atom4._dihedral_partners, self.atom2)
-        _delete_from_list(self.atom4._dihedral_partners, self.atom3)
+        if not self.improper:
+            _delete_from_list(self.atom1._dihedral_partners, self.atom2)
+            _delete_from_list(self.atom1._dihedral_partners, self.atom3)
+            _delete_from_list(self.atom1._dihedral_partners, self.atom4)
+            _delete_from_list(self.atom2._dihedral_partners, self.atom1)
+            _delete_from_list(self.atom2._dihedral_partners, self.atom3)
+            _delete_from_list(self.atom2._dihedral_partners, self.atom4)
+            _delete_from_list(self.atom3._dihedral_partners, self.atom1)
+            _delete_from_list(self.atom3._dihedral_partners, self.atom2)
+            _delete_from_list(self.atom3._dihedral_partners, self.atom4)
+            _delete_from_list(self.atom4._dihedral_partners, self.atom1)
+            _delete_from_list(self.atom4._dihedral_partners, self.atom2)
+            _delete_from_list(self.atom4._dihedral_partners, self.atom3)
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
@@ -1254,12 +1258,12 @@ class Improper(_FourAtomTerm):
         if isinstance(thing, Improper):
             # I'm comparing with another Improper here. Central atom must be
             # the same. Others can be in any order
-            if self.atom1 != thing.atom1:
+            if self.atom1 is not thing.atom1:
                 return False
             # Make a set with the remaining atoms. If they are equal, the
             # impropers are equivalent
             selfset = set([self.atom2, self.atom3, self.atom4])
-            otherset = set([thing.atom2, thing.atom3, thing.atom3])
+            otherset = set([thing.atom2, thing.atom3, thing.atom4])
             return selfset == otherset
         thing = list(thing)
         # Here, atoms are expected to index from 0 (Python standard) if we
@@ -2362,9 +2366,6 @@ class TrackedList(list):
                 self[index]._idx = -1
             except AttributeError:
                 pass
-            except IndexError:
-                print(index)
-                raise
             try:
                 self[index].list = None
             except AttributeError:
