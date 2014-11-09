@@ -256,13 +256,13 @@ class ParmedCmd(cmd.Cmd):
             # XXX check arg syntax
             try:
                 func = getattr(self, 'help_' + arg)
-            except AttributeError:
+            except (AttributeError, TypeError):
                 try:
                     doc=getattr(self, 'do_' + arg).__doc__
                     if doc:
                         self.stdout.write("%s\n" % str(doc))
                         return
-                except AttributeError:
+                except (AttributeError, TypeError):
                     pass
                 try:
                     _action = getattr(ParmedActions, arg.lower())
