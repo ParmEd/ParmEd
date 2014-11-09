@@ -21,12 +21,11 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Cmap',
            'CmapType', 'Dihedral', 'DihedralType', 'Improper', 'ImproperType',
            'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList',
            'StretchBend', 'StretchBendType', 'TorsionTorsion',
-           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
-           'UreyBradleyType']
+           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# Private classes
+# Private classes and methods
 
 class _ListItem(object):
     """
@@ -44,8 +43,12 @@ class _ListItem(object):
     Notes
     -----
     For lists that support indexing its members and tracking when that list is
-    changed (so we know when to update indexes), this is a fast lookup.
-    Otherwise, it can be slow.
+    changed (so we know when to update indexes), this is a fast lookup, as
+    indexing only needs to be done once, at most, for the entire list (until
+    changes are made that could change the indexing).
+
+    The `idx` lookup in a TrackedList is therefore an O(1) operation, while it
+    is O(N^2) for standard containers.
     """
 
     @property
@@ -59,14 +62,14 @@ class _ListItem(object):
             return -1
 
         try:
-            list_changed = mylist.changed
+            needs_indexing = mylist.needs_indexing
         except AttributeError:
             # This isn't a tracked list, so just look through the list
             for i, item in enumerate(mylist):
                 if item is self: return i
             return -1
         else:
-            if list_changed or self._idx == -1:
+            if needs_indexing or self._idx == -1:
                 try:
                     self._idx = -1
                     mylist.index_members()
@@ -111,6 +114,20 @@ class _FourAtomTerm(object):
     def __contains__(self, thing):
         return (self.atom1 is thing or self.atom2 is thing or
                 self.atom3 is thing or self.atom4 is thing)
+
+def _delete_from_list(list, item):
+    """
+    Deletes a requested item from a list. If the item does not exist in the
+    list, a ValueError is raised
+
+    Parameters
+    ----------
+    list : list
+        The list from which an item will be deleted
+    item : object
+        The object to delete from the list
+    """
+    list.pop(list.index(item))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -272,7 +289,8 @@ class Atom(_ListItem):
     #===================================================
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
-                 charge=0.0, mass=0.0, nb_idx=0, radii=0.0, tree='BLA'):
+                 charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
+                 tree='BLA'):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -282,12 +300,13 @@ class Atom(_ListItem):
         self.mass = mass
         self.nb_idx = nb_idx
         self.radii = radii
+        self.screen = screen
         self.tree = tree
-        self._bond_partners = set()
-        self._angle_partners = set()
-        self._dihedral_partners = set()
-        self._tortor_partners = set()
-        self._exclusion_partners = set() # For arbitrary/other exclusions
+        self._bond_partners = []
+        self._angle_partners = []
+        self._dihedral_partners = []
+        self._tortor_partners = []
+        self._exclusion_partners = [] # For arbitrary/other exclusions
         self.residue = None
         self.marked = 0 # For setting molecules
         self.bonds, self.angles, self.dihedrals = [], [], []
@@ -326,18 +345,23 @@ class Atom(_ListItem):
     @property
     def bond_partners(self):
         """ Go through all bonded partners """
-        return sorted(list(self._bond_partners))
+        bp = set(self._bond_partners)
+        return sorted(list(bp))
 
     @property
     def angle_partners(self):
         """ List of all angle partners that are NOT bond partners """
-        return sorted(list(self._angle_partners - self._bond_partners))
+        bp = set(self._bond_partners)
+        ap = set(self._angle_partners)
+        return sorted(list(ap - bp))
 
     @property
     def dihedral_partners(self):
         " List of all dihedral partners that are NOT angle or bond partners "
-        return sorted(list(self._dihedral_partners - self._angle_partners -
-                           self._bond_partners))
+        dp = set(self._dihedral_partners)
+        ap = set(self._angle_partners)
+        bp = set(self._bond_partners)
+        return sorted(list(dp - ap - bp))
 
     @property
     def tortor_partners(self):
@@ -345,16 +369,23 @@ class Atom(_ListItem):
         List of all 1-5 partners that are NOT in angle or bond partners. This is
         _only_ used in the Amoeba force field
         """
-        return sorted(list(self._tortor_partners - self._dihedral_partners -
-                           self._angle_partners - self._bond_partners))
+        tp = set(self._tortor_partners)
+        dp = set(self._dihedral_partners)
+        ap = set(self._angle_partners)
+        bp = set(self._bond_partners)
+        return sorted(list(tp - dp - ap - bp))
 
     @property
     def exclusion_partners(self):
         """
         List of all exclusions not otherwise excluded by bonds/angles/torsions
         """
-        return sorted(list(self._exclusion_partners - self._dihedral_partners -
-                           self._angle_partners - self._bond_partners))
+        ep = set(self._exclusion_partners)
+        tp = set(self._tortor_partners)
+        dp = set(self._dihedral_partners)
+        ap = set(self._angle_partners)
+        bp = set(self._bond_partners)
+        return sorted(list(ep - tp - dp - ap - bp))
 
     #===================================================
 
@@ -385,8 +416,8 @@ class Atom(_ListItem):
         """
         if self is other:
             raise BondError("Cannot bond atom to itself!")
-        self._bond_partners.add(other)
-        other._bond_partners.add(self)
+        self._bond_partners.append(other)
+        other._bond_partners.append(self)
 
     #===================================================
       
@@ -406,8 +437,8 @@ class Atom(_ListItem):
         """
         if self is other:
             raise BondError("Cannot angle an atom with itself!")
-        self._angle_partners.add(other)
-        other._angle_partners.add(self)
+        self._angle_partners.append(other)
+        other._angle_partners.append(self)
    
     #===================================================
 
@@ -427,8 +458,8 @@ class Atom(_ListItem):
         """
         if self is other:
             raise BondError("Cannot dihedral an atom with itself!")
-        self._dihedral_partners.add(other)
-        other._dihedral_partners.add(self)
+        self._dihedral_partners.append(other)
+        other._dihedral_partners.append(self)
       
     #===================================================
 
@@ -448,8 +479,8 @@ class Atom(_ListItem):
         """
         if self is other:
             raise BondError('Cannot coupled-dihedral atom to itself')
-        self._tortor_partners.add(self)
-        other._tortor_partners.add(self)
+        self._tortor_partners.append(self)
+        other._tortor_partners.append(self)
 
     #===================================================
 
@@ -469,8 +500,8 @@ class Atom(_ListItem):
         """
         if self is other:
             raise BondError("Cannot exclude an atom from itself")
-        self._exclusion_partners.add(other)
-        other._exclusion_partners.add(self)
+        self._exclusion_partners.append(other)
+        other._exclusion_partners.append(self)
 
     #===================================================
 
@@ -485,11 +516,12 @@ class Atom(_ListItem):
             If True, the `exclusion_partners` array is left alone. If False,
             `exclusion_partners` is emptied as well.
         """
-        self._bond_partners = set()
-        self._angle_partners = set()
-        self._dihedral_partners = set()
+        self._bond_partners = []
+        self._angle_partners = []
+        self._dihedral_partners = []
+        self._tortor_partners = []
         if not keep_exclusions:
-            self._exclusion_partners = set()
+            self._exclusion_partners = []
 
     #===================================================
 
@@ -531,6 +563,7 @@ class Bond(object):
     You can test whether an Atom is contained within the bond using the `in`
     operator. A `BondError` is raised if `atom1` and `atom2` are identical. This
     bond instance is `append`ed to the `bonds` list for both `atom1` and `atom2`
+    and is automatically removed from those lists upon garbage collection
 
     Examples
     --------
@@ -562,6 +595,19 @@ class Bond(object):
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom is in this Bond """
         return thing is self.atom1 or thing is self.atom2
+
+    def delete(self):
+        """
+        Deletes this bond from the atoms that make it up. This method removes
+        this bond from the `bonds` list for both atom1 and atom2 as well as
+        removing atom1 from atom2.bond_partners and vice versa.
+        """
+        _delete_from_list(self.atom1.bonds, self)
+        _delete_from_list(self.atom2.bonds, self)
+        _delete_from_list(self.atom1._bond_partners, self.atom2)
+        _delete_from_list(self.atom2._bond_partners, self.atom1)
+
+        self.atom1 = self.atom2 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -665,7 +711,9 @@ class Angle(object):
         atom3.angles.append(self)
         # Load the force constant and equilibrium angle
         self.type = type
+        atom1.angle_to(atom2)
         atom1.angle_to(atom3)
+        atom2.angle_to(atom3)
 
     @property
     def angle_type(self):
@@ -680,6 +728,25 @@ class Angle(object):
                     thing is self.atom3)
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing))
+
+    def delete(self):
+        """
+        Deletes this angle from the atoms that make it up. This method removes
+        this angle from the `angles` list for atom1, atom2, and atom3 as well as
+        removing each atom form each others' angle partner lists
+        """
+        _delete_from_list(self.atom1.angles, self)
+        _delete_from_list(self.atom2.angles, self)
+        _delete_from_list(self.atom3.angles, self)
+
+        _delete_from_list(self.atom1._angle_partners, self.atom2)
+        _delete_from_list(self.atom1._angle_partners, self.atom3)
+        _delete_from_list(self.atom2._angle_partners, self.atom1)
+        _delete_from_list(self.atom2._angle_partners, self.atom3)
+        _delete_from_list(self.atom3._angle_partners, self.atom1)
+        _delete_from_list(self.atom3._angle_partners, self.atom2)
+
+        self.atom1 = self.atom2 = self.atom3 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -793,6 +860,8 @@ class Dihedral(_FourAtomTerm):
     def __init__(self, atom1, atom2, atom3, atom4, improper=False,
                  ignore_end=False, type=None):
         _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
+        # improper _implies_ ignore_end
+        ignore_end = improper or ignore_end
         # Log these dihedrals in each atom
         atom1.dihedrals.append(self)
         atom2.dihedrals.append(self)
@@ -804,7 +873,12 @@ class Dihedral(_FourAtomTerm):
         self._signs = [1, 1]
         if ignore_end: self._signs[0] = -1
         if improper: self._signs[1] = -1
+        atom1.dihedral_to(atom2)
+        atom1.dihedral_to(atom3)
         atom1.dihedral_to(atom4)
+        atom2.dihedral_to(atom3)
+        atom2.dihedral_to(atom4)
+        atom3.dihedral_to(atom4)
 
     @property
     def dihed_type(self):
@@ -886,6 +960,33 @@ class Dihedral(_FourAtomTerm):
     def __repr__(self):
         return "<Dihedral %r--%r--%r--%r>" % (self.atom1, self.atom2,
                 self.atom3, self.atom4)
+
+    def delete(self):
+        """
+        Deletes this dihedral from the atoms that make it up. This method
+        removes this dihedral from the `dihedrals` list for atom1, atom2, atom3,
+        and atom4 as well as removing each atom form each others' dihedral
+        partner lists
+        """
+        _delete_from_list(self.atom1.dihedrals, self)
+        _delete_from_list(self.atom2.dihedrals, self)
+        _delete_from_list(self.atom3.dihedrals, self)
+        _delete_from_list(self.atom4.dihedrals, self)
+
+        _delete_from_list(self.atom1._dihedral_partners, self.atom2)
+        _delete_from_list(self.atom1._dihedral_partners, self.atom3)
+        _delete_from_list(self.atom1._dihedral_partners, self.atom4)
+        _delete_from_list(self.atom2._dihedral_partners, self.atom1)
+        _delete_from_list(self.atom2._dihedral_partners, self.atom3)
+        _delete_from_list(self.atom2._dihedral_partners, self.atom4)
+        _delete_from_list(self.atom3._dihedral_partners, self.atom1)
+        _delete_from_list(self.atom3._dihedral_partners, self.atom2)
+        _delete_from_list(self.atom3._dihedral_partners, self.atom4)
+        _delete_from_list(self.atom4._dihedral_partners, self.atom1)
+        _delete_from_list(self.atom4._dihedral_partners, self.atom2)
+        _delete_from_list(self.atom4._dihedral_partners, self.atom3)
+
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -993,7 +1094,7 @@ class UreyBradley(object):
         The first atom involved in the Urey-Bradley bond
     atom2 : Atom
         The other atom involved in the Urey-Bradley bond
-    type : UreyBradleyType=None
+    type : BondType=None
         The Urey-Bradley bond type that defines the parameters for this bond
 
     Notes
@@ -1066,62 +1167,20 @@ class UreyBradley(object):
         # bonds
         return False
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def delete(self):
+        """
+        Deletes this Urey-Bradley from the atoms that make it up. This method
+        removes this urey-bradley from the `urey_bradleys` list for atom1 and
+        atom2.
+        """
+        _delete_from_list(self.atom1.urey_bradleys, self)
+        _delete_from_list(self.atom2.urey_bradleys, self)
 
-class UreyBradleyType(_ListItem):
-    """
-    A Urey-Bradley bond type with a set of bond parameters
-
-    Parameters (and Attributes)
-    ---------------------------
-    k : float
-        Force constant in kcal/mol/Angstrom^2
-    req : float
-        Equilibrium distance in Angstroms
-    list : TrackedList=None
-        A list of `UreyBradleyType`s in which this is a member
-
-    Inherited Attributes
-    --------------------
-    idx : int
-        The index of this UreyBradleyType inside its containing list
-
-    Notes
-    -----
-    Two `UreyBradleyType`s are equal if their `k` and `req` attributes are
-    equal
-
-    Examples
-    --------
-    >>> ubt1 = UreyBradleyType(10.0, 1.0)
-    >>> ubt2 = UreyBradleyType(10.0, 1.0)
-    >>> ubt1 is ubt2
-    False
-    >>> ubt1 == ubt2
-    True
-
-    As part of a list, they can be indexed
-
-    >>> urey_list = []
-    >>> urey_list.append(UreyBradleyType(10.0, 1.0, list=urey_list))
-    >>> urey_list.append(UreyBradleyType(10.0, 1.0, list=urey_list))
-    >>> urey_list[0].idx
-    0
-    >>> urey_list[1].idx
-    1
-    """
-    def __init__(self, k, req, list=None):
-        self.k = k
-        self.req = req
-        self.list = list
-        self._idx = -1
-
-    def __eq__(self, other):
-        return self.k == other.k and self.req == other.req
+        self.atom1 = self.atom2 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class Improper(object):
+class Improper(_FourAtomTerm):
     """
     A CHARMM-style improper torsion between 4 atoms. The first atom must be the
     central atom, as shown in the schematic below
@@ -1161,17 +1220,7 @@ class Improper(object):
     False
     """
     def __init__(self, atom1, atom2, atom3, atom4, type=None):
-        # Make sure we're not dihedraling me to myself
-        atmlist = [atom1, atom2, atom3, atom4]
-        for i in xrange(len(atmlist)):
-            for j in xrange(i+1, len(atmlist)):
-                if atmlist[i] is atmlist[j]:
-                    raise BondError('Cannot improper atom to itself!')
-        # Set up instances
-        self.atom1 = atom1
-        self.atom2 = atom2
-        self.atom3 = atom3
-        self.atom4 = atom4
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         # Log these impropers in each atom
         atom1.impropers.append(self)
         atom2.impropers.append(self)
@@ -1191,8 +1240,7 @@ class Improper(object):
         Quick and easy way to find out if an Atom or Bond is in this Improper
         """
         if isinstance(thing, Atom):
-            return (thing is self.atom1 or thing is self.atom2 or
-                    thing is self.atom3 or thing is self.atom4)
+            return _FourAtomTerm.__contains__(self, thing)
         # Treat it like a Bond
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom1 in thing and self.atom3 in thing) or
@@ -1223,6 +1271,19 @@ class Improper(object):
         selfset = set([self.atom2.idx, self.atom3.idx, self.atom4.idx])
         otherset = set([thing[1], thing[2], thing[3]])
         return selfset == otherset
+
+    def delete(self):
+        """
+        Deletes this Improper from the atoms that make it up. This method
+        removes this Improper from the `impropers` list for atom1, atom2, atom3,
+        and atom4
+        """
+        _delete_from_list(self.atom1.impropers, self)
+        _delete_from_list(self.atom2.impropers, self)
+        _delete_from_list(self.atom3.impropers, self)
+        _delete_from_list(self.atom4.impropers, self)
+
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1386,6 +1447,20 @@ class Cmap(object):
                  self.atom3.idx == thing[2] and self.atom4.idx == thing[1] and
                  self.atom5.idx == thing[0]))
 
+    def delete(self):
+        """
+        Deletes this Cmap from the atoms that make it up. This method removes
+        the Cmap from the `cmaps` list for atom1, atom2, atom3, atom4, and atom5
+        """
+        _delete_from_list(self.atom1.cmaps, self)
+        _delete_from_list(self.atom2.cmaps, self)
+        _delete_from_list(self.atom3.cmaps, self)
+        _delete_from_list(self.atom4.cmaps, self)
+        _delete_from_list(self.atom5.cmaps, self)
+
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = None
+        self.type = None
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class CmapType(_ListItem):
@@ -1519,7 +1594,7 @@ class _CmapGrid(object):
             self._data[self.resolution*idx[0]+idx[1]] = val
         else:
             try:
-                indices = idx.indices(len(self._data))
+                indices = xrange(*idx.indices(len(self._data)))
             except AttributeError:
                 self._data[idx] = val
             else:
@@ -1808,8 +1883,8 @@ class StretchBendType(_ListItem):
 
     Notes
     -----
-    Two `StretchBendType`s are equal if their `psi_k` and `psi_eq` attributes
-    are equal
+    Two `StretchBendType`s are equal if their `req1`, `req2`, `theteq`, and `k`
+    attributes are equal
 
     Examples
     --------
@@ -1883,13 +1958,64 @@ class TorsionTorsion(Cmap):
     """
     def __init__(self, atom1, atom2, atom3, atom4, atom5, type=None):
         Cmap.__init__(self, atom1, atom2, atom3, atom4, atom5, type)
+        atom1.tortors.append(self)
+        atom2.tortors.append(self)
+        atom3.tortors.append(self)
+        atom4.tortors.append(self)
+        atom5.tortors.append(self)
+        atom1.tortor_to(atom2)
+        atom1.tortor_to(atom3)
+        atom1.tortor_to(atom4)
         atom1.tortor_to(atom5)
+        atom2.tortor_to(atom3)
+        atom2.tortor_to(atom4)
+        atom2.tortor_to(atom5)
+        atom3.tortor_to(atom4)
+        atom3.tortor_to(atom5)
+        atom4.tortor_to(atom5)
 
     @property
     def tortor_type(self):
         warnings.warn("tortor_type has been replaced by type",
                       DeprecationWarning)
         return self.type
+
+    def delete(self):
+        """
+        Deletes this TorsionTorsion from the atoms that make it up. This method
+        removes the TorsionTorsion from the `tortors` list for atom1, atom2,
+        atom3, atom4, and atom5, and removes each atom from the others'
+        tortor_partners list.
+        """
+        _delete_from_list(self.atom1.tortors, self)
+        _delete_from_list(self.atom2.tortors, self)
+        _delete_from_list(self.atom3.tortors, self)
+        _delete_from_list(self.atom4.tortors, self)
+        _delete_from_list(self.atom5.tortors, self)
+
+        _delete_from_list(self.atom1._tortor_partners, self.atom2)
+        _delete_from_list(self.atom1._tortor_partners, self.atom3)
+        _delete_from_list(self.atom1._tortor_partners, self.atom4)
+        _delete_from_list(self.atom1._tortor_partners, self.atom5)
+        _delete_from_list(self.atom2._tortor_partners, self.atom1)
+        _delete_from_list(self.atom2._tortor_partners, self.atom3)
+        _delete_from_list(self.atom2._tortor_partners, self.atom4)
+        _delete_from_list(self.atom2._tortor_partners, self.atom5)
+        _delete_from_list(self.atom3._tortor_partners, self.atom1)
+        _delete_from_list(self.atom3._tortor_partners, self.atom2)
+        _delete_from_list(self.atom3._tortor_partners, self.atom4)
+        _delete_from_list(self.atom3._tortor_partners, self.atom5)
+        _delete_from_list(self.atom4._tortor_partners, self.atom1)
+        _delete_from_list(self.atom4._tortor_partners, self.atom2)
+        _delete_from_list(self.atom4._tortor_partners, self.atom3)
+        _delete_from_list(self.atom4._tortor_partners, self.atom5)
+        _delete_from_list(self.atom5._tortor_partners, self.atom1)
+        _delete_from_list(self.atom5._tortor_partners, self.atom2)
+        _delete_from_list(self.atom5._tortor_partners, self.atom3)
+        _delete_from_list(self.atom5._tortor_partners, self.atom4)
+
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = None
+        self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2227,7 +2353,7 @@ class TrackedList(list):
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
         try:
-            indices = item.indices(len(self))
+            indices = xrange(*item.indices(len(self)))
         except AttributeError:
             indices = [item]
 
@@ -2236,6 +2362,9 @@ class TrackedList(list):
                 self[index]._idx = -1
             except AttributeError:
                 pass
+            except IndexError:
+                print(index)
+                raise
             try:
                 self[index].list = None
             except AttributeError:
@@ -2243,12 +2372,21 @@ class TrackedList(list):
 
         list.__delitem__(self, item)
 
+    @_changes
+    def pop(self, idx):
+        item = list.pop(self, idx)
+        try:
+            item._idx = -1
+        except IndexError:
+            # Must be an immutable type, so don't complain
+            pass
+        return item
+
     append = _changes(list.append)
     extend = _changes(list.extend)
     __setitem__ = _changes(list.__setitem__)
     __iadd__ = _changes(list.__iadd__)
     __imul__ = _changes(list.__imul__)
-    pop = _changes(list.pop)
 
     # Type-safe methods that return another instance
     def __add__(self, other):
@@ -2357,7 +2495,7 @@ class AtomList(TrackedList):
     def __delitem__(self, idx):
         """ Deleting an atom also needs to delete it from the residue """
         try:
-            indices = idx.indices(len(self))
+            indices = xrange(*idx.indices(len(self)))
         except AttributeError:
             indices = [idx]
 
@@ -2366,7 +2504,7 @@ class AtomList(TrackedList):
             atom._idx = -1
             atom.list = None
             # Make sure we delete this atom from its respective residue
-            atom.residue.delete_atom(atom)
+            if atom.residue is not None: atom.residue.delete_atom(atom)
 
         list.__delitem__(self, idx)
 
@@ -2393,4 +2531,4 @@ def Element(mass):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(verbose=True)
