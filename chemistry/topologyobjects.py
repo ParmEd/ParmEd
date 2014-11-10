@@ -17,11 +17,12 @@ try:
 except ImportError:
     pass # Must be Python 3... zip _is_ izip
 
-__all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Cmap',
-           'CmapType', 'Dihedral', 'DihedralType', 'Improper', 'ImproperType',
-           'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList',
-           'StretchBend', 'StretchBendType', 'TorsionTorsion',
-           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley']
+__all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
+           'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
+           'Improper', 'ImproperType', 'MultipoleFrame', 'OutOfPlaneBend',
+           'PiTorsion', 'Residue', 'ResidueList', 'StretchBend',
+           'StretchBendType', 'TorsionTorsion', 'TorsionTorsionType',
+           'TrigonalAngle', 'TrackedList', 'UreyBradley']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2103,9 +2104,17 @@ class _TorTorTable(object):
         self.data[idx] = value
 
     def __eq__(self, other):
-        for x, y in zip(self.data, other.data):
-            if x != y: return False
-        return True
+        try:
+            for idx in self._indexes.keys():
+                if abs(self[idx] - other[idx]) > TINY:
+                    return False
+        except KeyError:
+            return False
+        else:
+            return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2125,11 +2134,11 @@ class TorsionTorsionType(_ListItem):
         The list of angles in the second dimension
     f : list of floats
         The interpolation table for the energy
-    dfda1 : list of floats
+    dfda1 : list of floats=None
         The interpolation table of the gradient w.r.t. angle 1
-    dfda2 : list of floats
+    dfda2 : list of floats=None
         The interpolation table of the gradient w.r.t. angle 2
-    d2fda1da2 : list of floats
+    d2fda1da2 : list of floats=None
         The interpolation table of the 2nd derivative w.r.t. both angles
     list : TrackedList=None
         The list containing this coupled torsion-torsion map
@@ -2154,14 +2163,9 @@ class TorsionTorsionType(_ListItem):
         The list that may, or may not, contain this TorsionTorsionType
     idx : int
         The index of this item in the list or iterable defined by `list`
-
-    Notes
-    -----
-    Since the derivatives are uniquely determined by the original potential,
-    equality between two coupled-coupled torsions can be uniquely determined by
-    comparing the energy table. The other tables are assumed to follow suit.
     """
-    def __init__(self, dims, ang1, ang2, f, dfda1, dfda2, d2fda1da2, list=None):
+    def __init__(self, dims, ang1, ang2, f,
+                 dfda1=None, dfda2=None, d2fda1da2=None, list=None):
         if len(dims) != 2:
             raise ValueError('dims must be a 2-dimensional iterable')
         if len(ang1) != dims[0] or len(ang2) != dims[1]:
@@ -2170,17 +2174,27 @@ class TorsionTorsionType(_ListItem):
         self.ang1 = ang1
         self.ang2 = ang2
         self.f = _TorTorTable(ang1, ang2, f)
-        self.dfda1 = _TorTorTable(ang1, ang2, dfda1)
-        self.dfda2 = _TorTorTable(ang1, ang2, dfda2)
-        self.d2fda1da2 = _TorTorTable(ang1, ang2, d2fda1da2)
+        if dfda1 is None:
+            self.dfda1 = None
+        else:
+            self.dfda1 = _TorTorTable(ang1, ang2, dfda1)
+        if dfda2 is None:
+            self.dfda2 = None
+        else:
+            self.dfda2 = _TorTorTable(ang1, ang2, dfda2)
+        if d2fda1da2 is None:
+            self.d2fda1da2 = None
+        else:
+            self.d2fda1da2 = _TorTorTable(ang1, ang2, d2fda1da2)
         self._idx = -1
-        self.list = None
+        self.list = list
 
     def __eq__(self, other):
         if self.dims != other.dims: return False
         if self.ang1 != other.ang1: return False
         if self.ang2 != other.ang2: return False
-        return self.f == other.f
+        return (self.f == other.f and self.dfda1 == other.dfda1 and
+                self.dfda2 == other.dfda2 and self.d2fda1da2 == other.d2fda1da2)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2196,15 +2210,18 @@ class ChiralFrame(object):
     atom2 : Atom
         The second atom defined in the chiral frame
     chirality : int
-        Either 1 or -1 to identify directionality
+        Either 1 or -1 to identify directionality. A ValueError is raised if a
+        different value is provided
 
     Notes
     -----
-    A chiral frame can only contain atoms
+    A chiral frame can only contain atoms.
     """
     def __init__(self, atom1, atom2, chirality):
         self.atom1 = atom1
         self.atom2 = atom2
+        if chirality != 1 and chirality != -1:
+            raise ValueError('chirality must be 1 or -1')
         self.chirality = chirality
 
     def __contains__(self, thing):
@@ -2229,6 +2246,21 @@ class MultipoleFrame(object):
         The vector head index
     nvec : int
         The number of vectors
+
+    Examples
+    --------
+    >>> atom = Atom()
+    >>> mf = MultipoleFrame(atom, 0, 1, 2, 3)
+    >>> atom in mf
+    True
+    >>> mf.frame_pt_num
+    0
+    >>> mf.vectail
+    1
+    >>> mf.vechead
+    2
+    >>> mf.nvec
+    3
     """
     def __init__(self, atom, frame_pt_num, vectail, vechead, nvec):
         self.atom = atom
@@ -2236,6 +2268,9 @@ class MultipoleFrame(object):
         self.vectail = vectail
         self.vechead = vechead
         self.nvec = nvec
+
+    def __contains__(self, thing):
+        return self.atom is thing
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2302,7 +2337,10 @@ class Residue(_ListItem):
         If an atom is present in this residue, delete it from the list of
         atoms. No change if an atom is not present in this residue.
         """
-        self.atoms = [a for a in self.atoms if a is not atom]
+        for a in self.atoms:
+            if atom.residue is self:
+                atom.residue = None
+                self.atoms = [a for a in self.atoms if a is not atom]
 
     # Implement some container methods over the list of atoms
     def __contains__(self, thing):
@@ -2323,16 +2361,16 @@ class Residue(_ListItem):
         -------
         True if there are no atoms left. False if this residue still has atoms
         """
-        return not bool(self.atoms)
+        return len(self) == 0
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def _changes(func):
     """ Decorator to indicate the list has changed """
-    def new_func(self, *args):
+    def new_func(self, *args, **kwargs):
         self.changed = True
         self.needs_indexing = True
-        return func(self, *args)
+        return func(self, *args, **kwargs)
     return new_func
 
 class TrackedList(list):
@@ -2367,7 +2405,7 @@ class TrackedList(list):
     def __init__(self, arg=[]):
         self.changed = False
         self.needs_indexing = False
-        list.__init__(self, arg)
+        return list.__init__(self, arg)
 
     @_changes
     def __delitem__(self, item):
@@ -2387,10 +2425,25 @@ class TrackedList(list):
             except AttributeError:
                 pass
 
-        list.__delitem__(self, item)
+        return list.__delitem__(self, item)
 
     @_changes
-    def pop(self, idx):
+    def __delslice__(self, *args):
+        """ Python 2 still uses __delslice__... """
+        indices = xrange(*args)
+        for index in indices:
+            try:
+                self[index]._idx = -1
+            except AttributeError:
+                pass
+            try:
+                self[index].list = None
+            except AttributeError:
+                pass
+        return list.__delslice__(self, *args)
+
+    @_changes
+    def pop(self, idx=-1):
         item = list.pop(self, idx)
         try:
             item._idx = -1
@@ -2414,10 +2467,9 @@ class TrackedList(list):
 
     def __getitem__(self, thing):
         retval = list.__getitem__(self, thing)
-        try:
+        if hasattr(thing, 'indices'):
             return TrackedList(retval)
-        except TypeError:
-            return retval
+        return list.__getitem__(self, thing)
 
     def index_members(self):
         """
@@ -2494,7 +2546,7 @@ class ResidueList(TrackedList):
         # Delete from the back to avoid indexes changing as we iterate
         for i in xrange(len(self)-1, -1, -1):
             res = self[i]
-            if res.empty(): del self[i]
+            if res.is_empty(): del self[i]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2520,14 +2572,79 @@ class AtomList(TrackedList):
             atom = self[index]
             atom._idx = -1
             atom.list = None
+            print 'Deleting the atom...'
             # Make sure we delete this atom from its respective residue
             if atom.residue is not None: atom.residue.delete_atom(atom)
 
         list.__delitem__(self, idx)
 
+    @_changes
+    def __delslice__(self, *args):
+        """ Python 2 still uses __delslice__... sigh. """
+        indices = xrange(*args)
+        for index in indices:
+            atom = self[index]
+            atom._idx = -1
+            atom.list = None
+            if atom.residue is not None: atom.residue.delete_atom(atom)
+        list.__delslice__(self, *args)
+
+    @_changes
+    def pop(self, idx=-1):
+        atom = list.pop(self, idx)
+        atom._idx = -1
+        atom.list = None
+        if atom.residue is not None: atom.residue.delete_atom(atom)
+        return atom
+
     def unmark(self):
         """ Unmark all atoms in this list """
         for atm in self: atm.marked = 0
+
+    @_changes
+    def append(self, item):
+        """
+        Add an Atom to the end of the list and have this list claim ownership of
+        the item.
+
+        Parameters
+        ----------
+        item : Atom
+            The atom to add to this list
+
+        Notes
+        -----
+        Only Atom objects should be added here, so if `item` does not have a
+        `list` attribute, an AttributeError will be raised. This action assigns
+        this list as the `list` attribute to the passed Atom.
+        """
+        item.list = self
+        return list.append(self, item)
+
+    @_changes
+    def extend(self, items):
+        """
+        Add an iterable of `Atom`s to the end of the list and have this list
+        claim ownership of the items.
+
+        Parameters
+        ----------
+        items : iterable of `Atom`s
+            The iterable containing Atom instances to add to the end of this
+            list
+
+        Notes
+        -----
+        Any generator passed here will be exhausted. The `list` attribute for
+        every object in `items` will have their `list` attribute set to this
+        list, and an AttributeError will be raised if this is not possible.
+        """
+        for item in items:
+            item.list = self
+        return list.extend(self, items)
+
+    def __iadd__(self, other):
+        return NotImplemented
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2548,4 +2665,4 @@ def Element(mass):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod(verbose=True)
+    doctest.testmod()

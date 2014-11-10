@@ -7,9 +7,12 @@ from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError)
+import chemistry.topologyobjects as topologyobjects
 from chemistry.topologyobjects import _ListItem, _FourAtomTerm
 from chemistry.topologyobjects import *
+from chemistry.amber.readparm import AmberFormat
 import unittest
+from utils import get_fn
 import random
 
 class TestTopologyObjects(unittest.TestCase):
@@ -586,3 +589,182 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(strbnd.type.req1, 1.1)
         self.assertEqual(strbnd.type.req2, 1.2)
         self.assertEqual(strbnd.type.theteq, 109.0)
+
+    #=============================================
+
+    def test_torsion_torsion(self):
+        """ Tests the torsion-torsion term used in the AMOEBA force field """
+        data = AmberFormat(get_fn('amoeba.parm7')).parm_data
+        pre = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_'
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for i in range(15)])
+        bonds = [Bond(atoms[i], atoms[i+1]) for i in range(14)]
+        tortor_types = TrackedList()
+        tortor_types.extend([
+                TorsionTorsionType((25, 25), data[pre+'01_ANGLE1'],
+                    data[pre+'01_ANGLE2'],
+                    data[pre+'01_FUNC'],
+                    list=tortor_types),
+                TorsionTorsionType((25, 25),
+                    data[pre+'01_ANGLE1'], data[pre+'01_ANGLE2'],
+                    data[pre+'01_FUNC'], data[pre+'01_DFUNC_DANGLE1'],
+                    data[pre+'01_DFUNC_DANGLE2'],
+                    data[pre+'01_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
+                TorsionTorsionType((25, 25),
+                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
+                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
+                    data[pre+'03_DFUNC_DANGLE2'],
+                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
+        ])
+        tortor1 = TorsionTorsion(*atoms[:5], type=tortor_types[0])
+        tortor2 = TorsionTorsion(*atoms[5:10], type=tortor_types[1])
+        tortor3 = TorsionTorsion(*atoms[10:], type=tortor_types[2])
+
+        # Check the container properties of the torsion-torsion
+        for i, atom in enumerate(atoms):
+            if i < 5:
+                self.assertIn(atom, tortor1)
+                self.assertNotIn(atom, tortor2)
+                self.assertNotIn(atom, tortor3)
+            elif i < 10:
+                self.assertNotIn(atom, tortor1)
+                self.assertIn(atom, tortor2)
+                self.assertNotIn(atom, tortor3)
+            else:
+                self.assertNotIn(atom, tortor1)
+                self.assertNotIn(atom, tortor2)
+                self.assertIn(atom, tortor3)
+
+        omitted_bonds = 0
+        for i, bond in enumerate(bonds):
+            if bond.atom1.idx < 5 and bond.atom2.idx < 5:
+                self.assertIn(bond, tortor1)
+                self.assertNotIn(bond, tortor2)
+                self.assertNotIn(bond, tortor3)
+            elif 5 <= bond.atom1.idx < 10 and 5 <= bond.atom2.idx < 10:
+                self.assertNotIn(bond, tortor1)
+                self.assertIn(bond, tortor2)
+                self.assertNotIn(bond, tortor3)
+            elif 10 <= bond.atom1.idx < 15 and 10 <= bond.atom2.idx < 15:
+                self.assertNotIn(bond, tortor1)
+                self.assertNotIn(bond, tortor2)
+                self.assertIn(bond, tortor3)
+            else:
+                omitted_bonds += 1
+                self.assertNotIn(bond, tortor1)
+                self.assertNotIn(bond, tortor2)
+                self.assertNotIn(bond, tortor3)
+        self.assertTrue(omitted_bonds > 0)
+        self.assertEqual(tortor1.type.idx, 0)
+        self.assertEqual(tortor2.type.idx, 1)
+        self.assertEqual(tortor3.type.idx, 2)
+        # Now check the _TorTorTable API
+
+        self.assertEqual(tortor1.type.f, tortor2.type.f)
+        self.assertNotEqual(tortor1.type.f, tortor3.type.f)
+
+    #=============================================
+
+    def test_chiral_frame(self):
+        """ Tests the chiral frame object used in the AMOEBA force field """
+        atom1 = Atom()
+        atom2 = Atom()
+        cf1 = ChiralFrame(atom1, atom2, 1)
+        cf2 = ChiralFrame(atom1, atom2, -1)
+        self.assertRaises(ValueError, lambda: ChiralFrame(atom1, atom2, 2))
+        self.assertIn(atom1, cf1)
+        self.assertIn(atom2, cf1)
+        self.assertIn(atom1, cf2)
+        self.assertIn(atom2, cf2)
+
+    #=============================================
+
+    def test_docstrings(self):
+        """ Running the topologyobjects docstring examples/tests """
+        import doctest
+        results = doctest.testmod(topologyobjects)
+        self.assertEqual(results.failed, 0)
+
+    #=============================================
+
+    def test_residue(self):
+        """ Tests the Residue object """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for i in range(10)])
+        res = Residue('ALA')
+        for atom in atoms:
+            res.add_atom(atom)
+        self.assertEqual(len(res), len(atoms))
+        for atom in atoms:
+            self.assertIs(atom.residue, res)
+        for x, y in zip(atoms, res):
+            self.assertIs(x, y)
+        for atom in atoms:
+            self.assertIn(atom, res)
+
+        # Try deleting all of our atoms
+        while len(res):
+            lenres = len(res)
+            atom = random.choice(atoms)
+            is_inside = atom in res
+            res.delete_atom(atom)
+            self.assertEqual(lenres-len(res), is_inside)
+            self.assertIs(atom.residue, None)
+        self.assertEqual(len(res), 0)
+        for atom in atoms:
+            self.assertIs(atom.residue, None)
+        self.assertTrue(res.is_empty())
+
+    #=============================================
+
+    def test_atom_list(self):
+        """ Tests the AtomList class """
+        atoms = AtomList()
+        res = Residue('ALA')
+        atoms.extend([Atom(list=atoms) for i in range(15)])
+        for atom in atoms:
+            res.add_atom(atom)
+        # Test the indexing
+        for i, atom in enumerate(atoms):
+            self.assertEqual(atom.idx, i)
+        while atoms:
+            atom = atoms.pop()
+            self.assertEqual(atom.idx, -1)
+            self.assertIs(atom.residue, None)
+            self.assertIs(atom.list, None)
+        atoms.extend([Atom() for i in range(15)])
+        self.assertTrue(res.is_empty())
+        for i, atom in enumerate(atoms):
+            self.assertEqual(atom.idx, i)
+            self.assertIs(atom.residue, None)
+
+    #=============================================
+
+    def test_residue_list(self):
+        """ Tests the ResidueList class """
+        atoms = AtomList()
+        reslist = ResidueList()
+        for i in range(40):
+            new_at = Atom()
+            if i < 10:
+                reslist.add_atom(new_at, 'A', 10)
+            elif i < 21:
+                reslist.add_atom(new_at, 'A', 11)
+            elif i < 33:
+                reslist.add_atom(new_at, 'B', 20)
+            else:
+                reslist.add_atom(new_at, 'C', 21)
+            atoms.append(new_at)
+            self.assertEqual(atoms[-1].idx, i)
+
+        self.assertEqual(len(reslist), 4)
+        self.assertEqual(len(reslist[0]), 10)
+        self.assertEqual(len(reslist[1]), 11)
+        self.assertEqual(len(reslist[2]), 12)
+        self.assertEqual(len(reslist[3]), 7)
+        del atoms[:10]
+        self.assertEqual(len(reslist), 4)
+        self.assertTrue(reslist[0].is_empty())
+        reslist.prune()
+        self.assertEqual(len(reslist), 3) # Got rid of empty residue.
+        self.assertEqual(len(atoms), sum([len(r) for r in reslist]))
