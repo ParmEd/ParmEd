@@ -198,33 +198,45 @@ class Atom(_ListItem):
         is passed to `Residue.add_atom` -- see below for more information. Until
         it is set there, it is None
     bonds : list of Bond instances
-        list of Bond objects in which this atom is a member
+        list of Bond objects in which this atom is a member. This attribute
+        should not be modified.
     angles : list of Angle instances
-        list of Angle objects in which this atom is a member
+        list of Angle objects in which this atom is a member. This attribute
+        should not be modified.
     dihedrals : list of Dihedral instances
-        list of Dihedral objects in which this atom is a member
+        list of Dihedral objects in which this atom is a member. This attribute
+        should not be modified.
     urey_bradleys : list of UreyBradley instances
         list of UreyBradley objects in which this atom is a member (CHARMM,
-        AMOEBA)
+        AMOEBA). This attribute should not be modified.
     impropers : list of Improper instances
-        list of Improper objects in which the atom is a member (CHARMM)
+        list of Improper objects in which the atom is a member (CHARMM). This
+        attribute should not be modified.
     cmaps : list of Cmap instances
-        list of Cmap objects in which the atom is a member (CHARMM, AMOEBA)
+        list of Cmap objects in which the atom is a member (CHARMM, AMOEBA).
+        This attribute should not be modified.
     tortors : list of TorsionTorsion instances
-        list of TorsionTorsion objects in which the atom is a member (AMOEBA)
+        list of TorsionTorsion objects in which the atom is a member (AMOEBA).
+        This attribute should not be modified.
     bond_partners : list of Atom instances
-        list of Atoms to which this atom is bonded.
+        list of Atoms to which this atom is bonded. Do not modify this
+        attribute -- it will almost certainly not do what you think it will
     angle_partners : list of Atom instances
-        list of Atoms to which this atom forms an angle, but not a bond
+        list of Atoms to which this atom forms an angle, but not a bond. Do not
+        modify this attribute -- it will almost certainly not do what you think
+        it will
     dihedral_partners : list of Atom instances
         list of Atoms to which this atom forms an dihedral, but not a bond or
-        angle
+        angle. Do not modify this attribute -- it will almost certainly not do
+        what you think it will
     tortor_partners : list of Atom instances
         list of Atoms to which this atom forms a coupled Torsion-Torsion, but
-        not a bond or angle (AMOEBA)
+        not a bond or angle (AMOEBA). Do not modify this attribute -- it will
+        almost certainly not do what you think it will
     exclusion_partners : list of Atom instances
         list of Atoms with which this atom is excluded, but not bonded, angled,
-        or dihedraled to
+        or dihedraled to. Do not modify this attribute -- it will almost
+        certainly not do what you think it will
     marked : int
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
@@ -1006,9 +1018,9 @@ class DihedralType(_ListItem):
         The dihedral periodicity
     phase : float
         The dihedral phase in degrees
-    scee : float
+    scee : float=1.0
         1-4 electrostatic scaling factor
-    scnb : float
+    scnb : float=1.0
         1-4 Lennard-Jones scaling factor
     list : TrackedList=None
         A list of `DihedralType`s in which this is a member
@@ -1049,7 +1061,7 @@ class DihedralType(_ListItem):
 
     #===================================================
    
-    def __init__(self, phi_k, per, phase, scee, scnb, list=None):
+    def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
         self.phi_k = phi_k
         self.per = per
@@ -1541,8 +1553,10 @@ class _CmapGrid(object):
 
     The _CmapGrid usually has ranges for the two angles from -180 to 180. Some
     places will expect the range to be 0-360 degrees (e.g., OpenMM). The
-    switch_range method returns a _CmapGrid with this range. This method will
-    also work to go backwards.
+    switch_range method returns a _CmapGrid with the "other" range than the
+    current object.  i.e., if the current range is from 0 to 360 degrees, the
+    _CmapGrid returned by `switch_range` will be from -180 to 180, and vice
+    versa.
 
     Example:
     >>> g = _CmapGrid(2, [0, 1, 2, 3])
@@ -1657,9 +1671,11 @@ class _CmapGrid(object):
         mid = res // 2
         newgrid = _CmapGrid(res)
         for i in xrange(res):
+            ii = (i + mid) % res
             for j in xrange(res):
+                jj = (j + mid) % res
                 # Start from the middle
-                newgrid[i, j] = self[(i+mid)%res, (j+mid)%res]
+                newgrid[i, j] = self[ii, jj]
         return newgrid
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1692,7 +1708,7 @@ class TrigonalAngle(_FourAtomTerm):
     Either `Atom`s or `Bond`s can be contained within this trigonal angle
     """
     def __init__(self, atom1, atom2, atom3, atom4, type=None):
-        _FourAtomTerm.__init__(self)
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         self.type = type
 
     @property
@@ -1733,7 +1749,7 @@ class OutOfPlaneBend(_FourAtomTerm):
     Either `Atom`s or `Bond`s can be contained within this trigonal angle
     """
     def __init__(self, atom1, atom2, atom3, atom4, type=None):
-        _FourAtomTerm.__init__(self)
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         self.type = type
 
     @property
@@ -1810,7 +1826,7 @@ class PiTorsion(object):
         if isinstance(thing, Atom):
             return (thing is self.atom1 or thing is self.atom2 or
                     thing is self.atom3 or thing is self.atom4 or
-                    thing is self.atom5 or thing is self.atom5)
+                    thing is self.atom5 or thing is self.atom6)
         # Assume Bond
         return ((self.atom2 in thing and self.atom3 in thing) or
                 (self.atom1 in thing and self.atom3 in thing) or

@@ -441,4 +441,148 @@ class TestTopologyObjects(unittest.TestCase):
 
     def test_cmap(self):
         """ Tests the coupled-torsion CMAP terms used by CHARMM """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for i in range(10)])
+        bonds = [Bond(atoms[i], atoms[i+1]) for i in range(9)]
+        cg1 = list(range(36))
+        cg2 = list(reversed(range(36)))
+        cmap_types = TrackedList()
+        cmap_types.append(CmapType(6, cg1, list=cmap_types))
+        cmap_types.append(CmapType(6, cg2, list=cmap_types))
+        cmap_types.append(CmapType(6, cg1[:], list=cmap_types))
+        cmap1 = Cmap(atoms[0], atoms[1], atoms[2], atoms[3], atoms[4],
+                     cmap_types[0])
+        cmap2 = Cmap(atoms[3], atoms[4], atoms[5], atoms[6], atoms[7],
+                     cmap_types[1])
+        cmap3 = Cmap(atoms[5], atoms[6], atoms[7], atoms[8], atoms[9],
+                     cmap_types[2])
+        # Check illegal CmapType assignment
+        self.assertRaises(CmapError, lambda: CmapType(5, cg1))
+        # Check container functionality
+        for i, atom in enumerate(atoms):
+            if 0 <= i < 5:
+                self.assertIn(atom, cmap1)
+            if 3 <= i < 7:
+                self.assertIn(atom, cmap2)
+            if 5 <= i < 9:
+                self.assertIn(atom, cmap3)
+        self.assertEqual(cmap_types[0], cmap_types[2])
+        self.assertNotEqual(cmap_types[0], cmap_types[1])
+        for i, bond in enumerate(bonds):
+            if 0 <= i < 4:
+                self.assertIn(bond, cmap1)
+            if 3 <= i < 7:
+                self.assertIn(bond, cmap2)
+            if 5 <= i < 9:
+                self.assertIn(bond, cmap3)
+        # Check the same_atoms method
+        self.assertTrue(cmap1.same_atoms(cmap1))
+        self.assertFalse(cmap2.same_atoms(cmap1))
+        self.assertTrue(cmap1.same_atoms((0, 1, 2, 3, 4)))
+        self.assertTrue(cmap1.same_atoms((4, 3, 2, 1, 0)))
+        self.assertFalse(cmap1.same_atoms((0, 2, 1, 3, 4)))
+        # Check Cmap grid indexing
+        for i, val in enumerate(cg1):
+            self.assertEqual(cmap_types[0].grid[i], val)
+            i1 = i // 6
+            i2 = i % 6
+            self.assertEqual(cmap_types[0].grid[i1,i2], val)
+        transpose = cmap_types[0].grid.T
+        for i, val in enumerate(cg1):
+            i1 = i // 6
+            i2 = i % 6
+            self.assertEqual(transpose[i2, i1], val)
+        # Transpose of the transpose should be the original
+        self.assertEqual(transpose.T, cmap_types[0].grid)
+        # Check switch_range functionality
+        sg = cmap_types[0].grid.switch_range()
+        for i in range(6):
+            for j in range(6):
+                self.assertEqual(sg[i,j], cmap_types[0].grid[(i+3)%6,(j+3)%6])
 
+    #=============================================
+
+    def test_trigonal_angle(self):
+        """ Tests the trigonal angle term used in the AMOEBA force field """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for x in range(8)])
+        bonds = []
+        bonds.append(Bond(atoms[0], atoms[1]))
+        bonds.append(Bond(atoms[2], atoms[1]))
+        bonds.append(Bond(atoms[3], atoms[1]))
+        bonds.append(Bond(atoms[0], atoms[2]))
+        t1 = TrigonalAngle(atoms[0], atoms[1], atoms[2], atoms[3])
+        t2 = TrigonalAngle(atoms[4], atoms[5], atoms[6], atoms[7],
+                           AngleType(50.0, 90.0))
+        t1.type = AngleType(50.0, 90.0)
+        self.assertIsNot(t1.type, t2.type)
+        self.assertEqual(t1.type, t2.type)
+        self.assertIn(bonds[0], t1)
+        self.assertIn(bonds[1], t1)
+        self.assertIn(bonds[2], t1)
+        self.assertNotIn(bonds[3], t1)
+        self.assertRaises(BondError, lambda: TrigonalAngle(atoms[0], atoms[1],
+                                                           atoms[2], atoms[1]))
+        self.assertEqual(t1.type.k, 50)
+        self.assertEqual(t1.type.theteq, 90.0)
+
+    #=============================================
+
+    def test_oopbend_angle(self):
+        """ Tests the out-of-plane bend term used in the AMOEBA force field """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for x in range(8)])
+        bonds = []
+        bonds.append(Bond(atoms[0], atoms[1]))
+        bonds.append(Bond(atoms[2], atoms[1]))
+        bonds.append(Bond(atoms[3], atoms[1]))
+        bonds.append(Bond(atoms[0], atoms[2]))
+        t1 = OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[3])
+        t2 = OutOfPlaneBend(atoms[4], atoms[5], atoms[6], atoms[7],
+                            AngleType(50.0, 90.0))
+        t1.type = AngleType(50.0, 90.0)
+        self.assertIsNot(t1.type, t2.type)
+        self.assertEqual(t1.type, t2.type)
+        self.assertIn(bonds[0], t1)
+        self.assertIn(bonds[1], t1)
+        self.assertIn(bonds[2], t1)
+        self.assertNotIn(bonds[3], t1)
+        self.assertRaises(BondError, lambda: TrigonalAngle(atoms[0], atoms[1],
+                                                           atoms[2], atoms[1]))
+        self.assertEqual(t1.type.k, 50)
+        self.assertEqual(t1.type.theteq, 90.0)
+
+    #=============================================
+
+    def test_pitorsion(self):
+        """ Tests the pi-torsion term used in the AMOEBA force field """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for i in range(6)])
+        bonds = [Bond(atoms[0], atoms[2]), Bond(atoms[1], atoms[2]),
+                 Bond(atoms[2], atoms[3]), Bond(atoms[3], atoms[4]),
+                 Bond(atoms[3], atoms[5])]
+        pit = PiTorsion(*atoms, type=DihedralType(10.0, 2, 180.0))
+        for atom in atoms:
+            self.assertIn(atom, pit)
+        for bond in bonds:
+            self.assertIn(bond, pit)
+        self.assertNotIn(Bond(atoms[0], atoms[1]), pit)
+        self.assertEqual(pit.type.phi_k, 10)
+        self.assertEqual(pit.type.per, 2)
+        self.assertEqual(pit.type.phase, 180)
+
+    #=============================================
+
+    def test_stretchbend(self):
+        """ Tests the stretch-bend term and type """
+        atoms = TrackedList()
+        atoms.extend([Atom(list=atoms) for i in range(3)])
+        bonds = [Bond(atoms[0], atoms[1]), Bond(atoms[1], atoms[2])]
+        strbnd = StretchBend(atoms[0], atoms[1], atoms[2],
+                             StretchBendType(10.0, 1.1, 1.2, 109.0))
+        for obj in atoms + bonds:
+            self.assertIn(obj, strbnd)
+        self.assertEqual(strbnd.type.idx, -1)
+        self.assertEqual(strbnd.type.req1, 1.1)
+        self.assertEqual(strbnd.type.req2, 1.2)
+        self.assertEqual(strbnd.type.theteq, 109.0)
