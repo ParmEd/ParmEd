@@ -80,35 +80,13 @@ class AmberParm(AmberFormat):
         self.LJ_depth = []   # similarly ordered array of L-J depths
 
         # If we were given a prmtop, read it in
-        if self.valid:
-            try:
-                self.LoadPointers()
-                self.valid = True
-            except KeyError:
-                warn('POINTERS flag not found! Likely a bad AMBER topology '
-                     'file.', AmberParmWarning)
-                self.valid = False
-            except IndexError:
-                if (len(self.parm_data['POINTERS'])) < 30:
-                    warn('Fewer integers in POINTERS section than expected! '
-                         'Likely a bad AMBER topology file.', AmberParmWarning)
-                    self.valid = False
-
-        if (self.valid and 'LENNARD_JONES_ACOEF' in self.parm_data.keys() and
-                           'LENNARD_JONES_BCOEF' in self.parm_data.keys()):
-            try:
-                # fill LJ arrays with LJ data for easy manipulations
-                self.fill_LJ()
-            except (IndexError, KeyError), err:
-                self.valid = False
-                raise AmberParmError('Problem parsing L-J 6-12 parameters.\n\t'
-                                     + str(err))
+        self.LoadPointers()
+        self.fill_LJ()
 
         # Load the structure arrays
-        if self.valid:
-            self._load_structure()
-            # Find any extra exclusion rules that may be defined
-            self.atom_list.find_extra_exclusions()
+        self._load_structure()
+        # Find any extra exclusion rules that may be defined
+        self.atom_list.find_extra_exclusions()
 
         # We now have the following instance arrays: All arrays are dynamic such
         # that removing an item propagates the indices if applicable. bond has
@@ -162,7 +140,6 @@ class AmberParm(AmberFormat):
         inst.parm_data = rawdata.parm_data
         inst.parm_comments = rawdata.parm_comments
         inst.flag_list = rawdata.flag_list
-        inst.valid = True
         inst.initialize_topology()
         # Convert charges if necessary due to differences in electrostatic
         # scaling factors
@@ -196,8 +173,6 @@ class AmberParm(AmberFormat):
         other.LJ_depth = self.LJ_depth[:]
         other.hasvels = self.hasvels
         other.hasbox = self.hasbox
-        # This is as far as we've gotten if the prm is invalid
-        if not self.valid: return other
 
         # Now fill the LJ and other data structures
         for p in self.pointers: other.pointers[p] = self.pointers[p]
@@ -922,8 +897,6 @@ class AmberParm(AmberFormat):
             self.rst7 = rst7
         elif isinstance(rst7, basestring):
             self.rst7 = Rst7.open(rst7)
-        if not self.rst7.valid:
-            raise AmberParmError("Invalid restart file!")
         self.load_coordinates(self.rst7.coordinates)
         self.hasvels = self.rst7.hasvels
         self.hasbox = self.rst7.hasbox
@@ -1036,31 +1009,29 @@ class AmberParm(AmberFormat):
         for atm in self.atom_list:
             radii.append(self.LJ_radius[self.LJ_types[atm.attype]-1])
         try:
-            if self.valid and self.rst7.valid:
-                return Molecule(atoms=self.parm_data['ATOM_NAME'][:],
-                                atom_types=self.parm_data['AMBER_ATOM_TYPE'][:],
-                                charges=self.parm_data['CHARGE'][:],
-                                residues=self.parm_data['RESIDUE_LABEL'][:],
-                                bonds=all_bonds,
-                                residue_pointers=residue_pointers,
-                                coords=self.coords[:],
-                                elements=elements,
-                                title=title,
-                                radii=radii
-                )
+            return Molecule(atoms=self.parm_data['ATOM_NAME'][:],
+                            atom_types=self.parm_data['AMBER_ATOM_TYPE'][:],
+                            charges=self.parm_data['CHARGE'][:],
+                            residues=self.parm_data['RESIDUE_LABEL'][:],
+                            bonds=all_bonds,
+                            residue_pointers=residue_pointers,
+                            coords=self.coords[:],
+                            elements=elements,
+                            title=title,
+                            radii=radii
+            )
         except AttributeError: # use dummy list if no coords are loaded
-            if self.valid:
-                return Molecule(atoms=self.parm_data['ATOM_NAME'][:],
-                                atom_types=self.parm_data['AMBER_ATOM_TYPE'][:],
-                                charges=self.parm_data['CHARGE'][:],
-                                residues=self.parm_data['RESIDUE_LABEL'][:], 
-                                bonds=all_bonds,
-                                residue_pointers=residue_pointers,
-                                coords=list(xrange(self.pointers['NATOM']*3)),
-                                elements=elements,
-                                title=title,
-                                radii=radii
-                )
+            return Molecule(atoms=self.parm_data['ATOM_NAME'][:],
+                            atom_types=self.parm_data['AMBER_ATOM_TYPE'][:],
+                            charges=self.parm_data['CHARGE'][:],
+                            residues=self.parm_data['RESIDUE_LABEL'][:], 
+                            bonds=all_bonds,
+                            residue_pointers=residue_pointers,
+                            coords=list(xrange(self.pointers['NATOM']*3)),
+                            elements=elements,
+                            title=title,
+                            radii=radii
+            )
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1083,7 +1054,6 @@ class Rst7(object):
         self.hasbox = hasbox
         self.natom = natom
         self.title = title
-        self.valid = True
         self.time = 0
         if filename is not None:
             self.filename = filename
@@ -1107,7 +1077,6 @@ class Rst7(object):
         """
         from chemistry.amber.asciicrd import AmberAsciiRestart
         from chemistry.amber.netcdffiles import NetCDFRestart
-        self.valid = False
         try:
             f = AmberAsciiRestart(filename, 'r')
             self.natom = f.natom
@@ -1132,7 +1101,6 @@ class Rst7(object):
         if f.hasbox:
             self.box = f.box
         self.title = f.title
-        self.valid = True
         self.time = f.time
 
     @property

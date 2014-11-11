@@ -16,11 +16,37 @@ import re
 from warnings import warn
 
 # Some Py3 compatibility tweaks
-if not 'unicode' in dir(__builtins__): unicode = str
 if not 'basestring' in dir(__builtins__): basestring = str
 
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class FortranFormat(object):
-    """ Handles fortran formats """
+    """
+    Processes Fortran format strings according to the Fortran specification for
+    such formats. This object handles reading and writing data with any valid
+    Fortran format. It does this by using the `fortranformat` project
+    [https://bitbucket.org/brendanarnold/py-fortranformat].
+
+    However, while `fortranformat` is very general and adheres well to the
+    standard, it is very slow. As a result, simple, common format strings have
+    been optimized and processes reads and writes between 3 and 5 times faster.
+    The format strings (case-insensitive) of the following form (where # can be
+    replaced by any number) are optimized:
+        - #E#.#
+        - #D#.#
+        - #F#.#
+        - #(F#.#)
+        - #a#
+        - #I#
+
+    Parameters
+    ----------
+    format_string : str
+        The Fortran Format string to process
+    strip_strings : bool=True
+        If True, strings are stripped before being processed by stripping
+        (only) trailing whitespace
+    """
 
     strre = re.compile(r'(\d+)?a(\d+)$', re.I)
     intre = re.compile(r'(\d+)?i(\d+)$', re.I)
@@ -45,7 +71,7 @@ class FortranFormat(object):
         if FortranFormat.strre.match(format_string):
             rematch = FortranFormat.strre.match(format_string)
             # replace our write() method with write_string to force left-justify
-            self.type, self.write = str, self.write_string
+            self.type, self.write = str, self._write_string
             nitems, itemlen = rematch.groups()
             if nitems is None:
                 self.nitems = 1
@@ -95,8 +121,8 @@ class FortranFormat(object):
             # We tried... now just use the fortranformat package
             self._reader = FortranRecordReader(format_string)
             self._writer = FortranRecordWriter(format_string)
-            self.write = self.write_ffwriter
-            self.read = self.read_ffreader
+            self.write = self._write_ffwriter
+            self.read = self._read_ffreader
 
     #===================================================
 
@@ -111,7 +137,27 @@ class FortranFormat(object):
     #===================================================
 
     def write(self, items, dest):
-        """ Writes a list/tuple of data (or a single item) """
+        """
+        Writes an iterable of data (or a single item) to the passed file-like
+        object
+
+        Parameters
+        ----------
+        items : iterable or single float/str/int
+            These are the objects to write in this format. The types of each
+            item should match the type specified in this Format for that
+            argument
+        dest : file or file-like
+            This is the file to write the data to. It must have a `write` method
+            or an AttributeError will be raised
+
+        Notes
+        -----
+        This method may be replaced with _write_string (for #a#-style formats)
+        or _write_ffwriter in the class initializer if no optimization is
+        provided for this format, but the call signatures and behavior are the
+        same for each of those functions.
+        """
         if hasattr(items, '__iter__') and not isinstance(items, basestring):
             mod = self.nitems - 1
             for i, item in enumerate(items):
@@ -126,7 +172,7 @@ class FortranFormat(object):
 
     #===================================================
 
-    def write_string(self, items, dest):
+    def _write_string(self, items, dest):
         """ Writes a list/tuple of strings """
         if hasattr(items, '__iter__') and not isinstance(items, basestring):
             mod = self.nitems - 1
@@ -142,7 +188,7 @@ class FortranFormat(object):
 
     #===================================================
 
-    def read_nostrip(self, line):
+    def _read_nostrip(self, line):
         """
         Reads the line and returns converted data. Special-cased for flags that
         may contain 'blank' data. ugh.
@@ -173,21 +219,65 @@ class FortranFormat(object):
 
     #===================================================
 
-    def read_ffreader(self, line):
+    def _read_ffreader(self, line):
         """ Reads the line and returns the converted data """
         return self._reader.read(line.rstrip())
 
     #===================================================
 
-    def write_ffwriter(self, items, dest):
+    def _write_ffwriter(self, items, dest):
         dest.write('%s\n' % self._writer.write(items))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberFormat(object):
     """ 
-    Generalization of the AmberParm class without some of the assumptions made
-    about Amber topology files specifically
+    A class that can parse and print files stored in the Amber topology or MDL
+    format. In particular, these files have the general form:
+
+    ```
+    %VERSION VERSION_STAMP = V00001.000  DATE = XX/XX/XX  XX:XX:XX
+    %FLAG <FLAG_NAME>
+    %COMMENT <comments>
+    %FORMAT(<Fortran_Format>)
+    ... data corresponding to that Fortran Format
+    %FLAG <FLAG_NAME2>
+    %COMMENT <comments>
+    %FORMAT(<Fortran_Format>)
+    ... data corresponding to that Fortran Format
+    ```
+
+    where the `%COMMENT` sections are entirely optional
+
+    Parameters
+    ----------
+    fname : str=None
+        If provided, this file is parsed and the data structures will be loaded
+        from the data in this file
+
+    Attributes
+    ----------
+    parm_data : dict {str : list}
+        A dictionary that maps FLAG names to all of the data contained in that
+        section of the Amber file.
+    formats : dict {str : FortranFormat}
+        A dictionary that maps FLAG names to the FortranFormat instance in which
+        the data is stored in that section
+    parm_comments : dict {str : list}
+        A dictionary that maps FLAG names to the list of COMMENT lines that were
+        stored in the original file
+    flag_list : list
+        An ordered list of all FLAG names. This must be kept synchronized with
+        `parm_data`, `formats`, and `parm_comments` such that every item in
+        `flag_list` is a key to those 3 dicts and no other keys exist
+    charge_flag : str='CHARGE'
+        The name of the name of the FLAG that describes partial atomic charge
+        data. If this flag is found, then its data are multiplied by the
+        CHARGE_SCALE value attached to the current class
+    version : str
+        The VERSION string from the Amber file
+    prm_name : str
+        The file name of the originally parsed file (set to the fname parameter)
     """
    
     CHARGE_SCALE = AMBER_ELECTROSTATIC # chamber uses a SLIGHTLY diff value
@@ -202,9 +292,7 @@ class AmberFormat(object):
         self.parm_comments = {}
         self.flag_list = []
         self.version = None
-        self.prm_name = fname
         self.charge_flag = 'CHARGE'
-        self.valid = True
 
         if fname is not None:
             self.rdparm(fname)
@@ -217,12 +305,14 @@ class AmberFormat(object):
         other = type(self)()
         other.flag_list = self.flag_list[:]
         other.version = self.version
-        other.prm_name = self.prm_name + '_copy%d' % self._ncopies
+        if self.prm_name is not None:
+            other.prm_name = self.prm_name + '_copy%d' % self._ncopies
+        else:
+            other.prm_name = None
         other.charge_flag = self.charge_flag
-        other.valid = self.valid
         other.parm_data = {}
         other.parm_comments = {}
-        other.formats = {} # formats{} are copied shallow
+        other.formats = {}
         for flag in other.flag_list:
             other.parm_data[flag] = self.parm_data[flag][:]
             other.parm_comments[flag] = self.parm_comments[flag][:]
@@ -235,24 +325,23 @@ class AmberFormat(object):
         """
         Returns a view of the current object as another object.
 
-        Parameters:
-            cls Class definition of an AmberParm subclass for the current
-                object to be converted into
+        Parameters
+        ----------
+        cls : type
+            Class definition of an AmberParm subclass for the current object to
+            be converted into
 
-        Returns:
-            instance of cls initialized from data in this object. This is NOT a
-            deep copy, so modifying the original object may modify this. The
-            copy function will create a deep copy of any AmberFormat-derived
-            object
+        Returns
+        -------
+        instance of cls initialized from data in this object. This is NOT a deep
+        copy, so modifying the original object may modify this. The copy
+        function will create a deep copy of any AmberFormat-derived object
         """
         # If these are the same classes, just return the original instance,
         # since there's nothing to do. Classes are singletons, so use "is"
         if type(self) is cls:
             return self
-        if hasattr(cls, 'load_from_rawdata'):
-            return cls.load_from_rawdata(self)
-        raise ValueError('Cannot instantiate %s from AmberFormat' %
-                         cls.__name__)
+        return cls.load_from_rawdata(self)
 
     #===================================================
 
@@ -266,7 +355,6 @@ class AmberFormat(object):
         self.parm_data = {}
         self.parm_comments = {}
         self.flag_list = []
-        self.valid = False
 
         try:
             from chemistry.amber import _rdparm
@@ -305,7 +393,6 @@ class AmberFormat(object):
                     self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
             except KeyError:
                 pass
-            self.valid = True
 
     #===================================================
 
@@ -316,38 +403,34 @@ class AmberFormat(object):
         """
 
         current_flag = ''
-        gathering_data = False
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
 
         # Open up the file and read the data into memory
         prm = open(self.prm_name, 'r')
 
         for line in prm:
-
-            if line[0:8] == '%VERSION':
-                self.version = line.strip()
-
-            elif line[0:5] == '%FLAG':
-                current_flag = line[6:].strip()
-                self.formats[current_flag] = ''
-                self.parm_data[current_flag] = []
-                self.parm_comments[current_flag] = []
-                self.flag_list.append(current_flag)
-                gathering_data = False
-
-            elif line[0:8] == '%COMMENT':
-                self.parm_comments[current_flag].append(line[9:].strip())
-
-            elif line[0:7] == '%FORMAT':
-                fmt = FortranFormat(fmtre.match(line).groups()[0])
-                # RESIDUE_ICODE can have a lot of blank data...
-                if current_flag == 'RESIDUE_ICODE':
-                    fmt.read = fmt.read_nostrip
-                self.formats[current_flag] = fmt
-                gathering_data = True
-
-            elif gathering_data:
-                self.parm_data[current_flag].extend(fmt.read(line))
+            if line[0] == '%':
+                if line[0:8] == '%VERSION':
+                    self.version = line.strip()
+                    continue
+                elif line[0:5] == '%FLAG':
+                    current_flag = line[6:].strip()
+                    self.formats[current_flag] = ''
+                    self.parm_data[current_flag] = []
+                    self.parm_comments[current_flag] = []
+                    self.flag_list.append(current_flag)
+                    continue
+                elif line[0:8] == '%COMMENT':
+                    self.parm_comments[current_flag].append(line[9:].strip())
+                    continue
+                elif line[0:7] == '%FORMAT':
+                    fmt = FortranFormat(fmtre.match(line).groups()[0])
+                    # RESIDUE_ICODE can have a lot of blank data...
+                    if current_flag == 'RESIDUE_ICODE':
+                        fmt.read = fmt._read_nostrip
+                    self.formats[current_flag] = fmt
+                    continue
+            self.parm_data[current_flag].extend(fmt.read(line))
 
         # convert charges to fraction-electrons
         try:
@@ -355,7 +438,6 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
         except KeyError:
             pass
-        self.valid = True
 
         prm.close()
 
@@ -699,7 +781,7 @@ class AmberFormat(object):
                                 "must be non-negative!")
             self.parm_data[flag_name.upper()] = [0 for i in xrange(num_items)]
         if comments:
-            if isinstance(comments, str) or isinstance(comments, unicode):
+            if isinstance(comments, basestring):
                 comments = [comments]
             elif isinstance(comments, tuple):
                 comments = list(comments)

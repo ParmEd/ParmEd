@@ -72,22 +72,10 @@ class AmoebaParm(AmberParm):
         self.LJ_depth = []  # similarly ordered array of L-J depths
 
         # If we were given a prmtop, read it in
-        if self.valid:
-            try:
-                self.LoadPointers()
-                self.valid = True
-            except KeyError:
-                warn('POINTERS flag not found! Likely a bad AMBER '
-                     'topology file.', AmberParmWarning)
-                self.valid = False
-            except IndexError:
-                if (len(self.parm_data['POINTERS'])) < 30:
-                    warn('Fewer integers in POINTERS section than expected! '
-                         'Likely a bad AMBER topology file.', AmberParmWarning)
-                    self.valid = False
+        self.LoadPointers()
 
-            # Load the structure arrays
-            self._load_structure()
+        # Load the structure arrays
+        self._load_structure()
       
         if rst7_name is not None:
             self.LoadRst7(rst7_name)

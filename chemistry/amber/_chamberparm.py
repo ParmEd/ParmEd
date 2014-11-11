@@ -85,12 +85,8 @@ class ChamberParm(AmberParm):
     def __copy__(self):
         """ Needs to copy a few additional data structures """
         other = AmberParm.__copy__(self)
-        if other.valid:
-            other.LJ_14_radius = self.LJ_14_radius[:]
-            other.LJ_14_depth = self.LJ_14_depth[:]
-        else:
-            other.LJ_14_radius = []
-            other.LJ_14_depth = []
+        other.LJ_14_radius = self.LJ_14_radius[:]
+        other.LJ_14_depth = self.LJ_14_depth[:]
         return other
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
