@@ -210,6 +210,9 @@ class Atom(_ListItem):
         The Residue that this atom belongs to. This is assigned when this atom
         is passed to `Residue.add_atom` -- see below for more information. Until
         it is set there, it is None
+    other_locations : dict of Atoms
+        A dict of Atom instances that represent alternate conformers of this
+        atom. The keys are the `altloc` characters for those Atoms.
     bonds : list of Bond instances
         list of Bond objects in which this atom is a member. This attribute
         should not be modified.
@@ -319,8 +322,8 @@ class Atom(_ListItem):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
-        self.name = name
-        self.type = type
+        self.name = name.strip()
+        self.type = type.strip()
         self.charge = charge
         self.mass = mass
         self.nb_idx = nb_idx
@@ -328,8 +331,8 @@ class Atom(_ListItem):
         self.screen = screen
         self.tree = tree
         self.bfactor = bfactor
-        self.occupancy = occupancy
         self.altloc = altloc
+        self.occupancy = occupancy
         self._bond_partners = []
         self._angle_partners = []
         self._dihedral_partners = []
@@ -340,6 +343,7 @@ class Atom(_ListItem):
         self.bonds, self.angles, self.dihedrals = [], [], []
         self.urey_bradleys, self.impropers, self.cmaps = [], [], []
         self.tortors = []
+        self.other_locations = {} # A dict of Atom instances
    
     #===================================================
 
@@ -2320,6 +2324,9 @@ class Residue(_ListItem):
         The 1-letter chain identifier for this residue
     insertion_code : str
         The insertion code (used in PDB files) for this residue
+    ter : bool
+        If True, there is a TER card directly after this residue (i.e., a
+        molecule or chain ends). By default, it is False
     list : TrackedList
         The container that _may_ have this residue contained inside
     atoms : list of Atom instances
@@ -2334,13 +2341,14 @@ class Residue(_ListItem):
     """
 
     def __init__(self, name, number=-1, chain='', insertion_code='', list=None):
-        self.name = name
+        self.name = name.strip()
         self.number = number
-        self.chain = chain
-        self.insertion_code = insertion_code
+        self.chain = chain.strip()
+        self.insertion_code = insertion_code.strip()
         self.list = list
         self._idx = -1
         self.atoms = []
+        self.ter = False
 
     def add_atom(self, atom):
         """ Adds an atom to this residue
@@ -2559,9 +2567,10 @@ class ResidueList(TrackedList):
             new_res.add_atom(atom)
             self.append(new_res)
         else:
-            if (last.number != resnum or last.name != resname or
-                last.chain != chain or last.insertion_code != inscode):
-                new_res = Residue(resname, resnum, list=self)
+            if (last.number != resnum or last.name != resname.strip() or
+                last.chain != chain.strip() or
+                last.insertion_code != inscode.strip()):
+                new_res = Residue(resname, resnum, chain, inscode, list=self)
                 new_res.add_atom(atom)
                 self.append(new_res)
             else:

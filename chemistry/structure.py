@@ -21,7 +21,38 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+# Private attributes and methods
+
 relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
+
+def _compare_atoms(old_atom, new_atom, resname, resid, chain):
+    """
+    Compares two atom instances, along with the residue name, number, and chain
+    identifier, to determine if two atoms are actually the *same* atom, but
+    simply different conformations
+
+    Parameters
+    ----------
+    old_atom : Atom
+        The original atom that has been added to the structure already
+    new_atom : Atom
+        The new atom that we want to see if it is the same as the old atom
+    resname : str
+        The name of the residue that the new atom would belong to
+    resid : int
+        The number of the residue that the new atom would belong to
+    chain : str
+        The chain identifier that the new atom would belong to
+
+    Returns
+    -------
+    True if they are the same atom, False otherwise
+    """
+    if old_atom.name != new_atom.name: return False
+    if old_atom.residue.name != resname: return False
+    if old_atom.residue.number != resid: return False
+    if old_atom.residue.chain != chain.strip(): return False
+    return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -138,7 +169,7 @@ def read_PDB(filename):
     filename : str or file-like
         Name of PDB file to read, or a file-like object that can iterate over
         the lines of a PDB. Compressed file names can be specified and are
-        determined by file-name extension.
+        determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)
 
     Metadata
     --------
@@ -159,8 +190,10 @@ def read_PDB(filename):
         PMID from the JRNL record
     journal_authors : str
         Author info from the JRNL record
-    volume_page : str
-        Volume page from the JRNL record
+    volume : str
+        Volume of the published article from the JRNL record
+    page : str
+        Page of the published article from the JRNL record
     title : str
         TITL section of the JRNL record
     year : int=None
@@ -212,6 +245,7 @@ def read_PDB(filename):
     all_coordinates = []
 
     # Support hexadecimal numbering like that printed by VMD
+    last_atom = Atom()
     last_resid = 1
     res_hex = False
     atom_hex = False
@@ -219,7 +253,7 @@ def read_PDB(filename):
     try:
         for line in fileobj:
             try:
-                line = line.decode('ascii')
+                line = line.encode('ascii')
             except AttributeError:
                 # ssume this is a string in Py3 which doesn't have 'decode'
                 pass
@@ -309,28 +343,36 @@ def read_PDB(filename):
                     chg = float(chg)
                 except ValueError:
                     chg = 0
+                atom = Atom(atomic_number=atomic_number, name=atname,
+                            charge=chg, mass=mass, occupancy=occupancy,
+                            bfactor=bfactor, altloc=altloc)
+                atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
+                if _compare_atoms(last_atom, atom, resname, resid, chain):
+                    atom.residue = last_atom.residue
+                    last_atom.other_locations[altloc] = atom
+                    continue
+                last_atom = atom
                 if modelno == 1:
-                    atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=chg, mass=mass, occupancy=occupancy,
-                                bfactor=bfactor, altloc=altloc)
-                    atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                     struct.residues.add_atom(atom, resname, resid,
                                              chain, inscode)
                     struct.atoms.append(atom)
                 else:
                     try:
-                        atom = struct.atoms[atomno-1]
+                        orig_atom = struct.atoms[atomno-1]
                     except IndexError:
                         raise PDBError('Atom %d differs in MODEL %d [%s %s vs. '
                                        '%s %s]' % (atomno, modelno,
                                        atom.residue.name, atom.name, resname,
                                        atname))
-                    if atom.residue.name != resname or atom.name != atname:
+                    if (orig_atom.residue.name != resname.strip()
+                            or orig_atom.name != atname.strip()):
                         raise PDBError('Atom %d differs in MODEL %d [%s %s vs. '
                                        '%s %s]' % (atomno, modelno,
-                                       atom.residue.name, atom.name, resname,
-                                       atname))
-                coordinates.extend([x, y, z])
+                                       orig_atom.residue.name, orig_atom.name,
+                                       resname, atname))
+                coordinates.extend([atom.xx, atom.xy, atom.xz])
+            elif rec.strip() == 'TER':
+                if modelno == 1: last_atom.residue.ter = True
             elif rec == 'ENDMDL':
                 # End the current model
                 if len(struct.atoms) == 0:
@@ -377,7 +419,8 @@ def read_PDB(filename):
                 elif part == 'REF ':
                     struct.journal += ' %s' % line[19:47].strip()
                     if not line[16:18].strip():
-                        struct.volume_page = line[50:61].strip()
+                        struct.volume = line[51:55].strip()
+                        struct.page = line[56:61].strip()
                         try:
                             struct.year = int(line[62:66])
                         except ValueError:
@@ -387,7 +430,7 @@ def read_PDB(filename):
                 elif part == 'DOI ':
                     struct.doi = line[19:].strip()
             elif rec == 'KEYWDS':
-                struct.keywords += '%s ' % line[11:]
+                struct.keywords += '%s,' % line[10:]
             elif rec == 'REMARK' and line[6:10] == ' 900':
                 # Related entries
                 rematch = relatere.match(line[11:])
@@ -397,9 +440,12 @@ def read_PDB(filename):
         # Make sure our file is closed if we opened it
         if own_handle: fileobj.close()
 
-    # Make the keywords into a list
-    struct.keywords = [x.strip() for x in struct.keywords.split(',')
-                                        if x.strip()]
+    # Post-process some of the metadata to make it more reader-friendly
+    struct.keywords = [s.strip() for s in struct.keywords.split(',')
+                                        if s.strip()]
+    struct.journal = struct.journal.strip()
+    struct.title = struct.title.strip()
+
     struct.unchange()
     if coordinates:
         if len(coordinates) != 3*len(struct.atoms):
