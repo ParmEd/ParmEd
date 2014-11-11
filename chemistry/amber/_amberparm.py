@@ -54,8 +54,8 @@ class AmberParm(AmberFormat):
         you should use LoadParm from the readparm module instead. LoadParm will
         correctly dispatch the object to the 'correct' flavor of AmberParm
         """
-
         AmberFormat.__init__(self, prm_name)
+        self.hasvels = self.hasbox = False
         if prm_name is not None:
             self.initialize_topology(rst7_name)
 
@@ -138,7 +138,6 @@ class AmberParm(AmberFormat):
                 i3 = i * 3
                 atom.vx, atom.vy, atom.vz = self.coords[i3:i3+3]
 
-        self.hasvels = self.hasbox = False
         if rst7_name is not None:
             self.LoadRst7(rst7_name)
 

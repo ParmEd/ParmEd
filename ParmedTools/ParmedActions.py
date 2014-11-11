@@ -2752,13 +2752,13 @@ class addpdb(Action):
         return retstr
 
     def execute(self):
-        from chemistry.system import ChemicalSystem
+        from chemistry import read_PDB
         if self.pdbpresent: return
-        pdb = ChemicalSystem.load_from_pdb(self.pdbfile)
+        pdb = read_PDB(self.pdbfile)
         resnums = [0 for i in xrange(self.parm.ptr('nres'))]
         chainids = ['*' for i in xrange(self.parm.ptr('nres'))]
         icodes = ['' for i in xrange(self.parm.ptr('nres'))]
-        for i, res in enumerate(pdb):
+        for i, res in enumerate(pdb.residues):
             try:
                 reslab = self.parm.parm_data['RESIDUE_LABEL'][i].strip()
                 resname = res.name.strip()
@@ -3478,7 +3478,7 @@ class chamber(Action):
         from chemistry.charmm.parameters import CharmmParameterSet
         from chemistry.charmm.psf import CharmmPsfFile
         from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
-        from chemistry.system import ChemicalSystem
+        from chemistry import read_PDB
         from subprocess import Popen
         import tempfile
         if self.usechamber:
@@ -3535,12 +3535,12 @@ class chamber(Action):
                     crd = CharmmRstFile(self.crdfile)
                     coords = crd.coords
                 except CharmmFileError:
-                    crd = ChemicalSystem.load_from_pdb(self.crdfile)
-                    if not crd:
+                    crd = read_PDB(self.crdfile)
+                    if len(crd.atoms) == 0:
                         raise ChamberError('Could not determine coordinate'
                                            'file type')
                     crdbox = crd.box
-                    coords = crd.positions()
+                    coords = crd.pdbxyz[0]
             if len(coords) != len(psf.atom_list) * 3:
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
