@@ -170,14 +170,17 @@ def read_PDB(filename):
 
     Returns
     -------
-    structure, coordinates
+    structure
     
     structure : Structure
         The Structure object initialized with all of the information from the
         PDB file.  No bonds or other topological features are added by default.
-    coordinates : list of list of floats
-        The coordinates for every conformation in the PDB file. Each MODEL must
-        have the same number of atoms and residues, in the same order
+
+    Notes
+    -----
+    The returned structure has an extra attribute, pdbxyz, that contains all of
+    the coordinates for all of the frames in the PDB file as a list of NATOM*3
+    lists.
     """
     global relatere
     if isinstance(filename, basestring):
@@ -333,15 +336,23 @@ def read_PDB(filename):
                 if len(struct.atoms) == 0:
                     raise PDBError('MODEL ended before any atoms read in')
                 modelno += 1
+                if len(struct.atoms)*3 != len(coordinates):
+                    raise ValueError(
+                            'Inconsistent atom numbers in some PDB models')
                 all_coordinates.append(coordinates)
+                atomno = 0
                 coordinates = []
             elif rec == 'MODEL ':
                 if modelno == 1 and len(struct.atoms) == 0: continue
                 if len(coordinates) > 0:
+                    if len(struct.atoms)*3 != len(coordinates):
+                        raise ValueError(
+                                'Inconsistent atom numbers in some PDB models')
                     warnings.warn('MODEL not explicitly ended', PDBWarning)
                     all_coordinates.append(coordinates)
                     coordinates = []
                 modelno += 1
+                atomno = 0
             elif rec == 'CRYST1':
                 a = float(line[6:15])
                 b = float(line[15:24])
@@ -390,6 +401,11 @@ def read_PDB(filename):
     struct.keywords = [x.strip() for x in struct.keywords.split(',')
                                         if x.strip()]
     struct.unchange()
+    if coordinates:
+        if len(coordinates) != 3*len(struct.atoms):
+            raise ValueError('bad number of atoms in some PDB models')
+        all_coordinates.append(coordinates)
+    struct.pdbxyz = all_coordinates
     return struct
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
