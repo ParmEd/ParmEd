@@ -768,3 +768,29 @@ class TestTopologyObjects(unittest.TestCase):
         reslist.prune()
         self.assertEqual(len(reslist), 3) # Got rid of empty residue.
         self.assertEqual(len(atoms), sum([len(r) for r in reslist]))
+
+    #=============================================
+
+    def test_tracked_list(self):
+        """ Test the TrackedList class """
+        items = TrackedList()
+        items.extend([Atom() for i in range(100)])
+        for atom in items:
+            self.assertEqual(atom.idx, -1)
+            self.assertIs(atom.list, None)
+        items.claim()
+        for i, atom in enumerate(items):
+            self.assertEqual(atom.idx, i)
+        self.assertTrue(items.changed)
+        self.assertFalse(items.needs_indexing)
+        items.changed = False
+        self.assertFalse(items.changed)
+        all_atoms = items[:]
+        for atom in all_atoms:
+            self.assertIsNot(atom.list, all_atoms)
+            self.assertIn(atom, items)
+        while items:
+            atom = items.pop(random.choice(range(len(items))))
+            for item in items:
+                self.assertIsNot(item, atom)
+            self.assertEqual(atom.idx, -1)

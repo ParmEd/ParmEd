@@ -163,6 +163,12 @@ class Atom(_ListItem):
     tree : str='BLA'
         The tree chain identifier assigned to this atom. Relevant in the context
         of an Amber topology file, and not used for very much.
+    occupancy : str=''
+        The occupancy of the atom (see PDB file)
+    bfactor : float=0.0
+        The B-factor of the atom (see PDB file)
+    altloc : str=''
+        Alternate location indicator (see PDB file)
 
     Attributes
     ----------
@@ -186,6 +192,12 @@ class Atom(_ListItem):
     tree : str
         The tree chain classification string. Applies to the Amber topology file
         instance, but is not used for much.
+    occupancy : float
+        The occupancy of the atom (see PDB file)
+    bfactor : float
+        The B-factor of the atom (see PDB file)
+    altloc : str
+        The alternate location indicator (see PDB file)
     radii : float
         The intrinsic solvation radius of the atom
     screen : float
@@ -303,7 +315,7 @@ class Atom(_ListItem):
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
-                 tree='BLA'):
+                 tree='BLA', occupancy=0.0, bfactor=0.0, altloc=''):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -315,6 +327,9 @@ class Atom(_ListItem):
         self.radii = radii
         self.screen = screen
         self.tree = tree
+        self.bfactor = bfactor
+        self.occupancy = occupancy
+        self.altloc = altloc
         self._bond_partners = []
         self._angle_partners = []
         self._dihedral_partners = []
@@ -2285,6 +2300,10 @@ class Residue(_ListItem):
         characters or shorter
     number : int
         Residue number assigned in the input structure
+    chain : str
+        The 1-letter chain identifier for this residue
+    insertion_code : str
+        The insertion code (used in PDB files) for this residue
     list : TrackedList=None
         List of residues in which this residue is a member
 
@@ -2297,6 +2316,10 @@ class Residue(_ListItem):
     idx : int
         The index of this residue inside the container. If this residue has no
         container, or it is not present in the container, idx is -1
+    chain : str
+        The 1-letter chain identifier for this residue
+    insertion_code : str
+        The insertion code (used in PDB files) for this residue
     list : TrackedList
         The container that _may_ have this residue contained inside
     atoms : list of Atom instances
@@ -2310,9 +2333,11 @@ class Residue(_ListItem):
     - `len()` returns the number of atoms in this residue
     """
 
-    def __init__(self, name, number=-1, list=None):
+    def __init__(self, name, number=-1, chain='', insertion_code='', list=None):
         self.name = name
         self.number = number
+        self.chain = chain
+        self.insertion_code = insertion_code
         self.list = list
         self._idx = -1
         self.atoms = []
@@ -2502,7 +2527,7 @@ class TrackedList(list):
 class ResidueList(TrackedList):
     """ Array of `Residue` instances """
 
-    def add_atom(self, atom, resname, resnum):
+    def add_atom(self, atom, resname, resnum, chain='', inscode=''):
         """
         Adds a new atom to the ResidueList, adding a new residue to this list if
         it has a different name or number as the last residue
@@ -2515,21 +2540,27 @@ class ResidueList(TrackedList):
             The name of the residue this atom belongs to
         resnum : int
             The number of the residue this atom belongs to
+        chain : str=''
+            The chain ID character for this residue
+        inscode : str=''
+            The insertion code ID character for this residue (it is stripped)
 
         Notes
         -----
         If the residue name and number differ from the last residue in this
         list, a new residue is added and the atom is added to that residue
         """
+        inscode = inscode.strip()
         try:
             last = self[-1]
         except IndexError:
             # Empty list -- add our first residue
-            new_res = Residue(resname, resnum, list=self)
+            new_res = Residue(resname, resnum, chain, inscode, list=self)
             new_res.add_atom(atom)
             self.append(new_res)
         else:
-            if last.number != resnum or last.name != resname:
+            if (last.number != resnum or last.name != resname or
+                last.chain != chain or last.insertion_code != inscode):
                 new_res = Residue(resname, resnum, list=self)
                 new_res.add_atom(atom)
                 self.append(new_res)

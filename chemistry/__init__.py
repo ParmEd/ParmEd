@@ -11,6 +11,8 @@ __all__ = ('amber',
            'system',
 )
 
-__version__ = '1.1.1'
+__version__ = '2.0b'
 __author__ = 'Jason Swails'
 
+from chemistry.topologyobjects import *
+from chemistry.structure import Structure, read_PDB
