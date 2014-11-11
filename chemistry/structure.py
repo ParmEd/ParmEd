@@ -123,8 +123,9 @@ class Structure(object):
     def unchange(self):
         """ Toggles all lists so that they do not indicate any changes """
         for attr in dir(self):
-            if hasattr(getattr(self, attr), 'changed'):
-                setattr(getattr(getattr(self, attr), 'changed'), False)
+            at = getattr(self, attr)
+            if hasattr(at, 'changed'):
+                setattr(at, 'changed', False)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -189,6 +190,8 @@ def read_PDB(filename):
             if bz2 is None:
                 raise ImportError('bz2 is not available for compressed PDB')
             fileobj = bz2.BZ2File(filename, 'r')
+        else:
+            fileobj = open(filename, 'r')
     else:
         own_handle = False
         fileobj = filename
@@ -199,7 +202,7 @@ def read_PDB(filename):
     struct.doi = struct.pmid = struct.journal_authors = struct.volume_page = ''
     struct.title = ''
     struct.year = None
-    struct.related_entries
+    struct.related_entries = []
     modelno = 1 # For PDB files with multiple MODELs
     atomno = 0
     coordinates = []
@@ -231,18 +234,22 @@ def read_PDB(filename):
                 try:
                     atsym = (elem[0] + elem[1].lower()).strip()
                     atomic_number = AtomicNum[atsym]
+                    mass = Mass[atsym]
                 except KeyError:
                     # Now try based on the atom name... but don't try too hard
                     # (e.g., don't try to differentiate b/w Ca and C)
                     try:
                         atomic_number = AtomicNum[atname.strip()[0].upper()]
+                        mass = Mass[atname.strip()[0].upper()]
                     except KeyError:
                         try:
                             sym = atname.strip()[:2]
                             sym = '%s%s' % (sym[0].upper(), sym[0].lower())
                             atomic_number = AtomicNum[sym]
+                            mass = Mass[sym]
                         except KeyError:
                             atomic_number = 0 # give up
+                            mass = 0.0
                 try:
                     bfactor = float(bfactor)
                 except ValueError:
@@ -301,10 +308,9 @@ def read_PDB(filename):
                     chg = 0
                 if modelno == 1:
                     atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=chg, mass=Mass[atomic_number],
-                                occupancy=occupancy, bfactor=bfactor,
-                                altloc=altloc)
-                    atom.xx, atom.xy, atom.xz = x, y, z
+                                charge=chg, mass=mass, occupancy=occupancy,
+                                bfactor=bfactor, altloc=altloc)
+                    atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                     struct.residues.add_atom(atom, resname, resid,
                                              chain, inscode)
                     struct.atoms.append(atom)
@@ -383,6 +389,7 @@ def read_PDB(filename):
     # Make the keywords into a list
     struct.keywords = [x.strip() for x in struct.keywords.split(',')
                                         if x.strip()]
+    struct.unchange()
     return struct
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
