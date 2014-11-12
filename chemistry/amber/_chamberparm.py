@@ -266,11 +266,11 @@ class ChamberParm(AmberParm):
         if cmap_num == 0:
             # We have deleted all cmaps. Get rid of them from the parm file and
             # bail out. This is probably pretty unlikely, though...
-            self.deleteFlag('CHARMM_CMAP_COUNT')
-            self.deleteFlag('CHARMM_CMAP_RESOLUTION')
+            self.delete_flag('CHARMM_CMAP_COUNT')
+            self.delete_flag('CHARMM_CMAP_RESOLUTION')
             for flag in self.flag_list:
                 if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                    self.deleteFlag(flag)
+                    self.delete_flag(flag)
             self.LoadPointers() # update CHARMM pointers
             del self.cmap, self.cmap_type_list
             return
@@ -291,11 +291,11 @@ class ChamberParm(AmberParm):
             fmt = '8(F9.5)'
         for flag in self.flag_list:
             if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                self.deleteFlag(flag)
+                self.delete_flag(flag)
         # Now the parameters are gone, so go through and add those flags back
         # using the cmap_types we tagged along earlier.
         for i, ct in enumerate(cmap_types):
-            self.addFlag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
+            self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
                          data=ct.grid, comments=ct.comments)
         self.LoadPointers() # update CHARMM pointers
         self.cmap.changed = False
@@ -521,24 +521,25 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
     # First add all of the flags
     parm = ChamberParm()
     if vmd:
-        parm.addFlag('TITLE', '20a4', data=[title])
+        parm.add_flag('TITLE', '20a4', data=[title])
     else:
-        parm.addFlag('CTITLE', 'a80', data=[title])
-    parm.addFlag('POINTERS', '10I8', data=pointers)
-    parm.addFlag('FORCE_FIELD_TYPE', 'i2,a78', data=frcfield)
-    parm.addFlag('ATOM_NAME','20a4',data=[a.name[:4] for a in struct.atom_list])
+        parm.add_flag('CTITLE', 'a80', data=[title])
+    parm.add_flag('POINTERS', '10I8', data=pointers)
+    parm.add_flag('FORCE_FIELD_TYPE', 'i2,a78', data=frcfield)
+    parm.add_flag('ATOM_NAME','20a4',
+                  data=[a.name[:4] for a in struct.atom_list])
     chgdat = [a.charge for a in struct.atom_list]
     if vmd:
-        parm.addFlag('CHARGE', '5E16.8', data=chgdat)
+        parm.add_flag('CHARGE', '5E16.8', data=chgdat)
     else:
-        parm.addFlag('CHARGE', '3E24.16', data=chgdat,
+        parm.add_flag('CHARGE', '3E24.16', data=chgdat,
                      comments=['Atomic charge multiplied by sqrt(332.0716D0) '
                                '(CCELEC)']
         )
-    parm.addFlag('MASS', '5E16.8', data=[a.mass for a in struct.atom_list])
-    parm.addFlag('ATOM_TYPE_INDEX', '10I8', data=lj_idx_list)
-    parm.addFlag('NUMBER_EXCLUDED_ATOMS', '10I8', data=num_excluded_atoms)
-    parm.addFlag('EXCLUDED_ATOMS_LIST', '10I8', data=excluded_atoms_list)
+    parm.add_flag('MASS', '5E16.8', data=[a.mass for a in struct.atom_list])
+    parm.add_flag('ATOM_TYPE_INDEX', '10I8', data=lj_idx_list)
+    parm.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=num_excluded_atoms)
+    parm.add_flag('EXCLUDED_ATOMS_LIST', '10I8', data=excluded_atoms_list)
     # Assign the nonbonded parm index table
     holder = [0 for i in xrange(num_lj_types*num_lj_types)]
     idx = 0
@@ -554,15 +555,15 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             holder2[idx] = holder[i*num_lj_types+j]
             idx += 1
     del holder
-    parm.addFlag('NONBONDED_PARM_INDEX', '10I8', data=holder2)
-    parm.addFlag('RESIDUE_LABEL', '20a4',
-                 data=[res.resname[:4] for res in struct.residue_list])
+    parm.add_flag('NONBONDED_PARM_INDEX', '10I8', data=holder2)
+    parm.add_flag('RESIDUE_LABEL', '20a4',
+                  data=[res.resname[:4] for res in struct.residue_list])
     resptr = [0 for i in xrange(len(struct.residue_list))]
     n = 1
     for i, res in enumerate(struct.residue_list):
         resptr[i] = n
         n += len(res)
-    parm.addFlag('RESIDUE_POINTER', '10I8', data=resptr)
+    parm.add_flag('RESIDUE_POINTER', '10I8', data=resptr)
     # Assign the bond types and bond type indexes
     numbnd = 0
     bond_frc_cnst, bond_equil = [], []
@@ -574,8 +575,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             bond.bond_type.idx = numbnd
             numbnd += 1
     parm.parm_data['POINTERS'][NUMBND] = numbnd
-    parm.addFlag('BOND_FORCE_CONSTANT', '5E16.8', data=bond_frc_cnst)
-    parm.addFlag('BOND_EQUIL_VALUE', '5E16.8', data=bond_equil)
+    parm.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=bond_frc_cnst)
+    parm.add_flag('BOND_EQUIL_VALUE', '5E16.8', data=bond_equil)
     # Assign the angle types and angle type indexes
     numang = 0
     angle_frc_cnst, angle_equil = [], []
@@ -587,8 +588,8 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             angle.angle_type.idx = numang
             numang += 1
     parm.parm_data['POINTERS'][NUMANG] = numang
-    parm.addFlag('ANGLE_FORCE_CONSTANT', '5E16.8', data=angle_frc_cnst)
-    parm.addFlag('ANGLE_EQUIL_VALUE', '3E25.17', data=angle_equil)
+    parm.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', data=angle_frc_cnst)
+    parm.add_flag('ANGLE_EQUIL_VALUE', '3E25.17', data=angle_equil)
     # Assign the Urey-Bradley terms
     nub = 0
     ub_frc_cnst, ub_equil = [], []
@@ -600,18 +601,18 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             ureybrad.ub_type.idx = nub
             nub += 1
     ubcnt = [len(struct.urey_bradley_list), nub]
-    parm.addFlag('CHARMM_UREY_BRADLEY_COUNT', '2I8', data=ubcnt,
-                 comments=['V(ub) = K_ub(r_ik - R_ub)**2',
-                           'Number of Urey Bradley terms and types']
+    parm.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', data=ubcnt,
+                  comments=['V(ub) = K_ub(r_ik - R_ub)**2',
+                            'Number of Urey Bradley terms and types']
     )
-    parm.addFlag('CHARMM_UREY_BRADLEY', '10I8', num_items=ubcnt[0]*3,
-                 comments=['List of the two atoms and its parameter index',
-                           'in each UB term: i,k,index']
+    parm.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=ubcnt[0]*3,
+                  comments=['List of the two atoms and its parameter index',
+                            'in each UB term: i,k,index']
     )
-    parm.addFlag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
-                 data=ub_frc_cnst, comments=['K_ub: kcal/mol/A**2'])
-    parm.addFlag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', data=ub_equil,
-                 comments='r_ub: A')
+    parm.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
+                  data=ub_frc_cnst, comments=['K_ub: kcal/mol/A**2'])
+    parm.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', data=ub_equil,
+                  comments='r_ub: A')
     for i, ureybrad in enumerate(struct.urey_bradley_list):
         parm.parm_data['CHARMM_UREY_BRADLEY'][3*i  ] = ureybrad.atom1.idx + 1
         parm.parm_data['CHARMM_UREY_BRADLEY'][3*i+1] = ureybrad.atom2.idx + 1
@@ -628,12 +629,12 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             dihed.dihedral_type.idx = nphi
             nphi += 1
     parm.parm_data['POINTERS'][NPTRA] = nphi
-    parm.addFlag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', data=dih_frc_cnst)
-    parm.addFlag('DIHEDRAL_PERIODICITY', '5E16.8', data=dih_per)
-    parm.addFlag('DIHEDRAL_PHASE', '5E16.8', data=dih_phase)
+    parm.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', data=dih_frc_cnst)
+    parm.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', data=dih_per)
+    parm.add_flag('DIHEDRAL_PHASE', '5E16.8', data=dih_phase)
     # No 1-4 scaling 
-    parm.addFlag('SCEE_SCALE_FACTOR','5E16.8', data=[1.0 for i in xrange(nphi)])
-    parm.addFlag('SCNB_SCALE_FACTOR','5E16.8', data=[1.0 for i in xrange(nphi)])
+    parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8', data=[1 for i in xrange(nphi)])
+    parm.add_flag('SCNB_SCALE_FACTOR', '5E16.8', data=[1 for i in xrange(nphi)])
     # Assign impropers
     nimpt = 0
     imp_frc_cnst, imp_equil = [], []
@@ -645,25 +646,25 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             imp.improper_type.idx = nimpt
             nimpt += 1
     nimp = len(struct.improper_list)
-    parm.addFlag('CHARMM_NUM_IMPROPERS', '10I8',
-                 data=[nimp], comments=['Number of terms contributing to the',
-                 'quadratic four atom improper energy term:',
-                 'V(improper) = K_psi(psi - psi_0)**2']
+    parm.add_flag('CHARMM_NUM_IMPROPERS', '10I8',
+                  data=[nimp], comments=['Number of terms contributing to the',
+                  'quadratic four atom improper energy term:',
+                  'V(improper) = K_psi(psi - psi_0)**2']
     )
-    parm.addFlag('CHARMM_IMPROPERS', '10I8', num_items=nimp*5,
-                 comments=['List of the four atoms in each improper term',
-                           'i,j,k,l,index  i,j,k,l,index',
-                           'where index is into the following two lists:',
-                           'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}']
+    parm.add_flag('CHARMM_IMPROPERS', '10I8', num_items=nimp*5,
+                  comments=['List of the four atoms in each improper term',
+                            'i,j,k,l,index  i,j,k,l,index',
+                            'where index is into the following two lists:',
+                            'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}']
     )
-    parm.addFlag('CHARMM_NUM_IMPR_TYPES', '1I8', data=[nimpt],
-                 comments=['Number of unique parameters contributing to the',
-                           'quadratic four atom improper energy term']
+    parm.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', data=[nimpt],
+                  comments=['Number of unique parameters contributing to the',
+                            'quadratic four atom improper energy term']
     )
-    parm.addFlag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', data=imp_frc_cnst,
-                 comments=['K_psi: kcal/mole/rad**2'])
-    parm.addFlag('CHARMM_IMPROPER_PHASE', '5E16.8', data=imp_equil,
-                 comments=['psi: degrees'])
+    parm.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', data=imp_frc_cnst,
+                  comments=['K_psi: kcal/mole/rad**2'])
+    parm.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', data=imp_equil,
+                  comments=['psi: degrees'])
     # Add the impropers
     for i, imp in enumerate(struct.improper_list):
         parm.parm_data['CHARMM_IMPROPERS'][5*i  ] = imp.atom1.idx + 1
@@ -672,16 +673,16 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         parm.parm_data['CHARMM_IMPROPERS'][5*i+3] = imp.atom4.idx + 1
         parm.parm_data['CHARMM_IMPROPERS'][5*i+4] = imp.improper_type.idx + 1
 
-    parm.addFlag('SOLTY', '5E16.8', num_items=parm.parm_data['POINTERS'][NATYP])
+    parm.add_flag('SOLTY','5E16.8',num_items=parm.parm_data['POINTERS'][NATYP])
     if vmd:
         fmt = '5E16.8'
     else:
         fmt = '3E24.16'
     nttyp = num_lj_types * (num_lj_types + 1) // 2
-    parm.addFlag('LENNARD_JONES_ACOEF', fmt, num_items=nttyp)
-    parm.addFlag('LENNARD_JONES_BCOEF', fmt, num_items=nttyp)
-    parm.addFlag('LENNARD_JONES_14_ACOEF', fmt, num_items=nttyp)
-    parm.addFlag('LENNARD_JONES_14_BCOEF', fmt, num_items=nttyp)
+    parm.add_flag('LENNARD_JONES_ACOEF', fmt, num_items=nttyp)
+    parm.add_flag('LENNARD_JONES_BCOEF', fmt, num_items=nttyp)
+    parm.add_flag('LENNARD_JONES_14_ACOEF', fmt, num_items=nttyp)
+    parm.add_flag('LENNARD_JONES_14_BCOEF', fmt, num_items=nttyp)
     for i in xrange(num_lj_types):
         for j in xrange(i, num_lj_types):
             index = parm.parm_data['NONBONDED_PARM_INDEX'][num_lj_types*i+j] - 1
@@ -704,9 +705,9 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             parm.parm_data['LENNARD_JONES_14_ACOEF'][index] = a14
             parm.parm_data['LENNARD_JONES_14_BCOEF'][index] = b14
     # Bonds with and without hydrogen now
-    parm.addFlag('BONDS_INC_HYDROGEN', '10I8', num_items=len(bonds_inc_h)*3)
-    parm.addFlag('BONDS_WITHOUT_HYDROGEN', '10I8',
-                 num_items=len(bonds_without_h)*3)
+    parm.add_flag('BONDS_INC_HYDROGEN', '10I8', num_items=len(bonds_inc_h)*3)
+    parm.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8',
+                  num_items=len(bonds_without_h)*3)
     pd = parm.parm_data
     for i, bond in enumerate(bonds_inc_h):
         pd['BONDS_INC_HYDROGEN'][3*i  ] = bond.atom1.idx * 3
@@ -717,9 +718,9 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         pd['BONDS_WITHOUT_HYDROGEN'][3*i+1] = bond.atom2.idx * 3
         pd['BONDS_WITHOUT_HYDROGEN'][3*i+2] = bond.bond_type.idx + 1
     # Angles with and without hydrogen now
-    parm.addFlag('ANGLES_INC_HYDROGEN', '10I8', num_items=len(angles_inc_h)*4)
-    parm.addFlag('ANGLES_WITHOUT_HYDROGEN', '10I8',
-                 num_items=len(angles_without_h)*4)
+    parm.add_flag('ANGLES_INC_HYDROGEN', '10I8', num_items=len(angles_inc_h)*4)
+    parm.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8',
+                  num_items=len(angles_without_h)*4)
     for i, ang in enumerate(angles_inc_h):
         pd['ANGLES_INC_HYDROGEN'][4*i  ] = ang.atom1.idx * 3
         pd['ANGLES_INC_HYDROGEN'][4*i+1] = ang.atom2.idx * 3
@@ -731,9 +732,9 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
         pd['ANGLES_WITHOUT_HYDROGEN'][4*i+2] = ang.atom3.idx * 3
         pd['ANGLES_WITHOUT_HYDROGEN'][4*i+3] = ang.angle_type.idx + 1
     # Dihedrals with and without hydrogen now
-    parm.addFlag('DIHEDRALS_INC_HYDROGEN', '10I8',
+    parm.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8',
                  num_items=len(dihedrals_inc_h)*5)
-    parm.addFlag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8',
+    parm.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8',
                  num_items=len(dihedrals_without_h)*5)
     for i, dih in enumerate(dihedrals_inc_h):
         if dih.atom3.idx == 0 or dih.atom4.idx == 0:
@@ -761,15 +762,15 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = a3.idx * 3
         pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+3] = a4.idx * 3
         pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+4] = dih.dihedral_type.idx + 1
-    parm.addFlag('HBOND_ACOEF', '5E16.8', num_items=0)
-    parm.addFlag('HBOND_BCOEF', '5E16.8', num_items=0)
-    parm.addFlag('HBCUT', '5E16.8', num_items=0)
-    parm.addFlag('AMBER_ATOM_TYPE', '20a4',
+    parm.add_flag('HBOND_ACOEF', '5E16.8', num_items=0)
+    parm.add_flag('HBOND_BCOEF', '5E16.8', num_items=0)
+    parm.add_flag('HBCUT', '5E16.8', num_items=0)
+    parm.add_flag('AMBER_ATOM_TYPE', '20a4',
                  data=[a.type.name[:4] for a in struct.atom_list])
-    parm.addFlag('TREE_CHAIN_CLASSIFICATION', '20a4',
+    parm.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4',
                  data=['BLA' for a in struct.atom_list])
-    parm.addFlag('JOIN_ARRAY', '10I8', data=[0 for a in struct.atom_list])
-    parm.addFlag('IROTAT', '10I8', data=[0 for a in struct.atom_list])
+    parm.add_flag('JOIN_ARRAY', '10I8', data=[0 for a in struct.atom_list])
+    parm.add_flag('IROTAT', '10I8', data=[0 for a in struct.atom_list])
     if hasattr(struct, 'cmap_list'):
         # Do the CMAP terms if we have cmaps
         ncmapt = 0
@@ -781,21 +782,21 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
                 cmap_types.append(cmap.cmap_type)
                 cmap.cmap_type.idx = ncmapt
                 ncmapt += 1
-        parm.addFlag('CHARMM_CMAP_COUNT', '2I8', data=[ncmap, ncmapt],
+        parm.add_flag('CHARMM_CMAP_COUNT', '2I8', data=[ncmap, ncmapt],
                      comments=['Number of CMAP terms, number of unique CMAP '
                                'parameters']
         )
-        parm.addFlag('CHARMM_CMAP_RESOLUTION', '20I4',
+        parm.add_flag('CHARMM_CMAP_RESOLUTION', '20I4',
                      data=[cm.cmap_type.resolution for cm in struct.cmap_list],
                      comments=['Number of steps along each phi/psi CMAP axis',
                                'for each CMAP_PARAMETER grid']
         )
         # Now add each of the cmap flags
         for i, ct in enumerate(cmap_types):
-            parm.addFlag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), '8(F9.5)',
+            parm.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), '8(F9.5)',
                          data=ct.grid[:])
         # Now add the cmap data
-        parm.addFlag('CHARMM_CMAP_INDEX', '6I8', num_items=ncmap*6,
+        parm.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=ncmap*6,
                      comments=['Atom index i,j,k,l,m of the cross term',
                                'and then pointer to CHARMM_CMAP_PARAMETER_n']
         )
@@ -821,12 +822,12 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
             if atom.residue.resname in charmm_solvent:
                 nspsol = atom.marked
                 break
-        parm.addFlag('SOLVENT_POINTERS', '3I8', data=[iptres, nspm, nspsol])
-        parm.addFlag('ATOMS_PER_MOLECULE', '10i8', num_items=nspm)
+        parm.add_flag('SOLVENT_POINTERS', '3I8', data=[iptres, nspm, nspsol])
+        parm.add_flag('ATOMS_PER_MOLECULE', '10i8', num_items=nspm)
         for atom in struct.atom_list:
             parm.parm_data['ATOMS_PER_MOLECULE'][atom.marked-1] += 1
         box_info = [struct.box[3]] + struct.box[:3]
-        parm.addFlag('BOX_DIMENSIONS', '5E16.8', data=box_info)
+        parm.add_flag('BOX_DIMENSIONS', '5E16.8', data=box_info)
         parm.initialize_topology()
         parm.hasbox = True
         parm.box = struct.box[:]

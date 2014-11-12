@@ -398,11 +398,11 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = _zeros(typenum)
             self.bond_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_REGULAR_BOND_LIST')
-            self.deleteFlag('AMOEBA_REGULAR_BOND_NUM_LIST')
-            self.deleteFlag('AMOEBA_REGULAR_BOND_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_REGULAR_BOND_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_REGULAR_BOND_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_REGULAR_BOND_LIST')
+            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_LIST')
+            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_PARAMS')
+            self.delete_flag('AMOEBA_REGULAR_BOND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_REGULAR_BOND_EQUIL_VALUE')
 
         # Now time for urey-bradleys
         if self.urey_bradley_list:
@@ -426,11 +426,11 @@ class AmoebaParm(AmberParm):
                                             _zeros(typenum)
             self.urey_bradley_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST')
-            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_LIST')
-            self.deleteFlag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_LIST')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE')
 
         # Now time for angles
         if self.angle_list:
@@ -453,11 +453,11 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
             self.angle_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_REGULAR_ANGLE_NUM_LIST')
-            self.deleteFlag('AMOEBA_REGULAR_ANGLE_LIST')
-            self.deleteFlag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_LIST')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
 
         # Now time for the trigonal angles
         if self.trigonal_angle_list:
@@ -483,11 +483,11 @@ class AmoebaParm(AmberParm):
                                         _zeros(typenum)
             self.trigonal_angle_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_NUM_LIST')
-            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_LIST')
-            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_LIST')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE')
 
         # Now time for the out-of-plane bending terms
         if self.oopbend_list:
@@ -512,11 +512,11 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_OPBEND_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
             self.oopbend_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_OPBEND_ANGLE_NUM_LIST')
-            self.deleteFlag('AMOEBA_OPBEND_ANGLE_LIST')
-            self.deleteFlag('AMOEBA_OPBEND_ANGLE_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_OPBEND_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_LIST')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_EQUIL_VALUE')
 
         # Now time for torsions
         if self.dihedral_list:
@@ -541,12 +541,12 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_TORSION_PHASE'] = _zeros(typenum)
             self.dihedral_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_TORSION_NUM_LIST')
-            self.deleteFlag('AMOEBA_TORSION_LIST')
-            self.deleteFlag('AMOEBA_TORSION_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_TORSION_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_TORSION_PERIODICITY')
-            self.deleteFlag('AMOEBA_TORSION_PHASE')
+            self.delete_flag('AMOEBA_TORSION_NUM_LIST')
+            self.delete_flag('AMOEBA_TORSION_LIST')
+            self.delete_flag('AMOEBA_TORSION_NUM_PARAMS')
+            self.delete_flag('AMOEBA_TORSION_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_TORSION_PERIODICITY')
+            self.delete_flag('AMOEBA_TORSION_PHASE')
 
         # Now time for pi-torsions
         if self.pitorsion_list:
@@ -571,12 +571,12 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_PI_TORSION_PHASE'] = _zeros(typenum)
             self.pitorsion_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_PI_TORSION_NUM_LIST')
-            self.deleteFlag('AMOEBA_PI_TORSION_LIST')
-            self.deleteFlag('AMOEBA_PI_TORSION_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_PI_TORSION_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_PI_TORSION_PERIODICITY')
-            self.deleteFlag('AMOEBA_PI_TORSION_PHASE')
+            self.delete_flag('AMOEBA_PI_TORSION_NUM_LIST')
+            self.delete_flag('AMOEBA_PI_TORSION_LIST')
+            self.delete_flag('AMOEBA_PI_TORSION_NUM_PARAMS')
+            self.delete_flag('AMOEBA_PI_TORSION_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_PI_TORSION_PERIODICITY')
+            self.delete_flag('AMOEBA_PI_TORSION_PHASE')
 
         # Now time for the stretch-bends
         if self.stretch_bend_list:
@@ -604,13 +604,13 @@ class AmoebaParm(AmberParm):
                                         _zeros(typenum)
             self.stretch_bend_type_list.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_STRETCH_BEND_NUM_LIST')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_LIST')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_NUM_PARAMS')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_EQUIL_VALUE')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE')
-            self.deleteFlag('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_NUM_LIST')
+            self.delete_flag('AMOEBA_STRETCH_BEND_LIST')
+            self.delete_flag('AMOEBA_STRETCH_BEND_NUM_PARAMS')
+            self.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_STRETCH_BEND_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE')
 
         # Now time for the coupled torsions
         if self.torsion_torsion_list:
@@ -635,7 +635,7 @@ class AmoebaParm(AmberParm):
             # We have to delete all of the 'old' types
             for flag in self.flag_list:
                 if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
-                    self.deleteFlag(flag)
+                    self.delete_flag(flag)
             # Now add them back for all of the types
             after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
             for tortype in typelist:
@@ -643,12 +643,12 @@ class AmoebaParm(AmberParm):
                 after = ('AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_'
                          'D2FUNC_DANGLE1_DANGLE2' % (tortype.idx+1))
         else:
-            self.deleteFlag('AMOEBA_TORSION_TORSION_NUM_LIST')
-            self.deleteFlag('AMOEBA_TORSION_TORSION_LIST')
-            self.deleteFlag('AMOEBA_TORSION_TORSION_NUM_PARAMS')
+            self.delete_flag('AMOEBA_TORSION_TORSION_NUM_LIST')
+            self.delete_flag('AMOEBA_TORSION_TORSION_LIST')
+            self.delete_flag('AMOEBA_TORSION_TORSION_NUM_PARAMS')
             for flag in self.flag_list:
                 if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
-                    self.deleteFlag(flag)
+                    self.delete_flag(flag)
 
         # Now time for the chiral frames
         if self.chiral_frame_list:
@@ -662,8 +662,8 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'] = [chi_num]
             self._truncate_array('AMOEBA_CHIRAL_FRAME_LIST', chi_num*3)
         else:
-            self.deleteFlag('AMOEBA_CHIRAL_FRAME_NUM_LIST')
-            self.deleteFlag('AMOEBA_CHIRAL_FRAME_LIST')
+            self.delete_flag('AMOEBA_CHIRAL_FRAME_NUM_LIST')
+            self.delete_flag('AMOEBA_CHIRAL_FRAME_LIST')
 
         # Now time for the multipole frames
         if self.multipole_frame_list:
@@ -677,8 +677,8 @@ class AmoebaParm(AmberParm):
             self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'] = [mul_num]
             self._truncate_array('AMOEBA_FRAME_DEF_NUM_LIST', mul_num*5)
         else:
-            self.deleteFlag('AMOEBA_FRAME_DEF_NUM_LIST')
-            self.deleteFlag('AMOEBA_FRAME_DEF_LIST')
+            self.delete_flag('AMOEBA_FRAME_DEF_NUM_LIST')
+            self.delete_flag('AMOEBA_FRAME_DEF_LIST')
 
         # Now time for the adjust array
         if self.adjust_list:
@@ -694,8 +694,8 @@ class AmoebaParm(AmberParm):
             # Now for the weights
             self.adjust_weights.write_to_parm()
         else:
-            self.deleteFlag('AMOEBA_ADJUST_NUM_LIST')
-            self.deleteFlag('AMOEBA_ADJUST_LIST')
+            self.delete_flag('AMOEBA_ADJUST_NUM_LIST')
+            self.delete_flag('AMOEBA_ADJUST_LIST')
 
         # Mark all lists as *not* changed
         self.bond_type_list.changed = False

@@ -386,7 +386,7 @@ class AmberParm(AmberFormat):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    def writeParm(self, name):
+    def write_parm(self, name):
         """
         Writes the current data in parm_data into a new topology file with a
         given name.
@@ -400,7 +400,7 @@ class AmberParm(AmberFormat):
             # sections
             if self.ptr('ifbox'): self.rediscover_molecules()
 
-        AmberFormat.writeParm(self, name)
+        AmberFormat.write_parm(self, name)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -685,9 +685,9 @@ class AmberParm(AmberFormat):
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
             self.LoadPointers()
-            self.deleteFlag('SOLVENT_POINTERS')
-            self.deleteFlag('ATOMS_PER_MOLECULE')
-            self.deleteFlag('BOX_DIMENSIONS')
+            self.delete_flag('SOLVENT_POINTERS')
+            self.delete_flag('ATOMS_PER_MOLECULE')
+            self.delete_flag('BOX_DIMENSIONS')
             self.hasbox = False
             try: 
                 self.rst7.hasbox = False

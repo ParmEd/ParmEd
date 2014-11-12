@@ -221,36 +221,36 @@ def addCoarseGrain(parm, param_file):
                 'This section is not used for Coarse grained topologies')
    
     # Now let's add our new sections
-    parm.addFlag('ANGLE_COEF_A','5E16.8',parm.ptr('numang'),
+    parm.add_flag('ANGLE_COEF_A','5E16.8',parm.ptr('numang'),
                  comments='A Coefficient for Coarse grained force field')
-    parm.addFlag('ANGLE_COEF_B','5E16.8',parm.ptr('numang'),
+    parm.add_flag('ANGLE_COEF_B','5E16.8',parm.ptr('numang'),
                  comments='B Coefficient for Coarse grained force field')
-    parm.addFlag('ANGLE_COEF_C','5E16.8',parm.ptr('numang'),
+    parm.add_flag('ANGLE_COEF_C','5E16.8',parm.ptr('numang'),
                  comments='C Coefficient for Coarse grained force field')
-    parm.addFlag('ANGLE_COEF_D','5E16.8',parm.ptr('numang'),
+    parm.add_flag('ANGLE_COEF_D','5E16.8',parm.ptr('numang'),
                  comments='D Coefficient for Coarse grained force field')
-    parm.addFlag('DIHEDRAL_AMPLITUDE_1','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_AMPLITUDE_1','5E16.8',parm.ptr('nptra'),
                  comments='1st Dihedral Amplitude for coarse grained force '
                           'field')
-    parm.addFlag('DIHEDRAL_AMPLITUDE_2','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_AMPLITUDE_2','5E16.8',parm.ptr('nptra'),
                  comments='2nd Dihedral Amplitude for coarse grained force '
                           'field'
     )
-    parm.addFlag('DIHEDRAL_AMPLITUDE_3','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_AMPLITUDE_3','5E16.8',parm.ptr('nptra'),
                  comments='3rd Dihedral Amplitude for coarse grained force '
                           'field'
     )
-    parm.addFlag('DIHEDRAL_AMPLITUDE_4','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_AMPLITUDE_4','5E16.8',parm.ptr('nptra'),
                  comments='4th Dihedral Amplitude for coarse grained force '
                           'field'
     )
-    parm.addFlag('DIHEDRAL_PHASE_1','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_PHASE_1','5E16.8',parm.ptr('nptra'),
                  comments='1st Dihedral Phase for coarse grained force field')
-    parm.addFlag('DIHEDRAL_PHASE_2','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_PHASE_2','5E16.8',parm.ptr('nptra'),
                  comments='2nd Dihedral Phase for coarse grained force field')
-    parm.addFlag('DIHEDRAL_PHASE_3','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_PHASE_3','5E16.8',parm.ptr('nptra'),
                  comments='3rd Dihedral Phase for coarse grained force field')
-    parm.addFlag('DIHEDRAL_PHASE_4','5E16.8',parm.ptr('nptra'),
+    parm.add_flag('DIHEDRAL_PHASE_4','5E16.8',parm.ptr('nptra'),
                  comments='4th Dihedral Phase for coarse grained force field')
 
     for i in xrange(len(parm.parm_data['ANGLE_FORCE_CONSTANT'])):

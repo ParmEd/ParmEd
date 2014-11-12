@@ -268,7 +268,7 @@ class parmout(Action):
         if self.rst_name is not None:
             if not Action.overwrite and os.path.exists(self.rst_name):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
-        self.parm.writeParm(self.filename)
+        self.parm.write_parm(self.filename)
         if self.rst_name is not None:
             self.parm.writeRst7(self.rst_name, netcdf=self.netcdf)
 
@@ -396,15 +396,15 @@ class changeradii(Action):
         # Add RADIUS_SET to prmtop if it's not there already, and a blank 
         # description, since it's about to be set here
         if not 'RADIUS_SET' in self.parm.flag_list:
-            self.parm.addFlag('RADIUS_SET', '1a80', num_items=1)
+            self.parm.add_flag('RADIUS_SET', '1a80', num_items=1)
         # Add RADII prmtop section if it doesn't exist already. Just make it a
         # zeroed array, since it's all about to be set here
         if not 'RADII' in self.parm.flag_list:
-            self.parm.addFlag('RADII', '5E16.8',
-                              num_items=self.parm.ptr('natom'))
+            self.parm.add_flag('RADII', '5E16.8',
+                               num_items=self.parm.ptr('natom'))
         if not 'SCREEN' in self.parm.flag_list:
-            self.parm.addFlag('SCREEN', '5E16.8',
-                              num_items=self.parm.ptr('natom'))
+            self.parm.add_flag('SCREEN', '5E16.8',
+                               num_items=self.parm.ptr('natom'))
         ChRad(self.parm, self.radii)
         self.parm.atom_list.refresh_data()
 
@@ -791,9 +791,9 @@ class scee(Action):
 
     def execute(self):
         if not 'SCEE_SCALE_FACTOR' in self.parm.flag_list:
-            self.parm.addFlag('SCEE_SCALE_FACTOR', '5E16.8',
-                              data=[self.scee_value
-                                    for i in xrange(self.parm.ptr('nptra'))]
+            self.parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8',
+                               data=[self.scee_value
+                                     for i in xrange(self.parm.ptr('nptra'))]
             )
         else:
             self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
@@ -820,7 +820,7 @@ class scnb(Action):
 
     def execute(self):
       if not 'SCNB_SCALE_FACTOR' in self.parm.flag_list:
-         self.parm.addFlag('SCNB_SCALE_FACTOR','5E16.8', data=[self.scnb_value 
+         self.parm.add_flag('SCNB_SCALE_FACTOR','5E16.8', data=[self.scnb_value
                                     for i in xrange(self.parm.ptr('nptra'))])
       else:
          self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
@@ -1770,8 +1770,8 @@ class addatomicnumber(Action):
 
     def execute(self):
         if self.present: return
-        self.parm.addFlag('ATOMIC_NUMBER', '10I8',
-                          num_items=self.parm.ptr('natom'))
+        self.parm.add_flag('ATOMIC_NUMBER', '10I8',
+                           num_items=self.parm.ptr('natom'))
         for i, atm in enumerate(self.parm.atom_list):
             self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
 
@@ -2569,7 +2569,7 @@ class interpolate(Action):
             parm1.parm_data['CHARGE'] = [c for c in new_chg]
             newname = '%s.%d' % (self.prefix, i+self.startnum)
             print 'Printing %s' % newname
-            parm1.writeParm(newname)
+            parm1.write_parm(newname)
         # Restore the original charges
         parm1.parm_data['CHARGE'] = orig_chg1
 
@@ -2790,19 +2790,19 @@ class addpdb(Action):
             haveicodes = False
             ncmts += ['Residue insertion code (iCode) not present in PDB file',
                       'If present: %FLAG RESIDUE_ICODE, %FORMAT(20a4)']
-        self.parm.addFlag('RESIDUE_NUMBER', '20I4', data=resnums,
-                          comments=ncmts)
-        self.parm.addFlag('RESIDUE_CHAINID', '20a4', data=chainids,
+        self.parm.add_flag('RESIDUE_NUMBER', '20I4', data=resnums,
+                           comments=ncmts)
+        self.parm.add_flag('RESIDUE_CHAINID', '20a4', data=chainids,
                           comments=['Residue chain ID (chainId) read from PDB '
                                     'file; DIMENSION(NRES)']
         )
         if haveicodes:
-            self.parm.addFlag('RESIDUE_ICODE', '20a4', data=icodes,
+            self.parm.add_flag('RESIDUE_ICODE', '20a4', data=icodes,
                 comments=['Residue insertion code (iCode) read from PDB file; '
                         'DIMENSION(NRES)']
             )
         if self.elements:
-            self.parm.addFlag('ATOM_ELEMENT', '20a4',
+            self.parm.add_flag('ATOM_ELEMENT', '20a4',
                 data=['%2s' % (_Element[atm.atomic_number].upper()) 
                             for atm in self.parm.atom_list
                 ], comments=['Atom element name read from topology file']
@@ -2829,10 +2829,10 @@ class deletepdb(Action):
 
     def execute(self):
         if not self.pdbpresent: return
-        self.parm.deleteFlag('RESIDUE_NUMBER')
-        self.parm.deleteFlag('RESIDUE_CHAINID')
-        self.parm.deleteFlag('ATOM_ELEMENT')
-        self.parm.deleteFlag('RESIDUE_ICODE')
+        self.parm.delete_flag('RESIDUE_NUMBER')
+        self.parm.delete_flag('RESIDUE_CHAINID')
+        self.parm.delete_flag('ATOM_ELEMENT')
+        self.parm.delete_flag('RESIDUE_ICODE')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2895,8 +2895,8 @@ class add12_6_4(Action):
     def execute(self):
         from ParmedTools.add1264 import params1264 as params
         if 'LENNARD_JONES_CCOEF' in self.parm.flag_list:
-            self.parm.deleteFlag('LENNARD_JONES_CCOEF')
-        self.parm.addFlag('LENNARD_JONES_CCOEF', '5E16.8',
+            self.parm.delete_flag('LENNARD_JONES_CCOEF')
+        self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
                 comments=['For 12-6-4 potential used for divalent metal ions'])
         for i, param in enumerate(params(self.parm, self.mask, self.c4file,
