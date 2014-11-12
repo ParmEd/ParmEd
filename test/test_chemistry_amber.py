@@ -40,7 +40,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ifbox'), 0)
 
         # Now check the restart file
-        rst = readparm.Rst7(get_fn('trx.inpcrd'))
+        rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
         coords = rst.coordinates
         vels = rst.velocities
         for i, atom in enumerate(gasparm.atom_list):
@@ -272,7 +272,7 @@ class TestWriteFiles(unittest.TestCase):
     def testWriteAmberParm(self):
         """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
-        parm.writeParm(get_fn('trx.prmtop', written=True))
+        parm.write_parm(get_fn('trx.prmtop', written=True))
         f1 = open(get_fn('trx.prmtop'), 'r')
         f2 = open(get_fn('trx.prmtop', written=True), 'r')
         try:
