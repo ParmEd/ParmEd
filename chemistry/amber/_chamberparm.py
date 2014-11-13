@@ -91,12 +91,12 @@ class ChamberParm(AmberParm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    
-    def LoadPointers(self):
+    def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each
         key being the pointer name according to http://ambermd.org/formats.html
         """
-        AmberParm.LoadPointers(self)
+        AmberParm.load_pointers(self)
         # Other pointers
         nub, nubtypes = self.parm_data['CHARMM_UREY_BRADLEY_COUNT'][:2]
         self.pointers['NUB'] = nub
@@ -247,7 +247,7 @@ class ChamberParm(AmberParm):
 
         # If we have no CMAP, we are done. Otherwise, press on
         if not self.has_cmap:
-            self.LoadPointers() # update CHARMM pointers
+            self.load_pointers() # update CHARMM pointers
             return
 
         # If we are here, then we have CMAP terms to do
@@ -271,7 +271,7 @@ class ChamberParm(AmberParm):
             for flag in self.flag_list:
                 if flag.startswith('CHARMM_CMAP_PARAMETER'):
                     self.delete_flag(flag)
-            self.LoadPointers() # update CHARMM pointers
+            self.load_pointers() # update CHARMM pointers
             del self.cmap, self.cmap_type_list
             return
         # Truncate our list to only include those cmaps that remain
@@ -297,7 +297,7 @@ class ChamberParm(AmberParm):
         for i, ct in enumerate(cmap_types):
             self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
                          data=ct.grid, comments=ct.comments)
-        self.LoadPointers() # update CHARMM pointers
+        self.load_pointers() # update CHARMM pointers
         self.cmap.changed = False
         self.cmap_type_list.changed = False
 

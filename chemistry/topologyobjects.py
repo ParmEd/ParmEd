@@ -163,6 +163,13 @@ class Atom(_ListItem):
     tree : str='BLA'
         The tree chain identifier assigned to this atom. Relevant in the context
         of an Amber topology file, and not used for very much.
+    join : int=0
+        The 'join` property of atoms stored in the Amber topology file. At the
+        time of writing this class, `join` is unused, but still oddly required.
+        Add support for future-proofing
+    irotat : int=0
+        The `irotat` property of atoms stored in the Amber topology file.
+        Unused, but included for future-proofing.
     occupancy : str=''
         The occupancy of the atom (see PDB file)
     bfactor : float=0.0
@@ -192,6 +199,13 @@ class Atom(_ListItem):
     tree : str
         The tree chain classification string. Applies to the Amber topology file
         instance, but is not used for much.
+    join : int=0
+        The 'join` property of atoms stored in the Amber topology file. At the
+        time of writing this class, `join` is unused, but still oddly required.
+        Add support for future-proofing
+    irotat : int=0
+        The `irotat` property of atoms stored in the Amber topology file.
+        Unused, but included for future-proofing.
     occupancy : float
         The occupancy of the atom (see PDB file)
     bfactor : float
@@ -318,7 +332,8 @@ class Atom(_ListItem):
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
-                 tree='BLA', occupancy=0.0, bfactor=0.0, altloc=''):
+                 tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
+                 bfactor=0.0, altloc=''):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -330,6 +345,8 @@ class Atom(_ListItem):
         self.radii = radii
         self.screen = screen
         self.tree = tree
+        self.join = join
+        self.irotat = irotat
         self.bfactor = bfactor
         self.altloc = altloc
         self.occupancy = occupancy
