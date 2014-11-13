@@ -22,8 +22,9 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.periodic_table import AtomicNum, element_by_mass
-from chemistry import Bond, Angle, Dihedral, ResidueList, AtomList, TrackedList
+from chemistry.periodic_table import AtomicNum, element_by_mass, Element
+from chemistry import (Bond, Angle, Dihedral, AtomList, Atom, BondType,
+                       AngleType, DihedralType)
 from chemistry.structure import Structure
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
@@ -31,14 +32,13 @@ from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
             NNB)
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.exceptions import (AmberParmWarning, AmberParmError, ReadError,
+from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
 try:
     from itertools import izip as zip
 except ImportError:
     # This only happens in Python 3, where zip is equivalent to izip
     pass
-from math import sqrt
 from warnings import warn
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -159,17 +159,15 @@ class AmberParm(AmberFormat, Structure):
         self.fill_LJ()
 
         # Load the Structure arrays
-        self._load_structure()
-        # Find any extra exclusion rules that may be defined
-        self.atom_list.find_extra_exclusions()
+        self.load_structure()
 
         # If we have coordinates or velocities, load them into the atom list
         if hasattr(self, 'coords'):
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 i3 = i * 3
                 atom.xx, atom.xy, atom.xz = self.coords[i3:i3+3]
         if hasattr(self, 'vels'):
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 i3 = i * 3
                 atom.vx, atom.vy, atom.vz = self.coords[i3:i3+3]
 
@@ -235,7 +233,7 @@ class AmberParm(AmberFormat, Structure):
         for p in self.pointers: other.pointers[p] = self.pointers[p]
         for typ in self.LJ_types: other.LJ_types[typ] = self.LJ_types[typ]
         try:
-            other._load_structure()
+            other.load_structure()
         except (KeyError, IndexError, AttributeError):
             raise AmberParmError('Could not set up topology for parm copy')
         # See if we have a restart file
@@ -295,7 +293,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _load_structure(self):
+    def load_structure(self):
         """ 
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
@@ -303,49 +301,20 @@ class AmberParm(AmberFormat, Structure):
         """
         self._check_section_lengths()
         self._load_atoms_and_residues()
-        self._load_atom_info()
+        self.load_atom_info()
         self._load_bond_info()
         self._load_angle_info()
         self._load_dihedral_info()
 
     #===================================================
 
-    def _load_atoms_and_residues(self):
-        """
-        Loads the atoms and residues (which are always done together) into the
-        data structure
-        """
-        del self.residues[:]
-        del self.atoms[:]
-        # Figure out on which atoms the residues start and stop
-        res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom]
-        try:
-            res_icd = self.parm_data['RESIDUE_ICODE']
-        except KeyError:
-            res_icd = ['' for i in xrange(self.parm_data['POINTERS'][NRES]]
-        try:
-            res_chn = self.parm_data['RESIDUE_CHAINID']
-        except KeyError:
-            res_chn = ['' for i in xrange(self.parm_data['POINTERS'][NRES]]
-        for i, resname in enumerate(self.parm_data['RESIDUE_NAME']):
-            resstart = res_ptr[i] - 1
-            resend = res_ptr[i+1] - 1
-            for j in range(resstart, resend):
-                atom = Atom(atomic_number=atnum[j], name=anam[j], charge=chg[j],
-                            mass=mass[j], nb_idx=nbtyp[j], radii=radii[j],
-                            screen=screen[j], tree=tree[j], join=join[j],
-                            irotat=irot[j])
-                self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
-                self.atoms.append(atom)
-
-    #===================================================
-
-    def _load_atom_info(self):
+    def load_atom_info(self):
         """
         Loads atom properties into the atoms that have been loaded. If any
         arrays are too short or too long, an IndexError will be raised
         """
         # Collect all of the atom properties present in our topology file
+        zeros = _zeros(len(self.atoms))
         anam = self.parm_data['ATOM_NAME']
         chg = self.parm_data['CHARGE']
         mass = self.parm_data['MASS']
@@ -378,159 +347,6 @@ class AmberParm(AmberFormat, Structure):
             atom.radii = radii[i]
             atom.screen = screen[i]
             atom.atomic_number = atnum[i]
-
-    #===================================================
-
-    def _load_bond_info(self):
-        """ Loads the bond types and bond arrays """
-        del self.bond_types[:]
-        del self.bonds[:]
-        for k, req in zip(self.parm_data['BOND_FORCE_CONSTANT'],
-                          self.parm_data['BOND_EQUIL_VALUE']):
-            self.bond_types.append(BondType(k, req, self.bond_types))
-        blist = self.parm_data['BONDS_INC_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
-            self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                         self.bond_types[blist[i+2]-1])
-            )
-        blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][MBONA], 3):
-            self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                         self.bond_types[blist[i+2]-1])
-            )
-
-    #===================================================
-
-    def _load_angle_info(self):
-        """ Loads the angle types and angle arrays """
-        del self.angle_types[:]
-        del self.angles[:]
-        for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
-                             self.parm_data['ANGLE_EQUIL_VALUE']):
-            self.angle_types.append(AngleType(k, theteq, self.angle_types))
-        alist = self.parm_data['ANGLES_INC_HYDROGEN']
-        for i in xrange(0, self.parm_data['POINTERS'][NTHETH], 4):
-            self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
-            )
-        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
-        for i in xrange(0, self.parm_data['POINTERS'][MTHETA], 4):
-            self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
-            )
-
-    #===================================================
-
-    def _load_dihedral_info(self):
-        """ Loads the dihedral types and dihedral arrays """
-        del self.dihedral_types[:]
-        del self.dihedrals[:]
-        try:
-            scee = self.parm_data['SCEE_SCALE_FACTOR']
-        except KeyError:
-            scee = [1.2 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
-        try:
-            scnb = self.parm_data['SCNB_SCALE_FACTOR']
-        except KeyError:
-            scnb = [1.2 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
-        for terms in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
-                         self.parm_data['DIHEDRAL_PERIODICITY'],
-                         self.parm_data['DIHEDRAL_PHASE'],
-                         scee, scnb):
-            self.dihedral_types.append(
-                    DihedralType(*terms, list=self.dihedral_types)
-            )
-        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
-            self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[dlist[i+2]//3],
-                             self.atoms[dlist[i+3]//3],
-                             type=self.dihedral_types[dlist[i+4]-1])
-            )
-        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
-            self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[dlist[i+2]//3],
-                             self.atoms[dlist[i+3]//3],
-                             type=self.dihedral_types[dlist[i+4]-1])
-            )
-
-    #===================================================
-
-    def _check_section_lengths(self):
-        """
-        Checks that all of the raw sections have the appropriate length as
-        specified by the POINTER section.
-
-        If any of the lengths are incorrect, AmberParmError is raised
-        """
-        def check_length(key, length, required=True):
-            if not required and key not in data: return
-            if len(self.parm_data[key]) != length:
-                raise AmberParmError('FLAG %s has %d elements; expected %d' %
-                                     (key, len(self.parm_data[key]), length))
-        natom = self.ptr('NATOM')
-        check_length('ATOM_NAME', natom)
-        check_length('CHARGE', natom)
-        check_length('MASS', natom)
-        check_length('ATOM_TYPE_INDEX', natom)
-        check_length('NUMBER_EXCLUDED_ATOMS', natom)
-        check_length('JOIN_ARRAY', natom)
-        check_length('IROTAT', natom)
-        check_length('RADIUS', natom, False)
-        check_length('SCREEN', natom, False)
-        check_length('ATOMIC_NUMBER', natom, False)
-
-        ntypes = self.ptr('NTYPES')
-        check_length('NONBONDED_PARM_INDEX', ntypes*ntypes)
-        check_length('LENNARD_JONES_ACOEF', ntypes*(ntypes+1)//2)
-        check_length('LENNARD_JONES_BCOEF', ntypes*(ntypes+1)//2)
-        check_length('LENNARD_JONES_CCOEF', ntypes*(ntypes+1)//2, False)
-
-        nres = self.ptr('NRES')
-        check_length('RESIDUE_LABEL', nres)
-        check_length('RESIDUE_POINTER', nres)
-        check_length('RESIDUE_CHAINID', nres, False)
-        check_length('RESIDUE_ICODE', nres, False)
-        check_length('RESIDUE_NUMBER', nres, False)
-
-        check_length('BOND_FORCE_CONSTANT', self.ptr('NUMBND'))
-        check_length('BOND_EQUIL_VALUE', self.ptr('NUMBND'))
-        check_length('ANGLE_FORCE_CONSTANT', self.ptr('NUMANG'))
-        check_length('ANGLE_EQUIL_VALUE', self.ptr('NUMANG'))
-        check_length('DIHEDRAL_FORCE_CONSTANT', self.ptr('NPTRA'))
-        check_length('DIHEDRAL_PERIODICITY', self.ptr('NPTRA'))
-        check_length('DIHEDRAL_PHASE', self.ptr('NPTRA'))
-        check_length('SCEE_SCALE_FACTOR', self.ptr('NPTRA'), False)
-        check_length('SCNB_SCALE_FACTOR', self.ptr('NPTRA'), False)
-        check_length('SOLTY', self.ptr('NATYP'))
-        check_length('BONDS_INC_HYDROGEN', self.ptr('NBONH'))
-        check_length('BONDS_WITHOUT_HYDROGEN', self.ptr('MBONA'))
-        check_length('ANGLES_INC_HYDROGEN', self.ptr('NTHETH'))
-        check_length('ANGLES_WITHOUT_HYDROGEN', self.ptr('NTHETA'))
-        check_length('DIHEDRALS_INC_HYDROGEN', self.ptr('NPHIH'))
-        check_length('DIHEDRALS_WITHOUT_HYDROGEN', self.ptr('NPHIA'))
-        check_length('HBOND_ACOEF', parm.ptr('NPHB'))
-        check_length('HBOND_BCOEF', parm.ptr('NPHB'))
-        check_length('SOLVENT_POINTERS', 3, False)
-        check_length('ATOMS_PER_MOLECULE',
-                     self.parm_data['SOLVENT_POINTERS'][i], False)
 
     #===================================================
 
@@ -595,216 +411,41 @@ class AmberParm(AmberFormat, Structure):
         # Now write the restart file
         self.rst7.write(name, netcdf)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    flush_data_changes = _load_structure
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def write_parm(self, name):
         """
         Writes the current data in parm_data into a new topology file with a
         given name.
         """
-        if hasattr(self, 'atom_list') and self._topology_changed(): 
+        if self._topology_changed(): 
             self.remake_parm()
-            # Reload the structure now that we've recalculated it to flush all
-            # data structures to what they *should* be.
-            self._load_structure()
-            # Now we have to redo the ATOMS_PER_MOLECULE/SOLVENT_POINTERS
-            # sections
-            if self.ptr('ifbox'): self.rediscover_molecules()
+#           self.load_structure()
 
         AmberFormat.write_parm(self, name)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def remake_parm(self):
         """
         Re-fills the topology file arrays if we have changed the underlying
         structure
         """
-        # First thing we have to do is load any of our old atom parameters into
-        # our atom_list to preserve any changes we've made directly to the data
-        self._load_atom_info()
-        # Now delete all of the bond/angle/dihedral partner information and
-        # refresh it to make sure we get the exclusions right
-        for atm in self.atom_list: atm.reset_topology()
-        for bnd in self.bonds_inc_h: bnd.register()
-        for bnd in self.bonds_without_h: bnd.register()
-        for ang in self.angles_inc_h: ang.register()
-        for ang in self.angles_without_h: ang.register()
-        for dih in self.dihedrals_inc_h: dih.register()
-        for dih in self.dihedrals_without_h: dih.register()
-        # Reset all type lists
-        self.bond_type_list.reset()
-        self.angle_type_list.reset()
-        self.dihedral_type_list.reset()
-        # Fill up the atom arrays. This will also adjust NATOM for us if 
-        # we've deleted atoms
-        self.atom_list.write_to_parm()
+        # Get rid of terms containing deleted atoms and empty residues
+        self.prune_empty_terms()
+        self.residue_list.prune()
 
-        # Recount number of extra points
-        nextra = 0
-        for atm in self.atom_list:
-            if atm.attype[:2] in ['EP', 'LP']: nextra += 1
-        self.parm_data['POINTERS'][NUMEXTRA] = nextra
-
-        nnb = self.parm_data['EXCLUDED_ATOMS_LIST']
-        self.parm_data['POINTERS'][NNB] = len(nnb)
-        # Reset the residue indexes
-        for res in self.residue_list: res.idx = -1
-        # Write the residue arrays
-        num_res = 0
-        for i, atm in enumerate(self.atom_list):
-            if atm.residue.idx == -1:
-                self.parm_data['RESIDUE_LABEL'][num_res] = atm.residue.resname
-                self.parm_data['RESIDUE_POINTER'][num_res] = i+1
-                num_res += 1
-                atm.residue.idx = num_res # index from 1
-        self.parm_data['POINTERS'][NRES] = num_res
-        self._truncate_array('RESIDUE_LABEL', num_res)
-        self._truncate_array('RESIDUE_POINTER', num_res)
-
-        # Adjust NMXRS (number of atoms in largest residue) in case that changed
-        bigres = max([len(r) for r in self.residue_list])
-        self.parm_data['POINTERS'][NMXRS] = bigres
-
-        # Now write all of the bond arrays. We will loop through all of the
-        # bonds to make sure that all of their atoms still exist (atm.idx > -1).
-        # At the same time, we will start applying indexes to the bond_types so
-        # we only print out the bond types that will be used. To do this, we
-        # need a couple counters. Different bond types will have an index of -1
-        # until we find out they are needed. Then we assign them an index and
-        # write out that bond info. We also have to make sure that every array
-        # is at least large enough, so give it enough elements to cover every
-        # bond in the list which will be reduced in size if not every bond is
-        # actually added
-        bond_num = 0
-        bond_type_num = 0
-        self.parm_data['BONDS_INC_HYDROGEN'] = _zeros(len(self.bonds_inc_h)*3)
-        for i, bnd in enumerate(self.bonds_inc_h):
-            if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
-            if bnd.bond_type.idx == -1:
-                bnd.bond_type.idx = bond_type_num
-                bond_type_num += 1
-            bnd.write_info(self, 'BONDS_INC_HYDROGEN', bond_num)
-            bond_num += 1
-        self.parm_data['POINTERS'][NBONH] = bond_num
-        self._truncate_array('BONDS_INC_HYDROGEN', 3*bond_num)
-        # Now we know how many bonds with hydrogen we have. Note that bond_num
-        # is +1 past the last index used, but that last index is -1 from total
-        # bond number due to indexing from 0, so it's just right now. So is the
-        # bond_type index, but that is applicable for the bonds_without_h
-        # as well.
-        bond_num = 0
-        self.parm_data['BONDS_WITHOUT_HYDROGEN'] = \
-                        _zeros(len(self.bonds_without_h)*3)
-        for i, bnd in enumerate(self.bonds_without_h):
-            if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
-            if bnd.bond_type.idx == -1:
-                bnd.bond_type.idx = bond_type_num
-                bond_type_num += 1
-            bnd.write_info(self, 'BONDS_WITHOUT_HYDROGEN', bond_num)
-            bond_num += 1
-        # Make sure BOND_FORCE_CONSTANT and BOND_EQUIL_VALUE arrays are big
-        # enough
-        self.parm_data['BOND_FORCE_CONSTANT'] = _zeros(bond_type_num)
-        self.parm_data['BOND_EQUIL_VALUE'] = _zeros(bond_type_num)
-        # Now we can write all of the bond types out
-        self.bond_type_list.write_to_parm()
-        # Now we know how many bonds without H we have and our # of bond types
-        self.parm_data['POINTERS'][MBONA] = bond_num
-        self.parm_data['POINTERS'][NBONA] = bond_num
-        self.parm_data['POINTERS'][NUMBND] = bond_type_num
-        self._truncate_array('BONDS_WITHOUT_HYDROGEN', 3*bond_num)
-
-        # Now do all of the angle arrays
-        angle_num = 0
-        angle_type_num = 0
-        # Make sure we have enough ANGLES_INC_HYDROGEN
-        self.parm_data['ANGLES_INC_HYDROGEN'] = _zeros(len(self.angles_inc_h)*4)
-        for i, ang in enumerate(self.angles_inc_h):
-            if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx):
-                continue
-            if ang.angle_type.idx == -1:
-                ang.angle_type.idx = angle_type_num
-                angle_type_num += 1
-            ang.write_info(self, 'ANGLES_INC_HYDROGEN', angle_num)
-            angle_num += 1
-        self.parm_data['POINTERS'][NTHETH] = angle_num
-        self._truncate_array('ANGLES_INC_HYDROGEN', 4*angle_num)
-        # Time for Angles without H
-        angle_num = 0
-        self.parm_data['ANGLES_WITHOUT_HYDROGEN'] = \
-                                          _zeros(len(self.angles_without_h)*4)
-        for i, ang in enumerate(self.angles_without_h):
-            if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx):
-                continue
-            if ang.angle_type.idx == -1:
-                ang.angle_type.idx = angle_type_num
-                angle_type_num += 1
-            ang.write_info(self, 'ANGLES_WITHOUT_HYDROGEN', angle_num)
-            angle_num += 1
-        # Make sure BOND_FORCE_CONSTANT and BOND_EQUIL_VALUE arrays are big
-        # enough
-        self.parm_data['ANGLE_FORCE_CONSTANT'] = _zeros(angle_type_num)
-        self.parm_data['ANGLE_EQUIL_VALUE'] = _zeros(angle_type_num)
-        # Write angle type info to parm
-        self.angle_type_list.write_to_parm()
-        self.parm_data['POINTERS'][NTHETA] = angle_num
-        self.parm_data['POINTERS'][MTHETA] = angle_num
-        self.parm_data['POINTERS'][NUMANG] = angle_type_num
-        self._truncate_array('ANGLES_WITHOUT_HYDROGEN', 4*angle_num)
-
-        # Now do all of the dihedral arrays
-        dihedral_num = 0
-        dihedral_type_num = 0
-        self.parm_data['DIHEDRALS_INC_HYDROGEN'] = \
-                                          _zeros(len(self.dihedrals_inc_h)*5)
-        for i, dih in enumerate(self.dihedrals_inc_h):
-            if -1 in (dih.atom1.idx, dih.atom2.idx,
-                      dih.atom3.idx, dih.atom4.idx):
-                continue
-            if dih.dihed_type.idx == -1:
-                dih.dihed_type.idx = dihedral_type_num
-                dihedral_type_num += 1
-            dih.write_info(self, 'DIHEDRALS_INC_HYDROGEN', dihedral_num)
-            dihedral_num += 1
-        self.parm_data['POINTERS'][NPHIH] = dihedral_num
-        self._truncate_array('DIHEDRALS_INC_HYDROGEN', 5*dihedral_num)
-        # Time for dihedrals without H
-        dihedral_num = 0
-        self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'] = \
-                                       _zeros(len(self.dihedrals_without_h)*5)
-        for i, dih in enumerate(self.dihedrals_without_h):
-            if -1 in (dih.atom1.idx, dih.atom2.idx,
-                      dih.atom3.idx, dih.atom4.idx):
-                continue
-            if dih.dihed_type.idx == -1:
-                dih.dihed_type.idx = dihedral_type_num
-                dihedral_type_num += 1
-            dih.write_info(self, 'DIHEDRALS_WITHOUT_HYDROGEN', dihedral_num)
-            dihedral_num += 1
-        self.parm_data['POINTERS'][NPHIA] = dihedral_num
-        self.parm_data['POINTERS'][MPHIA] = dihedral_num
-        self.parm_data['POINTERS'][NPTRA] = dihedral_type_num
-        self._truncate_array('DIHEDRALS_WITHOUT_HYDROGEN', 5*dihedral_num)
-
-        # Adjust lengths of the dihedral arrays to make sure they're long enough
-        for key in ('DIHEDRAL_FORCE_CONSTANT', 'DIHEDRAL_PERIODICITY',
-                    'DIHEDRAL_PHASE', 'SCEE_SCALE_FACTOR', 'SCNB_SCALE_FACTOR'):
-            if not key in self.parm_data.keys(): continue
-            self.parm_data[key] = _zeros(dihedral_type_num)
-      
-        self.dihedral_type_list.write_to_parm()
-      
-        # Load the pointers now
-        self.load_pointers()
+        # Transfer information from the topology lists 
+        self._xfer_atom_properties()
+        self._xfer_residue_properties()
+        self._xfer_bond_properties()
+        self._xfer_angle_properties()
+        self._xfer_dihedral_properties()
+        self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
    
     def is_changed(self):
         """ 
@@ -816,43 +457,41 @@ class AmberParm(AmberFormat, Structure):
             del self._topology
         return is_changed
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def delete_mask(self, mask):
-        """ Deletes all of the atoms corresponding to an entire mask """
+        """
+        Deletes all of the atoms corresponding to an entire Amber mask
+
+        Parameters
+        ----------
+        mask : str or AmberMask
+            The Amber mask defining the selection of atoms that will be deleted
+            from this topology
+        """
         from chemistry.amber.mask import AmberMask
-        # Determine if we were given an AmberMask object or a string. If the
-        # latter, turn it into an AmberMask and get the selection
+        # Get the atom selection
         if isinstance(mask, AmberMask):
-            # Make sure the AmberMask's parm is this one!
-            if id(self) != id(mask.parm):
+            if mask.parm is not self:
                 raise AmberParmError('Mask belongs to different prmtop!')
-            selection = mask.Selection()
+            selection = reversed(list(mask.Selected()))
         else:
-            selection = AmberMask(self, mask).Selection()
-
-        # Delete all of the atoms
-        for i in reversed(range(len(selection))):
-            if not selection[i]: continue
-            self.atom_list[i].deleted = True
-            del self.atom_list[i]
-
-        # Remake the topology file and re-set the molecules if we have periodic
-        # boxes (or delete the Molecule info if we removed all solvent)
+            selection = reversed(list(AmberMask(self, mask).Selected()))
+        # Delete the atoms and rebuild the topology and coordinates
+        for i in selection:
+            del self.atoms[i]
         self.remake_parm()
-
-        # Reconstruct the coordinates and velocities from the remaining atoms
         if hasattr(self, 'coords'):
             self.coords = []
-            if self.hasvels: self.vels = []
-            for atm in self.atom_list:
-                self.coords.extend([atm.xx, atm.xy, atm.xz])
-                if self.hasvels: self.vels.extend([atm.vx, atm.vy, atm.vz])
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+            if self.hasvels:
+                for atom in self.atoms:
+                    self.vels.extend([atom.vx, atom.vy, atom.vz])
+#       self.load_structure()
+        if self.ptr('IFBOX'): self.rediscover_molecules()
 
-        self._load_structure()
-        if self.ptr('ifbox'): self.rediscover_molecules()
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def rediscover_molecules(self, solute_ions=True, fix_broken=True):
         """
@@ -862,13 +501,13 @@ class AmberParm(AmberFormat, Structure):
         the tleap bug. Returns None otherwise.
         """
         # Bail out of we are not doing a solvated prmtop
-        if not self.ptr('ifbox'): return None
+        if not self.parm_data['POINTERS'][IFBOX]: return None
 
         owner = set_molecules(self)
         ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
                 'CIO','MG2']
         indices = []
-        for res in self.solvent_residues:
+        for res in AmberParm.solvent_residues:
             try:
                 indices.append(self.parm_data['RESIDUE_LABEL'].index(res))
             except ValueError:
@@ -881,7 +520,10 @@ class AmberParm(AmberFormat, Structure):
         # If we have no water, we do not have a molecules section!
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
-            self.load_pointers()
+            self.pointers['IFBOX'] = 0
+            del self.pointers['IPTRES']
+            del self.pointers['NSPM']
+            del self.pointers['NSPSOL']
             self.delete_flag('SOLVENT_POINTERS')
             self.delete_flag('ATOMS_PER_MOLECULE')
             self.delete_flag('BOX_DIMENSIONS')
@@ -919,20 +561,18 @@ class AmberParm(AmberFormat, Structure):
             if not fix_broken:
                 raise MoleculeError('Molecule atoms are not contiguous!')
             # Non-contiguous molecules detected... time to fix (ugh!)
-            warn('Molecule atoms are not contiguous! I am attempting to fix '
-                 'this, but it may take a while.', MoleculeWarning)
-            new_atoms = AtomList(self, fill_from=self.atom_list)
-            i = 0
+            warn('Molecule atoms are not contiguous! I am attempting to '
+                 'reorder the atoms to fix this.', MoleculeWarning)
+            new_atoms = AtomList()
             for mol in owner:
-                for atm in mol:
-                    new_atoms[i] = self.atom_list[atm]
-                    i += 1
-            self.atom_list = new_atoms
+                for atom in mol:
+                    new_atoms.append(atom)
+            self.atoms = new_atoms
             return owner
 
         return None
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def writeOFF(self, off_file='off.lib'):
         """ Writes an OFF file from all of the residues found in a prmtop """
@@ -970,7 +610,7 @@ class AmberParm(AmberFormat, Structure):
 
         off_file.close()
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def fill_LJ(self):
         """
@@ -1001,7 +641,7 @@ class AmberParm(AmberFormat, Structure):
                 self.LJ_radius.append(pow(factor, one_sixth) * 0.5)
                 self.LJ_depth.append(bcoef[lj_index] / 2 / factor)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def fill_14_LJ(self):
         """
@@ -1031,7 +671,7 @@ class AmberParm(AmberFormat, Structure):
                 self.LJ_14_radius.append(pow(factor, one_sixth) * 0.5)
                 self.LJ_14_depth.append(bcoef[lj_index] / 2 / factor)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def recalculate_LJ(self):
         """
@@ -1049,7 +689,7 @@ class AmberParm(AmberFormat, Structure):
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
                 pd["LENNARD_JONES_BCOEF"][index] = 2 * wdij * rij**6
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def recalculate_14_LJ(self):
         """
@@ -1074,19 +714,7 @@ class AmberParm(AmberFormat, Structure):
                 pd["LENNARD_JONES_14_ACOEF"][index] = wdij * rij**12
                 pd["LENNARD_JONES_14_BCOEF"][index] = 2 * wdij * rij**6
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    def combine_rmin(self, rmin1, rmin2):
-        """ Define the combining rule for Rmin """
-        return rmin1 + rmin2
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    def combine_epsilon(self, eps1, eps2):
-        """ Define the combining rule for Epsilon """
-        return sqrt(eps1 * eps2)
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def LoadRst7(self, rst7):
         """ Loads coordinates into the AmberParm class """
@@ -1102,7 +730,7 @@ class AmberParm(AmberFormat, Structure):
         if self.hasvels:
             self.load_velocities(self.rst7.velocities)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def load_coordinates(self, coords):
         """ Loads the coordinates into the atom list """
@@ -1113,7 +741,7 @@ class AmberParm(AmberFormat, Structure):
             atom.xy = coords[i3+1]
             atom.xz = coords[i3+2]
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def load_velocities(self, vels):
         """ Loads the coordinates into the atom list """
@@ -1125,12 +753,65 @@ class AmberParm(AmberFormat, Structure):
             atom.vy = vels[i3+1]
             atom.vz = vels[i3+2]
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
-    # For backwards-compatibility. AmberParm used to be a single container for
-    # chamber and amber topologies, with a property 'chamber' that indicated
-    # whether or not it was a chamber-style topology file or not. Now, this is
-    # never a chamber topology
+    # Iterators for parameters with and without hydrogen
+    @property
+    def bonds_inc_h(self):
+        """ All bonds including hydrogen """
+        for bond in self.bonds:
+            if (bond.atom1.atomic_number == 1 or
+                    bond.atom2.atomic_number == 1):
+                yield bond
+
+    @property
+    def bonds_without_h(self):
+        """ All bonds without hydrogen """
+        for bond in self.bonds:
+            if (bond.atom1.atomic_number == 1 or
+                    bond.atom2.atomic_number == 1):
+                continue
+            yield bond
+
+    @property
+    def angles_inc_h(self):
+        """ All angles including hydrogen """
+        for angle in self.angles:
+            if (angle.atom1.atomic_number == 1 or angle.atom2.atomic_number == 1
+                    or angle.atom3.atomic_number == 1):
+                yield angle
+
+    @property
+    def angles_without_h(self):
+        """ All angles including hydrogen """
+        for angle in self.angles:
+            if (angle.atom1.atomic_number == 1 or angle.atom2.atomic_number == 1
+                    or angle.atom3.atomic_number == 1):
+                continue
+            yield angle
+
+    @property
+    def dihedrals_inc_h(self):
+        """ All dihedrals including hydrogen """
+        for dihed in self.dihedrals:
+            if (dihed.atom1.atomic_number == 1
+                    or dihed.atom2.atomic_number == 1
+                    or dihed.atom3.atomic_number == 1
+                    or dihed.atom3.atomic_number == 1):
+                yield dihed
+
+    @property
+    def dihedrals_without_h(self):
+        """ All dihedrals including hydrogen """
+        for dihed in self.dihedrals:
+            if (dihed.atom1.atomic_number == 1
+                    or dihed.atom2.atomic_number == 1
+                    or dihed.atom3.atomic_number == 1
+                    or dihed.atom3.atomic_number == 1):
+                continue
+            yield dihed
+
+    #===================================================
 
     @property
     def chamber(self):
@@ -1140,13 +821,358 @@ class AmberParm(AmberFormat, Structure):
     def amoeba(self):
         return False
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===========  PRIVATE INSTANCE METHODS  ============
 
     def _truncate_array(self, section, length):
         """ Truncates an array to get the given length """
         self.parm_data[section] = self.parm_data[section][:length]
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
+
+    def _check_section_lengths(self):
+        """
+        Checks that all of the raw sections have the appropriate length as
+        specified by the POINTER section.
+
+        If any of the lengths are incorrect, AmberParmError is raised
+        """
+        def check_length(key, length, required=True):
+            if not required and key not in self.parm_data: return
+            if len(self.parm_data[key]) != length:
+                raise AmberParmError('FLAG %s has %d elements; expected %d' %
+                                     (key, len(self.parm_data[key]), length))
+        natom = self.ptr('NATOM')
+        check_length('ATOM_NAME', natom)
+        check_length('CHARGE', natom)
+        check_length('MASS', natom)
+        check_length('ATOM_TYPE_INDEX', natom)
+        check_length('NUMBER_EXCLUDED_ATOMS', natom)
+        check_length('JOIN_ARRAY', natom)
+        check_length('IROTAT', natom)
+        check_length('RADIUS', natom, False)
+        check_length('SCREEN', natom, False)
+        check_length('ATOMIC_NUMBER', natom, False)
+
+        ntypes = self.ptr('NTYPES')
+        check_length('NONBONDED_PARM_INDEX', ntypes*ntypes)
+        check_length('LENNARD_JONES_ACOEF', ntypes*(ntypes+1)//2)
+        check_length('LENNARD_JONES_BCOEF', ntypes*(ntypes+1)//2)
+        check_length('LENNARD_JONES_CCOEF', ntypes*(ntypes+1)//2, False)
+
+        nres = self.ptr('NRES')
+        check_length('RESIDUE_LABEL', nres)
+        check_length('RESIDUE_POINTER', nres)
+        check_length('RESIDUE_CHAINID', nres, False)
+        check_length('RESIDUE_ICODE', nres, False)
+        check_length('RESIDUE_NUMBER', nres, False)
+
+        check_length('BOND_FORCE_CONSTANT', self.ptr('NUMBND'))
+        check_length('BOND_EQUIL_VALUE', self.ptr('NUMBND'))
+        check_length('ANGLE_FORCE_CONSTANT', self.ptr('NUMANG'))
+        check_length('ANGLE_EQUIL_VALUE', self.ptr('NUMANG'))
+        check_length('DIHEDRAL_FORCE_CONSTANT', self.ptr('NPTRA'))
+        check_length('DIHEDRAL_PERIODICITY', self.ptr('NPTRA'))
+        check_length('DIHEDRAL_PHASE', self.ptr('NPTRA'))
+        check_length('SCEE_SCALE_FACTOR', self.ptr('NPTRA'), False)
+        check_length('SCNB_SCALE_FACTOR', self.ptr('NPTRA'), False)
+        check_length('SOLTY', self.ptr('NATYP'))
+        check_length('BONDS_INC_HYDROGEN', self.ptr('NBONH')*3)
+        check_length('BONDS_WITHOUT_HYDROGEN', self.ptr('MBONA')*3)
+        check_length('ANGLES_INC_HYDROGEN', self.ptr('NTHETH')*4)
+        check_length('ANGLES_WITHOUT_HYDROGEN', self.ptr('NTHETA')*4)
+        check_length('DIHEDRALS_INC_HYDROGEN', self.ptr('NPHIH')*5)
+        check_length('DIHEDRALS_WITHOUT_HYDROGEN', self.ptr('NPHIA')*5)
+        check_length('HBOND_ACOEF', self.ptr('NPHB'))
+        check_length('HBOND_BCOEF', self.ptr('NPHB'))
+        check_length('SOLVENT_POINTERS', 3, False)
+        if 'SOLVENT_POINTERS' in self.parm_data:
+            check_length('ATOMS_PER_MOLECULE',
+                         self.parm_data['SOLVENT_POINTERS'][1], False)
+
+    #===================================================
+
+    def _load_atoms_and_residues(self):
+        """
+        Loads the atoms and residues (which are always done together) into the
+        data structure
+        """
+        del self.residues[:]
+        del self.atoms[:]
+        # Figure out on which atoms the residues start and stop
+        natom = self.parm_data['POINTERS'][NATOM]
+        res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom+1]
+        try:
+            res_icd = self.parm_data['RESIDUE_ICODE']
+        except KeyError:
+            res_icd = ['' for i in xrange(self.parm_data['POINTERS'][NRES])]
+        try:
+            res_chn = self.parm_data['RESIDUE_CHAINID']
+        except KeyError:
+            res_chn = ['' for i in xrange(self.parm_data['POINTERS'][NRES])]
+        for i, resname in enumerate(self.parm_data['RESIDUE_LABEL']):
+            resstart = res_ptr[i] - 1
+            resend = res_ptr[i+1] - 1
+            for j in range(resstart, resend):
+                atom = Atom()
+                self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
+                self.atoms.append(atom)
+
+    #===================================================
+
+    def _load_bond_info(self):
+        """ Loads the bond types and bond arrays """
+        del self.bond_types[:]
+        del self.bonds[:]
+        for k, req in zip(self.parm_data['BOND_FORCE_CONSTANT'],
+                          self.parm_data['BOND_EQUIL_VALUE']):
+            self.bond_types.append(BondType(k, req, self.bond_types))
+        blist = self.parm_data['BONDS_INC_HYDROGEN']
+        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
+            self.bonds.append(
+                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
+                         self.bond_types[blist[i+2]-1])
+            )
+        blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
+        for i in xrange(0, 3*self.parm_data['POINTERS'][MBONA], 3):
+            self.bonds.append(
+                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
+                            self.bond_types[blist[i+2]-1])
+            )
+
+    #===================================================
+
+    def _load_angle_info(self):
+        """ Loads the angle types and angle arrays """
+        del self.angle_types[:]
+        del self.angles[:]
+        for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
+                             self.parm_data['ANGLE_EQUIL_VALUE']):
+            self.angle_types.append(AngleType(k, theteq, self.angle_types))
+        alist = self.parm_data['ANGLES_INC_HYDROGEN']
+        for i in xrange(0, self.parm_data['POINTERS'][NTHETH], 4):
+            self.angles.append(
+                    Angle(self.atoms[alist[i]//3],
+                          self.atoms[alist[i+1]//3],
+                          self.atoms[alist[i+2]//3],
+                          self.angle_types[alist[i+3]-1])
+            )
+        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
+        for i in xrange(0, self.parm_data['POINTERS'][MTHETA], 4):
+            self.angles.append(
+                    Angle(self.atoms[alist[i]//3],
+                          self.atoms[alist[i+1]//3],
+                          self.atoms[alist[i+2]//3],
+                          self.angle_types[alist[i+3]-1])
+            )
+
+    #===================================================
+
+    def _load_dihedral_info(self):
+        """ Loads the dihedral types and dihedral arrays """
+        del self.dihedral_types[:]
+        del self.dihedrals[:]
+        try:
+            scee = self.parm_data['SCEE_SCALE_FACTOR']
+        except KeyError:
+            scee = [1.2 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
+        try:
+            scnb = self.parm_data['SCNB_SCALE_FACTOR']
+        except KeyError:
+            scnb = [1.2 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
+        for terms in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
+                         self.parm_data['DIHEDRAL_PERIODICITY'],
+                         self.parm_data['DIHEDRAL_PHASE'],
+                         scee, scnb):
+            self.dihedral_types.append(
+                    DihedralType(*terms, list=self.dihedral_types)
+            )
+        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
+        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
+            ignore_end = dlist[i+2] < 0
+            improper = dlist[i+3] < 0
+            self.dihedrals.append(
+                    Dihedral(self.atoms[dlist[i]//3],
+                             self.atoms[dlist[i+1]//3],
+                             self.atoms[abs(dlist[i+2])//3],
+                             self.atoms[abs(dlist[i+3])//3],
+                             improper=improper, ignore_end=ignore_end,
+                             type=self.dihedral_types[dlist[i+4]-1])
+            )
+        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
+        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
+            ignore_end = dlist[i+2] < 0
+            improper = dlist[i+3] < 0
+            self.dihedrals.append(
+                    Dihedral(self.atoms[dlist[i]//3],
+                             self.atoms[dlist[i+1]//3],
+                             self.atoms[abs(dlist[i+2])//3],
+                             self.atoms[abs(dlist[i+3])//3],
+                             improper=improper, ignore_end=ignore_end,
+                             type=self.dihedral_types[dlist[i+4]-1])
+            )
+
+    #===================================================
+
+    def _xfer_atom_properties(self):
+        """
+        Sets the various topology file section data from the `atoms` list to the
+        topology file data in `parm_data`
+        """
+        natom = len(self.atoms)
+        data = self.parm_data
+        data['POINTERS'][NATOM] = natom
+        self.pointers['NATOM'] = natom
+        data['ATOM_NAME'] = [atom.name for atom in self.atoms]
+        data['CHARGE'] = [atom.charge for atom in self.atoms]
+        data['MASS'] = [atom.mass for atom in self.atoms]
+        data['ATOM_TYPE_INDEX'] = [atom.nb_idx for atom in self.atoms]
+        data['JOIN_ARRAY'] = [atom.join for atom in self.atoms]
+        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree for atom in self.atoms]
+        data['IROTAT'] = [atom.irotat for atom in self.atoms]
+        if 'RADII' in data:
+            data['RADII'] = [atom.radii for atom in self.atoms]
+        if 'SCREEN' in data:
+            data['SCREEN'] = [atom.screen for atom in self.atoms]
+        if 'ATOMIC_NUMBER' in data:
+            data['ATOMIC_NUMBER'] = [atom.atomic_number for atom in self.atoms]
+        # Do the non-bonded exclusions now
+        data['EXCLUDED_ATOMS_LIST'] = []
+        nextra = 0
+        for i, atom in enumerate(self.atoms):
+            excl = atom.nonbonded_exclusions(index_from=1)
+            if len(excl) == 0:
+                excl = [0]
+            data['EXCLUDED_ATOMS_LIST'] += excl
+            data['NUMBER_EXCLUDED_ATOMS'][i] = len(excl)
+            if atom.atomic_number == 0:
+                nextra += 1
+        nnb = len(data['EXCLUDED_ATOMS_LIST'])
+        data['POINTERS'][NNB] = nnb
+        self.pointers['NNB'] = self.pointers['NEXT'] = nnb
+        data['POINTERS'][NUMEXTRA] = nextra
+        self.pointers['NUMEXTRA'] = nextra
+
+    #===================================================
+
+    def _xfer_residue_properties(self):
+        """
+        Sets the various topology file section data from the `residues` list to
+        the topology file data in `parm_data`
+        """
+        data = self.parm_data
+        nres = len(self.residues)
+        data['POINTERS'][NRES] = nres
+        self.pointers['NRES'] = nres
+        data['RESIDUE_LABEL'] = [res.name for res in self.residues]
+        data['RESIDUE_POINTER'] = [res.atoms[0].idx+1 for res in self.residues]
+        if 'RESIDUE_NUMBER' in data:
+            data['RESIDUE_NUMBER'] = [res.number for res in self.residues]
+        if 'RESIDUE_CHAINID' in data:
+            data['RESIDUE_CHAINID'] = [res.chain for res in self.residues]
+        if 'RESIDUE_ICODE' in data:
+            data['RESIDUE_ICODE'] = [res.icode for res in self.residues]
+        nmxrs = max([len(res) for res in self.residues])
+        data['POINTERS'][NMXRS] = nmxrs
+        self.pointers['NMXRS'] = nmxrs
+
+    #===================================================
+
+    def _xfer_bond_properties(self):
+        """
+        Sets the data for the various bond arrays in the raw data from the
+        parameter lists
+        """
+        # First do the bond types
+        data = self.parm_data
+        for bond_type in self.bond_types:
+            bond_type.used = False
+        for bond in self.bonds:
+            bond.type.used = True
+        self.bond_types.prune_unused()
+        data['BOND_FORCE_CONSTANT'] = [type.k for type in self.bond_types]
+        data['BOND_EQUIL_VALUE'] = [type.req for type in self.bond_types]
+        data['POINTERS'][NUMBND] = len(self.bond_types)
+        self.pointers['NUMBND'] = len(self.bond_types)
+        # Now do the bond arrays
+        data['BONDS_INC_HYDROGEN'] = bond_array = []
+        for i, bond in enumerate(self.bonds_inc_h):
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
+                               bond.type.idx+1])
+        data['POINTERS'][NBONH] = i + 1
+        self.pointers['NBONH'] = i + 1
+        data['BONDS_WITHOUT_HYDROGEN'] = bond_array = []
+        for i, bond in enumerate(self.bonds_without_h):
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
+                               bond.type.idx+1])
+        data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = i + 1
+        self.pointers['MBONA'] = self.pointers['NBONA'] = i + 1
+
+    #===================================================
+
+    def _xfer_angle_properties(self):
+        """
+        Sets the data for the various angle arrays in the raw data from the
+        parameter lists
+        """
+        # First do the angle types
+        data = self.parm_data
+        for angle_type in self.angle_types:
+            angle_type.used = False
+        for angle in self.angles:
+            angle.type.used = True
+        self.angle_types.prune_unused()
+        data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq for type in self.angle_types]
+        # Now do the angle arrays
+        data['ANGLES_INC_HYDROGEN'] = angle_array = []
+        for i, angle in enumerate(self.angles_inc_h):
+            angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
+                                angle.atom3.idx*3, angle.type.idx+1])
+        data['POINTERS'][NTHETH] = i + 1
+        self.pointers['NTHETH'] = i + 1
+        data['ANGLES_WITHOUT_HYDROGEN'] = angle_array = []
+        for i, angle in enumerate(self.angles_inc_h):
+            angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
+                                angle.atom3.idx*3, angle.type.idx+1])
+        data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = i + 1
+        self.pointers['NTHETA'] = self.pointers['MTHETA'] = i + 1
+
+    #===================================================
+
+    def _xfer_dihedral_properties(self):
+        """
+        Sets the data for the various dihedral arrays in the raw data from the
+        parameter lists
+        """
+        # First do the dihedral types
+        data = self.parm_data
+        for dihedral_type in self.dihedral_types:
+            dihedral_type.used = False
+        for dihed in self.dihedrals:
+            dihed.type.used = True
+        self.dihedral_types.prune_unused()
+        data['DIHEDRAL_FORCE_CONSTANT'] = [type.phi_k
+                for type in self.dihedral_types]
+        data['DIHEDRAL_PERIODICITY'] = [type.per
+                for type in self.dihedral_types]
+        data['DIHEDRAL_PHASE'] = [type.phase for type in self.dihedral_types]
+        # Now do the dihedral arrays
+        data['DIHEDRALS_INC_HYDROGEN'] = dihed_array = []
+        for i, dihed in enumerate(self.dihedrals_inc_h):
+            dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
+                                dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                dihed.type.idx+1])
+        data['POINTERS'][NTHETH] = i + 1
+        self.pointers['NTHETH'] = i + 1
+        data['DIHEDRALS_WITHOUT_HYDROGEN'] = dihed_array = []
+        for i, dihed in enumerate(self.dihedrals_inc_h):
+            dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
+                                dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                dihed.type.idx+1])
+        data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = i + 1
+        self.pointers['NTHETA'] = self.pointers['MTHETA'] = i + 1
+
+    #===================================================
 
     def ToMolecule(self):
         """ Translates an amber system into a molecule format """
@@ -1156,7 +1182,7 @@ class AmberParm(AmberFormat, Structure):
         if self._topology_changed():
             self.remake_parm()
             if self.ptr('ifbox'): self.rediscover_molecules()
-            self._load_structure()
+            self.load_structure()
 
         all_bonds = []        # bond array in Molecule format
         residue_pointers = [] # residue pointers adjusted for indexing from 0
@@ -1189,8 +1215,7 @@ class AmberParm(AmberFormat, Structure):
             residue_pointers.append(self.parm_data['RESIDUE_POINTER'][i]-1)
 
         # Determine which element each atom is
-        elements = [periodic_table.Element[atm.atomic_number]
-                    for atm in self.atom_list]
+        elements = [Element[atm.atomic_number] for atm in self.atom_list]
 
         # Put together the title
         title = ''

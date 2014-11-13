@@ -108,6 +108,7 @@ class Structure(object):
         out_of_plane_bend_types, pi_torsion_types, stretch_bend_types,
         torsion_torsion_types
     """
+    #===================================================
 
     def __init__(self):
 
@@ -143,6 +144,8 @@ class Structure(object):
 
         self.box = None
 
+    #===================================================
+
     def is_changed(self):
         """ Determines if any of the topology has changed for this structure """
         for attr in dir(self):
@@ -151,12 +154,209 @@ class Structure(object):
                     return True
         return False
 
+    #===================================================
+
     def unchange(self):
         """ Toggles all lists so that they do not indicate any changes """
         for attr in dir(self):
             at = getattr(self, attr)
             if hasattr(at, 'changed'):
                 setattr(at, 'changed', False)
+
+    #===================================================
+
+    def prune_empty_terms(self):
+        """
+        Looks through all of the topological lists and gets rid of terms
+        in which at least one of the atoms is None or has an `idx` attribute set
+        to -1 (indicating that it has been removed from the `atoms` atom list)
+        """
+        self._prune_empty_bonds()
+        self._prune_empty_angles()
+        self._prune_empty_dihedrals()
+        self._prune_empty_ureys()
+        self._prune_empty_impropers()
+        self._prune_empty_cmaps()
+        self._prune_empty_trigonal_angles()
+        self._prune_empty_out_of_plane_bends()
+        self._prune_empty_pi_torsions()
+        self._prune_empty_stretch_bends()
+        self._prune_empty_torsion_torsions()
+        self._prune_empty_chiral_frames()
+        self._prune_empty_multipole_frames()
+
+    #===================================================
+
+    def _prune_empty_bonds(self):
+        """ Gets rid of any empty bonds """
+        for i in reversed(xrange(len(self.bonds))):
+            bond = self.bonds[i]
+            if bond.atom1 is None and bond.atom2 is None:
+                del self.bonds[i]
+            elif bond.atom1.idx == -1 or bond.atom2.idx == -1:
+                bond.delete()
+                del self.bonds[i]
+
+    #===================================================
+
+    def _prune_empty_angles(self):
+        """ Gets rid of any empty angles """
+        for i in reversed(xrange(len(self.angles))):
+            angle = self.angles[i]
+            if (angle.atom1 is None and angle.atom2 is None and
+                    angle.atom3 is None):
+                del self.angles[i]
+            elif (angle.atom1.idx == -1 or angle.atom2.idx == -1 or
+                    angle.atom3.idx == -1):
+                angle.delete()
+                del self.angles[i]
+
+    #===================================================
+
+    def _prune_empty_dihedrals(self):
+        """ Gets rid of any empty dihedrals """
+        for i in reversed(xrange(len(self.dihedrals))):
+            dihed = self.dihedrals[i]
+            if (dihed.atom1 is None and dihed.atom2 is None and
+                    dihed.atom3 is None and dihed.atom4 is None):
+                del self.dihedrals[i]
+            elif (dihed.atom1.idx == -1 or dihed.atom2.idx == -1 or
+                    dihed.atom3.idx == -1 or dihed.atom4.idx == -1):
+                dihed.delete()
+                del self.dihedrals[i]
+
+    #===================================================
+
+    def _prune_empty_ureys(self):
+        """ Gets rid of any empty Urey-Bradley terms """
+        for i in reversed(xrange(len(self.urey_bradleys))):
+            ub = self.urey_bradleys[i]
+            if ub.atom1 is None and ub.atom2 is None:
+                del self.urey_bradleys[i]
+            elif ub.atom1.idx == -1 or ub.atom2.idx == -1:
+                ub.delete()
+                del self.urey_bradleys[i]
+
+    #===================================================
+
+    def _prune_empty_impropers(self):
+        """ Gets rid of any empty improper torsions """
+        for i in reversed(xrange(len(self.impropers))):
+            imp = self.impropers[i]
+            if (imp.atom1 is None and imp.atom2 is None and imp.atom3 is None
+                    and imp.atom4 is None):
+                del self.impropers[i]
+            elif (imp.atom1.idx == -1 or imp.atom2.idx == -1 or
+                    imp.atom3.idx == -1 or imp.atom4.idx == -1):
+                imp.delete()
+                del self.impropers[i]
+
+    #===================================================
+
+    def _prune_empty_cmaps(self):
+        """ Gets rid of any empty CMAP terms """
+        for i in reversed(xrange(len(self.cmaps))):
+            cmap = self.cmaps[i]
+            if (cmap.atom1 is None and cmap.atom2 is None and cmap.atom3 is None
+                    and cmap.atom4 is None and cmap.atom5 is None):
+                del self.cmaps[i]
+            elif (cmap.atom1.idx == -1 or cmap.atom2.idx == -1 or
+                    cmap.atom3.idx == -1 or cmap.atom4.idx == -1 or
+                    cmap.atom5.idx == -1):
+                cmap.delete()
+                del self.cmaps[i]
+
+    #===================================================
+
+    def _prune_empty_trigonal_angles(self):
+        """ Gets rid of any empty trigonal angles """
+        for i in reversed(xrange(len(self.trigonal_angles))):
+            ta = self.trigonal_angles[i]
+            if (ta.atom1 is None and ta.atom2 is None and ta.atom3 is None and
+                    ta.atom4 is None):
+                del self.trigonal_angles[i]
+            elif (ta.atom1.idx == -1 or ta.atom2.idx == -1 or
+                    ta.atom3.idx == -1 or ta.atom4.idx == -1):
+                # Not stored anywhere, no need to call delete()
+                del self.trigonal_angles[i]
+
+    #===================================================
+
+    def _prune_empty_out_of_plane_bends(self):
+        """ Gets rid of any empty out-of-plane bends """
+        for i in reversed(xrange(len(self.out_of_plane_bends))):
+            oop = self.out_of_plane_bends[i]
+            if (oop.atom1 is None and oop.atom2 is None and oop.atom3 is None
+                    and oop.atom4 is None):
+                del self.out_of_plane_bends[i]
+            elif (oop.atom1.idx == -1 or oop.atom2.idx == -1 or
+                    oop.atom3.idx == -1 or oop.atom4.idx == -1):
+                # Not stored anywhere, no need to call delete()
+                del self.out_of_plane_bends[i]
+
+    #===================================================
+
+    def _prune_empty_pi_torsions(self):
+        """ Gets rid of any empty pi-torsions """
+        for i in reversed(xrange(len(self.pi_torsions))):
+            pit = self.pi_torsions[i]
+            if (pit.atom1 is None and pit.atom2 is None and
+                    pit.atom3 is None and pit.atom4 is None and
+                    pit.atom5 is None and pit.atom6 is None):
+                del self.pi_torsions[i]
+            elif (pit.atom1.idx == -1 or pit.atom2.idx == -1 or
+                    pit.atom3.idx == -1 or pit.atom4.idx == -1 or
+                    pit.atom5.idx == -1 or pit.atom6.idx == -1):
+                # Not stored anywhere, no need to call delete()
+                del self.pi_torsions[i]
+
+    #===================================================
+
+    def _prune_empty_stretch_bends(self):
+        """ Gets rid of any empty stretch-bend terms """
+        for i in reversed(xrange(len(self.stretch_bends))):
+            sb = self.stretch_bends[i]
+            if sb.atom1 is None and sb.atom2 is None and sb.atom3 is None:
+                del self.stretch_bends[i]
+            elif (sb.atom1.idx == -1 or sb.atom2.idx == -1 or
+                    sb.atom3.idx == -1):
+                # Not stored anywhere, no need to call delete()
+                del self.stretch_bends[i]
+
+    #===================================================
+
+    def _prune_empty_torsion_torsions(self):
+        """ Gets rid of any empty torsion-torsion terms """
+        for i in reversed(xrange(len(self.torsion_torsions))):
+            tt = self.torsion_torsions[i]
+            if (tt.atom1 is None and tt.atom2 is None and tt.atom3 is None
+                    and tt.atom4 is None and tt.atom5 is None):
+                del self.torsion_torsions[i]
+            elif (tt.atom1.idx == -1 or tt.atom2.idx == -1 or
+                    tt.atom3.idx == -1 or tt.atom4.idx == -1 or
+                    tt.atom5.idx == -1):
+                tt.delete()
+                del self.torsion_torsions[i]
+
+    #===================================================
+
+    def _prune_empty_chiral_frames(self):
+        """ Gets rid of any empty chiral frame terms """
+        for i in reversed(xrange(len(self.chiral_frames))):
+            cf = self.chiral_frames[i]
+            if cf.atom1 is None or cf.atom2 is None:
+                del self.chiral_frames[i]
+            elif cf.atom1.idx == -1 or cf.atom2.idx == -1:
+                del self.chiral_frames[i]
+
+    #===================================================
+
+    def _prune_empty_multipole_frames(self):
+        """ Gets rid of any empty multipole frame terms """
+        for i in reversed(xrange(len(self.multipole_frames))):
+            mf = self.multipole_frames[i]
+            if mf.atom is None or mf.atom.idx == -1:
+                del self.multipole_frames[i]
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

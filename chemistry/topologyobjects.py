@@ -116,6 +116,23 @@ class _FourAtomTerm(object):
         return (self.atom1 is thing or self.atom2 is thing or
                 self.atom3 is thing or self.atom4 is thing)
 
+class _ParameterType(object):
+    """
+    A parameter type that defines the nature of a particular molecular
+    interaction. This is a base class that simply indicates whether a particular
+    parameter type is "used", which in turn is used to determine whether or not
+    this parameter type needs to be printed
+
+    Attributes
+    ----------
+    used : bool
+        If True, then this parameter type should be considered `used`. If False,
+        it is not being used and does not need to be printed.
+    """
+
+    def __init__(self):
+        self.used = False
+
 def _delete_from_list(list, item):
     """
     Deletes a requested item from a list. If the item does not exist in the
@@ -438,6 +455,80 @@ class Atom(_ListItem):
 
     #===================================================
 
+    def nonbonded_exclusions(self, only_greater=True, index_from=0):
+        """
+        Returns the total number of nonbonded atom exclusions for this atom. The
+        general rules for building the exclusion list is to include both
+        exceptions AND exclusions (i.e., the Amber scaling of 1-4 interactions
+        means that the 1-4 terms are excluded and a special pairlist is built to
+        handle those exceptions).
+
+        All atoms in the `_partners` arrays are nonbonded exclusions.
+
+        Parameters
+        ----------
+        only_greater : bool=True
+            If True, only atoms whose `idx` value is greater than this `Atom`s
+            `idx` will be counted as an exclusion (to avoid double-counting
+            exclusions). If False, all exclusions will be counted.
+        index_from : int=0
+            This is the index of the first atom, and is intended to be 0 (for C-
+            and Python-style numbering) or 1 (for Fortran-style numbering, such
+            as that used in the Amber and CHARMM topology files)
+
+        Returns
+        -------
+        list of int
+            The returned list will be the atom indexes of the exclusion partners
+            for this atom (indexing starts from `index_from`)
+
+        Notes
+        -----
+        If this instance's `idx` attribute evaluates to -1 -- meaning it is not
+        in an AtomList -- a IndexError will be raised. If you have two extra
+        points (i.e., those with atomic numbers of 0) bonded to each other, this
+        routine may raise a RuntimeError if the recursion depth is exceeded.
+        """
+        if self.idx < 0:
+            raise IndexError('Cannot find exclusions of an unindexed Atom')
+        if only_greater:
+            baseline = self.idx
+        else:
+            baseline = 0
+        if self.atomic_number > 0:
+            excl = []
+            for atm in self.bond_partners:
+                i = atm.idx + index_from
+                if i > baseline:
+                    excl.append(i)
+            for atm in self.angle_partners:
+                i = atm.idx + index_from
+                if i > baseline:
+                    excl.append(i)
+            for atm in self.dihedral_partners:
+                i = atm.idx + index_from
+                if i > baseline:
+                    excl.append(i)
+            for atm in self.tortor_partners:
+                i = atm.idx + index_from
+                if i > baseline:
+                    excl.append(i)
+            for atm in self.exclusion_partners:
+                i = atm.idx + index_from
+                if i > baseline:
+                    excl.append(i)
+        else:
+            # Extra point!! Special handling required. Basically, the extra
+            # point adopts all of the exclusions of the atom it is bonded to
+            partner = self.bond_partners[0]
+            myidx = self.idx + index_from
+            excl = [a for a in partner.nonbonded_exclusions()
+                        if a != myidx]
+            excl.append(partner.idx + index_from)
+        return sorted(excl)
+
+    #===================================================
+
     # Make 'element' an alias for 'atomic_number'
 
     @property
@@ -662,7 +753,7 @@ class Bond(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class BondType(_ListItem):
+class BondType(_ListItem, _ParameterType):
     """
     A bond type with a set of bond parameters
 
@@ -707,6 +798,7 @@ class BondType(_ListItem):
     """
 
     def __init__(self, k, req, list=None):
+        _ParameterType.__init__(self)
         self.k = k
         self.req = req
         self.list = list
@@ -801,7 +893,7 @@ class Angle(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class AngleType(_ListItem):
+class AngleType(_ListItem, _ParameterType):
     """
     An angle type with a set of angle parameters
 
@@ -845,6 +937,7 @@ class AngleType(_ListItem):
     1
     """
     def __init__(self, k, theteq, list=None):
+        _ParameterType.__init__(self)
         self.k = k
         self.theteq = theteq
         self._idx = -1
@@ -1043,7 +1136,7 @@ class Dihedral(_FourAtomTerm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class DihedralType(_ListItem):
+class DihedralType(_ListItem, _ParameterType):
     """
     A dihedral type with a set of dihedral parameters
 
@@ -1100,6 +1193,7 @@ class DihedralType(_ListItem):
    
     def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
+        _ParameterType.__init__(self)
         self.phi_k = phi_k
         self.per = per
         self.phase = phase
@@ -1340,7 +1434,7 @@ class Improper(_FourAtomTerm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class ImproperType(_ListItem):
+class ImproperType(_ListItem, _ParameterType):
     """
     An improper type with a set of improper torsion parameters
 
@@ -1385,6 +1479,7 @@ class ImproperType(_ListItem):
     1
     """
     def __init__(self, psi_k, psi_eq, list=None):
+        _ParameterType.__init__(self)
         self.psi_k = psi_k
         self.psi_eq = psi_eq
         self.list = list
@@ -1516,7 +1611,7 @@ class Cmap(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class CmapType(_ListItem):
+class CmapType(_ListItem, _ParameterType):
     """
     A CMAP type with a potential energy interpoloation grid mapping out the 2-D
     potential of coupled torsions.
@@ -1569,6 +1664,7 @@ class CmapType(_ListItem):
     -1
     """
     def __init__(self, resolution, grid, list=None):
+        _ParameterType.__init__(self)
         self.resolution = resolution
         self.grid = _CmapGrid(resolution, grid)
         if len(grid) != self.resolution * self.resolution:
@@ -1914,7 +2010,7 @@ class StretchBend(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class StretchBendType(_ListItem):
+class StretchBendType(_ListItem, _ParameterType):
     """
     A stretch-bend type with two distances and an angle in AMOEBA
 
@@ -1965,6 +2061,7 @@ class StretchBendType(_ListItem):
     1
     """
     def __init__(self, k, req1, req2, theteq, list=None):
+        _ParameterType.__init__(self)
         self.k = k
         self.req1 = req1
         self.req2 = req2
@@ -2154,7 +2251,7 @@ class _TorTorTable(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class TorsionTorsionType(_ListItem):
+class TorsionTorsionType(_ListItem, _ParameterType):
     """
     The type containing the parameter maps for the Amoeba torsion-torsion
     potentials. It contains the original potential as well as interpolated first
@@ -2202,6 +2299,7 @@ class TorsionTorsionType(_ListItem):
     """
     def __init__(self, dims, ang1, ang2, f,
                  dfda1=None, dfda2=None, d2fda1da2=None, list=None):
+        _ParameterType.__init__(self)
         if len(dims) != 2:
             raise ValueError('dims must be a 2-dimensional iterable')
         if len(ang1) != dims[0] or len(ang2) != dims[1]:
@@ -2480,6 +2578,7 @@ class TrackedList(list):
     @_changes
     def __delslice__(self, *args):
         """ Python 2 still uses __delslice__... """
+        if not self: return
         indices = xrange(*args)
         for index in indices:
             try:
@@ -2547,6 +2646,19 @@ class TrackedList(list):
                 pass
         self.index_members()
 
+    def prune_unused(self):
+        """
+        This method inspects the `used` attribute of all of its members, if it
+        has one, and deletes any item in which it is set to `False`
+        """
+        for i in reversed(xrange(len(self))):
+            try:
+                if not self[i].used:
+                    del self[i]
+            except AttributeError:
+                # Don't worry if we don't have a `used` attribute
+                pass
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ResidueList(TrackedList):
@@ -2601,7 +2713,7 @@ class ResidueList(TrackedList):
         avoid including empty residues
         """
         # Delete from the back to avoid indexes changing as we iterate
-        for i in xrange(len(self)-1, -1, -1):
+        for i in reversed(xrange(len(self))):
             res = self[i]
             if res.is_empty(): del self[i]
 
@@ -2638,6 +2750,7 @@ class AtomList(TrackedList):
     @_changes
     def __delslice__(self, *args):
         """ Python 2 still uses __delslice__... sigh. """
+        if not self: return
         indices = xrange(*args)
         for index in indices:
             atom = self[index]
