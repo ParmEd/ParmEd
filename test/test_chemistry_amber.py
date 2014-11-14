@@ -84,9 +84,9 @@ class TestReadParm(unittest.TestCase):
         """ Test the AmoebaParm class with a large system """
         parm = readparm.AmoebaParm(get_fn('amoeba.parm7'))
         self.assertEqual(parm.ptr('natom'), len(parm.atoms))
-        self.assertEqual([a.atname for a in parm.atoms],
+        self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.attype for a in parm.atoms],
+        self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
         self.assertTrue(parm.amoeba)
         for attr in ['bond_list', 'angle_list', 'urey_bradley_list',
@@ -120,9 +120,9 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ntheta'), len(list(parm.angles_without_h)))
         self.assertEqual(parm.ptr('nphih'), len(list(parm.dihedrals_inc_h)))
         self.assertEqual(parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
-        self.assertEqual([a.atname for a in parm.atoms],
+        self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.attype for a in parm.atoms],
+        self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
 
     def _solv_pointer_tests(self, parm):
@@ -136,31 +136,30 @@ class TestReadParm(unittest.TestCase):
     def _extensive_checks(self, parm):
         # Check the __contains__ methods of the various topologyobjects
         atoms = parm.atoms
-        bond_list = parm.bonds_inc_h + parm.bonds_without_h
-        for bond in bond_list:
+        for bond in parm.bonds:
             self.assertEqual(sum([a in bond for a in atoms]), 2)
-        for angle in parm.angles_inc_h + parm.angles_without_h:
+        for angle in parm.angles:
             self.assertEqual(sum([a in angle for a in atoms]), 3)
-            self.assertEqual(sum([b in angle for b in bond_list]), 2)
-        for dihedral in parm.dihedrals_inc_h + parm.dihedrals_without_h:
+            self.assertEqual(sum([b in angle for b in parm.bonds]), 2)
+        for dihedral in parm.dihedrals:
             self.assertEqual(sum([a in dihedral for a in atoms]), 4)
-            self.assertEqual(sum([b in dihedral for b in bond_list]), 3)
+            self.assertEqual(sum([b in dihedral for b in parm.bonds]), 3)
         for residue in parm.residues:
             self.assertTrue(all([a in residue for a in residue.atoms]))
             self.assertEqual(sum([a in residue for a in atoms]),
                              len(residue))
         if not parm.chamber: return
         # Chamber tests now
-        for ub in parm.urey_bradley:
+        for ub in parm.urey_bradleys:
             self.assertEqual(sum([a in ub for a in atoms]), 2)
-            self.assertEqual(sum([b in ub for b in bond_list]), 2)
-        for imp in parm.improper:
+            self.assertEqual(sum([b in ub for b in parm.bonds]), 2)
+        for imp in parm.impropers:
             self.assertEqual(sum([a in imp for a in atoms]), 4)
-            self.assertEqual(sum([b in imp for b in bond_list]), 3)
+            self.assertEqual(sum([b in imp for b in parm.bonds]), 3)
         if parm.has_cmap:
-            for cmap in parm.cmap:
+            for cmap in parm.cmaps:
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
-                self.assertEqual(sum([b in cmap for b in bond_list]), 4)
+                self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
 class TestCoordinateFiles(unittest.TestCase):
     """ Tests the various coordinate file classes """

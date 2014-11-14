@@ -72,7 +72,7 @@ class AmoebaParm(AmberParm):
         self.LJ_depth = []  # similarly ordered array of L-J depths
 
         # If we were given a prmtop, read it in
-        self.LoadPointers()
+        self.load_pointers()
 
         # Load the structure arrays
         self._load_structure()
