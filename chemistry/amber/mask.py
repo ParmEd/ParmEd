@@ -327,16 +327,16 @@ class AmberMask(object):
             distance = float(pmask1[1:])
         except TypeError:
             raise MaskError('Distance must be a number: %s' % pmask1[1:])
-        if not hasattr(self.parm.atom_list[0], 'xx'):
+        if not hasattr(self.parm.atoms[0], 'xx'):
             raise MaskError('Distance-based masks require loaded coordinates.')
         distance *= distance # Faster to compare square of distance
         # First select all atoms that satisfy the distance. If we ended up
         # choosing residues, then we will go back through afterwards and select
         # entire residues when one of the atoms in that residue is selected.
         idxlist = [i for i, val in enumerate(pmask2) if val == 1]
-        for i, atomi in enumerate(self.parm.atom_list):
+        for i, atomi in enumerate(self.parm.atoms):
             for j in idxlist:
-                atomj = self.parm.atom_list[j]
+                atomj = self.parm.atoms[j]
                 dx = atomi.xx - atomj.xx
                 dy = atomi.xy - atomj.xy
                 dz = atomi.xz - atomj.xz
@@ -566,7 +566,7 @@ class AmberMask(object):
     def _resnum_select(self, res1, res2, mask):
         """ Fills a _mask array between residues res1 and res2 """
         for i in xrange(self.parm.ptr('natom')):
-            res = self.parm.atom_list[i].residue.idx
+            res = self.parm.atoms[i].residue.idx + 1
             if res >= res1 and res <= res2: mask[i] = 1
 
     #======================================================
@@ -583,11 +583,11 @@ class AmberMask(object):
    
     def _resname_select(self, resname, mask):
         """ Fills a _mask array with all residue names of a given name """
-        for i, atm in enumerate(self.parm.atom_list):
-            if _nameMatch(resname, atm.residue.resname):
+        for i, atm in enumerate(self.parm.atoms):
+            if _nameMatch(resname, atm.residue.name):
                 mask[i] = 1
             elif resname.isdigit():
-                mask[i] = int(int(resname) == atm.residue.idx)
+                mask[i] = int(int(resname) == atm.residue.idx + 1)
             
     #======================================================
    

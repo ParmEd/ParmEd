@@ -18,11 +18,16 @@ from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.parmlist import ParmList, ChamberParm, AmoebaParm
 from chemistry.amber.mask import AmberMask
 from chemistry.amber.readparm import AmberFormat
-from chemistry.amber.topologyobjects import (Bond, BondType, Angle, AngleType,
-                                             Dihedral, DihedralType)
+from chemistry.topologyobjects import (Bond, BondType, Angle, AngleType,
+                                       Dihedral, DihedralType)
 from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.periodic_table import Element as _Element
 from compat24 import any
+try:
+    from itertools import izip as zip
+except ImportError:
+    # Must be Python 3, zip already is izip
+    pass
 import math
 import os
 import warnings
@@ -406,7 +411,7 @@ class changeradii(Action):
             self.parm.add_flag('SCREEN', '5E16.8',
                                num_items=self.parm.ptr('natom'))
         ChRad(self.parm, self.radii)
-        self.parm.atom_list.refresh_data()
+        self.parm.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -437,19 +442,19 @@ class changeljpair(Action):
         # Make sure we only selected 1 atom type in each mask
         attype1 = None
         attype2 = None
-        for i in xrange(self.parm.ptr('natom')):
+        for i, atom in enumerate(self.parm.atoms):
             if selection1[i] == 1:
-                if not attype1:
-                    attype1 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
+                if attype1 is None:
+                    attype1 = atom.nb_idx
                 else:
-                    if attype1 != self.parm.parm_data['ATOM_TYPE_INDEX'][i]:
+                    if attype1 != atom.nb_idx:
                         raise ChangeLJPairError(
                                       'First mask matches multiple atom types!')
             if selection2[i] == 1:
-                if not attype2:
-                    attype2 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
+                if attype2 is None:
+                    attype2 = atom.nb_idx
                 else:
-                    if attype2 != self.parm.parm_data['ATOM_TYPE_INDEX'][i]:
+                    if attype2 != atom.nb_idx:
                         raise ChangeLJPairError(
                                      'Second mask matches multiple atom types!')
         ChLJPair(self.parm, attype1, attype2, self.rmin, self.eps)
@@ -490,19 +495,19 @@ class changelj14pair(Action):
         # Make sure we only selected 1 atom type, and figure out what it is
         attype1 = None
         attype2 = None
-        for i in xrange(self.parm.ptr('natom')):
+        for i, atom in enumerate(self.parm.atoms):
             if selection1[i] == 1:
-                if not attype1:
-                    attype1 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
+                if attype1 is None:
+                    attype1 = atom.nb_idx
                 else:
-                    if attype1 != self.parm.parm_data['ATOM_TYPE_INDEX'][i]:
+                    if attype1 != atom.nb_idx
                         raise ChangeLJPairError(
                                       'First mask matches multiple atom types!')
             if selection2[i] == 1:
-                if not attype2:
-                    attype2 = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
+                if attype2 is None:
+                    attype2 = atom.nb_idx
                 else:
-                    if attype2 != self.parm.parm_data['ATOM_TYPE_INDEX'][i]:
+                    if attype2 != atom.nb_idx:
                         raise ChangeLJPairError(
                                      'Second mask matches multiple atom types!')
 
@@ -592,11 +597,10 @@ class change(Action):
         if self.quiet:
             return "Changing %s of %s to %s" % (self.prop, self.mask,
                                                 self.new_val)
-        string = '\n'
-        for i in xrange(self.parm.ptr('natom')):
+        for i, atom in enumerate(self.parm.atoms):
             if atnums[i] == 1:
                 string += "Changing %s of atom # %d (%s) from %s to %s\n" % (
-                        self.prop, i+1, self.parm.parm_data['ATOM_NAME'][i],
+                        self.prop, i+1, atom.name,
                         self.parm.parm_data[self.prop][i], self.new_val_str)
         return string
 
@@ -610,10 +614,7 @@ class change(Action):
             if atnums[i] == 1:
                 self.parm.parm_data[self.prop][i] = self.new_val
         # Update the atom properties in the atom list
-        try:
-            self.parm.atom_list.refresh_data()
-        except AttributeError:
-            pass
+        self.parm.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -668,37 +669,31 @@ class addljtype(Action):
         # Find the first atom that's selected in this selection. We've
         # already made sure that at least one atom was selected
         sel_atms = self.mask.Selection()
-        for i in xrange(self.parm.ptr('natom')):
+        for i, atom in enumerate(self.parm.atoms):
             if sel_atms[i] == 1: 
-                first_atm = i
                 break
         # If either the radius or epsilon were not specified, then pull it
         # from the *first* atom in the selection
         if self.new_radius is None:
-            self.new_radius = self.parm.LJ_radius[
-                    self.parm.parm_data['ATOM_TYPE_INDEX'][first_atm]-1]
+            self.new_radius = self.parm.LJ_radius[atom.nb_idx-1]
         else:
             self.new_radius = self.new_radius
         if self.new_epsilon is None:
-            self.new_epsilon = self.parm.LJ_depth[
-                    self.parm.parm_data['ATOM_TYPE_INDEX'][first_atm]-1]
+            self.new_epsilon = self.parm.LJ_depth[atom.nb_idx-1]
         else:
             self.new_epsilon = self.new_epsilon
         # Now do the same for chamber prmtops
         if self.new_radius_14 is None and self.parm.chamber:
-            self.new_radius_14 = self.parm.LJ_14_radius[
-                    self.parm.parm_data['ATOM_TYPE_INDEX'][first_atm]-1]
+            self.new_radius_14 = self.parm.LJ_14_radius[atom.nb_idx-1]
         elif not self.parm.chamber:
             self.new_radius_14 = None
         if self.new_epsilon_14 is None and self.parm.chamber:
-            self.new_epsilon_14 = self.parm.LJ_14_depth[
-                    self.parm.parm_data['ATOM_TYPE_INDEX'][first_atm]-1]
+            self.new_epsilon_14 = self.parm.LJ_14_depth[atom.nb_idx-1]
         elif not self.parm.chamber:
             self.new_epsilon_14 = None
-      
         AddLJType(self.parm, sel_atms, self.new_radius, self.new_epsilon, 
                   self.new_radius_14, self.new_epsilon_14)
-        self.parm.atom_list.refresh_data()
+        self.parm.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -757,22 +752,17 @@ class printljtypes(Action):
         else:
             return 'Nothing to do for printLJTypes'
 
-        self.idx = []
-
-        for i in xrange(self.parm.ptr('natom')):
+        indices = set()
+        for i, atom in enumerate(self.parm.atoms):
             if selection[i] == 1:
-                if not self.parm.parm_data['ATOM_TYPE_INDEX'][i] in self.idx:
-                    self.idx.append(self.parm.parm_data['ATOM_TYPE_INDEX'][i])
+                indices.add(atom.nb_idx)
 
         string = '\n%15s %4s %4s\n' % ("  ATOM NUMBER  ", 'NAME', 'TYPE')
         string += '---------------------------------------------\n'
-        for i in xrange(self.parm.ptr('natom')):
-            if self.parm.parm_data['ATOM_TYPE_INDEX'][i] in self.idx:
+        for i, atom in enumerate(self.parm.atoms):
+            if atom.nb_idx in indices:
                 string += 'ATOM %-10d %-4s %-4s: Type index: %d\n' % (
-                                      i+1, self.parm.parm_data['ATOM_NAME'][i],
-                                      self.parm.parm_data['AMBER_ATOM_TYPE'][i],
-                                      self.parm.parm_data['ATOM_TYPE_INDEX'][i])
-
+                                      i+1, atom.name, atom.type, atom.nb_idx)
         return string
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -799,10 +789,8 @@ class scee(Action):
             self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
                                 for i in xrange(self.parm.ptr('nptra'))]
         # Now add it to each of the torsions
-        for dih in self.parm.dihedrals_inc_h:
-            dih.dihed_type.scee = self.scee_value
-        for dih in self.parm.dihedrals_without_h:
-            dih.dihed_type.scee = self.scee_value
+        for typ in self.diheral_types:
+            typ.scee = self.scee_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -826,10 +814,8 @@ class scnb(Action):
          self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
                                     for i in xrange(self.parm.ptr('nptra'))]
       # Now add it to each of the torsions
-      for dih in self.parm.dihedrals_inc_h:
-         dih.dihed_type.scnb = self.scnb_value
-      for dih in self.parm.dihedrals_without_h:
-         dih.dihed_type.scnb = self.scnb_value
+      for typ in self.parm.dihedral_types:
+         typ.scnb = self.scnb_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -848,9 +834,10 @@ class changeljsingletype(Action):
         self.radius = arg_list.get_next_float()
         self.depth = arg_list.get_next_float()
         self.orig_radius = self.orig_depth = None
-        if 1 in self.mask.Selection():
-            first_loc = self.mask.Selection().index(1)
-            attype = self.parm.parm_data['ATOM_TYPE_INDEX'][first_loc]
+        selection = self.mask.Selection()
+        if 1 in selection:
+            first_loc = selection.index(1)
+            attype = self.parm.atoms[first_loc].nb_idx
             self.orig_radius = self.parm.LJ_radius[attype-1]
             self.orig_depth = self.parm.LJ_depth[attype-1]
 
@@ -870,12 +857,13 @@ class changeljsingletype(Action):
         if self.orig_radius is None: return
         # Make sure we've only selected a single atom type with our mask
         attype = None
-        for i, sel in enumerate(self.mask.Selection()):
-            if sel == 1:
+        selection = self.mask.Selection()
+        for i, atom in enumerate(self.parm.atoms):
+            if selection[i] == 1:
                 if attype is None:
-                    attype = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
+                    attype = atom.nb_idx
                 else:
-                    if attype != self.parm.parm_data['ATOM_TYPE_INDEX'][i]:
+                    if attype != atom.nb_idx:
                         raise LJ_TypeError('changeLJSingleType: Selection '
                                            'mask has multiple atom types!')
         # Fill the Lennard-Jones radius and depth arrays to make sure they're
@@ -883,10 +871,10 @@ class changeljsingletype(Action):
         self.parm.fill_LJ()
         self.parm.LJ_radius[attype-1] = self.radius
         self.parm.LJ_depth[attype-1] = self.depth
-
-        for i in xrange(self.parm.ptr('ntypes')):
+        ntypes = self.parm.ptr('NTYPES')
+        for i in xrange(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][
-                                    self.parm.ptr('ntypes')*i+attype-1] - 1
+                                    ntypes*i+attype-1] - 1
             rij = self.parm.LJ_radius[i] + self.radius
             wij = sqrt(self.parm.LJ_depth[i] * self.depth)
             acoef = wij * rij ** 12
@@ -911,25 +899,24 @@ class printdetails(Action):
         if isinstance(self.parm, AmoebaParm):
             retstr += '%7s%7s%9s%6s%6s%10s\n' % ('ATOM', 'RES', 'RESNAME',
                                                  'NAME', 'TYPE', 'Mass')
-            for i, atm in enumerate(self.parm.atom_list):
+            for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
                 retstr += (
                         '%7d%7d%9s%6s%6s%10.4f\n' %
-                            (i+1, atm.residue.idx, atm.residue.resname,
-                             atm.atname, atm.attype, atm.mass)
+                            (i+1, atm.residue.idx, atm.residue.name, atm.name,
+                             atm.type, atm.mass)
                 )
         else:
             retstr += ("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
                        ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'LJ Radius',
                         'LJ Depth', 'Mass', 'Charge','GB Radius','GB Screen')
             )
-            for i, atm in enumerate(self.parm.atom_list):
+            for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
                 retstr += (
                         "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"
-                        % (i+1, atm.residue.idx, atm.residue.resname,
-                           atm.atname, atm.attype,
-                           self.parm.LJ_radius[atm.nb_idx-1], 
+                        % (i+1, atm.residue.idx, atm.residue.name, atm.name,
+                           atm.type, self.parm.LJ_radius[atm.nb_idx-1],
                            self.parm.LJ_depth[atm.nb_idx-1], atm.mass,
                            atm.charge, atm.radii, atm.screen)
                 )
@@ -1100,7 +1087,7 @@ class changeprotstate(Action):
         sel = self.mask.Selection()
         if sum(sel) == 0:
             return "No residues selected for state change"
-        res = self.parm.atom_list[sel.index(1)].residue
+        res = self.parm.atoms[sel.index(1)].residue
         return 'Changing protonation state of residue %d (%s) to %d' % (res.idx,
                             res.resname, self.state)
    
@@ -1152,9 +1139,9 @@ class changeprotstate(Action):
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
         if sum(sel) == 0: return
-        res = self.parm.atom_list[sel.index(1)].residue
-        resnum = res.idx
-        resname = res.resname
+        residue = self.parm.atoms[sel.index(1)].residue
+        resnum = residue.idx
+        resname = residue.name
         # Get the charges from cpin_data. The first 2 elements are energy and 
         # proton count so the charges are chgs[2:]
         if not resname in residues.titratable_residues:
@@ -1172,18 +1159,14 @@ class changeprotstate(Action):
             raise ChangeStateError('You must select one and only one entire '
                                    'titratable residue')
       
-        chgnum = 0
-        for i in xrange(self.parm.parm_data['RESIDUE_POINTER'][resnum-1]-1,
-                        self.parm.parm_data['RESIDUE_POINTER'][resnum]-1):
-            if sel[i] != 1:
+        charges = res.states[self.state].charges
+        for i, atom in enumerate(residue.atoms):
+            if sel[atom.idx] != 1:
                 raise ChangeStateError('You must select 1 and only 1 entire '
                                        'residue to change the protonation '
                                        'state of')
             # Actually make the change
-            charge = res.states[self.state].charges[chgnum]
-            self.parm.parm_data['CHARGE'][i] = charge
-            self.parm.atom_list[i].charge = charge
-            chgnum += 1
+            self.parm.parm_data['CHARGE'][atom.idx] = atom.charge = charges[i]
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1201,12 +1184,11 @@ class netcharge(Action):
 
     def __str__(self):
         return 'The net charge of %s is %.4f' % (self.mask,
-            sum([self.parm.atom_list[i].charge for i in self.mask.Selected()]))
+            sum([self.parm.atoms[i].charge for i in self.mask.Selected()]))
 
     def execute(self):
         """ Calculates the charge of all atoms selected in mask """
-        return sum([self.parm.atom_list[i].charge
-                    for i in self.mask.Selected()])
+        return sum([self.parm.atoms[i].charge for i in self.mask.Selected()])
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1270,14 +1252,14 @@ class addexclusions(Action):
         # Loop through both selections and add each selected atom in sel2 to
         # the exclusion list for selected atoms in sel1 (and vice-versa).
         for i in self.mask1.Selected():
+            atm1 = self.parm.atoms[i]
             for j in self.mask2.Selected():
-                atm1 = self.parm.atom_list[i]
-                atm2 = self.parm.atom_list[j]
+                atm2 = self.parm.atoms[j]
                 # Skip over atm1 == atm2
                 if atm1 is atm2: continue
                 # Add each other to each other's exclusion lists.
                 atm1.exclude(atm2)
-                self.parm.atom_list.changed = True
+                self.parm.atoms.changed = True
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1294,28 +1276,12 @@ class printbonds(Action):
                                     'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')
         # Loop through all of the bonds without and inc hydrogen
         atomsel = self.mask.Selection()
-        for bond in self.parm.bonds_without_h:
-            idx1 = bond.atom1.starting_index
-            idx2 = bond.atom2.starting_index
-            if not (atomsel[idx1] or atomsel[idx2]): continue
-
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
+        for bond in self.parm.bonds:
+            atom1, atom2 = bond.atom1, bond.atom2
+            if not (atomsel[atom1.idx] or atomsel[atom2.idx]): continue
             retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
-                    idx1+1, atm1.atname, atm1.attype, idx2+1, atm2.atname,
-                    atm2.attype, bond.bond_type.req, bond.bond_type.k)
-
-        for bond in self.parm.bonds_inc_h:
-            idx1 = bond.atom1.starting_index
-            idx2 = bond.atom2.starting_index
-            if not (atomsel[idx1] or atomsel[idx2]): continue
-
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
-            retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
-                        idx1+1, atm1.atname, atm1.attype, idx2+1, atm2.atname,
-                        atm2.attype, bond.bond_type.req, bond.bond_type.k)
-
+                    atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                    atom2.name, atom2.type, bond.type.req, bond.type.k)
         return retstr
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1334,37 +1300,16 @@ class printangles(Action):
         # Loop through all of the bonds without and inc hydrogen
         atomsel = self.mask.Selection()
         for angle in self.parm.angles_without_h:
-            idx1 = angle.atom1.starting_index
-            idx2 = angle.atom2.starting_index
-            idx3 = angle.atom3.starting_index
-            if not (atomsel[idx1] or atomsel[idx2] or atomsel[idx3]): continue
-
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
-            atm3 = self.parm.atom_list[idx3]
+            atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
+            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                    atomsel[atom3.idx]):
+                continue
             retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                       '%10.4f %10.4f\n' % (idx1+1, atm1.atname, atm1.attype,
-                       idx2+1, atm2.atname, atm2.attype, idx3+1, atm3.atname,
-                       atm3.attype, angle.angle_type.k,
-                       angle.angle_type.theteq*180/math.pi)
+                       '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
+                       atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
+                       atom3.name, atom3.type, angle.type.k,
+                       angle.type.theteq*180/math.pi)
             )
-
-        for angle in self.parm.angles_inc_h:
-            idx1 = angle.atom1.starting_index
-            idx2 = angle.atom2.starting_index
-            idx3 = angle.atom3.starting_index
-            if not (atomsel[idx1] or atomsel[idx2] or atomsel[idx3]): continue
-
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
-            atm3 = self.parm.atom_list[idx3]
-            retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                       '%10.4f %10.4f\n' % (idx1+1, atm1.atname, atm1.attype,
-                       idx2+1, atm2.atname, atm2.attype, idx3+1, atm3.atname,
-                       atm3.attype, angle.angle_type.k,
-                       angle.angle_type.theteq*180/math.pi)
-            )
-      
         return retstr
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1383,77 +1328,38 @@ class printdihedrals(Action):
                 'Phase', 'EEL Scale', 'VDW Scale')
         # Loop through all of the bonds without and inc hydrogen
         atomsel = self.mask.Selection()
-        for dihedral in self.parm.dihedrals_without_h:
-            idx1 = dihedral.atom1.starting_index
-            idx2 = dihedral.atom2.starting_index
-            idx3 = dihedral.atom3.starting_index
-            idx4 = dihedral.atom4.starting_index
-            if not (atomsel[idx1] or atomsel[idx2] or atomsel[idx3] or 
-                    atomsel[idx4]):
+        for dihedral in self.parm.dihedrals:
+            atom1 = dihedral.atom1
+            atom2 = dihedral.atom2
+            atom3 = dihedral.atom3
+            atom4 = dihedral.atom4
+            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                    atomsel[atom3.idx] or atomsel[atom4.idx]):
                 continue
 
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
-            atm3 = self.parm.atom_list[idx3]
-            atm4 = self.parm.atom_list[idx4]
             # Determine if it's an Improper, Multiterm, or neither
             if isinstance(self.parm, AmoebaParm):
                 char = ' '
                 scee = scnb = 'N/A'
             elif dihedral.signs[1] < 0:
                 char = 'I'
-                scee = '%10.4f' % dihedral.dihed_type.scee
-                scnb = '%10.4f' % dihedral.dihed_type.scnb
+                scee = '%10.4f' % dihedral.type.scee
+                scnb = '%10.4f' % dihedral.type.scnb
             elif dihedral.signs[0] < 0:
                 char = 'M'
-                scee = '%10.4f' % dihedral.dihed_type.scee
-                scnb = '%10.4f' % dihedral.dihed_type.scnb
+                scee = '%10.4f' % dihedral.type.scee
+                scnb = '%10.4f' % dihedral.type.scnb
             else:
                 char = ' '
-                scee = '%10.4f' % dihedral.dihed_type.scee
-                scnb = '%10.4f' % dihedral.dihed_type.scnb
+                scee = '%10.4f' % dihedral.type.scee
+                scnb = '%10.4f' % dihedral.type.scnb
             retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
                        '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
-                       (char, idx1+1, atm1.atname, atm1.attype, idx2+1,
-                        atm2.atname, atm2.attype, idx3+1, atm3.atname,
-                        atm3.attype, idx4+1, atm4.atname, atm4.attype,
-                        dihedral.dihed_type.phi_k, dihedral.dihed_type.per,
-                        dihedral.dihed_type.phase*180/math.pi, scee, scnb)
-            )
-
-        for dihedral in self.parm.dihedrals_inc_h:
-            idx1 = dihedral.atom1.starting_index
-            idx2 = dihedral.atom2.starting_index
-            idx3 = dihedral.atom3.starting_index
-            idx4 = dihedral.atom4.starting_index
-            if not (atomsel[idx1] or atomsel[idx2] or atomsel[idx3] or 
-                    atomsel[idx4]):
-                continue
-
-            atm1 = self.parm.atom_list[idx1]
-            atm2 = self.parm.atom_list[idx2]
-            atm3 = self.parm.atom_list[idx3]
-            atm4 = self.parm.atom_list[idx4]
-            if isinstance(self.parm, AmoebaParm):
-                char = ' '
-                scee = scnb = 'N/A'
-            elif dihedral.signs[1] < 0:
-                char = 'I'
-                scee = '%10.4f' % dihedral.dihed_type.scee
-                scnb = '%10.4f' % dihedral.dihed_type.scnb
-            elif dihedral.signs[0] < 0:
-                char = 'M'
-                scee = '%10.4f' % dihedral.dihed_type.scee
-                scnb = '%10.4f' % dihedral.dihed_type.scnb
-            else:
-                char = ' '
-            retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
-                      (char, idx1+1, atm1.atname, atm1.attype, idx2+1,
-                       atm2.atname, atm2.attype, idx3+1, atm3.atname,
-                       atm3.attype, idx4+1, atm4.atname, atm4.attype,
-                       dihedral.dihed_type.phi_k, dihedral.dihed_type.per,
-                       dihedral.dihed_type.phase*180/math.pi, scee, scnb)
+                       (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                        atom2.name, atom2.type, atom3.idx+1, atom3.name,
+                        atom3.type, atom4.idx+1, atom4.name, atom4.type,
+                        dihedral.type.phi_k, dihedral.type.per,
+                        dihedral.type.phase*180/math.pi, scee, scnb)
             )
 
         return retstr
@@ -1497,18 +1403,19 @@ class setbond(Action):
         if sum(sel1) == 0: return
 
         # Create the new bond type
-        new_bnd_typ = BondType(self.k, self.req, -1)
+        new_bnd_typ = BondType(self.k, self.req)
         # Does that bond type exist in the list already? If it does, re-bind
         # new_bnd to that bond type reference
         exists = False
-        for bnd_typ in self.parm.bond_type_list:
+        for bnd_typ in self.parm.bond_types:
             if new_bnd_typ == bnd_typ:
                 new_bnd_typ = bnd_typ
                 exists = True
                 break
         # If the bond is new, add it to the type list
         if not exists:
-            self.parm.bond_type_list.append(new_bnd_typ)
+            self.parm.bond_types.append(new_bnd_typ)
+            new_bnd_typ.list = self.parm.bond_types
 
         atnum1, atnum2 = -1, -1
         # Loop through all of the selected atoms
@@ -1516,27 +1423,20 @@ class setbond(Action):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
-            atm1 = self.parm.atom_list[atnum1]
-            atm2 = self.parm.atom_list[atnum2]
+            atm1 = self.parm.atoms[atnum1]
+            atm2 = self.parm.atoms[atnum2]
 
-            # See if any atom is Hydrogen (allow for deuteriums)
-            if atm1.element == 1 or atm2.element == 1:
-                bond_list = self.parm.bonds_inc_h
-            else:
-                bond_list = self.parm.bonds_without_h
-   
             # See if the bond exists in the first place, and if so, replace its
             # bond type with our new bond type (new_bnd)
-            if atm2 in atm1.bond_partners or atm1 in atm2.bond_partners:
-                for bnd in bond_list:
-                    if atm1 in bnd and atm2 in bnd:
-                        bnd.bond_type = new_bnd_typ
-                        bond_list.changed = True
+            if atm2 in atm1.bond_partners and atm1 in atm2.bond_partners:
+                for bond in atm1.bonds:
+                    if atm2 in bond:
+                        bond.type = new_bnd_typ
+                        self.bonds.changed = True
                         break
-   
             # Otherwise, it doesn't exist, so we just create a new one
             else:
-                bond_list.append(Bond(atm1, atm2, new_bnd_typ))
+                self.bonds.append(Bond(atm1, atm2, new_bnd_typ))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1578,18 +1478,19 @@ class setangle(Action):
         if sum(sel1) == 0: return
 
         # Create the new angle type
-        new_ang_typ = AngleType(self.k, self.theteq, -1)
+        new_ang_typ = AngleType(self.k, self.theteq)
         # Does that angle type exist in the list already? If it does, re-bind
         # new_ang to that angle type reference
         exists = False
-        for ang_typ in self.parm.angle_type_list:
+        for ang_typ in self.parm.angle_types:
             if new_ang_typ == ang_typ:
                 new_ang_typ = ang_typ
                 exists = True
                 break
         # If the angle is new, add it to the type list
         if not exists:
-            self.parm.angle_type_list.append(new_ang_typ)
+            self.parm.angle_types.append(new_ang_typ)
+            new_ang_typ.list = self.parm.angle_types
 
         atnum1, atnum2, atnum3 = -1, -1, -1
 
@@ -1599,28 +1500,23 @@ class setangle(Action):
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
             atnum3 = sel3.index(1, atnum3+1)
-            atm1 = self.parm.atom_list[atnum1]
-            atm2 = self.parm.atom_list[atnum2]
-            atm3 = self.parm.atom_list[atnum3]
-            # See if any atom is Hydrogen (allow for deuteriums)
-            if atm1.element == 1 or atm2.element == 1 or atm3.element == 1:
-                angle_list = self.parm.angles_inc_h
-            else:
-                angle_list = self.parm.angles_without_h
+            atm1 = self.parm.atoms[atnum1]
+            atm2 = self.parm.atoms[atnum2]
+            atm3 = self.parm.atoms[atnum3]
    
             # See if the angle exists in the first place, and if so, replace its
             # angle type with our new angle type (new_ang)
-            if ((atm1 in atm2.bond_partners and atm1 in atm3.angle_partners) and
-                (atm2 in atm3.bond_partners)):
-                for ang in angle_list:
-                    if atm1 in ang and atm2 in ang and atm3 in ang:
-                        ang.angle_type = new_ang_typ
-                        angle_list.changed = True
+            found = False
+            if atm1 in atm3.angle_partners:
+                for ang in atm1.angles:
+                    if atm2 in ang and atm3 in ang:
+                        ang.type = new_ang_typ
+                        self.angles.changed = True
+                        found = True
                         break
-   
-            # Otherwise, it doesn't exist, so we just create a new one
-            else:
-                angle_list.append(Angle(atm1, atm2, atm3, new_ang_typ))
+            # If not found, create a new angle
+            if not found:
+                self.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1692,16 +1588,17 @@ class adddihedral(Action):
    
         # Create the new dihedral type
         new_dih_typ = DihedralType(self.phi_k, self.per, self.phase, self.scee,
-                                   self.scnb, -1)
+                                   self.scnb)
         exists = False
         # Do not add a duplicate dihedral type
-        for dih_typ in self.parm.dihedral_type_list:
+        for dih_typ in self.parm.dihedral_types:
             if new_dih_typ == dih_typ:
                 new_dih_typ = dih_typ
                 exists = True
                 break
         if not exists:
-            self.parm.dihedral_type_list.append(new_dih_typ)
+            self.parm.dihedral_types.append(new_dih_typ)
+            new_dih_type.list = self.parm.dihedral_types
 
         # Loop through all of the atoms
         atnum1, atnum2, atnum3, atnum4 = -1, -1, -1, -1
@@ -1712,42 +1609,17 @@ class adddihedral(Action):
             atnum2 = sel2.index(1, atnum2+1)
             atnum3 = sel3.index(1, atnum3+1)
             atnum4 = sel4.index(1, atnum4+1)
-            atm1 = self.parm.atom_list[atnum1]
-            atm2 = self.parm.atom_list[atnum2]
-            atm3 = self.parm.atom_list[atnum3]
-            atm4 = self.parm.atom_list[atnum4]
-            if (atm1 == atm2 or atm1 == atm3 or atm1 == atm4 or
-                atm2 == atm3 or atm2 == atm4 or atm3 == atm4):
+            atm1 = self.parm.atoms[atnum1]
+            atm2 = self.parm.atoms[atnum2]
+            atm3 = self.parm.atoms[atnum3]
+            atm4 = self.parm.atoms[atnum4]
+            if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or
+                atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
                 raise SetParamError('addDihedral: Duplicate atoms found!')
-   
-            # Make sure atom 1 doesn't occur in the 3rd or 4th spot since we'll
-            # have the -0 effect biting us...
-            if atm3.starting_index == 0 or atm4.starting_index == 0:
-                atm1, atm2, atm3, atm4 = atm4, atm3, atm2, atm1
-   
-            # See if any atom is Hydrogen (allow for deuterium)
-            if (atm1.element == 1 or atm2.element == 1 or 
-                atm3.element == 1 or atm4.element == 1):
-                dihed_list = self.parm.dihedrals_inc_h
-            else:
-                dihed_list = self.parm.dihedrals_without_h
-   
-            # See what signs has to be.  signs is a 2-element list with a 1 or
-            # -1 for the 3rd or 4th atom index. A -1 for the 3rd means the end
-            # groups are not calculated (multiterm, 6-or-lower-membered rings,
-            # impropers, etc.) and a -1 for the 4th means improper (-1 for 4th
-            # always means -1 for 3rd)
-            if self.improper:
-                signs = [-1,-1]
-            elif self.multiterm:
-                signs = [-1,1]
-            else:
-                signs = [1,1]
-            # Create our new dihedral!
-            dihed_list.append(
-                    Dihedral(atm1, atm2, atm3, atm4, new_dih_typ, signs)
+            self.dihedrals.append(
+                    Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
+                             ignore_end=self.multiterm, new_dih_typ)
             )
-        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1772,7 +1644,7 @@ class addatomicnumber(Action):
         if self.present: return
         self.parm.add_flag('ATOMIC_NUMBER', '10I8',
                            num_items=self.parm.ptr('natom'))
-        for i, atm in enumerate(self.parm.atom_list):
+        for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1815,7 +1687,7 @@ class deletedihedral(Action):
         if sum(sel1) == 0: return
         # Keep track of the dihedrals we want to delete from each
         # dihedral list (dihedrals_inc_h, dihedrals_without_h)
-        deleting_dihedrals = [[],[]]
+        deleting_dihedrals = []
         # We have already checked that they are the same number of atoms
         # Now, loop through the atoms and see if any dihedrals match that spec
         atnum1 = atnum2 = atnum3 = atnum4 = -1
@@ -1826,13 +1698,13 @@ class deletedihedral(Action):
             atnum2 = sel2.index(1, atnum2+1)
             atnum3 = sel3.index(1, atnum3+1)
             atnum4 = sel4.index(1, atnum4+1)
-            atm1 = self.parm.atom_list[atnum1]
-            atm2 = self.parm.atom_list[atnum2]
-            atm3 = self.parm.atom_list[atnum3]
-            atm4 = self.parm.atom_list[atnum4]
+            atm1 = self.parm.atoms[atnum1]
+            atm2 = self.parm.atoms[atnum2]
+            atm3 = self.parm.atoms[atnum3]
+            atm4 = self.parm.atoms[atnum4]
             # Make sure none of the indices are the same
-            if (atm1 == atm2 or atm1 == atm3 or atm1 == atm4 or 
-                atm2 == atm3 or atm2 == atm4 or atm3 == atm4):
+            if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or 
+                atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
                 warnings.warn('Skipping %d-%d-%d-%d dihedral deletion -- '
                               'duplicate atoms!' %
                               (atnum1, atnum2, atnum3, atnum4),
@@ -1841,40 +1713,26 @@ class deletedihedral(Action):
             # This helps us keep track of multi-term dihedrals so we don't
             # confuse users
             found_this_dihedral = False
-            # Figure out if our dihedral would have hydrogen or not (limits what
-            # dihedral list we have to search...)
-            if (atm1.element == 1 or atm2.element == 1 or
-                atm3.element == 1 or atm4.element == 1):
-                dihed_list = self.parm.dihedrals_inc_h
-                dihed_list_idx = 0
-            else:
-                dihed_list = self.parm.dihedrals_without_h
-                dihed_list_idx = 1
             # Now search through our dihedral list to see which indexes (if any)
             # we have to remove. Keep tabs of them so we can pop them in reverse
             # order (so we don't have to re-figure indices) afterwards
             proposed_dihedral = (atnum1, atnum2, atnum3, atnum4)
-            for j, dihed in enumerate(dihed_list):
-                if dihed == proposed_dihedral:
+            for j, dihed in enumerate(self.dihedrals):
+                if dihed.same_atoms(proposed_dihedral):
                     if not found_this_dihedral:
                         found_this_dihedral = True
                         total_diheds += 1
-                    deleting_dihedrals[dihed_list_idx].append(j)
+                    deleting_dihedrals.append(j)
 
-        if not deleting_dihedrals[0] and not deleting_dihedrals[1]:
+        if not deleting_dihedrals:
             return
 
         # At this point, we've collected all of our dihedrals, now sort them
-        if deleting_dihedrals[0]: deleting_dihedrals[0].sort()
-        if deleting_dihedrals[1]: deleting_dihedrals[1].sort()
+        deleting_dihedrals.sort()
         # deleting_dihedrals now contains all of our dihedral indexes
-        if deleting_dihedrals[0]:
-            while deleting_dihedrals[0]:
-                del self.parm.dihedrals_inc_h[deleting_dihedrals[0].pop()]
-        if deleting_dihedrals[1]:
-            while deleting_dihedrals[1]:
-                del self.parm.dihedrals_without_h[deleting_dihedrals[1].pop()]
-        self.parm.remake_parm()
+        while deleting_dihedrals:
+            del self.parm.dihedrals[deleting_dihedrals.pop()]
+
         return total_diheds
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1897,23 +1755,22 @@ class printljmatrix(Action):
         ntypes = self.parm.ptr('NTYPES')
         ret_str = ''
         if self.idx is not None:
-            sel = [0 for i in self.parm.parm_data['ATOM_TYPE_INDEX']]
-            for i, idx in enumerate(self.parm.parm_data['ATOM_TYPE_INDEX']):
-                if idx == self.idx: sel[i] = 1
+            sel = [0 for i in self.parm.atoms]
+            for i, atom in enumerate(self.parm.atoms):
+                if atom.nb_idx == self.idx: sel[i] = 1
         else:
             sel = self.mask.Selection()
         # If we selected no atoms, bail out
-        if sum(sel) == 0: return ''
+        if sum(sel) == 0: return 'No atom types selected'
         # Figure out which types correspond to which names
         typenames = [set() for i in xrange(self.parm.ptr('NTYPES'))]
-        for i, ty in enumerate(self.parm.parm_data['ATOM_TYPE_INDEX']):
-            typenames[ty-1].add(self.parm.parm_data['AMBER_ATOM_TYPE'][i])
+        for i, atom in enumerate(self.atoms):
+            typenames[atom.nb_idx-1].add(atom.type)
         # Otherwise, collect our list of atom types that we selected
         sel_types = set()
-        for i, val in enumerate(sel):
-            if not val: continue
-            attype = self.parm.parm_data['ATOM_TYPE_INDEX'][i]
-            sel_types.add(attype)
+        for i, atom in enumerate(self.parm.atoms):
+            if sel[i] == 0: continue
+            sel_types.add(atom.type)
         sel_types = sorted(list(sel_types)) # sort the atom types
         # Convert all of the typenames into strings, then find the longest one so
         # we can properly format the string
@@ -2044,8 +1901,8 @@ class timerge(Action):
             if molsel2[i]:
                 for j in xrange(natom):
                     if sel2[j]:
-                        atm1 = self.parm.atom_list[i]
-                        atm2 = self.parm.atom_list[j]
+                        atm1 = self.parm.atoms[i]
+                        atm2 = self.parm.atoms[j]
 
                         if (atm1 in atm2.bond_partners or
                             atm1 in atm2.angle_partners or
@@ -2125,91 +1982,71 @@ class timerge(Action):
       
         for j in xrange(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
-                atm = self.parm.atom_list[j]
+                atm = self.parm.atoms[j]
                 idx = mol1common[mol2common.index(j)]
-                atm_new = self.parm.atom_list[idx]
+                atm_new = self.parm.atoms[idx]
 
+                # What is happening here???
                 for k in xrange(natom):
                     if sel2[k]:
-                        atm2 = self.parm.atom_list[k]
+                        atm2 = self.parm.atoms[k]
                         # update partners -- the exclusion list will be updated 
                         # when the file is written out
                         if atm in atm2.bond_partners:
-                            atm.bond_partners.remove(atm2)
-                            atm2.bond_partners.remove(atm)
+                            atm._bond_partners.remove(atm2)
+                            atm2._bond_partners.remove(atm)
                             atm2.bond_to(atm_new)
-                            atm_new.bond_to(atm2)
 
                         if atm in atm2.angle_partners:
-                            atm.angle_partners.remove(atm2)
-                            atm2.angle_partners.remove(atm)
+                            atm._angle_partners.remove(atm2)
+                            atm2._angle_partners.remove(atm)
                             atm2.angle_to(atm_new)
-                            atm_new.angle_to(atm2)
 
                         if atm in atm2.dihedral_partners:
-                            atm.dihedral_partners.remove(atm2)
-                            atm2.dihedral_partners.remove(atm)
+                            atm._dihedral_partners.remove(atm2)
+                            atm2._dihedral_partners.remove(atm)
                             atm2.dihedral_to(atm_new)
-                            atm_new.dihedral_to(atm2)
 
                         # Now go through each array re-indexing the atoms
                         # Check to make sure that this is a bond/angle/dihed 
                         # involving the common atom j and the softcore atom k
                       
-                        for bond in (self.parm.bonds_inc_h, 
-                                     self.parm.bonds_without_h):
-                            for i in xrange(len(bond)):
-                                holder = bond[i]
-                                if (holder.atom1.starting_index == j and 
-                                    holder.atom2.starting_index == k):
-                                    holder.atom1 = atm_new
-                                elif (holder.atom2.starting_index == j and 
-                                      holder.atom1.starting_index == k):
-                                    holder.atom2 = atm_new
+                        for bond in self.parm.bonds:
+                            if (bond.atom1.idx == j and bond.atom2.idx == k):
+                                bond.atom1 = atm_new
+                            elif (bond.atom2.idx == j and bond.atom1.idx == k):
+                                bond.atom2 = atm_new
 
-                        for angle in (self.parm.angles_inc_h, 
-                                      self.parm.angles_without_h):
-                            for i in xrange(len(angle)):
-                                holder = angle[i]
-                                if holder.atom1.starting_index == j:
-                                    if (holder.atom2.starting_index == k or 
-                                        holder.atom3.starting_index == k):
-                                        holder.atom1 = atm_new
-                                elif holder.atom2.starting_index == j:
-                                    if (holder.atom1.starting_index == k or 
-                                        holder.atom3.starting_index == k):
-                                        holder.atom2 = atm_new
-                                elif holder.atom3.starting_index == j:
-                                    if (holder.atom1.starting_index == k or 
-                                        holder.atom2.starting_index == k):
-                                        holder.atom3 = atm_new
+                        for angle in self.parm.angles:
+                            if angle.atom1.idx == j:
+                                if angle.atom2.idx == k or angle.atom3.idx == k:
+                                    angle.atom1 = atm_new
+                            elif angle.atom2.idx == j:
+                                if angle.atom1.idx == k or angle.atom3.idx == k:
+                                    angle.atom2 = atm_new
+                            elif angle.atom3.idx == j:
+                                if angle.atom1.idx == k or angle.atom2.idx == k:
+                                    angle.atom3 = atm_new
                   
-                        for dihed in (self.parm.dihedrals_inc_h, 
-                                      self.parm.dihedrals_without_h):
-                            for i in xrange(len(dihed)):
-                                holder = dihed[i]
-                                if holder.atom1.starting_index == j:
-                                    if (holder.atom2.starting_index == k or 
-                                        holder.atom3.starting_index == k or 
-                                        holder.atom4.starting_index == k):
-                                        holder.atom1 = atm_new
-                                elif holder.atom2.starting_index == j:
-                                    if (holder.atom1.starting_index == k or 
-                                        holder.atom3.starting_index == k or 
-                                        holder.atom4.starting_index == k):
-                                        holder.atom2 = atm_new
-                                elif holder.atom3.starting_index == j:
-                                    if (holder.atom1.starting_index == k or 
-                                        holder.atom2.starting_index == k or 
-                                        holder.atom4.starting_index == k):
-                                        holder.atom3 = atm_new
-                                elif holder.atom4.starting_index == j:
-                                    if (holder.atom1.starting_index == k or 
-                                        holder.atom2.starting_index == k or 
-                                        holder.atom3.starting_index == k):
-                                        holder.atom4 = atm_new               
+                        for dihed in self.parm.dihedrals:
+                            if holder.atom1.idx == j:
+                                if (dihed.atom2.idx == k or dihed.atom3.idx == k
+                                        or dihed.atom4.idx == k):
+                                    dihed.atom1 = atm_new
+                            elif dihed.atom2.idx == j:
+                                if (dihed.atom1.idx == k or dihed.atom3.idx == k
+                                        or dihed.atom4.idx == k):
+                                    dihed.atom2 = atm_new
+                            elif dihed.atom3.idx == j:
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
+                                        or dihed.atom4.idx == k):
+                                    dihed.atom3 = atm_new
+                            elif dihed.atom4.starting_index == j:
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
+                                        or dihed.atom3.idx == k):
+                                    dihed.atom4 = atm_new               
 
-        self.parm.atom_list.changed = True
+        self.parm.atoms.changed = True
 
         if nremove > 0:
             self.parm.delete_mask(remove_str)
@@ -2231,37 +2068,36 @@ class timerge(Action):
         # and can cause problems with the 1-4 nonbonded calculations.
         # This can be worked-around: 
         # Define your softcore region so that it includes the ring.        
-        for dihed in (self.parm.dihedrals_inc_h,self.parm.dihedrals_without_h):
-            for i in xrange(len(dihed)):
-                holder = dihed[i]
-                # skip impropers, these are not used to define 1-4 interactions
-                # so these can cross through the softcore region
-                if holder.signs[1] < 0: continue
-                atmi = holder.atom1.starting_index
-                atmj = holder.atom2.starting_index
-                atmk = holder.atom3.starting_index
-                atml = holder.atom4.starting_index
-                if (atmj in new_sc_atm1_int or 
-                    atmk in new_sc_atm1_int or 
-                    atmj in new_sc_atm2_int or 
-                    atmk in new_sc_atm2_int): #dihedral includes sc atoms 
-               
-                    #endpoint atoms are not softcore
-                    #we are crossing through the softcore region
-                    if (atmi not in new_sc_atm1_int and 
-                        atmi not in new_sc_atm2_int and 
-                        atml not in new_sc_atm1_int and 
-                        atml not in new_sc_atm2_int):
-                        raise TiMergeError('Cannot have dihedral cross through '
-                        'softcore region. (DIHED : %d %d %d %d)\n Usually this '
-                        'means you have defined the softcore region in a way '
-                        'that breaks a ring.\n Try redefining your softcore '
-                        'region to include the ring or at least three '
-                        'consecutive atoms.' % (atmi+1,
-                                                atmj+1, 
-                                               (atmk+1) * holder.signs[0], 
-                                               (atml+1) * holder.signs[1]))
-                     
+        for dihed in self.parm.dihedrals:
+            # skip impropers, these are not used to define 1-4 interactions
+            # so these can cross through the softcore region
+            if dihed.improper: continue
+            atmi = dihed.atom1.idx
+            atmj = dihed.atom2.idx
+            atmk = dihed.atom3.idx
+            atml = dihed.atom4.idx
+            if (atmj in new_sc_atm1_int or 
+                atmk in new_sc_atm1_int or 
+                atmj in new_sc_atm2_int or 
+                atmk in new_sc_atm2_int): #dihedral includes sc atoms 
+            
+                #endpoint atoms are not softcore
+                #we are crossing through the softcore region
+                if (atmi not in new_sc_atm1_int and 
+                    atmi not in new_sc_atm2_int and 
+                    atml not in new_sc_atm1_int and 
+                    atml not in new_sc_atm2_int):
+                    raise TiMergeError(
+                            'Cannot have dihedral cross through softcore '
+                            'region. (DIHED : %d %d %d %d). Usually this means '
+                            'you have defined the softcore region in a way '
+                            'that breaks a ring. Try redefining your softcore '
+                            'region to include the ring or at least three '
+                            'consecutive atoms.' %
+                            (atmi+1, atmj+1, (atmk+1) * holder.signs[0], 
+                             (atml+1) * holder.signs[1])
+                    )
+
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
         self.sc_mask2 = '@' + ','.join(new_sc_atm2)
 
@@ -2538,17 +2374,16 @@ class interpolate(Action):
             raise IncompatibleParmsError('%s and %s have different #s of '
                                          'atoms!' % (parm1, parm2))
         ndiff = 0
-        for atom1, atom2 in zip(parm1.atom_list, parm2.atom_list):
-            if atom1.atname != atom2.atname:
+        for atom1, atom2 in zip(parm1.atoms, parm2.atoms):
+            if atom1.name != atom2.name:
                 ndiff += 1
         if ndiff > 0:
             warnings.warn('%d atoms have different names b/w %s and %s' %
                           (ndiff, parm1, parm2), SeriousParmWarning)
-        for atm1, atm2 in zip(parm1.atom_list, parm2.atom_list):
-            if ((parm1.LJ_radius[atm1.nb_idx-1] !=
-                 parm2.LJ_radius[atm2.nb_idx-1]) or
-                (parm1.LJ_depth[atm1.nb_idx-1] !=
-                 parm2.LJ_radius[atm2.nb_idx-1])):
+        for atm1, atm2 in zip(parm1.atoms, parm2.atoms):
+            i1, i2 = atm1.nb_idx-1, atm2.nb_idx-1
+            if ((parm1.LJ_radius[i1] != parm2.LJ_radius[i2]) or
+                    (parm1.LJ_depth[i1] != parm2.LJ_radius[i2])):
                 self.diff_vdw = True
 
     def execute(self):
@@ -2567,11 +2402,13 @@ class interpolate(Action):
         for i in xrange(self.nparm):
             new_chg = chg1 + diff * (i + 1)
             parm1.parm_data['CHARGE'] = [c for c in new_chg]
+            parm1.load_atom_info()
             newname = '%s.%d' % (self.prefix, i+self.startnum)
             print 'Printing %s' % newname
             parm1.write_parm(newname)
         # Restore the original charges
         parm1.parm_data['CHARGE'] = orig_chg1
+        parm1.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2599,16 +2436,16 @@ class summary(Action):
     def __str__(self):
         """ Collect statistics """
         nnuc = namin = ncion = naion = nwat = nunk = 0
-        for i, res in enumerate(self.parm.parm_data['RESIDUE_LABEL']):
-            if res in summary.nucleic:
+        for res in self.parm.residues:
+            if res.name in summary.nucleic:
                 nnuc += 1
-            elif res in summary.amino:
+            elif res.name in summary.amino:
                 namin += 1
-            elif res in self.parm.solvent_residues:
+            elif res.name in self.parm.solvent_residues:
                 nwat += 1
-            elif res in summary.anions:
+            elif res.name in summary.anions:
                 naion += 1
-            elif res in summary.cations:
+            elif res.name in summary.cations:
                 ncion += 1
             else:
                 nunk += 1
@@ -2630,7 +2467,7 @@ class summary(Action):
                    self.parm.ptr('natom'), self.parm.ptr('nres'))
         )
 
-        if self.parm.ptr('ifbox') == 1:
+        if self.parm.ptr('IFBOX') == 1:
             if hasattr(self.parm, 'box'):
                 a, b, c = self.parm.box[:3]
             else:
@@ -2641,7 +2478,7 @@ class summary(Action):
                        'System density (g/mL): %f\n' %
                        (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
             )
-        elif self.parm.ptr('ifbox') == 2:
+        elif self.parm.ptr('IFBOX') == 2:
             # General triclinic cell
             if hasattr(self.parm, 'box'):
                 a, b, c, alpha, beta, gamma = self.parm.box[:]
@@ -2681,9 +2518,10 @@ class scale(Action):
         try:
             for i in xrange(len(self.parm.parm_data[self.flag])):
                 self.parm.parm_data[self.flag][i] *= self.factor
-            self.parm.flush_data_changes()
         except TypeError:
             raise ArgumentError('Cannot scale data in %%FLAG %s' % self.flag)
+        else:
+            self.parm.load_structure()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2760,7 +2598,7 @@ class addpdb(Action):
         icodes = ['' for i in xrange(self.parm.ptr('nres'))]
         for i, res in enumerate(pdb.residues):
             try:
-                reslab = self.parm.parm_data['RESIDUE_LABEL'][i].strip()
+                reslab = self.parm.residues[i].name
                 resname = res.name.strip()
                 if resname != reslab:
                     if (not resname in ('WAT', 'HOH') or 
@@ -2777,7 +2615,7 @@ class addpdb(Action):
                                           AddPDBWarning)
                 resnums[i] = res.number
                 chainids[i] = res.chain
-                icodes[i] = res.insertion_code.strip()
+                icodes[i] = res.insertion_code
             except IndexError:
                 raise AddPDBError('PDB %s has more residues than prmtop %s' %
                                 (self.pdbfile, self.parm))
@@ -2807,6 +2645,7 @@ class addpdb(Action):
                             for atm in self.parm.atom_list
                 ], comments=['Atom element name read from topology file']
             )
+        self.load_structure() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2932,9 +2771,9 @@ class hmassrepartition(Action):
         # Back up the masses in case something goes wrong
         original_masses = self.parm.parm_data['MASS'][:]
         water = self.parm.solvent_residues
-        for i, atom in enumerate(self.parm.atom_list):
+        for i, atom in enumerate(self.parm.atoms):
             if atom.atomic_number != 1: continue
-            if not self.changewater and atom.residue.resname in water:
+            if not self.changewater and atom.residue.name in water:
                 continue
             heteroatom = None
             heteroidx = 0
@@ -2949,20 +2788,21 @@ class hmassrepartition(Action):
                 warnings.warn('H atom detected not bound to heteroatom. '
                               'Ignoring.', ParmWarning)
                 continue
-            transfermass = self.new_h_mass - self.parm.parm_data['MASS'][i]
-            oi = heteroatom.starting_index
-            self.parm.parm_data['MASS'][i] = self.new_h_mass
+            transfermass = self.new_h_mass - atom.mass
+            oi = heteroatom.idx
+            self.parm.parm_data['MASS'][i] = atom.mass = self.new_h_mass
             self.parm.parm_data['MASS'][oi] -= transfermass
+            heteroatom.mass -= transfermass
 
         # Now make sure that all masses are positive, or revert masses and
         # raise an exception
-        for i, mass in enumerate(self.parm.parm_data['MASS']):
-            if mass <= 0 and self.parm.atom_list[i].atomic_number > 0:
+        for atom in self.parm.atoms:
+            if atom.mass <= 0 and atom.atomic_number > 0:
                 self.parm.parm_data['MASS'] = original_masses
+                self.parm.load_atom_info()
                 raise HMassRepartitionError('Too much mass removed from atom '
                                             '%d. Hydrogen masses must be '
                                             'smaller.' % i)
-        self.parm.atom_list.refresh_data()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

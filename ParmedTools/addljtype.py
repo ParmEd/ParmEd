@@ -13,9 +13,9 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
                 old_type = parm.parm_data['ATOM_TYPE_INDEX'][i]
             parm.parm_data['ATOM_TYPE_INDEX'][i] = parm.ptr('ntypes') + 1
 
-    # Now increment NTYPES and reload the pointers
+    # Now increment NTYPES
     parm.parm_data['POINTERS'][NTYPES] += 1
-    parm.LoadPointers()
+    parm.pointers['NTYPES'] += 1
    
     # Now create a whole new array for NONBONDED_PARM_INDEX
     start_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1

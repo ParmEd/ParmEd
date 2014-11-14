@@ -394,12 +394,12 @@ class AmberParm(AmberFormat, Structure):
                 self.rst7.box = self.box
 
         # Now fill in the rst7 coordinates
-        self.rst7.natom = len(self.atom_list)
-        self.rst7.coordinates = [0.0 for i in xrange(len(self.atom_list)*3)]
+        self.rst7.natom = len(self.atoms)
+        self.rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
         if self.rst7.hasvels:
-            self.rst7.velocities = [0.0 for i in xrange(len(self.atom_list)*3)]
+            self.rst7.velocities = [0.0 for i in xrange(len(self.atoms)*3)]
 
-        for i, at in enumerate(self.atom_list):
+        for i, at in enumerate(self.atoms):
             self.rst7.coordinates[3*i  ] = at.xx
             self.rst7.coordinates[3*i+1] = at.xy
             self.rst7.coordinates[3*i+2] = at.xz
@@ -418,7 +418,7 @@ class AmberParm(AmberFormat, Structure):
         Writes the current data in parm_data into a new topology file with a
         given name.
         """
-        if self._topology_changed(): 
+        if self.is_changed():
             self.remake_parm()
 #           self.load_structure()
 
@@ -735,7 +735,7 @@ class AmberParm(AmberFormat, Structure):
     def load_coordinates(self, coords):
         """ Loads the coordinates into the atom list """
         self.coords = coords
-        for i, atom in enumerate(self.atom_list):
+        for i, atom in enumerate(self.atoms):
             i3 = 3 * i
             atom.xx = coords[i3  ]
             atom.xy = coords[i3+1]
@@ -747,7 +747,7 @@ class AmberParm(AmberFormat, Structure):
         """ Loads the coordinates into the atom list """
         self.hasvels = True
         self.vels = vels
-        for i, atom in enumerate(self.atom_list):
+        for i, atom in enumerate(self.atoms):
             i3 = 3 * i
             atom.vx = vels[i3  ]
             atom.vy = vels[i3+1]
@@ -1159,16 +1159,26 @@ class AmberParm(AmberFormat, Structure):
         # Now do the dihedral arrays
         data['DIHEDRALS_INC_HYDROGEN'] = dihed_array = []
         for i, dihed in enumerate(self.dihedrals_inc_h):
-            dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                dihed.atom3.idx*3, dihed.atom4.idx*3,
-                                dihed.type.idx+1])
+            if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
+                dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
+                                    dihed.atom2.idx*3, dihed.atom1.idx*3,
+                                    dihed.type.idx+1])
+            else:
+                dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
+                                    dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                    dihed.type.idx+1])
         data['POINTERS'][NTHETH] = i + 1
         self.pointers['NTHETH'] = i + 1
         data['DIHEDRALS_WITHOUT_HYDROGEN'] = dihed_array = []
         for i, dihed in enumerate(self.dihedrals_inc_h):
-            dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                dihed.atom3.idx*3, dihed.atom4.idx*3,
-                                dihed.type.idx+1])
+            if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
+                dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
+                                    dihed.atom2.idx*3, dihed.atom1.idx*3,
+                                    dihed.type.idx+1])
+            else:
+                dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
+                                    dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                    dihed.type.idx+1])
         data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = i + 1
         self.pointers['NTHETA'] = self.pointers['MTHETA'] = i + 1
 
@@ -1179,7 +1189,7 @@ class AmberParm(AmberFormat, Structure):
         from chemistry.molecule import Molecule
 
         # Remake the topology file if it's changed
-        if self._topology_changed():
+        if self.is_changed():
             self.remake_parm()
             if self.ptr('ifbox'): self.rediscover_molecules()
             self.load_structure()
@@ -1215,7 +1225,7 @@ class AmberParm(AmberFormat, Structure):
             residue_pointers.append(self.parm_data['RESIDUE_POINTER'][i]-1)
 
         # Determine which element each atom is
-        elements = [Element[atm.atomic_number] for atm in self.atom_list]
+        elements = [Element[atm.atomic_number] for atm in self.atoms]
 
         # Put together the title
         title = ''
@@ -1228,7 +1238,7 @@ class AmberParm(AmberFormat, Structure):
 
         # Fill the VDW radii array
         self.fill_LJ()
-        for atm in self.atom_list:
+        for atm in self.atoms:
             radii.append(self.LJ_radius[self.LJ_types[atm.attype]-1])
         try:
             return Molecule(atoms=self.parm_data['ATOM_NAME'][:],
@@ -1403,7 +1413,7 @@ def set_molecules(parm):
     setrecursionlimit(max(parm.ptr('natom'), getrecursionlimit()))
 
     # Unmark all atoms so we can track which molecule each goes into
-    parm.atom_list.unmark()
+    parm.atoms.unmark()
 
     if not parm.ptr('ifbox'):
         raise MoleculeError('Only periodic prmtops can have '
@@ -1419,7 +1429,7 @@ def set_molecules(parm):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)
-        if not parm.atom_list[i].marked:
+        if not parm.atoms[i].marked:
             tmp = [i]
             _set_owner(parm, tmp, i, molecule_number)
             # Make sure the atom indexes are sorted
@@ -1432,14 +1442,14 @@ def set_molecules(parm):
 
 def _set_owner(parm, owner_array, atm, mol_id):
     """ Recursively sets ownership of given atom and all bonded partners """
-    parm.atom_list[atm].marked = mol_id
-    for partner in parm.atom_list[atm].bond_partners:
+    parm.atoms[atm].marked = mol_id
+    for partner in parm.atoms[atm].bond_partners:
         if not partner.marked:
-            owner_array.append(partner.starting_index)
-            _set_owner(parm, owner_array, partner.starting_index, mol_id)
+            owner_array.append(partner.idx)
+            _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
             raise MoleculeError('Atom %d in multiple molecules' % 
-                                partner.starting_index)
+                                partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
