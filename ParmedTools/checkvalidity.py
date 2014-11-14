@@ -202,48 +202,11 @@ def check_validity(parm, warnings):
         if not sel: continue
         atm = parm.atom_list[i]
         # We expect 2 bonds
-        bondedatms = [a.atname for a in atm.bond_partners]
+        bondedatms = [a.name for a in atm.bond_partners]
         if len(bondedatms) != 2 or 'SG' not in bondedatms:
             warnings.warn('Detected CYX residue with a Sulfur atom not bonded '
                           'to another CYX Sulfur! Did you forget to make the '
                           'disulfide bond?', MissingDisulfide)
-            break
-
-    # Check that our bonds/angles/dihedrals with and without hydrogen ACTUALLY
-    # have hydrogen or not hydrogen
-    for bond in parm.bonds_inc_h:
-        if bond.atom1.element != 1 and bond.atom2.element != 1:
-            warnings.warn('Bond with hydrogen has no hydrogen atom! Use '
-                '"fixTopology" to fix this issue.', BadParmWarning)
-            break
-    for bond in parm.bonds_without_h:
-        if bond.atom1.element == 1 or bond.atom2.element == 1:
-            warnings.warn('Bond without hydrogen has a hydrogen atom! Use '
-                '"fixTopology" to fix this issue.', BadParmWarning)
-            break
-    for angle in parm.angles_inc_h:
-        if (angle.atom1.element != 1 and angle.atom2.element != 1 and
-            angle.atom3.element != 1):
-            warnings.warn('Angle with hydrogen has no hydrogen atom! Use '
-                '"fixTopology to fix this issue.', BadParmWarning)
-            break
-    for angle in parm.angles_without_h:
-        if (angle.atom1.element == 1 or angle.atom2.element == 1 or
-            angle.atom3.element == 1):
-            warnings.warn('Angle without hydrogen has a hydrogen atom! Use '
-                '"fixTopology" to fix this issue.', BadParmWarning)
-            break
-    for dihed in parm.dihedrals_inc_h:
-        if (dihed.atom1.element != 1 and dihed.atom2.element != 1 and
-            dihed.atom3.element != 1 and dihed.atom4.element != 1):
-            warnings.warn('Dihedral with hydrogen has no hydrogen atom! Use '
-                '"fixTopology" to fix this issue.', BadParmWarning)
-            break
-    for dihed in parm.dihedrals_without_h:
-        if (dihed.atom1.element == 1 or dihed.atom2.element == 1 or
-            dihed.atom3.element == 1 or dihed.atom4.element == 1):
-            warnings.warn('Dihedral without hydrogen has a hydrogen atom! Use '
-                '"fixTopology" to fix this issue.', BadParmWarning)
             break
 
     if hasattr(parm, 'coords'):
@@ -272,22 +235,22 @@ def check_validity(parm, warnings):
             pass
         # Now check if we have any bonds that seem unreasonably large. This
         # would indicate gaps in the structure.
-        for bnd in parm.bonds_without_h:
+        for bnd in parm.bonds:
             dx = bnd.atom1.xx - bnd.atom2.xx
             dy = bnd.atom1.xy - bnd.atom2.xy
             dz = bnd.atom1.xz - bnd.atom2.xz
             d2 = dx*dx + dy*dy + dz*dz
-            req = bnd.bond_type.req
+            req = bnd.type.req
             # Warn if any bond starts at > 3 times its equilibrium length
             if d2 > 9 * req*req:
                 warnings.warn('Atoms %d (%s %d [%s]) and %d (%s %d [%s]) are '
                     'bonded (equilibrium length %.3f A) but are %.3f A apart. '
                     'This often indicates gaps in the original sequence and '
                     'should be checked carefully.' %
-                     (bnd.atom1.starting_index+1, bnd.atom1.residue.resname,
-                      bnd.atom1.residue.idx+1, bnd.atom1.atname,
-                      bnd.atom2.starting_index+1, bnd.atom2.residue.resname,
-                      bnd.atom2.residue.idx+1, bnd.atom2.atname,
+                     (bnd.atom1.idx+1, bnd.atom1.residue.name,
+                      bnd.atom1.residue.idx+1, bnd.atom1.name,
+                      bnd.atom2.idx+1, bnd.atom2.residue.name,
+                      bnd.atom2.residue.idx+1, bnd.atom2.name,
                       req, sqrt(d2)),
                     LongBondWarning
                 )

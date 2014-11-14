@@ -116,6 +116,11 @@ class _FourAtomTerm(object):
         return (self.atom1 is thing or self.atom2 is thing or
                 self.atom3 is thing or self.atom4 is thing)
 
+    def delete(self):
+        """ Sets all atoms in this term to None, and its type if it exists """
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = None
+        if hasattr(self, 'type'): self.type = None
+
 class _ParameterType(object):
     """
     A parameter type that defines the nature of a particular molecular
@@ -1544,7 +1549,7 @@ class Cmap(object):
         atom2.cmaps.append(self)
         atom3.cmaps.append(self)
         atom4.cmaps.append(self)
-        atom4.cmaps.append(self)
+        atom5.cmaps.append(self)
         # Load the CMAP interpolation table
         self.type = type
 
@@ -1635,6 +1640,8 @@ class CmapType(_ListItem, _ParameterType):
     grid : _CmapGrid
         A _CmapGrid object defining the interpolating potential energy grid,
         with each point having the units kcal/mol
+    comments : list(str)=None
+        List of strings that represent comments about this parameter type
     list : TrackedList=None
         If not None, this is a list in which this instance _may_ be a member
     idx : int
@@ -1663,12 +1670,16 @@ class CmapType(_ListItem, _ParameterType):
     >>> ct.idx # not part of a list or iterable
     -1
     """
-    def __init__(self, resolution, grid, list=None):
+    def __init__(self, resolution, grid, comments=None, list=None):
         _ParameterType.__init__(self)
         self.resolution = resolution
         self.grid = _CmapGrid(resolution, grid)
         if len(grid) != self.resolution * self.resolution:
             raise CmapError('CMAP grid does not match expected resolution')
+        if comments is None:
+            self.comments = []
+        else:
+            self.comments = comments
         self._idx = -1
         self.list = list
 
@@ -1967,6 +1978,11 @@ class PiTorsion(object):
                 (self.atom4 in thing and self.atom5 in thing) or
                 (self.atom4 in thing and self.atom6 in thing))
 
+    def delete(self):
+        """ Sets all atoms to None and deletes the type """
+        self.type = self.atom1 = self.atom2 = self.atom3 = None
+        self.atom4 = self.atom5 = self.atom6 = None
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class StretchBend(object):
@@ -2007,6 +2023,10 @@ class StretchBend(object):
                     self.atom3 is thing)
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing))
+
+    def delete(self):
+        """ Sets all of the atoms and parameter type to None """
+        self.atom1 = self.atom2 = self.atom3 = self.type = None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2576,10 +2596,10 @@ class TrackedList(list):
         return list.__delitem__(self, item)
 
     @_changes
-    def __delslice__(self, *args):
+    def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
         if not self: return
-        indices = xrange(*args)
+        indices = xrange(start, min(stop, len(self)))
         for index in indices:
             try:
                 self[index]._idx = -1
@@ -2589,7 +2609,7 @@ class TrackedList(list):
                 self[index].list = None
             except AttributeError:
                 pass
-        return list.__delslice__(self, *args)
+        return list.__delslice__(self, start, stop)
 
     @_changes
     def pop(self, idx=-1):
@@ -2741,23 +2761,21 @@ class AtomList(TrackedList):
             atom = self[index]
             atom._idx = -1
             atom.list = None
-            print 'Deleting the atom...'
             # Make sure we delete this atom from its respective residue
             if atom.residue is not None: atom.residue.delete_atom(atom)
 
         list.__delitem__(self, idx)
 
     @_changes
-    def __delslice__(self, *args):
+    def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... sigh. """
-        if not self: return
-        indices = xrange(*args)
+        indices = xrange(start, min(stop, len(self)))
         for index in indices:
             atom = self[index]
             atom._idx = -1
             atom.list = None
             if atom.residue is not None: atom.residue.delete_atom(atom)
-        list.__delslice__(self, *args)
+        list.__delslice__(self, start, stop)
 
     @_changes
     def pop(self, idx=-1):

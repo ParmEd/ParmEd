@@ -39,6 +39,7 @@ try:
 except ImportError:
     # This only happens in Python 3, where zip is equivalent to izip
     pass
+from math import sqrt
 from warnings import warn
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -82,6 +83,18 @@ class AmberParm(AmberFormat, Structure):
         The VERSION string from the Amber file
     prm_name : str
         The file name of the originally parsed file (set to the fname parameter)
+    LJ_types : dict {str : int}
+        A mapping whose keys are atom types paired with the nonbonded index of
+        that type
+    LJ_radius : list(float)
+        A list of floats corresponding to the Rmin/2 parameter for every
+        Lennard-Jones type. The indexes are the nonbonded index (`nb_idx`
+        attribute of the `Atom` class) minus 1 to account for indexing from 0 in
+        Python. The values are in Angstroms. To get the radius for a particular
+        atom type, you can use `LJ_radius[LJ_types["type"]-1]`
+    LJ_depth : list(float)
+        A list of Lennard-Jones epsilon parameters laid out the same way as
+        LJ_radius, described above.
     atoms : AtomList(Atom)
         List of all atoms in the system
     residues : ResidueList(Residue)
@@ -116,6 +129,16 @@ class AmberParm(AmberFormat, Structure):
     dihedrals_without_h : iterator(Dihedral)
         Read-only generator that loops through all dihedrals that do not contain
         Hydrogen
+    chamber : bool=False
+        On AmberParm instances, this is always False to indicate that it is not
+        a CHAMBER-style topology file
+    amoeba : bool=False
+        On AmberParm instances, this is always False to indicate that it is not
+        an AMOEBA-style topology file
+    has_cmap : bool=False
+        On AmberParm instances, this is always False to indicate that it does
+        not have correction maps (unique to CHARMM force field and chamber
+        topologies)
     """
     #===================================================
 
@@ -146,20 +169,22 @@ class AmberParm(AmberFormat, Structure):
         if 'RESIDUE_ICODE' in self.flag_list:
             self._truncate_array('RESIDUE_ICODE',
                                  self.parm_data['POINTERS'][NRES])
-
-        # instance variables other than those in AmberFormat
-        self.pointers = {}   # list of all the pointers in the prmtop
-        self.LJ_types = {}   # dict pairing atom name with its LJ atom type #
-        self.LJ_radius = []  # ordered array of L-J radii in Ang -- indices
-                             # are elements in LJ_types-1
-        self.LJ_depth = []   # similarly ordered array of L-J depths
-
-        # If we were given a prmtop, read it in
+        # Set up some of the attributes provided
+        self.pointers = {}
+        self.LJ_types = {}
+        self.LJ_radius = []
+        self.LJ_depth = []
         self.load_pointers()
         self.fill_LJ()
-
-        # Load the Structure arrays
+        # Instantiate the Structure data structures
         self.load_structure()
+
+        if rst7_name is not None:
+            self.LoadRst7(rst7_name)
+        elif self.parm_data['POINTERS'][IFBOX] > 0:
+            self.hasbox = True
+            box = self.parm_data['BOX_DIMENSIONS']
+            self.box = box[1:] + [box[0], box[0], box[0]]
 
         # If we have coordinates or velocities, load them into the atom list
         if hasattr(self, 'coords'):
@@ -170,9 +195,6 @@ class AmberParm(AmberFormat, Structure):
             for i, atom in enumerate(self.atoms):
                 i3 = i * 3
                 atom.vx, atom.vy, atom.vz = self.coords[i3:i3+3]
-
-        if rst7_name is not None:
-            self.LoadRst7(rst7_name)
 
     #===================================================
 
@@ -239,6 +261,11 @@ class AmberParm(AmberFormat, Structure):
         # See if we have a restart file
         if hasattr(self, 'rst7'):
             other.rst7 = Rst7.copy_from(self.rst7)
+        if hasattr(self, 'coords'):
+            other.coords = self.coords[:]
+        if hasattr(self, 'vels'):
+            other.vels = self.vels[:]
+        other.box = self.box
         # Now we should have a full copy
         return other
 
@@ -566,8 +593,8 @@ class AmberParm(AmberFormat, Structure):
                  'reorder the atoms to fix this.', MoleculeWarning)
             new_atoms = AtomList()
             for mol in owner:
-                for atom in mol:
-                    new_atoms.append(atom)
+                for idx in mol:
+                    new_atoms.append(self.atoms[idx])
             self.atoms = new_atoms
             return owner
 
@@ -685,35 +712,10 @@ class AmberParm(AmberFormat, Structure):
         for i in xrange(ntypes):
             for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                rij = self.combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
-                wdij = self.combine_epsilon(self.LJ_depth[i], self.LJ_depth[j])
+                rij = self.LJ_radius[i] + self.LJ_radius[j]
+                wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
                 pd["LENNARD_JONES_BCOEF"][index] = 2 * wdij * rij**6
-
-    #===================================================
-
-    def recalculate_14_LJ(self):
-        """
-        Takes the values of the LJ_radius and LJ_depth arrays and recalculates
-        the LENNARD_JONES_A/BCOEF topology sections from the canonical combining
-        rules for the 1-4 LJ interactions (CHAMBER only)
-        """
-        if not self.chamber:
-            raise TypeError('recalculate_14_LJ() requires a CHAMBER prmtop!')
-
-        pd = self.parm_data
-        ntypes = self.pointers['NYTPES']
-        for i in xrange(ntypes):
-            for j in xrange(i, ntypes):
-                index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                rij = self.combine_rmin(
-                        self.LJ_14_radius[i],self.LJ_14_radius[j]
-                )
-                wdij = self.combine_epsilon(
-                        self.LJ_14_depth[i],self.LJ_14_depth[j]
-                )
-                pd["LENNARD_JONES_14_ACOEF"][index] = wdij * rij**12
-                pd["LENNARD_JONES_14_BCOEF"][index] = 2 * wdij * rij**6
 
     #===================================================
 
@@ -822,6 +824,10 @@ class AmberParm(AmberFormat, Structure):
     def amoeba(self):
         return False
 
+    @property
+    def has_cmap(self):
+        return False
+
     #===========  PRIVATE INSTANCE METHODS  ============
 
     def _truncate_array(self, section, length):
@@ -927,17 +933,17 @@ class AmberParm(AmberFormat, Structure):
         for k, req in zip(self.parm_data['BOND_FORCE_CONSTANT'],
                           self.parm_data['BOND_EQUIL_VALUE']):
             self.bond_types.append(BondType(k, req, self.bond_types))
-        blist = self.parm_data['BONDS_INC_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
-            self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                         self.bond_types[blist[i+2]-1])
-            )
         blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
         for i in xrange(0, 3*self.parm_data['POINTERS'][MBONA], 3):
             self.bonds.append(
                     Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
                             self.bond_types[blist[i+2]-1])
+            )
+        blist = self.parm_data['BONDS_INC_HYDROGEN']
+        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
+            self.bonds.append(
+                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
+                         self.bond_types[blist[i+2]-1])
             )
 
     #===================================================
@@ -949,16 +955,16 @@ class AmberParm(AmberFormat, Structure):
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
-        alist = self.parm_data['ANGLES_INC_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][NTHETH], 4):
+        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
+        for i in xrange(0, 4*self.parm_data['POINTERS'][MTHETA], 4):
             self.angles.append(
                     Angle(self.atoms[alist[i]//3],
                           self.atoms[alist[i+1]//3],
                           self.atoms[alist[i+2]//3],
                           self.angle_types[alist[i+3]-1])
             )
-        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][MTHETA], 4):
+        alist = self.parm_data['ANGLES_INC_HYDROGEN']
+        for i in xrange(0, 4*self.parm_data['POINTERS'][NTHETH], 4):
             self.angles.append(
                     Angle(self.atoms[alist[i]//3],
                           self.atoms[alist[i+1]//3],
@@ -979,7 +985,7 @@ class AmberParm(AmberFormat, Structure):
         try:
             scnb = self.parm_data['SCNB_SCALE_FACTOR']
         except KeyError:
-            scnb = [1.2 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
+            scnb = [2.0 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
         for terms in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
                          self.parm_data['DIHEDRAL_PERIODICITY'],
                          self.parm_data['DIHEDRAL_PHASE'],
@@ -987,8 +993,8 @@ class AmberParm(AmberFormat, Structure):
             self.dihedral_types.append(
                     DihedralType(*terms, list=self.dihedral_types)
             )
-        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
+        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
+        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
             ignore_end = dlist[i+2] < 0
             improper = dlist[i+3] < 0
             self.dihedrals.append(
@@ -999,8 +1005,8 @@ class AmberParm(AmberFormat, Structure):
                              improper=improper, ignore_end=ignore_end,
                              type=self.dihedral_types[dlist[i+4]-1])
             )
-        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
+        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
+        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
             ignore_end = dlist[i+2] < 0
             improper = dlist[i+3] < 0
             self.dihedrals.append(

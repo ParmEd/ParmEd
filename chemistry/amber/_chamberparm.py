@@ -22,25 +22,71 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.amber._amberparm import AmberParm, Rst7, _zeros
+from chemistry.amber._amberparm import AmberParm, Rst7
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
                 MTHETA, NPHIH, MPHIA, NNB, NRES, NBONA, NTHETA, NPHIA, NUMBND,
                 NUMANG, NPTRA, NATYP, IFBOX, NMXRS, CHARMM_ELECTROSTATIC)
-from chemistry.amber.topologyobjects import (TrackedList, UreyBradley, Improper,
-            Cmap, UreyBradleyTypeList, ImproperTypeList, CmapTypeList)
+from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
+                                       ImproperType, CmapType)
 from chemistry.exceptions import CharmmPSFError
 from math import pi, sqrt
 import warnings
 
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class ChamberParm(AmberParm):
     """
     Chamber Topology (parm7 format) class. Gives low, and some high, level
-    access to topology data.
+    access to topology data or interact with some of the high-level classes
+    comprising the system topology and parameters.  The ChamberParm class uses
+    the same attributes that the AmberParm class uses, and only the ones unique
+    to ChamberParm will be shown below.
+
+    Parameters
+    ----------
+    prm_name : str=None
+        If provided, this file is parsed and the data structures will be loaded
+        from the data in this file
+    rst7_name : str=None
+        If provided, the coordinates and unit cell dimensions from the provided
+        Amber inpcrd/restart file will be loaded into the molecule
+
+    Attributes
+    ----------
+    In addition to the attributes listed for `AmberParm`, the following
+    attributes are available:
+
+    LJ_14_radius : list(float)
+        The same as LJ_radius, except specific for 1-4 nonbonded parameters,
+        which may differ in the CHARMM force field
+    LJ_14_depth : list(float)
+        The same as LJ_depth, except specific for 1-4 nonbonded parameters,
+        which may differ in the CHARMM force field
+    urey_bradleys : TrackedList(UreyBradley)
+        List of Urey-Bradley terms between two atoms in a valence angle
+    impropers : TrackedList(Improper)
+        List of CHARMM-style improper torsions
+    cmaps : TrackedList(Cmap)
+        List of coupled-torsion correction map parameters
+    urey_bradley_types : TrackedList(UreyBradleyType)
+        List of parameters defining the Urey-Bradley terms
+    improper_types : TrackedList(Improper)
+        List of parameters defining the Improper terms
+    cmap_types : TrackedList(CmapType)
+        List of parameters defining the CMAP terms
+    chamber : bool=True
+        On ChamberParm instances, this is always True to indicate that it is a
+        CHAMBER-style topology file
+    amoeba : bool=False
+        On ChamberParm instances, this is always False to indicate that it is
+        not an AMOEBA-style topology file
+    has_cmap : bool
+        True if CMAP parameters are present in this system; False otherwise
     """
 
     CHARGE_SCALE = CHARMM_ELECTROSTATIC
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def initialize_topology(self, rst7_name=None):
         """
@@ -48,39 +94,11 @@ class ChamberParm(AmberParm):
         etc., after the topology file has been read. The following methods are
         called:
         """
-
-        self.LJ_14_radius = []   # Radii for 1-4 atom pairs
-        self.LJ_14_depth = []    # Depth for 1-4 atom pairs
-
+        self.LJ_14_radius = []
+        self.LJ_14_depth = []
         AmberParm.initialize_topology(self, rst7_name)
       
-        # We now have the following instance arrays: All arrays are dynamic such
-        # that removing an item propagates the indices if applicable. bond has
-        # angle/dihed analogs. All non-dynamic lists have a check on any
-        # modification function to track if they have been changed or not so we
-        # know whether we have to reload the data before writing.
-        #
-        # atom_list          a dynamic list of all Atom objects
-        # residue_list       a dynamic list of all Residue objects
-        # bond_type_list     a dynamic list of all BondType objects
-        # bonds_inc_h        list of all bonds including hydrogen
-        # bonds_without_h    list of all bonds without hydrogen
-        # angle_type_list
-        # angles_inc_h
-        # angles_without_h
-        # dihedral_type_list
-        # dihedrals_inc_h
-        # dihedrals_without_h
-        # urey_bradley
-        # urey_bradley_type_list
-        # improper
-        # improper_type_list
-        #
-        # MAYBE the following (if CMAPs are present)
-        # cmap
-        # cmap_type_list
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def __copy__(self):
         """ Needs to copy a few additional data structures """
@@ -89,7 +107,7 @@ class ChamberParm(AmberParm):
         other.LJ_14_depth = self.LJ_14_depth[:]
         return other
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
    
     def load_pointers(self):
         """
@@ -108,216 +126,97 @@ class ChamberParm(AmberParm):
             self.pointers['CMAP'] = self.parm_data['CHARMM_CMAP_COUNT'][0]
             self.pointers['CMAP_TYPES'] = self.parm_data['CHARMM_CMAP_COUNT'][1]
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
-    def _load_structure(self):
+    def load_structure(self):
         """ 
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
         """
-        AmberParm._load_structure(self)
-        # The AmberParm _load_structure routine loads everything except the
-        # Urey-Bradley, Improper, and CMAP lists. The latter are only present
-        # in chamber prmtops created with a force field that has correction map
-        # potentials, so support topologies that do not have this extra
-        # potential as well.
+        super(ChamberParm, self).load_structure()
+        self._load_urey_brad_info()
+        self._load_improper_info()
+        self._load_cmap_info()
+        super(ChamberParm, self).unchange()
 
-        # Do the Urey-Bradley terms now
-        self.urey_bradley = TrackedList()
-        self.urey_bradley_type_list = UreyBradleyTypeList(self)
-        for i in xrange(self.ptr('NUB')):
-            a1 = self.parm_data['CHARMM_UREY_BRADLEY'][3*i  ] - 1
-            a2 = self.parm_data['CHARMM_UREY_BRADLEY'][3*i+1] - 1
-            ty = self.parm_data['CHARMM_UREY_BRADLEY'][3*i+2] - 1
-            self.urey_bradley.append(
-                    UreyBradley(self.atom_list[a1], self.atom_list[a2],
-                                self.urey_bradley_type_list[ty])
+    #===================================================
+
+    def _load_urey_brad_info(self):
+        """ Loads the Urey-Bradley types and array """
+        del self.urey_bradleys[:]
+        del self.urey_bradley_types[:]
+        for k, req in zip(self.parm_data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT'],
+                          self.parm_data['CHARMM_UREY_BRADLEY_EQUIL_VALUE']):
+            self.urey_bradley_types.append(
+                    BondType(k, req, self.urey_bradley_types)
+            )
+        ulist = self.parm_data['CHARMM_UREY_BRADLEY']
+        for i in xrange(0, 3*self.pointers['NUB'], 3):
+            self.urey_bradleys.append(
+                    UreyBradley(self.atoms[ulist[i  ]-1],
+                                self.atoms[ulist[i+1]-1],
+                                self.urey_bradley_types[ulist[i+2]-1])
             )
 
-        # Now do the improper torsion terms
-        self.improper = TrackedList()
-        self.improper_type_list = ImproperTypeList(self)
-        for i in xrange(self.ptr('NIMPHI')):
-            a1 = self.parm_data['CHARMM_IMPROPERS'][5*i  ] - 1
-            a2 = self.parm_data['CHARMM_IMPROPERS'][5*i+1] - 1
-            a3 = self.parm_data['CHARMM_IMPROPERS'][5*i+2] - 1
-            a4 = self.parm_data['CHARMM_IMPROPERS'][5*i+3] - 1
-            ty = self.parm_data['CHARMM_IMPROPERS'][5*i+4] - 1
-            self.improper.append(
-                    Improper(self.atom_list[a1], self.atom_list[a2],
-                             self.atom_list[a3], self.atom_list[a4],
-                             self.improper_type_list[ty])
+    #===================================================
+
+    def _load_improper_info(self):
+        """ Loads the CHARMM Improper types and array """
+        del self.impropers[:]
+        del self.improper_types[:]
+        for k, eq in zip(self.parm_data['CHARMM_IMPROPER_FORCE_CONSTANT'],
+                         self.parm_data['CHARMM_IMPROPER_PHASE']):
+            self.improper_types.append(
+                    ImproperType(k, eq, self.improper_types)
+            )
+        ilist = self.parm_data['CHARMM_IMPROPERS']
+        for i in xrange(0, 5*self.pointers['NIMPHI'], 5):
+            self.impropers.append(
+                    Improper(self.atoms[ilist[i  ]-1],
+                             self.atoms[ilist[i+1]-1],
+                             self.atoms[ilist[i+2]-1],
+                             self.atoms[ilist[i+3]-1],
+                             self.improper_types[ilist[i+4]-1])
             )
 
-        # Mark all new lists unchanged
-        self.urey_bradley.changed = False
-        self.urey_bradley_type_list.changed = False
-        self.improper.changed = False
-        self.improper_type_list.changed = False
+    #===================================================
 
-        # Now if we have CMAP, do those
-        if self.has_cmap:
-            self.cmap = TrackedList()
-            self.cmap_type_list = CmapTypeList(self)
-            for i in xrange(self.ptr('CMAP')):
-                a1 = self.parm_data['CHARMM_CMAP_INDEX'][6*i  ] - 1
-                a2 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+1] - 1
-                a3 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+2] - 1
-                a4 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+3] - 1
-                a5 = self.parm_data['CHARMM_CMAP_INDEX'][6*i+4] - 1
-                ty = self.parm_data['CHARMM_CMAP_INDEX'][6*i+5] - 1
-                self.cmap.append(
-                        Cmap(self.atom_list[a1], self.atom_list[a2],
-                             self.atom_list[a3], self.atom_list[a4],
-                             self.atom_list[a5], self.cmap_type_list[ty])
-                )
-            # Mark the cmap lists unchanged
-            self.cmap.changed = False
-            self.cmap_type_list.changed = False
+    def _load_cmap_info(self):
+        """ Loads the CHARMM CMAP types and array """
+        if not self.has_cmap: return
+        del self.cmaps[:]
+        del self.cmap_types[:]
+        for i in xrange(self.pointers['CMAP_TYPES']):
+            resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
+            grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
+            cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
+            self.cmap_types.append(
+                    CmapType(resolution, grid, cmts, list=self.cmap_types)
+            )
+        clist = self.parm_data['CHARMM_CMAP_INDEX']
+        for i in xrange(0, 6*self.pointers['CMAP'], 6):
+            self.cmaps.append(
+                    Cmap(self.atoms[clist[i  ]-1], self.atoms[clist[i+1]-1],
+                         self.atoms[clist[i+2]-1], self.atoms[clist[i+3]-1],
+                         self.atoms[clist[i+4]-1],
+                         self.cmap_types[clist[i+5]-1])
+            )
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    flush_data_changes = _load_structure
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def remake_parm(self):
         """
         Re-fills the topology file arrays if we have changed the underlying
         structure
         """
-        # Reset the chamber-specific type lists
-        self.urey_bradley_type_list.reset()
-        self.improper_type_list.reset()
-        if self.has_cmap:
-            self.cmap_type_list.reset()
+        super(ChamberParm, self).remake_parm()
+        self._xfer_urey_bradley_properties()
+        self._xfer_improper_properties()
+        self._xfer_cmap_properties()
+        super(ChamberParm, self).unchange()
 
-        # Handle all parts that are common with Amber via AmberParm
-        AmberParm.remake_parm(self)
-
-        # Now rebuild the remaining parts -- Urey-Bradley, Impropers, and CMAP
-
-        # Urey-Bradley
-        ub_num = ub_type_num = 0
-        self.parm_data['CHARMM_UREY_BRADLEY'] = _zeros(len(self.urey_bradley)*3)
-        for i, ub in enumerate(self.urey_bradley):
-            if -1 in (ub.atom1.idx, ub.atom2.idx):
-                continue
-            if ub.ub_type.idx == -1:
-                ub.ub_type.idx = ub_type_num
-                ub_type_num += 1
-            ub.write_info(self, 'CHARMM_UREY_BRADLEY', ub_num)
-            ub_num += 1
-        # Truncate our list to only include those Urey-Bradleys that remain
-        self.parm_data['CHARMM_UREY_BRADLEY_COUNT'] = [ub_num, ub_type_num]
-        self._truncate_array('CHARMM_UREY_BRADLEY', 3*ub_num)
-        # type parameters
-        for key in ('CHARMM_UREY_BRADLEY_FORCE_CONSTANT',
-                    'CHARMM_UREY_BRADLEY_EQUIL_VALUE'):
-            self.parm_data[key] = _zeros(ub_type_num)
-        self.urey_bradley_type_list.write_to_parm()
-
-        # Impropers
-        imp_num = imp_type_num = 0
-        self.parm_data['CHARMM_IMPROPERS'] = _zeros(len(self.improper) * 5)
-        for i, imp in enumerate(self.improper):
-            if -1 in (imp.atom1.idx, imp.atom2.idx,
-                      imp.atom3.idx, imp.atom4.idx):
-                continue
-            if imp.improp_type.idx == -1:
-                imp.improp_type.idx = imp_type_num
-                imp_type_num += 1
-            imp.write_info(self, 'CHARMM_IMPROPERS', imp_num)
-            imp_num += 1
-        # Truncate our list to only include those impropers that remain
-        self.parm_data['CHARMM_NUM_IMPROPERS'] = [imp_num]
-        self._truncate_array('CHARMM_IMPROPERS', 5*imp_num)
-        # type parameters
-        self.parm_data['CHARMM_NUM_IMPR_TYPES'] = [imp_type_num]
-        for key in ('CHARMM_IMPROPER_FORCE_CONSTANT', 'CHARMM_IMPROPER_PHASE'):
-            self.parm_data[key] = _zeros(imp_type_num)
-        self.improper_type_list.write_to_parm()
-
-        # These arrays should no longer appear changed
-        self.urey_bradley.changed = False
-        self.urey_bradley_type_list.changed = False
-        self.improper.changed = False
-        self.improper_type_list.changed = False
-
-        # If we have no CMAP, we are done. Otherwise, press on
-        if not self.has_cmap:
-            self.load_pointers() # update CHARMM pointers
-            return
-
-        # If we are here, then we have CMAP terms to do
-        cmap_num = 0
-        cmap_types = []
-        self.parm_data['CHARMM_CMAP_INDEX'] = _zeros(len(self.cmap)*6)
-        for i, cm in enumerate(self.cmap):
-            if -1 in (cm.atom1.idx, cm.atom2.idx, cm.atom3.idx,
-                      cm.atom4.idx, cm.atom5.idx):
-                continue
-            if cm.cmap_type.idx == -1:
-                cm.cmap_type.idx = len(cmap_types)
-                cmap_types.append(cm.cmap_type)
-            cm.write_info(self, 'CHARMM_CMAP_INDEX', cmap_num)
-            cmap_num += 1
-        if cmap_num == 0:
-            # We have deleted all cmaps. Get rid of them from the parm file and
-            # bail out. This is probably pretty unlikely, though...
-            self.delete_flag('CHARMM_CMAP_COUNT')
-            self.delete_flag('CHARMM_CMAP_RESOLUTION')
-            for flag in self.flag_list:
-                if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                    self.delete_flag(flag)
-            self.load_pointers() # update CHARMM pointers
-            del self.cmap, self.cmap_type_list
-            return
-        # Truncate our list to only include those cmaps that remain
-        self._truncate_array('CHARMM_CMAP_INDEX', 6*cmap_num)
-        self.parm_data['CHARMM_CMAP_COUNT'] = [cmap_num, len(cmap_types)]
-
-        # Now comes the tricky part. We need to delete all of the
-        # CHARMM_CMAP_PARAMETER_XX sections and then recreate them with the
-        # correct size and comments. The comments have been stored in the cmap
-        # types themselves to prevent them from being lost. We will also assume
-        # that the Fortran format we're going to use is the same for all CMAP
-        # types, so just pull it from CHARMM_CMAP_PARAMETER_01 (or fall back to
-        # 8(F9.5))
-        try:
-            fmt = str(self.formats['CHARMM_CMAP_PARAMETER_01'])
-        except KeyError:
-            fmt = '8(F9.5)'
-        for flag in self.flag_list:
-            if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                self.delete_flag(flag)
-        # Now the parameters are gone, so go through and add those flags back
-        # using the cmap_types we tagged along earlier.
-        for i, ct in enumerate(cmap_types):
-            self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
-                         data=ct.grid, comments=ct.comments)
-        self.load_pointers() # update CHARMM pointers
-        self.cmap.changed = False
-        self.cmap_type_list.changed = False
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   
-    def _topology_changed(self):
-        """ 
-        Determines if any of the topological arrays have changed since the
-        last upload
-        """
-        tc = (AmberParm._topology_changed(self) or
-              self.urey_bradley.changed or
-              self.urey_bradley_type_list.changed or
-              self.improper.changed or
-              self.improper_type_list.changed)
-        if self.has_cmap:
-            return tc or self.cmap.changed or self.cmap_type_list.changed
-        return tc
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def writeOFF(self, off_file='off.lib'):
         """ Writes an OFF file from all of the residues found in a prmtop """
@@ -325,7 +224,7 @@ class ChamberParm(AmberParm):
                       'in LEaP unless you KNOW what you are doing...')
         return super(ChamberParm, self).writeOFF(off_file)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def fill_LJ(self):
         """
@@ -353,7 +252,7 @@ class ChamberParm(AmberParm):
                 self.LJ_14_radius.append(pow(factor, one_sixth) * 0.5)
                 self.LJ_14_depth.append(bcoef[lj_index] / 2 / factor)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
     def recalculate_LJ(self):
         """
@@ -375,12 +274,8 @@ class ChamberParm(AmberParm):
                 acoef[index] = wdij * rij ** 12
                 bcoef[index] = 2 * wdij * rij**6
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #===================================================
 
-    # For compatibility with the old AmberParm class that used to instantiate
-    # both Amber and Chamber topologies, the `chamber' attribute indicates
-    # whether or not a topology file is a chamber topology. For ChamberParm,
-    # the answer is always 'yes'
     @property
     def chamber(self):
         return True
@@ -389,11 +284,109 @@ class ChamberParm(AmberParm):
     def amoeba(self):
         return False
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     @property
     def has_cmap(self):
         return 'CHARMM_CMAP_COUNT' in self.flag_list
+
+    #===========  PRIVATE INSTANCE METHODS  ============
+
+    def _xfer_urey_bradley_properties(self):
+        """
+        Sets the various topology file section data from the Urey-Bradley arrays
+        """
+        data = self.parm_data
+        for urey_type in self.urey_bradley_types:
+            urey_type.used = False
+        for urey in self.urey_bradleys:
+            urey.type.used = True
+        self.urey_bradley_types.prune_unused()
+        data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT'] = \
+                [type.k for type in self.urey_bradley_types]
+        data['CHARMM_UREY_BRADLEY_EQUIL_VALUE'] = \
+                [type.req for type in self.urey_bradley_types]
+        data['CHARMM_UREY_BRADLEY'] = bond_array = []
+        for i, urey in enumerate(self.urey_bradleys):
+            bond_array.extend([urey.atom1.idx+1, urey.atom2.idx+1,
+                               urey.type.idx+1])
+        data['CHARMM_UREY_BRADLEY_COUNT'] = [i+1, len(self.urey_bradley_types)]
+        self.pointers['NUB'] = i + 1
+        self.pointers['NUBTYPES'] = len(self.urey_bradley_types)
+
+    #===================================================
+
+    def _xfer_improper_properties(self):
+        """ Sets the topology file section data from the improper arrays """
+        data = self.parm_data
+        for improper_type in self.improper_types:
+            improper_type.used = False
+        for improper in self.impropers:
+            improper.type.used = True
+        self.improper_types.prune_unused()
+        data['CHARMM_IMPROPER_FORCE_CONSTANT'] = \
+                [type.psi_k for type in self.improper_types]
+        data['CHARMM_IMPROPER_PHASE'] = \
+                [type.psi_eq for type in self.improper_types]
+        data['CHARMM_IMPROPERS'] = improper_array = []
+        for i, imp in enumerate(self.impropers):
+            improper_array.extend([imp.atom1.idx+1, imp.atom2.idx+1,
+                                   imp.atom3.idx+1, imp.atom4.idx+1,
+                                   imp.type.idx+1])
+        data['CHARMM_NUM_IMPROPERS'] = [i+1]
+        data['CHARMM_NUM_IMPR_TYPES'] = [len(self.improper_types)]
+        self.pointers['NIMPHI'] = i + 1
+        self.pointers['NIMPRTYPES'] = len(self.improper_types)
+
+    #===================================================
+
+    def _xfer_cmap_properties(self):
+        """ Sets the topology file section data from the cmap arrays """
+        if not self.has_cmap: return
+        data = self.parm_data
+        for ct in self.cmap_types:
+            ct.used = False
+        for cmap in self.cmaps:
+            cmap.type.used = True
+        self.cmap_types.prune_unused()
+        # If we have no cmaps, delete all remnants of the CMAP terms in the
+        # prmtop and bail out
+        if len(self.cmaps) == 0:
+            # We have deleted all cmaps. Get rid of them from the parm file and
+            # bail out. This is probably pretty unlikely, though...
+            self.delete_flag('CHARMM_CMAP_COUNT')
+            self.delete_flag('CHARMM_CMAP_RESOLUTION')
+            for flag in self.flag_list:
+                if flag.startswith('CHARMM_CMAP_PARAMETER'):
+                    self.delete_flag(flag)
+            del self.pointers['CMAP']
+            del self.pointers['CMAP_TYPES']
+            return
+        # All of our CMAP types are in different topology file sections. We need
+        # to delete all of the CHARMM_CMAP_PARAMETER_XX sections and then
+        # recreate them with the correct size and comments.  The comments have
+        # been stored in the CMAP types themselves to prevent them from being
+        # lost. We will also assume that the Fortran format we're going to use
+        # is the same for all CMAP types, so just pull it from
+        # CHARMM_CMAP_PARAMETER_01 (or fall back to 8(F9.5))
+        try:
+            fmt = str(self.formats['CHARMM_CMAP_PARAMETER_01'])
+        except KeyError:
+            fmt = '8(F9.5)'
+        for flag in self.flag_list:
+            if flag.startswith('CHARMM_CMAP_PARAMETER'):
+                self.delete_flag(flag)
+        # Now add them back
+        for i, ct in enumerate(self.cmap_types):
+            self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
+                          data=ct.grid, comments=ct.comments)
+        # Now do the CMAP_INDEX section
+        data['CHARMM_CMAP_INDEX'] = cmap_array = []
+        for i, cm in enumerate(self.cmaps):
+            cmap_array.extend([cmap.atom1.idx+1, cmap.atom2.idx+1,
+                               cmap.atom3.idx+1, cmap.atom4.idx+1,
+                               cmap.atom5.idx+1, cmap.type.idx+1])
+        data['CHARMM_CMAP_COUNT'] = [i+1, len(self.cmap_types)]
+        self.pointers['CMAP'] = i+1
+        self.pointers['CMAP_TYPES'] = len(self.cmap_types)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

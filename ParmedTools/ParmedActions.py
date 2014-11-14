@@ -5,15 +5,15 @@ from __future__ import division
 
 import sys
 from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
-              ParmedMoleculeError, ChangeStateError, ChangeLJPairError,
-              ParmedChangeError, SetParamError, DeleteDihedralError, NoArgument,
-              NonexistentParm, AmbiguousParmError, IncompatibleParmsError,
-              ArgumentError, AddPDBError, AddPDBWarning, HMassRepartitionError,
+              ChangeStateError, ChangeLJPairError, ParmedChangeError,
+              SetParamError, DeleteDihedralError, NoArgument, NonexistentParm,
+              AmbiguousParmError, IncompatibleParmsError, ArgumentError,
+              AddPDBError, AddPDBWarning, HMassRepartitionError,
               SimulationError, UnhandledArgumentWarning, SeriousParmWarning,
               FileExists, NonexistentParmWarning, LJ12_6_4Error, ChamberError,
               FileDoesNotExist, InputError, TiMergeError,
 #             CoarseGrainError,
-                                   )
+)
 from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.parmlist import ParmList, ChamberParm, AmoebaParm
 from chemistry.amber.mask import AmberMask
@@ -106,7 +106,6 @@ Usages = {
             'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
                        '[Ewald]] [nodisper] [omm] [applayer] [platform '
                        '<platform>] [precision <precision model>] [decompose]',
-#      'fixtopology' : 'fixTopology',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
                        '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]'
@@ -500,7 +499,7 @@ class changelj14pair(Action):
                 if attype1 is None:
                     attype1 = atom.nb_idx
                 else:
-                    if attype1 != atom.nb_idx
+                    if attype1 != atom.nb_idx:
                         raise ChangeLJPairError(
                                       'First mask matches multiple atom types!')
             if selection2[i] == 1:
@@ -597,6 +596,7 @@ class change(Action):
         if self.quiet:
             return "Changing %s of %s to %s" % (self.prop, self.mask,
                                                 self.new_val)
+        string = ''
         for i, atom in enumerate(self.parm.atoms):
             if atnums[i] == 1:
                 string += "Changing %s of atom # %d (%s) from %s to %s\n" % (
@@ -789,7 +789,7 @@ class scee(Action):
             self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
                                 for i in xrange(self.parm.ptr('nptra'))]
         # Now add it to each of the torsions
-        for typ in self.diheral_types:
+        for typ in self.parm.dihedral_types:
             typ.scee = self.scee_value
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -903,8 +903,8 @@ class printdetails(Action):
                 if not selection[i]: continue
                 retstr += (
                         '%7d%7d%9s%6s%6s%10.4f\n' %
-                            (i+1, atm.residue.idx, atm.residue.name, atm.name,
-                             atm.type, atm.mass)
+                            (i+1, atm.residue.idx+1, atm.residue.name,
+                             atm.name, atm.type, atm.mass)
                 )
         else:
             retstr += ("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
@@ -915,7 +915,7 @@ class printdetails(Action):
                 if not selection[i]: continue
                 retstr += (
                         "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"
-                        % (i+1, atm.residue.idx, atm.residue.name, atm.name,
+                        % (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
                            atm.type, self.parm.LJ_radius[atm.nb_idx-1],
                            self.parm.LJ_depth[atm.nb_idx-1], atm.mass,
                            atm.charge, atm.radii, atm.screen)
@@ -1042,7 +1042,7 @@ class setmolecules(Action):
                 )
             # If we had to reorder our atoms, we need to remake our parm
             self.parm.remake_parm()
-        self.parm.LoadPointers()
+        self.parm.load_pointers()
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #
@@ -1140,7 +1140,6 @@ class changeprotstate(Action):
         # If we didn't select any residues, just return
         if sum(sel) == 0: return
         residue = self.parm.atoms[sel.index(1)].residue
-        resnum = residue.idx
         resname = residue.name
         # Get the charges from cpin_data. The first 2 elements are energy and 
         # proton count so the charges are chgs[2:]
@@ -1299,7 +1298,7 @@ class printangles(Action):
                         'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')
         # Loop through all of the bonds without and inc hydrogen
         atomsel = self.mask.Selection()
-        for angle in self.parm.angles_without_h:
+        for angle in self.parm.angles:
             atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
             if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
                     atomsel[atom3.idx]):
@@ -1432,7 +1431,7 @@ class setbond(Action):
                 for bond in atm1.bonds:
                     if atm2 in bond:
                         bond.type = new_bnd_typ
-                        self.bonds.changed = True
+                        self.parm.bonds.changed = True
                         break
             # Otherwise, it doesn't exist, so we just create a new one
             else:
@@ -1511,7 +1510,7 @@ class setangle(Action):
                 for ang in atm1.angles:
                     if atm2 in ang and atm3 in ang:
                         ang.type = new_ang_typ
-                        self.angles.changed = True
+                        self.parm.angles.changed = True
                         found = True
                         break
             # If not found, create a new angle
@@ -1598,7 +1597,7 @@ class adddihedral(Action):
                 break
         if not exists:
             self.parm.dihedral_types.append(new_dih_typ)
-            new_dih_type.list = self.parm.dihedral_types
+            new_dih_typ.list = self.parm.dihedral_types
 
         # Loop through all of the atoms
         atnum1, atnum2, atnum3, atnum4 = -1, -1, -1, -1
@@ -1616,10 +1615,11 @@ class adddihedral(Action):
             if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or
                 atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
                 raise SetParamError('addDihedral: Duplicate atoms found!')
-            self.dihedrals.append(
+            self.parm.dihedrals.append(
                     Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
-                             ignore_end=self.multiterm, new_dih_typ)
+                             ignore_end=self.multiterm, type=new_dih_typ)
             )
+        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1710,29 +1710,24 @@ class deletedihedral(Action):
                               (atnum1, atnum2, atnum3, atnum4),
                               SeriousParmWarning)
                 continue
-            # This helps us keep track of multi-term dihedrals so we don't
-            # confuse users
-            found_this_dihedral = False
             # Now search through our dihedral list to see which indexes (if any)
             # we have to remove. Keep tabs of them so we can pop them in reverse
             # order (so we don't have to re-figure indices) afterwards
             proposed_dihedral = (atnum1, atnum2, atnum3, atnum4)
-            for j, dihed in enumerate(self.dihedrals):
+            for j, dihed in enumerate(self.parm.dihedrals):
                 if dihed.same_atoms(proposed_dihedral):
-                    if not found_this_dihedral:
-                        found_this_dihedral = True
-                        total_diheds += 1
+                    total_diheds += 1
                     deleting_dihedrals.append(j)
 
         if not deleting_dihedrals:
-            return
+            return 0
 
         # At this point, we've collected all of our dihedrals, now sort them
         deleting_dihedrals.sort()
         # deleting_dihedrals now contains all of our dihedral indexes
         while deleting_dihedrals:
             del self.parm.dihedrals[deleting_dihedrals.pop()]
-
+        self.parm.remake_parm()
         return total_diheds
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1764,13 +1759,13 @@ class printljmatrix(Action):
         if sum(sel) == 0: return 'No atom types selected'
         # Figure out which types correspond to which names
         typenames = [set() for i in xrange(self.parm.ptr('NTYPES'))]
-        for i, atom in enumerate(self.atoms):
+        for i, atom in enumerate(self.parm.atoms):
             typenames[atom.nb_idx-1].add(atom.type)
         # Otherwise, collect our list of atom types that we selected
         sel_types = set()
         for i, atom in enumerate(self.parm.atoms):
             if sel[i] == 0: continue
-            sel_types.add(atom.type)
+            sel_types.add(atom.nb_idx)
         sel_types = sorted(list(sel_types)) # sort the atom types
         # Convert all of the typenames into strings, then find the longest one so
         # we can properly format the string
@@ -2029,7 +2024,7 @@ class timerge(Action):
                                     angle.atom3 = atm_new
                   
                         for dihed in self.parm.dihedrals:
-                            if holder.atom1.idx == j:
+                            if dihed.atom1.idx == j:
                                 if (dihed.atom2.idx == k or dihed.atom3.idx == k
                                         or dihed.atom4.idx == k):
                                     dihed.atom1 = atm_new
@@ -2094,8 +2089,8 @@ class timerge(Action):
                             'that breaks a ring. Try redefining your softcore '
                             'region to include the ring or at least three '
                             'consecutive atoms.' %
-                            (atmi+1, atmj+1, (atmk+1) * holder.signs[0], 
-                             (atml+1) * holder.signs[1])
+                            (atmi+1, atmj+1, (atmk+1) * dihed.signs[0], 
+                             (atml+1) * dihed.signs[1])
                     )
 
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
@@ -2468,10 +2463,7 @@ class summary(Action):
         )
 
         if self.parm.ptr('IFBOX') == 1:
-            if hasattr(self.parm, 'box'):
-                a, b, c = self.parm.box[:3]
-            else:
-                a, b, c = self.parm.parm_data['BOX_DIMENSIONS'][1:]
+            a, b, c = self.parm.box[:3]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
             retval += ('System volume (ang^3): %.2f\n' 
@@ -2642,10 +2634,10 @@ class addpdb(Action):
         if self.elements:
             self.parm.add_flag('ATOM_ELEMENT', '20a4',
                 data=['%2s' % (_Element[atm.atomic_number].upper()) 
-                            for atm in self.parm.atom_list
+                            for atm in self.parm.atoms
                 ], comments=['Atom element name read from topology file']
             )
-        self.load_structure() # Get that information saved
+        self.parm.load_structure() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2946,7 +2938,7 @@ class deletebond(Action):
     (like angles and dihedrals) that would get severed by the deletion of one of
     the bonds.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = ('AmberParm', 'ChamberParm', 'AmoebaParm')
 
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -2954,226 +2946,107 @@ class deletebond(Action):
         self.verbose = arg_list.has_key('verbose')
         # Go through each atom in mask1 and see if it forms a bond with any atom
         # in mask2.
-        self.del_h_bonds = list()
-        self.del_noh_bonds = list()
-        deleted_bond_list = set()
+        self.del_bonds = set()
+        self.del_angles = set()
+        self.del_dihedrals = set()
+        self.del_urey_bradleys = set()
+        self.del_impropers = set()
+        self.del_cmaps = set()
+        self.del_trigonal_angles = set()
+        self.del_oopbends = set()
+        self.del_pi_torsions = set()
+        self.del_strbnds = set()
+        self.del_tortors = set()
         for i in self.mask1.Selected():
-            ai = self.parm.atom_list[i]
+            ai = self.parm.atoms[i]
             for j in self.mask2.Selected():
-                aj = self.parm.atom_list[j]
+                aj = self.parm.atoms[j]
                 # Skip if these two atoms are identical
                 if ai is aj: continue
-                if any([aj in b for b in ai.bonds]):
-                    # A bond exists here. Now find the bond in the appropriate
-                    # list (is there a hydrogen or not?) and add its index to
-                    # the relevant list.
-                    if 1 in (ai.atomic_number, aj.atomic_number):
-                        for ii, bond in enumerate(self.parm.bonds_inc_h):
-                            if ai in bond and aj in bond:
-                                self.del_h_bonds.append(ii)
-                                deleted_bond_list.add(bond)
-                                break
-                    else:
-                        for ii, bond in enumerate(self.parm.bonds_without_h):
-                            if ai in bond and aj in bond:
-                                self.del_noh_bonds.append(ii)
-                                deleted_bond_list.add(bond)
-                                break
-        # Now go through all of our other valence terms and collect the terms
-        # we need to delete.
-        if not deleted_bond_list:
-            # Nothing to delete
-            return
-        self.del_h_angles = list()
-        self.del_noh_angles = list()
-        self.del_h_dihedrals = list()
-        self.del_noh_dihedrals = list()
-        if self.parm.chamber:
-            self.del_impropers = list()
-            self.del_ureybrad = list()
-            self.del_cmap = list()
-        for bond in deleted_bond_list:
-            for i, angle in enumerate(self.parm.angles_inc_h):
+                for bond in ai.bonds:
+                    if aj not in bond: continue
+                    self.del_bonds.add(bond)
+        # Find other valence terms we need to delete
+        for bond in self.del_bonds:
+            for angle in self.parm.angles:
                 if bond in angle:
-                    self.del_h_angles.append(i)
-            for i, angle in enumerate(self.parm.angles_without_h):
-                if bond in angle:
-                    self.del_noh_angles.append(i)
-            for i, dihed in enumerate(self.parm.dihedrals_inc_h):
+                    self.del_angles.add(angle)
+            for dihed in self.parm.dihedrals:
                 if bond in dihed:
-                    self.del_h_dihedrals.append(i)
-            for i, dihed in enumerate(self.parm.dihedrals_without_h):
-                if bond in dihed:
-                    self.del_noh_dihedrals.append(i)
-            if self.parm.chamber:
-                for i, ureybrad in enumerate(self.parm.urey_bradley):
-                    if bond in ureybrad:
-                        self.del_ureybrad.append(i)
-                for i, improper in enumerate(self.parm.improper):
-                    if bond in improper:
-                        self.del_impropers.append(i)
-                if self.parm.has_cmap:
-                    for i, cmap in enumerate(self.parm.cmap):
-                        if bond in cmap:
-                            self.del_cmap.append(i)
+                    self.del_dihedrals.add(dihed)
+            for urey in self.parm.urey_bradleys:
+                if bond in urey:
+                    self.del_urey_bradleys.add(urey)
+            for improper in self.parm.impropers:
+                if bond in improper:
+                    self.del_impropers.add(improper)
+            for cmap in self.parm.cmaps:
+                if bond in cmap:
+                    self.del_cmaps.add(cmap)
+            for trigonal_angle in self.parm.trigonal_angles:
+                if bond in trigonal_angle:
+                    self.del_trigonal_angles.add(trigonal_angle)
+            for oopbend in self.parm.out_of_plane_bends:
+                if bond in oopbend:
+                    self.del_oopbends.add(oopbend)
+            for pitor in self.parm.pi_torsions:
+                if bond in pitor:
+                    self.del_pi_torsions.add(pitor)
+            for strbnd in self.parm.stretch_bends:
+                if bond in strbnd:
+                    self.del_strbnds.add(strbnd)
+            for tortor in self.parm.torsion_torsions:
+                if bond in tortor:
+                    self.del_tortors.add(tortor)
 
     def __str__(self):
         if not self.del_h_bonds and not self.del_noh_bonds:
             return 'No bonds to delete'
         if not self.verbose:
             return 'Deleting the %d bonds found between %s and %s' % (
-                    len(self.del_h_bonds) + len(self.del_noh_bonds),
-                    self.mask1, self.mask2)
+                    len(self.del_bonds), self.mask1, self.mask2)
         # Now we want full statistics
         retstr = 'Deleting %d bonds between %s and %s:\n' % (
-                    len(self.del_h_bonds) + len(self.del_noh_bonds),
-                    self.mask1, self.mask2)
-        for i in sorted(list(self.del_h_bonds)):
-            a1 = self.parm.bonds_inc_h[i].atom1
-            a2 = self.parm.bonds_inc_h[i].atom2
-            retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (
-                    a1.starting_index+1, a1.residue.resname, a1.residue.idx,
-                    a1.atname, a2.starting_index+1, a2.residue.resname,
-                    a2.residue.idx, a2.atname)
-        for i in sorted(list(self.del_noh_bonds)):
-            a1 = self.parm.bonds_without_h[i].atom1
-            a2 = self.parm.bonds_without_h[i].atom2
-            retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (
-                    a1.starting_index+1, a1.residue.resname, a1.residue.idx,
-                    a1.atname, a2.starting_index+1, a2.residue.resname,
-                    a2.residue.idx, a2.atname)
-        retstr += 'Deleting %d angles, ' % (len(self.del_h_angles) +
-                                            len(self.del_noh_angles))
+                    len(self.del_bonds), self.mask1, self.mask2)
+        for bond in self.del_bonds:
+            a1, a2 = bond.atom1, bond.atom2
+            retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.idx+1,
+                    a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
+                    a2.residue.name, a2.residue.idx+1, a2.name)
+        retstr += 'Deleting %d angles, ' % (len(self.del_angles))
         if self.parm.chamber:
             retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
                         'and %d CMAPs' % (
-                        len(self.del_ureybrad), len(self.del_impropers),
-                        len(self.del_h_dihedrals) + len(self.del_noh_dihedrals),
-                        len(self.del_cmap))
+                        len(self.del_urey_bradleys), len(self.del_impropers),
+                        len(self.del_dihedrals), len(self.del_cmap))
+            )
+        elif self.parm.amoeba:
+            retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
+                       '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
+                       '         and %d torsion-torsions' % (
+                        len(self.del_urey_bradleys),
+                        len(self.del_trigonal_angles),
+                        len(self.del_dihedrals), len(self.del_oopbends),
+                        len(self.del_strbnds), len(self.del_tortors))
             )
         else:
-            retstr += 'and %d dihedrals' % (len(self.del_h_dihedrals) +
-                                            len(self.del_noh_dihedrals))
+            retstr += 'and %d dihedrals' % (len(self.del_dihedrals))
         return retstr
 
-    @staticmethod
-    def _dfl(selection, mylist):
-        """ Delete From List """
-        if not selection: return
-        for i in reversed(selection):
-            del mylist[i]
-
     def execute(self):
-        if not self.del_h_bonds and not self.del_noh_bonds:
-            # Nothing to do...
-            return
-        self._dfl(self.del_h_bonds, self.parm.bonds_inc_h)
-        self._dfl(self.del_noh_bonds, self.parm.bonds_without_h)
-        self._dfl(self.del_h_angles, self.parm.angles_inc_h)
-        self._dfl(self.del_noh_angles, self.parm.angles_without_h)
-        self._dfl(self.del_h_dihedrals, self.parm.dihedrals_inc_h)
-        self._dfl(self.del_noh_dihedrals, self.parm.dihedrals_without_h)
-        # Now get rid of chamber sections
-        if self.parm.chamber:
-            self._dfl(self.del_ureybrad, self.parm.urey_bradley)
-            self._dfl(self.del_impropers, self.parm.improper)
-            if self.del_cmap:
-                self._dfl(self.del_cmap, self.parm.cmap)
+        if not self.del_bonds: return
+        for bond in self.del_bonds: bond.delete()
+        for angle in self.del_angles: angle.delete()
+        for dihedral in self.del_dihedrals: dihedral.delete()
+        for urey in self.del_urey_bradleys: urey.delete()
+        for imp in self.del_impropers: imp.delete()
+        for cmap in self.del_cmaps: cmap.delete()
+        for trigang in self.del_trigonal_angles: trigang.delete()
+        for oopbend in self.del_oopbends: oopbend.delete()
+        for tortor in self.del_tortors: tortor.delete()
+        for strbnd in self.del_strbnds: strbnd.delete()
         # If we had anything to do, remake the parm
         self.parm.remake_parm()
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-#class fixtopology(Action):
-#    """
-#    This action will look through the lists of bonds, angles, and dihedrals both
-#    with and without hydrogen and make sure that all of the parameters are
-#    assigned to the correct lists. LEaP is known in certain cases to misassign
-#    angles and torsions if dummy atoms are involved. This action will correct
-#    the parameter assignments if any mistake was made
-#    """
-#    supported_classes = ('ChamberParm', 'AmberParm')
-#
-#    def init(self, arg_list):
-#        # First check to see if there is any problem
-#        self.needs_fixing = False
-#        # Bond Fix, Angle Fix, Dihedral Fix -- variables to determine which
-#        # specific lists need fixing
-#        self.bf = self.af = self.df = False
-#        for bnd in self.parm.bonds_inc_h:
-#            if bnd.atom1.element != 1 and bnd.atom2.element != 1:
-#                self.needs_fixing = self.bf = True
-#                break
-#        for bnd in self.parm.bonds_without_h:
-#            if bnd.atom1.element == 1 or bnd.atom2.element == 1:
-#                self.needs_fixing = self.bf = True
-#                break
-#        for ang in self.parm.angles_inc_h:
-#            if (ang.atom1.element != 1 and ang.atom2.element != 1 and
-#                ang.atom3.element != 1):
-#                self.needs_fixing = self.af = True
-#                break
-#        for ang in self.parm.angles_without_h:
-#            if (ang.atom1.element == 1 or ang.atom2.element == 1 or
-#                ang.atom3.element == 1):
-#                self.needs_fixing = self.af = True
-#                break
-#        for dih in self.parm.dihedrals_inc_h:
-#            if (dih.atom1.element != 1 and dih.atom2.element != 1 and
-#                dih.atom3.element != 1 and dih.atom4.element != 1):
-#                self.needs_fixing = self.df = True
-#                break
-#        for dih in self.parm.dihedrals_without_h:
-#            if (dih.atom1.element == 1 or dih.atom2.element == 1 or
-#                dih.atom3.element == 1 or dih.atom4.element == 1):
-#                self.needs_fixing = self.df = True
-#                break
-#
-#    def __str__(self):
-#        if self.needs_fixing:
-#            return 'Fixing bond/angle/dihedral list assignments'
-#        return 'No bond/angle/dihedral list problems detected. Doing nothing.'
-#
-#    def execute(self):
-#        if not self.needs_fixing: return
-#        # This is the tracked list type we're using
-#        listtype = type(self.parm.bonds_inc_h)
-#        if self.bf:
-#            # Need to fix bonds
-#            bonds_inc_h = listtype()
-#            bonds_without_h = listtype()
-#            for bnd in self.parm.bonds_inc_h + self.parm.bonds_without_h:
-#                if bnd.atom1.element == 1 or bnd.atom2.element == 1:
-#                    bonds_inc_h.append(bnd)
-#                else:
-#                    bonds_without_h.append(bnd)
-#            self.parm.bonds_inc_h = bonds_inc_h
-#            self.parm.bonds_without_h = bonds_without_h
-#        if self.af:
-#            # Need to fix angles
-#            angles_inc_h = listtype()
-#            angles_without_h = listtype()
-#            for ang in self.parm.angles_inc_h + self.parm.angles_without_h:
-#                if (ang.atom1.element == 1 or ang.atom2.element == 1 or
-#                    ang.atom3.element == 1):
-#                    angles_inc_h.append(ang)
-#                else:
-#                    angles_without_h.append(ang)
-#            self.parm.angles_inc_h = angles_inc_h
-#            self.parm.angles_without_h = angles_without_h
-#        if self.df:
-#            # Need to fix dihedrals
-#            dihedrals_inc_h = listtype()
-#            dihedrals_without_h = listtype()
-#            for dih in self.parm.dihedrals_inc_h+self.parm.dihedrals_without_h:
-#                if (dih.atom1.element == 1 or dih.atom2.element == 1 or
-#                    dih.atom3.element == 1 or dih.atom4.element == 1):
-#                    dihedrals_inc_h.append(dih)
-#                else:
-#                    dihedrals_without_h.append(dih)
-#            self.parm.dihedrals_inc_h = dihedrals_inc_h
-#            self.parm.dihedrals_without_h = dihedrals_without_h
-#        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
