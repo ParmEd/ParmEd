@@ -6,7 +6,7 @@ Author: Jason M. Swails
 Contributors:
 Date: June 30, 2014
 """
-from chemistry.amber.topologyobjects import TrackedList
+from chemistry.topologyobjects import TrackedList
 from chemistry.exceptions import (SplitResidueWarning, BondError, ResidueError,
                 CmapError, MissingParameter)
 import warnings

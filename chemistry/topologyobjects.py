@@ -2688,7 +2688,7 @@ class TrackedList(list):
         item = list.pop(self, idx)
         try:
             item._idx = -1
-        except IndexError:
+        except AttributeError:
             # Must be an immutable type, so don't complain
             pass
         return item
@@ -2710,7 +2710,10 @@ class TrackedList(list):
         retval = list.__getitem__(self, thing)
         if hasattr(thing, 'indices'):
             return TrackedList(retval)
-        return list.__getitem__(self, thing)
+        return retval
+
+    def __getslice__(self, start, end):
+        return TrackedList(list.__getslice__(self, start, end))
 
     def index_members(self):
         """

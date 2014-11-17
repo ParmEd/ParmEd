@@ -3,7 +3,8 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm, asciicrd, mask, topologyobjects
+from chemistry.amber import readparm, asciicrd, mask
+from chemistry import topologyobjects
 import os
 import unittest
 from utils import get_fn, has_numpy
@@ -89,15 +90,14 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
         self.assertTrue(parm.amoeba)
-        for attr in ['bond_list', 'angle_list', 'urey_bradley_list',
-                     'angle_list', 'trigonal_angle_list', 'oopbend_list',
-                     'dihedral_list', 'pitorsion_list', 'stretch_bend_list',
-                     'torsion_torsion_list', 'chiral_frame_list',
-                     'multipole_frame_list', 'adjust_list', 'adjust_weights',
-                     'bond_type_list', 'angle_type_list',
-                     'trigonal_angle_type_list', 'oopbend_type_list',
-                     'dihedral_type_list', 'pitorsion_type_list',
-                     'stretch_bend_type_list', 'torsion_torsion_type_list']:
+        for attr in ['bonds', 'angles', 'urey_bradleys', 'angles',
+                     'trigonal_angles', 'out_of_plane_bends', 'dihedrals',
+                     'pi_torsions', 'stretch_bends', 'torsion_torsions',
+                     'chiral_frames', 'multipole_frames', 'adjusts',
+                     'adjust_types', 'bond_types', 'angle_types',
+                     'trigonal_angle_types', 'out_of_plane_bend_types',
+                     'dihedral_types', 'pi_torsion_types', 'stretch_bend_types',
+                     'torsion_torsion_types']:
             self.assertTrue(hasattr(parm, attr))
 
     def testAmoebaSmall(self):
@@ -107,7 +107,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(3*rst7.natom, len(rst7.coordinates))
         self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
         self.assertEqual(rst7.natom, parm.ptr('natom'))
-        self.assertFalse(parm.torsion_torsion_list)
+        self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
 
     # Tests for individual prmtops
