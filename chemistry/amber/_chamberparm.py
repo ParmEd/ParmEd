@@ -28,7 +28,7 @@ from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
                 NUMANG, NPTRA, NATYP, IFBOX, NMXRS, CHARMM_ELECTROSTATIC)
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
-from chemistry.exceptions import CharmmPSFError
+from chemistry.exceptions import CharmmPSFError, AmberParmError
 from math import pi, sqrt
 import warnings
 
@@ -120,7 +120,7 @@ class ChamberParm(AmberParm):
         self.pointers['NUB'] = nub
         self.pointers['NUBTYPES'] = nubtypes
         self.pointers['NIMPHI'] = self.parm_data['CHARMM_NUM_IMPROPERS'][0]
-        self.pointers['NIMPRTYPES']=self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
+        self.pointers['NIMPRTYPES'] = self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
         # If CMAP is not present, don't load the pointers
         if self.has_cmap:
             self.pointers['CMAP'] = self.parm_data['CHARMM_CMAP_COUNT'][0]
@@ -289,6 +289,41 @@ class ChamberParm(AmberParm):
         return 'CHARMM_CMAP_COUNT' in self.flag_list
 
     #===========  PRIVATE INSTANCE METHODS  ============
+
+    def _check_section_lengths(self):
+        """ Make sure each section has the necessary number of entries """
+        super(ChamberParm, self)._check_section_lengths()
+
+        def check_length(key, length, required=True):
+            if not required and not key in self.parm_data: return
+            if len(self.parm_data[key]) != length:
+                raise AmberParmError('FLAG %s has %d elements; expected %d' %
+                                     (key, len(self.parm_data[key]), length))
+
+        check_length('CHARMM_UREY_BRADLEY_COUNT', 2)
+        check_length('CHARMM_UREY_BRADLEY', self.pointers['NUB']*3)
+        check_length('CHARMM_UREY_BRADLEY_FORCE_CONSTANT',
+                     self.pointers['NUBTYPES'])
+        check_length('CHARMM_UREY_BRADLEY_EQUIL_VALUE',
+                     self.pointers['NUBTYPES'])
+        check_length('CHARMM_NUM_IMPROPERS', 1)
+        check_length('CHARMM_IMPROPERS', self.pointers['NIMPHI']*5)
+        check_length('CHARMM_NUM_IMPR_TYPES', 1)
+        check_length('CHARMM_IMPROPER_FORCE_CONSTANT',
+                     self.pointers['NIMPRTYPES'])
+        check_length('CHARMM_IMPROPER_PHASE', self.pointers['NIMPRTYPES'])
+
+        ntypes = self.pointers['NTYPES']
+        check_length('LENNARD_JONES_14_ACOEF', ntypes*(ntypes+1)//2)
+        check_length('LENNARD_JONES_14_BCOEF', ntypes*(ntypes+1)//2)
+        if self.has_cmap:
+            check_length('CHARMM_CMAP_COUNT', 2)
+            check_length('CHARMM_CMAP_RESOLUTION', self.pointers['CMAP_TYPES'])
+            for i in range(self.pointers['CMAP_TYPES']):
+                res = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
+                check_length('CHARMM_CMAP_PARAMETER_%02d' % (i+1), res*res)
+
+    #===================================================
 
     def _xfer_urey_bradley_properties(self):
         """
@@ -780,7 +815,7 @@ def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
                                'parameters']
         )
         parm.add_flag('CHARMM_CMAP_RESOLUTION', '20I4',
-                     data=[cm.cmap_type.resolution for cm in struct.cmap_list],
+                     data=[cmap_type.resolution for cmap_type in cmap_types],
                      comments=['Number of steps along each phi/psi CMAP axis',
                                'for each CMAP_PARAMETER grid']
         )

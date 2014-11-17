@@ -23,23 +23,129 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from compat24 import property
-from chemistry.amber._amberparm import AmberParm, _zeros
+from chemistry.amber._amberparm import AmberParm
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.amber.constants import NRES, NNB, NMXRS
-from chemistry.amber.tinkertopology import (AtomList, ResidueList, TrackedList,
-        Bond, BondTypeList, PiTorsionTypeList, PiTorsion, UreyBradleyTypeList,
-        UreyBradley, AngleTypeList, Angle, TrigonalAngle, TrigonalAngleTypeList,
-        OutOfPlaneBend, OutOfPlaneBendTypeList, Dihedral, DihedralTypeList,
-        StretchBendTypeList, StretchBend, TorsionTorsion, ChiralFrame,
-        TorsionTorsionTypeList, MultipoleFrame, ExclusionAssignment,
-        ExclusionAssignmentWeights)
-from chemistry.exceptions import (FormatError, AmberParmWarning)
-from warnings import warn
+from chemistry.amber.constants import NATOM, NRES, IFBOX
+from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
+                DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
+                Dihedral, StretchBend, TorsionTorsion, ChiralFrame,
+                MultipoleFrame, NonbondedException, NonbondedExceptionType,
+                StretchBendType, TorsionTorsionType)
+from chemistry.exceptions import FormatError, AmoebaError
 
 class AmoebaParm(AmberParm):
     """
-    Tinker Topology (parm7 format) class. Gives low, and some high, level
-    access to topology data.
+    Tinker Topology (parm7 format) class defining the AMOEBA force field. Gives
+    low, and some high, level access to topology data.  You can interact with
+    the raw data in the topology file directly or interact with some of the
+    high-level classes comprising the system topology and parameters.
+
+    Parameters
+    ----------
+    prm_name : str=None
+        If provided, this file is parsed and the data structures will be loaded
+        from the data in this file
+    rst7_name : str=None
+        If provided, the coordinates and unit cell dimensions from the provided
+        Amber inpcrd/restart file will be loaded into the molecule
+
+    Attributes
+    ----------
+    parm_data : dict {str : list}
+        A dictionary that maps FLAG names to all of the data contained in that
+        section of the Amber file.
+    formats : dict {str : FortranFormat}
+        A dictionary that maps FLAG names to the FortranFormat instance in which
+        the data is stored in that section
+    parm_comments : dict {str : list}
+        A dictionary that maps FLAG names to the list of COMMENT lines that were
+        stored in the original file
+    flag_list : list
+        An ordered list of all FLAG names. This must be kept synchronized with
+        `parm_data`, `formats`, and `parm_comments` such that every item in
+        `flag_list` is a key to those 3 dicts and no other keys exist
+    version : str
+        The VERSION string from the Amber file
+    prm_name : str
+        The file name of the originally parsed file (set to the fname parameter)
+    atoms : AtomList(Atom)
+        List of all atoms in the system
+    residues : ResidueList(Residue)
+        List of all residues in the system
+    bonds : TrackedList(Bond)
+        List of bonds between two atoms in the system
+    angles : TrackedList(Angle)
+        List of regular angles between three atoms in the system
+    dihedrals : TrackedList(Angle)
+        List of all proper torsions between 4 atoms in the system
+    urey_bradleys : TrackedList(UreyBradley)
+        List of all Urey-Bradley terms between 2 atoms connected by an angle
+    trigonal_angles : TrackedList(TrigonalAngle)
+        List of all trigonal angle terms
+    out_of_plane_bends : TrackedList(OutOfPlaneBend)
+        List of all out-of-plane bending terms
+    pi_torsions : TrackedList(PiTorsion)
+        List of all pi-torsion terms
+    stretch_bends : TrackedList(StretchBend)
+        List of all stretch-bending terms
+    torsion_torsions : TrackedList(TorsionTorsion)
+        List of all coupled torsion-torsion terms
+    chiral_frames : TrackedList(ChiralFrame)
+        List of all chiral centers
+    multipole_frames : TrackedList(MultipoleFrame)
+        List of all multipole frames of reference
+    adjusts : TrackedList(NonbondedException)
+        List of all nonbonded exception parameters used for adjusting nonbonded
+        interactions between particular pairs of atoms
+    box : list of 6 floats
+        Periodic boundary unit cell dimensions and angles
+    bond_types : TrackedList(BondType)
+        The bond types containing the parameters for each bond stretching term
+    angle_types : TrackedList(AngleType)
+        The angle types containing the parameters for each angle bending term
+    dihedral_types : TrackedList(DihedralType)
+        The dihedral types containing the parameters for each torsional term
+    urey_bradley_types : TrackedList(BondType)
+        The Urey-Bradley types containing the parameters for each term
+    trigonal_angle_types : TrackedList(AngleType)
+        The trigonal angle types containing the parameters for each term
+    out_of_plane_bend_types : TrackedList(AngleType)
+        The out-of-plane bending angle type containing parameters for each term
+    pi_torsion_types : TrackedList(DihedralType)
+        The pi-torsion type containing parameters for each torsional term
+    stretch_bend_types : TrackedList(StretchBendType)
+        The stretch-bend type containing parameters for each term
+    torsion_torsion_types : TrackedList(TorsionTorsionType)
+        The coupled torsion-torsion type containing parameters for coupled
+        torsions
+    adjust_types : TrackedList(NonbondedExceptionType)
+        The nonbonded exception scaling factors for pairs of particles
+    bonds_inc_h : iterator(Bond)
+        Read-only generator that loops through all bonds that contain Hydrogen
+    bonds_without_h : iterator(Bond)
+        Read-only generator that loops through all bonds that do not contain
+        Hydrogen
+    angles_inc_h : iterator(Angle)
+        Read-only generator that loops through all angles that contain Hydrogen
+    angles_without_h : iterator(Angle)
+        Read-only generator that loops through all angles that do not contain
+        Hydrogen
+    dihedrals_inc_h : iterator(Dihedral)
+        Read-only generator that loops through all dihedrals that contain
+        Hydrogen
+    dihedrals_without_h : iterator(Dihedral)
+        Read-only generator that loops through all dihedrals that do not contain
+        Hydrogen
+    chamber : bool=False
+        On AmberParm instances, this is always False to indicate that it is not
+        a CHAMBER-style topology file
+    amoeba : bool=False
+        On AmberParm instances, this is always False to indicate that it is not
+        an AMOEBA-style topology file
+    has_cmap : bool=False
+        On AmberParm instances, this is always False to indicate that it does
+        not have correction maps (unique to CHARMM force field and chamber
+        topologies)
     """
 
     solvent_residues = ['WAT', 'HOH']
@@ -64,687 +170,107 @@ class AmoebaParm(AmberParm):
             self._truncate_array('RESIDUE_ICODE',
                                  self.parm_data['POINTERS'][NRES])
 
-        # instance variables other than those in AmberFormat
-        self.pointers = {}  # list of all the pointers in the prmtop
-        self.LJ_types = {}  # dict pairing atom name with its LJ atom type #
-        self.LJ_radius = [] # ordered array of L-J radii in Ang -- indices
-                            # are elements in LJ_types-1
-        self.LJ_depth = []  # similarly ordered array of L-J depths
-
+        self.LJ_types = {}
+        self.LJ_radius = []
+        self.LJ_depth = []
         # If we were given a prmtop, read it in
+        self.pointers = {}
         self.load_pointers()
 
         # Load the structure arrays
-        self._load_structure()
+        self.load_structure()
       
         if rst7_name is not None:
             self.LoadRst7(rst7_name)
+        elif self.parm_data['POINTERS'][IFBOX] > 0:
+            self.hasbox = True
+            box = self.parm_data['BOX_DIMENSIONS']
+            self.box = box[1:] + [box[0], box[0], box[0]]
 
     #=============================================
 
-    def _load_structure(self):
-        " Responsible for setting up the parameter and parameter type arrays "
-
-        ##### First create our atoms #####
-        self.atom_list = AtomList(self)
-        ##### Next, load our residues #####
-        self.residue_list = ResidueList(self)
-        self.atom_list.changed = False
-        self.residue_list.changed = False
-        ##### Next create our list of bonds #####
-        self.bond_type_list = BondTypeList(self)
-        self.bond_list = TrackedList()
-        # Add all of our bonds
-        try:
-            for i in xrange(self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i  ] - 1
-                id2 = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+1] - 1
-                typ = self.parm_data['AMOEBA_REGULAR_BOND_LIST'][3*i+2] - 1
-                self.bond_list.append(
-                        Bond(self.atom_list[id1], self.atom_list[id2],
-                             self.bond_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.bond_list.changed = False
-        self.bond_type_list.changed = False
-        ##### Next create our list of urey-bradleys #####
-        self.urey_bradley_type_list = UreyBradleyTypeList(self)
-        self.urey_bradley_list = TrackedList()
-        # Add all of our urey-bradley terms
-        try:
-            nub = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'][0]
-            for i in xrange(nub):
-                id1 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i  ] - 1
-                id2 = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+1] - 1
-                typ = self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'][3*i+2] - 1
-                self.urey_bradley_list.append(
-                        UreyBradley(self.atom_list[id1], self.atom_list[id2],
-                                    self.urey_bradley_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.urey_bradley_type_list.changed = False
-        self.urey_bradley_list.changed = False
-        ##### Next create our list of angles #####
-        self.angle_type_list = AngleTypeList(self)
-        self.angle_list = TrackedList()
-        # Add all of our angles
-        try:
-            for i in xrange(self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i  ] - 1
-                id2 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+1] - 1
-                id3 = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+2] - 1
-                typ = self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'][4*i+3] - 1
-                self.angle_list.append(
-                        Angle(self.atom_list[id1], self.atom_list[id2],
-                              self.atom_list[id3], self.angle_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.angle_type_list.changed = False
-        self.angle_list.changed = False
-        ##### Next create our list of trigonal angles (in-plane)
-        self.trigonal_angle_type_list = TrigonalAngleTypeList(self)
-        self.trigonal_angle_list = TrackedList()
-        # Add all trigonal angles
-        try:
-            for i in xrange(self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i  ] - 1
-                id2 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+1] - 1
-                id3 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+2] - 1
-                id4 = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+3] - 1
-                typ = self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'][5*i+4] - 1
-                self.trigonal_angle_list.append(
-                        TrigonalAngle(self.atom_list[id1], self.atom_list[id2],
-                                      self.atom_list[id3], self.atom_list[id4],
-                                      self.trigonal_angle_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.trigonal_angle_type_list.changed = False
-        self.trigonal_angle_list.changed = False
-        ##### Next create our list of out-of-plane bending terms #####
-        self.oopbend_type_list = OutOfPlaneBendTypeList(self)
-        self.oopbend_list = TrackedList()
-        # Add the out-of-plane bending terms
-        try:
-            for i in xrange(self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i  ] - 1
-                id2 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+1] - 1
-                id3 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+2] - 1
-                id4 = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+3] - 1
-                typ = self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'][5*i+4] - 1
-                self.oopbend_list.append(
-                        OutOfPlaneBend(self.atom_list[id1], self.atom_list[id2],
-                                       self.atom_list[id3], self.atom_list[id4],
-                                       self.oopbend_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.oopbend_type_list.changed = False
-        self.oopbend_list.changed = False
-        ##### Next create our list of normal dihedrals #####
-        self.dihedral_type_list = DihedralTypeList(self)
-        self.dihedral_list = TrackedList()
-        # Add the dihedrals
-        try:
-            for i in xrange(self.parm_data['AMOEBA_TORSION_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_TORSION_LIST'][5*i  ] - 1
-                id2 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+1] - 1
-                id3 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+2] - 1
-                id4 = self.parm_data['AMOEBA_TORSION_LIST'][5*i+3] - 1
-                typ = self.parm_data['AMOEBA_TORSION_LIST'][5*i+4] - 1
-                self.dihedral_list.append(
-                        Dihedral(self.atom_list[id1], self.atom_list[id2],
-                                 self.atom_list[id3], self.atom_list[id4],
-                                 self.dihedral_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.dihedral_type_list.changed = False
-        self.dihedral_list.changed = False
-        ##### Next create our list of pi-torsions #####
-        self.pitorsion_type_list = PiTorsionTypeList(self)
-        self.pitorsion_list = TrackedList()
-        # Add the pi-torsions
-        try:
-            for i in xrange(self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i  ] - 1
-                id2 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+1] - 1
-                id3 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+2] - 1
-                id4 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+3] - 1
-                id5 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+4] - 1
-                id6 = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+5] - 1
-                typ = self.parm_data['AMOEBA_PI_TORSION_LIST'][7*i+6] - 1
-                self.pitorsion_list.append(
-                        PiTorsion(self.atom_list[id1], self.atom_list[id2],
-                                  self.atom_list[id3], self.atom_list[id4],
-                                  self.atom_list[id5], self.atom_list[id6],
-                                  self.pitorsion_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.pitorsion_type_list.changed = False
-        self.pitorsion_list.changed = False
-        ##### Next create stretch-bend terms #####
-        self.stretch_bend_type_list = StretchBendTypeList(self)
-        self.stretch_bend_list = TrackedList()
-        # Add the stretch-bends
-        try:
-            for i in xrange(self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i  ] - 1
-                id2 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+1] - 1
-                id3 = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+2] - 1
-                typ = self.parm_data['AMOEBA_STRETCH_BEND_LIST'][4*i+3] - 1
-                self.stretch_bend_list.append(
-                        StretchBend(self.atom_list[id1], self.atom_list[id2],
-                                    self.atom_list[id3],
-                                    self.stretch_bend_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.stretch_bend_type_list.changed = False
-        self.stretch_bend_list.changed = False
-        ##### Next create the torsion-torsion parameters #####
-        self.torsion_torsion_type_list = TorsionTorsionTypeList(self)
-        self.torsion_torsion_list = TrackedList()
-        # Add the torsion-torsions
-        try:
-            ntt = self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]
-            for i in xrange(ntt):
-                id1 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i  ] - 1
-                id2 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+1] - 1
-                id3 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+2] - 1
-                id4 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+3] - 1
-                id5 = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+4] - 1
-                typ = self.parm_data['AMOEBA_TORSION_TORSION_LIST'][6*i+5] - 1
-                self.torsion_torsion_list.append(
-                        TorsionTorsion(self.atom_list[id1], self.atom_list[id2],
-                                       self.atom_list[id3], self.atom_list[id4],
-                                       self.atom_list[id5],
-                                       self.torsion_torsion_type_list[typ])
-                )
-        except KeyError:
-            pass
-        self.torsion_torsion_type_list.changed = False
-        self.torsion_torsion_list.changed = False
-        ##### Next create the chiral frame list #####
-        self.chiral_frame_list = TrackedList()
-        try:
-            for i in xrange(self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i  ] - 1
-                id2 = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+1] - 1
-                chi = self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'][3*i+2]
-                self.chiral_frame_list.append(
-                        ChiralFrame(self.atom_list[id1],
-                                    self.atom_list[id2], chi)
-                )
-        except KeyError:
-            pass
-        self.chiral_frame_list.changed = False
-        ##### Create the multipole frame list #####
-        self.multipole_frame_list = TrackedList()
-        try:
-            for i in xrange(self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'][0]):
-                id1 = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i  ] - 1
-                fpn = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+1]
-                vct = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+2]
-                vch = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+3]
-                nvc = self.parm_data['AMOEBA_FRAME_DEF_LIST'][5*i+4]
-                self.multipole_frame_list.append(
-                        MultipoleFrame(self.atom_list[id1], fpn, vct, vch, nvc)
-                )
-        except KeyError:
-            pass
-        self.multipole_frame_list.changed = False
-        ##### Create the "adjust" (detailed exclusion) list #####
-        self.adjust_list = TrackedList()
-        for i in xrange(self.parm_data['AMOEBA_ADJUST_NUM_LIST'][0]):
-            id1 = self.parm_data['AMOEBA_ADJUST_LIST'][3*i  ] - 1
-            id2 = self.parm_data['AMOEBA_ADJUST_LIST'][3*i+1] - 1
-            wt = self.parm_data['AMOEBA_ADJUST_LIST'][3*i+2]
-            self.adjust_list.append(
-                    ExclusionAssignment(self.atom_list[id1],
-                                        self.atom_list[id2], wt)
-            )
-        self.adjust_weights = ExclusionAssignmentWeights(self)
-        self.adjust_weights.changed = False
-        self.adjust_list.changed = False
-        ##### Finally we can determine the full exclusion list #####
-        first_atom = 0
-        for atom in self.atom_list:
-            first_atom += atom.determine_all_exclusion_partners(first_atom)
+    def load_structure(self):
+        """
+        Loads all of the topology instance variables. This is necessary if we
+        actually want to modify the topological layout of our system
+        """
+        self._load_atoms_and_residues()
+        self.load_atom_info()
+        self._load_bond_info()
+        self._load_angle_info()
+        self._load_urey_bradley_info()
+        self._load_trigonal_angle_info()
+        self._load_oopbend_info()
+        self._load_dihedral_info()
+        self._load_pitorsion_info()
+        self._load_stretch_bend_info()
+        self._load_torsion_torsion_info()
+        self._load_frame_info()
+        self._load_exception_info()
+        super(AmoebaParm, self).unchange()
 
     #=============================================
 
-    flush_data_changes = _load_structure
+    def load_atom_info(self):
+        """
+        Loads atom properties into the atoms that have been loaded. If any
+        arrays are too short or too long, an IndexError will be raised
+        """
+        anam = self.parm_data['ATOM_NAME']
+        mass = self.parm_data['MASS']
+        atyp = self.parm_data['AMBER_ATOM_TYPE']
+        tree = self.parm_data['TREE_CHAIN_CLASSIFICATION']
+        join = self.parm_data['JOIN_ARRAY']
+        irot = self.parm_data['IROTAT']
+        typi = self.parm_data['AMOEBA_ATOM_TYPE_INDEX']
+        atnum = self.parm_data['AMOEBA_ATOMIC_NUMBER']
+        clsi = self.parm_data['AMOEBA_ATOM_CLASS_INDEX']
+        nbtyp = self.parm_data['AMOEBA_VDW_ATOM_TYPES_LIST']
+        vdwp = self.parm_data['AMOEBA_VDW_ATOM_PARENT_LIST']
+        vdww = self.parm_data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST']
+        mpole = self.parm_data['AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST']
+        pol = self.parm_data['AMOEBA_POLARIZABILITY_LIST']
+        for i, atom in enumerate(self.atoms):
+            i10 = i * 10
+            multipoles = mpole[i10:i10+10]
+            atom.name = anam[i]
+            atom.type = atyp[i]
+            atom.mass = mass[i]
+            atom.tree = tree[i]
+            atom.join = join[i]
+            atom.irotat = irot[i]
+            atom.type_idx = typi[i]
+            atom.atomic_number = atnum[i]
+            atom.class_idx = clsi[i]
+            atom.vdw_parent = self.atoms[vdwp[i]-1]
+            atom.vdw_weight = vdww[i]
+            atom.charge = multipoles[0] # monopole is charge
+            atom.multipoles = multipoles
+            atom.polarizability = pol[i]
+            atom.nb_idx = nbtyp[i]
 
     #=============================================
 
     def remake_parm(self):
-        """ Recomputes the topology file parameters """
-        # First thing we have to do is load any of our old atom parameters into
-        # our atom_list to preserve any changes we've made directly to the data
-        self.atom_list.refresh_data()
-        # Now delete all of the bond/angle/dihedral partner information and
-        # refresh it to make sure we get the exclusions right
-        for atm in self.atom_list: atm.reset_topology()
-        for bnd in self.bond_list: bnd.register()
-        # Reset all of the type lists
-        self.bond_type_list.reset()
-        self.urey_bradley_type_list.reset()
-        self.angle_type_list.reset()
-        self.trigonal_angle_type_list.reset()
-        self.oopbend_type_list.reset()
-        self.dihedral_type_list.reset()
-        self.pitorsion_type_list.reset()
-        self.stretch_bend_type_list.reset()
-        self.torsion_torsion_type_list.reset()
-        # Shortcut here -- for each atom now just determine the angle/dihedral
-        # partners directly from the bonded network
-        for atm in self.atom_list: atm.determine_exclusions_from_bonds()
-        # Now fill up the arrays of atomic properties. This will also adjust
-        # NATOM for us if we've deleted atoms
-        self.atom_list.write_to_parm()
-        nnb = len(self.parm_data['EXCLUDED_ATOMS_LIST'])
-        self.parm_data['POINTERS'][NNB] = nnb
-        # Reset the residue indexes
-        for res in self.residue_list: res.idx = -1
-        # Write the residue arrays
-        num_res = 0
-        for i, atm in enumerate(self.atom_list):
-            if atm.residue.idx == -1:
-                self.parm_data['RESIDUE_LABEL'][num_res] = atm.residue.resname
-                self.parm_data['RESIDUE_POINTER'][num_res] = i + 1
-                atm.residue.idx = num_res
-                num_res += 1
-        self.parm_data['POINTERS'][NRES] = num_res
-        self._truncate_array('RESIDUE_LABEL', num_res)
-        self._truncate_array('RESIDUE_POINTER', num_res)
-        nmxrs = max([len(r) for r in self.residue_list])
-        self.parm_data['POINTERS'][NMXRS] = nmxrs
-    
-        # Now write all of the bond arrays. We will loop through all of the
-        # bonds to make sure that all of their atoms still exist (atm.idx > -1).
-        # At the same time, we will start applying indexes to the bond_types so
-        # we only print out the bond types that will be used. To do this, we
-        # need a copule counters. Different bond types will have an index of -1
-        # until we find out that they are needed. Then we assign them an index
-        # and write out that bond info. We also have to make sure that every
-        # array is at least large enough, so give it enough elements to cover
-        # every bond in the list, which will be reduced in size of not every
-        # bond is actually added
-        if self.bond_list:
-            bond_num = typenum = 0
-            self.parm_data['AMOEBA_REGULAR_BOND_LIST'] = \
-                                            _zeros(len(self.bond_list)*3)
-            for i, bnd in enumerate(self.bond_list):
-                if -1 in (bnd.atom1.idx, bnd.atom2.idx): continue
-                if bnd.bond_type.idx == -1:
-                    bnd.bond_type.idx = typenum
-                    typenum += 1
-                bnd.write_info(self, bond_num)
-                bond_num += 1
-            # At this point, bond_num is one past the last index used, but since
-            # Python indexes from 0 bond_num is actually now equal to the total
-            # number of bonds that were written
-            self.parm_data['AMOEBA_REGULAR_BOND_NUM_LIST'] = [bond_num]
-            self._truncate_array('AMOEBA_REGULAR_BOND_LIST', bond_num*3)
-            # Now write the types
-            self.parm_data['AMOEBA_REGULAR_BOND_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = \
-                                                _zeros(typenum)
-            self.parm_data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = _zeros(typenum)
-            self.bond_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_REGULAR_BOND_LIST')
-            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_LIST')
-            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_PARAMS')
-            self.delete_flag('AMOEBA_REGULAR_BOND_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_REGULAR_BOND_EQUIL_VALUE')
+        """ Recomputes the topology file parameters and fills parm_data """
+        # Get rid of terms containing deleted atoms and empty residues
+        self.prune_empty_terms()
+        self.residues.prune()
 
-        # Now time for urey-bradleys
-        if self.urey_bradley_list:
-            ub_num = typenum = 0
-            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = \
-                                        _zeros(len(self.urey_bradley_list)*3)
-            for i, ub in enumerate(self.urey_bradley_list):
-                if -1 in (ub.atom1, ub.atom2): continue
-                if ub.ub_type.idx == -1:
-                    ub.ub_type.idx = typenum
-                    typenum += 1
-                ub.write_info(self, ub_num)
-                ub_num += 1
-            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'] = [ub_num]
-            self._truncate_array('AMOEBA_UREY_BRADLEY_BOND_LIST', ub_num*3)
-            # Now the types
-            self.parm_data['AMOEBA_UREY_BRADLEY_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = \
-                                            _zeros(typenum)
-            self.parm_data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = \
-                                            _zeros(typenum)
-            self.urey_bradley_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_LIST')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE')
-
-        # Now time for angles
-        if self.angle_list:
-            ang_num = typenum = 0
-            self.parm_data['AMOEBA_REGULAR_ANGLE_LIST'] = \
-                                            _zeros(len(self.angle_list)*4)
-            for i, ang in enumerate(self.angle_list):
-                if -1 in (ang.atom1.idx, ang.atom2.idx, ang.atom3.idx): continue
-                if ang.angle_type.idx == -1:
-                    ang.angle_type.idx = typenum
-                    typenum += 1
-                ang.write_info(self, ang_num)
-                ang_num += 1
-            self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_LIST'] = [ang_num]
-            self._truncate_array('AMOEBA_REGULAR_ANGLE_LIST', ang_num*4)
-            # Now the types
-            self.parm_data['AMOEBA_REGULAR_ANGLE_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = \
-                                                _zeros(typenum)
-            self.parm_data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
-            self.angle_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_LIST')
-            self.delete_flag('AMOEBA_REGULAR_ANGLE_LIST')
-            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
-            self.delete_flag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
-
-        # Now time for the trigonal angles
-        if self.trigonal_angle_list:
-            ang_num = typenum = 0
-            self.parm_data['AMOEBA_TRIGONAL_ANGLE_LIST'] = \
-                                        _zeros(len(self.trigonal_angle_list)*5)
-            for i, ang in enumerate(self.trigonal_angle_list):
-                if -1 in (ang.atom1.idx, ang.atom2.idx,
-                          ang.atom3.idx, ang.atom4.idx):
-                    continue
-                if ang.trigang_type.idx == -1:
-                    ang.trigang_type.idx = typenum
-                    typenum += 1
-                ang.write_info(self, ang_num)
-                ang_num += 1
-            self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'] = [ang_num]
-            self._truncate_array('AMOEBA_TRIGONAL_ANGLE_LIST', ang_num*5)
-            # Now the types
-            self.parm_data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = \
-                                        _zeros(typenum)
-            self.parm_data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = \
-                                        _zeros(typenum)
-            self.trigonal_angle_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_LIST')
-            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_LIST')
-            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS')
-            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE')
-
-        # Now time for the out-of-plane bending terms
-        if self.oopbend_list:
-            oop_num = typenum = 0
-            self.parm_data['AMOEBA_OPBEND_ANGLE_LIST'] = \
-                                            _zeros(len(self.oopbend_list)*5)
-            for i, oop in enumerate(self.oopbend_list):
-                if -1 in (oop.atom1.idx, oop.atom2.idx,
-                          oop.atom3.idx, oop.atom4.idx):
-                    continue
-                if oop.oopbend_type.idx == -1:
-                    oop.oopbend_type.idx = typenum
-                    typenum += 1
-                oop.write_info(self, oop_num)
-                oop_num += 1
-            self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_LIST'] = [oop_num]
-            self._truncate_array('AMOEBA_OPBEND_ANGLE_LIST', oop_num*5)
-            # Now the types
-            self.parm_data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = \
-                                            _zeros(typenum)
-            self.parm_data['AMOEBA_OPBEND_ANGLE_EQUIL_VALUE'] = _zeros(typenum)
-            self.oopbend_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_LIST')
-            self.delete_flag('AMOEBA_OPBEND_ANGLE_LIST')
-            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_PARAMS')
-            self.delete_flag('AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_OPBEND_ANGLE_EQUIL_VALUE')
-
-        # Now time for torsions
-        if self.dihedral_list:
-            dih_num = typenum = 0
-            self.parm_data['AMOEBA_TORSION_LIST'] = \
-                                            _zeros(len(self.dihedral_list)*5)
-            for i, dih in enumerate(self.dihedral_list):
-                if -1 in (dih.atom1.idx, dih.atom2.idx,
-                          dih.atom3.idx, dih.atom4.idx):
-                    continue
-                if dih.dihedral_type.idx == -1:
-                    dih.dihedral_type.idx = typenum
-                    typenum += 1
-                dih.write_info(self, dih_num)
-                dih_num += 1
-            self.parm_data['AMOEBA_TORSION_NUM_LIST'] = [dih_num]
-            self._truncate_array('AMOEBA_TORSION_LIST', dih_num*5)
-            # Now the types
-            self.parm_data['AMOEBA_TORSION_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
-            self.parm_data['AMOEBA_TORSION_PERIODICITY'] = _zeros(typenum)
-            self.parm_data['AMOEBA_TORSION_PHASE'] = _zeros(typenum)
-            self.dihedral_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_TORSION_NUM_LIST')
-            self.delete_flag('AMOEBA_TORSION_LIST')
-            self.delete_flag('AMOEBA_TORSION_NUM_PARAMS')
-            self.delete_flag('AMOEBA_TORSION_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_TORSION_PERIODICITY')
-            self.delete_flag('AMOEBA_TORSION_PHASE')
-
-        # Now time for pi-torsions
-        if self.pitorsion_list:
-            tor_num = typenum = 0
-            self.parm_data['AMOEBA_PI_TORSION_LIST'] = \
-                                            _zeros(len(self.pitorsion_list)*7)
-            for i, tor in enumerate(self.pitorsion_list):
-                if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                        tor.atom4.idx, tor.atom5.idx, tor.atom6.idx):
-                    continue
-                if tor.pitor_type.idx == -1:
-                    tor.pitor_type.idx = typenum
-                    typenum += 1
-                tor.write_info(self, tor_num)
-                tor_num += 1
-            self.parm_data['AMOEBA_PI_TORSION_NUM_LIST'] = [tor_num]
-            self._truncate_array('AMOEBA_PI_TORSION_LIST', tor_num*7)
-            # Now the types
-            self.parm_data['AMOEBA_PI_TORSION_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = _zeros(typenum)
-            self.parm_data['AMOEBA_PI_TORSION_PERIODICITY'] = _zeros(typenum)
-            self.parm_data['AMOEBA_PI_TORSION_PHASE'] = _zeros(typenum)
-            self.pitorsion_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_PI_TORSION_NUM_LIST')
-            self.delete_flag('AMOEBA_PI_TORSION_LIST')
-            self.delete_flag('AMOEBA_PI_TORSION_NUM_PARAMS')
-            self.delete_flag('AMOEBA_PI_TORSION_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_PI_TORSION_PERIODICITY')
-            self.delete_flag('AMOEBA_PI_TORSION_PHASE')
-
-        # Now time for the stretch-bends
-        if self.stretch_bend_list:
-            strb_num = typenum = 0
-            self.parm_data['AMOEBA_STRETCH_BEND_LIST'] = \
-                                        _zeros(len(self.stretch_bend_list)*4)
-            for i, strb in enumerate(self.stretch_bend_list):
-                if -1 in (strb.atom1.idx, strb.atom2.idx, strb.atom3.idx):
-                    continue
-                if strb.strbnd_type.idx == -1:
-                    strb.strbnd_type.idx = typenum
-                    typenum += 1
-                strb.write_info(self, strb_num)
-                strb_num += 1
-            self.parm_data['AMOEBA_STRETCH_BEND_NUM_LIST'] = [strb_num]
-            self._truncate_array('AMOEBA_STRETCH_BEND_LIST', strb_num*4)
-            # Now the types
-            self.parm_data['AMOEBA_STRETCH_BEND_NUM_PARAMS'] = [typenum]
-            self.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'] = \
-                                        _zeros(typenum)
-            self.parm_data['AMOEBA_STRETCH_BEND_EQUIL_VALUE'] = _zeros(typenum)
-            self.parm_data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'] = \
-                                        _zeros(typenum)
-            self.parm_data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'] = \
-                                        _zeros(typenum)
-            self.stretch_bend_type_list.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_STRETCH_BEND_NUM_LIST')
-            self.delete_flag('AMOEBA_STRETCH_BEND_LIST')
-            self.delete_flag('AMOEBA_STRETCH_BEND_NUM_PARAMS')
-            self.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_STRETCH_BEND_EQUIL_VALUE')
-            self.delete_flag('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE')
-            self.delete_flag('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE')
-
-        # Now time for the coupled torsions
-        if self.torsion_torsion_list:
-            tor_num = 0
-            typelist = []
-            self.parm_data['AMOEBA_TORSION_TORSION_LIST'] = \
-                                    _zeros(len(self.torsion_torsion_list)*6)
-            for i, tor in enumerate(self.torsion_torsion_list):
-                if -1 in (tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                          tor.atom4.idx, tor.atom5.idx):
-                    continue
-                if tor.tortor_type.idx == -1:
-                    tor.tortor_type.idx = len(typelist)
-                    typelist.append(tor.tortor_type)
-                tor.write_info(self, tor_num)
-                tor_num += 1
-            self.parm_data['AMOEBA_TORSION_TORSION_NUM_LIST'] = [tor_num]
-            self._truncate_array('AMOEBA_TORSION_TORSION_LIST', tor_num*6)
-            # Now the types
-            self.parm_data['AMOEBA_TORSION_TORSION_NUM_PARAMS'] = \
-                                    [len(typelist)]
-            # We have to delete all of the 'old' types
-            for flag in self.flag_list:
-                if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
-                    self.delete_flag(flag)
-            # Now add them back for all of the types
-            after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
-            for tortype in typelist:
-                tortype.write_info(self, after)
-                after = ('AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_'
-                         'D2FUNC_DANGLE1_DANGLE2' % (tortype.idx+1))
-        else:
-            self.delete_flag('AMOEBA_TORSION_TORSION_NUM_LIST')
-            self.delete_flag('AMOEBA_TORSION_TORSION_LIST')
-            self.delete_flag('AMOEBA_TORSION_TORSION_NUM_PARAMS')
-            for flag in self.flag_list:
-                if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'):
-                    self.delete_flag(flag)
-
-        # Now time for the chiral frames
-        if self.chiral_frame_list:
-            chi_num = 0
-            self.parm_data['AMOEBA_CHIRAL_FRAME_LIST'] = \
-                                        _zeros(len(self.chiral_frame_list)*3)
-            for i, chi in enumerate(self.chiral_frame_list):
-                if -1 in (chi.atom1, chi.atom2): continue
-                chi.write_info(self, chi_num)
-                chi_num += 1
-            self.parm_data['AMOEBA_CHIRAL_FRAME_NUM_LIST'] = [chi_num]
-            self._truncate_array('AMOEBA_CHIRAL_FRAME_LIST', chi_num*3)
-        else:
-            self.delete_flag('AMOEBA_CHIRAL_FRAME_NUM_LIST')
-            self.delete_flag('AMOEBA_CHIRAL_FRAME_LIST')
-
-        # Now time for the multipole frames
-        if self.multipole_frame_list:
-            mul_num = 0
-            self.parm_data['AMOEBA_FRAME_DEF_LIST'] = \
-                                    _zeros(len(self.multipole_frame_list)*5)
-            for i, mul in enumerate(self.multipole_frame_list):
-                if mul.atom.idx == -1: continue
-                mul.write_info(self, mul_num)
-                mul_num += 1
-            self.parm_data['AMOEBA_FRAME_DEF_NUM_LIST'] = [mul_num]
-            self._truncate_array('AMOEBA_FRAME_DEF_NUM_LIST', mul_num*5)
-        else:
-            self.delete_flag('AMOEBA_FRAME_DEF_NUM_LIST')
-            self.delete_flag('AMOEBA_FRAME_DEF_LIST')
-
-        # Now time for the adjust array
-        if self.adjust_list:
-            adj_num = 0
-            self.parm_data['AMOEBA_ADJUST_LIST'] = \
-                                    _zeros(len(self.adjust_list)*3)
-            for i, adj in enumerate(self.adjust_list):
-                if -1 in (adj.atom1.idx, adj.atom2.idx): continue
-                adj.write_info(self, adj_num)
-                adj_num += 1
-            self.parm_data['AMOEBA_ADJUST_NUM_LIST'] = [adj_num]
-            self._truncate_array('AMOEBA_ADJUST_LIST', adj_num*3)
-            # Now for the weights
-            self.adjust_weights.write_to_parm()
-        else:
-            self.delete_flag('AMOEBA_ADJUST_NUM_LIST')
-            self.delete_flag('AMOEBA_ADJUST_LIST')
-
-        # Mark all lists as *not* changed
-        self.bond_type_list.changed = False
-        self.bond_list.changed = False
-        self.urey_bradley_type_list.changed = False
-        self.urey_bradley_list.changed = False
-        self.angle_type_list.changed = False
-        self.angle_list.changed = False
-        self.trigonal_angle_type_list.changed = False
-        self.trigonal_angle_list.changed = False
-        self.oopbend_type_list.changed = False
-        self.oopbend_list.changed = False
-        self.dihedral_type_list.changed = False
-        self.dihedral_list.changed = False
-        self.pitorsion_type_list.changed = False
-        self.pitorsion_list.changed = False
-        self.stretch_bend_type_list.changed = False
-        self.stretch_bend_list.changed = False
-        self.torsion_torsion_type_list.changed = False
-        self.torsion_torsion_list.changed = False
-        self.chiral_frame_list.changed = False
-        self.multipole_frame_list.changed = False
-        self.adjust_weights.changed = False
-        self.adjust_list.changed = False
-
-    #=============================================
-
-    def _topology_changed(self):
-        return (self.bond_type_list.changed or
-                self.bond_list.changed or
-                self.urey_bradley_type_list.changed or
-                self.urey_bradley_list.changed or
-                self.angle_type_list.changed or
-                self.angle_list.changed or
-                self.trigonal_angle_list.changed or
-                self.trigonal_angle_type_list.changed or
-                self.oopbend_type_list.changed or
-                self.oopbend_list.changed or
-                self.dihedral_type_list.changed or
-                self.dihedral_list.changed or
-                self.pitorsion_type_list.changed or
-                self.pitorsion_list.changed or
-                self.stretch_bend_type_list.changed or
-                self.stretch_bend_list.changed or
-                self.torsion_torsion_type_list.changed or
-                self.torsion_torsion_list.changed or
-                self.chiral_frame_list.changed or
-                self.adjust_weights.changed or
-                self.adjust_list.changed)
+        # Transfer information from the topology lists
+        self._xfer_atom_info()
+        self._xfer_residue_info()
+        self._xfer_bond_info()
+        self._xfer_angle_info()
+        self._xfer_urey_bradley_info()
+        self._xfer_trigonal_angle_info()
+        self._xfer_oopbend_info()
+        self._xfer_dihedral_info()
+        self._xfer_pitorsion_info()
+        self._xfer_stretch_bend_info()
+        self._xfer_torsion_torsion_info()
+        self._xfer_frame_info()
+        self._xfer_exception_info()
 
     #=============================================
 
@@ -789,77 +315,48 @@ class AmoebaParm(AmberParm):
 
     @property
     def bonds_inc_h(self):
-        """
-        For compatibility with Amber and Chamber-style prmtops. This is a
-        generator, so it cannot be used everywhere that a bonds_inc_h array can
-        be used
-        """
-        for bnd in self.bond_list:
+        """ All bonds with at least one atom being hydrogen """
+        for bnd in self.bonds:
             if 1 in (bnd.atom1.element, bnd.atom2.element):
                 yield bnd
    
-    @bonds_inc_h.setter
-    def bonds_inc_h(self, thing):
-        raise NotImplemented('bonds_inc_h is a generator property '
-                             'in AmoebaParm')
-
     @property
     def bonds_without_h(self):
-        for bnd in self.bond_list:
+        """ All bonds in which neither atom is hydrogen """
+        for bnd in self.bonds:
             if not 1 in (bnd.atom1.element, bnd.atom2.element):
                 yield bnd
 
-    @bonds_without_h.setter
-    def bonds_without_h(self, thing):
-        raise NotImplemented('bonds_without_h is a generator property in '
-                             'AmoebaParm')
-
     @property
     def angles_inc_h(self):
-        for ang in self.angle_list:
+        """ All angles in which at least one atom is hydrogen """
+        for ang in self.angles:
             if 1 in (ang.atom1.element, ang.atom2.element, ang.atom3.element):
                 yield ang
 
-    @angles_inc_h.setter
-    def angles_inc_h(self, thing):
-        raise NotImplemented('angles_inc_h is a generator property in '
-                             'AmoebaParm')
-
     @property
     def angles_without_h(self):
-        for ang in self.angle_list:
+        """ All angles in which no atom is hydrogen """
+        for ang in self.angles:
             if not 1 in (ang.atom1.element, ang.atom2.element,
                          ang.atom3.element):
                 yield ang
 
-    @angles_without_h.setter
-    def angles_without_h(self, thing):
-        raise NotImplemented('angles_without_h is a generator property in '
-                             'AmoebaParm')
-
     @property
     def dihedrals_inc_h(self):
-        for dih in self.dihedral_list:
+        """ All dihedrals in which at least one atom is hydrogen """
+        for dih in self.dihedrals:
             if 1 in (dih.atom1.element, dih.atom2.element,
                      dih.atom3.element, dih.atom4.element):
                 yield dih
 
-    @dihedrals_inc_h.setter
-    def dihedrals_inc_h(self, thing):
-        raise NotImplemented('dihedrals_inc_h is a generator property in '
-                             'AmoebaParm')
-
     @property
     def dihedrals_without_h(self):
+        """ All dihedrals in which no atom is hydrogen """
         for dih in self.dihedral_list:
             if not 1 in (dih.atom1.element, dih.atom2.element,
                          dih.atom3.element, dih.atom4.element):
                 yield dih
-
-    @dihedrals_without_h.setter
-    def dihedrals_without_h(self, thing):
-        raise NotImplemented('dihedrals_without_h is a generator property in '
-                             'AmoebaParm')
 
     #=============================================
 
@@ -870,6 +367,727 @@ class AmoebaParm(AmberParm):
     @property
     def amoeba(self):
         return True
+
+    #===========  PRIVATE INSTANCE METHODS  ============
+
+    def _load_bond_info(self):
+        """ Load the regular AMOEBA bonds, if they exist """
+        if not 'AMOEBA_REGULAR_BOND_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.bonds[:]
+        del self.bond_types[:]
+        for k, req in zip(data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'],
+                          data['AMOEBA_REGULAR_BOND_EQUIL_VALUE']):
+            self.bond_types.append(BondType(k, req, self.bond_types))
+        self.bond_types.degree = data['AMOEBA_REGULAR_BOND_FTAB_DEGREE'][0]
+        self.bond_types.coeffs = data['AMOEBA_REGULAR_BOND_FTAB_COEFFS'][:]
+        if len(self.bond_types.coeffs) != self.bond_types.degree + 1:
+            raise AmoebaError('Bond degree (%d) does not make sense with %d '
+                              'coefficients' % (self.bond_types.degree,
+                              len(self.bond_types.coeffs)))
+        nbond = data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]
+        blist = self.parm_data['AMOEBA_REGULAR_BOND_LIST']
+        for i in xrange(0, 3*nbond, 3):
+            self.bonds.append(
+                    Bond(self.atoms[blist[i]-1], self.atoms[blist[i+1]-1],
+                         self.bond_types[blist[i+2]-1])
+            )
+
+    #=============================================
+
+    def _load_angle_info(self):
+        """ Load the regular AMOEBA angles, if they exist """
+        if not 'AMOEBA_REGULAR_ANGLE_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.angles[:]
+        del self.angle_types[:]
+        for k, eq in zip(data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'],
+                         data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE']):
+            self.angle_types.append(AngleType(k, eq, self.angle_types))
+        self.angle_types.degree = data['AMOEBA_REGULAR_ANGLE_FTAB_DEGREE'][0]
+        self.angle_types.coeffs = data['AMOEBA_REGULAR_ANGLE_FTAB_COEFFS'][:]
+        if len(self.angle_types.coeffs) != self.angle_types.degree + 1:
+            raise AmoebaError('Angle degree (%d) does not make sense with %d '
+                              'coefficients' % (self.angle_types.degree,
+                              len(self.angle_types.coeffs)))
+        nang = data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]
+        alist = data['AMOEBA_REGULAR_ANGLE_LIST']
+        for i in xrange(0, 4*nang, 4):
+            self.angles.append(
+                    Angle(self.atoms[alist[i]-1], self.atoms[alist[i+1]-1],
+                          self.atoms[alist[i+2]-1],
+                          self.angle_types[alist[i+3]-1])
+            )
+
+    #=============================================
+
+    def _load_urey_bradley_info(self):
+        """ Loads the AMOEBA Urey-Bradley terms, if they exist """
+        if not 'AMOEBA_UREY_BRADLEY_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.urey_bradleys[:]
+        del self.urey_bradley_types[:]
+        for k, eq in zip(data['AMOEBA_UREY_BRADLEY_FORCE_CONSTANT'],
+                         data['AMOEBA_UREY_BRADLEY_EQUIL_VALUE']):
+            self.urey_bradley_types.append(
+                    BondType(k, eq, self.urey_bradley_types)
+            )
+        self.urey_bradley_types.degree = degree = \
+                data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][0]
+        self.urey_bradley_types.coeffs = coeffs = \
+                data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][:]
+        if len(coeffs) != degree + 1:
+            raise AmoebaError('Urey-Bradley degree (%d) does not make sense '
+                              'with %d coefficients' % (degree, len(coeffs)))
+        nurey = data['AMOEBA_UREY_BRADLEY_NUM_LIST'][0]
+        ulist = data['AMOEBA_UREY_BRADLEY_LIST']
+        for i in xrange(0, 3*nurey, 3):
+            self.urey_bradleys.append(
+                    UreyBradley(self.atoms[ulist[i]-1],
+                                self.atoms[ulist[i+1]-1],
+                                self.urey_bradley_types[ulist[i+2]-1])
+            )
+
+    #=============================================
+
+    def _load_trigonal_angle_info(self):
+        """ Loads the AMOEBA trigonal angle terms, if they exist """
+        if not 'AMOEBA_TRIGONAL_ANGLE_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.trigonal_angles[:]
+        del self.trigonal_angle_types[:]
+        for k, eq in zip(data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'],
+                         data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE']):
+            self.trigonal_angle_types.append(
+                    AngleType(k, eq, self.trigonal_angle_types)
+            )
+        self.trigonal_angle_types.degree = degree = \
+                data['AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE'][0]
+        self.trigonal_angle_types.coeffs = coeffs = \
+                data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'][:]
+        if len(coeffs) != degree + 1:
+            raise AmoebaError('Trigonal Angle degree (%d) does not make sense '
+                              'with %d coefficients' % (degree, len(coeffs)))
+        nang = data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]
+        alist = data['AMOEBA_TRIGONAL_ANGLE_LIST']
+        for i in xrange(0, 5*nang, 5):
+            self.trigonal_angles.append(
+                    TrigonalAngle(self.atoms[alist[i  ]-1],
+                                  self.atoms[alist[i+1]-1],
+                                  self.atoms[alist[i+2]-1],
+                                  self.atoms[alist[i+3]-1],
+                                  self.trigonal_angle_types[alist[i+4]-1])
+            )
+
+    #=============================================
+
+    def _load_oopbend_info(self):
+        """ Loads the AMOEBA out-of-plane bending terms, if they exist """
+        if not 'AMOEBA_OPBEND_ANGLE_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.out_of_plane_bends[:]
+        del self.out_of_plane_bend_types[:]
+        for k in data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT']:
+            self.out_of_plane_bend_types.append(
+                    OutOfPlaneBendType(k, self.out_of_plane_bend_types)
+            )
+        self.out_of_plane_bend_types.degree = degree = \
+                data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'][0]
+        self.out_of_plane_bend_types.coeffs = coeffs = \
+                data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'][:]
+        if len(coeffs) != degree + 1:
+            raise AmoebaError('OOP-bend angle degree (%d) does not make sense '
+                              'with %d coefficients.' % (degree, len(coeffs)))
+        nang = data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]
+        alist = data['AMOEBA_OPBEND_ANGLE_LIST']
+        for i in xrange(0, 5*nang, 5):
+            self.out_of_plane_bends.append(
+                    OutOfPlaneBend(self.atoms[alist[i  ]-1],
+                                   self.atoms[alist[i+1]-1],
+                                   self.atoms[alist[i+2]-1],
+                                   self.atoms[alist[i+3]-1],
+                                   self.out_of_plane_bend_types[alist[i+4]-1])
+            )
+
+    #=============================================
+
+    def _load_dihedral_info(self):
+        """ Loads the AMOEBA regular torsion terms, if they exist """
+        if not 'AMOEBA_TORSION_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.dihedrals[:]
+        del self.dihedral_types[:]
+        for k, per, phase in zip(data['AMOEBA_TORSION_FORCE_CONSTANT'],
+                                 data['AMOEBA_TORSION_PERIODICITY'],
+                                 data['AMOEBA_TORSION_PHASE']):
+            self.dihedral_types.append(
+                    DihedralType(k, per, phase, list=self.dihedral_types)
+            )
+        nphi = data['AMOEBA_TORSION_NUM_LIST'][0]
+        dlist = data['AMOEBA_TORSION_LIST']
+        for i in xrange(0, 5*nphi, 5):
+            self.dihedrals.append(
+                    Dihedral(self.atoms[dlist[i]-1], self.atoms[dlist[i+1]-1],
+                             self.atoms[dlist[i+2]-1], self.atoms[dlist[i+3]-1],
+                             type=self.dihedral_types[dlist[i+4]-1])
+            )
+
+    #=============================================
+
+    def _load_pitorsion_info(self):
+        """ Loads the AMOEBA pi-torsion terms, if they exist """
+        if not 'AMOEBA_PI_TORSION_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.pi_torsions[:]
+        del self.pi_torsion_types[:]
+        for k, per, phase in zip(data['AMOEBA_PI_TORSION_FORCE_CONSTANT'],
+                                 data['AMOEBA_PI_TORSION_PERIODICITY'],
+                                 data['AMOEBA_PI_TORSION_PHASE']):
+            self.pi_torsion_types.append(
+                    DihedralType(k, per, phase, list=self.pi_torsion_types)
+            )
+        nphi = data['AMOEBA_PI_TORSION_NUM_LIST'][0]
+        tlist = data['AMOEBA_PI_TORSION_LIST']
+        for i in xrange(0, 7*nphi, 7):
+            self.pi_torsions.append(
+                    PiTorsion(self.atoms[tlist[i  ]-1],
+                              self.atoms[tlist[i+1]-1],
+                              self.atoms[tlist[i+2]-1],
+                              self.atoms[tlist[i+3]-1],
+                              self.atoms[tlist[i+4]-1],
+                              self.atoms[tlist[i+5]-1],
+                              self.pi_torsion_types[tlist[i+6]-1])
+            )
+
+    #=============================================
+
+    def _load_stretch_bend_info(self):
+        """ Loads the AMOEBA stretch-bend terms, if they exist """
+        if not 'AMOEBA_STRETCH_BEND_LIST' in self.parm_data: return
+        data = self.parm_data
+        del self.stretch_bends[:]
+        del self.stretch_bend_types[:]
+        for terms in zip(data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'],
+                         data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'],
+                         data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'],
+                         data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']):
+            self.stretch_bend_types.append(
+                    StretchBendType(*terms, list=self.stretch_bend_types)
+            )
+        nstrbnd = data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]
+        slist = data['AMOEBA_STRETCH_BEND_LIST']
+        for i in xrange(0, 4*nstrbnd, 4):
+            self.stretch_bends.append(
+                    StretchBend(self.atoms[slist[i  ]-1],
+                                self.atoms[slist[i+1]-1],
+                                self.atoms[slist[i+2]-1],
+                                self.stretch_bend_types[slist[i+3]-1])
+            )
+
+    #=============================================
+
+    def _load_torsion_torsion_info(self):
+        """ Loads the AMOEBA coupled torsion-torsion terms, if they exist """
+        if not 'AMOEBA_TORSION_TORSION_LIST' in self.parm_data: return
+        del self.torsion_torsion_types[:]
+        del self.torsion_torsions[:]
+        data = self.parm_data
+        ntypes = data['AMOEBA_TORSION_TORSION_NUM_PARAMS'][0]
+        for i in xrange(ntypes):
+            prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_' % (i + 1)
+            dims = tuple(data[prefix + 'DIMS'])
+            ang1 = data[prefix + 'ANGLE1']
+            ang2 = data[prefix + 'ANGLE2']
+            f = data[prefix + 'FUNC']
+            dfda1 = data[prefix + 'DFUNC_DANGLE1']
+            dfda2 = data[prefix + 'DFUNC_DANGLE2']
+            d2fda1da2 = data[prefix + 'D2FUNC_DANGLE1_DANGLE2']
+            self.torsion_torsion_types.append(
+                    TorsionTorsionType(dims, ang1, ang2, f, dfda1,
+                                       dfda2, d2fda1da2,
+                                       list=self.torsion_torsion_types)
+            )
+        ntor = data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]
+        tlist = data['AMOEBA_TORSION_TORSION_LIST']
+        for i in xrange(0, 6*ntor, 6):
+            self.torsion_torsions.append(
+                    TorsionTorsion(self.atoms[tlist[i  ]-1],
+                                   self.atoms[tlist[i+1]-1],
+                                   self.atoms[tlist[i+2]-1],
+                                   self.atoms[tlist[i+3]-1],
+                                   self.atoms[tlist[i+4]-1],
+                                   self.torsion_torsion_types[tlist[i+5]-1])
+            )
+
+    #=============================================
+
+    def _load_frame_info(self):
+        """ Loads the AMOEBA chiral and multipole frames """
+        data = self.parm_data
+        del self.chiral_frames[:]
+        try:
+            nframe = data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]
+            framelist = data['AMOEBA_CHIRAL_FRAME_LIST']
+            for i in xrange(0, 3*nframe, 3):
+                self.chiral_frames.append(
+                        ChiralFrame(self.atoms[framelist[i  ]-1],
+                                    self.atoms[framelist[i+1]-1],
+                                    framelist[i+2])
+                )
+        except KeyError:
+            pass
+        del self.multipole_frames[:]
+        try:
+            nframe = data['AMOEBA_FRAME_DEF_NUM_LIST'][0]
+            framelist = data['AMOEBA_FRAME_DEF_LIST']
+            for i in xrange(0, 5*nframe, 5):
+                self.multipole_frames.append(
+                        MultipoleFrame(self.atoms[framelist[i]-1],
+                                       framelist[i+1], framelist[i+2],
+                                       framelist[i+3], framelist[i+4])
+                )
+        except KeyError:
+            pass
+
+    #=============================================
+
+    def _load_exception_info(self):
+        """ Loads all of the pairwise nonbonded exception rules """
+        del self.adjust_types[:]
+        del self.adjusts[:]
+        data = self.parm_data
+        try:
+            for terms in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
+                self.adjust_types.append(
+                        NonbondedExceptionType(*terms, list=self.adjust_types)
+                )
+            nadj = data['AMOEBA_ADJUST_NUM_LIST'][0]
+            adjlist = data['AMOEBA_ADJUST_LIST']
+            for i in xrange(0, 3*nadj, 3):
+                self.adjusts.append(
+                        NonbondedException(self.atoms[adjlist[i  ]-1],
+                                           self.atoms[adjlist[i+1]-1],
+                                           self.adjust_types[adjlist[i+2]-1])
+                )
+        except KeyError:
+            pass
+
+    #=============================================
+
+    def _xfer_atom_info(self):
+        """ Transfers atom info to the topology file data arrays """
+        data = self.parm_data
+        data['POINTERS'][NATOM] = self.pointers['NATOM'] = len(self.atoms)
+        data['ATOM_NAME'] = [a.name for a in self.atoms]
+        data['MASS'] = [a.mass for a in self.atoms]
+        data['CHARGE'] = [0.0 for a in self.atoms] # charge is in multipoles
+        data['AMBER_ATOM_TYPE'] = [a.type for a in self.atoms]
+        data['TREE_CHAIN_CLASSIFICATION'] = [a.tree for a in self.atoms]
+        data['JOIN_ARRAY'] = [a.join for a in self.atoms]
+        data['IROTAT'] = [a.irotat for a in self.atoms]
+        data['AMOEBA_ATOM_TYPE_INDEX'] = [a.type_idx for a in self.atoms]
+        data['AMOEBA_ATOMIC_NUMBER'] = [a.atomic_number for a in self.atoms]
+        data['AMOEBA_ATOM_CLASS_INDEX'] = [a.class_idx for a in self.atoms]
+        data['AMOEBA_VDW_ATOM_TYPES_LIST'] = [a.nb_idx for a in self.atoms]
+        data['AMOEBA_VDW_ATOM_PARENT_LIST'] = \
+                    [a.vdw_parent.idx+1 for a in self.atoms]
+        data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'] = \
+                    [a.vdw_weight for a in self.atoms]
+        data['AMOEBA_POLARIZABILITY_LIST'] = \
+                    [a.polarizability for a in self.atoms]
+        data['AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'] = mpoles = []
+        for atom in self.atoms:
+            mpoles.extend(atom.multipoles)
+
+    #=============================================
+
+    def _xfer_bond_info(self):
+        """
+        Transfers the bond information from the bond arrays to the raw data
+        arrays
+        """
+        if len(self.bonds) == 0:
+            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_PARAMS')
+            self.delete_flag('AMOEBA_REGULAR_BOND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_REGULAR_BOND_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_REGULAR_BOND_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_REGULAR_BOND_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_REGULAR_BOND_NUM_LIST')
+            self.delete_flag('AMOEBA_REGULAR_BOND_LIST')
+            return
+        data = self.parm_data
+        for bond_type in self.bond_types:
+            bond_type.used = False
+        for bond in self.bonds:
+            bond.type.used = True
+        self.bond_types.prune_unused()
+        data['AMOEBA_REGULAR_BOND_NUM_PARAMS'] = [len(self.bond_types)]
+        data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = \
+                    [bt.k for bt in self.bond_types]
+        data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = \
+                    [bt.req for bt in self.bond_types]
+        data['AMOEBA_REGULAR_BOND_FTAB_DEGREE'] = [self.bond_types.degree]
+        data['AMOEBA_REGULAR_BOND_FTAB_COEFFS'] = self.bond_types.coeffs[:]
+        data['AMOEBA_REGULAR_BOND_NUM_LIST'] = [len(self.bonds)]
+        data['AMOEBA_REGULAR_BOND_LIST'] = bond_array = []
+        for bond in self.bonds:
+            bond_array.extend([bond.atom1.idx+1, bond.atom2.idx+1,
+                               bond.type.idx+1])
+
+    #=============================================
+
+    def _xfer_angle_info(self):
+        """
+        Transfers the regular AMOEBA angle information from the topology arrays
+        to the raw data arrays
+        """
+        if len(self.angles):
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_REGULAR_ANGLE_LIST')
+            return
+        data = self.parm_data
+        for angle_type in self.angle_types:
+            angle_type.used = False
+        for angle in self.angles:
+            angle.type.used = True
+        self.angle_types.prune_unused()
+        data['AMOEBA_REGULAR_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
+        data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = \
+                    [at.k for at in self.angle_types]
+        data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = \
+                    [at.theteq for at in self.angle_types]
+        data['AMOEBA_REGULAR_ANGLE_FTAB_DEGREE'] = [self.angle_types.degree]
+        data['AMOEBA_REGULAR_ANGLE_FTAB_COEFFS'] = self.angle_types.coeffs[:]
+        data['AMOEBA_REGULAR_ANGLE_NUM_LIST'] = [len(self.angles)]
+        data['AMOEBA_REGULAR_ANGLE_LIST'] = angle_array = []
+        for angle in self.angles:
+            angle_array.extend([angle.atom1.idx+1, angle.atom2.idx+1,
+                                angle.atom3.idx+1, angle.type.idx+1])
+
+    #=============================================
+
+    def _xfer_urey_bradley_info(self):
+        """
+        Transfers the AMOEBA Urey-Bradley bond information from the topology
+        arrays to the raw data arrays
+        """
+        if len(self.urey_bradleys) == 0:
+            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_LIST')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_LIST')
+            return
+        data = self.parm_data
+        for urey_bradley_type in self.urey_bradley_types:
+            urey_bradley_type.used = False
+        for urey_bradley in self.urey_bradleys:
+            urey_bradley.type.used = True
+        self.urey_bradley_types.prune_unused()
+        data['AMOEBA_UREY_BRADLEY_NUM_PARAMS'] = [len(self.urey_bradley_types)]
+        data['AMOEBA_UREY_BRADLEY_FORCE_CONSTANT'] = \
+                    [ut.k for ut in self.urey_bradley_types]
+        data['AMOEBA_UREY_BRADLEY_EQUIL_VALUE'] = \
+                    [ut.req for ut in self.urey_bradley_types]
+        data['AMOEBA_UREY_BRADLEY_FTAB_DEGREE'] = [self.urey_bradley_types.degree]
+        data['AMOEBA_UREY_BRADLEY_FTAB_COEFFS'] = self.urey_bradley_types.coeffs[:]
+        data['AMOEBA_UREY_BRADLEY_NUM_LIST'] = [len(self.urey_bradleys)]
+        data['AMOEBA_UREY_BRADLEY_LIST'] = urey_array = []
+        for urey in self.urey_bradleys:
+            urey_array.extend([urey.atom1.idx+1, urey.atom2.idx+1,
+                               urey.type.idx+1])
+
+    #=============================================
+
+    def _xfer_trigonal_angle_info(self):
+        """
+        Transfers the AMOEBA trigonal angle information from the topology arrays
+        to the raw data arrays
+        """
+        if len(self.trigonal_angles) == 0:
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_TRIGONAL_ANGLE_LIST')
+            return
+        data = self.parm_data
+        for trigonal_angle_type in self.trigonal_angle_types:
+            trigonal_angle_type.used = False
+        for trigonal_angle in self.trigonal_angles:
+            trigonal_angle.type.used = True
+        self.trigonal_angle_types.prune_unused()
+        data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
+        data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = \
+                    [at.k for at in self.trigonal_angle_types]
+        data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = \
+                    [at.theteq for at in self.trigonal_angle_types]
+        data['AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE'] = \
+                    [self.trigonal_angle_types.degree]
+        data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'] = \
+                    self.trigonal_angle_types.coeffs[:]
+        data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'] = [len(self.trigonal_angles)]
+        data['AMOEBA_TRIGONAL_ANGLE_LIST'] = angle_array = []
+        for angle in self.trigonal_angles:
+            angle_array.extend([angle.atom1.idx+1, angle.atom2.idx+1,
+                                angle.atom3.idx+1, angle.atom4.idx+1,
+                                angle.type.idx+1])
+
+    #=============================================
+
+    def _xfer_oopbend_info(self):
+        """
+        Transfers the AMOEBA out-of-plane bending angle information from the
+        topology arrays to the raw data arrays
+        """
+        if len(self.out_of_plane_bends) == 0:
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_PARAMS')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_NUM_LIST')
+            self.delete_flag('AMOEBA_OPBEND_ANGLE_LIST')
+            return
+        data = self.parm_data
+        for out_of_plane_bend_type in self.out_of_plane_bend_types:
+            out_of_plane_bend_type.used = False
+        for out_of_plane_bend in self.out_of_plane_bends:
+            out_of_plane_bend.type.used = True
+        self.out_of_plane_bend_types.prune_unused()
+        data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
+        data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = \
+                    [at.k for at in self.out_of_plane_bend_types]
+        data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'] = \
+                    [self.out_of_plane_bend_types.degree]
+        data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'] = \
+                    self.out_of_plane_bend_types.coeffs[:]
+        data['AMOEBA_OPBEND_ANGLE_NUM_LIST'] = [len(self.out_of_plane_bends)]
+        data['AMOEBA_OPBEND_ANGLE_LIST'] = angle_array = []
+        for angle in self.out_of_plane_bends:
+            angle_array.extend([angle.atom1.idx+1, angle.atom2.idx+1,
+                                angle.atom3.idx+1, angle.atom4.idx+1,
+                                angle.type.idx+1])
+
+    #=============================================
+
+    def _xfer_dihedral_info(self):
+        """
+        Transfers the AMOEBA regular torsion angle information from the topology
+        arrays to the raw data arrays
+        """
+        if len(self.dihedrals) == 0:
+            self.delete_flag('AMOEBA_TORSION_NUM_PARAMS')
+            self.delete_flag('AMOEBA_TORSION_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_TORSION_PERIODICITY')
+            self.delete_flag('AMOEBA_TORSION_PHASE')
+            self.delete_flag('AMOEBA_TORSION_NUM_LIST')
+            self.delete_flag('AMOEBA_TORSION_LIST')
+            return
+        data = self.parm_data
+        for dihedral_type in self.dihedral_types:
+            dihedral_type.used = False
+        for dihedral in self.dihedrals:
+            dihedral.type.used = True
+        self.dihedral_types.prune_unused()
+        data['AMOEBA_TORSION_NUM_PARAMS'] = [len(self.dihedral_types)]
+        data['AMOEBA_TORSION_FORCE_CONSTANT'] = \
+                    [dt.phi_k for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_PEROIDICITY'] = \
+                    [dt.per for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_PHASE'] = [dt.phase for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_NUM_LIST'] = [len(self.dihedrals)]
+        data['AMOEBA_TORSION_LIST'] = dlist = []
+        for dih in self.dihedrals:
+            dlist.extend([dih.atom1.idx+1, dih.atom2.idx+1, dih.atom3.idx+1,
+                          dih.atom4.idx+1, dih.type.idx+1])
+
+    #=============================================
+
+    def _xfer_pitorsion_info(self):
+        """
+        Transfers the AMOEBA pi-torsion information from the topology arrays to
+        the raw data arrays
+        """
+        if len(self.pi_torsions) == 0:
+            self.delete_flag('AMOEBA_PI_TORSION_NUM_PARAMS')
+            self.delete_flag('AMOEBA_PI_TORSION_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_PI_TORSION_PERIODICITY')
+            self.delete_flag('AMOEBA_PI_TORSION_PHASE')
+            self.delete_flag('AMOEBA_PI_TORSION_NUM_LIST')
+            self.delete_flag('AMOEBA_PI_TORSION_LIST')
+            return
+        data = self.parm_data
+        for pitor_type in self.pi_torsion_types:
+            pitor_type.used = False
+        for pi_torsion in self.pi_torsions:
+            pi_torsion.type.used = True
+        self.pi_torsion_types.prune_unused()
+        data['AMOEBA_PI_TORSION_NUM_PARAMS'] = [len(self.pi_torsion_types)]
+        data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = \
+                    [dt.phi_k for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_PEROIDICITY'] = \
+                    [dt.per for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_PHASE'] = \
+                    [dt.phase for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_NUM_LIST'] = [len(self.pi_torsions)]
+        data['AMOEBA_PI_TORSION_LIST'] = dlist = []
+        for pit in self.pi_torsions:
+            dlist.extend([pit.atom1.idx+1, pit.atom2.idx+1, pit.atom3.idx+1,
+                          pit.atom4.idx+1, pit.atom5.idx+1, pit.atom6.idx+1,
+                          pit.type.idx+1])
+
+    #=============================================
+
+    def _xfer_stretch_bend_info(self):
+        """
+        Transfers the AMOEBA stretch-bend information from the topology arrays
+        to the raw data arrays
+        """
+        if len(self.stretch_bends) == 0:
+            self.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_STRETCH_BEND_NUM_LIST')
+            self.delete_flag('AMOEBA_STRETCH_BEND_LIST')
+            return
+        data = self.parm_data
+        for strbnd_type in self.stretch_bend_types:
+            strbnd_type.used = False
+        for strbnd in self.stretch_bends:
+            strbnd.type.used = True
+        self.stretch_bend_types.prune_unused()
+        data['AMOEBA_STRETCH_BEND_NUM_PARAMS'] = [len(self.stretch_bend_types)]
+        data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'] = \
+                    [strbnd.k for strbnd in self.stretch_bend_types]
+        data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'] = \
+                    [strbnd.req1 for strbnd in self.stretch_bend_types]
+        data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'] = \
+                    [strbnd.req2 for strbnd in self.stretch_bend_types]
+        data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE'] = \
+                    [strbnd.theteq for strbnd in self.stretch_bend_types]
+        data['AMOEBA_STRETCH_BEND_NUM_LIST'] = [len(self.stretch_bends)]
+        data['AMOEBA_STRETCH_BEND_LIST'] = slist = []
+        for strbnd in self.stretch_bends:
+            slist.extend([strbnd.atom1.idx+1, strbnd.atom2.idx+1,
+                          strbnd.atom3.idx+1, strbnd.type.idx+1])
+
+    #=============================================
+
+    def _xfer_torsion_torsion_info(self):
+        """
+        Transfers the AMOEBA coupled torsion-torsion information from the
+        topology arrays to the raw data arrays
+        """
+        if len(self.torsion_torsions) == 0:
+            for flag in self.flag_list:
+                if flag.startswith('AMOEBA_TORSION_TORSION'):
+                    self.delete_flag(flag)
+            return
+        data = self.parm_data
+        for tortor_type in self.torsion_torsion_types:
+            tortor_type.used = False
+        for tortor in self.torsion_torsions:
+            tortor.type.used = True
+        self.torsion_torsion_types.prune_unused()
+        after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
+        data[after] = [len(self.torsion_torsion_types)]
+        for flag in self.flag_list:
+            if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE_'):
+                self.delete_flag(flag)
+        for i, tt in enumerate(self.torsion_torsion_types):
+            tblsize = ['dimension = (%d,%d)' % tt.dims]
+            prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_' % (i+1)
+            self.add_flag(prefix+'DIMS', '2I8', data=list(tt.dims),
+                          comments=['dimension = (2)'], after=after)
+            self.add_flag(prefix+'ANGLE1', '5E16.8', data=tt.ang1[:],
+                          comments=['dimension = (%d)' % tt.dims[0]],
+                          after=prefix+'DIMS')
+            self.add_flag(prefix+'ANGLE2', '5E16.8', data=tt.ang2[:],
+                          comments=['dimension = (%d)' % tt.dims[1]],
+                          after=prefix+'ANGLE1')
+            self.add_flag(prefix+'FUNC', '5E16.8', data=tt.f.data[:],
+                          comments=tblsize[:], after=prefix+'ANGLE2')
+            self.add_flag(prefix+'DFUNC_DANGLE1', '5E16.8',
+                          data=tt.dfda1.data[:], comments=tblsize[:],
+                          after=prefix+'FUNC')
+            self.add_flag(prefix+'DFUNC_DANGLE2', '5E16.8',
+                          data=tt.dfda2.data[:], comments=tblsize[:],
+                          after=prefix+'DFUNC_DANGLE1')
+            self.add_flag(prefix+'D2FUNC_DANGLE1_DANGLE2', '5E16.8',
+                          data=tt.d2fda1da2.data[:], comments=tblsize[:],
+                          after=prefix+'DFUNC_DANGLE2')
+            after = prefix + 'D2FUNC_DANGLE1_DANGLE2'
+        data['TORSION_TORSION_NUM_LIST'] = [len(self.torsion_torsions)]
+        data['TORSION_TORSION_LIST'] = tlist = []
+        for tortor in self.torsion_torsions:
+            tlist.extend([tortor.atom1.idx+1, tortor.atom2.idx+1,
+                          tortor.atom3.idx+1, tortor.atom4.idx+1,
+                          tortor.atom5.idx+1, tortor.type.idx+1])
+
+    #=============================================
+
+    def _xfer_frame_info(self):
+        """
+        Transfers the chiral and multipole frame data from the topology arrays
+        to the raw data arrays
+        """
+        data = self.parm_data
+        if len(self.chiral_frames) > 0:
+            data['AMOEBA_CHIRAL_FRAME_NUM_LIST'] = [len(self.chiral_frames)]
+            data['AMOEBA_CHIRAL_FRAME_LIST'] = clist = []
+            for cf in self.chiral_frames:
+                clist.extend([cf.atom1.idx+1, cf.atom2.idx+1, cf.chirality])
+        else:
+            self.delete_flag('AMOEBA_CHIRAL_FRAME_NUM_LIST')
+            self.delete_flag('AMOEBA_CHIRAL_FRAME_LIST')
+
+        if len(self.multipole_frames) > 0:
+            data['AMOEBA_FRAME_DEF_NUM_LIST'] = [len(self.multipole_frames)]
+            data['AMOEBA_FRAME_DEF_LIST'] = flist = []
+            for mf in self.multipole_frames:
+                flist.extend([mf.atom.idx+1, mf.frame_pt_num, mf.vectail,
+                              mf.vechead, mf.nvec])
+        else:
+            self.delete_flag('AMOEBA_FRAME_DEF_NUM_LIST')
+            self.delete_flag('AMOEBA_FRAME_DEF_LIST')
+
+    #=============================================
+
+    def _xfer_exception_info(self):
+        """
+        Transfers the nonboned exception (adjust) info from the topology arrays
+        to the raw data arrays
+        """
+        # adjust type arrays hard-coded in length... do not purge unused.
+        data = self.parm_data
+        data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'] = \
+                    [at.vdw_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'] = \
+                    [at.multipole_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'] = \
+                    [at.direct_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'] = \
+                    [at.polar_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST'] = \
+                    [at.mutual_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_NUM_LIST'] = [len(self.adjusts)]
+        data['AMOEBA_ADJUST_LIST'] = alist = []
+        for adj in self.adjusts:
+            alist.extend([adj.atom1.idx+1, adj.atom2.idx+1, adj.type.idx+1])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

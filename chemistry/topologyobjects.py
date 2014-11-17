@@ -22,7 +22,8 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'Improper', 'ImproperType', 'MultipoleFrame', 'OutOfPlaneBend',
            'PiTorsion', 'Residue', 'ResidueList', 'StretchBend',
            'StretchBendType', 'TorsionTorsion', 'TorsionTorsionType',
-           'TrigonalAngle', 'TrackedList', 'UreyBradley']
+           'TrigonalAngle', 'TrackedList', 'UreyBradley', 'OutOfPlaneBendType',
+           'NonbondedException', 'NonbondedExceptionType']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -314,6 +315,25 @@ class Atom(_ListItem):
     vz : float
         The Z-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
+    type_idx : int
+        The AMOEBA atom type index. Only present if initialized with the AMOEBA
+        force field. Otherwise raises AttributeError.
+    class_idx : int
+        The AMOEBA class type index Only present if initialized with the AMOEBA
+        force field. Otherwise raises AttributeError.
+    multipoles : list(float)
+        The list of the 10 multipole moments up through quadrupoles Only present
+        if initialized with the AMOEBA force field. Otherwise raises
+        AttributeError.
+    polarizability : list(float)
+        The polarizability of the atom. Only present if initialized with the
+        AMOEBA force field. Otherwise raises AttributeError.
+    vdw_parent : Atom
+        In the AMOEBA force field, this is the parent atom for the van der Waals
+        term
+    vdw_weight : float
+        In the AMOEBA force field, this is the weight of the van der Waals
+        interaction on the parent atom
 
     Notes
     -----
@@ -1885,7 +1905,7 @@ class OutOfPlaneBend(_FourAtomTerm):
         The third atom involved in the trigonal angle
     atom4 : Atom
         The fourth atom involved in the trigonal angle
-    type : AngleType=None
+    type : OutOfPlaneBendType=None
         The angle type containing the parameters
 
     Notes
@@ -1908,6 +1928,58 @@ class OutOfPlaneBend(_FourAtomTerm):
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class OutOfPlaneBendType(_ListItem, _ParameterType):
+    """
+    An angle type with a set of angle parameters
+
+    Parameters (and Attributes)
+    ---------------------------
+    k : float
+        Force constant in kcal/mol/radians^2
+    list : TrackedList=None
+        A list of `OutOfPlaneBendType`s in which this is a member
+
+    Inherited Attributes
+    --------------------
+    idx : int
+        The index of this OutOfPlaneBendType inside its containing list
+
+    Notes
+    -----
+    Two `OutOfPlaneBendType`s are equal if their `k` attribute is equal
+
+    Examples
+    --------
+    >>> ot1 = OutOfPlaneBendType(10.0)
+    >>> ot2 = OutOfPlaneBendType(10.0)
+    >>> ot1 is ot2
+    False
+    >>> ot1 == ot2
+    True
+    >>> ot1.idx # not part of any list or iterable
+    -1
+
+    As part of a list, they can be indexed
+
+    >>> oopbend_list = []
+    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=angle_list))
+    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=angle_list))
+    >>> oopbend_list[0].idx
+    0
+    >>> oopbend_list[1].idx
+    1
+    """
+    def __init__(self, k, list=None):
+        _ParameterType.__init__(self)
+        self.k = k
+        self._idx = -1
+        self.list = list
+
+    def __eq__(self, other):
+        return self.k == other.k
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2833,6 +2905,93 @@ class AtomList(TrackedList):
 
     def __iadd__(self, other):
         return NotImplemented
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class NonbondedException(object):
+    """
+    The AMOEBA force field has complex exclusion and exception rules (referred
+    to as "adjustments" in the Amber-converted files). This class stores
+    per-particle exceptions.
+
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        One of the atoms in the exclusion pair
+    atom2 : Atom
+        The other atom in the exclusion pair
+    type : NonbondedExceptionType=None
+        The nonbonded exception type that describes how the various nonbonded
+        interactions between these two atoms should work
+
+    Notes
+    -----
+    NonbondedException objects "contain" two atoms and will return True when
+    used with the binary `in` operator
+    """
+    def __init__(self, atom1, atom2, type=None):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.type = type
+
+    def __contains__(self, thing):
+        return thing is self.atom1 or thing is self.atom2
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class NonbondedExceptionType(_ListItem):
+    """
+    A parameter describing how the various nonbonded interactions between a
+    particular pair of atoms is scaled in the AMOEBA force field
+
+    Parameters
+    ----------
+    vdw_weight : float
+        The scaling factor by which van der Waals interactions are multiplied
+    multipole_weight : float
+        The scaling factor by which multipole interactions are multiplied
+    direct_weight : float
+        The scaling factor by which direct-space interactions are multiplied
+    polar_weight : float
+        The scaling factor by which polarization interactions are multiplied
+    mutual_weight : float
+        The scaling factor by which mutual interactions are multiplied
+    list : float
+        The list containing this nonbonded exception
+
+    Attributes
+    ----------
+    vdw_weight : float
+        The scaling factor by which van der Waals interactions are multiplied
+    multipole_weight : float
+        The scaling factor by which multipole interactions are multiplied
+    direct_weight : float
+        The scaling factor by which direct-space interactions are multiplied
+    polar_weight : float
+        The scaling factor by which polarization interactions are multiplied
+    mutual_weight : float
+        The scaling factor by which mutual interactions are multiplied
+    list : float
+        The list containing this nonbonded exception
+    idx : int
+        The index of this term in the list that contains it
+    """
+    def __init__(self, vdw_weight, multipole_weight, direct_weight,
+                 polar_weight, mutual_weight, list=None):
+        self.vdw_weight = vdw_weight
+        self.multipole_weight = multipole_weight
+        self.direct_weight = direct_weight
+        self.polar_weight = polar_weight
+        self.mutual_weight = mutual_weight
+        self._idx = -1
+        self.list = None
+
+    def __eq__(self, other):
+        return (self.vdw_weight == other.vdw_weight and
+                self.multipole_weight == other.multipole_weight and
+                self.direct_weight == other.direct_weight and
+                self.polar_weight == other.polar_weight and
+                self.mutual_weight == other.mutual_weight)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

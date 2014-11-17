@@ -1857,15 +1857,17 @@ class TestAmoebaParmActions(unittest.TestCase):
         """ Check that netCharge fails for AmoebaParm """
         self.assertRaises(exc.ParmError, lambda: PT.netCharge(amoebaparm))
 
-#   def testStrip(self):
-#       """ Test strip action for AmoebaParm """
-#       parm = copy(gascham)
-#       PT.strip(parm, ':1').execute()
-#       self.assertEqual(parm.ptr('natom'), 21)
-#       self.assertEqual(len(parm.atoms), 21)
-#       # Good enough for here. The strip action is repeatedly tested in the
-#       # core Amber test suite as part of the MM/PBSA tests via ante-MMPBSA.py
-#       # and that part also tests that the energies come out correct as well
+    def testStrip(self):
+        """ Test strip action for AmoebaParm """
+        parm = copy(amoebaparm)
+        natoms = len(parm.atoms)
+        lenres = len(parm.residues[0])
+        PT.strip(parm, ':1').execute()
+        self.assertEqual(parm.ptr('natom'), natoms-lenres)
+        self.assertEqual(len(parm.atoms), natoms-lenres)
+        # Good enough for here. The strip action is repeatedly tested in the
+        # core Amber test suite as part of the MM/PBSA tests via ante-MMPBSA.py
+        # and that part also tests that the energies come out correct as well
 
     def testDefineSolvent(self):
         """ Test defineSolvent for AmoebaParm """
@@ -1916,10 +1918,29 @@ class TestAmoebaParmActions(unittest.TestCase):
                 PT.printLJMatrix(amoebaparm, '@1'))
 
     def testDeleteBond(self):
-        """ Check that deleteBond fails for AmoebaParm """
+        """ Test deleteBond for AmoebaParm """
         parm = copy(amoebaparm)
-        self.assertRaises(exc.ParmError, lambda:
-                PT.deleteBond(parm, '@1 @2').execute())
+        for bond in parm.atoms[0].bonds:
+            if parm.atoms[1] in bond: break
+        TrackedList = type(parm.bond_types)
+        objs_with_bond = []
+        for attribute in dir(parm):
+            attr = getattr(parm, attribute)
+            if not isinstance(attr, TrackedList): continue
+            for obj in attr:
+                try:
+                    if bond in obj:
+                        objs_with_bond.append(attr)
+                        break
+                except TypeError:
+                    break
+        self.assertTrue(len(objs_with_bond) > 0)
+        act = PT.deleteBond(parm, '@1', '@2', 'verbose')
+        act.execute()
+        self.assertTrue(bond not in parm.bonds)
+        for attr in objs_with_bond:
+            for obj in attr:
+                self.assertNotIn(bond, attr)
 
     def testSummary(self):
         """ Test summary action for AmoebaParm """
@@ -1971,7 +1992,7 @@ class TestAmoebaParmActions(unittest.TestCase):
         for i in range(parm.ptr('nres')):
             self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i+1)
             self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
-            if parm.residues[i].resname == 'WAT':
+            if parm.residues[i].name == 'WAT':
                 self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'B')
             else:
                 self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'A')
@@ -2011,5 +2032,3 @@ class TestAmoebaParmActions(unittest.TestCase):
                 self.assertEqual(atom.mass, 3.0)
         self.assertAlmostEqual(sum(amoebaparm.parm_data['MASS']),
                                sum(parm.parm_data['MASS']), places=6)
-
-del TestAmoebaParmActions

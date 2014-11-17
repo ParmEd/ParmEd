@@ -95,6 +95,8 @@ class Structure(object):
         List of all AMOEBA-style chiral frames defined in the structure
     multipole_frames : TrackedList(MultipoleFrame)
         List of all AMOEBA-style multipole frames defined in the structure
+    adjusts : TrackedList(NonbondedException)
+        List of all AMOEBA-style nonbonded pair-exception rules
     box : list of 6 floats
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
         box is defined, `box` is set to `None`
@@ -106,7 +108,7 @@ class Structure(object):
         bond_types, angle_types, dihedral_types, urey_bradley_types,
         improper_types, cmap_types, trigonal_angle_types,
         out_of_plane_bend_types, pi_torsion_types, stretch_bend_types,
-        torsion_torsion_types
+        torsion_torsion_types, adjust_types
     """
     #===================================================
 
@@ -128,6 +130,7 @@ class Structure(object):
         self.torsion_torsions = TrackedList()
         self.chiral_frames = TrackedList()
         self.multipole_frames = TrackedList()
+        self.adjusts = TrackedList()
 
         # Parameter type lists
         self.bond_types = TrackedList()
@@ -141,6 +144,7 @@ class Structure(object):
         self.pi_torsion_types = TrackedList()
         self.stretch_bend_types = TrackedList()
         self.torsion_torsion_types = TrackedList()
+        self.adjust_types = TrackedList()
 
         self.box = None
 
@@ -184,6 +188,7 @@ class Structure(object):
         self._prune_empty_torsion_torsions()
         self._prune_empty_chiral_frames()
         self._prune_empty_multipole_frames()
+        self._prune_empty_adjusts()
 
     #===================================================
 
@@ -357,6 +362,17 @@ class Structure(object):
             mf = self.multipole_frames[i]
             if mf.atom is None or mf.atom.idx == -1:
                 del self.multipole_frames[i]
+
+    #===================================================
+
+    def _prune_empty_adjusts(self):
+        """ Gets rid of any empty nonbonded exception adjustments """
+        for i in reversed(xrange(len(self.adjusts))):
+            adj = self.adjusts[i]
+            if adj.atom1 is None or adj.atom2 is None:
+                del self.adjusts[i]
+            elif adj.atom1.idx == -1 or adj.atom2.idx == -1:
+                del self.adjusts[i]
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

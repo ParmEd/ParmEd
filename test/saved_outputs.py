@@ -423,15 +423,15 @@ Atom 1               Atom 2               Atom 3               Frc Cnst   Theta 
 
 PRINT_DIHEDRALSA = """\
 Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
-        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)    -1.0000     1.0000     0.0000        N/A        N/A
-        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     2.0000   180.0000        N/A        N/A
-        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     3.0000     0.0000        N/A        N/A
         4 H31H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
         4 H31H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
         5 H32H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
         5 H32H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
         6 H33H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
         6 H33H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)    -1.0000     1.0000     0.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     2.0000   180.0000        N/A        N/A
+        1  CH3 (   C)        2    C (   C)        7    N (   N)        8  CH3 (   C)     2.0000     3.0000     0.0000        N/A        N/A
         1  CH3 (   C)        2    C (   C)        7    N (   N)        9    H (  HN)     1.0000     2.0000   180.0000        N/A        N/A
         1  CH3 (   C)        2    C (   C)        7    N (   N)        9    H (  HN)     0.8000     3.0000     0.0000        N/A        N/A
 """

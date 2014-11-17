@@ -329,6 +329,7 @@ class AmberParm(AmberFormat, Structure):
         self._check_section_lengths()
         self._load_atoms_and_residues()
         self.load_atom_info()
+        self._load_extra_exclusions()
         self._load_bond_info()
         self._load_angle_info()
         self._load_dihedral_info()
@@ -464,11 +465,11 @@ class AmberParm(AmberFormat, Structure):
         self.residues.prune()
 
         # Transfer information from the topology lists 
-        self._xfer_atom_properties()
-        self._xfer_residue_properties()
-        self._xfer_bond_properties()
-        self._xfer_angle_properties()
-        self._xfer_dihedral_properties()
+        self._xfer_atom_info()
+        self._xfer_residue_info()
+        self._xfer_bond_info()
+        self._xfer_angle_info()
+        self._xfer_dihedral_info()
         self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
@@ -926,6 +927,30 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
+    def _load_extra_exclusions(self):
+        """
+        Look through the exclusion list in the prmtop file and see if any
+        _additional_ exclusions outside the basic ones defined for bonds,
+        angles, and dihedrals are specified. If so, add those to the exclusion
+        list.
+        """
+        num_excluded = self.parm_data['NUMBER_EXCLUDED_ATOMS']
+        excluded_list = self.parm_data['EXCLUDED_ATOMS_LIST']
+        first_excl = 0
+        for i, atom in enumerate(self.atoms):
+            exclusions = set()
+            bond_excl = set(atom._bond_partners + atom._angle_partners +
+                            atom._dihedral_partners + atom._tortor_partners +
+                            atom._exclusion_partners)
+            nexcl = num_excluded[i]
+            for j in xrange(first_excl, nexcl):
+                exclusions.add(self.atoms[excluded_list[j]-1])
+            for eatom in exclusions - bond_excl:
+                atom.exclude(eatom)
+            first_excl += nexcl
+
+    #===================================================
+
     def _load_bond_info(self):
         """ Loads the bond types and bond arrays """
         del self.bond_types[:]
@@ -1020,7 +1045,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _xfer_atom_properties(self):
+    def _xfer_atom_info(self):
         """
         Sets the various topology file section data from the `atoms` list to the
         topology file data in `parm_data`
@@ -1061,7 +1086,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _xfer_residue_properties(self):
+    def _xfer_residue_info(self):
         """
         Sets the various topology file section data from the `residues` list to
         the topology file data in `parm_data`
@@ -1084,7 +1109,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _xfer_bond_properties(self):
+    def _xfer_bond_info(self):
         """
         Sets the data for the various bond arrays in the raw data from the
         parameter lists
@@ -1116,7 +1141,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _xfer_angle_properties(self):
+    def _xfer_angle_info(self):
         """
         Sets the data for the various angle arrays in the raw data from the
         parameter lists
@@ -1146,7 +1171,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _xfer_dihedral_properties(self):
+    def _xfer_dihedral_info(self):
         """
         Sets the data for the various dihedral arrays in the raw data from the
         parameter lists
