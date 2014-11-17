@@ -53,6 +53,24 @@ class TestReadParm(unittest.TestCase):
             self.assertEqual(vels[i3+1], atom.vy)
             self.assertEqual(vels[i3+2], atom.vz)
 
+    def testRemakeParm(self):
+        """ Tests the rebuilding of the AmberParm raw data structures """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm.remake_parm()
+        self.assertEqual(parm.flag_list, parm2.flag_list)
+        for flag in parm.flag_list:
+            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+
+    def testRemakeChamberParm(self):
+        """ Tests the rebuilding of the ChamberParm raw data structures """
+        parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        parm2 = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        parm.remake_parm()
+        self.assertEqual(set(parm.flag_list), set(parm2.flag_list))
+        for flag in parm.flag_list:
+            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
         parm = readparm.AmberParm(get_fn('solv.prmtop'),
