@@ -1965,8 +1965,8 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     As part of a list, they can be indexed
 
     >>> oopbend_list = []
-    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=angle_list))
-    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=angle_list))
+    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=oopbend_list))
+    >>> oopbend_list.append(OutOfPlaneBendType(10.0, list=oopbend_list))
     >>> oopbend_list[0].idx
     0
     >>> oopbend_list[1].idx
