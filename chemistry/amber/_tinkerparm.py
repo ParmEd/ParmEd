@@ -745,7 +745,7 @@ class AmoebaParm(AmberParm):
         Transfers the regular AMOEBA angle information from the topology arrays
         to the raw data arrays
         """
-        if len(self.angles):
+        if len(self.angles) == 0:
             self.delete_flag('AMOEBA_REGULAR_ANGLE_NUM_PARAMS')
             self.delete_flag('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT')
             self.delete_flag('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE')
@@ -830,7 +830,8 @@ class AmoebaParm(AmberParm):
         for trigonal_angle in self.trigonal_angles:
             trigonal_angle.type.used = True
         self.trigonal_angle_types.prune_unused()
-        data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
+        data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = \
+                    [len(self.trigonal_angle_types)]
         data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = \
                     [at.k for at in self.trigonal_angle_types]
         data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = \
@@ -867,7 +868,8 @@ class AmoebaParm(AmberParm):
         for out_of_plane_bend in self.out_of_plane_bends:
             out_of_plane_bend.type.used = True
         self.out_of_plane_bend_types.prune_unused()
-        data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
+        data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = \
+                    [len(self.out_of_plane_bend_types)]
         data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = \
                     [at.k for at in self.out_of_plane_bend_types]
         data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'] = \
