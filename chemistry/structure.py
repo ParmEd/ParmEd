@@ -97,6 +97,12 @@ class Structure(object):
         List of all AMOEBA-style multipole frames defined in the structure
     adjusts : TrackedList(NonbondedException)
         List of all AMOEBA-style nonbonded pair-exception rules
+    acceptors : TrackedList(AcceptorDonor)
+        List of all H-bond acceptors, if that information is present
+    donors : TrackedList(AcceptorDonor)
+        List of all H-bond donors, if that information is present
+    groups : TrackedList(Group)
+        List of all CHARMM-style GROUP objects (whatever those are used for)
     box : list of 6 floats
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
         box is defined, `box` is set to `None`
@@ -109,6 +115,11 @@ class Structure(object):
         improper_types, cmap_types, trigonal_angle_types,
         out_of_plane_bend_types, pi_torsion_types, stretch_bend_types,
         torsion_torsion_types, adjust_types
+
+    Notes
+    -----
+    dihedral_types _may_ be a list of DihedralType instances, since torsion
+    profiles are often represented by a Fourier series with multiple terms
     """
     #===================================================
 
@@ -131,6 +142,11 @@ class Structure(object):
         self.chiral_frames = TrackedList()
         self.multipole_frames = TrackedList()
         self.adjusts = TrackedList()
+        # Extraneous information stored in CHARMM PSF files... not used as far
+        # as I can tell for much of anything
+        self.acceptors = TrackedList()
+        self.donors = TrackedList()
+        self.groups = TrackedList()
 
         # Parameter type lists
         self.bond_types = TrackedList()

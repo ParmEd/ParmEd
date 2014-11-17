@@ -7,13 +7,12 @@ Author: Jason M. Swails
 Contributors:
 Date: Sep. 17, 2014
 """
-import compat24
+from chemistry import (AtomType, BondType, AngleType, DihedralType,
+                       ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
-from chemistry.charmm.topologyobjects import (AtomType, BondType, AngleType,
-                    DihedralType, ImproperType, CmapType, UreyBradleyType,
-                    NoUreyBradley)
 from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
+import compat24 # needs to be before collections
 from collections import OrderedDict
 import os
 import warnings
@@ -24,40 +23,55 @@ class CharmmParameterSet(object):
     the information found in the MASS section of the CHARMM topology file
     (TOP/RTF) and all of the information in the parameter files (PAR)
 
-    Parameters:
-        - filenames : List of topology, parameter, and stream files to load into
-          the parameter set. The following file type suffixes are recognized.
-          Unrecognized file types raise a TypeError
+    Parameters
+    ----------
+    filenames : list of str
+        The list of topology, parameter, and stream files to load into the
+        parameter set. The following file type suffixes are recognized:
             .rtf, .top -- Residue topology file
             .par, .prm -- Parameter file
             .str -- Stream file
             .inp -- If "par" is in the file name, it is a parameter file. If
-                    "top" is in the file name, it is a topology file. Otherwise,
-                    raise TypeError
+                    "top" is in the file name, it is a topology file.
+                    Otherwise, ValueError is raised.
 
-    Attributes:
-        All type lists are dictionaries whose keys are tuples (with however
-        many elements are needed to define that type of parameter). The types
-        that can be in any order are SORTED.
-        
-        - atom_types_str
-        - atom_types_int
-        - atom_types_tuple
-        - bond_types
-        - angle_types
-        - urey_bradley_types
-        - dihedral_types
-        - improper_types
-        - cmap_types
-        - nbfix_types
-
-        The dihedral types can be multiterm, so the values for each dict key is
-        actually a list of DihedralType instances. The atom_types are dicts that
-        match the name (str), number (int), or (name, number) tuple (tuple) to
-        the atom type. The tuple is guaranteed to be the most robust, although
-        when only the integer or string is available the other dictionaries are
-        helpful
-
+    Attributes
+    ----------
+    atom_types_str : dict(str:AtomType)
+        Dictionary mapping the names of the atom types to the corresponding
+        AtomType instances
+    atom_types_int : dict(int:AtomType)
+        Dictionary mapping the serial indexes of the atom types to the
+        corresponding AtomType instances
+    atom_types_double : dict((str,int):AtomType)
+        Dictionary mapping the (name,number) tuple of the atom types to the
+        corresponding AtomType instances
+    bond_types : dict((str,str):AtomType)
+        Dictionary mapping the 2-element tuple of the names of the two atom
+        types involved in the bond to the BondType instances
+    angle_types : dict((str,str,str):AngleType)
+        Dictionary mapping the 3-element tuple of the names of the three atom
+        types involved in the angle to the AngleType instances
+    urey_bradley_types : dict((str,str,str):BondType)
+        Dictionary mapping the 3-element tuple of the names of the three atom
+        types involved in the angle to the BondType instances of the
+        Urey-Bradley terms
+    dihedral_types : dict((str,str,str,str):list(DihedralType))
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the dihedral to the DihedralType instances. Since each
+        torsion term can be a multiterm expansion, each item corresponding to a
+        key in this dict is a list of `DihedralType`s for each term in the
+        expansion
+    improper_types : dict((str,str,str,str):ImproperType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the improper torsion to the ImproperType instances
+    cmap_types : dict((str,str,str,str,str):CmapType)
+        Dictionary mapping the 5-element tuple of the names of the five atom
+        types involved in the correction map to the CmapType instances
+    nbfix_types : dict((str,str):(float,float))
+        Dictionary mapping the 2-element tuple of the names of the two atom
+        types whose LJ terms are modified to the tuple of the (epsilon,rmin)
+        terms for that off-diagonal term
     """
 
     @staticmethod
@@ -103,34 +117,39 @@ class CharmmParameterSet(object):
                 elif 'top' in fname:
                     tops.append(arg)
                 else:
-                    raise TypeError('Unrecognized file type: %s' % arg)
+                    raise ValueError('Unrecognized file type: %s' % arg)
             else:
-                raise TypeError('Unrecognized file type: %s' % arg)
+                raise ValueError('Unrecognized file type: %s' % arg)
         for top in tops: self.read_topology_file(top)
         for par in pars: self.read_parameter_file(par)
         for strf in strs: self.read_stream_file(strf)
 
     @classmethod
-    def load_set(cls, tfile=None, pfile=None, sfiles=[]):
+    def load_set(cls, tfile=None, pfile=None, sfiles=None):
         """
         Instantiates a CharmmParameterSet from a Topology file and a Parameter
         file (or just a Parameter file if it has all information)
 
-        Parameters:
-            - tfile (str) : Name of the Topology (RTF/TOP) file
-            - pfile (str) : Name of the Parameter (PAR) file
-            - sfiles (list of str) : List or tuple of stream (STR) file names.
+        Parameters
+        ----------
+        tfile : str
+            The name of the Topology (RTF/TOP) file to parse
+        pfile : str
+            The name of the Parameter (PAR/PRM) file to parse
+        sfiles : list(str)
+            Iterable of stream (STR) file names
 
-        Returns:
-            New CharmmParameterSet populated with the parameters found in the
-            provided files.
+        Returns
+        -------
+        New CharmmParameterSet populated with parameters found in the provided
+        files
             
-        Notes:
-            The RTF file is read first (if provided), followed by the PAR file,
-            followed by the list of stream files (in the order they are
-            provided). Parameters in each stream file will overwrite those that
-            came before (or simply append to the existing set if they are
-            different)
+        Notes
+        -----
+        The RTF file is read first (if provided), followed by the PAR file,
+        followed by the list of stream files (in the order they are provided).
+        Parameters in each stream file will overwrite those that came before (or
+        simply append to the existing set if they are different)
         """
         inst = cls()
         if tfile is not None:
@@ -153,13 +172,16 @@ class CharmmParameterSet(object):
         all of the atom types.  Older versions need to load this information
         from the RTF/TOP files.
 
-        Parameters:
-            - pfile (str) : Name of the CHARMM PARameter file to read
+        Parameters
+        ----------
+        pfile : str
+            Name of the CHARMM parameter file to read
 
-        Notes: The atom types must all be loaded by the end of this routine.
-        Either supply a PAR file with atom definitions in them or read in a
-        RTF/TOP file first. Failure to do so will result in a raised
-        RuntimeError.
+        Notes
+        -----
+        The atom types must all be loaded by the end of this routine.  Either
+        supply a PAR file with atom definitions in them or read in a RTF/TOP
+        file first. Failure to do so will result in a raised RuntimeError.
         """
         conv = CharmmParameterSet._convert
         if isinstance(pfile, str):
@@ -172,6 +194,7 @@ class CharmmParameterSet(object):
         section = None
         # The current cmap we are building (these span multiple lines)
         current_cmap = None
+        current_cmap2 = None
         current_cmap_data = []
         current_cmap_res = 0
         nonbonded_types = dict() # Holder
@@ -255,7 +278,9 @@ class CharmmParameterSet(object):
                 except IndexError:
                     raise CharmmFileError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
-                self.bond_types[key] = BondType(k, req)
+                bond_type = BondType(k, req)
+                self.bond_types[(type1, type2)] = bond_type
+                self.bond_types[(type2, type1)] = bond_type
                 continue
             if section == 'ANGLES':
                 words = line.split()
@@ -267,16 +292,18 @@ class CharmmParameterSet(object):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmFileError('Could not parse angles.')
-                key = (min(type1, type3), type2, max(type1, type3))
-                self.angle_types[key] = AngleType(k, theteq)
+                angle_type = AngleType(k, theteq)
+                self.angle_types[(type1, type2, type3)] = angle_type
+                self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
                 try:
                     ubk = conv(words[5], float, 'Urey-Bradley force constant')
                     ubeq = conv(words[6], float, 'Urey-Bradley equil. value')
-                    ubtype = UreyBradleyType(ubk, ubeq)
+                    ubtype = BondType(ubk, ubeq)
                 except IndexError:
                     ubtype = NoUreyBradley
-                self.urey_bradley_types[key] = ubtype
+                self.urey_bradley_types[(type1, type2, type3)] = ubtype
+                self.urey_bradley_types[(type3, type2, type1)] = ubtype
                 continue
             if section == 'DIHEDRALS':
                 words = line.split()
@@ -290,18 +317,7 @@ class CharmmParameterSet(object):
                     phase = conv(words[6], float, 'dihedral phase')
                 except IndexError:
                     raise CharmmFileError('Could not parse dihedrals.')
-                # Torsion can be in either direction. Sort by end groups first,
-                # then sort by middle 2
-                if type1 < type4:
-                    key = (type1, type2, type3, type4)
-                elif type1 > type4:
-                    key = (type4, type3, type2, type1)
-                else:
-                    # OK, we need to sort by the middle atoms now
-                    if type2 < type3:
-                        key = (type1, type2, type3, type4)
-                    else:
-                        key = (type4, type3, type2, type1)
+                key = (type1, type2, type3, type4)
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
                 dihedral = DihedralType(k, n, phase)
@@ -315,13 +331,24 @@ class CharmmParameterSet(object):
                             if dtype != dihedral:
                                 warnings.warn('Replacing dihedral %r with %r' % 
                                               (dtype, dihedral))
-                            self.dihedral_types[key]
+                            self.dihedral_types[key][i] = dihedral
+                            replaced = True
+                            break
+                    if not replaced:
+                        self.dihedral_types[key].append(dihedral)
+                    # Now do the other order
+                    replaced = False
+                    key = (type4, type3, type2, type1)
+                    for i, dtype in enumerate(self.dihedral_types[key]):
+                        if dtype.per == dihedral.per:
+                            self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break
                     if not replaced:
                         self.dihedral_types[key].append(dihedral)
                 else: # key not present
-                    self.dihedral_types[key] = [dihedral]
+                    self.dihedral_types[(type1,type2,type3,type4)] = [dihedral]
+                    self.dihedral_types[(type4,type3,type2,type1)] = [dihedral]
                 continue
             if section == 'IMPROPER':
                 words = line.split()
@@ -361,6 +388,7 @@ class CharmmParameterSet(object):
                         # We have a map to terminate
                         ty = CmapType(current_cmap_res, current_cmap_data)
                         self.cmap_types[current_cmap] = ty
+                        self.cmap_types[current_cmap2] = ty
                     try:
                         type1 = words[0]
                         type2 = words[1]
@@ -374,13 +402,10 @@ class CharmmParameterSet(object):
                     except IndexError:
                         raise CharmmFileError('Could not parse CMAP data.')
                     # order the torsions independently
-                    k1 = [type1, type2, type3, type4]
-                    k2 = [type4, type3, type2, type1]
-                    key1 = min(k1, k2)
-                    k1 = [type5, type6, type7, type8]
-                    k2 = [type8, type7, type6, type5]
-                    key2 = min(k1, k2)
-                    current_cmap = tuple(key1 + key2)
+                    k1 = [type1,type2,type3,type4,type5,type6,type7,type8]
+                    k2 = [type8,type7,type6,type5,type4,type3,type2,type1]
+                    current_cmap = tuple(min(k1, k2))
+                    current_cmap2 = tuple(max(k1, k2))
                     current_cmap_res = res
                     current_cmap_data = []
                 continue
@@ -446,6 +471,7 @@ class CharmmParameterSet(object):
         if current_cmap is not None:
             ty = CmapType(current_cmap_res, current_cmap_data)
             self.cmap_types[current_cmap] = ty
+            self.cmap_types[current_cmap2] = ty
         # Now we're done. Load the nonbonded types into the relevant AtomType
         # instances. In order for this to work, all keys in nonbonded_types
         # must be in the self.atom_types_str dict. Raise a RuntimeError if this
@@ -464,10 +490,10 @@ class CharmmParameterSet(object):
         Reads _only_ the atom type definitions from a topology file. This is
         unnecessary for versions 36 and later of the CHARMM force field.
 
-        Parameters:
-            - tfile (str) : Name of the CHARMM TOPology file to read
-
-        Note: The CHARMM TOPology file is also called a Residue Topology File
+        Parameters
+        ----------
+        tfile : str
+            Name of the CHARMM topology file to read
         """
         conv = CharmmParameterSet._convert
         if isinstance(tfile, str):
@@ -508,8 +534,10 @@ class CharmmParameterSet(object):
         Reads RTF and PAR sections from a stream file and dispatches the
         sections to read_topology_file or read_parameter_file
 
-        Parameters:
-            - sfile (str or CharmmStreamFile) : Stream file to parse
+        Parameters
+        ----------
+        sfile : str or CharmmStreamFile
+            Stream file to parse
         """
         if isinstance(sfile, CharmmStreamFile):
             f = sfile
@@ -534,15 +562,20 @@ class CharmmParameterSet(object):
         bond, angle, dihedral, improper, or cmap type will pair with EVERY key
         in the type mapping dictionaries that points to the equivalent type
 
-        Returns:
-            - Returns the instance that is being condensed.
+        Returns
+        -------
+        self
+            The instance that is being condensed
 
-        Notes:
-            The return value allows you to condense the types at construction
-            time.
+        Notes
+        -----
+        The return value allows you to condense the types at construction time.
 
-        Example:
+        Example
+        -------
         >>> params = CharmmParameterSet('charmm.prm').condense()
+        >>> params
+        <chemistry.charmm.parameters.CharmmParameterSet at 0x7f88757de090>
         """
         # First scan through all of the bond types
         self._condense_types(self.bond_types)
@@ -571,8 +604,10 @@ class CharmmParameterSet(object):
         """
         Loops through the given dict and condenses all types.
 
-        Parameter:
-            - typedict : Type dictionary to condense
+        Parameter
+        ---------
+        typedict : dict
+            Type dictionary to condense
         """
         keylist = typedict.keys()
         for i in xrange(len(keylist) - 1):

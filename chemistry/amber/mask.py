@@ -9,7 +9,12 @@ class AmberMask(object):
     """ 
     What is hopefully a fully-fledged Amber mask parser implemented in Python.
 
-    It currently lacks the capability to evaluate masks with distance criteria
+    Parameters
+    ----------
+    parm : Structure
+        The topology structure for which to select atoms
+    mask : str
+        The mask string that selects a subset of atoms
     """
 
     #======================================================
@@ -341,17 +346,17 @@ class AmberMask(object):
                 dy = atomi.xy - atomj.xy
                 dz = atomi.xz - atomj.xz
                 d2 = dx*dx + dy*dy + dz*dz
-                if d2 < distance:
+                if cmp(d2, distance):
                     pmask[i] = 1
                     break
         # Now see if we have to select all atoms in residues with any selected
         # atoms
         if pmask1[0] == ':':
-            for res in self.parm.residue_list:
+            for res in self.parm.residues:
                 for atom in res.atoms:
-                    if pmask[atom.starting_index] == 1:
+                    if pmask[atom.idx] == 1:
                         for atom in res.atoms:
-                            pmask[atom.starting_index] = 1
+                            pmask[atom.idx] = 1
                         break
         return pmask
 

@@ -28,4 +28,4 @@ __license__ = 'GPL v.3'
 __date__ = 'Apr. 20, 2014'
 
 
-__private__ = ['topologyobjects', '_charmmfile']
+__private__ = ['_charmmfile']

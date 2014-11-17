@@ -7,7 +7,7 @@ by Jason Swails
 from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
-                                  AmoebaError)
+                                  AmoebaError, MissingParameter)
 from chemistry.amber.constants import TINY
 from chemistry.periodic_table import Mass, Element as _Element
 from compat24 import all, property
@@ -23,7 +23,8 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'PiTorsion', 'Residue', 'ResidueList', 'StretchBend',
            'StretchBendType', 'TorsionTorsion', 'TorsionTorsionType',
            'TrigonalAngle', 'TrackedList', 'UreyBradley', 'OutOfPlaneBendType',
-           'NonbondedException', 'NonbondedExceptionType']
+           'NonbondedException', 'NonbondedExceptionType', 'AcceptorDonor',
+           'Group', 'AtomType', 'NoUreyBradley']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -212,6 +213,10 @@ class Atom(_ListItem):
         The name of this atom
     type : str
         The name of the atom type assigned to this atom
+    atom_type : AtomType
+        In some cases, "type" is an ambiguous choice of an integer serial number
+        or a string descriptor. In this case, atom_type is an AtomType instance
+        that disambiguates this discrepancy.
     mass : float
         The mass, in daltons, of this atom
     charge : float
@@ -380,7 +385,10 @@ class Atom(_ListItem):
         self._idx = -1
         self.atomic_number = atomic_number
         self.name = name.strip()
-        self.type = type.strip()
+        try:
+            self.type = type.strip()
+        except AttributeError:
+            self.type = type
         self.charge = charge
         self.mass = mass
         self.nb_idx = nb_idx
@@ -403,6 +411,7 @@ class Atom(_ListItem):
         self.urey_bradleys, self.impropers, self.cmaps = [], [], []
         self.tortors = []
         self.other_locations = {} # A dict of Atom instances
+        self.atom_type = _UnassignedAtomType
    
     #===================================================
 
@@ -1559,6 +1568,45 @@ class Cmap(object):
         atom5.cmaps.append(self)
         # Load the CMAP interpolation table
         self.type = type
+
+    @classmethod
+    def extended(cls, atom1, atom2, atom3, atom4,
+                 atom5, atom6, atom7, atom8, type=None):
+        """
+        Alternative constructor for correction maps defined with 8 atoms (each
+        torsion being separately specified). Correction maps are, to the best of
+        my knowledge, used to parametrized "consecutive" torsions (i.e., atoms
+        2, 3, and 4 are common to both torsions). However, the CHARMM definition
+        specifies the torsions separately.
+
+        If the torsions are _not_ consecutive (i.e., if atoms 2, 3, and 4 are
+        not the same as atoms 5, 6, and 7), NotImplementedError is raised.
+
+        Parameters
+        ----------
+        atom1 : Atom
+            The first atom of the first torsion
+        atom2 : Atom
+            The second atom of the first torsion
+        atom3 : Atom
+            The third atom of the first torsion
+        atom4 : Atom
+            The fourth atom of the first torsion
+        atom5 : Atom
+            The first atom of the second torsion
+        atom6 : Atom
+            The second atom of the second torsion
+        atom7 : Atom
+            The third atom of the second torsion
+        atom8 : Atom
+            The fourth atom of the second torsion
+        type : CmapType=None
+            The CmapType object containing the parameter map for this term
+        """
+        if atom2 is not atom5 or atom3 is not atom6 or atom7 is not atom4:
+            raise NotImplementedError('Only consecutive coupled-torsions are '
+                                      'supported by CMAPs currently')
+        return cls(atom1, atom2, atom3, atom4, atom8, type=type)
 
     @property
     def cmap_type(self):
@@ -2985,6 +3033,194 @@ class NonbondedExceptionType(_ListItem):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class AtomType(object):
+    """
+    Atom types can either be compared by indexes or names. Can be assigned with
+    a string, integer, (string is not automatically cast) or with both.
+
+    Parameters
+    ----------
+    name : str
+        The name of the atom type
+    number : int
+        The serial index of the atom type
+    mass : float
+        The mass of the atom type
+    atomic_number : int
+        The atomic number of the element of the atom type
+
+    Attributes
+    ----------
+    name : str
+        The name of the atom type
+    number : int
+        The serial index of the atom type
+    mass : float
+        The mass of the atom type
+    atomic_number : int
+        The atomic number of the element of the atom type
+    nbfix : dict(str:tuple)
+        A hash that maps atom type names of other atom types with which _this_
+        atom type has a defined NBFIX with a tuple containing the terms
+        (Rmin, epsilon, Rmin14, Epsilon14)
+
+    Notes
+    -----
+    This object is primarily used to build parameter databases from parameter
+    files
+
+    Examples
+    --------
+    >>> at = AtomType('HA', 1, 1.008, 1)
+    >>> at.name, at.number
+    ('HA', 1)
+    >>> at2 = AtomType('CA', 2, 12.01, 6)
+    >>> at2.name, at2.number
+    ('CA', 2)
+    >>> print "%s: %d" % (str(at), int(at))
+    HA: 1
+    >>> print at == WildCard
+    True
+    >>> print at2 == WildCard
+    True
+    """
+
+    def __init__(self, name, number, mass, atomic_number):
+        if number is None and name is not None:
+            # If we were given an integer, assign it to number. Otherwise,
+            # assign it to the name
+            if isinstance(name, int):
+                self.number = name
+                self.name = None
+            else:
+                self.name = name
+                self.number = None
+        else:
+            self.name = name
+            self.number = int(number)
+        self.mass = mass
+        self.atomic_number = atomic_number
+        # We have no LJ parameters as of yet
+        self.epsilon = self.rmin = self.epsilon_14 = self.rmin_14 = None
+        # Store each NBFIX term as a dict with the atom type string matching to
+        # a 2-element tuple that is rmin, epsilon
+        self.nbfix = dict()
+
+    def __eq__(self, other):
+        """
+        Compares based on available properties (name and number, just name,
+        or just number)
+        """
+        if other is WildCard: return True # all atom types match wild cards
+        if isinstance(other, AtomType):
+            return self.name == other.name and self.number == other.number
+        if isinstance(other, basestring):
+            return self.name == other
+        if isinstance(other, int):
+            return self.number == other
+        return other == (self.number, self.name)
+
+    def set_lj_params(self, eps, rmin, eps14=None, rmin14=None):
+        """ Sets Lennard-Jones parameters on this atom type """
+        if eps14 is None:
+            eps14 = eps
+        if rmin14 is None:
+            rmin14 = rmin
+        self.epsilon = eps
+        self.rmin = rmin
+        self.epsilon_14 = eps14
+        self.rmin_14 = rmin14
+
+    def __int__(self):
+        """ The integer representation of an AtomType is its index """
+        return self.number
+
+    def add_nbfix(self, typename, rmin, epsilon, rmin14, epsilon14):
+        """ Adds a new NBFIX exclusion for this atom """
+        if rmin14 is None: rmin14 = rmin
+        if epsilon14 is None: epsilon14 = epsilon
+        self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)
+
+    def __str__(self):
+        return self.name
+
+    # Comparisons are all based on number
+    def __gt__(self, other):
+        return self._member_number > other._member_number
+    def __lt__(self, other):
+        return self._member_number < other._member_number
+    def __ge__(self, other):
+        return self._member_number > other._member_number or self == other
+    def __le__(self, other):
+        return self._member_number < other._member_number or self == other
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _UnassignedAtomType(object):
+    """
+    This raises the appropriate exceptions (MissingParameter) when you try to
+    access its properties
+    """
+
+    def __int__(self):
+        raise MissingParameter('Atom type is not defined')
+
+    def __str__(self):
+        raise MissingParameter('Atom type is not defined')
+
+_UnassignedAtomType = _UnassignedAtomType() # Make it a singleton
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class AcceptorDonor(object):
+    """
+    Just a holder for donors and acceptors in CHARMM speak
+    
+    Parameters (and Attributes)
+    ---------------------------
+    atom1 : Atom
+        First atom in the donor/acceptor group
+    atom2 : Atom
+        Second atom in the donor/acceptor group
+    """
+    def __init__(self, atom1, atom2):
+        self.atom1 = atom1
+        self.atom2 = atom2
+
+    def __repr__(self):
+        return '<AcceptorDonor; %r %r>' % (self.atom1, self.atom2)
+
+    def __contains__(self, thing):
+        """ See if the atom is in this donor/acceptor """
+        return thing is self.atom1 or thing is self.atom2
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class Group(object):
+    """
+    An 'interacting' group defined by CHARMM PSF files
+
+    Parameters
+    ----------
+    bs : int
+        Not sure
+    type : int
+        The group type (??)
+    move : int
+        If the group moves (??)
+
+    Disclaimer
+    ----------
+    I really don't know what these numbers mean. I'm speculating based on the
+    source code of 'chamber', and this section is simply ignored there.
+    """
+    def __init__(self, bs, type, move):
+        self.bs = bs
+        self.type = type
+        self.move = move
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 def Element(mass):
     """ Determines what element the given atom is based on its mass """
 
@@ -2997,6 +3233,10 @@ def Element(mass):
             diff = abs(Mass[element] - mass)
 
     return best_guess
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
