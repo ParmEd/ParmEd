@@ -1039,9 +1039,9 @@ class Dihedral(_FourAtomTerm):
         self.type = type
         self.improper = improper
         self.ignore_end = ignore_end
-        self._signs = [1, 1]
-        if ignore_end: self._signs[0] = -1
-        if improper: self._signs[1] = -1
+        self.signs = [1, 1]
+        if ignore_end: self.signs[0] = -1
+        if improper: self.signs[1] = -1
         if not improper:
             atom1.dihedral_to(atom2)
             atom1.dihedral_to(atom3)
@@ -1055,19 +1055,6 @@ class Dihedral(_FourAtomTerm):
         warnings.warn('dihed_type has been replaced by type',
                       DeprecationWarning)
         return self.type
-
-    @property
-    def signs(self):
-        """
-        For Amber topology files, the signs of the 3rd and 4th atoms indicate
-        whether the end-group interactions (i.e., 1-4 nonbonded terms) are
-        ignored or if the torsion is improper, respectively.
-
-        This is a 2-element list with elements:
-            If end-groups are ignored, signs[0] = -1
-            If the torsion is improper, signs[1] = -1
-        """
-        return self._signs
 
     def __contains__(self, thing):
         """

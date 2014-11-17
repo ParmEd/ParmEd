@@ -1193,11 +1193,13 @@ class AmberParm(AmberFormat, Structure):
         for i, dihed in enumerate(self.dihedrals_inc_h):
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3, dihed.atom1.idx*3,
+                                    dihed.atom2.idx*3*dihed.signs[0],
+                                    dihed.atom1.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                    dihed.atom3.idx*3*dihed.signs[0],
+                                    dihed.atom4.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIH] = i + 1
         self.pointers['NPHIH'] = i + 1
@@ -1205,11 +1207,13 @@ class AmberParm(AmberFormat, Structure):
         for i, dihed in enumerate(self.dihedrals_without_h):
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3, dihed.atom1.idx*3,
+                                    dihed.atom2.idx*3*dihed.signs[0],
+                                    dihed.atom1.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3, dihed.atom4.idx*3,
+                                    dihed.atom3.idx*3*dihed.signs[0],
+                                    dihed.atom4.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = i + 1
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = i + 1
