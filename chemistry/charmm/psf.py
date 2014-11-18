@@ -569,6 +569,7 @@ class CharmmPsfFile(Structure):
                 raise MissingParameter('Missing bond type for %r' % bond)
         # Next load all of the angles. If a Urey-Bradley term is defined for
         # this angle, also build the urey_bradley and urey_bradley_type lists
+        del self.urey_bradleys[:]
         for ang in self.angles:
             # Construct the key
             key = (min(ang.atom1.type, ang.atom3.type), ang.atom2.type,
