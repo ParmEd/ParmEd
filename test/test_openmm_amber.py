@@ -541,15 +541,6 @@ class TestAmberParm(unittest.TestCase):
             has_cmmotion = has_cmmotion or isinstance(f, mm.CMMotionRemover)
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            elif isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=2,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         self.assertTrue(has_cmmotion)
         system = parm.createSystem(nonbondedMethod=app.CutoffNonPeriodic,
                                    nonbondedCutoff=100*u.angstroms,
@@ -1457,19 +1448,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                sfac = sqrt(0.1/(80.0*400.0))
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.0195141, neckScale=0.826836,
-                                       kappa=50.33355*sfac*7.3, neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         # Test some illegal options
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.PME))
