@@ -168,20 +168,62 @@ class Structure(object):
 
     def is_changed(self):
         """ Determines if any of the topology has changed for this structure """
-        for attr in dir(self):
-            if hasattr(getattr(self, attr), 'changed'):
-                if getattr(getattr(self, attr), 'changed'):
-                    return True
-        return False
+        return (self.atoms.changed or self.residues.changed or
+                self.bonds.changed or self.trigonal_angles.changed or
+                self.dihedrals.changed or self.urey_bradleys.changed or
+                self.impropers.changed or self.cmaps.changed or
+                self.angles.changed or self.out_of_plane_bends.changed or
+                self.pi_torsions.changed or self.stretch_bends.changed or
+                self.torsion_torsions.changed or self.chiral_frames.changed or
+                self.multipole_frames.changed or self.adjusts.changed or
+                self.acceptors.changed or self.donors.changed or
+                self.groups.changed or self.bond_types.changed or
+                self.angle_types.changed or self.dihedral_types.changed or
+                self.urey_bradley_types.changed or self.cmap_types.changed or
+                self.improper_types.changed or self.adjust_types.changed or
+                self.trigonal_angle_types.changed or
+                self.out_of_plane_bends.changed or
+                self.stretch_bend_types.changed or
+                self.torsion_torsion_types.changed or
+                self.pi_torsion_types.changed)
 
     #===================================================
 
     def unchange(self):
         """ Toggles all lists so that they do not indicate any changes """
-        for attr in dir(self):
-            at = getattr(self, attr)
-            if hasattr(at, 'changed'):
-                setattr(at, 'changed', False)
+        self.atoms.changed = False
+        self.residues.changed = False
+        self.bonds.changed = False
+        self.angles.changed = False
+        self.dihedrals.changed = False
+        self.urey_bradleys.changed = False
+        self.impropers.changed = False
+        self.cmaps.changed = False
+        self.trigonal_angles.changed = False
+        self.out_of_plane_bends.changed = False
+        self.pi_torsions.changed = False
+        self.stretch_bends.changed = False
+        self.torsion_torsions.changed = False
+        self.chiral_frames.changed = False
+        self.multipole_frames.changed = False
+        self.adjusts.changed = False
+        self.acceptors.changed = False
+        self.donors.changed = False
+        self.groups.changed = False
+
+        # Parameter type lists
+        self.bond_types.changed = False
+        self.angle_types.changed = False
+        self.dihedral_types.changed = False
+        self.urey_bradley_types.changed = False
+        self.improper_types.changed = False
+        self.cmap_types.changed = False
+        self.trigonal_angle_types.changed = False
+        self.out_of_plane_bend_types.changed = False
+        self.pi_torsion_types.changed = False
+        self.stretch_bend_types.changed = False
+        self.torsion_torsion_types.changed = False
+        self.adjust_types.changed = False
 
     #===================================================
 

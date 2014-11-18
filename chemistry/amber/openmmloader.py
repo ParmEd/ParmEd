@@ -111,7 +111,7 @@ class OpenMMAmberParm(AmberParm):
         topology object lists results in the topology being deleted and rebuilt
         """
         # If anything changed, rebuild the topology
-        if not self._topology_changed():
+        if not self.is_changed():
             try:
                 return self._topology
             except AttributeError:
@@ -124,23 +124,22 @@ class OpenMMAmberParm(AmberParm):
         # Add all of the atoms to the topology file in the same chain
         chain = self._topology.addChain()
         last_residue = None
-        for i, atm in enumerate(self.atom_list):
+        for i, atm in enumerate(self.atoms):
             resnum = atm.residue.idx
             if last_residue != resnum:
                 last_residue = resnum
-                resname = atm.residue.resname
+                resname = atm.residue.name
                 res = self._topology.addResidue(resname, chain)
             try:
                 elem = element.get_by_symbol(pt.Element[atm.element])
             except KeyError:
                 elem = None
-            self._topology.addAtom(atm.atname, elem, res)
+            self._topology.addAtom(atm.name, elem, res)
 
         # Add bonds to the topology (both with and without hydrogen)
         atoms = list(self._topology.atoms())
-        for bnd in self.bonds_inc_h + self.bonds_without_h:
-            self._topology.addBond(atoms[bnd.atom1.starting_index],
-                                   atoms[bnd.atom2.starting_index])
+        for bnd in self.bonds:
+            self._topology.addBond(atoms[bnd.atom1.idx], atoms[bnd.atom2.idx])
       
         # Set the box dimensions
         if self.ptr('ifbox'):
@@ -158,8 +157,8 @@ class OpenMMAmberParm(AmberParm):
     def _get_gb_params(self, gb_model=HCT):
         """ Gets the GB parameters. Need this method to special-case GB neck """
         if gb_model is GBn:
-            screen = [0.5 for atom in self.atom_list]
-            for i, atom in enumerate(self.atom_list):
+            screen = [0.5 for atom in self.atoms]
+            for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 0.48435382330
                 elif atom.element == 1:
@@ -172,11 +171,11 @@ class OpenMMAmberParm(AmberParm):
                     screen[i] = 0.602256336067
         elif gb_model is GBn2:
             # Add non-optimized values as defaults
-            alpha = [1.0 for i in self.atom_list]
-            beta = [0.8 for i in self.atom_list]
-            gamma = [4.85 for i in self.atom_list]
-            screen = [0.5 for i in self.atom_list]
-            for i, atom in enumerate(self.atom_list):
+            alpha = [1.0 for i in self.atoms]
+            beta = [0.8 for i in self.atoms]
+            gamma = [4.85 for i in self.atoms]
+            screen = [0.5 for i in self.atoms]
+            for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 1.058554
                     alpha[i] = 0.733756
@@ -271,10 +270,10 @@ class OpenMMAmberParm(AmberParm):
         """
         # Rebuild the topology file if necessary, and flush the atom property
         # data to the atom list
-        if self._topology_changed():
+        if self.is_changed():
             self.remake_parm()
         else:
-            self.atom_list.refresh_data()
+            self.load_atom_info()
         try:
             LJ_radius, LJ_depth = self.openmm_LJ() # Get our LJ parameters
             LJ_14_radius, LJ_14_depth = self.openmm_14_LJ()
@@ -325,21 +324,18 @@ class OpenMMAmberParm(AmberParm):
             print('Adding constraints...')
         if constraints in (ff.HBonds, ff.AllBonds, ff.HAngles):
             for bond in self.bonds_inc_h:
-                system.addConstraint(bond.atom1.starting_index,
-                                     bond.atom2.starting_index,
-                                     bond.bond_type.req*length_conv)
+                system.addConstraint(bond.atom1.idx, bond.atom2.idx,
+                                     bond.type.req*length_conv)
         if constraints in (ff.AllBonds, ff.HAngles):
             for bond in self.bonds_without_h:
-                system.addConstraint(bond.atom1.starting_index,
-                                     bond.atom2.starting_index,
-                                     bond.bond_type.req*length_conv)
+                system.addConstraint(bond.atom1.idx, bond.atom2.idx,
+                                     bond.type.req*length_conv)
         if rigidWater and constraints is None:
             for bond in self.bonds_inc_h:
-                if (bond.atom1.residue.resname in WATNAMES and
-                    bond.atom2.residue.resname in WATNAMES):
-                    system.addConstraint(bond.atom1.starting_index,
-                                         bond.atom2.starting_index,
-                                         bond.bond_type.req*length_conv)
+                if (bond.atom1.residue.name in WATNAMES and
+                    bond.atom2.residue.name in WATNAMES):
+                    system.addConstraint(bond.atom1.idx, bond.atom2.idx,
+                                         bond.type.req*length_conv)
         # Add Bond forces
         if verbose: print('Adding bonds...')
         force = mm.HarmonicBondForce()
@@ -347,16 +343,14 @@ class OpenMMAmberParm(AmberParm):
         if flexibleConstraints or (constraints not in (ff.HBonds, ff.AllBonds,
                                                        ff.HAngles)):
             for bond in self.bonds_inc_h:
-                force.addBond(bond.atom1.starting_index,
-                              bond.atom2.starting_index,
-                              bond.bond_type.req*length_conv,
-                              2*bond.bond_type.k*bond_frc_conv)
+                force.addBond(bond.atom1.idx, bond.atom2.idx,
+                              bond.type.req*length_conv,
+                              2*bond.type.k*bond_frc_conv)
         if flexibleConstraints or (constraints not in (ff.AllBonds,ff.HAngles)):
             for bond in self.bonds_without_h:
-                force.addBond(bond.atom1.starting_index,
-                              bond.atom2.starting_index,
-                              bond.bond_type.req*length_conv,
-                              2*bond.bond_type.k*bond_frc_conv)
+                force.addBond(bond.atom1.idx, bond.atom2.idx,
+                              bond.type.req*length_conv,
+                              2*bond.type.k*bond_frc_conv)
         system.addForce(force)
         # Add Angle forces
         if verbose: print('Adding angles...')
@@ -383,39 +377,29 @@ class OpenMMAmberParm(AmberParm):
                 l1 = l2 = None
                 for bond in angle.atom2.bonds:
                     if bond.atom1 is angle.atom1 or bond.atom2 is angle.atom1:
-                        l1 = bond.bond_type.req * length_conv
+                        l1 = bond.type.req * length_conv
                     elif bond.atom1 is angle.atom3 or bond.atom2 is angle.atom3:
-                        l2 = bond.bond_type.req * length_conv
+                        l2 = bond.type.req * length_conv
                 # Compute the distance between the atoms and add a constraint
                 length = sqrt(l1*l1 + l2*l2 - 2*l1*l2*
-                              cos(angle.angle_type.theteq))
-                system.addConstraint(bond.atom1.starting_index,
-                                     bond.atom2.starting_index, length)
+                              cos(angle.type.theteq))
+                system.addConstraint(bond.atom1.idx, bond.atom2.idx, length)
             if flexibleConstraints or not constrained:
-                force.addAngle(angle.atom1.starting_index,
-                               angle.atom2.starting_index,
-                               angle.atom3.starting_index,
-                               angle.angle_type.theteq,
-                               2*angle.angle_type.k*angle_frc_conv)
+                force.addAngle(angle.atom1.idx, angle.atom2.idx,
+                               angle.atom3.idx, angle.type.theteq,
+                               2*angle.type.k*angle_frc_conv)
         for angle in self.angles_without_h:
-            force.addAngle(angle.atom1.starting_index,
-                           angle.atom2.starting_index,
-                           angle.atom3.starting_index,
-                           angle.angle_type.theteq,
-                           2*angle.angle_type.k*angle_frc_conv)
+            force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
+                           angle.type.theteq, 2*angle.type.k*angle_frc_conv)
         system.addForce(force)
         # Add dihedral forces
         if verbose: print('Adding torsions...')
         force = mm.PeriodicTorsionForce()
         force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
-        for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
-            force.addTorsion(tor.atom1.starting_index,
-                             tor.atom2.starting_index,
-                             tor.atom3.starting_index,
-                             tor.atom4.starting_index,
-                             int(tor.dihed_type.per),
-                             tor.dihed_type.phase,
-                             tor.dihed_type.phi_k*dihe_frc_conv)
+        for tor in self.dihedrals:
+            force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                             tor.atom4.idx, int(tor.type.per),
+                             tor.type.phase, tor.type.phi_k*dihe_frc_conv)
         system.addForce(force)
 
         # Add nonbonded terms now
@@ -471,33 +455,31 @@ class OpenMMAmberParm(AmberParm):
         # Add per-particle nonbonded parameters (LJ params)
         sigma_scale = 2**(-1/6) * 2 * length_conv
         if not (has_nbfix or forceNBFIX):
-            for i, atm in enumerate(self.atom_list):
+            for i, atm in enumerate(self.atoms):
                 force.addParticle(atm.charge,
                                   sigma_scale*LJ_radius[atm.nb_idx-1],
                                   LJ_depth[atm.nb_idx-1]*ene_conv)
         else:
-            for i, atm in enumerate(self.atom_list):
+            for i, atm in enumerate(self.atoms):
                 force.addParticle(atm.charge, 1.0, 0.0)
 
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
         sigma_scale = 2**(-1/6) * length_conv
         if not (has_nbfix or forceNBFIX):
             # Add 1-4 interactions
-            for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
+            for tor in self.dihedrals:
                 if min(tor.signs) < 0: continue # multi-terms and impropers
-                charge_prod = (tor.atom1.charge * tor.atom4.charge /
-                               tor.dihed_type.scee)
+                charge_prod = tor.atom1.charge*tor.atom4.charge / tor.type.scee
                 epsilon = (sqrt(LJ_14_depth[tor.atom1.nb_idx-1] *
                                 LJ_14_depth[tor.atom4.nb_idx-1]) * ene_conv /
-                                tor.dihed_type.scnb)
+                                tor.type.scnb)
                 sigma = (LJ_14_radius[tor.atom1.nb_idx-1] +
                          LJ_14_radius[tor.atom4.nb_idx-1]) * sigma_scale
-                force.addException(tor.atom1.starting_index,
-                                   tor.atom4.starting_index,
+                force.addException(tor.atom1.idx, tor.atom4.idx,
                                    charge_prod, sigma, epsilon)
                 excluded_atom_pairs.add(
-                        min( (tor.atom1.starting_index, tor.atom4.starting_index),
-                             (tor.atom4.starting_index, tor.atom1.starting_index) )
+                        min( (tor.atom1.idx, tor.atom4.idx),
+                             (tor.atom4.idx, tor.atom1.idx) )
                 )
         else:
             # Add 1-4 interactions to the NonbondedForce object. Support both
@@ -511,53 +493,47 @@ class OpenMMAmberParm(AmberParm):
                 parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             ntypes = self.ptr('ntypes')
-            for tor in self.dihedrals_inc_h + self.dihedrals_without_h:
+            for tor in self.dihedrals:
                 if min(tor.signs) < 0: continue
-                charge_prod = (tor.atom1.charge * tor.atom4.charge /
-                               tor.dihed_type.scee)
+                charge_prod = tor.atom1.charge*tor.atom4.charge / tor.type.scee
                 typ1 = tor.atom1.nb_idx - 1
                 typ2 = tor.atom4.nb_idx - 1
                 idx = nbidx[ntypes*typ1+typ2] - 1
                 b = parm_bcoef[idx]
                 a = parm_acoef[idx]
                 try:
-                    epsilon = b * b / (4 * a) * ene_conv / tor.dihed_type.scnb
+                    epsilon = b * b / (4 * a) * ene_conv / tor.type.scnb
                     sigma = (2*a/b)**(1/6) * sigma_scale
                 except ZeroDivisionError:
                     if a != 0 or b != 0:
                         raise RuntimeError('Cannot have only one of '
                                     'A-coefficient or B-coefficient be 0.')
                     epsilon = sigma = 0
-                force.addException(tor.atom1.starting_index,
-                                   tor.atom4.starting_index,
+                force.addException(tor.atom1.idx, tor.atom4.idx,
                                    charge_prod, sigma, epsilon)
                 excluded_atom_pairs.add(
-                        min( (tor.atom1.starting_index, tor.atom4.starting_index),
-                             (tor.atom4.starting_index, tor.atom1.starting_index) )
+                        min( (tor.atom1.idx, tor.atom4.idx),
+                             (tor.atom4.idx, tor.atom1.idx) )
                 )
 
         # Add excluded atoms
-        for atom in self.atom_list:
+        for atom in self.atoms:
             # Exclude all bonds and angles
             for atom2 in atom.bond_partners:
-                if atom2.starting_index > atom.starting_index:
-                    force.addException(atom.starting_index,
-                                       atom2.starting_index, 0.0, 0.1, 0.0)
+                if atom2.idx > atom.idx:
+                    force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
             for atom2 in atom.angle_partners:
-                if atom2.starting_index > atom.starting_index:
-                    force.addException(atom.starting_index,
-                                       atom2.starting_index, 0.0, 0.1, 0.0)
+                if atom2.idx > atom.idx:
+                    force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
             for atom2 in atom.exclusion_partners:
-                if atom2.starting_index > atom.starting_index:
-                    force.addException(atom.starting_index,
-                                       atom2.starting_index, 0.0, 0.1, 0.0)
+                if atom2.idx > atom.idx:
+                    force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
             for atom2 in atom.dihedral_partners:
-                if atom2.starting_index <= atom.starting_index: continue
-                if ((atom.starting_index, atom2.starting_index) in
+                if atom2.idx <= atom.idx: continue
+                if ((atom.idx, atom2.idx) in
                     excluded_atom_pairs):
                     continue
-                force.addException(atom.starting_index,
-                                   atom2.starting_index, 0.0, 0.1, 0.0)
+                force.addException(atom.idx, atom2.idx, 0.0, 0.1, 0.0)
         system.addForce(force)
 
         if has_nbfix or forceNBFIX:
@@ -603,7 +579,7 @@ class OpenMMAmberParm(AmberParm):
                         mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             cforce.addPerParticleParameter('type')
             cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
-            for atom in self.atom_list:
+            for atom in self.atoms:
                 cforce.addParticle((atom.nb_idx - 1,)) # index from 0
             # Now add the exclusions
             for i in xrange(force.getNumExceptions()):
@@ -642,7 +618,7 @@ class OpenMMAmberParm(AmberParm):
                     mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             cforce.addPerParticleParameter('type')
             cforce.setForceGroup(self.NONBONDED_FORCE_GROUP)
-            for atom in self.atom_list:
+            for atom in self.atoms:
                 cforce.addParticle((atom.nb_idx - 1,)) # index from 0
             # Now add the exclusions
             for i in xrange(force.getNumExceptions()):
@@ -664,15 +640,15 @@ class OpenMMAmberParm(AmberParm):
 
         # Add virtual sites for water
         # First tag the residues that have an extra point in them
-        for res in self.residue_list: res.has_ep = False
-        ep = [atom for atom in self.atom_list if atom.atname in EPNAMES]
+        for res in self.residues: res.has_ep = False
+        ep = [atom for atom in self.atoms if atom.name in EPNAMES]
         for atom in ep: atom.residue.has_ep = True
         if len(ep) > 0:
             numRes = ep[-1].residue.idx + 1
             waterO = [[] for i in xrange(numRes)]
             waterH = [[] for i in xrange(numRes)]
             waterEP = [[] for i in xrange(numRes)]
-            for atom in self.atom_list:
+            for atom in self.atoms:
                 if atom.residue.has_ep:
                     if atom.element == 8:
                         waterO[res].append(atom)
@@ -691,17 +667,17 @@ class OpenMMAmberParm(AmberParm):
                     res = a1.residue.idx
                     if a1.element == 1 or a2.element == 1:
                         if a1.element == 1 and a2.element == 1:
-                            distHH[res] = bond.bond_type.req * u.angstroms
+                            distHH[res] = bond.type.req * u.angstroms
                         if a1.element == 8 or a2.element == 8:
-                            distOH[res] = bond.bond_type.req * u.angstroms
+                            distOH[res] = bond.type.req * u.angstroms
                     elif ((a1.element == 8 or a2.element == 8) and
                           (a1.element == 0 or a2.element == 0)):
-                        distOE[res] = bond.bond_type.req * u.angstroms
+                        distOE[res] = bond.type.req * u.angstroms
             # Loop over residues and add the virtual points
             out_of_plane_angle = 54.735 * u.degrees
             cosOOP = u.cos(out_of_plane_angle)
             sinOOP = u.sin(out_of_plane_angle)
-            for residue in self.residue_list:
+            for residue in self.residues:
                 if not residue.has_ep: continue
                 res = residue.idx
                 if len(waterO[res]) == 1 and len(waterH[res]) == 2:
@@ -775,7 +751,7 @@ class OpenMMAmberParm(AmberParm):
             elif implicitSolvent is GBn2:
                 gb = GBSAGBn2Force(solventDielectric, soluteDielectric, None,
                                    cutoff, kappa=implicitSolventKappa)
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 gb.addParticle([atom.charge] + list(gb_parms[i]))
             # Set cutoff method
             if nonbondedMethod is ff.NoCutoff:
@@ -802,10 +778,10 @@ class OpenMMAmberParm(AmberParm):
                     atom1, atom2 = atom2, atom1 # now atom2 is hydrogen for sure
                 if atom1.element != 1:
                     transfer_mass = hydrogenMass - atom2.mass * u.daltons
-                    new_mass1 = (system.getParticleMass(atom1.starting_index) -
+                    new_mass1 = (system.getParticleMass(atom1.idx) -
                                  transfer_mass)
-                    system.setParticleMass(atom2.starting_index, hydrogenMass)
-                    system.setParticleMass(atom1.starting_index, new_mass1)
+                    system.setParticleMass(atom2.idx, hydrogenMass)
+                    system.setParticleMass(atom1.idx, new_mass1)
         # See if we want to remove COM motion
         if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
@@ -824,8 +800,7 @@ class OpenMMAmberParm(AmberParm):
         try:
             return self._system
         except AttributeError:
-            raise APIError('You must initialize the system with createSystem '
-                           'before accessing the cached object.')
+            return None
 
     @property
     def positions(self):
@@ -833,13 +808,17 @@ class OpenMMAmberParm(AmberParm):
         Return the cached positions or create new ones from the atoms
         """
         try:
-            if len(self._positions) == len(self.atom_list):
+            if len(self._positions) == len(self.atoms):
                 return self._positions
         except AttributeError:
             pass
 
-        self._positions = tuple([Vec3(a.xx, a.xy, a.xz)
-                               for a in self.atom_list]) * u.angstroms
+        try:
+            self._positions = tuple([Vec3(a.xx, a.xy, a.xz)
+                                   for a in self.atoms]) * u.angstroms
+        except AttributeError:
+            return None
+
         return self._positions
 
     @positions.setter
@@ -850,7 +829,7 @@ class OpenMMAmberParm(AmberParm):
         self._positions = stuff
         for i, pos in enumerate(stuff.value_in_unit(u.angstroms)):
             i3 = i * 3
-            atom = self.atom_list[i]
+            atom = self.atoms[i]
             atom.xx, atom.xy, atom.xz = pos
             self.coords[i3], self.coords[i3+1], self.coords[i3+2] = pos
 
@@ -858,25 +837,29 @@ class OpenMMAmberParm(AmberParm):
     def velocities(self):
         """ Same as for positions, but for velocities """
         try:
-            if len(self._velocities) == len(self.atom_list):
+            if len(self._velocities) == len(self.atoms):
                 return self._velocities
         except AttributeError:
             pass
 
-        self._velocities = tuple([Vec3(a.vx, a.vy, a.vz)
-                    for a in self.atom_list]) * (u.angstroms/u.picosecond) 
+        try:
+            self._velocities = tuple([Vec3(a.vx, a.vy, a.vz)
+                        for a in self.atoms]) * (u.angstroms/u.picosecond)
+        except AttributeError:
+            return None
         return self._velocities
 
     @velocities.setter
     def velocities(self, stuff):
         self._velocities = stuff
-        for atom, vel in zip(self.atom_list, stuff):
+        for atom, vel in zip(self.atoms, stuff):
             atom.vx, atom.vy, atom.vz = vel.value_in_unit(
                     u.angstroms/u.picoseconds)
 
     @property
     def box_vectors(self):
         """ Return tuple of box vectors """
+        if self.pointers['IFBOX'] == 0: return None
         if hasattr(self, 'rst7'):
             box = [x*u.angstrom for x in self.rst7.box[:3]]
             ang = [self.rst7.box[3], self.rst7.box[4], self.rst7.box[5]]
@@ -891,6 +874,7 @@ class OpenMMAmberParm(AmberParm):
     @property
     def box_lengths(self):
         """ Return tuple of 3 units """
+        if self.pointers['IFBOX'] == 0: return None
         if hasattr(self, 'rst7'):
             box = [x*u.angstrom for x in self.rst7.box[:3]]
         else:
@@ -1057,10 +1041,8 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
         force = mm.HarmonicBondForce()
         force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
         for ub in self.urey_bradley:
-            force.addBond(ub.atom1.starting_index,
-                          ub.atom2.starting_index,
-                          ub.ub_type.req*length_conv,
-                          2*ub.ub_type.k*bond_frc_conv)
+            force.addBond(ub.atom1.idx, ub.atom2.idx, ub.type.req*length_conv,
+                          2*ub.type.k*bond_frc_conv)
         system.addForce(force)
 
         if verbose: print('Adding impropers...')
@@ -1070,13 +1052,10 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
         force.addPerTorsionParameter('k')
         force.addPerTorsionParameter('theta0')
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
-        for imp in self.improper:
-            force.addTorsion(imp.atom1.starting_index,
-                             imp.atom2.starting_index,
-                             imp.atom3.starting_index,
-                             imp.atom4.starting_index,
-                             (imp.improp_type.psi_k*dihe_frc_conv,
-                              imp.improp_type.psi_eq*pi/180)
+        for imp in self.impropers:
+            force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
+                             imp.atom4.idx, (imp.type.psi_k*dihe_frc_conv,
+                              imp.type.psi_eq*pi/180)
             )
         system.addForce(force)
 
@@ -1088,9 +1067,9 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
             # IDs so we have simple integer comparisons to do later
             cmap_type_list = []
             cmap_map = dict()
-            for cmap in self.cmap:
-                if not id(cmap.cmap_type) in cmap_type_list:
-                    ct = cmap.cmap_type
+            for cmap in self.cmaps:
+                if not id(cmap.type) in cmap_type_list:
+                    ct = cmap.type
                     cmap_type_list.append(id(ct))
                     # Our torsion correction maps need to go from 0 to 360
                     # degrees
@@ -1099,16 +1078,10 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                     cmap_map[id(ct)] = m
             # Now add in all of the cmaps
             for cmap in self.cmap:
-                force.addTorsion(cmap_map[id(cmap.cmap_type)],
-                                 cmap.atom1.starting_index,
-                                 cmap.atom2.starting_index,
-                                 cmap.atom3.starting_index,
-                                 cmap.atom4.starting_index, # end of 1st torsion
-                                 cmap.atom2.starting_index,
-                                 cmap.atom3.starting_index,
-                                 cmap.atom4.starting_index,
-                                 cmap.atom5.starting_index  # end of 2nd torsion
-                )
+                force.addTorsion(cmap_map[id(cmap.type)],
+                                 cmap.atom1.idx, cmap.atom2.idx, cmap.atom3.idx,
+                                 cmap.atom4.idx, cmap.atom2.idx, cmap.atom3.idx,
+                                 cmap.atom4.idx, cmap.atom5.idx)
             system.addForce(force)
 
         # Now see if we need to toggle the switching function
@@ -1176,6 +1149,7 @@ class OpenMMRst7(Rst7):
     @property
     def box_vectors(self):
         """ Return tuple of box vectors """
+        if self.box is None: return None
         box = [x*u.angstrom for x in self.box[:3]]
         ang = [self.box[3], self.box[4], self.box[5]]
         return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
