@@ -1040,7 +1040,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
         if verbose: print('Adding Urey-Bradley terms')
         force = mm.HarmonicBondForce()
         force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
-        for ub in self.urey_bradley:
+        for ub in self.urey_bradleys:
             force.addBond(ub.atom1.idx, ub.atom2.idx, ub.type.req*length_conv,
                           2*ub.type.k*bond_frc_conv)
         system.addForce(force)
@@ -1077,7 +1077,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
                     m = force.addMap(ct.resolution, [x*ene_conv for x in grid])
                     cmap_map[id(ct)] = m
             # Now add in all of the cmaps
-            for cmap in self.cmap:
+            for cmap in self.cmaps:
                 force.addTorsion(cmap_map[id(cmap.type)],
                                  cmap.atom1.idx, cmap.atom2.idx, cmap.atom3.idx,
                                  cmap.atom4.idx, cmap.atom2.idx, cmap.atom3.idx,
