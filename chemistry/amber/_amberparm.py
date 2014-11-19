@@ -329,10 +329,10 @@ class AmberParm(AmberFormat, Structure):
         self._check_section_lengths()
         self._load_atoms_and_residues()
         self.load_atom_info()
-        self._load_extra_exclusions()
         self._load_bond_info()
         self._load_angle_info()
         self._load_dihedral_info()
+        self._load_extra_exclusions()
         super(AmberParm, self).unchange()
 
     #===================================================
@@ -933,6 +933,11 @@ class AmberParm(AmberFormat, Structure):
         _additional_ exclusions outside the basic ones defined for bonds,
         angles, and dihedrals are specified. If so, add those to the exclusion
         list.
+
+        This also goes through all atoms and loads the proper bond, angle and
+        dihedral partners into any extra points. The way extra points are
+        handled is that they are considered to carry the same topological
+        connectivity as they actual atom they are bonded to.
         """
         num_excluded = self.parm_data['NUMBER_EXCLUDED_ATOMS']
         excluded_list = self.parm_data['EXCLUDED_ATOMS_LIST']
@@ -948,6 +953,22 @@ class AmberParm(AmberFormat, Structure):
             for eatom in exclusions - bond_excl:
                 atom.exclude(eatom)
             first_excl += nexcl
+        # Do the extra points after all of the exclusions have been loaded to
+        # make sure the lists are all up-to-date.
+        for i, atom in enumerate(self.atoms):
+            if atom.atomic_number > 0: continue
+            # This is an extra point -- exclude accordingly
+            real_atom = atom.bond_partners[0]
+            for atom2 in real_atom.bond_partners:
+                if atom2 is atom: continue
+                atom.bond_to(atom2)
+            for atom2 in real_atom.angle_partners:
+                atom.angle_to(atom2)
+            for atom2 in real_atom.dihedral_partners:
+                atom.dihedral_to(atom2)
+            for atom2 in real_atom.tortor_partners:
+                atom.tortor_to(atom2)
+            atom.prune_exclusions()
 
     #===================================================
 

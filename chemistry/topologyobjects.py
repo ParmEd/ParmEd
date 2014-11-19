@@ -699,6 +699,22 @@ class Atom(_ListItem):
 
     #===================================================
 
+    def prune_exclusions(self):
+        """
+        For extra points, the exclusion partners may be filled before the bond,
+        angle, dihedral, and tortor partners. Since we don't want memory of
+        these exclusions if any of those topological features were to break, we
+        want to *remove* those from the exclusion list. This function makes sure
+        that nothing in the bond, angle, dihedral, and tortor lists appears in
+        the exclusion list.
+        """
+        excludes = (set(self._exclusion_partners) - set(self._tortor_partners) -
+                    set(self._dihedral_partners) - set(self._angle_partners) -
+                    set(self._bond_partners))
+        self._exclusion_partners = sorted(list(excludes))
+
+    #===================================================
+
     # Comparisons are done by comparing indexes
 
     def __gt__(self, other):

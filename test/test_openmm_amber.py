@@ -102,6 +102,28 @@ class TestAmberParm(unittest.TestCase):
             )
             return self.assertAlmostEqual(ratio, 1.0, places=places)
 
+    def testEPEnergy(self):
+        """ Tests AmberParm handling of extra points in TIP4P water """
+        parm = tip4p_system
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+# Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
+# BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
+# 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
+# EELEC  =     -2511.3511  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+# EKCMT  =         0.0000  VIRIAL  =         0.0000  VOLUME     =      6514.3661
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 0)
+        self.assertAlmostEqual(energies['dihedral'], 0)
+        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
+
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """
         parm = amber_simple_gas_system
@@ -1095,28 +1117,6 @@ class TestChamberParm(unittest.TestCase):
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
-    def testEPEnergy(self):
-        """ Tests AmberParm handling of extra points in TIP4P water """
-        parm = tip4p_system
-        system = parm.createSystem(nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstroms,
-                                   constraints=app.HBonds,
-                                   rigidWater=True,
-                                   flexibleConstraints=False)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
-        sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
-# Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
-# BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
-# 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
-# EELEC  =     -2511.3511  EHBOND  =         0.0000  RESTRAINT  =         0.0000
-# EKCMT  =         0.0000  VIRIAL  =         0.0000  VOLUME     =      6514.3661
-        self.assertAlmostEqual(energies['bond'], 0)
-        self.assertAlmostEqual(energies['angle'], 0)
-        self.assertAlmostEqual(energies['dihedral'], 0)
-        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
-
     def testInterfaceNoPBC(self):
         """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
         parm = chamber_gas_system
@@ -1217,7 +1217,7 @@ class TestChamberParm(unittest.TestCase):
                 parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
-        
+
 if not has_openmm:
     # If we don't have OpenMM installed, delete all of the test classes so we
     # don't try to test anything (nor does it count in the final tally, giving

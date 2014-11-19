@@ -641,26 +641,28 @@ class OpenMMAmberParm(AmberParm):
         # Add virtual sites for water
         # First tag the residues that have an extra point in them
         for res in self.residues: res.has_ep = False
-        ep = [atom for atom in self.atoms if atom.name in EPNAMES]
+        ep = [atom for atom in self.atoms
+                if atom.type in EPNAMES or atom.atomic_number == 0]
         for atom in ep: atom.residue.has_ep = True
         if len(ep) > 0:
-            numRes = ep[-1].residue.idx + 1
+            numRes = max([at.residue.idx for at in ep]) + 1
             waterO = [[] for i in xrange(numRes)]
             waterH = [[] for i in xrange(numRes)]
             waterEP = [[] for i in xrange(numRes)]
             for atom in self.atoms:
                 if atom.residue.has_ep:
+                    res = atom.residue.idx
                     if atom.element == 8:
-                        waterO[res].append(atom)
+                        waterO[res].append(atom.idx)
                     elif atom.element == 1:
-                        waterH[res].append(atom)
+                        waterH[res].append(atom.idx)
                     elif atom.element == 0:
-                        waterEP[res].append(atom)
+                        waterEP[res].append(atom.idx)
             # Record bond lengths for faster access
             distOH = [None] * numRes
             distHH = [None] * numRes
             distOE = [None] * numRes
-            for bond in self.bonds_inc_h + self.bonds_without_h:
+            for bond in self.bonds:
                 a1 = bond.atom1
                 a2 = bond.atom2
                 if a1.residue.has_ep:
@@ -683,8 +685,9 @@ class OpenMMAmberParm(AmberParm):
                 if len(waterO[res]) == 1 and len(waterH[res]) == 2:
                     if len(waterEP[res]) == 1:
                         # 4-point water
-                        weightH = distOE[res] / sqrt(distOH[res] * distOH[res] -
-                                               0.25 * distHH[res] * distHH[res])
+                        weightH = (distOE[res] /
+                                   u.sqrt(distOH[res]*distOH[res] -
+                                          0.25*distHH[res]*distHH[res]))
                         system.setVirtualSite(
                                 waterEP[res][0],
                                 mm.ThreeParticleAverageSite(waterO[res][0],
@@ -697,8 +700,8 @@ class OpenMMAmberParm(AmberParm):
                                sqrt(distOH[res] * distOH[res] -
                                  0.25 * distHH[res] * distHH[res])
                     )
-                    angleHOH = 2 * asin(0.5 * distHH[res] / distOH[res])
-                    lenCross = distOH[res] * distOH[res] * sin(angleHOH)
+                    angleHOH = 2 * u.asin(0.5 * distHH[res] / distOH[res])
+                    lenCross = distOH[res] * distOH[res] * u.sin(angleHOH)
                     weightCross = sinOOP * distOE[res] / lenCross
                     site1 = mm.OutOfPlaneSite(waterO[res][0], waterH[res][0],
                             waterH[res][1], weightH/2, weightH/2, weightCross)
