@@ -8,7 +8,7 @@ Contributors:
 Date: Sep. 17, 2014
 """
 from chemistry import (AtomType, BondType, AngleType, DihedralType,
-                       ImproperType, CmapType, NoUreyBradley)
+                       DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
@@ -347,8 +347,10 @@ class CharmmParameterSet(object):
                     if not replaced:
                         self.dihedral_types[key].append(dihedral)
                 else: # key not present
-                    self.dihedral_types[(type1,type2,type3,type4)] = [dihedral]
-                    self.dihedral_types[(type4,type3,type2,type1)] = [dihedral]
+                    dtl = DihedralTypeList()
+                    dtl.append(dihedral)
+                    self.dihedral_types[(type1,type2,type3,type4)] = dtl
+                    self.dihedral_types[(type4,type3,type2,type1)] = dtl
                 continue
             if section == 'IMPROPER':
                 words = line.split()

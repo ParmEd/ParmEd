@@ -785,6 +785,8 @@ class AmberFormat(object):
             name given to `after`. If this flag does not exist, IndexError will
             be raised
         """
+        if flag_name in self.parm_data:
+            raise FlagError('%s already exists' % (flag_name))
         if after is not None:
             after = after.upper()
             if not after in self.flag_list:

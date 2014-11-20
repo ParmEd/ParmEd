@@ -24,7 +24,7 @@ from __future__ import division
 
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
 from chemistry import (Bond, Angle, Dihedral, AtomList, Atom, BondType,
-                       AngleType, DihedralType)
+                       AngleType, DihedralType, AtomType)
 from chemistry.structure import Structure
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
@@ -241,6 +241,37 @@ class AmberParm(AmberFormat, Structure):
    
     #===================================================
 
+    @classmethod
+    def load_from_structure(cls, struct):
+        """
+        Take a Structure instance and initialize an AmberParm instance from that
+        data.
+
+        Parameters
+        ----------
+        struct : Structure
+            The input structure from which to construct an AmberParm instance
+        """
+        inst = struct.copy(cls, split_dihedrals=True)
+        inst.pointers = {}
+        inst.LJ_types = {}
+        inst.atoms.assign_nbidx_from_types()
+        # Fill the Lennard-Jones arrays/dicts
+        ntyp = 0
+        for atom in inst.atoms:
+            inst.LJ_types[atom.type] = atom.nb_idx
+            ntyp = max(ntyp, atom.nb_idx)
+        inst.LJ_radius = [0 for i in xrange(ntyp)]
+        inst.LJ_depth = [0 for i in xrange(ntyp)]
+        for atom in inst.atoms:
+            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        inst._add_standard_flags()
+        inst.remake_parm()
+        inst._set_nonbonded_tables()
+
+    #===================================================
+
     def __copy__(self):
         """ Needs to copy a few additional data structures """
         other = super(AmberParm, self).__copy__()
@@ -376,6 +407,15 @@ class AmberParm(AmberFormat, Structure):
             atom.radii = radii[i]
             atom.screen = screen[i]
             atom.atomic_number = atnum[i]
+            atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
+            depth = self.LJ_depth[atom.nb_idx-1]
+            radius = self.LJ_radius[atom.nb_idx-1]
+            try:
+                depth14 = self.LJ_14_depth[atom.nb_idx-1]
+                radius14 = self.LJ_14_radius[atom.nb_idx-1]
+            except AttributeError:
+                depth14 = radius14 = None
+            atom.atom_type.set_lj_params(depth, radius, depth14, radius14)
 
     #===================================================
 
@@ -449,7 +489,6 @@ class AmberParm(AmberFormat, Structure):
         """
         if self.is_changed():
             self.remake_parm()
-#           self.load_structure()
 
         AmberFormat.write_parm(self, name)
 
@@ -709,7 +748,7 @@ class AmberParm(AmberFormat, Structure):
         rules.
         """
         pd = self.parm_data
-        ntypes = self.pointers['NYTPES']
+        ntypes = self.pointers['NTYPES']
         for i in xrange(ntypes):
             for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
@@ -1076,12 +1115,14 @@ class AmberParm(AmberFormat, Structure):
         data['POINTERS'][NATOM] = natom
         self.pointers['NATOM'] = natom
         data['ATOM_NAME'] = [atom.name for atom in self.atoms]
+        data['AMBER_ATOM_TYPE'] = [atom.type for atom in self.atoms]
         data['CHARGE'] = [atom.charge for atom in self.atoms]
         data['MASS'] = [atom.mass for atom in self.atoms]
         data['ATOM_TYPE_INDEX'] = [atom.nb_idx for atom in self.atoms]
         data['JOIN_ARRAY'] = [atom.join for atom in self.atoms]
         data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree for atom in self.atoms]
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
+        data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
             data['RADII'] = [atom.radii for atom in self.atoms]
         if 'SCREEN' in data:
@@ -1091,6 +1132,7 @@ class AmberParm(AmberFormat, Structure):
         # Do the non-bonded exclusions now
         data['EXCLUDED_ATOMS_LIST'] = []
         nextra = 0
+        max_typ = 0
         for i, atom in enumerate(self.atoms):
             excl = atom.nonbonded_exclusions(index_from=1)
             if len(excl) == 0:
@@ -1099,11 +1141,14 @@ class AmberParm(AmberFormat, Structure):
             data['NUMBER_EXCLUDED_ATOMS'][i] = len(excl)
             if atom.atomic_number == 0:
                 nextra += 1
+            max_typ = max(max_typ, atom.nb_idx)
         nnb = len(data['EXCLUDED_ATOMS_LIST'])
         data['POINTERS'][NNB] = nnb
         self.pointers['NNB'] = self.pointers['NEXT'] = nnb
         data['POINTERS'][NUMEXTRA] = nextra
         self.pointers['NUMEXTRA'] = nextra
+        data['POINTERS'][NTYPES] = max_typ
+        self.pointers['NTYPES'] = max_typ
 
     #===================================================
 
@@ -1176,6 +1221,8 @@ class AmberParm(AmberFormat, Structure):
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
         data['ANGLE_EQUIL_VALUE'] = [type.theteq for type in self.angle_types]
+        data['POINTERS'][NUMANG] = len(self.angle_types)
+        self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
         data['ANGLES_INC_HYDROGEN'] = angle_array = []
         for i, angle in enumerate(self.angles_inc_h):
@@ -1204,11 +1251,20 @@ class AmberParm(AmberFormat, Structure):
         for dihed in self.dihedrals:
             dihed.type.used = True
         self.dihedral_types.prune_unused()
-        data['DIHEDRAL_FORCE_CONSTANT'] = [type.phi_k
-                for type in self.dihedral_types]
-        data['DIHEDRAL_PERIODICITY'] = [type.per
-                for type in self.dihedral_types]
-        data['DIHEDRAL_PHASE'] = [type.phase for type in self.dihedral_types]
+        data['DIHEDRAL_FORCE_CONSTANT'] = \
+                    [type.phi_k for type in self.dihedral_types]
+        data['DIHEDRAL_PERIODICITY'] = \
+                    [type.per for type in self.dihedral_types]
+        data['DIHEDRAL_PHASE'] = \
+                    [type.phase for type in self.dihedral_types]
+        if 'SCEE_SCALE_FACTOR' in data:
+            data['SCEE_SCALE_FACTOR'] = \
+                    [type.scee for type in self.dihedral_types]
+        if 'SCNB_SCALE_FACTOR' in data:
+            data['SCNB_SCALE_FACTOR'] = \
+                    [type.scnb for type in self.dihedral_types]
+        data['POINTERS'][NPTRA] = len(self.dihedral_types)
+        self.pointers['NPTRA'] = len(self.dihedral_types)
         # Now do the dihedral arrays
         data['DIHEDRALS_INC_HYDROGEN'] = dihed_array = []
         for i, dihed in enumerate(self.dihedrals_inc_h):
@@ -1238,6 +1294,86 @@ class AmberParm(AmberFormat, Structure):
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = i + 1
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = i + 1
+
+    #===================================================
+
+    def _add_standard_flags(self):
+        """ Adds all of the standard flags to the parm_data array """
+        self.set_version()
+        self.add_flag('TITLE', '20a4', num_items=0)
+        self.add_flag('POINTERS', '10I8', num_items=31)
+        self.add_flag('ATOM_NAME', '20a4', num_items=0)
+        self.add_flag('CHARGE', '5E16.8', num_items=0)
+        self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
+        self.add_flag('MASS', '5E16.8', num_items=0)
+        self.add_flag('ATOM_TYPE_INDEX', '10I8', num_items=0)
+        self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', num_items=0)
+        self.add_flag('NONBONDED_PARM_INDEX', '10I8', num_items=0)
+        self.add_flag('RESIDUE_LABEL', '20a4', num_items=0)
+        self.add_flag('RESIDUE_POINTER', '10I8', num_items=0)
+        self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('BOND_EQUIL_VALUE', '5E16.8', num_items=0)
+        self.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('ANGLE_EQUIL_VALUE', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
+        self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
+        self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
+        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
+        self.add_flag('SOLTY', '5E16.8', num_items=1)
+        self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', num_items=0)
+        self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('BONDS_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('ANGLES_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('EXCLUDED_ATOMS_LIST', '10I8', num_items=0)
+        self.add_flag('HBOND_ACOEF', '5E16.8', num_items=0)
+        self.add_flag('HBOND_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('HBCUT', '5E16.8', num_items=0)
+        self.add_flag('AMBER_ATOM_TYPE', '20a4', num_items=0)
+        self.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4', num_items=0)
+        self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
+        self.add_flag('IROTAT', '10I8', num_items=0)
+        if self.box is not None:
+            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
+            self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
+            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=0)
+        self.add_flag('RADIUS_SET', '1a80', num_items=0)
+        self.add_flag('RADII', '5E16.8', num_items=0)
+        self.add_flag('SCREEN', '5E16.8', num_items=0)
+        self.add_flag('IPOL', '1I8', num_items=1)
+
+    #===================================================
+
+    def _set_nonbonded_tables(self):
+        """
+        Sets the tables of Lennard-Jones nonbonded interaction pairs
+        """
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        ntypes2 = ntypes * ntypes
+        # Set up the index lookup tables (not a unique solution)
+        self.parm_data['NONBONDED_PARM_INDEX'] = [0 for i in xrange(ntypes2)]
+        holder = [0 for i in xrange(ntypes2)]
+        idx = 0
+        for i in xrange(ntypes):
+            for j in xrange(i+1):
+                idx += 1
+                holder[ntypes*i+j] = holder[ntypes*j+i] = idx
+        idx = 0
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
+                self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
+                            holder[ntypes*i+j]
+                idx += 1
+        nttyp = ntypes * (ntypes + 1) // 2
+        # Now build the Lennard-Jones arrays
+        self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
+        self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
+        self.recalculate_LJ()
 
     #===================================================
 

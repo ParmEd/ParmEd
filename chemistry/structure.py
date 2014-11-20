@@ -11,7 +11,8 @@ except ImportError:
     bz2 = None
 from chemistry.exceptions import PDBError, PDBWarning
 from chemistry.periodic_table import AtomicNum, Mass
-from chemistry.topologyobjects import TrackedList, AtomList, ResidueList, Atom
+from chemistry.topologyobjects import *
+import copy
 try:
     import gzip
 except ImportError:
@@ -163,6 +164,234 @@ class Structure(object):
         self.adjust_types = TrackedList()
 
         self.box = None
+
+    #===================================================
+
+    def __copy__(self):
+        """ A deep copy of the Structure """
+        return self.copy(type(self))
+
+    #===================================================
+
+    def copy(self, cls, split_dihedrals=False):
+        """
+        Makes a copy of the current structure as an instance of a specified
+        subclass
+
+        Parameters
+        ----------
+        cls : Structure subclass
+            The returned object is a copy of this structure as a `cls` instance
+        split_dihedrals : bool=False
+            If True, then the Dihedral entries will be split up so that each one
+            is paired with a single DihedralType (rather than a
+            DihedralTypeList)
+
+        Returns
+        -------
+        cls instance
+            The instance of the Structure subclass `cls` with a copy of the
+            current Structure's topology information
+        """
+        c = cls()
+        for atom in self.atoms:
+            res = atom.residue
+            a = copy.copy(atom)
+            c.residues.add_atom(a, res.name, res.number, res.chain,
+                                res.insertion_code)
+            c.atoms.append(a)
+        # Now copy all of the types
+        for bt in self.bond_types:
+            c.bond_types.append(BondType(bt.k, bt.req, c.bond_types))
+        for at in self.angle_types:
+            c.angle_types.append(AngleType(at.k, at.theteq, c.angle_types))
+        if split_dihedrals:
+            idx = 0
+            for dt in self.dihedral_types:
+                dt.starting_index = idx
+                if hasattr(dt, '__iter__'):
+                    for t in dt:
+                        c.dihedral_types.append(
+                                DihedralType(t.phi_k, t.per, t.phase,
+                                             t.scee, t.scnb,
+                                             list=c.dihedral_types)
+                        )
+                        idx += 1
+                else:
+                    c.dihedral_types.append(
+                            DihedralType(t.phi_k, t.per, t.phase,
+                                         t.scee, t.scnb,
+                                         list=c.dihedral_types)
+                    )
+                    idx += 1
+        else:
+            for dt in self.dihedral_types:
+                if hasattr(dt, '__iter__'):
+                    dtl = DihedralTypeList()
+                    for t in dt:
+                        dtl.append(DihedralType(t.phi_k, t.per, t.phase, t.scee,
+                                                t.scnb))
+                else:
+                    dtl = DihedralType(dt.phi_k, dt.per, dt.phase, dt.scee,
+                                       dt.scnb)
+                dtl.list = c.dihedral_types
+                c.dihedral_types.append(dtl)
+        for ut in self.urey_bradley_types:
+            c.urey_bradley_types.append(BondType(ut.k, ut.req,
+                                                 c.urey_bradley_types))
+        for it in self.improper_types:
+            c.improper_types.append(ImproperType(it.psi_k, it.psi_eq,
+                                                 c.improper_types))
+        for ct in self.cmap_types:
+            c.cmap_types.append(CmapType(ct.resolution, list(ct.grid),
+                                         c.cmap_types))
+        for ta in self.trigonal_angle_types:
+            c.trigonal_angle_types.append(
+                    AngleType(ta.k, ta.theteq, c.trigonal_angle_types)
+            )
+        for ot in self.out_of_plane_bend_types:
+            c.out_of_plane_bend_types.append(
+                    OutOfPlaneBendType(ot.k, self.out_of_plane_bend_types)
+            )
+        for pt in self.pi_torsion_types:
+            c.pi_torsion_types.append(
+                    DihedralType(pt.phi_k, pt.per, pt.phase,
+                                 list=c.pi_torsion_types)
+            )
+        for st in self.stretch_bend_types:
+            c.stretch_bend_types.append(
+                    StretchBendType(st.k, st.req1, st.req2, st.theteq,
+                                    c.stretch_bend_types)
+            )
+        for tt in self.torsion_torsion_types:
+            c.torsion_torsion_types.append(
+                    TorsionTorsionType(tt.dims, tt.ang1[:], tt.ang2[:],
+                                       tt.f.data[:], tt.dfda1.data[:],
+                                       tt.dfda2.data[:], tt.d2fda1da2.data[:],
+                                       c.torsion_torsion_types)
+            )
+        for at in self.adjust_types:
+            c.adjust_types.append(
+                    NonbondedExceptionType(at.vdw_weight, at.multipole_weight,
+                                           at.direct_weight, at.polar_weight,
+                                           at.mutual_weight, c.adjust_types)
+            )
+        # Now create the topological objects
+        atoms = c.atoms
+        for b in self.bonds:
+            c.bonds.append(
+                    Bond(atoms[b.atom1.idx], atoms[b.atom2.idx],
+                         c.bond_types[b.type.idx])
+            )
+        for a in self.angles:
+            c.angles.append(
+                    Angle(atoms[a.atom1.idx], atoms[a.atom2.idx],
+                          atoms[a.atom3.idx], c.angle_types[a.type.idx])
+            )
+        if split_dihedrals:
+            for d in self.dihedrals:
+                if hasattr(d.type, '__iter__'):
+                    for i in xrange(len(d.type)):
+                        ie = d.ignore_end or i < len(d.type) - 1
+                        ti = d.type.starting_index + i
+                        c.dihedrals.append(
+                                Dihedral(c.atoms[d.atom1.idx],
+                                         c.atoms[d.atom2.idx],
+                                         c.atoms[d.atom3.idx],
+                                         c.atoms[d.atom4.idx],
+                                         improper=d.improper, ignore_end=ie,
+                                         type=c.dihedral_types[ti])
+                        )
+                else:
+                    c.dihedrals.append(
+                        Dihedral(c.atoms[d.atom1.idx], c.atoms[d.atom2.idx],
+                                 c.atoms[d.atom3.idx], c.atoms[d.atom4.idx],
+                                 improper=d.improper, ignore_end=d.ignore_end,
+                                 type=c.dihedral_types[d.type.starting_index])
+                    )
+        else:
+            for d in self.dihedrals:
+                c.dihedrals.append(
+                        Dihedral(atoms[d.atom1.idx], atoms[d.atom2.idx],
+                                 atoms[d.atom3.idx], atoms[d.atom4.idx],
+                                 improper=d.improper, ignore_end=d.ignore_end,
+                                 type=c.dihedral_types[d.type.idx])
+                )
+        for u in self.urey_bradleys:
+            c.urey_bradleys.append(
+                    UreyBradley(atoms[u.atom1.idx], atoms[u.atom2.idx],
+                                c.urey_bradley_types[u.type.idx])
+            )
+        for i in self.impropers:
+            c.impropers.append(
+                    Improper(atoms[i.atom1.idx], atoms[i.atom2.idx],
+                             atoms[i.atom3.idx], atoms[i.atom4.idx],
+                             c.improper_types[i.type.idx])
+            )
+        for cm in self.cmaps:
+            c.cmaps.append(
+                    Cmap(atoms[cm.atom1.idx], atoms[cm.atom2.idx],
+                         atoms[cm.atom3.idx], atoms[cm.atom4.idx],
+                         atoms[cm.atom5.idx], c.cmap_types[cm.type.idx])
+            )
+        for t in self.trigonal_angles:
+            c.trigonal_angles.append(
+                    TrigonalAngle(atoms[t.atom1.idx], atoms[t.atom2.idx],
+                                  atoms[t.atom3.idx], atoms[t.atom4.idx],
+                                  c.trigonal_angle_types[t.type.idx])
+            )
+        for o in self.out_of_plane_bends:
+            c.out_of_plane_bends.append(
+                    OutOfPlaneBend(atoms[t.atom1.idx], atoms[t.atom2.idx],
+                                   atoms[t.atom3.idx], atoms[t.atom4.idx],
+                                   c.out_of_plane_bend_types[o.type.idx])
+            )
+        for p in self.pi_torsions:
+            c.pi_torsions.append(
+                    PiTorsion(atoms[p.atom1.idx], atoms[p.atom2.idx],
+                              atoms[p.atom3.idx], atoms[p.atom4.idx],
+                              atoms[p.atom5.idx], atoms[p.atom6.idx],
+                              c.pi_torsion_types[p.type.idx])
+            )
+        for s in self.stretch_bends:
+            c.stretch_bends.append(
+                    StretchBend(atoms[s.atom1.idx], atoms[s.atom2.idx],
+                                atoms[s.atom3.idx],
+                                c.stretch_bend_types[s.type.idx])
+            )
+        for t in self.torsion_torsions:
+            c.torsion_torsions.append(
+                    TorsionTorsion(atoms[t.atom1.idx], atoms[t.atom2.idx],
+                                   atoms[t.atom3.idx], atoms[t.atom4.idx],
+                                   atoms[t.atom5.idx],
+                                   c.torsion_torsion_types[t.type.idx])
+            )
+        for ch in self.chiral_frames:
+            c.chiral_frames.append(
+                    ChiralFrame(atoms[ch.atom1.idx], atoms[ch.atom2.idx],
+                                ch.chirality)
+            )
+        for m in self.multipole_frames:
+            c.multipole_frames.append(
+                    MultipoleFrame(atoms[m.atom.idx], m.frame_pt_num, m.vectail,
+                                   m.vechead, m.nvec)
+            )
+        for a in self.adjusts:
+            c.adjusts.append(
+                    NonbondedException(atoms[a.atom1.idx], atoms[a.atom2.idx],
+                                       c.adjust_types[a.type.idx])
+            )
+        for a in self.acceptors:
+            c.acceptors.append(
+                    AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
+            )
+        for d in self.donors:
+            c.acceptors.append(
+                    AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
+            )
+        for g in self.groups:
+            c.groups.append(Group(g.bs, g.type, g.move))
+        return c
 
     #===================================================
 

@@ -22,14 +22,12 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.amber._amberparm import AmberParm, Rst7
-from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
-                MTHETA, NPHIH, MPHIA, NNB, NRES, NBONA, NTHETA, NPHIA, NUMBND,
-                NUMANG, NPTRA, NATYP, IFBOX, NMXRS, CHARMM_ELECTROSTATIC)
+from chemistry.amber._amberparm import AmberParm
+from chemistry.amber.constants import (NTYPES, CHARMM_ELECTROSTATIC, NATYP)
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
-from chemistry.exceptions import CharmmPSFError, AmberParmError
-from math import pi, sqrt
+from chemistry.exceptions import AmberParmError
+from math import sqrt
 import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -139,6 +137,42 @@ class ChamberParm(AmberParm):
         self._load_improper_info()
         self._load_cmap_info()
         super(ChamberParm, self).unchange()
+
+    #===================================================
+
+    @classmethod
+    def load_from_structure(cls, struct):
+        """
+        Take a Structure instance and initialize a ChamberParm instance from
+        that data.
+
+        Parameters
+        ----------
+        struct : Structure
+            The input structure from which to construct a ChamberParm instance
+        """
+        inst = struct.copy(cls, split_dihedrals=True)
+        inst.pointers = {}
+        inst.LJ_types = {}
+        inst.atoms.assign_nbidx_from_types()
+        # Fill the Lennard-Jones arrays/dicts
+        ntyp = 0
+        for atom in inst.atoms:
+            inst.LJ_types[atom.type] = atom.nb_idx
+            ntyp = max(ntyp, atom.nb_idx)
+        inst.LJ_radius = [0 for i in xrange(ntyp)]
+        inst.LJ_depth = [0 for i in xrange(ntyp)]
+        inst.LJ_14_radius = [0 for i in xrange(ntyp)]
+        inst.LJ_14_depth = [0 for i in xrange(ntyp)]
+        for atom in inst.atoms:
+            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+            inst.LJ_14_radius[atom.nb_idx-1] = atom.atom_type.rmin_14
+            inst.LJ_14_depth[atom.nb_idx-1] = atom.atom_type.epsilon_14
+        inst._add_standard_flags()
+        inst.remake_parm()
+        inst._set_nonbonded_tables()
+        return inst
 
     #===================================================
 
@@ -267,10 +301,8 @@ class ChamberParm(AmberParm):
         for i in xrange(ntypes):
             for j in xrange(i, ntypes):
                 index = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                rij = self.combine_rmin(self.LJ_14_radius[i],
-                                        self.LJ_14_radius[j])
-                wdij = self.combine_epsilon(self.LJ_14_depth[i],
-                                            self.LJ_14_depth[j])
+                rij = self.LJ_14_radius[i] + self.LJ_14_radius[j]
+                wdij = sqrt(self.LJ_14_depth[i] * self.LJ_14_depth[j])
                 acoef[index] = wdij * rij ** 12
                 bcoef[index] = 2 * wdij * rij**6
 
@@ -286,7 +318,7 @@ class ChamberParm(AmberParm):
 
     @property
     def has_cmap(self):
-        return 'CHARMM_CMAP_COUNT' in self.flag_list
+        return len(self.cmaps) > 0 or 'CHARMM_CMAP_COUNT' in self.parm_data
 
     #===========  PRIVATE INSTANCE METHODS  ============
 
@@ -420,457 +452,142 @@ class ChamberParm(AmberParm):
                                cmap.atom3.idx+1, cmap.atom4.idx+1,
                                cmap.atom5.idx+1, cmap.type.idx+1])
         data['CHARMM_CMAP_COUNT'] = [i+1, len(self.cmap_types)]
+        data['CHARMM_CMAP_RESOLUTION'] = \
+                    [ct.resolution for ct in self.cmap_types]
         self.pointers['CMAP'] = i+1
         self.pointers['CMAP_TYPES'] = len(self.cmap_types)
+
+    #===================================================
+
+    def _add_standard_flags(self):
+        """ Adds all of the standard flags to the parm_data array """
+        self.set_version()
+        self.add_flag('CTITLE', '20a4', num_items=0)
+        self.add_flag('POINTERS', '10I8', num_items=31)
+        self.add_flag('FORCE_FIELD_TYPE', 'i2,a78', num_items=0)
+        self.add_flag('ATOM_NAME', '20a4', num_items=0)
+        self.add_flag('CHARGE', '3E24.16', num_items=0)
+        self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
+        self.add_flag('MASS', '5E16.8', num_items=0)
+        self.add_flag('ATOM_TYPE_INDEX', '10I8', num_items=0)
+        self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', num_items=0)
+        self.add_flag('NONBONDED_PARM_INDEX', '10I8', num_items=0)
+        self.add_flag('RESIDUE_LABEL', '20a4', num_items=0)
+        self.add_flag('RESIDUE_POINTER', '10I8', num_items=0)
+        self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('BOND_EQUIL_VALUE', '5E16.8', num_items=0)
+        self.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('ANGLE_EQUIL_VALUE', '3E25.17', num_items=0)
+        self.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', num_items=2)
+        self.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=0)
+        self.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
+                      num_items=0)
+        self.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', num_items=0)
+        self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
+        self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
+        self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
+        self.add_flag('CHARMM_NUM_IMPROPERS', '10I8', num_items=0)
+        self.add_flag('CHARMM_IMPROPERS', '10I8', num_items=0)
+        self.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', num_items=1)
+        self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0)
+        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0)
+        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
+        self.add_flag('SOLTY', '5E16.8', num_items=natyp)
+        self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', num_items=0)
+        self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('LENNARD_JONES_14_ACOEF', '5E16.8', num_items=0)
+        self.add_flag('LENNARD_JONES_14_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('BONDS_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('ANGLES_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8', num_items=0)
+        self.add_flag('EXCLUDED_ATOMS_LIST', '10I8', num_items=0)
+        self.add_flag('HBOND_ACOEF', '5E16.8', num_items=0)
+        self.add_flag('HBOND_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('HBCUT', '5E16.8', num_items=0)
+        self.add_flag('AMBER_ATOM_TYPE', '20a4', num_items=0)
+        self.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4', num_items=0)
+        self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
+        self.add_flag('IROTAT', '10I8', num_items=0)
+        if self.box is not None:
+            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
+            self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
+            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=0)
+        self.add_flag('RADIUS_SET', '1a80', num_items=1)
+        self.add_flag('RADII', '5E16.8', num_items=0)
+        self.add_flag('SCREEN', '5E16.8', num_items=0)
+        self.add_flag('IPOL', '1I8', num_items=1)
+
+    #===================================================
+
+    def _set_nonbonded_tables(self):
+        """
+        Sets the tables of Lennard-Jones nonbonded interaction pairs
+        """
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        ntypes2 = ntypes * ntypes
+        # Set up the index lookup tables (not a unique solution)
+        self.parm_data['NONBONDED_PARM_INDEX'] = [0 for i in xrange(ntypes2)]
+        holder = [0 for i in xrange(ntypes2)]
+        idx = 0
+        for i in xrange(ntypes):
+            for j in xrange(i+1):
+                idx += 1
+                holder[ntypes*i+j] = holder[ntypes*j+i] = idx
+        idx = 0
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
+                self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
+                            holder[ntypes*i+j]
+                idx += 1
+        nttyp = ntypes * (ntypes + 1) // 2
+        # Now build the Lennard-Jones arrays
+        self.parm_data['LENNARD_JONES_14_ACOEF'] = [0 for i in xrange(nttyp)]
+        self.parm_data['LENNARD_JONES_14_BCOEF'] = [0 for i in xrange(nttyp)]
+        self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
+        self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
+        self.recalculate_LJ()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 charmm_solvent = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
-def ConvertFromPSF(struct, frcfield, vmd=False, title=''):
+def ConvertFromPSF(struct, params, title=''):
     """
     This function instantiates a ChamberParm instance from a data structure
     instantiated by a CHARMM PSF.
 
-    Parameters:
-        - struct (ProteinStructure) : The structure loaded from a PSF file.
-        - frcfield (str) : The name of the CHARMM force field being used
-        - vmd (bool) : Print a VMD-compatible topology file
-        - title (str) : The title of the topology file
+    Parameters
+    ----------
+    struct : Structure
+        The structure object (typically loaded from a PSF file)
+    params : CharmmParameterSet
+        The parameter set describing the parameters of the input struct
+    title : str=''
+        The title to assign to the topology file
 
-    Returns:
-        ChamberParm with all parameters loaded
+    Returns
+    -------
+    ChamberParm
+        ChamberParm instance with all parameters loaded
     """
-    # Make sure that frcfield is the right type
-    if isinstance(frcfield, list):
-        for i, x in enumerate(frcfield):
-            if i % 2 == 0 and not isinstance(x, int):
-                raise TypeError('frcfield must be [int, str, [int, str, ...]]')
-            elif i % 2 == 1 and not isinstance(x, str):
-                raise TypeError('frcfield must be [int, str, [int, str, ...]]')
-    # Make sure the structure has had its box info loaded
-    if not hasattr(struct, 'box'):
-        raise CharmmPSFError('Box and coordinate info must be set in the PSF '
-                             'prior to converting to a topology.')
-    struct.atom_list.assign_indexes()
-    # First define the pointers
-    # Split parameters b/w those with hydrogen and those without
-    bonds_inc_h, bonds_without_h = [], []
-    for bond in struct.bond_list:
-        if (bond.atom1.type.atomic_number == 1 or
-            bond.atom2.type.atomic_number == 1):
-            bonds_inc_h.append(bond)
-        else:
-            bonds_without_h.append(bond)
-    angles_inc_h, angles_without_h = [], []
-    for angle in struct.angle_list:
-        if (angle.atom1.type.atomic_number == 1 or
-            angle.atom2.type.atomic_number == 1 or
-            angle.atom3.type.atomic_number == 1):
-            angles_inc_h.append(angle)
-        else:
-            angles_without_h.append(angle)
-    dihedrals_inc_h, dihedrals_without_h = [], []
-    for dihed in struct.dihedral_parameters:
-        if (dihed.atom1.type.atomic_number == 1 or
-            dihed.atom2.type.atomic_number == 1 or
-            dihed.atom3.type.atomic_number == 1 or
-            dihed.atom4.type.atomic_number == 1):
-            dihedrals_inc_h.append(dihed)
-        else:
-            dihedrals_without_h.append(dihed)
-    pointers = [0 for i in xrange(32)]
-    # Define the exclusion list from the 1-2, 1-3, and 1-4 partners
-    excluded_atoms_list = []
-    num_excluded_atoms = [0 for i in xrange(len(struct.atom_list))]
-    for i, atom in enumerate(struct.atom_list):
-        vals_to_add = []
-        for partner in atom.bond_partners:
-            if partner.idx > atom.idx: vals_to_add.append(partner.idx + 1)
-        for partner in atom.angle_partners:
-            if partner.idx > atom.idx: vals_to_add.append(partner.idx + 1)
-        for partner in atom.dihedral_partners:
-            if partner.idx > atom.idx: vals_to_add.append(partner.idx + 1)
-        if not vals_to_add: vals_to_add = [0]
-        num_excluded_atoms[i] = len(vals_to_add)
-        excluded_atoms_list.extend(sorted(vals_to_add))
-    # Determine the number of LJ atom types by condensing them into as few atom
-    # types as possible
-    lj_idx_list = [0 for atom in struct.atom_list]
-    num_lj_types = 0
-    lj_radii, lj_depths = [], []
-    lj_radii14, lj_depths14 = [], []
-    lj_type_list = []
-    for i, atom in enumerate(struct.atom_list):
-        atom = atom.type
-        # If we have already assigned the LJ type, skip this one
-        if lj_idx_list[i] > 0: continue
-        # This is a NEW nonbonded LJ type
-        num_lj_types += 1
-        lj_idx_list[i] = num_lj_types
-        ljtype = (atom.rmin, atom.rmin_14, atom.epsilon, atom.epsilon_14)
-        lj_type_list.append(atom)
-        lj_radii.append(atom.rmin)
-        lj_radii14.append(atom.rmin_14)
-        lj_depths.append(atom.epsilon)
-        lj_depths14.append(atom.epsilon_14)
-        # Look through the rest of the atoms and assign any equivalent types as
-        # the same
-        for j in xrange(i+1, len(struct.atom_list)):
-            atom2 = struct.atom_list[j].type
-            if lj_idx_list[j] > 0: continue
-            elif atom2 is atom: # same exact type!
-                lj_idx_list[j] = num_lj_types
-            elif not atom.nbfix:
-                # Only non-NBFIXed atom types can be compressed
-                ljtype2 = (atom2.rmin, atom2.rmin_14,
-                           atom2.epsilon, atom2.epsilon_14)
-                if ljtype == ljtype2:
-                    lj_idx_list[j] = num_lj_types
-    # Now we should be ready to set some of our pointers (not # of types yet)
-    pointers[NATOM] = len(struct.atom_list)
-    pointers[NTYPES] = pointers[NATYP] = num_lj_types
-    pointers[NBONH] = len(bonds_inc_h)
-    pointers[MBONA] = pointers[NBONA] = len(bonds_without_h)
-    pointers[NTHETH] = len(angles_inc_h)
-    pointers[MTHETA] = pointers[NTHETA] = len(angles_without_h)
-    pointers[NPHIH] = len(dihedrals_inc_h)
-    pointers[MPHIA] = pointers[NPHIA] = len(dihedrals_without_h)
-    pointers[NNB] = len(excluded_atoms_list)
-    pointers[NRES] = len(struct.residue_list)
-    if struct.box is None:
-        pointers[IFBOX] = 0
-    elif struct.box[3:] == [90, 90, 90]:
-        pointers[IFBOX] = 1
-    else:
-        # triclinic
-        pointers[IFBOX] = 2
-    pointers[NMXRS] = max([len(r) for r in struct.residue_list])
-    # First add all of the flags
-    parm = ChamberParm()
-    if vmd:
-        parm.add_flag('TITLE', '20a4', data=[title])
-    else:
-        parm.add_flag('CTITLE', 'a80', data=[title])
-    parm.add_flag('POINTERS', '10I8', data=pointers)
-    parm.add_flag('FORCE_FIELD_TYPE', 'i2,a78', data=frcfield)
-    parm.add_flag('ATOM_NAME','20a4',
-                  data=[a.name[:4] for a in struct.atom_list])
-    chgdat = [a.charge for a in struct.atom_list]
-    if vmd:
-        parm.add_flag('CHARGE', '5E16.8', data=chgdat)
-    else:
-        parm.add_flag('CHARGE', '3E24.16', data=chgdat,
-                     comments=['Atomic charge multiplied by sqrt(332.0716D0) '
-                               '(CCELEC)']
-        )
-    parm.add_flag('MASS', '5E16.8', data=[a.mass for a in struct.atom_list])
-    parm.add_flag('ATOM_TYPE_INDEX', '10I8', data=lj_idx_list)
-    parm.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=num_excluded_atoms)
-    parm.add_flag('EXCLUDED_ATOMS_LIST', '10I8', data=excluded_atoms_list)
-    # Assign the nonbonded parm index table
-    holder = [0 for i in xrange(num_lj_types*num_lj_types)]
-    idx = 0
-    for i in xrange(num_lj_types):
-        for j in xrange(i+1):
-            idx += 1
-            holder[num_lj_types*i+j] = idx
-            holder[num_lj_types*j+i] = idx
-    holder2 = [0 for i in xrange(num_lj_types*num_lj_types)]
-    idx = 0
-    for i in xrange(num_lj_types):
-        for j in xrange(num_lj_types):
-            holder2[idx] = holder[i*num_lj_types+j]
-            idx += 1
-    del holder
-    parm.add_flag('NONBONDED_PARM_INDEX', '10I8', data=holder2)
-    parm.add_flag('RESIDUE_LABEL', '20a4',
-                  data=[res.resname[:4] for res in struct.residue_list])
-    resptr = [0 for i in xrange(len(struct.residue_list))]
-    n = 1
-    for i, res in enumerate(struct.residue_list):
-        resptr[i] = n
-        n += len(res)
-    parm.add_flag('RESIDUE_POINTER', '10I8', data=resptr)
-    # Assign the bond types and bond type indexes
-    numbnd = 0
-    bond_frc_cnst, bond_equil = [], []
-    for bond in struct.bond_list: bond.bond_type.idx = -1
-    for bond in struct.bond_list:
-        if bond.bond_type.idx == -1:
-            bond_frc_cnst.append(bond.bond_type.k)
-            bond_equil.append(bond.bond_type.req)
-            bond.bond_type.idx = numbnd
-            numbnd += 1
-    parm.parm_data['POINTERS'][NUMBND] = numbnd
-    parm.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=bond_frc_cnst)
-    parm.add_flag('BOND_EQUIL_VALUE', '5E16.8', data=bond_equil)
-    # Assign the angle types and angle type indexes
-    numang = 0
-    angle_frc_cnst, angle_equil = [], []
-    for angle in struct.angle_list: angle.angle_type.idx = -1
-    for angle in struct.angle_list:
-        if angle.angle_type.idx == -1:
-            angle_frc_cnst.append(angle.angle_type.k)
-            angle_equil.append(angle.angle_type.theteq * pi/180) # to radians
-            angle.angle_type.idx = numang
-            numang += 1
-    parm.parm_data['POINTERS'][NUMANG] = numang
-    parm.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', data=angle_frc_cnst)
-    parm.add_flag('ANGLE_EQUIL_VALUE', '3E25.17', data=angle_equil)
-    # Assign the Urey-Bradley terms
-    nub = 0
-    ub_frc_cnst, ub_equil = [], []
-    for ureybrad in struct.urey_bradley_list: ureybrad.ub_type.idx = -1
-    for ureybrad in struct.urey_bradley_list:
-        if ureybrad.ub_type.idx == -1:
-            ub_frc_cnst.append(ureybrad.ub_type.k)
-            ub_equil.append(ureybrad.ub_type.req)
-            ureybrad.ub_type.idx = nub
-            nub += 1
-    ubcnt = [len(struct.urey_bradley_list), nub]
-    parm.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', data=ubcnt,
-                  comments=['V(ub) = K_ub(r_ik - R_ub)**2',
-                            'Number of Urey Bradley terms and types']
-    )
-    parm.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=ubcnt[0]*3,
-                  comments=['List of the two atoms and its parameter index',
-                            'in each UB term: i,k,index']
-    )
-    parm.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
-                  data=ub_frc_cnst, comments=['K_ub: kcal/mol/A**2'])
-    parm.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', data=ub_equil,
-                  comments='r_ub: A')
-    for i, ureybrad in enumerate(struct.urey_bradley_list):
-        parm.parm_data['CHARMM_UREY_BRADLEY'][3*i  ] = ureybrad.atom1.idx + 1
-        parm.parm_data['CHARMM_UREY_BRADLEY'][3*i+1] = ureybrad.atom2.idx + 1
-        parm.parm_data['CHARMM_UREY_BRADLEY'][3*i+2] = ureybrad.ub_type.idx + 1
-    # Assign the dihedral constants
-    nphi = 0
-    dih_frc_cnst, dih_per, dih_phase = [], [], []
-    for dihed in struct.dihedral_parameters: dihed.dihedral_type.idx = -1
-    for dihed in struct.dihedral_parameters:
-        if dihed.dihedral_type.idx == -1:
-            dih_frc_cnst.append(dihed.dihedral_type.phi_k)
-            dih_per.append(dihed.dihedral_type.per)
-            dih_phase.append(dihed.dihedral_type.phase * pi/180)
-            dihed.dihedral_type.idx = nphi
-            nphi += 1
-    parm.parm_data['POINTERS'][NPTRA] = nphi
-    parm.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', data=dih_frc_cnst)
-    parm.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', data=dih_per)
-    parm.add_flag('DIHEDRAL_PHASE', '5E16.8', data=dih_phase)
-    # No 1-4 scaling 
-    parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8', data=[1 for i in xrange(nphi)])
-    parm.add_flag('SCNB_SCALE_FACTOR', '5E16.8', data=[1 for i in xrange(nphi)])
-    # Assign impropers
-    nimpt = 0
-    imp_frc_cnst, imp_equil = [], []
-    for imp in struct.improper_list: imp.improper_type.idx = -1
-    for imp in struct.improper_list:
-        if imp.improper_type.idx == -1:
-            imp_frc_cnst.append(imp.improper_type.k)
-            imp_equil.append(imp.improper_type.phieq)
-            imp.improper_type.idx = nimpt
-            nimpt += 1
-    nimp = len(struct.improper_list)
-    parm.add_flag('CHARMM_NUM_IMPROPERS', '10I8',
-                  data=[nimp], comments=['Number of terms contributing to the',
-                  'quadratic four atom improper energy term:',
-                  'V(improper) = K_psi(psi - psi_0)**2']
-    )
-    parm.add_flag('CHARMM_IMPROPERS', '10I8', num_items=nimp*5,
-                  comments=['List of the four atoms in each improper term',
-                            'i,j,k,l,index  i,j,k,l,index',
-                            'where index is into the following two lists:',
-                            'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}']
-    )
-    parm.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', data=[nimpt],
-                  comments=['Number of unique parameters contributing to the',
-                            'quadratic four atom improper energy term']
-    )
-    parm.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', data=imp_frc_cnst,
-                  comments=['K_psi: kcal/mole/rad**2'])
-    parm.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', data=imp_equil,
-                  comments=['psi: degrees'])
-    # Add the impropers
-    for i, imp in enumerate(struct.improper_list):
-        parm.parm_data['CHARMM_IMPROPERS'][5*i  ] = imp.atom1.idx + 1
-        parm.parm_data['CHARMM_IMPROPERS'][5*i+1] = imp.atom2.idx + 1
-        parm.parm_data['CHARMM_IMPROPERS'][5*i+2] = imp.atom3.idx + 1
-        parm.parm_data['CHARMM_IMPROPERS'][5*i+3] = imp.atom4.idx + 1
-        parm.parm_data['CHARMM_IMPROPERS'][5*i+4] = imp.improper_type.idx + 1
-
-    parm.add_flag('SOLTY','5E16.8',num_items=parm.parm_data['POINTERS'][NATYP])
-    if vmd:
-        fmt = '5E16.8'
-    else:
-        fmt = '3E24.16'
-    nttyp = num_lj_types * (num_lj_types + 1) // 2
-    parm.add_flag('LENNARD_JONES_ACOEF', fmt, num_items=nttyp)
-    parm.add_flag('LENNARD_JONES_BCOEF', fmt, num_items=nttyp)
-    parm.add_flag('LENNARD_JONES_14_ACOEF', fmt, num_items=nttyp)
-    parm.add_flag('LENNARD_JONES_14_BCOEF', fmt, num_items=nttyp)
-    for i in xrange(num_lj_types):
-        for j in xrange(i, num_lj_types):
-            index = parm.parm_data['NONBONDED_PARM_INDEX'][num_lj_types*i+j] - 1
-            typi = lj_type_list[i]
-            typj = lj_type_list[j]
-            # Get any NBFIXes we may have
-            try:
-                rij, wdij, wdij14, rij14 = typi.nbfix[typj.name]
-            except KeyError:
-                rij = lj_radii[i] + lj_radii[j]
-                wdij = sqrt(lj_depths[i] * lj_depths[j])
-                rij14 = lj_radii14[i] + lj_radii14[j]
-                wdij14 = sqrt(lj_depths14[i] * lj_depths14[j])
-            a = wdij * rij**12
-            a14 = wdij14 * rij14**12
-            b = 2 * wdij * rij**6
-            b14 = 2 * wdij14 * rij14**6
-            parm.parm_data['LENNARD_JONES_ACOEF'][index] = a
-            parm.parm_data['LENNARD_JONES_BCOEF'][index] = b
-            parm.parm_data['LENNARD_JONES_14_ACOEF'][index] = a14
-            parm.parm_data['LENNARD_JONES_14_BCOEF'][index] = b14
-    # Bonds with and without hydrogen now
-    parm.add_flag('BONDS_INC_HYDROGEN', '10I8', num_items=len(bonds_inc_h)*3)
-    parm.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8',
-                  num_items=len(bonds_without_h)*3)
-    pd = parm.parm_data
-    for i, bond in enumerate(bonds_inc_h):
-        pd['BONDS_INC_HYDROGEN'][3*i  ] = bond.atom1.idx * 3
-        pd['BONDS_INC_HYDROGEN'][3*i+1] = bond.atom2.idx * 3
-        pd['BONDS_INC_HYDROGEN'][3*i+2] = bond.bond_type.idx + 1
-    for i, bond in enumerate(bonds_without_h):
-        pd['BONDS_WITHOUT_HYDROGEN'][3*i  ] = bond.atom1.idx * 3
-        pd['BONDS_WITHOUT_HYDROGEN'][3*i+1] = bond.atom2.idx * 3
-        pd['BONDS_WITHOUT_HYDROGEN'][3*i+2] = bond.bond_type.idx + 1
-    # Angles with and without hydrogen now
-    parm.add_flag('ANGLES_INC_HYDROGEN', '10I8', num_items=len(angles_inc_h)*4)
-    parm.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8',
-                  num_items=len(angles_without_h)*4)
-    for i, ang in enumerate(angles_inc_h):
-        pd['ANGLES_INC_HYDROGEN'][4*i  ] = ang.atom1.idx * 3
-        pd['ANGLES_INC_HYDROGEN'][4*i+1] = ang.atom2.idx * 3
-        pd['ANGLES_INC_HYDROGEN'][4*i+2] = ang.atom3.idx * 3
-        pd['ANGLES_INC_HYDROGEN'][4*i+3] = ang.angle_type.idx + 1
-    for i, ang in enumerate(angles_without_h):
-        pd['ANGLES_WITHOUT_HYDROGEN'][4*i  ] = ang.atom1.idx * 3
-        pd['ANGLES_WITHOUT_HYDROGEN'][4*i+1] = ang.atom2.idx * 3
-        pd['ANGLES_WITHOUT_HYDROGEN'][4*i+2] = ang.atom3.idx * 3
-        pd['ANGLES_WITHOUT_HYDROGEN'][4*i+3] = ang.angle_type.idx + 1
-    # Dihedrals with and without hydrogen now
-    parm.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8',
-                 num_items=len(dihedrals_inc_h)*5)
-    parm.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8',
-                 num_items=len(dihedrals_without_h)*5)
-    for i, dih in enumerate(dihedrals_inc_h):
-        if dih.atom3.idx == 0 or dih.atom4.idx == 0:
-            a1, a2, a3, a4 = dih.atom4, dih.atom3, dih.atom2, dih.atom1
-        else:
-            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i  ] = a1.idx * 3
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i+1] = a2.idx * 3
-        if not dih.end_groups_active:
-            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = -a3.idx * 3
-        else:
-            pd['DIHEDRALS_INC_HYDROGEN'][5*i+2] = a3.idx * 3
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i+3] = a4.idx * 3
-        pd['DIHEDRALS_INC_HYDROGEN'][5*i+4] = dih.dihedral_type.idx + 1
-    for i, dih in enumerate(dihedrals_without_h):
-        if dih.atom3.idx == 0 or dih.atom4.idx == 0:
-            a1, a2, a3, a4 = dih.atom4, dih.atom3, dih.atom2, dih.atom1
-        else:
-            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i  ] = a1.idx * 3
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+1] = a2.idx * 3
-        if not dih.end_groups_active:
-            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = -a3.idx * 3
-        else:
-            pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+2] = a3.idx * 3
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+3] = a4.idx * 3
-        pd['DIHEDRALS_WITHOUT_HYDROGEN'][5*i+4] = dih.dihedral_type.idx + 1
-    parm.add_flag('HBOND_ACOEF', '5E16.8', num_items=0)
-    parm.add_flag('HBOND_BCOEF', '5E16.8', num_items=0)
-    parm.add_flag('HBCUT', '5E16.8', num_items=0)
-    parm.add_flag('AMBER_ATOM_TYPE', '20a4',
-                 data=[a.type.name[:4] for a in struct.atom_list])
-    parm.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4',
-                 data=['BLA' for a in struct.atom_list])
-    parm.add_flag('JOIN_ARRAY', '10I8', data=[0 for a in struct.atom_list])
-    parm.add_flag('IROTAT', '10I8', data=[0 for a in struct.atom_list])
-    if hasattr(struct, 'cmap_list'):
-        # Do the CMAP terms if we have cmaps
-        ncmapt = 0
-        ncmap = len(struct.cmap_list)
-        cmap_types = []
-        for cmap in struct.cmap_list: cmap.cmap_type.idx = -1
-        for cmap in struct.cmap_list:
-            if cmap.cmap_type.idx == -1:
-                cmap_types.append(cmap.cmap_type)
-                cmap.cmap_type.idx = ncmapt
-                ncmapt += 1
-        parm.add_flag('CHARMM_CMAP_COUNT', '2I8', data=[ncmap, ncmapt],
-                     comments=['Number of CMAP terms, number of unique CMAP '
-                               'parameters']
-        )
-        parm.add_flag('CHARMM_CMAP_RESOLUTION', '20I4',
-                     data=[cmap_type.resolution for cmap_type in cmap_types],
-                     comments=['Number of steps along each phi/psi CMAP axis',
-                               'for each CMAP_PARAMETER grid']
-        )
-        # Now add each of the cmap flags
-        for i, ct in enumerate(cmap_types):
-            parm.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), '8(F9.5)',
-                         data=ct.grid[:])
-        # Now add the cmap data
-        parm.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=ncmap*6,
-                     comments=['Atom index i,j,k,l,m of the cross term',
-                               'and then pointer to CHARMM_CMAP_PARAMETER_n']
-        )
-        for i, cmap in enumerate(struct.cmap_list):
-            if not cmap.consecutive:
-                raise CharmmPSFError('Amber-CHARMM implementation only '
-                                     'supports consecutive coupled torsions.')
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i  ] = cmap.atom1.idx + 1
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i+1] = cmap.atom2.idx + 1
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i+2] = cmap.atom3.idx + 1
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i+3] = cmap.atom4.idx + 1
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i+4] = cmap.atom5.idx + 1
-            parm.parm_data['CHARMM_CMAP_INDEX'][6*i+5] = cmap.cmap_type.idx + 1
-    if struct.box is not None:
-        nspm = max([atom.marked for atom in struct.atom_list])
-        iptres = len(struct.residue_list)
-        for i, res in enumerate(struct.residue_list):
-            if res.resname in charmm_solvent:
-                iptres = i + 1
-                break
-        nspsol = nspm
-        for atom in struct.atom_list:
-            if atom.residue.resname in charmm_solvent:
-                nspsol = atom.marked
-                break
-        parm.add_flag('SOLVENT_POINTERS', '3I8', data=[iptres, nspm, nspsol])
-        parm.add_flag('ATOMS_PER_MOLECULE', '10i8', num_items=nspm)
-        for atom in struct.atom_list:
-            parm.parm_data['ATOMS_PER_MOLECULE'][atom.marked-1] += 1
-        box_info = [struct.box[3]] + struct.box[:3]
-        parm.add_flag('BOX_DIMENSIONS', '5E16.8', data=box_info)
-        parm.initialize_topology()
-        parm.hasbox = True
-        parm.box = struct.box[:]
-    else:
-        parm.initialize_topology()
-        parm.hasbox = False
-
-    # See if we need to set a rst7 attribute (if coordinates are set)
-    if hasattr(struct.atom_list[0], 'xx'):
-        # Assume if the first atom has an X-coordinate, all coordinates are
-        # present
-        parm.rst7 = Rst7(natom=len(struct.atom_list))
-        crds = []
-        for atom in struct.atom_list:
-            crds += [atom.xx, atom.xy, atom.xz]
-        parm.coords = crds
-        parm.hasvels = False
+    # Make sure all atom types are strings, not integers
+    int_starting = str(struct.atoms[0].atom_type) != struct.atoms[0].type
+    if int_starting:
+        for atom in struct.atoms:
+            atom.type = str(atom.atom_type)
+    parm = ChamberParm.load_from_structure(struct)
+    parm.parm_data['FORCE_FIELD_TYPE'] = fftype = []
+    for pset in params.parametersets:
+        fftype.extend([len(params.parametersets), pset])
+    if not fftype:
+        fftype.extend([1, 'No FF information parsed...'])
+    # Convert atom types back to integers if that's how they started
+    if int_starting:
+        for atom in struct.atoms:
+            atom.type = int(atom.atom_type)
     return parm

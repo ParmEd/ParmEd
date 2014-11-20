@@ -1088,8 +1088,8 @@ class changeprotstate(Action):
         if sum(sel) == 0:
             return "No residues selected for state change"
         res = self.parm.atoms[sel.index(1)].residue
-        return 'Changing protonation state of residue %d (%s) to %d' % (res.idx,
-                            res.resname, self.state)
+        return 'Changing protonation state of residue %d (%s) to %d' % (
+                            res.idx+1, res.name, self.state)
    
     @staticmethod
     def _add_ash_glh(residues):
@@ -3254,10 +3254,10 @@ class chamber(Action):
                                            'file type')
                     crdbox = crd.box
                     coords = crd.pdbxyz[0]
-            if len(coords) != len(psf.atom_list) * 3:
+            if len(coords) != len(psf.atoms) * 3:
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
-                                   3*len(psf.atom_list)))
+                                   3*len(psf.atoms)))
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
                 psf.set_box(*crdbox[:])
@@ -3265,7 +3265,7 @@ class chamber(Action):
                 # Define the bounding box
                 xmin, ymin, zmin = coords[:3]
                 xmax, ymax, zmax = xmin, ymin, zmin
-                for i in xrange(1, len(psf.atom_list)):
+                for i in xrange(1, len(psf.atoms)):
                     i3 = i * 3
                     xmin = min(xmin, coords[i3  ])
                     xmax = max(xmax, coords[i3  ])
@@ -3298,7 +3298,7 @@ class chamber(Action):
             psf.load_parameters(parmset)
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
-        parm = ConvertFromPSF(psf, frcfield).view(ChamberParm)
+        parm = ConvertFromPSF(psf, parmset).view(ChamberParm)
         if self.crdfile is not None:
             parm.load_coordinates(coords)
         parm.prm_name = self.psf

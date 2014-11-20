@@ -567,6 +567,14 @@ class CharmmPsfFile(Structure):
                 bond.type = parmset.bond_types[key]
             except KeyError:
                 raise MissingParameter('Missing bond type for %r' % bond)
+            bond.type.used = False
+        # Build the bond_types list
+        del self.bond_types[:]
+        for bond in self.bonds:
+            if bond.type.used: continue
+            bond.type.used = True
+            self.bond_types.append(bond.type)
+            bond.type.list = self.bond_types
         # Next load all of the angles. If a Urey-Bradley term is defined for
         # this angle, also build the urey_bradley and urey_bradley_type lists
         del self.urey_bradleys[:]
@@ -576,12 +584,26 @@ class CharmmPsfFile(Structure):
                    max(ang.atom1.type, ang.atom3.type))
             try:
                 ang.type = parmset.angle_types[key]
+                ang.type.used = False
                 ubt = parmset.urey_bradley_types[key]
                 if ubt is not NoUreyBradley:
                     ub = UreyBradley(ang.atom1, ang.atom3, ubt)
                     self.urey_bradleys.append(ub)
+                    ubt.used = False
             except KeyError:
                 raise MissingParameter('Missing angle type for %r' % ang)
+        del self.urey_bradley_types[:]
+        del self.angle_types[:]
+        for ub in self.urey_bradleys:
+            if ub.type.used: continue
+            ub.type.used = True
+            self.urey_bradley_types.append(ub.type)
+            ub.type.list = self.urey_bradley_types
+        for ang in self.angles:
+            if ang.type.used: continue
+            ang.type.used = True
+            self.angle_types.append(ang.type)
+            ang.type.list = self.angle_types
         # Next load all of the dihedrals.
         active_dih_list = set()
         for dih in self.dihedrals:
@@ -596,12 +618,19 @@ class CharmmPsfFile(Structure):
                     raise MissingParameter('No dihedral parameters found for '
                                            '%r' % dih)
             dih.type = parmset.dihedral_types[key]
+            dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
             if pair in active_dih_list:
                 dih.ignore_end = True
             else:
                 active_dih_list.add(pair)
                 active_dih_list.add((dih.atom4.idx, dih.atom1.idx))
+        del self.dihedral_types[:]
+        for dihedral in self.dihedrals:
+            if dihedral.type.used: continue
+            dihedral.type.used = True
+            self.dihedral_types.append(dihedral.type)
+            dihedral.type.list = self.dihedral_types
         # Now do the impropers
         for imp in self.impropers:
             # Store the atoms
@@ -619,6 +648,13 @@ class CharmmPsfFile(Structure):
             except KeyError:
                 raise MissingParameter('No improper parameters found for %r' %
                                        imp)
+            imp.type.used = False
+        del self.improper_types[:]
+        for improper in self.impropers:
+            if improper.type.used: continue
+            improper.type.used = True
+            self.improper_types.append(improper.type)
+            improper.type.list = self.improper_types
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
@@ -628,6 +664,13 @@ class CharmmPsfFile(Structure):
                 cmap.type = parmset.cmap_types[key]
             except KeyError:
                 raise MissingParameter('No CMAP parameters found for %r' % cmap)
+            cmap.type.used = False
+        del self.cmap_types[:]
+        for cmap in self.cmaps:
+            if cmap.type.used: continue
+            cmap.type.used = True
+            self.cmap_types.append(cmap.type)
+            cmap.type.list = self.cmap_types
         # If the types started out as integers, change them back
         if types_are_int:
             for atom in self.atoms: atom.type = int(atom.atom_type)

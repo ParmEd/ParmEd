@@ -11,6 +11,7 @@ from chemistry.exceptions import (BondError, DihedralError, CmapError,
 from chemistry.amber.constants import TINY
 from chemistry.periodic_table import Mass, Element as _Element
 from compat24 import all, property
+import copy
 import warnings
 try:
     from itertools import izip as zip
@@ -19,12 +20,12 @@ except ImportError:
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
-           'Improper', 'ImproperType', 'MultipoleFrame', 'OutOfPlaneBend',
-           'PiTorsion', 'Residue', 'ResidueList', 'StretchBend',
-           'StretchBendType', 'TorsionTorsion', 'TorsionTorsionType',
-           'TrigonalAngle', 'TrackedList', 'UreyBradley', 'OutOfPlaneBendType',
-           'NonbondedException', 'NonbondedExceptionType', 'AcceptorDonor',
-           'Group', 'AtomType', 'NoUreyBradley']
+           'DihedralTypeList', 'Improper', 'ImproperType', 'MultipoleFrame',
+           'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList',
+           'StretchBend', 'StretchBendType', 'TorsionTorsion',
+           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
+           'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
+           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -153,6 +154,16 @@ def _delete_from_list(list, item):
         The object to delete from the list
     """
     list.pop(list.index(item))
+
+def _safe_assigns(dest, source, attrs):
+    """
+    Shallow-copies all requested attributes from `source` to `dest` if they
+    are present. If not present, nothing is done
+    """
+    for attr in attrs:
+        if not hasattr(source, attr): continue
+        myattr = getattr(source, attr)
+        setattr(dest, attr, myattr)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -413,6 +424,24 @@ class Atom(_ListItem):
         self.other_locations = {} # A dict of Atom instances
         self.atom_type = _UnassignedAtomType
    
+    #===================================================
+
+    def __copy__(self):
+        """ Returns a deep copy of this atom, but not attached to any list """
+        new = type(self)(atomic_number=self.atomic_number, name=self.name,
+                         type=self.type, charge=self.charge, mass=self.mass,
+                         nb_idx=self.nb_idx, radii=self.radii,
+                         screen=self.screen, tree=self.tree, join=self.join,
+                         irotat=self.irotat, occupancy=self.occupancy,
+                         bfactor=self.bfactor, altloc=self.altloc)
+        new.atom_type = self.atom_type
+        for key in self.other_locations:
+            new.other_locations[key] = copy.copy(self.other_locations[key])
+        _safe_assigns(new, self, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
+                      'type_idx', 'class_idx', 'multipoles', 'polarizability',
+                      'vdw_parent', 'vdw_weight'))
+        return new
+
     #===================================================
 
     # To alert people to changes in the API
@@ -1263,6 +1292,24 @@ class DihedralType(_ListItem, _ParameterType):
         return (self.phi_k == other.phi_k and self.per == other.per and 
                 self.phase == other.phase and self.scee == other.scee and
                 self.scnb == other.scnb)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class DihedralTypeList(list, _ListItem):
+    """
+    Dihedral types are a Fourier expansion of terms. In some cases, they are
+    stored in a list like this one inside another TrackedList. In other cases,
+    each term is a separate entry in the TrackedList.
+
+    In cases where `DihedralType`s are stored with every term in the same
+    container, this object supports list assignment and indexing like
+    `DihedralType`.
+    """
+    def __init__(self, *args, **kwargs):
+        list.__init__(self, *args, **kwargs)
+        self._idx = -1
+        self.list = None
+        self.used = False
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2957,6 +3004,27 @@ class AtomList(TrackedList):
             item.list = self
         return list.extend(self, items)
 
+    def assign_nbidx_from_types(self):
+        """
+        Assigns the nb_idx attribute of every atom inside here from the
+        atom_type definition. If the atom_type is not assigned, RuntimeError is
+        raised.
+        """
+        idx = 1
+        assignments = dict()
+        try:
+            for i, atom in enumerate(self):
+                type = atom.atom_type
+                key = (type.rmin, type.epsilon, type.rmin_14, type.epsilon_14)
+                try:
+                    atom.nb_idx = assignments[key]
+                except KeyError:
+                    assignments[key] = idx
+                    atom.nb_idx = idx
+                    idx += 1
+        except AttributeError:
+            raise RuntimeError('atom types are not assigned')
+
     def __iadd__(self, other):
         return NotImplemented
 
@@ -3095,10 +3163,6 @@ class AtomType(object):
     ('CA', 2)
     >>> print "%s: %d" % (str(at), int(at))
     HA: 1
-    >>> print at == WildCard
-    True
-    >>> print at2 == WildCard
-    True
     """
 
     def __init__(self, name, number, mass, atomic_number):
@@ -3127,7 +3191,6 @@ class AtomType(object):
         Compares based on available properties (name and number, just name,
         or just number)
         """
-        if other is WildCard: return True # all atom types match wild cards
         if isinstance(other, AtomType):
             return self.name == other.name and self.number == other.number
         if isinstance(other, basestring):
