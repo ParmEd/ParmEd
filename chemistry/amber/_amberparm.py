@@ -34,6 +34,7 @@ from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
 from chemistry.amber.amberformat import AmberFormat
 from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
+import copy
 try:
     from itertools import izip as zip
 except ImportError:
@@ -237,6 +238,10 @@ class AmberParm(AmberFormat, Structure):
             inst.hasbox = rawdata.hasbox
         if hasattr(rawdata, 'hasvels'):
             inst.hasvels = rawdata.hasvels
+        try:
+            inst.box = copy.copy(rawdata.box)
+        except AttributeError:
+            inst.box = None
         return inst
    
     #===================================================
@@ -270,6 +275,8 @@ class AmberParm(AmberFormat, Structure):
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
+        return inst
+
     #===================================================
 
     def __copy__(self):
@@ -281,6 +288,7 @@ class AmberParm(AmberFormat, Structure):
         other.LJ_depth = self.LJ_depth[:]
         other.hasvels = self.hasvels
         other.hasbox = self.hasbox
+        other.box = copy.copy(self.box)
 
         # Now fill the LJ and other data structures
         for p in self.pointers: other.pointers[p] = self.pointers[p]

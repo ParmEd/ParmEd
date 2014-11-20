@@ -8,7 +8,7 @@ file.
 """
 from __future__ import division
 
-from chemistry.amber.constants import TINY
+from chemistry.amber.constants import TINY, DEG_TO_RAD
 from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
 from chemistry.exceptions import APIError, OpenMMError
 import chemistry.periodic_table as pt
@@ -1058,7 +1058,7 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
         for imp in self.impropers:
             force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
                              imp.atom4.idx, (imp.type.psi_k*dihe_frc_conv,
-                              imp.type.psi_eq*pi/180)
+                              imp.type.psi_eq)
             )
         system.addForce(force)
 
@@ -1192,9 +1192,9 @@ def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
     if alpha <= 2 * pi and beta <= 2 * pi and gamma <= 2 * pi:
         raise ValueError('box angles must be given in degrees')
 
-    alpha *= pi / 180
-    beta *= pi / 180
-    gamma *= pi / 180
+    alpha *= DEG_TO_RAD
+    beta *= DEG_TO_RAD
+    gamma *= DEG_TO_RAD
 
     av = Vec3(a, 0.0, 0.0) * u.angstrom
     bx = b * cos(gamma)

@@ -7,6 +7,7 @@ Author: Jason M. Swails
 Contributors:
 Date: Sep. 17, 2014
 """
+from chemistry.amber.constants import DEG_TO_RAD
 from chemistry import (AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
@@ -14,6 +15,7 @@ from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
 import compat24 # needs to be before collections
 from collections import OrderedDict
+import math
 import os
 import warnings
 
@@ -292,7 +294,7 @@ class CharmmParameterSet(object):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmFileError('Could not parse angles.')
-                angle_type = AngleType(k, theteq)
+                angle_type = AngleType(k, theteq*DEG_TO_RAD)
                 self.angle_types[(type1, type2, type3)] = angle_type
                 self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
@@ -320,7 +322,7 @@ class CharmmParameterSet(object):
                 key = (type1, type2, type3, type4)
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
-                dihedral = DihedralType(k, n, phase)
+                dihedral = DihedralType(k, n, phase*DEG_TO_RAD)
                 if key in self.dihedral_types:
                     # See if the existing dihedral type list has a term with
                     # the same periodicity -- If so, replace it
@@ -374,7 +376,7 @@ class CharmmParameterSet(object):
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                self.improper_types[key] = ImproperType(k, theteq)
+                self.improper_types[key] = ImproperType(k, theteq*DEG_TO_RAD)
                 continue
             if section == 'CMAP':
                 # This is the most complicated part, since cmap parameters span

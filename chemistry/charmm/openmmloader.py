@@ -365,7 +365,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 system.addConstraint(bond.atom1.idx, bond.atom2.idx, length)
             if flexibleConstraints or not constrained:
                 force.addAngle(angle.atom1.idx, angle.atom2.idx,
-                               angle.atom3.idx, angle.type.theteq*pi/180,
+                               angle.atom3.idx, angle.type.theteq,
                                2*angle.type.k*angle_frc_conv)
         for angle in self.angles:
             # Already did the angles with hydrogen above. So skip those here
@@ -374,7 +374,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 angle.atom3.atomic_number == 1):
                 continue
             force.addAngle(angle.atom1.idx, angle.atom2.idx,
-                           angle.atom3.idx, angle.type.theteq*pi/180,
+                           angle.atom3.idx, angle.type.theteq,
                            2*angle.type.k*angle_frc_conv)
         system.addForce(force)
 
@@ -395,7 +395,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         for tor in self.dihedrals:
             for typ in tor.type:
                 force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                                 tor.atom4.idx, int(typ.per), typ.phase*pi/180,
+                                 tor.atom4.idx, int(typ.per), typ.phase,
                                  typ.phi_k*dihe_frc_conv)
         system.addForce(force)
 
@@ -410,7 +410,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             force.addTorsion(imp.atom1.idx, imp.atom2.idx,
                              imp.atom3.idx, imp.atom4.idx,
                              (imp.type.psi_k*dihe_frc_conv,
-                              imp.type.psi_eq*pi/180)
+                              imp.type.psi_eq)
             )
         system.addForce(force)
 

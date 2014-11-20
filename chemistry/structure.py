@@ -391,6 +391,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
+        c.box = copy.copy(self.box)
         return c
 
     #===================================================
