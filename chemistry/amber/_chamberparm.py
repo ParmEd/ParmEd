@@ -156,7 +156,7 @@ class ChamberParm(AmberParm):
         inst = struct.copy(cls, split_dihedrals=True)
         inst.pointers = {}
         inst.LJ_types = {}
-        inst.atoms.assign_nbidx_from_types()
+        nbfixes = inst.atoms.assign_nbidx_from_types()
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -187,7 +187,7 @@ class ChamberParm(AmberParm):
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
-        inst._set_nonbonded_tables()
+        inst._set_nonbonded_tables(nbfixes)
 
         return inst
 
@@ -545,14 +545,15 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _set_nonbonded_tables(self):
+    def _set_nonbonded_tables(self, nbfixes=None):
         """
         Sets the tables of Lennard-Jones nonbonded interaction pairs
         """
-        ntypes = self.parm_data['POINTERS'][NTYPES]
+        data = self.parm_data
+        ntypes = data['POINTERS'][NTYPES]
         ntypes2 = ntypes * ntypes
         # Set up the index lookup tables (not a unique solution)
-        self.parm_data['NONBONDED_PARM_INDEX'] = [0 for i in xrange(ntypes2)]
+        data['NONBONDED_PARM_INDEX'] = [0 for i in xrange(ntypes2)]
         holder = [0 for i in xrange(ntypes2)]
         idx = 0
         for i in xrange(ntypes):
@@ -562,16 +563,27 @@ class ChamberParm(AmberParm):
         idx = 0
         for i in xrange(ntypes):
             for j in xrange(ntypes):
-                self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
+                data['NONBONDED_PARM_INDEX'][idx] = \
                             holder[ntypes*i+j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
-        self.parm_data['LENNARD_JONES_14_ACOEF'] = [0 for i in xrange(nttyp)]
-        self.parm_data['LENNARD_JONES_14_BCOEF'] = [0 for i in xrange(nttyp)]
-        self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
-        self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
+        data['LENNARD_JONES_14_ACOEF'] = [0 for i in xrange(nttyp)]
+        data['LENNARD_JONES_14_BCOEF'] = [0 for i in xrange(nttyp)]
+        data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
+        data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
         self.recalculate_LJ()
+        # Now make any NBFIX modifications we had
+        if nbfixes is not None:
+            for i, fix in enumerate(nbfixes):
+                for key in fix:
+                    j, rmin, eps, rmin14, eps14 = fix[key]
+                    i, j = min(i, j), max(i, j)
+                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
+                    data['LENNARD_JONES_BCOEF'][idx] = 2 * eps * rmin**6
+                    data['LENNARD_JONES_14_ACOEF'][idx] = eps14 * rmin14**12
+                    data['LENNARD_JONES_14_BCOEF'][idx] = 2 * eps14 * rmin14**6
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -3016,21 +3016,52 @@ class AtomList(TrackedList):
         Assigns the nb_idx attribute of every atom inside here from the
         atom_type definition. If the atom_type is not assigned, RuntimeError is
         raised.
+
+        Returns
+        -------
+        list of dict
+            Each element is a `set` of the `nb_idx` indices for which NBFIX
+            alterations are defined for the type with that given that index
+            (minus 1, to adjust for indexing from 0 and nb_idx starting from 1)
         """
         idx = 1
-        assignments = dict()
+        natoms = len(self)
+        atom_type_lookups = dict() # For fast lookups
+        atom_type_list = []
         try:
             for i, atom in enumerate(self):
-                type = atom.atom_type
-                key = (type.rmin, type.epsilon, type.rmin_14, type.epsilon_14)
-                try:
-                    atom.nb_idx = assignments[key]
-                except KeyError:
-                    assignments[key] = idx
-                    atom.nb_idx = idx
-                    idx += 1
+                atom.atom_type._idx = -1
         except AttributeError:
             raise RuntimeError('atom types are not assigned')
+
+        for i, atom in enumerate(self):
+            type1 = atom.atom_type
+            # Skip atom types that have already been assigned
+            if type1._idx != -1: continue
+            type1._idx = idx
+            atom_type_lookups[str(type1)] = type1
+            atom_type_list.append(type1)
+            for j in xrange(i+1, natoms):
+                atom2 = self[j]
+                type2 = atom2.atom_type
+                # Skip atom types that have already been assigned
+                if type2._idx != -1: continue
+                if type1 == type2:
+                    type2._idx = idx
+                    atom2.nb_idx = idx
+                atom_type_lookups[str(type2)] = type2
+            idx += 1
+        # Now collect the nbfixes
+        nbfix_list = [set() for i in xrange(idx-1)]
+        # Look through all of the atom types and add the nbfixes
+        for i, type in enumerate(atom_type_list):
+            for key in type.nbfix:
+                otype = atom_type_lookups[key]
+                obj = (otype._idx, otype.rmin, otype.epsilon,
+                       otype.rmin_14, otype.epsilon_14)
+                nbfix_list[i].add(obj)
+
+        return nbfix_list
 
     def __iadd__(self, other):
         return NotImplemented
@@ -3192,6 +3223,7 @@ class AtomType(object):
         # Store each NBFIX term as a dict with the atom type string matching to
         # a 2-element tuple that is rmin, epsilon
         self.nbfix = dict()
+        self._idx = -1 # needed for some internal bookkeeping
 
     def __eq__(self, other):
         """
@@ -3199,7 +3231,14 @@ class AtomType(object):
         or just number)
         """
         if isinstance(other, AtomType):
-            return self.name == other.name and self.number == other.number
+            if self.name != other.name or self.number != other.number:
+                return False
+            # Now check if LJ parameters are defined, and make sure those are
+            # also equal
+            return (self.epsilon == other.epsilon and
+                    self.rmin == other.rmin and
+                    self.epsilon_14 == other.epsilon_14 and
+                    self.rmin_14 == other.rmin_14 and self.nbfix == other.nbfix)
         if isinstance(other, basestring):
             return self.name == other
         if isinstance(other, int):
