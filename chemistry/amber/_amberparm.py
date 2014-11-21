@@ -30,7 +30,7 @@ from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB)
+            NNB, TINY)
 from chemistry.amber.amberformat import AmberFormat
 from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
@@ -143,7 +143,7 @@ class AmberParm(AmberFormat, Structure):
     """
     #===================================================
 
-    solvent_residues = ['WAT', 'HOH']
+    solvent_residues = ('WAT', 'HOH')
 
     def __init__(self, prm_name=None, rst7_name=None):
         """
@@ -272,6 +272,20 @@ class AmberParm(AmberFormat, Structure):
             inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
             inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
         inst._add_standard_flags()
+        inst.pointers['NATOM'] = len(inst.atoms)
+        inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        if struct.box is None:
+            inst.parm_data['POINTERS'][IFBOX] = 0
+            inst.pointers['IFBOX'] = 0
+        elif (abs(struct.box[3] - 90) > TINY or abs(struct.box[4] - 90) > TINY
+                or abs(struct.box[5] - 90) > TINY):
+            inst.parm_data['POINTERS'][IFBOX] = 2
+            inst.pointers['IFBOX'] = 2
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
+        else:
+            inst.parm_data['POINTERS'][IFBOX] = 1
+            inst.pointers['IFBOX'] = 1
+            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
@@ -583,7 +597,7 @@ class AmberParm(AmberFormat, Structure):
         ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
                 'CIO','MG2']
         indices = []
-        for res in AmberParm.solvent_residues:
+        for res in type(self).solvent_residues:
             try:
                 indices.append(self.parm_data['RESIDUE_LABEL'].index(res))
             except ValueError:
@@ -1349,7 +1363,7 @@ class AmberParm(AmberFormat, Structure):
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
-            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=0)
+            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=0)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)

@@ -585,6 +585,7 @@ class CharmmParameterSet(object):
         self._condense_types(self.bond_types)
         self._condense_types(self.angle_types)
         self._condense_types(self.urey_bradley_types)
+        self._condense_types(self.dihedral_types)
         self._condense_types(self.improper_types)
         self._condense_types(self.cmap_types)
         # Dihedrals have to be handled separately, since each key corresponds to

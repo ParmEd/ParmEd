@@ -620,7 +620,10 @@ class CharmmPsfFile(Structure):
             dih.type = parmset.dihedral_types[key]
             dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
-            if pair in active_dih_list:
+            if (dih.atom1 in dih.atom4.bond_partners or
+                dih.atom1 in dih.atom4.angle_partners):
+                dih.ignore_end = True
+            elif pair in active_dih_list:
                 dih.ignore_end = True
             else:
                 active_dih_list.add(pair)

@@ -347,7 +347,7 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(uniques(params.atom_types_tuple), 95)
         self.assertEqual(uniques(params.bond_types), 103)
         self.assertEqual(uniques(params.cmap_types), 3)
-        self.assertEqual(uniques(params.dihedral_types), 396)
+        self.assertEqual(uniques(params.dihedral_types), 81)
         self.assertEqual(uniques(params.improper_types), 20)
         self.assertEqual(uniques(params.urey_bradley_types), 42)
 
@@ -375,7 +375,7 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(uniques(p.atom_types_tuple), 123)
         self.assertEqual(uniques(p.bond_types), 114)
         self.assertEqual(uniques(p.cmap_types), 3)
-        self.assertEqual(uniques(p.dihedral_types), 1290)
+        self.assertEqual(uniques(p.dihedral_types), 257)
         self.assertEqual(uniques(p.improper_types), 15)
         self.assertEqual(uniques(p.nbfix_types), 6)
         self.assertEqual(uniques(p.urey_bradley_types), 45)

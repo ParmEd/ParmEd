@@ -3280,7 +3280,10 @@ class chamber(Action):
                 psf.box = None
         else:
             # Set the box information
-            psf.set_box(*self.box)
+            if self.box is None:
+                psf.set_box(None)
+            else:
+                psf.set_box(*self.box)
 
         nsets = len(parmset.parametersets)
         if nsets > 0:

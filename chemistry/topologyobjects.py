@@ -1311,6 +1311,13 @@ class DihedralTypeList(list, _ListItem):
         self.list = None
         self.used = False
 
+    def __eq__(self, other):
+        if len(self) != len(other): return False
+        for t1, t2 in zip(self, other):
+            if not t1 == t2:
+                return False
+        return True
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class UreyBradley(object):

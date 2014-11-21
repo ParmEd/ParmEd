@@ -23,7 +23,8 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from chemistry.amber._amberparm import AmberParm
-from chemistry.amber.constants import (NTYPES, CHARMM_ELECTROSTATIC, NATYP)
+from chemistry.amber.constants import (NTYPES, CHARMM_ELECTROSTATIC, NATYP,
+                    IFBOX, TINY, NATOM)
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
 from chemistry.exceptions import AmberParmError
@@ -83,6 +84,7 @@ class ChamberParm(AmberParm):
     """
 
     CHARGE_SCALE = CHARMM_ELECTROSTATIC
+    solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
     #===================================================
 
@@ -170,8 +172,23 @@ class ChamberParm(AmberParm):
             inst.LJ_14_radius[atom.nb_idx-1] = atom.atom_type.rmin_14
             inst.LJ_14_depth[atom.nb_idx-1] = atom.atom_type.epsilon_14
         inst._add_standard_flags()
+        inst.pointers['NATOM'] = len(inst.atoms)
+        inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        if struct.box is None:
+            inst.parm_data['POINTERS'][IFBOX] = 0
+            inst.pointers['IFBOX'] = 0
+        elif (abs(struct.box[3] - 90) > TINY or abs(struct.box[4] - 90) > TINY
+                or abs(struct.box[5] - 90) > TINY):
+            inst.parm_data['POINTERS'][IFBOX] = 2
+            inst.pointers['IFBOX'] = 2
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
+        else:
+            inst.parm_data['POINTERS'][IFBOX] = 1
+            inst.pointers['IFBOX'] = 1
+            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
         inst._set_nonbonded_tables()
+
         return inst
 
     #===================================================
@@ -516,7 +533,7 @@ class ChamberParm(AmberParm):
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
-            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=0)
+            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=1)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)
