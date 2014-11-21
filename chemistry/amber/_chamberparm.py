@@ -465,9 +465,9 @@ class ChamberParm(AmberParm):
         # Now do the CMAP_INDEX section
         data['CHARMM_CMAP_INDEX'] = cmap_array = []
         for i, cm in enumerate(self.cmaps):
-            cmap_array.extend([cmap.atom1.idx+1, cmap.atom2.idx+1,
-                               cmap.atom3.idx+1, cmap.atom4.idx+1,
-                               cmap.atom5.idx+1, cmap.type.idx+1])
+            cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1,
+                               cm.atom3.idx+1, cm.atom4.idx+1,
+                               cm.atom5.idx+1, cm.type.idx+1])
         data['CHARMM_CMAP_COUNT'] = [i+1, len(self.cmap_types)]
         data['CHARMM_CMAP_RESOLUTION'] = \
                     [ct.resolution for ct in self.cmap_types]
@@ -530,10 +530,14 @@ class ChamberParm(AmberParm):
         self.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4', num_items=0)
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
+        if self.has_cmap:
+            self.add_flag('CHARMM_CMAP_COUNT', '2I8', num_items=2)
+            self.add_flag('CHARMM_CMAP_RESOLUTION', '20I4', num_items=0)
+            self.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=0)
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
-            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
+            self.add_flag('BOX_DIMENSIONS', '5E16.8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=1)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)

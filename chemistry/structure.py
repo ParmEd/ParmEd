@@ -244,7 +244,7 @@ class Structure(object):
                                                  c.improper_types))
         for ct in self.cmap_types:
             c.cmap_types.append(CmapType(ct.resolution, list(ct.grid),
-                                         c.cmap_types))
+                                         list=c.cmap_types))
         for ta in self.trigonal_angle_types:
             c.trigonal_angle_types.append(
                     AngleType(ta.k, ta.theteq, c.trigonal_angle_types)
