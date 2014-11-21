@@ -604,9 +604,11 @@ def ConvertFromPSF(struct, params, title=''):
     parm = ChamberParm.load_from_structure(struct)
     parm.parm_data['FORCE_FIELD_TYPE'] = fftype = []
     for pset in params.parametersets:
+        if 'CHARMM' not in pset: # needed to trigger "charmm_active"...
+            pset = 'CHARMM: %s' % pset
         fftype.extend([len(params.parametersets), pset])
     if not fftype:
-        fftype.extend([1, 'No FF information parsed...'])
+        fftype.extend([1, 'CHARMM force field: No FF information parsed...'])
     # Convert atom types back to integers if that's how they started
     if int_starting:
         for atom in struct.atoms:
