@@ -366,7 +366,7 @@ Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
-System volume (ang^3): 615109.31
+System volume (ang^3): 615109.34
 System density (g/mL): 0.916989
 """
 

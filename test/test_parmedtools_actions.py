@@ -1481,7 +1481,8 @@ class TestChamberParmActions(unittest.TestCase):
         parm = copy(solvchamber)
         parm.LoadRst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
-        self.assertEqual(str(act), saved.SUMMARYC1)
+        self.assertTrue(utils.detailed_diff(str(act), saved.SUMMARYC1,
+                                            relative_error=1e-6))
 
     def testScale(self):
         """ Test scale action for ChamberParm """

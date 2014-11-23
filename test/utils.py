@@ -189,7 +189,7 @@ def record_diffs(i, f1, f2, l1, l2):
     f.write('< %s> %s' % (l1, l2))
     f.close()
 
-def detailed_diff(l1, l2, absolute_error, relative_error):
+def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
     """
     Check individual fields to make sure numbers are numerically equal if the
     lines differ. Also ignore fields that appear to be a file name, since those
