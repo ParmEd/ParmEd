@@ -79,7 +79,7 @@ class AmberParm(AmberFormat, Structure):
     charge_flag : str='CHARGE'
         The name of the name of the FLAG that describes partial atomic charge
         data. If this flag is found, then its data are multiplied by the
-        CHARGE_SCALE value attached to the current class
+        ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
     version : str
         The VERSION string from the Amber file
     prm_name : str
@@ -219,11 +219,6 @@ class AmberParm(AmberFormat, Structure):
         inst.parm_comments = rawdata.parm_comments
         inst.flag_list = rawdata.flag_list
         inst.initialize_topology()
-        # Convert charges if necessary due to differences in electrostatic
-        # scaling factors
-        chgscale = rawdata.CHARGE_SCALE / cls.CHARGE_SCALE
-        for i in xrange(len(inst.parm_data['CHARGE'])):
-            inst.parm_data['CHARGE'][i] *= chgscale
         # See if the rawdata has any kind of structural attributes, like rst7
         # (coordinates) and an atom list with positions and/or velocities
         if hasattr(rawdata, 'rst7'):

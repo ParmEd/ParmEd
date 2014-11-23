@@ -3048,9 +3048,10 @@ class AtomList(TrackedList):
                 if type2._idx != -1: continue
                 if type1 == type2:
                     type2._idx = idx
-                    atom2.nb_idx = idx
-                atom_type_lookups[str(type2)] = type2
             idx += 1
+        # Now go back through and assign nb_idx from type._idx
+        for atom in self:
+            atom.nb_idx = atom.atom_type._idx
         # Now collect the nbfixes
         nbfix_list = [set() for i in xrange(idx-1)]
         # Look through all of the atom types and add the nbfixes

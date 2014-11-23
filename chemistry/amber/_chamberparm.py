@@ -83,7 +83,6 @@ class ChamberParm(AmberParm):
         True if CMAP parameters are present in this system; False otherwise
     """
 
-    CHARGE_SCALE = CHARMM_ELECTROSTATIC
     solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
     #===================================================
@@ -455,9 +454,12 @@ class ChamberParm(AmberParm):
             fmt = str(self.formats['CHARMM_CMAP_PARAMETER_01'])
         except KeyError:
             fmt = '8(F9.5)'
+        flags_to_delete = []
         for flag in self.flag_list:
             if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                self.delete_flag(flag)
+                flags_to_delete.append(flag)
+        for flag in flags_to_delete:
+            self.delete_flag(flag)
         # Now add them back
         for i, ct in enumerate(self.cmap_types):
             self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
@@ -512,10 +514,10 @@ class ChamberParm(AmberParm):
         self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0)
         natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=natyp)
-        self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', num_items=0)
-        self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', num_items=0)
-        self.add_flag('LENNARD_JONES_14_ACOEF', '5E16.8', num_items=0)
-        self.add_flag('LENNARD_JONES_14_BCOEF', '5E16.8', num_items=0)
+        self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
+        self.add_flag('LENNARD_JONES_BCOEF', '3E24.16', num_items=0)
+        self.add_flag('LENNARD_JONES_14_ACOEF', '3E24.16', num_items=0)
+        self.add_flag('LENNARD_JONES_14_BCOEF', '3E24.16', num_items=0)
         self.add_flag('BONDS_INC_HYDROGEN', '10I8', num_items=0)
         self.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8', num_items=0)
         self.add_flag('ANGLES_INC_HYDROGEN', '10I8', num_items=0)

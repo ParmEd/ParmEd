@@ -29,3 +29,7 @@ __date__ = 'Apr. 20, 2014'
 
 
 __private__ = ['_charmmfile']
+
+from chemistry.charmm.psf import CharmmPsfFile
+from chemistry.charmm.parameters import CharmmParameterSet
+from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile

@@ -6,7 +6,7 @@ from __future__ import division
 
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
-            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC)
+            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from chemistry.exceptions import AmberFormatWarning, FlagError
 from compat24 import wraps
 from fortranformat import FortranRecordReader, FortranRecordWriter
@@ -286,15 +286,13 @@ class AmberFormat(object):
     charge_flag : str='CHARGE'
         The name of the name of the FLAG that describes partial atomic charge
         data. If this flag is found, then its data are multiplied by the
-        CHARGE_SCALE value attached to the current class
+        ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
     version : str
         The VERSION string from the Amber file
     prm_name : str
         The file name of the originally parsed file (set to the fname parameter)
     """
    
-    CHARGE_SCALE = AMBER_ELECTROSTATIC # chamber uses a SLIGHTLY diff value
-
     #===================================================
 
     def __init__(self, fname=None):
@@ -402,9 +400,14 @@ class AmberFormat(object):
                 for line in rawdata:
                     self.parm_data[flag].extend(self.formats[flag].read(line))
 
+            if 'CTITLE' in self.parm_data:
+                CHARGE_SCALE = CHARMM_ELECTROSTATIC
+            else:
+                CHARGE_SCALE = AMBER_ELECTROSTATIC
+
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                    self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
+                    self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
             except KeyError:
                 pass
 
@@ -447,9 +450,13 @@ class AmberFormat(object):
             self.parm_data[current_flag].extend(fmt.read(line))
 
         # convert charges to fraction-electrons
+        if 'CTITLE' in self.parm_data:
+            CHARGE_SCALE = CHARMM_ELECTROSTATIC
+        else:
+            CHARGE_SCALE = AMBER_ELECTROSTATIC
         try:
             for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         except KeyError:
             pass
 
@@ -558,7 +565,7 @@ class AmberFormat(object):
         # Next read the charges
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natom)
         # Divide by the electrostatic constant
-        tmp_data = [x / self.CHARGE_SCALE for x in tmp_data]
+        tmp_data = [x / AMBER_ELECTROSTATIC for x in tmp_data]
         self.add_flag('CHARGE', '5E16.8', data=tmp_data)
 
         # Next read the masses
@@ -730,9 +737,14 @@ class AmberFormat(object):
         self.set_version()
 
         # convert charges back to amber charges...
+        if 'CTITLE' in self.parm_data:
+            CHARGE_SCALE = CHARMM_ELECTROSTATIC
+        else:
+            CHARGE_SCALE = AMBER_ELECTROSTATIC
+
         if self.charge_flag in self.parm_data.keys():
             for i in xrange(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] *= self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
 
         # write version to top of prmtop file
         new_prm.write('%s\n' % self.version)
@@ -754,7 +766,7 @@ class AmberFormat(object):
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
             for i in xrange(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] /= self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] /= CHARGE_SCALE
 
     #===================================================
 
