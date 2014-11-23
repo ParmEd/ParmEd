@@ -3236,10 +3236,11 @@ class AtomType(object):
                 return False
             # Now check if LJ parameters are defined, and make sure those are
             # also equal
-            return (self.epsilon == other.epsilon and
-                    self.rmin == other.rmin and
-                    self.epsilon_14 == other.epsilon_14 and
-                    self.rmin_14 == other.rmin_14 and self.nbfix == other.nbfix)
+            return (abs(self.epsilon - other.epsilon) < TINY and
+                    abs(self.rmin - other.rmin) < TINY and
+                    abs(self.epsilon_14 - other.epsilon_14) > TINY and
+                    abs(self.rmin_14 - other.rmin_14) > TINY and
+                    self.nbfix == other.nbfix)
         if isinstance(other, basestring):
             return self.name == other
         if isinstance(other, int):
