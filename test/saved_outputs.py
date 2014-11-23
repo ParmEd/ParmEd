@@ -360,21 +360,6 @@ Amino Acid Residues:   154
 Nucleic Acid Residues: 0
 Number of cations:     0
 Number of anions:      0
-Num. of solvent mols:  0
-Num. of unknown atoms: 17861
-Total charge (e-):     -11.0000
-Total mass (amu):      339672.2974
-Number of atoms:       56057
-Number of residues:    18015
-System volume (ang^3): 615109.31
-System density (g/mL): 0.916989
-"""
-
-SUMMARYC2 = """\
-Amino Acid Residues:   154
-Nucleic Acid Residues: 0
-Number of cations:     0
-Number of anions:      0
 Num. of solvent mols:  17856
 Num. of unknown atoms: 5
 Total charge (e-):     -11.0000

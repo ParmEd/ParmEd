@@ -1482,9 +1482,6 @@ class TestChamberParmActions(unittest.TestCase):
         parm.LoadRst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARYC1)
-        PT.defineSolvent(parm, 'TIP3').execute()
-        act = PT.summary(parm)
-        self.assertEqual(str(act), saved.SUMMARYC2)
 
     def testScale(self):
         """ Test scale action for ChamberParm """
