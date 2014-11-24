@@ -485,7 +485,9 @@ class ChamberParm(AmberParm):
         self.add_flag('POINTERS', '10I8', num_items=31)
         self.add_flag('FORCE_FIELD_TYPE', 'i2,a78', num_items=0)
         self.add_flag('ATOM_NAME', '20a4', num_items=0)
-        self.add_flag('CHARGE', '3E24.16', num_items=0)
+        self.add_flag('CHARGE', '3E24.16', num_items=0,
+                comments=['Atomic charge multiplied by sqrt(322.0716D0) '
+                         '(CCELEC)'])
         self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
         self.add_flag('MASS', '5E16.8', num_items=0)
         self.add_flag('ATOM_TYPE_INDEX', '10I8', num_items=0)
@@ -497,21 +499,37 @@ class ChamberParm(AmberParm):
         self.add_flag('BOND_EQUIL_VALUE', '5E16.8', num_items=0)
         self.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', num_items=0)
         self.add_flag('ANGLE_EQUIL_VALUE', '3E25.17', num_items=0)
-        self.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', num_items=2)
-        self.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=0)
+        self.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', num_items=2,
+                comments=['V(ub) = K_ub(r_ik - R_ub)**2',
+                          'Number of Urey Bradley terms and types'])
+        self.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=0,
+                comments=['List of the two atoms and its parameter index',
+                          'in each UB term: i,k,index'])
         self.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
-                      num_items=0)
-        self.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', num_items=0)
+                num_items=0, comments=['K_ub:kcal/mole/A**2'])
+        self.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', num_items=0,
+                comments=['r_ub: A'])
         self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', num_items=0)
         self.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', num_items=0)
         self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
         self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
         self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
-        self.add_flag('CHARMM_NUM_IMPROPERS', '10I8', num_items=0)
-        self.add_flag('CHARMM_IMPROPERS', '10I8', num_items=0)
-        self.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', num_items=1)
-        self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0)
-        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0)
+        self.add_flag('CHARMM_NUM_IMPROPERS', '10I8', num_items=0,
+                comments=['Number of terms contributing to the',
+                          'quadratic four atom improper energy term:',
+                          'V(improper) = K_psi(psi - psi_0)**2'])
+        self.add_flag('CHARMM_IMPROPERS', '10I8', num_items=0,
+                comments=['List of the four atoms in each improper term',
+                          'i,j,k,l,index  i,j,j,l,index',
+                          'where index is into the following two lists:',
+                          'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}'])
+        self.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', num_items=1,
+                comments=['Number of unique parameters contributing to the',
+                          'quadratic four atom improper energy term'])
+        self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0,
+                comments=['K_psi: kcal/mole/rad**2'])
+        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0,
+                comments=['psi: degrees'])
         natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=natyp)
         self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
@@ -533,9 +551,15 @@ class ChamberParm(AmberParm):
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
         if self.has_cmap:
-            self.add_flag('CHARMM_CMAP_COUNT', '2I8', num_items=2)
-            self.add_flag('CHARMM_CMAP_RESOLUTION', '20I4', num_items=0)
-            self.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=0)
+            self.add_flag('CHARMM_CMAP_COUNT', '2I8', num_items=2,
+                    comments=['Number of CMAP terms, number of unique CMAP '
+                              'parameters'])
+            self.add_flag('CHARMM_CMAP_RESOLUTION', '20I4', num_items=0,
+                    comments=['Number of steps along each phi/psi CMAP axis',
+                              'for each CMAP_PARAMETER grid'])
+            self.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=0,
+                    comments=['Atom index i,j,k,l,m of the cross term',
+                              'and then pointer to CHARMM_CMAP_PARAMETER_n'])
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
