@@ -200,7 +200,7 @@ def check_validity(parm, warnings):
     mask = AmberMask(parm, ':CYX@SG')
     for i, sel in enumerate(mask.Selection()):
         if not sel: continue
-        atm = parm.atom_list[i]
+        atm = parm.atoms[i]
         # We expect 2 bonds
         bondedatms = [a.name for a in atm.bond_partners]
         if len(bondedatms) != 2 or 'SG' not in bondedatms:
@@ -215,7 +215,7 @@ def check_validity(parm, warnings):
         s_atms = []
         for i, sel in enumerate(mask.Selection()):
             if not sel: continue
-            s_atms.append(parm.atom_list[i])
+            s_atms.append(parm.atoms[i])
         try:
             for i in xrange(len(s_atms)-1):
                 for j in xrange(i, len(s_atms)):
