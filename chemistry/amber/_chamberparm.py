@@ -388,12 +388,14 @@ class ChamberParm(AmberParm):
         data['CHARMM_UREY_BRADLEY_EQUIL_VALUE'] = \
                 [type.req for type in self.urey_bradley_types]
         data['CHARMM_UREY_BRADLEY'] = bond_array = []
-        for i, urey in enumerate(self.urey_bradleys):
+        for urey in self.urey_bradleys:
             bond_array.extend([urey.atom1.idx+1, urey.atom2.idx+1,
                                urey.type.idx+1])
-        data['CHARMM_UREY_BRADLEY_COUNT'] = [i+1, len(self.urey_bradley_types)]
-        self.pointers['NUB'] = i + 1
-        self.pointers['NUBTYPES'] = len(self.urey_bradley_types)
+        nub = len(self.urey_bradleys)
+        nubt = len(self.urey_bradley_types)
+        data['CHARMM_UREY_BRADLEY_COUNT'] = [nub, nubt]
+        self.pointers['NUB'] = nub
+        self.pointers['NUBTYPES'] = nubt
 
     #===================================================
 
@@ -410,13 +412,13 @@ class ChamberParm(AmberParm):
         data['CHARMM_IMPROPER_PHASE'] = \
                 [type.psi_eq for type in self.improper_types]
         data['CHARMM_IMPROPERS'] = improper_array = []
-        for i, imp in enumerate(self.impropers):
+        for imp in self.impropers:
             improper_array.extend([imp.atom1.idx+1, imp.atom2.idx+1,
                                    imp.atom3.idx+1, imp.atom4.idx+1,
                                    imp.type.idx+1])
-        data['CHARMM_NUM_IMPROPERS'] = [i+1]
+        data['CHARMM_NUM_IMPROPERS'] = [len(self.impropers)]
         data['CHARMM_NUM_IMPR_TYPES'] = [len(self.improper_types)]
-        self.pointers['NIMPHI'] = i + 1
+        self.pointers['NIMPHI'] = len(self.impropers)
         self.pointers['NIMPRTYPES'] = len(self.improper_types)
 
     #===================================================
@@ -466,14 +468,14 @@ class ChamberParm(AmberParm):
                           data=ct.grid, comments=ct.comments)
         # Now do the CMAP_INDEX section
         data['CHARMM_CMAP_INDEX'] = cmap_array = []
-        for i, cm in enumerate(self.cmaps):
+        for cm in self.cmaps:
             cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1,
                                cm.atom3.idx+1, cm.atom4.idx+1,
                                cm.atom5.idx+1, cm.type.idx+1])
-        data['CHARMM_CMAP_COUNT'] = [i+1, len(self.cmap_types)]
+        data['CHARMM_CMAP_COUNT'] = [len(self.cmaps), len(self.cmap_types)]
         data['CHARMM_CMAP_RESOLUTION'] = \
                     [ct.resolution for ct in self.cmap_types]
-        self.pointers['CMAP'] = i+1
+        self.pointers['CMAP'] = len(self.cmaps)
         self.pointers['CMAP_TYPES'] = len(self.cmap_types)
 
     #===================================================
