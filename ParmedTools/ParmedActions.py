@@ -1433,7 +1433,7 @@ class setbond(Action):
                         break
             # Otherwise, it doesn't exist, so we just create a new one
             else:
-                self.bonds.append(Bond(atm1, atm2, new_bnd_typ))
+                self.parm.bonds.append(Bond(atm1, atm2, new_bnd_typ))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
