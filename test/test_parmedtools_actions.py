@@ -1479,7 +1479,7 @@ class TestChamberParmActions(unittest.TestCase):
     def testSummary(self):
         """ Test summary action for ChamberParm """
         parm = copy(solvchamber)
-        parm.LoadRst7(get_fn('dhfr_cmap_pbc.rst7'))
+        parm.load_rst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
         self.assertTrue(utils.detailed_diff(str(act), saved.SUMMARYC1,
                                             relative_error=1e-6))

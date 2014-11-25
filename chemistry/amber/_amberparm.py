@@ -154,7 +154,11 @@ class AmberParm(AmberFormat, Structure):
         """
         AmberFormat.__init__(self, prm_name)
         Structure.__init__(self)
-        self.hasvels = self.hasbox = False
+        self.hasvels = False
+        self.hasbox = False
+        self.coords = None
+        self.vels = None
+        self.box = None
         if prm_name is not None:
             self.initialize_topology(rst7_name)
 
@@ -181,21 +185,21 @@ class AmberParm(AmberFormat, Structure):
         self.load_structure()
 
         if rst7_name is not None:
-            self.LoadRst7(rst7_name)
+            self.load_rst7(rst7_name)
         elif self.parm_data['POINTERS'][IFBOX] > 0:
             self.hasbox = True
             box = self.parm_data['BOX_DIMENSIONS']
             self.box = box[1:] + [box[0], box[0], box[0]]
 
         # If we have coordinates or velocities, load them into the atom list
-        if hasattr(self, 'coords'):
+        if self.coords is not None:
             for i, atom in enumerate(self.atoms):
                 i3 = i * 3
                 atom.xx, atom.xy, atom.xz = self.coords[i3:i3+3]
-        if hasattr(self, 'vels'):
+        if self.vels is not None:
             for i, atom in enumerate(self.atoms):
                 i3 = i * 3
-                atom.vx, atom.vy, atom.vz = self.coords[i3:i3+3]
+                atom.vx, atom.vy, atom.vz = self.vels[i3:i3+3]
 
     #===================================================
 
@@ -219,24 +223,18 @@ class AmberParm(AmberFormat, Structure):
         inst.parm_comments = rawdata.parm_comments
         inst.flag_list = rawdata.flag_list
         inst.initialize_topology()
-        # See if the rawdata has any kind of structural attributes, like rst7
-        # (coordinates) and an atom list with positions and/or velocities
-        if hasattr(rawdata, 'rst7'):
-            inst.rst7 = rawdata.rst7
+        # See if the rawdata has any kind of structural attributes, like
+        # coordinates and an atom list with positions and/or velocities
         if hasattr(rawdata, 'coords'):
-            inst.load_coordinates(rawdata.coords)
+            inst.coords = copy.copy(rawdata.coords)
         if hasattr(rawdata, 'vels'):
-            inst.load_velocities(rawdata.vels)
+            inst.vels = copy.copy(rawdata.vels)
         if hasattr(rawdata, 'box'):
-            inst.box = rawdata.box
-        if hasattr(rawdata, 'hasbox'):
-            inst.hasbox = rawdata.hasbox
-        if hasattr(rawdata, 'hasvels'):
-            inst.hasvels = rawdata.hasvels
-        try:
             inst.box = copy.copy(rawdata.box)
-        except AttributeError:
-            inst.box = None
+        if hasattr(rawdata, 'hasbox'):
+            inst.hasbox = rawdata.hasbox or inst.box is not None
+        if hasattr(rawdata, 'hasvels'):
+            inst.hasvels = rawdata.hasvels or inst.vels is not None
         return inst
    
     #===================================================
@@ -297,6 +295,8 @@ class AmberParm(AmberFormat, Structure):
         other.LJ_depth = self.LJ_depth[:]
         other.hasvels = self.hasvels
         other.hasbox = self.hasbox
+        other.coords = copy.copy(self.coords)
+        other.vels = copy.copy(other.vels)
         other.box = copy.copy(self.box)
 
         # Now fill the LJ and other data structures
@@ -306,14 +306,6 @@ class AmberParm(AmberFormat, Structure):
             other.load_structure()
         except (KeyError, IndexError, AttributeError):
             raise AmberParmError('Could not set up topology for parm copy')
-        # See if we have a restart file
-        if hasattr(self, 'rst7'):
-            other.rst7 = Rst7.copy_from(self.rst7)
-        if hasattr(self, 'coords'):
-            other.coords = self.coords[:]
-        if hasattr(self, 'vels'):
-            other.vels = self.vels[:]
-        other.box = self.box
         # Now we should have a full copy
         return other
 
@@ -463,39 +455,51 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def writeRst7(self, name, netcdf=None):
+    def write_rst7(self, name, netcdf=None):
         """
         Writes a restart file with the current coordinates and velocities and
         box info if it's present
+
+        Parameters
+        ----------
+        name : str
+            Name of the file to write the restart file to
+        netcdf : bool=False
+            If True, write a NetCDF-format restart file (requires a NetCDF
+            backend; scipy, netCDF4, or ScientificPython; to be installed)
+
+        Notes
+        -----
+        If `netcdf` is not specified and the filename extension given by `name`
+        is `.ncrst`, the a NetCDF restart file will be written. However, an
+        explicit value for `netcdf` will override any filename extensions.
         """
         # By default, determine file type by extension (.ncrst is NetCDF)
         netcdf = netcdf or (netcdf is None and name.endswith('.ncrst'))
 
         # Check that we have a rst7 loaded, then overwrite it with a new one if
         # necessary
-        if not hasattr(self, 'rst7'):
-#           raise AmberParmError('No coordinates loaded. Cannot write restart')
-            self.rst7 = Rst7(hasbox=self.hasbox)
-            if self.hasbox:
-                self.rst7.box = self.box
+        rst7 = Rst7(natom=len(self.atoms), hasvels=self.vels is not None,
+                    hasbox=self.box is not None)
 
         # Now fill in the rst7 coordinates
-        self.rst7.natom = len(self.atoms)
-        self.rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
-        if self.rst7.hasvels:
-            self.rst7.velocities = [0.0 for i in xrange(len(self.atoms)*3)]
+        rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
+        if self.vels is not None:
+            rst7.velocities = [0.0 for i in xrange(len(self.atoms)*3)]
 
         for i, at in enumerate(self.atoms):
-            self.rst7.coordinates[3*i  ] = at.xx
-            self.rst7.coordinates[3*i+1] = at.xy
-            self.rst7.coordinates[3*i+2] = at.xz
-            if self.rst7.hasvels:
-                self.rst7.velocities[3*i  ] = at.vx
-                self.rst7.velocities[3*i+1] = at.vy
-                self.rst7.velocities[3*i+2] = at.vz
+            i3 = i * 3
+            rst7.coordinates[i3  ] = at.xx
+            rst7.coordinates[i3+1] = at.xy
+            rst7.coordinates[i3+2] = at.xz
+            if rst7.hasvels:
+                rst7.velocities[i3  ] = at.vx
+                rst7.velocities[i3+1] = at.vy
+                rst7.velocities[i3+2] = at.vz
 
+        rst7.box = copy.copy(self.box)
         # Now write the restart file
-        self.rst7.write(name, netcdf)
+        rst7.write(name, netcdf)
 
     #===================================================
 
@@ -503,6 +507,11 @@ class AmberParm(AmberFormat, Structure):
         """
         Writes the current data in parm_data into a new topology file with a
         given name.
+
+        Parameters
+        ----------
+        name : str
+            The name of the file to write the prmtop to
         """
         if self.is_changed():
             self.remake_parm()
@@ -566,14 +575,13 @@ class AmberParm(AmberFormat, Structure):
         for i in selection:
             del self.atoms[i]
         self.remake_parm()
-        if hasattr(self, 'coords'):
+        if self.coords is not None:
             self.coords = []
             for atom in self.atoms:
                 self.coords.extend([atom.xx, atom.xy, atom.xz])
             if self.hasvels:
                 for atom in self.atoms:
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
-#       self.load_structure()
         if self.ptr('IFBOX'): self.rediscover_molecules()
 
     #===================================================
@@ -613,13 +621,7 @@ class AmberParm(AmberFormat, Structure):
             self.delete_flag('ATOMS_PER_MOLECULE')
             self.delete_flag('BOX_DIMENSIONS')
             self.hasbox = False
-            try: 
-                self.rst7.hasbox = False
-                del self.box
-                del self.rst7.box
-            except AttributeError:
-                # So we don't have box information... doesn't matter :)
-                pass
+            self.box = None
             return None
         # Now remake our SOLVENT_POINTERS and ATOMS_PER_MOLECULE section
         self.parm_data['SOLVENT_POINTERS'] = [min(indices), len(owner), 0]
@@ -776,19 +778,17 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def LoadRst7(self, rst7):
+    def load_rst7(self, rst7):
         """ Loads coordinates into the AmberParm class """
-        if isinstance(rst7, Rst7):
-            self.rst7 = rst7
-        elif isinstance(rst7, basestring):
-            self.rst7 = Rst7.open(rst7)
-        self.load_coordinates(self.rst7.coordinates)
-        self.hasvels = self.rst7.hasvels
-        self.hasbox = self.rst7.hasbox
+        if not hasattr(rst7, 'coordinates'):
+            rst7 = Rst7.open(rst7)
+        self.load_coordinates(rst7.coordinates)
+        self.hasvels = rst7.hasvels
+        self.hasbox = rst7.hasbox
         if self.hasbox:
-            self.box = self.rst7.box
+            self.box = rst7.box[:]
         if self.hasvels:
-            self.load_velocities(self.rst7.velocities)
+            self.load_velocities(rst7.velocities)
 
     #===================================================
 

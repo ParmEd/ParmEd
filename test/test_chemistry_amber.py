@@ -23,7 +23,7 @@ class TestReadParm(unittest.TestCase):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
-        gasparm.LoadRst7(get_fn('trx.inpcrd'))
+        gasparm.load_rst7(get_fn('trx.inpcrd'))
 
         self.assertEqual([a.xx for a in gasparm.atoms],
                          [a.xx for a in parm.atoms])

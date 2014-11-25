@@ -37,84 +37,84 @@ GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
 # Add a help dictionary entry for each additional Action added to this class!
 # Each help entry should be a list with 2 elements: [Usage, description]
 Usages = {
-              'help' : 'help [<action>]',
-           'parmout' : 'parmout <prmtop_name> [<inpcrd_name>] [netcdf]',
-      'setoverwrite' : 'setOverwrite [True|False]', 
-       'writefrcmod' : 'writeFrcmod <frcmod_name>',
-        'loadrestrt' : 'loadRestrt <restrt_filename>',
-          'writeoff' : 'writeOFF <OFF_filename>',
-       'changeradii' : 'changeRadii <radii_set>',
-      'changeljpair' : 'changeLJPair <mask1> <mask2> <Rmin> <epsilon>',
-    'changelj14pair' : 'changeLJ14Pair <mask1> <mask2> <Rmin> <epsilon>',
-     'checkvalidity' : 'checkValidity',
-            'change' : 'change <property> <mask> <new_value> [quiet]',
-         'printinfo' : 'printInfo <flag>',
-         'addljtype' : 'addLJType <mask> [radius <new_radius>] '
-                       '[epsilon <new_epsilon>] [radius_14 <new_radius14>] '
-                       '[epsilon_14 <new_epsilon14>]',
-           'outparm' : 'outparm <prmtop_name> [<inpcrd_name>] [netcdf]',
-      'printljtypes' : 'printLJTypes [<mask>|<type name>]',
-              'scee' : 'scee <scee_value>',
-              'scnb' : 'scnb <scnb_value>',
-'changeljsingletype' : 'changeLJSingleType <mask> <radius> <depth>',
-      'printdetails' : 'printDetails <mask>',
-        'printflags' : 'printFlags',
-     'printpointers' : 'printPointers',
-        'printbonds' : 'printBonds <mask>',
-       'printangles' : 'printAngles <mask>',
-    'printdihedrals' : 'printDihedrals <mask>',
-      'setmolecules' : 'setMolecules [solute_ions True|False]',
-                'go' : 'go',
-              'quit' : 'quit',
-#   'addcoarsegrain' : 'addCoarseGrain <parameter_file>',
-   'changeprotstate' : 'changeProtState <mask> <state #>',
-         'netcharge' : 'netCharge [<mask>]',
-             'strip' : 'strip <mask>',
-     'definesolvent' : 'defineSolvent <residue list>',
-     'addexclusions' : 'addExclusions <mask1> <mask2>',
-       'adddihedral' : 'addDihedral <mask1> <mask2> <mask3> <mask4> <phi_k> '
-                       '<per> <phase> [<scee>] [<scnb>] [type <type>]',
-           'setbond' : 'setBond <mask1> <mask2> <k> <Req>',
-          'setangle' : 'setAngle <mask1> <mask2> <mask3> <k> <THETeq>',
-   'addatomicnumber' : 'addAtomicNumber',
-    'deletedihedral' : 'deleteDihedral <mask1> <mask2> <mask3> <mask4>',
-        'deletebond' : 'deleteBond <mask1> <mask2>',
-     'printljmatrix' : 'printLJMatrix <mask>|<index>',
-            'source' : 'source <file>',
-              'parm' : 'parm <filename> [<filename> [<filename> ...]] || '
-                       'parm copy <filename>|<index> || parm select '
-                       '<filename>|<index>',
-                'ls' : 'ls [Unix ls options]',
-                'cd' : 'cd <directory>',
-         'listparms' : 'listParms',
-           'timerge' : 'tiMerge <mol1mask> <mol2mask> <scmask1> <scmask2>'
-                            ' [<scmask1N>] [<scmask2N>] [tol <tol>]',
-       'interpolate' : 'interpolate <nparm> [parm2 <other_parm>] [eleconly]'
-                       ' [prefix <prefix>] [startnum <num>]',
-           'summary' : 'summary',
-             'scale' : 'scale <FLAG> <factor>',
-              'lmod' : 'lmod',
-            'addpdb' : 'addPDB <filename> [elem] [strict] [allicodes]',
-         'deletepdb' : 'deletePDB',
          'add12_6_4' : 'add12_6_4 [<divalent ion mask>] '
                        '[c4file <C4 Param. File> | watermodel <water model>] '
                        '[polfile <Pol. Param File>] [tunfactor <tunfactor>]',
-  'hmassrepartition' : 'HMassRepartition [<mass>] [dowater]',
-            'openmm' : 'OpenMM -p <parm>|<parm index> [sander/pmemd options] '
-                       '-platform <platform> -precision <precision model> '
-                       '[dcd] [progress] [script <script_file.py>] [norun]',
-            'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-                       '[Ewald]] [nodisper] [omm] [applayer] [platform '
-                       '<platform>] [precision <precision model>] [decompose]',
+   'addatomicnumber' : 'addAtomicNumber',
+     'addexclusions' : 'addExclusions <mask1> <mask2>',
+       'adddihedral' : 'addDihedral <mask1> <mask2> <mask3> <mask4> <phi_k> '
+                       '<per> <phase> [<scee>] [<scnb>] [type <type>]',
+#   'addcoarsegrain' : 'addCoarseGrain <parameter_file>',
+         'addljtype' : 'addLJType <mask> [radius <new_radius>] '
+                       '[epsilon <new_epsilon>] [radius_14 <new_radius14>] '
+                       '[epsilon_14 <new_epsilon14>]',
+            'addpdb' : 'addPDB <filename> [elem] [strict] [allicodes]',
+                'cd' : 'cd <directory>',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
                        '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]'
                        '[-radii <radiusset>]',
+            'change' : 'change <property> <mask> <new_value> [quiet]',
+    'changelj14pair' : 'changeLJ14Pair <mask1> <mask2> <Rmin> <epsilon>',
+      'changeljpair' : 'changeLJPair <mask1> <mask2> <Rmin> <epsilon>',
+'changeljsingletype' : 'changeLJSingleType <mask> <radius> <depth>',
+   'changeprotstate' : 'changeProtState <mask> <state #>',
+       'changeradii' : 'changeRadii <radii_set>',
+     'checkvalidity' : 'checkValidity',
+     'definesolvent' : 'defineSolvent <residue list>',
+        'deletebond' : 'deleteBond <mask1> <mask2>',
+    'deletedihedral' : 'deleteDihedral <mask1> <mask2> <mask3> <mask4>',
+         'deletepdb' : 'deletePDB',
+            'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
+                       '[Ewald]] [nodisper] [omm] [applayer] [platform '
+                       '<platform>] [precision <precision model>] [decompose]',
+                'go' : 'go',
+  'hmassrepartition' : 'HMassRepartition [<mass>] [dowater]',
+       'interpolate' : 'interpolate <nparm> [parm2 <other_parm>] [eleconly]'
+                       ' [prefix <prefix>] [startnum <num>]',
+              'help' : 'help [<action>]',
+         'listparms' : 'listParms',
+              'lmod' : 'lmod',
+        'loadrestrt' : 'loadRestrt <restrt_filename>',
+                'ls' : 'ls [Unix ls options]',
           'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
                        '[[restrain <mask>] [weight <k>]] [norun] '
                        '[script <script_file.py>] [platform <platform>] '
                        '[precision <precision model>] [tol <tolerance>] '
                        '[maxcyc <cycles>]',
+         'netcharge' : 'netCharge [<mask>]',
+            'openmm' : 'OpenMM -p <parm>|<parm index> [sander/pmemd options] '
+                       '-platform <platform> -precision <precision model> '
+                       '[dcd] [progress] [script <script_file.py>] [norun]',
+           'outparm' : 'outparm <prmtop_name> [<inpcrd_name>] [netcdf]',
+              'parm' : 'parm <filename> [<filename> [<filename> ...]] || '
+                       'parm copy <filename>|<index> || parm select '
+                       '<filename>|<index>',
+           'parmout' : 'parmout <prmtop_name> [<inpcrd_name>] [netcdf]',
+       'printangles' : 'printAngles <mask>',
+        'printbonds' : 'printBonds <mask>',
+      'printdetails' : 'printDetails <mask>',
+    'printdihedrals' : 'printDihedrals <mask>',
+        'printflags' : 'printFlags',
+     'printpointers' : 'printPointers',
+         'printinfo' : 'printInfo <flag>',
+     'printljmatrix' : 'printLJMatrix <mask>|<index>',
+      'printljtypes' : 'printLJTypes [<mask>|<type name>]',
+              'quit' : 'quit',
+             'scale' : 'scale <FLAG> <factor>',
+              'scee' : 'scee <scee_value>',
+              'scnb' : 'scnb <scnb_value>',
+           'setbond' : 'setBond <mask1> <mask2> <k> <Req>',
+          'setangle' : 'setAngle <mask1> <mask2> <mask3> <k> <THETeq>',
+      'setmolecules' : 'setMolecules [solute_ions True|False]',
+      'setoverwrite' : 'setOverwrite [True|False]', 
+            'source' : 'source <file>',
+           'summary' : 'summary',
+             'strip' : 'strip <mask>',
+           'timerge' : 'tiMerge <mol1mask> <mol2mask> <scmask1> <scmask2>'
+                            ' [<scmask1N>] [<scmask2N>] [tol <tol>]',
+       'writefrcmod' : 'writeFrcmod <frcmod_name>',
+          'writeoff' : 'writeOFF <OFF_filename>',
 #             'heat' : 'heat [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
 #                      '[[restrain <mask>] [weight <k>]] [langevin | '
 #                      'anderson] [nvt | npt] [anisotropic] [norun] [script '
@@ -274,7 +274,7 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
-            self.parm.writeRst7(self.rst_name, netcdf=self.netcdf)
+            self.parm.write_rst7(self.rst_name, netcdf=self.netcdf)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -356,7 +356,7 @@ class loadrestrt(Action):
         return 'Loading restart file %s' % self.rst_name
 
     def execute(self):
-        self.parm.LoadRst7(self.rst_name)
+        self.parm.load_rst7(self.rst_name)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -374,9 +374,7 @@ class writeoff(Action):
     def execute(self):
         if not Action.overwrite and os.path.exists(self.off_file):
             raise FileExists('%s exists; not overwriting' % self.off_file)
-        try:
-            self.parm.rst7
-        except:
+        if self.parm.coords is None:
             raise WriteOFFError('You must load a restart for WriteOFF!')
 
         self.parm.writeOFF(self.off_file)
@@ -1031,7 +1029,7 @@ class setmolecules(Action):
     def execute(self):
         owner = self.parm.rediscover_molecules(self.solute_ions)
         if owner is not None:
-            if not hasattr(self.parm, 'rst7'):
+            if self.parm.coords is None:
                 warnings.warn(
                         'The atoms in %s were reordered to correct molecule '
                         'ordering. Any topology printed from now on will _not_ '
@@ -2843,7 +2841,7 @@ class openmm(Action):
         # First try to load a restart file if it was supplied
         inptraj = self.arg_list.has_key('-y', mark=False)
         has_inpcrd = self.arg_list.has_key('-c', mark=False)
-        if not hasattr(self.parm, 'rst7') and not inptraj and not has_inpcrd:
+        if self.parm.coords is None and not inptraj and not has_inpcrd:
             raise SimulationError('No input coordinates provided.')
         # Eliminate some incompatibilities that are easy to catch now
         if self.parm.ptr('ifbox') > 1:

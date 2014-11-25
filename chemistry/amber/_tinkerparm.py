@@ -181,7 +181,7 @@ class AmoebaParm(AmberParm):
         self.load_structure()
       
         if rst7_name is not None:
-            self.LoadRst7(rst7_name)
+            self.load_rst7(rst7_name)
         elif self.parm_data['POINTERS'][IFBOX] > 0:
             self.hasbox = True
             box = self.parm_data['BOX_DIMENSIONS']

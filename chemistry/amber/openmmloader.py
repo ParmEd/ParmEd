@@ -143,14 +143,7 @@ class OpenMMAmberParm(AmberParm):
       
         # Set the box dimensions
         if self.ptr('ifbox'):
-            if hasattr(self, 'rst7'):
-                self._topology.setUnitCellDimensions(
-                        self.rst7.box[:3]*u.angstrom
-                )
-            else:
-                self._topology.setUnitCellDimensions(
-                        self.parm_data['BOX_DIMENSIONS'][1:4]*u.angstrom
-                )
+            self._topology.setUnitCellDimensions(self.box[:3]*u.angstrom)
 
         return self._topology
    
@@ -863,25 +856,16 @@ class OpenMMAmberParm(AmberParm):
     def box_vectors(self):
         """ Return tuple of box vectors """
         if self.pointers['IFBOX'] == 0: return None
-        if hasattr(self, 'rst7'):
-            box = [x*u.angstrom for x in self.rst7.box[:3]]
-            ang = [self.rst7.box[3], self.rst7.box[4], self.rst7.box[5]]
-            return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
-                                                    ang[0], ang[1], ang[2])
-        else:
-            box = [x*u.angstrom for x in self.parm_data['BOX_DIMENSIONS'][1:]]
-            ang = [self.parm_data['BOX_DIMENSIONS'][0]] * 3
-            return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
-                                                    ang[0], ang[1], ang[2])
+        box = [x*u.angstrom for x in self.box[:3]]
+        ang = [self.box[3], self.box[4], self.box[5]]
+        return _box_vectors_from_lengths_angles(box[0], box[1], box[2],
+                                                ang[0], ang[1], ang[2])
 
     @property
     def box_lengths(self):
         """ Return tuple of 3 units """
         if self.pointers['IFBOX'] == 0: return None
-        if hasattr(self, 'rst7'):
-            box = [x*u.angstrom for x in self.rst7.box[:3]]
-        else:
-            box = [x*u.angstrom for x in self.parm_data['BOX_DIMENSIONS'][1:]]
+        box = [x*u.angstrom for x in self.box[:3]]
         return tuple(box)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1161,7 +1145,7 @@ class OpenMMRst7(Rst7):
     @property
     def box_lengths(self):
         """ Return tuple of floats """
-        box = [x*u.angstrom for x in self.rst7.box[:3]]
+        box = [x*u.angstrom for x in self.box[:3]]
         return tuple(box)
 
 def _box_vectors_from_lengths_angles(a, b, c, alpha, beta, gamma):
