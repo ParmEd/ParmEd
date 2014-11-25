@@ -1174,6 +1174,7 @@ class AmberParm(AmberFormat, Structure):
         self.pointers['NNB'] = self.pointers['NEXT'] = nnb
         data['POINTERS'][NUMEXTRA] = nextra
         self.pointers['NUMEXTRA'] = nextra
+        max_typ = max(data['POINTERS'][NTYPES], max_typ)
         data['POINTERS'][NTYPES] = max_typ
         self.pointers['NTYPES'] = max_typ
 
