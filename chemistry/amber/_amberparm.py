@@ -23,8 +23,8 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
-from chemistry import (Bond, Angle, Dihedral, AtomList, Atom, BondType,
-                       AngleType, DihedralType, AtomType)
+from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
+                       BondType, AngleType, DihedralType, AtomType)
 from chemistry.structure import Structure
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,

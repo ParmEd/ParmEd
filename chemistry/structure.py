@@ -751,8 +751,10 @@ def read_PDB(filename):
     # Support hexadecimal numbering like that printed by VMD
     last_atom = Atom()
     last_resid = 1
+    resend = 26
     res_hex = False
     atom_hex = False
+    ZEROSET = set('0')
 
     try:
         for line in fileobj:
@@ -765,7 +767,7 @@ def read_PDB(filename):
             if rec == 'ATOM  ' or rec == 'HETATM':
                 atomno += 1
                 atnum, atname, altloc = line[6:11], line[12:16], line[16]
-                resname, chain, resid = line[17:20], line[21], line[22:26]
+                resname, chain, resid = line[17:20], line[21], line[22:resend]
                 inscode = line[26]
                 x, y, z = line[30:38], line[38:46], line[47:54]
                 occupancy, bfactor = line[54:60], line[60:66]
@@ -801,7 +803,7 @@ def read_PDB(filename):
                     occupancy = 0.0
                 # Figure out what my residue number is and see if the PDB is
                 # outputting residue numbers in hexadecimal (e.g., VMD)
-                if last_resid >= 9999:
+                if last_resid >= 9999 and resend == 26:
                     if not res_hex and resid == '9999':
                         resid = 9999
                     elif not res_hex:
@@ -816,6 +818,19 @@ def read_PDB(filename):
                                 resid = None # Figure out by unique atoms
                             else:
                                 raise e
+                    elif resid == '1000' and line[26] == '0':
+                        resend += 1
+                        resid = 10000
+                    else:
+                        resid = int(resid)
+                elif resend > 26:
+                    # VMD extends the field now... ugh.
+                    if resid[0] == '1' and set(resid[1:]) == ZEROSET:
+                        if line[resend] == '0':
+                            resid = int(resid) * 10
+                            resend += 1
+                        else:
+                            resid = int(resid)
                     else:
                         resid = int(resid)
                 else:
@@ -888,6 +903,7 @@ def read_PDB(filename):
                 all_coordinates.append(coordinates)
                 atomno = 0
                 coordinates = []
+                resend = 26
             elif rec == 'MODEL ':
                 if modelno == 1 and len(struct.atoms) == 0: continue
                 if len(coordinates) > 0:
@@ -899,6 +915,7 @@ def read_PDB(filename):
                     coordinates = []
                 modelno += 1
                 atomno = 0
+                resend = 26
             elif rec == 'CRYST1':
                 a = float(line[6:15])
                 b = float(line[15:24])
