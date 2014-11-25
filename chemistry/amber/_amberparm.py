@@ -40,6 +40,10 @@ try:
 except ImportError:
     # This only happens in Python 3, where zip is equivalent to izip
     pass
+try:
+    import numpy as np
+except ImportError:
+    np = None
 from math import sqrt
 from warnings import warn
 
@@ -579,9 +583,15 @@ class AmberParm(AmberFormat, Structure):
             self.coords = []
             for atom in self.atoms:
                 self.coords.extend([atom.xx, atom.xy, atom.xz])
+            if np is not None:
+                # Convert to numpy array
+                self.coords = np.asarray(self.coords)
             if self.hasvels:
+                self.vels = []
                 for atom in self.atoms:
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
+                if np is not None:
+                    self.vels = np.asarray(self.vels)
         if self.ptr('IFBOX'): self.rediscover_molecules()
 
     #===================================================
