@@ -488,7 +488,7 @@ class ChamberParm(AmberParm):
         self.add_flag('FORCE_FIELD_TYPE', 'i2,a78', num_items=0)
         self.add_flag('ATOM_NAME', '20a4', num_items=0)
         self.add_flag('CHARGE', '3E24.16', num_items=0,
-                comments=['Atomic charge multiplied by sqrt(322.0716D0) '
+                comments=['Atomic charge multiplied by sqrt(332.0716D0) '
                          '(CCELEC)'])
         self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
         self.add_flag('MASS', '5E16.8', num_items=0)
@@ -508,7 +508,7 @@ class ChamberParm(AmberParm):
                 comments=['List of the two atoms and its parameter index',
                           'in each UB term: i,k,index'])
         self.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
-                num_items=0, comments=['K_ub:kcal/mole/A**2'])
+                num_items=0, comments=['K_ub: kcal/mol/A**2'])
         self.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', num_items=0,
                 comments=['r_ub: A'])
         self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', num_items=0)
@@ -522,7 +522,7 @@ class ChamberParm(AmberParm):
                           'V(improper) = K_psi(psi - psi_0)**2'])
         self.add_flag('CHARMM_IMPROPERS', '10I8', num_items=0,
                 comments=['List of the four atoms in each improper term',
-                          'i,j,k,l,index  i,j,j,l,index',
+                          'i,j,k,l,index  i,j,k,l,index',
                           'where index is into the following two lists:',
                           'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}'])
         self.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', num_items=1,
