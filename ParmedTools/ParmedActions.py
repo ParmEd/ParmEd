@@ -1513,7 +1513,7 @@ class setangle(Action):
                         break
             # If not found, create a new angle
             if not found:
-                self.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
+                self.parm.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

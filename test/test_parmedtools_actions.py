@@ -671,6 +671,15 @@ class TestAmberParmActions(unittest.TestCase):
         PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute()
         act = PT.printBonds(parm, ':ALA@CA')
         self.assertEqual(str(act), saved.SET_BOND)
+        nala = sum([1 for res in parm.residues if res.name == 'ALA'])
+        nbon = len(parm.bonds)
+        PT.setBond(parm, ':ALA@CB', ':ALA@HA', 100.0, 1.5).execute()
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA' and atom.name == 'HA':
+                self.assertEqual(len(atom.bonds), 2)
+                for atom2 in atom.bond_partners:
+                    self.assertIn(atom2.name, ('CA','CB'))
+        self.assertEqual(nbon + nala, len(parm.bonds))
 
     def testSetAngle(self):
         """ Test setAngle on AmberParm """
@@ -678,6 +687,10 @@ class TestAmberParmActions(unittest.TestCase):
         PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100).execute()
         act = PT.printAngles(parm, ':ALA@CB')
         self.assertEqual(str(act), saved.SET_ANGLE)
+        nala = sum([1 for res in parm.residues if res.name == 'ALA'])
+        nang = len(parm.angles)
+        PT.setAngle(parm, ':ALA@HA', ':ALA@CB', ':ALA@HB1', 50, 120).execute()
+        self.assertEqual(nang + nala, len(parm.angles))
 
     def testAddAtomicNumber(self):
         """ Test addAtomicNumber on AmberParm """
