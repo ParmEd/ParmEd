@@ -1210,19 +1210,19 @@ class AmberParm(AmberFormat, Structure):
         self.pointers['NUMBND'] = len(self.bond_types)
         # Now do the bond arrays
         data['BONDS_INC_HYDROGEN'] = bond_array = []
-        i = 0
-        for i, bond in enumerate(self.bonds_inc_h):
+        bond_list = list(self.bonds_inc_h)
+        for bond in bond_list:
             bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
                                bond.type.idx+1])
-        data['POINTERS'][NBONH] = i + 1
-        self.pointers['NBONH'] = i + 1
+        data['POINTERS'][NBONH] = len(bond_list)
+        self.pointers['NBONH'] = len(bond_list)
         data['BONDS_WITHOUT_HYDROGEN'] = bond_array = []
-        i = 0
-        for i, bond in enumerate(self.bonds_without_h):
+        bond_list = list(self.bonds_without_h)
+        for bond in bond_list:
             bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
                                bond.type.idx+1])
-        data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = i + 1
-        self.pointers['MBONA'] = self.pointers['NBONA'] = i + 1
+        data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = len(bond_list)
+        self.pointers['MBONA'] = self.pointers['NBONA'] = len(bond_list)
 
     #===================================================
 
@@ -1244,19 +1244,19 @@ class AmberParm(AmberFormat, Structure):
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
         data['ANGLES_INC_HYDROGEN'] = angle_array = []
-        i = 0
-        for i, angle in enumerate(self.angles_inc_h):
+        angle_list = list(self.angles_inc_h)
+        for angle in angle_list:
             angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
                                 angle.atom3.idx*3, angle.type.idx+1])
-        data['POINTERS'][NTHETH] = i + 1
-        self.pointers['NTHETH'] = i + 1
+        data['POINTERS'][NTHETH] = len(angle_list)
+        self.pointers['NTHETH'] = len(angle_list)
         data['ANGLES_WITHOUT_HYDROGEN'] = angle_array = []
-        i = 0
-        for i, angle in enumerate(self.angles_without_h):
+        angle_list = list(self.angles_without_h)
+        for angle in angle_list:
             angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
                                 angle.atom3.idx*3, angle.type.idx+1])
-        data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = i + 1
-        self.pointers['NTHETA'] = self.pointers['MTHETA'] = i + 1
+        data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = len(angle_list)
+        self.pointers['NTHETA'] = self.pointers['MTHETA'] = len(angle_list)
 
     #===================================================
 
@@ -1288,8 +1288,8 @@ class AmberParm(AmberFormat, Structure):
         self.pointers['NPTRA'] = len(self.dihedral_types)
         # Now do the dihedral arrays
         data['DIHEDRALS_INC_HYDROGEN'] = dihed_array = []
-        i = 0
-        for i, dihed in enumerate(self.dihedrals_inc_h):
+        dihed_list = list(self.dihedrals_inc_h)
+        for dihed in dihed_list:
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
                                     dihed.atom2.idx*3*dihed.signs[0],
@@ -1300,11 +1300,11 @@ class AmberParm(AmberFormat, Structure):
                                     dihed.atom3.idx*3*dihed.signs[0],
                                     dihed.atom4.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
-        data['POINTERS'][NPHIH] = i + 1
-        self.pointers['NPHIH'] = i + 1
+        data['POINTERS'][NPHIH] = len(dihed_list)
+        self.pointers['NPHIH'] = len(dihed_list)
         data['DIHEDRALS_WITHOUT_HYDROGEN'] = dihed_array = []
-        i = 0
-        for i, dihed in enumerate(self.dihedrals_without_h):
+        dihed_list = list(self.dihedrals_without_h)
+        for dihed in dihed_list:
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
                                     dihed.atom2.idx*3*dihed.signs[0],
@@ -1315,8 +1315,8 @@ class AmberParm(AmberFormat, Structure):
                                     dihed.atom3.idx*3*dihed.signs[0],
                                     dihed.atom4.idx*3*dihed.signs[1],
                                     dihed.type.idx+1])
-        data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = i + 1
-        self.pointers['NPHIA'] = self.pointers['MPHIA'] = i + 1
+        data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = len(dihed_list)
+        self.pointers['NPHIA'] = self.pointers['MPHIA'] = len(dihed_list)
 
     #===================================================
 
