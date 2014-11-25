@@ -2034,7 +2034,7 @@ class timerge(Action):
                                 if (dihed.atom1.idx == k or dihed.atom2.idx == k
                                         or dihed.atom4.idx == k):
                                     dihed.atom3 = atm_new
-                            elif dihed.atom4.starting_index == j:
+                            elif dihed.atom4.idx == j:
                                 if (dihed.atom1.idx == k or dihed.atom2.idx == k
                                         or dihed.atom3.idx == k):
                                     dihed.atom4 = atm_new               
