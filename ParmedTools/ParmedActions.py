@@ -2597,7 +2597,7 @@ class addpdb(Action):
         icodes = ['' for i in xrange(self.parm.ptr('nres'))]
         tempfac = [0.0 for i in xrange(self.parm.ptr('natom'))]
         occupancies = [0.0 for i in xrange(self.parm.ptr('natom'))]
-        atomnums = [0 for i in xrange(self.parm.ptr('natom'))]
+        atomnums = [-1 for i in xrange(self.parm.ptr('natom'))]
         for i, res in enumerate(pdb.residues):
             parmres = self.parm.residues[i]
             try:
