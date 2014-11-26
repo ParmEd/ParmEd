@@ -116,7 +116,10 @@ class FortranFormat(object):
                 self.nitems = int(nitems)
             self.itemlen = int(itemlen)
             self.num_decimals = int(num_decimals)
-            self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
+            if 'F' in format_string.upper():
+                self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            else:
+                self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
 
         elif FortranFormat.floatre2.match(format_string):
             self.type = float
@@ -128,7 +131,10 @@ class FortranFormat(object):
                 self.nitems = int(nitems)
             self.itemlen = int(itemlen)
             self.num_decimals = int(num_decimals)
-            self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            if 'F' in format_string.upper():
+                self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            else:
+                self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
 
         else:
             # We tried... now just use the fortranformat package
