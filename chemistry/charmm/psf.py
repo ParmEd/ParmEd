@@ -9,9 +9,8 @@ Date: April 20, 2014
 from __future__ import division
 
 from compat24 import wraps
-from chemistry.charmm.topologyobjects import (ResidueList, AtomList,
-                TrackedList, Bond, Angle, Dihedral, Improper, AcceptorDonor,
-                Group, Cmap, UreyBradley, NoUreyBradley)
+from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
+                       Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
 import os
@@ -57,40 +56,38 @@ class _ZeroDict(dict):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class CharmmPsfFile(object):
+class CharmmPsfFile(Structure):
     """
     A chemical structure instantiated from CHARMM files.
 
-    Example:
-    >>> cs = CharmmPsfFile("testfiles/test.psf")
-    
     This structure has numerous attributes that are lists of the elements of
     this structure, including atoms, bonds, torsions, etc. The attributes are
-        - residue_list
-        - atom_list
-        - bond_list
-        - angle_list
-        - dihedral_list
-        - dihedral_parameter_list
-        - improper_list
-        - cmap_list
-        - donor_list    # hbonds donors?
-        - acceptor_list # hbond acceptors?
-        - group_list    # list of nonbonded interaction groups
+        - residues
+        - atoms
+        - bonds
+        - angles
+        - dihedrals
+        - dihedral_parameters
+        - impropers
+        - cmaps
+        - donors    # hbonds donors?
+        - acceptors # hbond acceptors?
+        - groups    # list of nonbonded interaction groups
 
     Additional attribute is available if a CharmmParameterSet is loaded into
     this structure.
         
-        - urey_bradley_list
+        - urey_bradleys
 
     The lengths of each of these lists gives the pointers (e.g., natom, nres,
     etc.)
 
-    Example:
+    Examples
+    --------
     >>> cs = CharmmPsfFile("testfiles/test.psf")
-    >>> len(cs.atom_list)
+    >>> len(cs.atoms)
     33
-    >>> len(cs.bond_list)
+    >>> len(cs.bonds)
     32
     """
 
@@ -115,20 +112,22 @@ class CharmmPsfFile(object):
         """
         This method parses a section of the PSF file
 
-        Parameters:
-            - psf (CharmmFile) : Open file that is pointing to the first line
-                                 of the section that is to be parsed
+        Parameters
+        ----------
+        psf : file
+            Open file that is pointing to the first line of the section that is
+            to be parsed
         
-        Returns:
-            (title, pointers, data)
-
-            - title (str) : The label of the PSF section we are parsing
-            - pointers (int/tuple of ints) : If one pointer is set, pointers is
-                    simply the integer that is value of that pointer. Otherwise
-                    it is a tuple with every pointer value defined in the first
-                    line
-            - data (list) : A list of all data in the parsed section converted
-                    to integers
+        Returns
+        -------
+        title : str 
+            The label of the PSF section we are parsing
+        pointers : (int/tuple of ints) 
+            If one pointer is set, pointers is simply the integer that is value
+            of that pointer. Otherwise it is a tuple with every pointer value
+            defined in the first line
+        data : list
+            A list of all data in the parsed section converted to integers
         """
         conv = CharmmPsfFile._convert
         line = psf.readline()
@@ -181,6 +180,7 @@ class CharmmPsfFile(object):
             IOError : If file "psf_name" does not exist
             CharmmPSFError: If any parsing errors are encountered
         """
+        Structure.__init__(self)
         conv = CharmmPsfFile._convert
         # Make sure the file exists
         if not os.path.exists(psf_name):
@@ -204,12 +204,10 @@ class CharmmPsfFile(object):
                 break
             psfsections[sec] = (ptr, data)
         # store the title
-        title = psfsections['NTITLE'][1]
+        self.title = psfsections['NTITLE'][1]
         # Next is the number of atoms
         natom = conv(psfsections['NATOM'][0], int, 'natom')
         # Parse all of the atoms
-        residue_list = ResidueList()
-        atom_list = AtomList()
         for i in xrange(natom):
             words = psfsections['NATOM'][1][i].split()
             atid = int(words[0])
@@ -228,186 +226,148 @@ class CharmmPsfFile(object):
             charge = conv(words[6], float, 'partial charge')
             mass = conv(words[7], float, 'atomic mass')
             props = words[8:]
-            atom = residue_list.add_atom(system, resid, resname, name,
-                                         attype, charge, mass, props)
-            atom_list.append(atom)
-        atom_list.assign_indexes()
-        atom_list.changed = False
+            atom = Atom(name=name, type=attype, charge=charge, mass=mass)
+            atom.props = props
+            self.residues.add_atom(atom, resname, resid, chain=system)
+            self.atoms.append(atom)
         # Now get the number of bonds
         nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
-        holder = psfsections['NBOND'][1]
-        bond_list = TrackedList()
-        if len(holder) != nbond * 2:
+        tmp = psfsections['NBOND'][1]
+        if len(tmp) != nbond * 2:
             raise CharmmPSFError('Got %d indexes for %d bonds' %
-                                 (len(holder), nbond))
-        for i in xrange(nbond):
-            id1 = holder[2*i  ] - 1
-            id2 = holder[2*i+1] - 1
-            bond_list.append(Bond(atom_list[id1], atom_list[id2]))
-        bond_list.changed = False
+                                 (len(tmp), nbond))
+        for i in xrange(0, 2*nbond, 2):
+            self.bonds.append(
+                    Bond(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
+            )
         # Now get the number of angles and the angle list
         ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
-        holder = psfsections['NTHETA'][1]
-        angle_list = TrackedList()
-        if len(holder) != ntheta * 3:
+        tmp = psfsections['NTHETA'][1]
+        if len(tmp) != ntheta * 3:
             raise CharmmPSFError('Got %d indexes for %d angles' %
-                                 (len(holder), ntheta))
-        for i in xrange(ntheta):
-            id1 = holder[3*i  ] - 1
-            id2 = holder[3*i+1] - 1
-            id3 = holder[3*i+2] - 1
-            angle_list.append(
-                    Angle(atom_list[id1], atom_list[id2], atom_list[id3])
+                                 (len(tmp), ntheta))
+        for i in xrange(0, 3*ntheta, 3):
+            self.angles.append(
+                    Angle(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1],
+                          self.atoms[tmp[i+2]-1])
             )
-        angle_list.changed = False
         # Now get the number of torsions and the torsion list
         nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
-        holder = psfsections['NPHI'][1]
-        dihedral_list = TrackedList()
-        if len(holder) != nphi * 4:
+        tmp = psfsections['NPHI'][1]
+        if len(tmp) != nphi * 4:
             raise CharmmPSFError('Got %d indexes for %d torsions' %
-                                 (len(holder), nphi))
-        for i in xrange(nphi):
-            id1 = holder[4*i  ] - 1
-            id2 = holder[4*i+1] - 1
-            id3 = holder[4*i+2] - 1
-            id4 = holder[4*i+3] - 1
-            dihedral_list.append(
-                    Dihedral(atom_list[id1], atom_list[id2], atom_list[id3],
-                             atom_list[id4])
+                                 (len(tmp), nphi))
+        for i in xrange(0, 4*nphi, 4):
+            self.dihedrals.append(
+                    Dihedral(self.atoms[tmp[i  ]-1], self.atoms[tmp[i+1]-1],
+                             self.atoms[tmp[i+2]-1], self.atoms[tmp[i+3]-1])
             )
-        dihedral_list.changed = False
+        self.dihedrals.split = False
         # Now get the number of improper torsions
         nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
-        holder = psfsections['NIMPHI'][1]
-        improper_list = TrackedList()
-        if len(holder) != nimphi * 4:
+        tmp = psfsections['NIMPHI'][1]
+        if len(tmp) != nimphi * 4:
             raise CharmmPSFError('Got %d indexes for %d impropers' %
-                                 (len(holder), nimphi))
-        for i in xrange(nimphi):
-            id1 = holder[4*i  ] - 1
-            id2 = holder[4*i+1] - 1
-            id3 = holder[4*i+2] - 1
-            id4 = holder[4*i+3] - 1
-            improper_list.append(
-                    Improper(atom_list[id1], atom_list[id2], atom_list[id3],
-                             atom_list[id4])
+                                 (len(tmp), nimphi))
+        for i in xrange(0, 4*nimphi, 4):
+            self.impropers.append(
+                    Improper(self.atoms[tmp[i  ]-1], self.atoms[tmp[i+1]-1],
+                             self.atoms[tmp[i+2]-1], self.atoms[tmp[i+3]-1])
             )
-        improper_list.changed = False
         # Now handle the donors (what is this used for??)
         ndon = conv(psfsections['NDON'][0], int, 'number of donors')
-        holder = psfsections['NDON'][1]
-        donor_list = TrackedList()
-        if len(holder) != ndon * 2:
+        tmp = psfsections['NDON'][1]
+        if len(tmp) != ndon * 2:
             raise CharmmPSFError('Got %d indexes for %d donors' %
-                                 (len(holder), ndon))
-        for i in xrange(ndon):
-            id1 = holder[2*i  ] - 1
-            id2 = holder[2*i+1] - 1
-            donor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
-        donor_list.changed = False
+                                 (len(tmp), ndon))
+        for i in xrange(0, 2*ndon, 2):
+            self.donors.append(
+                    AcceptorDonor(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
+            )
         # Now handle the acceptors (what is this used for??)
         nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
-        holder = psfsections['NACC'][1]
-        acceptor_list = TrackedList()
-        if len(holder) != nacc * 2:
+        tmp = psfsections['NACC'][1]
+        if len(tmp) != nacc * 2:
             raise CharmmPSFError('Got %d indexes for %d acceptors' %
-                                 (len(holder), ndon))
-        for i in xrange(nacc):
-            id1 = holder[2*i  ] - 1
-            id2 = holder[2*i+1] - 1
-            acceptor_list.append(AcceptorDonor(atom_list[id1], atom_list[id2]))
-        acceptor_list.changed = False
+                                 (len(tmp), ndon))
+        for i in xrange(0, 2*nacc, 2):
+            self.acceptors.append(
+                    AcceptorDonor(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
+            )
         # Now get the group sections
-        group_list = TrackedList()
         try:
             ngrp, nst2 = psfsections['NGRP NST2'][0]
         except ValueError:
             raise CharmmPSFError('Could not unpack GROUP pointers')
-        holder = psfsections['NGRP NST2'][1]
-        group_list.nst2 = nst2
+        tmp = psfsections['NGRP NST2'][1]
+        self.groups.nst2 = nst2
         # Now handle the groups
-        if len(holder) != ngrp * 3:
+        if len(tmp) != ngrp * 3:
             raise CharmmPSFError('Got %d indexes for %d groups' %
-                                 (len(holder), ngrp))
-        for i in xrange(ngrp):
-            i1 = holder[3*i  ]
-            i2 = holder[3*i+1]
-            i3 = holder[3*i+2]
-            group_list.append(Group(i1, i2, i3))
-        group_list.changed = False
+                                 (len(tmp), ngrp))
+        for i in xrange(0, 3*ngrp, 3):
+            self.groups.append(Group(tmp[i], tmp[i+1], tmp[i+2]))
         # Assign all of the atoms to molecules recursively
-        holder = psfsections['MOLNT'][1]
-        set_molecules(atom_list)
-        molecule_list = [atom.marked for atom in atom_list]
-        if len(holder) == len(atom_list):
-            if molecule_list != holder:
+        tmp = psfsections['MOLNT'][1]
+        set_molecules(self.atoms)
+        molecule_list = [a.marked for a in self.atoms]
+        if len(tmp) == len(self.atoms):
+            if molecule_list != tmp:
                 warnings.warn('Detected PSF molecule section that is WRONG. '
                               'Resetting molecularity.', CharmmPSFWarning)
             # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
             numlp, numlph = psfsections['NUMLP NUMLPH'][0]
             if numlp != 0 or numlph != 0:
-                raise NotImplemented('Cannot currently handle PSFs with lone '
-                                     'pairs defined in the NUMLP/NUMLPH '
-                                     'section.')
+                raise NotImplementedError('Cannot currently handle PSFs with '
+                                          'lone pairs defined in the NUMLP/'
+                                          'NUMLPH section.')
         # Now do the CMAPs
         ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
-        holder = psfsections['NCRTERM'][1]
-        cmap_list = TrackedList()
-        if len(holder) != ncrterm * 8:
+        tmp = psfsections['NCRTERM'][1]
+        if len(tmp) != ncrterm * 8:
             raise CharmmPSFError('Got %d CMAP indexes for %d cmap terms' %
-                                 (len(holder), ncrterm))
-        for i in xrange(ncrterm):
-            id1 = holder[8*i  ] - 1
-            id2 = holder[8*i+1] - 1
-            id3 = holder[8*i+2] - 1
-            id4 = holder[8*i+3] - 1
-            id5 = holder[8*i+4] - 1
-            id6 = holder[8*i+5] - 1
-            id7 = holder[8*i+6] - 1
-            id8 = holder[8*i+7] - 1
-            cmap_list.append(
-                    Cmap(atom_list[id1], atom_list[id2], atom_list[id3],
-                         atom_list[id4], atom_list[id5], atom_list[id6],
-                         atom_list[id7], atom_list[id8])
+                                 (len(tmp), ncrterm))
+        for i in xrange(0, 8*ncrterm, 8):
+            self.cmaps.append(
+                    Cmap.extended(self.atoms[tmp[i  ]-1],
+                                  self.atoms[tmp[i+1]-1],
+                                  self.atoms[tmp[i+2]-1],
+                                  self.atoms[tmp[i+3]-1],
+                                  self.atoms[tmp[i+4]-1],
+                                  self.atoms[tmp[i+5]-1],
+                                  self.atoms[tmp[i+6]-1],
+                                  self.atoms[tmp[i+7]-1])
             )
-        cmap_list.changed = False
-
-        self.residue_list = residue_list
-        self.atom_list = atom_list
-        self.bond_list = bond_list
-        self.angle_list = angle_list
-        self.dihedral_list = dihedral_list
-        self.dihedral_parameter_list = TrackedList()
-        self.improper_list = improper_list
-        self.cmap_list = cmap_list
-        self.donor_list = donor_list
-        self.acceptor_list = acceptor_list
-        self.group_list = group_list
-        self.title = title
+        self.unchange()
         self.flags = psf_flags
 
     def write_psf(self, dest, vmd=False):
         """
         Writes a PSF file from the stored molecule
 
-        Parameters:
-            - dest (str or file-like) : The place to write the output PSF file.
-                    If it has a "write" attribute, it will be used to print the
-                    PSF file. Otherwise, it will be treated like a string and a
-                    file will be opened, printed, then closed
-            - vmd (bool) : If True, it will write out a PSF in the format that
-                    VMD prints it in (i.e., no NUMLP/NUMLPH or MOLNT sections)
-        Example:
-            >>> cs = CharmmPsfFile('testfiles/test.psf')
-            >>> cs.write_psf('testfiles/test2.psf')
+        Parameters
+        ----------
+        dest : str or file-like
+            The place to write the output PSF file.  If it has a "write"
+            attribute, it will be used to print the PSF file. Otherwise, it will
+            be treated like a string and a file will be opened, printed, then
+            closed
+        vmd : bool 
+            If True, it will write out a PSF in the format that VMD prints it in
+            (i.e., no NUMLP/NUMLPH or MOLNT sections)
+
+        Examples
+        --------
+        >>> cs = CharmmPsfFile('testfiles/test.psf')
+        >>> cs.write_psf('testfiles/test2.psf')
         """
         # See if this is an extended format
-        ext = 'EXT' in self.flags
+        try:
+            ext = 'EXT' in self.flags
+        except AttributeError:
+            ext = True
         own_handle = False
         # Index the atoms and residues
-        self.residue_list.assign_indexes()
-        self.atom_list.assign_indexes()
         if not hasattr(dest, 'write'):
             own_handle = True
             dest = open(dest, 'w')
@@ -423,133 +383,134 @@ class CharmmPsfFile(object):
             intfmt = '%8d' # For pointers
 
         # Now print the header then the title
-        dest.write('PSF ' + ' '.join(self.flags) + '\n')
-        dest.write('\n')
+        dest.write('PSF ')
+        if hasattr(self, 'flags'):
+            dest.write(' '.join(self.flags))
+        else:
+            dest.write('EXT') # EXT is always active
+        dest.write('\n\n')
         dest.write(intfmt % len(self.title) + ' !NTITLE\n')
         dest.write('\n'.join(self.title) + '\n\n')
         # Now time for the atoms
-        dest.write(intfmt % len(self.atom_list) + ' !NATOM\n')
+        dest.write(intfmt % len(self.atoms) + ' !NATOM\n')
         # atmfmt1 is for CHARMM format (i.e., atom types are integers)
         # atmfmt is for XPLOR format (i.e., atom types are strings)
-        for i, atom in enumerate(self.atom_list):
-            if isinstance(atom.attype, str):
+        for i, atom in enumerate(self.atoms):
+            if isinstance(atom.type, str):
                 fmt = atmfmt2
             else:
                 fmt = atmfmt1
-            atmstr = fmt % (i+1, atom.system, atom.residue.resnum,
-                            atom.residue.resname, atom.name, atom.attype,
+            atmstr = fmt % (i+1, atom.residue.chain, atom.residue.number,
+                            atom.residue.name, atom.name, atom.type,
                             atom.charge, atom.mass)
-            dest.write(atmstr + '   '.join(atom.props) + '\n')
+            if hasattr(atom, 'props'):
+                dest.write(atmstr + '   '.join(atom.props) + '\n')
+            else:
+                dest.write('\n')
         dest.write('\n')
         # Bonds
-        dest.write(intfmt % len(self.bond_list) + ' !NBOND: bonds\n')
-        for i, bond in enumerate(self.bond_list):
+        dest.write(intfmt % len(self.bonds) + ' !NBOND: bonds\n')
+        for i, bond in enumerate(self.bonds):
             dest.write((intfmt*2) % (bond.atom1.idx+1, bond.atom2.idx+1))
             if i % 4 == 3: # Write 4 bonds per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(self.bond_list) % 4 != 0 or len(self.bond_list) == 0:
+        if len(self.bonds) % 4 != 0 or len(self.bonds) == 0:
             dest.write('\n')
         dest.write('\n')
         # Angles
-        dest.write(intfmt % len(self.angle_list) + ' !NTHETA: angles\n')
-        for i, angle in enumerate(self.angle_list):
+        dest.write(intfmt % len(self.angles) + ' !NTHETA: angles\n')
+        for i, angle in enumerate(self.angles):
             dest.write((intfmt*3) % (angle.atom1.idx+1, angle.atom2.idx+1,
                                      angle.atom3.idx+1)
             )
             if i % 3 == 2: # Write 3 angles per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(self.angle_list) % 3 != 0 or len(self.angle_list) == 0:
+        if len(self.angles) % 3 != 0 or len(self.angles) == 0:
             dest.write('\n')
         dest.write('\n')
         # Dihedrals
-        dest.write(intfmt % len(self.dihedral_list) + ' !NPHI: dihedrals\n')
-        for i, dih in enumerate(self.dihedral_list):
+        dest.write(intfmt % len(self.dihedrals) + ' !NPHI: dihedrals\n')
+        for i, dih in enumerate(self.dihedrals):
             dest.write((intfmt*4) % (dih.atom1.idx+1, dih.atom2.idx+1,
                                      dih.atom3.idx+1, dih.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(self.dihedral_list) % 2 != 0 or len(self.dihedral_list) == 0:
+        if len(self.dihedrals) % 2 != 0 or len(self.dihedrals) == 0:
             dest.write('\n')
         dest.write('\n')
         # Impropers
-        dest.write(intfmt % len(self.improper_list) + ' !NIMPHI: impropers\n')
-        for i, imp in enumerate(self.improper_list):
+        dest.write(intfmt % len(self.impropers) + ' !NIMPHI: impropers\n')
+        for i, imp in enumerate(self.impropers):
             dest.write((intfmt*4) % (imp.atom1.idx+1, imp.atom2.idx+1,
                                      imp.atom3.idx+1, imp.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(self.improper_list) % 2 != 0 or len(self.improper_list) == 0:
+        if len(self.impropers) % 2 != 0 or len(self.impropers) == 0:
             dest.write('\n')
         dest.write('\n')
         # Donor section
-        dest.write(intfmt % len(self.donor_list) + ' !NDON: donors\n')
-        for i, don in enumerate(self.donor_list):
+        dest.write(intfmt % len(self.donors) + ' !NDON: donors\n')
+        for i, don in enumerate(self.donors):
             dest.write((intfmt*2) % (don.atom1.idx+1, don.atom2.idx+1))
             if i % 4 == 3: # 4 donors per line
                 dest.write('\n')
-        if len(self.donor_list) % 4 != 0 or len(self.donor_list) == 0:
+        if len(self.donors) % 4 != 0 or len(self.donors) == 0:
             dest.write('\n')
         dest.write('\n')
         # Acceptor section
-        dest.write(intfmt % len(self.acceptor_list) + ' !NACC: acceptors\n')
-        for i, acc in enumerate(self.acceptor_list):
+        dest.write(intfmt % len(self.acceptors) + ' !NACC: acceptors\n')
+        for i, acc in enumerate(self.acceptors):
             dest.write((intfmt*2) % (acc.atom1.idx+1, acc.atom2.idx+1))
             if i % 4 == 3: # 4 donors per line
                 dest.write('\n')
-        if len(self.acceptor_list) % 4 != 0 or len(self.acceptor_list) == 0:
+        if len(self.acceptors) % 4 != 0 or len(self.acceptors) == 0:
             dest.write('\n')
         dest.write('\n')
         # NNB section ??
         dest.write(intfmt % 0 + ' !NNB\n\n')
-        for i in xrange(len(self.atom_list)):
+        for i in xrange(len(self.atoms)):
             dest.write(intfmt % 0)
             if i % 8 == 7: # Write 8 0's per line
                 dest.write('\n')
-        if len(self.atom_list) % 8 != 0: dest.write('\n')
+        if len(self.atoms) % 8 != 0: dest.write('\n')
         dest.write('\n')
         # Group section
-        dest.write((intfmt*2) % (len(self.group_list), self.group_list.nst2))
+        dest.write((intfmt*2) % (len(self.groups), self.groups.nst2))
         dest.write(' !NGRP NST2\n')
-        for i, gp in enumerate(self.group_list):
+        for i, gp in enumerate(self.groups):
             dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
             if i % 3 == 2: dest.write('\n')
-        if len(self.group_list) % 3 != 0 or len(self.group_list) == 0:
+        if len(self.groups) % 3 != 0 or len(self.groups) == 0:
             dest.write('\n')
         dest.write('\n')
         # The next two sections are never found in VMD prmtops...
         if not vmd:
             # Molecule section; first set molecularity
-            set_molecules(self.atom_list)
-            mollist = [a.marked for a in self.atom_list]
+            set_molecules(self.atoms)
+            mollist = [a.marked for a in self.atoms]
             dest.write(intfmt % max(mollist) + ' !MOLNT\n')
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 dest.write(intfmt % atom.marked)
                 if i % 8 == 7: dest.write('\n')
-            if len(self.atom_list) % 8 != 0: dest.write('\n')
+            if len(self.atoms) % 8 != 0: dest.write('\n')
             dest.write('\n')
             # NUMLP/NUMLPH section
             dest.write((intfmt*2) % (0, 0) + ' !NUMLP NUMLPH\n')
             dest.write('\n')
         # CMAP section
-        dest.write(intfmt % len(self.cmap_list) + ' !NCRTERM: cross-terms\n')
-        for i, cmap in enumerate(self.cmap_list):
-            dest.write((intfmt*4) % (cmap.atom1.idx+1, cmap.atom2.idx+1,
-                                     cmap.atom3.idx+1, cmap.atom4.idx+1)
+        dest.write(intfmt % len(self.cmaps) + ' !NCRTERM: cross-terms\n')
+        for i, cmap in enumerate(self.cmaps):
+            dest.write((intfmt*8) % (cmap.atom1.idx+1, cmap.atom2.idx+1,
+                                     cmap.atom3.idx+1, cmap.atom4.idx+1,
+                                     cmap.atom2.idx+1, cmap.atom3.idx+1,
+                                     cmap.atom4.idx+1, cmap.atom5.idx+1)
             )
-            if cmap.consecutive:
-                dest.write((intfmt*4) % (cmap.atom2.idx+1, cmap.atom3.idx+1,
-                                         cmap.atom4.idx+1, cmap.atom5.idx+1)
-                )
-            else:
-                dest.write((intfmt*4) % (cmap.atom5.idx+1, cmap.atom6.idx+1,
-                                         cmap.atom7.idx+1, cmap.atom8.idx+1)
-                )
             dest.write('\n')
         # Done!
         # If we opened our own handle, close it
@@ -561,97 +522,123 @@ class CharmmPsfFile(object):
         Loads parameters from a parameter set that was loaded via CHARMM RTF,
         PAR, and STR files.
 
-        Parameters:
-            - parmset (ParameterSet) : List of all parameters
+        Parameters
+        ----------
+        parmset : CharmmParameterSet
+            List of all parameters
 
-        Notes:
-            - If any parameters that are necessary cannot be found, a
-              MissingParameter exception is raised.
+        Notes
+        -----
+        - If any parameters that are necessary cannot be found, MissingParameter
+          is raised.
 
-            - If any dihedral or improper parameters cannot be found, I will try
-              inserting wildcards (at either end for dihedrals and as the two
-              central atoms in impropers) and see if that matches.  Wild-cards
-              will apply ONLY if specific parameters cannot be found.
+        - If any dihedral or improper parameters cannot be found, I will try
+          inserting wildcards (at either end for dihedrals and as the two
+          central atoms in impropers) and see if that matches.  Wild-cards will
+          apply ONLY if specific parameters cannot be found.
 
-            - This method will expand the dihedral_list attribute by adding a
-              separate Dihedral object for each term for types that have a
-              multi-term expansion
+        - This method will expand the dihedrals attribute by adding a separate
+          Dihedral object for each term for types that have a multi-term
+          expansion
         """
         # First load the atom types
         types_are_int = False
-        for atom in self.atom_list:
+        for atom in self.atoms:
             try:
-                if isinstance(atom.attype, int):
-                    atype = parmset.atom_types_int[atom.attype]
+                if isinstance(atom.type, int):
+                    atype = parmset.atom_types_int[atom.type]
                     types_are_int = True # if we have to change back
                 else:
-                    atype = parmset.atom_types_str[atom.attype]
+                    atype = parmset.atom_types_str[atom.type]
             except KeyError:
                 raise MissingParameter('Could not find atom type for %s' %
-                                       atom.attype)
-            atom.type = atype
-            # Change to string attype to look up the rest of the parameters
-            atom.type_to_str()
+                                       atom.type)
+            atom.atom_type = atype
+            # Change to string type to look up the rest of the parameters
+            atom.type = str(atom.atom_type)
+            atom.atomic_number = atype.atomic_number
 
         # Next load all of the bonds
-        for bond in self.bond_list:
+        for bond in self.bonds:
             # Construct the key
-            key = (min(bond.atom1.attype, bond.atom2.attype),
-                   max(bond.atom1.attype, bond.atom2.attype))
+            key = (min(bond.atom1.type, bond.atom2.type),
+                   max(bond.atom1.type, bond.atom2.type))
             try:
-                bond.bond_type = parmset.bond_types[key]
+                bond.type = parmset.bond_types[key]
             except KeyError:
                 raise MissingParameter('Missing bond type for %r' % bond)
+            bond.type.used = False
+        # Build the bond_types list
+        del self.bond_types[:]
+        for bond in self.bonds:
+            if bond.type.used: continue
+            bond.type.used = True
+            self.bond_types.append(bond.type)
+            bond.type.list = self.bond_types
         # Next load all of the angles. If a Urey-Bradley term is defined for
         # this angle, also build the urey_bradley and urey_bradley_type lists
-        self.urey_bradley_list = TrackedList()
-        for ang in self.angle_list:
+        del self.urey_bradleys[:]
+        for ang in self.angles:
             # Construct the key
-            key = (min(ang.atom1.attype, ang.atom3.attype), ang.atom2.attype,
-                   max(ang.atom1.attype, ang.atom3.attype))
+            key = (min(ang.atom1.type, ang.atom3.type), ang.atom2.type,
+                   max(ang.atom1.type, ang.atom3.type))
             try:
-                ang.angle_type = parmset.angle_types[key]
+                ang.type = parmset.angle_types[key]
+                ang.type.used = False
                 ubt = parmset.urey_bradley_types[key]
                 if ubt is not NoUreyBradley:
                     ub = UreyBradley(ang.atom1, ang.atom3, ubt)
-                    self.urey_bradley_list.append(ub)
+                    self.urey_bradleys.append(ub)
+                    ubt.used = False
             except KeyError:
                 raise MissingParameter('Missing angle type for %r' % ang)
+        del self.urey_bradley_types[:]
+        del self.angle_types[:]
+        for ub in self.urey_bradleys:
+            if ub.type.used: continue
+            ub.type.used = True
+            self.urey_bradley_types.append(ub.type)
+            ub.type.list = self.urey_bradley_types
+        for ang in self.angles:
+            if ang.type.used: continue
+            ang.type.used = True
+            self.angle_types.append(ang.type)
+            ang.type.list = self.angle_types
         # Next load all of the dihedrals.
-        self.dihedral_parameter_list = TrackedList()
         active_dih_list = set()
-        for dih in self.dihedral_list:
+        for dih in self.dihedrals:
             # Store the atoms
             a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
-            at1, at2, at3, at4 = a1.attype, a2.attype, a3.attype, a4.attype
+            key = (a1.type, a2.type, a3.type, a4.type)
             # First see if the exact dihedral is specified
-            key = min((at1,at2,at3,at4), (at4,at3,at2,at1))
             if not key in parmset.dihedral_types:
                 # Check for wild-cards
-                key = min(('X',at2,at3,'X'), ('X',at3,at2,'X'))
+                key = ('X', a2.type, a3.type, 'X')
                 if not key in parmset.dihedral_types:
                     raise MissingParameter('No dihedral parameters found for '
                                            '%r' % dih)
-            dtlist = parmset.dihedral_types[key]
-            for i, dt in enumerate(dtlist):
-                self.dihedral_parameter_list.append(Dihedral(a1,a2,a3,a4,dt))
-                # See if we include the end-group interactions for this
-                # dihedral. We do IFF it is the last or only dihedral term and
-                # it is NOT in the angle/bond partners
-                pair = tuple(sorted([a1.idx, a4.idx]))
-                if i != len(dtlist) - 1:
-                    self.dihedral_parameter_list[-1].end_groups_active = False
-                elif a1 in a4.bond_partners or a1 in a4.angle_partners:
-                    self.dihedral_parameter_list[-1].end_groups_active = False
-                elif pair in active_dih_list:
-                    self.dihedral_parameter_list[-1].end_groups_active = False
-                else:
-                    active_dih_list.add(pair)
+            dih.type = parmset.dihedral_types[key]
+            dih.type.used = False
+            pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
+            if (dih.atom1 in dih.atom4.bond_partners or
+                dih.atom1 in dih.atom4.angle_partners):
+                dih.ignore_end = True
+            elif pair in active_dih_list:
+                dih.ignore_end = True
+            else:
+                active_dih_list.add(pair)
+                active_dih_list.add((dih.atom4.idx, dih.atom1.idx))
+        del self.dihedral_types[:]
+        for dihedral in self.dihedrals:
+            if dihedral.type.used: continue
+            dihedral.type.used = True
+            self.dihedral_types.append(dihedral.type)
+            dihedral.type.list = self.dihedral_types
         # Now do the impropers
-        for imp in self.improper_list:
+        for imp in self.impropers:
             # Store the atoms
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
-            at1, at2, at3, at4 = a1.attype, a2.attype, a3.attype, a4.attype
+            at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
             key = tuple(sorted([at1, at2, at3, at4]))
             if not key in parmset.improper_types:
                 # Check for wild-cards
@@ -660,32 +647,36 @@ class CharmmPsfFile(object):
                     if key in parmset.improper_types:
                         break # This is the right key
             try:
-                imp.improper_type = parmset.improper_types[key]
+                imp.type = parmset.improper_types[key]
             except KeyError:
                 raise MissingParameter('No improper parameters found for %r' %
                                        imp)
+            imp.type.used = False
+        del self.improper_types[:]
+        for improper in self.impropers:
+            if improper.type.used: continue
+            improper.type.used = True
+            self.improper_types.append(improper.type)
+            improper.type.list = self.improper_types
         # Now do the cmaps. These will not have wild-cards
-        for cmap in self.cmap_list:
-            # Store the atoms for easy reference
-            if cmap.consecutive:
-                a1, a2, a3, a4 = cmap.atom1, cmap.atom2, cmap.atom3, cmap.atom4
-                a5, a6, a7, a8 = cmap.atom2, cmap.atom3, cmap.atom4, cmap.atom5
-            else:
-                a1, a2, a3, a4 = cmap.atom1, cmap.atom2, cmap.atom3, cmap.atom4
-                a5, a6, a7, a8 = cmap.atom5, cmap.atom6, cmap.atom7, cmap.atom8
-            at1, at2, at3, at4 = a1.attype, a2.attype, a3.attype, a4.attype
-            at5, at6, at7, at8 = a5.attype, a6.attype, a7.attype, a8.attype
-            # Construct the keys
-            k1 = list(min((at1,at2,at3,at4), (at4,at3,at2,at1)))
-            k2 = list(min((at5,at6,at7,at8), (at8,at7,at6,at5)))
-            key = tuple(k1 + k2)
+        for cmap in self.cmaps:
+            key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
+                   cmap.atom4.type, cmap.atom2.type, cmap.atom3.type,
+                   cmap.atom4.type, cmap.atom5.type)
             try:
-                cmap.cmap_type = parmset.cmap_types[key]
+                cmap.type = parmset.cmap_types[key]
             except KeyError:
                 raise MissingParameter('No CMAP parameters found for %r' % cmap)
+            cmap.type.used = False
+        del self.cmap_types[:]
+        for cmap in self.cmaps:
+            if cmap.type.used: continue
+            cmap.type.used = True
+            self.cmap_types.append(cmap.type)
+            cmap.type.list = self.cmap_types
         # If the types started out as integers, change them back
         if types_are_int:
-            for atom in self.atom_list: atom.type_to_int()
+            for atom in self.atoms: atom.type = int(atom.atom_type)
 
     def set_coordinates(self, positions, velocities=None):
         """
@@ -698,23 +689,23 @@ class CharmmPsfFile(object):
             - velocities (list of floats) : If not None, is the velocity
                 equivalent of the positions
         """
-        if len(positions) / 3 != len(self.atom_list):
+        if len(positions) / 3 != len(self.atoms):
             raise ValueError('Coordinates given for %s atoms, but %d atoms '
                              'exist in this structure.' %
-                             (len(positions)/3, len(self.atom_list)))
+                             (len(positions)/3, len(self.atoms)))
         # Now assign all of the atoms positions
-        for i, atom in enumerate(self.atom_list):
+        for i, atom in enumerate(self.atoms):
             atom.xx = positions[3*i  ]
             atom.xy = positions[3*i+1]
             atom.xz = positions[3*i+2]
 
         # Do velocities if given
         if velocities is not None:
-            if len(velocities) / 3 != len(self.atom_list):
+            if len(velocities) / 3 != len(self.atoms):
                 raise ValueError('Velocities given for %s atoms, but %d atoms '
                                  'exist in this structure.' %
-                                 (len(velocities)/3, len(self.atom_list)))
-            for i, atom in enumerate(self.atom_list):
+                                 (len(velocities)/3, len(self.atoms)))
+            for i, atom in enumerate(self.atoms):
                 atom.vx = velocities[3*i  ]
                 atom.vy = velocities[3*i+1]
                 atom.vz = velocities[3*i+2]
@@ -735,11 +726,11 @@ class CharmmPsfFile(object):
 
     def clear_cmap(self):
         " Clear the cmap list to prevent any CMAP parameters from being used "
-        self.cmap_list = TrackedList()
+        del self.cmaps[:]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def set_molecules(atom_list):
+def set_molecules(atoms):
     """
     Correctly sets the molecularity of the system based on connectivity.
     """
@@ -752,10 +743,10 @@ def set_molecules(atom_list):
     # could raise a recursion depth exceeded exception during a _Type/Atom/XList
     # creation. Therefore, set the recursion limit to the greater of the current
     # limit or the number of atoms
-    setrecursionlimit(max(len(atom_list), getrecursionlimit()))
+    setrecursionlimit(max(len(atoms), getrecursionlimit()))
 
     # Unmark all atoms so we can track which molecule each goes into
-    atom_list.unmark()
+    atoms.unmark()
 
     # The molecule "ownership" list
     owner = []
@@ -764,13 +755,13 @@ def set_molecules(atom_list):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in xrange(len(atom_list)):
+    for i in xrange(len(atoms)):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)
-        if not atom_list[i].marked:
+        if not atoms[i].marked:
             tmp = [i]
-            _set_owner(atom_list, tmp, i, molecule_number)
+            _set_owner(atoms, tmp, i, molecule_number)
             # Make sure the atom indexes are sorted
             tmp.sort()
             owner.append(tmp)
@@ -779,13 +770,13 @@ def set_molecules(atom_list):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _set_owner(atom_list, owner_array, atm, mol_id):
+def _set_owner(atoms, owner_array, atm, mol_id):
     """ Recursively sets ownership of given atom and all bonded partners """
-    atom_list[atm].marked = mol_id
-    for partner in atom_list[atm].bond_partners:
+    atoms[atm].marked = mol_id
+    for partner in atoms[atm].bond_partners:
         if not partner.marked:
             owner_array.append(partner.idx)
-            _set_owner(atom_list, owner_array, partner.idx, mol_id)
+            _set_owner(atoms, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
             raise MoleculeError('Atom %d in multiple molecules' % 
                                 partner.idx)

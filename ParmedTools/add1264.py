@@ -54,9 +54,9 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
     for i in mask.Selected():
         typeidx = parm.parm_data['ATOM_TYPE_INDEX'][i]
         if typeidx in typelist: continue
-        typelist[typeidx] = parm.atom_list[i].atomic_number
+        typelist[typeidx] = parm.atoms[i].atomic_number
         print "The selected metal ion is", \
-                pt.Element[parm.atom_list[i].atomic_number]
+                pt.Element[parm.atoms[i].atomic_number]
     types = typelist.keys()
     types.sort()
 

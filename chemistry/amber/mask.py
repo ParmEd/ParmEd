@@ -9,7 +9,12 @@ class AmberMask(object):
     """ 
     What is hopefully a fully-fledged Amber mask parser implemented in Python.
 
-    It currently lacks the capability to evaluate masks with distance criteria
+    Parameters
+    ----------
+    parm : Structure
+        The topology structure for which to select atoms
+    mask : str
+        The mask string that selects a subset of atoms
     """
 
     #======================================================
@@ -327,31 +332,31 @@ class AmberMask(object):
             distance = float(pmask1[1:])
         except TypeError:
             raise MaskError('Distance must be a number: %s' % pmask1[1:])
-        if not hasattr(self.parm.atom_list[0], 'xx'):
+        if not hasattr(self.parm.atoms[0], 'xx'):
             raise MaskError('Distance-based masks require loaded coordinates.')
         distance *= distance # Faster to compare square of distance
         # First select all atoms that satisfy the distance. If we ended up
         # choosing residues, then we will go back through afterwards and select
         # entire residues when one of the atoms in that residue is selected.
         idxlist = [i for i, val in enumerate(pmask2) if val == 1]
-        for i, atomi in enumerate(self.parm.atom_list):
+        for i, atomi in enumerate(self.parm.atoms):
             for j in idxlist:
-                atomj = self.parm.atom_list[j]
+                atomj = self.parm.atoms[j]
                 dx = atomi.xx - atomj.xx
                 dy = atomi.xy - atomj.xy
                 dz = atomi.xz - atomj.xz
                 d2 = dx*dx + dy*dy + dz*dz
-                if d2 < distance:
+                if cmp(d2, distance):
                     pmask[i] = 1
                     break
         # Now see if we have to select all atoms in residues with any selected
         # atoms
         if pmask1[0] == ':':
-            for res in self.parm.residue_list:
+            for res in self.parm.residues:
                 for atom in res.atoms:
-                    if pmask[atom.starting_index] == 1:
+                    if pmask[atom.idx] == 1:
                         for atom in res.atoms:
-                            pmask[atom.starting_index] = 1
+                            pmask[atom.idx] = 1
                         break
         return pmask
 
@@ -566,7 +571,7 @@ class AmberMask(object):
     def _resnum_select(self, res1, res2, mask):
         """ Fills a _mask array between residues res1 and res2 """
         for i in xrange(self.parm.ptr('natom')):
-            res = self.parm.atom_list[i].residue.idx
+            res = self.parm.atoms[i].residue.idx + 1
             if res >= res1 and res <= res2: mask[i] = 1
 
     #======================================================
@@ -583,11 +588,11 @@ class AmberMask(object):
    
     def _resname_select(self, resname, mask):
         """ Fills a _mask array with all residue names of a given name """
-        for i, atm in enumerate(self.parm.atom_list):
-            if _nameMatch(resname, atm.residue.resname):
+        for i, atm in enumerate(self.parm.atoms):
+            if _nameMatch(resname, atm.residue.name):
                 mask[i] = 1
             elif resname.isdigit():
-                mask[i] = int(int(resname) == atm.residue.idx)
+                mask[i] = int(int(resname) == atm.residue.idx + 1)
             
     #======================================================
    

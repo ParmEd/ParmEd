@@ -37,8 +37,7 @@ class Molecule:
         self.radii = radii
 
         self._check()
-        if self.valid:
-            self._fillcontainer()
+        self._fillcontainer()
 
     def DeleteAtom(self, atomno):
         """
@@ -84,7 +83,6 @@ class Molecule:
 
     def _check(self):
         """ Checks for consistency in the molecule """
-        self.valid = False
         if len(self.atoms) != len(self.atom_types):
             raise(MoleculeError('len(atoms) != len(atom_types)'))
 
@@ -106,8 +104,6 @@ class Molecule:
 
         if len(self.radii) != 0 and len(self.radii) != len(self.atoms):
             raise(MoleculeError('len(radii) != len(atoms)'))
-
-        self.valid = True
 
     def _fillcontainer(self):
         """ Fills residue_container so we know what residue each atom is in """

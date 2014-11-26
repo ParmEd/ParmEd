@@ -224,3 +224,28 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'Uuo': 'Unknown'      ,'EP' : 'N/A'          ,'Ep' : 'N/A'          ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
+
+def element_by_mass(mass):
+    """
+    Determine the element that has a mass closest to the input mass
+
+    Parameters
+    ----------
+    mass : float
+        The atomic mass to compare to
+
+    Returns
+    -------
+    str
+        The returned string is the name of the element whose atomic mass is
+        closest to the input mass
+    """
+    diff = mass
+    best_guess = 'EP'
+
+    for element in Element:
+        if abs(Mass[element] - mass) < diff:
+            best_guess = element
+            diff = abs(Mass[element] - mass)
+
+    return best_guess

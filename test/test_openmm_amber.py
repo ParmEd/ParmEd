@@ -102,6 +102,28 @@ class TestAmberParm(unittest.TestCase):
             )
             return self.assertAlmostEqual(ratio, 1.0, places=places)
 
+    def testEPEnergy(self):
+        """ Tests AmberParm handling of extra points in TIP4P water """
+        parm = tip4p_system
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+# Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
+# BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
+# 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
+# EELEC  =     -2511.3511  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+# EKCMT  =         0.0000  VIRIAL  =         0.0000  VOLUME     =      6514.3661
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 0)
+        self.assertAlmostEqual(energies['dihedral'], 0)
+        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
+
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """
         parm = amber_simple_gas_system
@@ -516,7 +538,7 @@ class TestAmberParm(unittest.TestCase):
         self.assertTrue(has_cmmotion)
         self.assertEqual(system.getNumConstraints(), parm.ptr('nbonh'))
         totmass = 0
-        for i, atom in enumerate(parm.atom_list):
+        for i, atom in enumerate(parm.atoms):
             mass = system.getParticleMass(i).value_in_unit(u.daltons)
             totmass += mass
             if atom.element == 1:
@@ -550,49 +572,18 @@ class TestAmberParm(unittest.TestCase):
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 1)
                 self.assertEqual(f.getCutoffDistance(), 100*u.angstroms)
-            elif isinstance(f, mm.CustomGBForce):
-                sfac = sqrt(0.1/(78.5*298.15))
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1,
-                                       kappa=50.33355*sfac*7.3,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
@@ -600,31 +591,12 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
@@ -632,16 +604,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009, neckScale=0.361825,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=10.0,
@@ -649,18 +611,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       neckScale=0.361825, neckCut=0.68,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
@@ -668,17 +618,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009, neckScale=0.361825,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -687,19 +626,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.0195141,
-                                       neckScale=0.826836, neckCut=0.68,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -707,18 +633,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.0195141, neckScale=0.826836,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -728,19 +642,6 @@ class TestAmberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                sfac = sqrt(0.1/(80.0*400.0))
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.0195141, neckScale=0.826836,
-                                       kappa=50.33355*sfac*7.3, neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         # Test some illegal options
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.PME))
@@ -1205,7 +1106,7 @@ class TestChamberParm(unittest.TestCase):
         self.assertTrue(has_cmmotion)
         self.assertEqual(system.getNumConstraints(), parm.ptr('nbonh'))
         totmass = 0
-        for i, atom in enumerate(parm.atom_list):
+        for i, atom in enumerate(parm.atoms):
             mass = system.getParticleMass(i).value_in_unit(u.daltons)
             totmass += mass
             if atom.element == 1:
@@ -1215,28 +1116,6 @@ class TestChamberParm(unittest.TestCase):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
-
-    def testEPEnergy(self):
-        """ Tests AmberParm handling of extra points in TIP4P water """
-        parm = tip4p_system
-        system = parm.createSystem(nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstroms,
-                                   constraints=app.HBonds,
-                                   rigidWater=True,
-                                   flexibleConstraints=False)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
-        sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
-# Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
-# BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
-# 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
-# EELEC  =     -2511.3511  EHBOND  =         0.0000  RESTRAINT  =         0.0000
-# EKCMT  =         0.0000  VIRIAL  =         0.0000  VOLUME     =      6514.3661
-        self.assertAlmostEqual(energies['bond'], 0)
-        self.assertAlmostEqual(energies['angle'], 0)
-        self.assertAlmostEqual(energies['dihedral'], 0)
-        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
 
     def testInterfaceNoPBC(self):
         """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
@@ -1252,15 +1131,6 @@ class TestChamberParm(unittest.TestCase):
             has_cmmotion = has_cmmotion or isinstance(f, mm.CMMotionRemover)
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            elif isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=2,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         self.assertTrue(has_cmmotion)
         system = parm.createSystem(nonbondedMethod=app.CutoffNonPeriodic,
                                    nonbondedCutoff=100*u.angstroms,
@@ -1270,49 +1140,18 @@ class TestChamberParm(unittest.TestCase):
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 1)
                 self.assertEqual(f.getCutoffDistance(), 100*u.angstroms)
-            elif isinstance(f, mm.CustomGBForce):
-                sfac = sqrt(0.1/(78.5*298.15))
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1,
-                                       kappa=50.33355*sfac*7.3,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
@@ -1320,31 +1159,12 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
@@ -1352,16 +1172,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009, neckScale=0.361825,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=10.0,
@@ -1369,18 +1179,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.009,
-                                       neckScale=0.361825, neckCut=0.68,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
@@ -1388,17 +1186,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.009, neckScale=0.361825,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -1407,19 +1194,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=78.5,
-                                       soluteDielectric=1, offset=0.0195141,
-                                       neckScale=0.826836, neckCut=0.68,
-                                       kappa=0.8)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -1427,18 +1201,6 @@ class TestChamberParm(unittest.TestCase):
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
-            if isinstance(f, mm.CustomGBForce):
-                expected_params = dict(solventDielectric=80, soluteDielectric=4,
-                                       offset=0.0195141, neckScale=0.826836,
-                                       neckCut=0.68)
-                names = set([f.getGlobalParameterName(i)
-                             for i in range(f.getNumGlobalParameters())])
-                self.assertEqual(set(expected_params.keys()), names)
-                self.assertEqual(f.getNumTabulatedFunctions(), 2)
-                self.assertEqual(f.getNumPerParticleParameters(), 6)
-                for i in range(f.getNumGlobalParameters()):
-                    p = expected_params[f.getGlobalParameterName(i)]
-                    self.assertEqual(f.getGlobalParameterDefaultValue(i), p)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
@@ -1455,7 +1217,7 @@ class TestChamberParm(unittest.TestCase):
                 parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
-        
+
 if not has_openmm:
     # If we don't have OpenMM installed, delete all of the test classes so we
     # don't try to test anything (nor does it count in the final tally, giving

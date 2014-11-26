@@ -15,6 +15,12 @@ class APIError(Exception):
 class ChemWarning(Warning):
     """ Base warning class """
 
+class PDBError(ChemError):
+    """ If there was a problem parsing a PDB file """
+
+class PDBWarning(ChemWarning):
+    """ A non-fatal error to indicate a problematic PDB file """
+
 class ReadError(ChemError):
     """ Error when files cannot be properly read """
 

@@ -3,7 +3,8 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from chemistry.amber import readparm, asciicrd, mask, topologyobjects
+from chemistry.amber import readparm, asciicrd, mask
+from chemistry import topologyobjects
 import os
 import unittest
 from utils import get_fn, has_numpy
@@ -22,14 +23,14 @@ class TestReadParm(unittest.TestCase):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
-        gasparm.LoadRst7(get_fn('trx.inpcrd'))
+        gasparm.load_rst7(get_fn('trx.inpcrd'))
 
-        self.assertEqual([a.xx for a in gasparm.atom_list],
-                         [a.xx for a in parm.atom_list])
-        self.assertEqual([a.xy for a in gasparm.atom_list],
-                         [a.xy for a in parm.atom_list])
-        self.assertEqual([a.xz for a in gasparm.atom_list],
-                         [a.xz for a in parm.atom_list])
+        self.assertEqual([a.xx for a in gasparm.atoms],
+                         [a.xx for a in parm.atoms])
+        self.assertEqual([a.xy for a in gasparm.atoms],
+                         [a.xy for a in parm.atoms])
+        self.assertEqual([a.xz for a in gasparm.atoms],
+                         [a.xz for a in parm.atoms])
         
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
@@ -40,10 +41,10 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ifbox'), 0)
 
         # Now check the restart file
-        rst = readparm.Rst7(get_fn('trx.inpcrd'))
+        rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
         coords = rst.coordinates
         vels = rst.velocities
-        for i, atom in enumerate(gasparm.atom_list):
+        for i, atom in enumerate(gasparm.atoms):
             i3 = i * 3
             self.assertEqual(coords[i3  ], atom.xx)
             self.assertEqual(coords[i3+1], atom.xy)
@@ -51,6 +52,24 @@ class TestReadParm(unittest.TestCase):
             self.assertEqual(vels[i3  ], atom.vx)
             self.assertEqual(vels[i3+1], atom.vy)
             self.assertEqual(vels[i3+2], atom.vz)
+
+    def testRemakeParm(self):
+        """ Tests the rebuilding of the AmberParm raw data structures """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm.remake_parm()
+        self.assertEqual(parm.flag_list, parm2.flag_list)
+        for flag in parm.flag_list:
+            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+
+    def testRemakeChamberParm(self):
+        """ Tests the rebuilding of the ChamberParm raw data structures """
+        parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        parm2 = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        parm.remake_parm()
+        self.assertEqual(set(parm.flag_list), set(parm2.flag_list))
+        for flag in parm.flag_list:
+            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
 
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
@@ -83,21 +102,20 @@ class TestReadParm(unittest.TestCase):
     def testAmoebaBig(self):
         """ Test the AmoebaParm class with a large system """
         parm = readparm.AmoebaParm(get_fn('amoeba.parm7'))
-        self.assertEqual(parm.ptr('natom'), len(parm.atom_list))
-        self.assertEqual([a.atname for a in parm.atom_list],
+        self.assertEqual(parm.ptr('natom'), len(parm.atoms))
+        self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.attype for a in parm.atom_list],
+        self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
         self.assertTrue(parm.amoeba)
-        for attr in ['bond_list', 'angle_list', 'urey_bradley_list',
-                     'angle_list', 'trigonal_angle_list', 'oopbend_list',
-                     'dihedral_list', 'pitorsion_list', 'stretch_bend_list',
-                     'torsion_torsion_list', 'chiral_frame_list',
-                     'multipole_frame_list', 'adjust_list', 'adjust_weights',
-                     'bond_type_list', 'angle_type_list',
-                     'trigonal_angle_type_list', 'oopbend_type_list',
-                     'dihedral_type_list', 'pitorsion_type_list',
-                     'stretch_bend_type_list', 'torsion_torsion_type_list']:
+        for attr in ['bonds', 'angles', 'urey_bradleys', 'angles',
+                     'trigonal_angles', 'out_of_plane_bends', 'dihedrals',
+                     'pi_torsions', 'stretch_bends', 'torsion_torsions',
+                     'chiral_frames', 'multipole_frames', 'adjusts',
+                     'adjust_types', 'bond_types', 'angle_types',
+                     'trigonal_angle_types', 'out_of_plane_bend_types',
+                     'dihedral_types', 'pi_torsion_types', 'stretch_bend_types',
+                     'torsion_torsion_types']:
             self.assertTrue(hasattr(parm, attr))
 
     def testAmoebaSmall(self):
@@ -107,22 +125,22 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(3*rst7.natom, len(rst7.coordinates))
         self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
         self.assertEqual(rst7.natom, parm.ptr('natom'))
-        self.assertFalse(parm.torsion_torsion_list)
+        self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
 
     # Tests for individual prmtops
     def _standard_parm_tests(self, parm):
-        self.assertEqual(parm.ptr('natom'), len(parm.atom_list))
-        self.assertEqual(parm.ptr('nres'), len(parm.residue_list))
-        self.assertEqual(parm.ptr('nbonh'), len(parm.bonds_inc_h))
-        self.assertEqual(parm.ptr('nbona'), len(parm.bonds_without_h))
-        self.assertEqual(parm.ptr('ntheth'), len(parm.angles_inc_h))
-        self.assertEqual(parm.ptr('ntheta'), len(parm.angles_without_h))
-        self.assertEqual(parm.ptr('nphih'), len(parm.dihedrals_inc_h))
-        self.assertEqual(parm.ptr('nphia'), len(parm.dihedrals_without_h))
-        self.assertEqual([a.atname for a in parm.atom_list],
+        self.assertEqual(parm.ptr('natom'), len(parm.atoms))
+        self.assertEqual(parm.ptr('nres'), len(parm.residues))
+        self.assertEqual(parm.ptr('nbonh'), len(list(parm.bonds_inc_h)))
+        self.assertEqual(parm.ptr('nbona'), len(list(parm.bonds_without_h)))
+        self.assertEqual(parm.ptr('ntheth'), len(list(parm.angles_inc_h)))
+        self.assertEqual(parm.ptr('ntheta'), len(list(parm.angles_without_h)))
+        self.assertEqual(parm.ptr('nphih'), len(list(parm.dihedrals_inc_h)))
+        self.assertEqual(parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
+        self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.attype for a in parm.atom_list],
+        self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
 
     def _solv_pointer_tests(self, parm):
@@ -135,32 +153,31 @@ class TestReadParm(unittest.TestCase):
 
     def _extensive_checks(self, parm):
         # Check the __contains__ methods of the various topologyobjects
-        atom_list = parm.atom_list
-        bond_list = parm.bonds_inc_h + parm.bonds_without_h
-        for bond in bond_list:
-            self.assertEqual(sum([a in bond for a in atom_list]), 2)
-        for angle in parm.angles_inc_h + parm.angles_without_h:
-            self.assertEqual(sum([a in angle for a in atom_list]), 3)
-            self.assertEqual(sum([b in angle for b in bond_list]), 2)
-        for dihedral in parm.dihedrals_inc_h + parm.dihedrals_without_h:
-            self.assertEqual(sum([a in dihedral for a in atom_list]), 4)
-            self.assertEqual(sum([b in dihedral for b in bond_list]), 3)
-        for residue in parm.residue_list:
+        atoms = parm.atoms
+        for bond in parm.bonds:
+            self.assertEqual(sum([a in bond for a in atoms]), 2)
+        for angle in parm.angles:
+            self.assertEqual(sum([a in angle for a in atoms]), 3)
+            self.assertEqual(sum([b in angle for b in parm.bonds]), 2)
+        for dihedral in parm.dihedrals:
+            self.assertEqual(sum([a in dihedral for a in atoms]), 4)
+            self.assertEqual(sum([b in dihedral for b in parm.bonds]), 3)
+        for residue in parm.residues:
             self.assertTrue(all([a in residue for a in residue.atoms]))
-            self.assertEqual(sum([a in residue for a in atom_list]),
+            self.assertEqual(sum([a in residue for a in atoms]),
                              len(residue))
         if not parm.chamber: return
         # Chamber tests now
-        for ub in parm.urey_bradley:
-            self.assertEqual(sum([a in ub for a in atom_list]), 2)
-            self.assertEqual(sum([b in ub for b in bond_list]), 2)
-        for imp in parm.improper:
-            self.assertEqual(sum([a in imp for a in atom_list]), 4)
-            self.assertEqual(sum([b in imp for b in bond_list]), 3)
+        for ub in parm.urey_bradleys:
+            self.assertEqual(sum([a in ub for a in atoms]), 2)
+            self.assertEqual(sum([b in ub for b in parm.bonds]), 2)
+        for imp in parm.impropers:
+            self.assertEqual(sum([a in imp for a in atoms]), 4)
+            self.assertEqual(sum([b in imp for b in parm.bonds]), 3)
         if parm.has_cmap:
-            for cmap in parm.cmap:
-                self.assertEqual(sum([a in cmap for a in atom_list]), 5)
-                self.assertEqual(sum([b in cmap for b in bond_list]), 4)
+            for cmap in parm.cmaps:
+                self.assertEqual(sum([a in cmap for a in atoms]), 5)
+                self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
 class TestCoordinateFiles(unittest.TestCase):
     """ Tests the various coordinate file classes """
@@ -233,25 +250,25 @@ class TestAmberMask(unittest.TestCase):
         # Check all of the masks
         self.assertEqual(sum(mask_res1.Selection()), 13)
         for idx in mask_res1.Selected():
-            self.assertEqual(parm.atom_list[idx].residue.idx, 1)
+            self.assertEqual(parm.atoms[idx].residue.idx, 0)
         self.assertEqual(list(range(13)), list(mask_res1.Selected()))
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
-            self.assertEqual(parm.atom_list[idx].residue.resname, 'ALA')
+            self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
         
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
-            self.assertEqual(parm.atom_list[idx].atname, 'CA')
+            self.assertEqual(parm.atoms[idx].name, 'CA')
 
         self.assertEqual(sum(mask_resat.Selection()), 12)
         for idx in mask_resat.Selected():
-            self.assertEqual(parm.atom_list[idx].atname, 'CA')
-            self.assertEqual(parm.atom_list[idx].residue.resname, 'ALA')
+            self.assertEqual(parm.atoms[idx].name, 'CA')
+            self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
 
         self.assertEqual(sum(mask_attyp.Selection()), 341)
         for idx in mask_attyp.Selected():
-            self.assertEqual(parm.atom_list[idx].attype, 'CT')
+            self.assertEqual(parm.atoms[idx].type, 'CT')
 
 class TestWriteFiles(unittest.TestCase):
     
@@ -272,7 +289,7 @@ class TestWriteFiles(unittest.TestCase):
     def testWriteAmberParm(self):
         """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
-        parm.writeParm(get_fn('trx.prmtop', written=True))
+        parm.write_parm(get_fn('trx.prmtop', written=True))
         f1 = open(get_fn('trx.prmtop'), 'r')
         f2 = open(get_fn('trx.prmtop', written=True), 'r')
         try:

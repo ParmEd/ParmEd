@@ -1,5 +1,5 @@
 *.pyc
 *.pyo
-.*.swp
+.*.sw[op]
 *~
 build

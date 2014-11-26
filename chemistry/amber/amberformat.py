@@ -6,21 +6,60 @@ from __future__ import division
 
 from chemistry.amber.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
-            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC)
+            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from chemistry.exceptions import AmberFormatWarning, FlagError
+from compat24 import wraps
 from fortranformat import FortranRecordReader, FortranRecordWriter
 from copy import copy
 import datetime
 from math import ceil
 import re
-from warnings import warn
+from warnings import warn, filterwarnings
+
+filterwarnings('always', message='.', category=DeprecationWarning)
 
 # Some Py3 compatibility tweaks
-if not 'unicode' in dir(__builtins__): unicode = str
 if not 'basestring' in dir(__builtins__): basestring = str
 
+def _deprecated(oldname, newname):
+    def wrapper(func):
+        @wraps(func)
+        def new_func(self, *args, **kwargs):
+            warn('%s has been deprecated, use %s instead' % (oldname, newname),
+                 DeprecationWarning)
+            return func(self, *args, **kwargs)
+        return new_func
+    return wrapper
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class FortranFormat(object):
-    """ Handles fortran formats """
+    """
+    Processes Fortran format strings according to the Fortran specification for
+    such formats. This object handles reading and writing data with any valid
+    Fortran format. It does this by using the `fortranformat` project
+    [https://bitbucket.org/brendanarnold/py-fortranformat].
+
+    However, while `fortranformat` is very general and adheres well to the
+    standard, it is very slow. As a result, simple, common format strings have
+    been optimized and processes reads and writes between 3 and 5 times faster.
+    The format strings (case-insensitive) of the following form (where # can be
+    replaced by any number) are optimized:
+        - #E#.#
+        - #D#.#
+        - #F#.#
+        - #(F#.#)
+        - #a#
+        - #I#
+
+    Parameters
+    ----------
+    format_string : str
+        The Fortran Format string to process
+    strip_strings : bool=True
+        If True, strings are stripped before being processed by stripping
+        (only) trailing whitespace
+    """
 
     strre = re.compile(r'(\d+)?a(\d+)$', re.I)
     intre = re.compile(r'(\d+)?i(\d+)$', re.I)
@@ -45,7 +84,7 @@ class FortranFormat(object):
         if FortranFormat.strre.match(format_string):
             rematch = FortranFormat.strre.match(format_string)
             # replace our write() method with write_string to force left-justify
-            self.type, self.write = str, self.write_string
+            self.type, self.write = str, self._write_string
             nitems, itemlen = rematch.groups()
             if nitems is None:
                 self.nitems = 1
@@ -77,7 +116,10 @@ class FortranFormat(object):
                 self.nitems = int(nitems)
             self.itemlen = int(itemlen)
             self.num_decimals = int(num_decimals)
-            self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
+            if 'F' in format_string.upper():
+                self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            else:
+                self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
 
         elif FortranFormat.floatre2.match(format_string):
             self.type = float
@@ -89,14 +131,17 @@ class FortranFormat(object):
                 self.nitems = int(nitems)
             self.itemlen = int(itemlen)
             self.num_decimals = int(num_decimals)
-            self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            if 'F' in format_string.upper():
+                self.fmt = '%%%s.%sF' % (self.itemlen, self.num_decimals)
+            else:
+                self.fmt = '%%%s.%sE' % (self.itemlen, self.num_decimals)
 
         else:
             # We tried... now just use the fortranformat package
             self._reader = FortranRecordReader(format_string)
             self._writer = FortranRecordWriter(format_string)
-            self.write = self.write_ffwriter
-            self.read = self.read_ffreader
+            self.write = self._write_ffwriter
+            self.read = self._read_ffreader
 
     #===================================================
 
@@ -111,7 +156,27 @@ class FortranFormat(object):
     #===================================================
 
     def write(self, items, dest):
-        """ Writes a list/tuple of data (or a single item) """
+        """
+        Writes an iterable of data (or a single item) to the passed file-like
+        object
+
+        Parameters
+        ----------
+        items : iterable or single float/str/int
+            These are the objects to write in this format. The types of each
+            item should match the type specified in this Format for that
+            argument
+        dest : file or file-like
+            This is the file to write the data to. It must have a `write` method
+            or an AttributeError will be raised
+
+        Notes
+        -----
+        This method may be replaced with _write_string (for #a#-style formats)
+        or _write_ffwriter in the class initializer if no optimization is
+        provided for this format, but the call signatures and behavior are the
+        same for each of those functions.
+        """
         if hasattr(items, '__iter__') and not isinstance(items, basestring):
             mod = self.nitems - 1
             for i, item in enumerate(items):
@@ -126,7 +191,7 @@ class FortranFormat(object):
 
     #===================================================
 
-    def write_string(self, items, dest):
+    def _write_string(self, items, dest):
         """ Writes a list/tuple of strings """
         if hasattr(items, '__iter__') and not isinstance(items, basestring):
             mod = self.nitems - 1
@@ -142,7 +207,7 @@ class FortranFormat(object):
 
     #===================================================
 
-    def read_nostrip(self, line):
+    def _read_nostrip(self, line):
         """
         Reads the line and returns converted data. Special-cased for flags that
         may contain 'blank' data. ugh.
@@ -173,25 +238,67 @@ class FortranFormat(object):
 
     #===================================================
 
-    def read_ffreader(self, line):
+    def _read_ffreader(self, line):
         """ Reads the line and returns the converted data """
         return self._reader.read(line.rstrip())
 
     #===================================================
 
-    def write_ffwriter(self, items, dest):
+    def _write_ffwriter(self, items, dest):
         dest.write('%s\n' % self._writer.write(items))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberFormat(object):
     """ 
-    Generalization of the AmberParm class without some of the assumptions made
-    about Amber topology files specifically
+    A class that can parse and print files stored in the Amber topology or MDL
+    format. In particular, these files have the general form:
+
+    ```
+    %VERSION VERSION_STAMP = V00001.000  DATE = XX/XX/XX  XX:XX:XX
+    %FLAG <FLAG_NAME>
+    %COMMENT <comments>
+    %FORMAT(<Fortran_Format>)
+    ... data corresponding to that Fortran Format
+    %FLAG <FLAG_NAME2>
+    %COMMENT <comments>
+    %FORMAT(<Fortran_Format>)
+    ... data corresponding to that Fortran Format
+    ```
+
+    where the `%COMMENT` sections are entirely optional
+
+    Parameters
+    ----------
+    fname : str=None
+        If provided, this file is parsed and the data structures will be loaded
+        from the data in this file
+
+    Attributes
+    ----------
+    parm_data : dict {str : list}
+        A dictionary that maps FLAG names to all of the data contained in that
+        section of the Amber file.
+    formats : dict {str : FortranFormat}
+        A dictionary that maps FLAG names to the FortranFormat instance in which
+        the data is stored in that section
+    parm_comments : dict {str : list}
+        A dictionary that maps FLAG names to the list of COMMENT lines that were
+        stored in the original file
+    flag_list : list
+        An ordered list of all FLAG names. This must be kept synchronized with
+        `parm_data`, `formats`, and `parm_comments` such that every item in
+        `flag_list` is a key to those 3 dicts and no other keys exist
+    charge_flag : str='CHARGE'
+        The name of the name of the FLAG that describes partial atomic charge
+        data. If this flag is found, then its data are multiplied by the
+        ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
+    version : str
+        The VERSION string from the Amber file
+    prm_name : str
+        The file name of the originally parsed file (set to the fname parameter)
     """
    
-    CHARGE_SCALE = AMBER_ELECTROSTATIC # chamber uses a SLIGHTLY diff value
-
     #===================================================
 
     def __init__(self, fname=None):
@@ -202,9 +309,8 @@ class AmberFormat(object):
         self.parm_comments = {}
         self.flag_list = []
         self.version = None
-        self.prm_name = fname
         self.charge_flag = 'CHARGE'
-        self.valid = True
+        self.prm_name = fname
 
         if fname is not None:
             self.rdparm(fname)
@@ -217,12 +323,14 @@ class AmberFormat(object):
         other = type(self)()
         other.flag_list = self.flag_list[:]
         other.version = self.version
-        other.prm_name = self.prm_name + '_copy%d' % self._ncopies
+        if self.prm_name is not None:
+            other.prm_name = self.prm_name + '_copy%d' % self._ncopies
+        else:
+            other.prm_name = None
         other.charge_flag = self.charge_flag
-        other.valid = self.valid
         other.parm_data = {}
         other.parm_comments = {}
-        other.formats = {} # formats{} are copied shallow
+        other.formats = {}
         for flag in other.flag_list:
             other.parm_data[flag] = self.parm_data[flag][:]
             other.parm_comments[flag] = self.parm_comments[flag][:]
@@ -235,24 +343,23 @@ class AmberFormat(object):
         """
         Returns a view of the current object as another object.
 
-        Parameters:
-            cls Class definition of an AmberParm subclass for the current
-                object to be converted into
+        Parameters
+        ----------
+        cls : type
+            Class definition of an AmberParm subclass for the current object to
+            be converted into
 
-        Returns:
-            instance of cls initialized from data in this object. This is NOT a
-            deep copy, so modifying the original object may modify this. The
-            copy function will create a deep copy of any AmberFormat-derived
-            object
+        Returns
+        -------
+        instance of cls initialized from data in this object. This is NOT a deep
+        copy, so modifying the original object may modify this. The copy
+        function will create a deep copy of any AmberFormat-derived object
         """
         # If these are the same classes, just return the original instance,
         # since there's nothing to do. Classes are singletons, so use "is"
         if type(self) is cls:
             return self
-        if hasattr(cls, 'load_from_rawdata'):
-            return cls.load_from_rawdata(self)
-        raise ValueError('Cannot instantiate %s from AmberFormat' %
-                         cls.__name__)
+        return cls.load_from_rawdata(self)
 
     #===================================================
 
@@ -266,7 +373,6 @@ class AmberFormat(object):
         self.parm_data = {}
         self.parm_comments = {}
         self.flag_list = []
-        self.valid = False
 
         try:
             from chemistry.amber import _rdparm
@@ -300,12 +406,16 @@ class AmberFormat(object):
                 for line in rawdata:
                     self.parm_data[flag].extend(self.formats[flag].read(line))
 
+            if 'CTITLE' in self.parm_data:
+                CHARGE_SCALE = CHARMM_ELECTROSTATIC
+            else:
+                CHARGE_SCALE = AMBER_ELECTROSTATIC
+
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                    self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
+                    self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
             except KeyError:
                 pass
-            self.valid = True
 
     #===================================================
 
@@ -316,46 +426,45 @@ class AmberFormat(object):
         """
 
         current_flag = ''
-        gathering_data = False
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
 
         # Open up the file and read the data into memory
         prm = open(self.prm_name, 'r')
 
         for line in prm:
-
-            if line[0:8] == '%VERSION':
-                self.version = line.strip()
-
-            elif line[0:5] == '%FLAG':
-                current_flag = line[6:].strip()
-                self.formats[current_flag] = ''
-                self.parm_data[current_flag] = []
-                self.parm_comments[current_flag] = []
-                self.flag_list.append(current_flag)
-                gathering_data = False
-
-            elif line[0:8] == '%COMMENT':
-                self.parm_comments[current_flag].append(line[9:].strip())
-
-            elif line[0:7] == '%FORMAT':
-                fmt = FortranFormat(fmtre.match(line).groups()[0])
-                # RESIDUE_ICODE can have a lot of blank data...
-                if current_flag == 'RESIDUE_ICODE':
-                    fmt.read = fmt.read_nostrip
-                self.formats[current_flag] = fmt
-                gathering_data = True
-
-            elif gathering_data:
-                self.parm_data[current_flag].extend(fmt.read(line))
+            if line[0] == '%':
+                if line[0:8] == '%VERSION':
+                    self.version = line.strip()
+                    continue
+                elif line[0:5] == '%FLAG':
+                    current_flag = line[6:].strip()
+                    self.formats[current_flag] = ''
+                    self.parm_data[current_flag] = []
+                    self.parm_comments[current_flag] = []
+                    self.flag_list.append(current_flag)
+                    continue
+                elif line[0:8] == '%COMMENT':
+                    self.parm_comments[current_flag].append(line[9:].strip())
+                    continue
+                elif line[0:7] == '%FORMAT':
+                    fmt = FortranFormat(fmtre.match(line).groups()[0])
+                    # RESIDUE_ICODE can have a lot of blank data...
+                    if current_flag == 'RESIDUE_ICODE':
+                        fmt.read = fmt._read_nostrip
+                    self.formats[current_flag] = fmt
+                    continue
+            self.parm_data[current_flag].extend(fmt.read(line))
 
         # convert charges to fraction-electrons
+        if 'CTITLE' in self.parm_data:
+            CHARGE_SCALE = CHARMM_ELECTROSTATIC
+        else:
+            CHARGE_SCALE = AMBER_ELECTROSTATIC
         try:
             for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                self.parm_data[self.charge_flag][i] = chg / self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         except KeyError:
             pass
-        self.valid = True
 
         prm.close()
 
@@ -429,14 +538,14 @@ class AmberFormat(object):
             return tmp_data, line_idx
 
         # First add a title
-        self.addFlag('TITLE', '20a4', data=['| Converted old-style topology'])
+        self.add_flag('TITLE', '20a4', data=['| Converted old-style topology'])
 
         # Next, read in the pointers
         line_idx = 0
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, 30)
         # Add a final pointer of 0, which corresponds to NUMEXTRA
         tmp_data.append(0)
-        self.addFlag('POINTERS', '10I8', data=tmp_data)
+        self.add_flag('POINTERS', '10I8', data=tmp_data)
 
         # Set some of the pointers we need
         natom = self.parm_data['POINTERS'][NATOM]
@@ -457,151 +566,151 @@ class AmberFormat(object):
 
         # Next read in the atom names
         tmp_data, line_idx = read_string(line_idx, prmtop_lines, natom)
-        self.addFlag('ATOM_NAME', '20a4', data=tmp_data)
+        self.add_flag('ATOM_NAME', '20a4', data=tmp_data)
 
         # Next read the charges
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natom)
         # Divide by the electrostatic constant
-        tmp_data = [x / self.CHARGE_SCALE for x in tmp_data]
-        self.addFlag('CHARGE', '5E16.8', data=tmp_data)
+        tmp_data = [x / AMBER_ELECTROSTATIC for x in tmp_data]
+        self.add_flag('CHARGE', '5E16.8', data=tmp_data)
 
         # Next read the masses
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natom)
-        self.addFlag('MASS', '5E16.8', data=tmp_data)
+        self.add_flag('MASS', '5E16.8', data=tmp_data)
 
         # Next read atom type index
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
-        self.addFlag('ATOM_TYPE_INDEX', '10I8', data=tmp_data)
+        self.add_flag('ATOM_TYPE_INDEX', '10I8', data=tmp_data)
 
         # Next read number excluded atoms
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
-        self.addFlag('NUMBER_EXCLUDED_ATOMS', '10I8', data=tmp_data)
+        self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=tmp_data)
       
         # Next read nonbonded parm index
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntypes**2)
-        self.addFlag('NONBONDED_PARM_INDEX', '10I8', data=tmp_data)
+        self.add_flag('NONBONDED_PARM_INDEX', '10I8', data=tmp_data)
 
         # Next read residue label
         tmp_data, line_idx = read_string(line_idx, prmtop_lines, nres)
-        self.addFlag('RESIDUE_LABEL', '20a4', data=tmp_data)
+        self.add_flag('RESIDUE_LABEL', '20a4', data=tmp_data)
 
         # Next read residue pointer
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nres)
-        self.addFlag('RESIDUE_POINTER', '10I8', data=tmp_data)
+        self.add_flag('RESIDUE_POINTER', '10I8', data=tmp_data)
    
         # Next read bond force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numbnd)
-        self.addFlag('BOND_FORCE_CONSTANT', '5E16.8', data=tmp_data)
+        self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=tmp_data)
 
         # Next read bond equil value
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numbnd)
-        self.addFlag('BOND_EQUIL_VALUE', '5E16.8', data=tmp_data)
+        self.add_flag('BOND_EQUIL_VALUE', '5E16.8', data=tmp_data)
 
         # Next read angle force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numang)
-        self.addFlag('ANGLE_FORCE_CONSTANT', '5E16.8', data=tmp_data)
+        self.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', data=tmp_data)
 
         # Next read the angle equilibrium value
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numang)
-        self.addFlag('ANGLE_EQUIL_VALUE', '5E16.8', data=tmp_data)
+        self.add_flag('ANGLE_EQUIL_VALUE', '5E16.8', data=tmp_data)
 
         # Next read the dihedral force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nptra)
-        self.addFlag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', data=tmp_data)
+        self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', data=tmp_data)
 
         # Next read dihedral periodicity
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nptra)
-        self.addFlag('DIHEDRAL_PERIODICITY', '5E16.8', data=tmp_data)
+        self.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', data=tmp_data)
 
         # Next read the dihedral phase
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nptra)
-        self.addFlag('DIHEDRAL_PHASE', '5E16.8', data=tmp_data)
+        self.add_flag('DIHEDRAL_PHASE', '5E16.8', data=tmp_data)
 
         # Next read SOLTY (?)
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natyp)
-        self.addFlag('SOLTY', '5E16.8', data=tmp_data)
+        self.add_flag('SOLTY', '5E16.8', data=tmp_data)
 
         # Next read lennard jones acoef and bcoef
         numvals = ntypes * (ntypes + 1) / 2
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numvals)
-        self.addFlag('LENNARD_JONES_ACOEF', '5E16.8', data=tmp_data)
+        self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', data=tmp_data)
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numvals)
-        self.addFlag('LENNARD_JONES_BCOEF', '5E16.8', data=tmp_data)
+        self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', data=tmp_data)
 
         # Next read bonds including hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbonh*3)
-        self.addFlag('BONDS_INC_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('BONDS_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read bonds without hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbona*3)
-        self.addFlag('BONDS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read angles including hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheth*4)
-        self.addFlag('ANGLES_INC_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('ANGLES_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read angles without hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheta*4)
-        self.addFlag('ANGLES_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read dihdrals including hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphih*5)
-        self.addFlag('DIHEDRALS_INC_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read dihedrals without hydrogen
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphia*5)
-        self.addFlag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
+        self.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read the excluded atoms list
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nex)
-        self.addFlag('EXCLUDED_ATOMS_LIST', '10I8', data=tmp_data)
+        self.add_flag('EXCLUDED_ATOMS_LIST', '10I8', data=tmp_data)
 
         # Next read the hbond terms
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nphb)
-        self.addFlag('HBOND_ACOEF', '5E16.8', data=tmp_data)
+        self.add_flag('HBOND_ACOEF', '5E16.8', data=tmp_data)
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nphb)
-        self.addFlag('HBOND_BCOEF', '5E16.8', data=tmp_data)
+        self.add_flag('HBOND_BCOEF', '5E16.8', data=tmp_data)
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, nphb)
-        self.addFlag('HBCUT', '5E16.8', data=tmp_data)
+        self.add_flag('HBCUT', '5E16.8', data=tmp_data)
 
         # Next read amber atom type
         tmp_data, line_idx = read_string(line_idx, prmtop_lines, natom)
-        self.addFlag('AMBER_ATOM_TYPE', '20a4', data=tmp_data)
+        self.add_flag('AMBER_ATOM_TYPE', '20a4', data=tmp_data)
 
         # Next read tree chain classification
         tmp_data, line_idx = read_string(line_idx, prmtop_lines, natom)
-        self.addFlag('TREE_CHAIN_CLASSIFICATION', '20a4', data=tmp_data)
+        self.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4', data=tmp_data)
 
         # Next read the join array
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
-        self.addFlag('JOIN_ARRAY', '10I8', data=tmp_data)
+        self.add_flag('JOIN_ARRAY', '10I8', data=tmp_data)
 
         # Next read the irotat array
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
-        self.addFlag('IROTAT', '10I8', data=tmp_data)
+        self.add_flag('IROTAT', '10I8', data=tmp_data)
 
         # Now do PBC stuff
         if self.parm_data['POINTERS'][IFBOX]:
             # Solvent pointers
             tmp_data, line_idx = read_integer(line_idx, prmtop_lines, 3)
-            self.addFlag('SOLVENT_POINTERS', '10I8', data=tmp_data)
+            self.add_flag('SOLVENT_POINTERS', '10I8', data=tmp_data)
             nspm = tmp_data[1]
 
             # Atoms per molecule
             tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nspm)
-            self.addFlag('ATOMS_PER_MOLECULE', '10I8', data=tmp_data)
+            self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=tmp_data)
 
             # Box dimensions
             tmp_data, line_idx = read_float(line_idx, prmtop_lines, 4)
-            self.addFlag('BOX_DIMENSIONS', '5E16.8', data=tmp_data)
+            self.add_flag('BOX_DIMENSIONS', '5E16.8', data=tmp_data)
 
         # Now do CAP stuff
         if self.parm_data['POINTERS'][IFCAP]:
             # CAP_INFO
             tmp_data, line_idx = read_integer(line_idx, prmtop_lines, 1)
-            self.addFlag('CAP_INFO', '10I8', data=tmp_data)
+            self.add_flag('CAP_INFO', '10I8', data=tmp_data)
             tmp_data, line_idx = read_integer(line_idx, prmtop_lines, 4)
-            self.addFlag('CAP_INFO2', '10I8', data=tmp_data)
+            self.add_flag('CAP_INFO2', '10I8', data=tmp_data)
         # end if self.parm_data['POINTERS'][IFCAP]
 
     #===================================================
@@ -617,10 +726,15 @@ class AmberFormat(object):
 
     #===================================================
 
-    def writeParm(self, name):
+    def write_parm(self, name):
         """
         Writes the current data in parm_data into a new topology file with
         the given name
+
+        Parameters
+        ----------
+        name : str
+            Name of the file to write the topology file to
         """
         # now that we know we will write the new prmtop file, open the new file
         new_prm = open(name, 'w')
@@ -629,16 +743,20 @@ class AmberFormat(object):
         self.set_version()
 
         # convert charges back to amber charges...
+        if 'CTITLE' in self.parm_data:
+            CHARGE_SCALE = CHARMM_ELECTROSTATIC
+        else:
+            CHARGE_SCALE = AMBER_ELECTROSTATIC
+
         if self.charge_flag in self.parm_data.keys():
             for i in xrange(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] *= self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
 
         # write version to top of prmtop file
         new_prm.write('%s\n' % self.version)
 
         # write data to prmtop file, inserting blank line if it's an empty field
-        for i in xrange(len(self.flag_list)):
-            flag = self.flag_list[i]
+        for flag in self.flag_list:
             new_prm.write('%%FLAG %s\n' % flag)
             # Insert any comments before the %FORMAT specifier
             for comment in self.parm_comments[flag]:
@@ -654,30 +772,39 @@ class AmberFormat(object):
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
             for i in xrange(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] /= self.CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] /= CHARGE_SCALE
 
     #===================================================
 
-    def addFlag(self, flag_name, flag_format, data=None, num_items=-1,
-                comments=[], after=None):
+    def add_flag(self, flag_name, flag_format, data=None, num_items=-1,
+                 comments=None, after=None):
         """
         Adds a new flag with the given flag name and Fortran format string and
         initializes the array with the values given, or as an array of 0s
         of length num_items
 
-        Parameters:
-            flag_name (str): Name of the flag to insert. It is converted to all
-                             upper case
-            flag_format (str): Fortran Format statement (do NOT enclose in ())
-            data (list): Sequence with data for the new flag. If None, a list
-                         of zeros of length num_items is given as a holder
-            num_items (int): Number of items in the section (only used if data
-                             is None)
-            comments (list): List of comments to put in this section
-            after (str): If not None, this flag will be added after the given
-                         flag. If the 'after' flag does not exist, IndexError is
-                         raised.
+        Parameters
+        ----------
+        flag_name : str
+            Name of the flag to insert. It is converted to all upper case
+        flag_format : str
+            Fortran format string representing how the data in this section
+            should be written and read. Do not enclose in ()
+        data : list=None
+            Sequence with data for the new flag. If None, a list of zeros of
+            length `num_items` (see below) is given as a holder
+        num_items : int=-1
+            Number of items in the section. This variable is ignored if a set of
+            data are given in `data`
+        comments : list of str=None
+            List of comments to add to this section
+        after : str=None
+            If provided, the added flag will be added after the one with the
+            name given to `after`. If this flag does not exist, IndexError will
+            be raised
         """
+        if flag_name in self.parm_data:
+            raise FlagError('%s already exists' % (flag_name))
         if after is not None:
             after = after.upper()
             if not after in self.flag_list:
@@ -698,22 +825,18 @@ class AmberFormat(object):
                 raise FlagError("If you do not supply prmtop data, num_items "
                                 "must be non-negative!")
             self.parm_data[flag_name.upper()] = [0 for i in xrange(num_items)]
-        if comments:
-            if isinstance(comments, str) or isinstance(comments, unicode):
+        if comments is not None:
+            if isinstance(comments, basestring):
                 comments = [comments]
-            elif isinstance(comments, tuple):
-                comments = list(comments)
-            elif isinstance(comments, list):
-                pass
             else:
-                raise TypeError('Comments must be string, list, or tuple')
+                comments = list(comments)
             self.parm_comments[flag_name.upper()] = comments
         else:
             self.parm_comments[flag_name.upper()] = []
 
     #===================================================
 
-    def deleteFlag(self, flag_name):
+    def delete_flag(self, flag_name):
         """ Removes a flag from the topology file """
         flag_name = flag_name.upper()
         if not flag_name in self.flag_list:
@@ -723,3 +846,13 @@ class AmberFormat(object):
         del self.formats[flag_name]
         del self.parm_data[flag_name]
 
+    #===================================================
+
+    # For backwards-compatibility, but warn of deprecation
+
+    addFlag = _deprecated('addFlag', 'add_flag')(add_flag)
+    deleteFlag = _deprecated('deleteFlag', 'delete_flag')(delete_flag)
+
+    @_deprecated('writeParm', 'write_parm')
+    def writeParm(self, name):
+        return self.write_parm(name)

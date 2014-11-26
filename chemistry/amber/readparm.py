@@ -66,6 +66,6 @@ def LoadParm(parmname, rst7name=None):
     # Now load the restart file
     if rst7name is not None:
         rst = Rst7.open(rst7name)
-        parm.LoadRst7(rst)
+        parm.load_rst7(rst)
 
     return parm

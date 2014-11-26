@@ -11,7 +11,7 @@ from compat24 import property
 from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
 from chemistry.charmm.parameters import element_by_mass
 from chemistry.charmm.psf import CharmmPsfFile
-from chemistry.charmm.topologyobjects import TrackedList
+from chemistry import TrackedList
 from chemistry.exceptions import APIError
 from math import sqrt, cos, pi, sin, acos
 import re
@@ -57,13 +57,13 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         last_chain = None
         last_residue = None
         # Add each chain (separate 'system's) and residue
-        for atom in self.atom_list:
-            if atom.system != last_chain:
+        for atom in self.atoms:
+            if atom.residue.chain != last_chain:
                 chain = topology.addChain()
-                last_chain = atom.system
+                last_chain = atom.residue.chain
             if atom.residue.idx != last_residue:
                 last_residue = atom.residue.idx
-                residue = topology.addResidue(atom.residue.resname, chain)
+                residue = topology.addResidue(atom.residue.name, chain)
             element_name = element_by_mass(atom.mass)
             elem = element.get_by_symbol(element_name)
             topology.addAtom(atom.name, elem, residue)
@@ -71,8 +71,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add all of the bonds
         atoms = list(topology.atoms())
         # Assign atom indexes to make sure they're current
-        self.atom_list.assign_indexes()
-        for bond in self.bond_list:
+        for bond in self.bonds:
             topology.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
 
         # Add the periodic box if there is one
@@ -85,78 +84,78 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
 
     def _get_gb_params(self, gb_model=HCT):
         """ Gets the GB parameters. Need this method to special-case GB neck """
-        screen = [0 for atom in self.atom_list]
+        screen = [0 for atom in self.atoms]
         if gb_model is GBn:
-            radii = _bondi_radii(self.atom_list)
-            screen = [0.5 for atom in self.atom_list]
-            for i, atom in enumerate(self.atom_list):
-                if atom.type.atomic_number == 6:
+            radii = _bondi_radii(self.atoms)
+            screen = [0.5 for atom in self.atoms]
+            for i, atom in enumerate(self.atoms):
+                if atom.atomic_number == 6:
                     screen[i] = 0.48435382330
-                elif atom.type.atomic_number == 1:
+                elif atom.atomic_number == 1:
                     screen[i] = 1.09085413633
-                elif atom.type.atomic_number == 7:
+                elif atom.atomic_number == 7:
                     screen[i] = 0.700147318409
-                elif atom.type.atomic_number == 8:
+                elif atom.atomic_number == 8:
                     screen[i] = 1.06557401132
-                elif atom.type.atomic_number == 16:
+                elif atom.atomic_number == 16:
                     screen[i] = 0.602256336067
         elif gb_model is GBn2:
-            radii = _mbondi3_radii(self.atom_list)
+            radii = _mbondi3_radii(self.atoms)
             # Add non-optimized values as defaults
-            alpha = [1.0 for i in self.atom_list]
-            beta = [0.8 for i in self.atom_list]
-            gamma = [4.85 for i in self.atom_list]
-            screen = [0.5 for i in self.atom_list]
-            for i, atom in enumerate(self.atom_list):
-                if atom.type.atomic_number == 6:
+            alpha = [1.0 for i in self.atoms]
+            beta = [0.8 for i in self.atoms]
+            gamma = [4.85 for i in self.atoms]
+            screen = [0.5 for i in self.atoms]
+            for i, atom in enumerate(self.atoms):
+                if atom.atomic_number == 6:
                     screen[i] = 1.058554
                     alpha[i] = 0.733756
                     beta[i] = 0.506378
                     gamma[i] = 0.205844
-                elif atom.type.atomic_number == 1:
+                elif atom.atomic_number == 1:
                     screen[i] = 1.425952
                     alpha[i] = 0.788440
                     beta[i] = 0.798699
                     gamma[i] = 0.437334
-                elif atom.type.atomic_number == 7:
+                elif atom.atomic_number == 7:
                     screen[i] = 0.733599
                     alpha[i] = 0.503364
                     beta[i] = 0.316828
                     gamma[i] = 0.192915
-                elif atom.type.atomic_number == 8:
+                elif atom.atomic_number == 8:
                     screen[i] = 1.061039
                     alpha[i] = 0.867814
                     beta[i] = 0.876635
                     gamma[i] = 0.387882
-                elif atom.type.atomic_number == 16:
+                elif atom.atomic_number == 16:
                     screen[i] = -0.703469
                     alpha[i] = 0.867814
                     beta[i] = 0.876635
                     gamma[i] = 0.387882
         else:
             # Set the default screening parameters
-            for i, atom in enumerate(self.atom_list):
-                if atom.type.atomic_number == 1:
+            for i, atom in enumerate(self.atoms):
+                if atom.atomic_number == 1:
                     screen[i] = 0.85
-                elif atom.type.atomic_number == 6:
+                elif atom.atomic_number == 6:
                     screen[i] = 0.72
-                elif atom.type.atomic_number == 7:
+                elif atom.atomic_number == 7:
                     screen[i] = 0.79
-                elif atom.type.atomic_number == 8:
+                elif atom.atomic_number == 8:
                     screen[i] = 0.85
-                elif atom.type.atomic_number == 9:
+                elif atom.atomic_number == 9:
                     screen[i] = 0.88
-                elif atom.type.atomic_number == 15:
+                elif atom.atomic_number == 15:
                     screen[i] = 0.86
-                elif atom.type.atomic_number == 16:
+                elif atom.atomic_number == 16:
                     screen[i] = 0.96
                 else:
                     screen[i] = 0.8
             # Determine which radii set we need
             if gb_model is OBC1 or gb_model is OBC2:
-                radii = _mbondi2_radii(self.atom_list)
+                radii = _mbondi2_radii(self.atoms)
             elif gb_model is HCT:
-                radii = _mbondi_radii(self.atom_list)
+                radii = _mbondi_radii(self.atoms)
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         radii = [x * length_conv for x in radii]
@@ -270,8 +269,8 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         typenames = set()
         system = mm.System()
         if verbose: print('Adding particles...')
-        for atom in self.atom_list:
-            typenames.add(atom.type.name)
+        for atom in self.atoms:
+            typenames.add(str(atom.atom_type))
             system.addParticle(atom.mass)
         has_nbfix_terms = False
         typenames = list(typenames)
@@ -288,28 +287,28 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         if verbose and (constraints is not None and not rigidWater):
             print('Adding constraints...')
         if constraints in (ff.HBonds, ff.AllBonds, ff.HAngles):
-            for bond in self.bond_list:
-                if (bond.atom1.type.atomic_number != 1 and
-                    bond.atom2.type.atomic_number != 1):
+            for bond in self.bonds:
+                if (bond.atom1.atomic_number != 1 and
+                    bond.atom2.atomic_number != 1):
                     continue
                 system.addConstraint(bond.atom1.idx, bond.atom2.idx,
-                                     bond.bond_type.req*length_conv)
+                                     bond.type.req*length_conv)
         if constraints in (ff.AllBonds, ff.HAngles):
-            for bond in self.bond_list:
-                if (bond.atom1.type.atomic_number == 1 or
-                    bond.atom2.type.atomic_number == 1):
+            for bond in self.bonds:
+                if (bond.atom1.atomic_number == 1 or
+                    bond.atom2.atomic_number == 1):
                     continue
                 system.addConstraint(bond.atom1.idx, bond.atom2.idx,
-                                     bond.bond_type.req*length_conv)
+                                     bond.type.req*length_conv)
         if rigidWater and constraints is None:
-            for bond in self.bond_list:
-                if (bond.atom1.type.atomic_number != 1 and
-                    bond.atom2.type.atomic_number != 1):
+            for bond in self.bonds:
+                if (bond.atom1.atomic_number != 1 and
+                    bond.atom2.atomic_number != 1):
                     continue
-                if (bond.atom1.residue.resname in WATNAMES and
-                    bond.atom2.residue.resname in WATNAMES):
+                if (bond.atom1.residue.name in WATNAMES and
+                    bond.atom2.residue.name in WATNAMES):
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
-                                         bond.bond_type.req*length_conv)
+                                         bond.type.req*length_conv)
         # Add Bond forces
         if verbose: print('Adding bonds...')
         force = mm.HarmonicBondForce()
@@ -318,14 +317,14 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         omitall = not flexibleConstraints and constraints is ff.AllBonds
         omith = omitall or (flexibleConstraints and constraints in
                             (ff.HBonds, ff.AllBonds, ff.HAngles))
-        for bond in self.bond_list:
+        for bond in self.bonds:
             if omitall: continue
-            if omith and (bond.atom1.type.atomic_number == 1 or
-                          bond.atom2.type.atomic_number == 1):
+            if omith and (bond.atom1.atomic_number == 1 or
+                          bond.atom2.atomic_number == 1):
                 continue
             force.addBond(bond.atom1.idx, bond.atom2.idx,
-                          bond.bond_type.req*length_conv,
-                          2*bond.bond_type.k*bond_frc_conv)
+                          bond.type.req*length_conv,
+                          2*bond.type.k*bond_frc_conv)
         system.addForce(force)
         # Add Angle forces
         if verbose: print('Adding angles...')
@@ -339,11 +338,11 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 dist = c[2].value_in_unit(u.nanometer)
                 atom_constraints[c[0]].append((c[1], dist))
                 atom_constraints[c[1]].append((c[0], dist))
-        for angle in self.angle_list:
+        for angle in self.angles:
             # Only constrain angles including hydrogen here
-            if (angle.atom1.type.atomic_number != 1 and
-                angle.atom2.type.atomic_number != 1 and
-                angle.atom3.type.atomic_number != 1):
+            if (angle.atom1.atomic_number != 1 and
+                angle.atom2.atomic_number != 1 and
+                angle.atom3.atomic_number != 1):
                 continue
             if constraints is ff.HAngles:
                 a1 = angle.atom1.atomic_number
@@ -357,47 +356,47 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 l1 = l2 = None
                 for bond in angle.atom2.bonds:
                     if bond.atom1 is angle.atom1 or bond.atom2 is angle.atom1:
-                        l1 = bond.bond_type.req * length_conv
+                        l1 = bond.type.req * length_conv
                     elif bond.atom1 is angle.atom3 or bond.atom2 is angle.atom3:
-                        l2 = bond.bond_type.req * length_conv
+                        l2 = bond.type.req * length_conv
                 # Compute the distance between the atoms and add a constraint
                 length = sqrt(l1*l1 + l2*l2 - 2*l1*l2*
-                              cos(angle.angle_type.theteq))
+                              cos(angle.type.theteq))
                 system.addConstraint(bond.atom1.idx, bond.atom2.idx, length)
             if flexibleConstraints or not constrained:
                 force.addAngle(angle.atom1.idx, angle.atom2.idx,
-                               angle.atom3.idx, angle.angle_type.theteq*pi/180,
-                               2*angle.angle_type.k*angle_frc_conv)
-        for angle in self.angle_list:
+                               angle.atom3.idx, angle.type.theteq,
+                               2*angle.type.k*angle_frc_conv)
+        for angle in self.angles:
             # Already did the angles with hydrogen above. So skip those here
-            if (angle.atom1.type.atomic_number == 1 or
-                angle.atom2.type.atomic_number == 1 or
-                angle.atom3.type.atomic_number == 1):
+            if (angle.atom1.atomic_number == 1 or
+                angle.atom2.atomic_number == 1 or
+                angle.atom3.atomic_number == 1):
                 continue
             force.addAngle(angle.atom1.idx, angle.atom2.idx,
-                           angle.atom3.idx, angle.angle_type.theteq*pi/180,
-                           2*angle.angle_type.k*angle_frc_conv)
+                           angle.atom3.idx, angle.type.theteq,
+                           2*angle.type.k*angle_frc_conv)
         system.addForce(force)
 
         # Add the urey-bradley terms
         if verbose: print('Adding Urey-Bradley terms')
         force = mm.HarmonicBondForce()
         force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
-        for ub in self.urey_bradley_list:
+        for ub in self.urey_bradleys:
             force.addBond(ub.atom1.idx, ub.atom2.idx,
-                          ub.ub_type.req*length_conv,
-                          2*ub.ub_type.k*bond_frc_conv)
+                          ub.type.req*length_conv,
+                          2*ub.type.k*bond_frc_conv)
         system.addForce(force)
 
         # Add dihedral forces
         if verbose: print('Adding torsions...')
         force = mm.PeriodicTorsionForce()
         force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
-        for tor in self.dihedral_parameter_list:
-            force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
-                             tor.atom4.idx, tor.dihedral_type.per,
-                             tor.dihedral_type.phase*pi/180,
-                             tor.dihedral_type.phi_k*dihe_frc_conv)
+        for tor in self.dihedrals:
+            for typ in tor.type:
+                force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                                 tor.atom4.idx, int(typ.per), typ.phase,
+                                 typ.phi_k*dihe_frc_conv)
         system.addForce(force)
 
         if verbose: print('Adding impropers...')
@@ -407,44 +406,38 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         force.addPerTorsionParameter('k')
         force.addPerTorsionParameter('theta0')
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
-        for imp in self.improper_list:
+        for imp in self.impropers:
             force.addTorsion(imp.atom1.idx, imp.atom2.idx,
                              imp.atom3.idx, imp.atom4.idx,
-                             (imp.improper_type.k*dihe_frc_conv,
-                              imp.improper_type.phieq*pi/180)
+                             (imp.type.psi_k*dihe_frc_conv,
+                              imp.type.psi_eq)
             )
         system.addForce(force)
 
-        if hasattr(self, 'cmap_list'):
+        if hasattr(self, 'cmaps'):
             if verbose: print('Adding CMAP coupled torsions...')
             force = mm.CMAPTorsionForce()
             force.setForceGroup(self.CMAP_FORCE_GROUP)
             # First get the list of cmap maps we're going to use. Just store the
             # IDs so we have simple integer comparisons to do later
-            cmap_type_list = []
+            cmap_types = []
             cmap_map = dict()
-            for cmap in self.cmap_list:
-                if not id(cmap.cmap_type) in cmap_type_list:
-                    ct = cmap.cmap_type
-                    cmap_type_list.append(id(ct))
+            for cmap in self.cmaps:
+                if not id(cmap.type) in cmap_types:
+                    ct = cmap.type
+                    cmap_types.append(id(ct))
                     # Our torsion correction maps need to go from 0 to 360
                     # degrees
                     grid = ct.grid.switch_range().T
                     m = force.addMap(ct.resolution, [x*ene_conv for x in grid])
                     cmap_map[id(ct)] = m
             # Now add in all of the cmaps
-            for cmap in self.cmap_list:
-                if cmap.consecutive:
-                    id1, id2 = cmap.atom1.idx, cmap.atom2.idx
-                    id3, id4 = cmap.atom3.idx, cmap.atom4.idx
-                    id5, id6 = cmap.atom2.idx, cmap.atom3.idx
-                    id7, id8 = cmap.atom4.idx, cmap.atom5.idx
-                else:
-                    id1, id2 = cmap.atom1.idx, cmap.atom2.idx
-                    id3, id4 = cmap.atom3.idx, cmap.atom4.idx
-                    id5, id6 = cmap.atom5.idx, cmap.atom6.idx
-                    id7, id8 = cmap.atom7.idx, cmap.atom8.idx
-                force.addTorsion(cmap_map[id(cmap.cmap_type)],
+            for cmap in self.cmaps:
+                id1, id2 = cmap.atom1.idx, cmap.atom2.idx
+                id3, id4 = cmap.atom3.idx, cmap.atom4.idx
+                id5, id6 = cmap.atom2.idx, cmap.atom3.idx
+                id7, id8 = cmap.atom4.idx, cmap.atom5.idx
+                force.addTorsion(cmap_map[id(cmap.type)],
                                  id1, id2, id3, id4, id5, id6, id7, id8)
             system.addForce(force)
         # Add nonbonded terms now
@@ -519,20 +512,20 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add per-particle nonbonded parameters (LJ params)
         sigma_scale = 2**(-1/6) * 2
         if not has_nbfix_terms:
-            for atm in self.atom_list:
+            for atm in self.atoms:
                 force.addParticle(atm.charge,
-                                  sigma_scale*atm.type.rmin*length_conv,
-                                  abs(atm.type.epsilon*ene_conv))
+                                  sigma_scale*atm.atom_type.rmin*length_conv,
+                                  abs(atm.atom_type.epsilon*ene_conv))
         else:
-            for atm in self.atom_list:
+            for atm in self.atoms:
                 force.addParticle(atm.charge, 1.0, 0.0)
             # Now add the custom nonbonded force that implements NBFIX. First
             # thing we need to do is condense our number of types
-            lj_idx_list = [0 for atom in self.atom_list]
+            lj_idx_list = [0 for atom in self.atoms]
             lj_radii, lj_depths = [], []
             num_lj_types = 0
             lj_type_list = []
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 atom = atom.type
                 if lj_idx_list[i]: continue # already assigned
                 num_lj_types += 1
@@ -541,8 +534,8 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 lj_type_list.append(atom)
                 lj_radii.append(atom.rmin)
                 lj_depths.append(atom.epsilon)
-                for j in xrange(i+1, len(self.atom_list)):
-                    atom2 = self.atom_list[j].type
+                for j in xrange(i+1, len(self.atoms)):
+                    atom2 = self.atoms[j].type
                     if lj_idx_list[j] > 0: continue # already assigned
                     if atom2 is atom:
                         lj_idx_list[j] = num_lj_types
@@ -602,7 +595,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         # Add 1-4 interactions
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
         sigma_scale = 2**(-1/6)
-        for tor in self.dihedral_parameter_list:
+        for tor in self.dihedrals:
             # First check to see if atoms 1 and 4 are already excluded because
             # they are 1-2 or 1-3 pairs (would happen in 6-member rings or
             # fewer). Then check that they're not already added as exclusions
@@ -612,9 +605,9 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                       (tor.atom4.idx, tor.atom1.idx))
             if key in excluded_atom_pairs: continue # multiterm...
             charge_prod = (tor.atom1.charge * tor.atom4.charge)
-            epsilon = (sqrt(abs(tor.atom1.type.epsilon_14) * ene_conv *
-                            abs(tor.atom4.type.epsilon_14) * ene_conv))
-            sigma = (tor.atom1.type.rmin_14 + tor.atom4.type.rmin_14) * (
+            epsilon = (sqrt(abs(tor.atom1.atom_type.epsilon_14) * ene_conv *
+                            abs(tor.atom4.atom_type.epsilon_14) * ene_conv))
+            sigma = (tor.atom1.atom_type.rmin_14+tor.atom4.atom_type.rmin_14)*(
                      length_conv * sigma_scale)
             force.addException(tor.atom1.idx, tor.atom4.idx,
                                charge_prod, sigma, epsilon)
@@ -624,7 +617,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             )
 
         # Add excluded atoms
-        for atom in self.atom_list:
+        for atom in self.atoms:
             # Exclude all bonds and angles
             for atom2 in atom.bond_partners:
                 if atom2.idx > atom.idx:
@@ -690,7 +683,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             elif implicitSolvent is GBn2:
                 gb = GBSAGBn2Force(solventDielectric, soluteDielectric, None,
                                    cutoff, kappa=implicitSolventKappa)
-            for i, atom in enumerate(self.atom_list):
+            for i, atom in enumerate(self.atoms):
                 gb.addParticle([atom.charge] + list(gb_parms[i]))
             # Set cutoff method
             if nonbondedMethod is ff.NoCutoff:
@@ -709,15 +702,15 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
 
         # See if we repartition the hydrogen masses
         if hydrogenMass is not None:
-            for bond in self.bond_list:
+            for bond in self.bonds:
                 # Only take the ones with at least one hydrogen
-                if (bond.atom1.type.atomic_number != 1 and
-                    bond.atom2.type.atomic_number != 1):
+                if (bond.atom1.atomic_number != 1 and
+                    bond.atom2.atomic_number != 1):
                     continue
                 atom1, atom2 = bond.atom1, bond.atom2
-                if atom1.type.atomic_number == 1:
+                if atom1.atomic_number == 1:
                     atom1, atom2 = atom2, atom1 # now atom2 is hydrogen for sure
-                if atom1.type.atomic_number != 1:
+                if atom1.atomic_number != 1:
                     transfer_mass = hydrogenMass - atom2.mass
                     new_mass1 = (system.getParticleMass(atom1.idx) -
                                  transfer_mass)
@@ -741,8 +734,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         try:
             return self._system
         except AttributeError:
-            raise APIError('You must initialize the system with createSystem '
-                           'before accessing the cached object.')
+            return None
 
     @property
     def positions(self):
@@ -750,13 +742,17 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         Return the cached positions or create new ones from the atoms
         """
         try:
-            if len(self._positions) == len(self.atom_list):
+            if len(self._positions) == len(self.atoms):
                 return self._positions
         except AttributeError:
             pass
 
-        self._positions = tuple([Vec3(a.xx, a.xy, a.xz)
-                               for a in self.atom_list]) * u.angstroms
+        try:
+            self._positions = tuple([Vec3(a.xx, a.xy, a.xz)
+                                     for a in self.atoms]) * u.angstroms
+        except AttributeError:
+            return None
+
         return self._positions
 
     @positions.setter
@@ -770,24 +766,28 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             stuff *= u.angstroms
 
         # If we got a 1-D array, reshape it into an natom list of Vec3's
-        if len(stuff) == len(self.atom_list) * 3:
+        if len(stuff) == len(self.atoms) * 3:
             stuff = [Vec3(stuff[i*3], stuff[i*3+1], stuff[i*3+2])
-                     for i in xrange(len(self.atom_list))]
+                     for i in xrange(len(self.atoms))]
         self._positions = stuff
-        for atom, pos in zip(self.atom_list, stuff):
+        for atom, pos in zip(self.atoms, stuff):
             atom.xx, atom.xy, atom.xz = pos.value_in_unit(u.angstrom)
 
     @property
     def velocities(self):
         """ Same as for positions, but for velocities """
         try:
-            if len(self._velocities) == len(self.atom_list):
+            if len(self._velocities) == len(self.atoms):
                 return self._velocities
         except AttributeError:
             pass
 
-        self._velocities = tuple([Vec3(a.vx, a.vy, a.vz)
-                    for a in self.atom_list]) * (u.angstroms/u.picosecond) 
+        try:
+            self._velocities = tuple([Vec3(a.vx, a.vy, a.vz)
+                        for a in self.atoms]) * (u.angstroms/u.picosecond) 
+        except AttributeError:
+            return None
+
         return self._velocities
 
     @property
@@ -809,6 +809,17 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                  vecs[2][2]*vecs[2][2])
         return (a, b, c) * u.nanometers
 
+    @property
+    def box_vectors(self):
+        try:
+            return self._box_vectors
+        except AttributeError:
+            return None
+
+    @box_vectors.setter
+    def box_vectors(self, thing):
+        self._box_vectors = thing
+
     def setBox(self, a, b, c, alpha=90.0*u.degrees, beta=90.0*u.degrees,
                gamma=90.0*u.degrees):
         """
@@ -818,7 +829,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             - a, b, c (float) : Lengths of the unit cell
             - alpha, beta, gamma (float) : Angles between the unit cell vectors
         """
-        self.box_vectors = _box_vectors_from_lengths_angles(a, b, c,
+        self._box_vectors = _box_vectors_from_lengths_angles(a, b, c,
                                                             alpha, beta, gamma)
         # Now call "set_box" for the non-OpenMM object
         self.set_box(a.value_in_unit(u.angstroms),
@@ -852,115 +863,115 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         super(OpenMMCharmmPsfFile, self).load_parameters(parmset)
     def deleteCmap(self):
         """ Deletes the CMAP terms """
-        self.cmap_list = TrackedList()
+        del self.cmaps[:]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Routines that set the necessary radii lists based on a list of atoms with
 # their connectivities
 
-def _bondi_radii(atom_list):
+def _bondi_radii(atoms):
     """ Sets the bondi radii """
-    radii = [0.0 for atom in atom_list]
-    for i, atom in enumerate(atom_list):
-        if atom.type.atomic_number == 6:
+    radii = [0.0 for atom in atoms]
+    for i, atom in enumerate(atoms):
+        if atom.atomic_number == 6:
             radii[i] = 1.7
-        elif atom.type.atomic_number == 1:
+        elif atom.atomic_number == 1:
             radii[i] = 1.2
-        elif atom.type.atomic_number == 7:
+        elif atom.atomic_number == 7:
             radii[i] = 1.55
-        elif atom.type.atomic_number == 8:
+        elif atom.atomic_number == 8:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 9:
+        elif atom.atomic_number == 9:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 14:
+        elif atom.atomic_number == 14:
             radii[i] = 2.1
-        elif atom.type.atomic_number == 15:
+        elif atom.atomic_number == 15:
             radii[i] = 1.85
-        elif atom.type.atomic_number == 16:
+        elif atom.atomic_number == 16:
             radii[i] = 1.8
-        elif atom.type.atomic_number == 17:
+        elif atom.atomic_number == 17:
             radii[i] = 1.5
         else:
             radii[i] = 1.5
     return radii  # converted to nanometers above
 
-def _mbondi_radii(atom_list):
+def _mbondi_radii(atoms):
     """ Sets the mbondi radii """
-    radii = [0.0 for atom in atom_list]
-    for i, atom in enumerate(atom_list):
+    radii = [0.0 for atom in atoms]
+    for i, atom in enumerate(atoms):
         # Radius of H atom depends on element it is bonded to
-        if atom.type.atomic_number == 1:
+        if atom.atomic_number == 1:
             bondeds = list(atom.bond_partners)
-            if bondeds[0].type.atomic_number in (6, 7): # C or N
+            if bondeds[0].atomic_number in (6, 7): # C or N
                 radii[i] = 1.3
-            elif bondeds[0].type.atomic_number in (8, 16): # O or S
+            elif bondeds[0].atomic_number in (8, 16): # O or S
                 radii[i] = 0.8
             else:
                 radii[i] = 1.2
         # Radius of C atom depends on what type it is
-        elif atom.type.atomic_number == 6:
+        elif atom.atomic_number == 6:
             radii[i] = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.type.atomic_number == 7:
+        elif atom.atomic_number == 7:
             radii[i] = 1.55
-        elif atom.type.atomic_number == 8:
+        elif atom.atomic_number == 8:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 9:
+        elif atom.atomic_number == 9:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 14:
+        elif atom.atomic_number == 14:
             radii[i] = 2.1
-        elif atom.type.atomic_number == 15:
+        elif atom.atomic_number == 15:
             radii[i] = 1.85
-        elif atom.type.atomic_number == 16:
+        elif atom.atomic_number == 16:
             radii[i] = 1.8
-        elif atom.type.atomic_number == 17:
+        elif atom.atomic_number == 17:
             radii[i] = 1.5
         else:
             radii[i] = 1.5
     return radii  # converted to nanometers above
 
-def _mbondi2_radii(atom_list):
+def _mbondi2_radii(atoms):
     """ Sets the mbondi2 radii """
-    radii = [0.0 for atom in atom_list]
-    for i, atom in enumerate(atom_list):
+    radii = [0.0 for atom in atoms]
+    for i, atom in enumerate(atoms):
         # Radius of H atom depends on element it is bonded to
-        if atom.type.atomic_number == 1:
-            if atom.bond_partners[0].type.atomic_number == 7:
+        if atom.atomic_number == 1:
+            if atom.bond_partners[0].atomic_number == 7:
                 radii[i] = 1.3
             else:
                 radii[i] = 1.2
         # Radius of C atom depends on what type it is
-        elif atom.type.atomic_number == 6:
+        elif atom.atomic_number == 6:
             radii[i] = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.type.atomic_number == 7:
+        elif atom.atomic_number == 7:
             radii[i] = 1.55
-        elif atom.type.atomic_number == 8:
+        elif atom.atomic_number == 8:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 9:
+        elif atom.atomic_number == 9:
             radii[i] = 1.5
-        elif atom.type.atomic_number == 14:
+        elif atom.atomic_number == 14:
             radii[i] = 2.1
-        elif atom.type.atomic_number == 15:
+        elif atom.atomic_number == 15:
             radii[i] = 1.85
-        elif atom.type.atomic_number == 16:
+        elif atom.atomic_number == 16:
             radii[i] = 1.8
-        elif atom.type.atomic_number == 17:
+        elif atom.atomic_number == 17:
             radii[i] = 1.5
         else:
             radii[i] = 1.5
     return radii  # Converted to nanometers above
 
-def _mbondi3_radii(atom_list):
+def _mbondi3_radii(atoms):
     """ Sets the mbondi3 radii """
-    radii = _mbondi2_radii(atom_list)
-    for i, atom in enumerate(atom_list):
+    radii = _mbondi2_radii(atoms)
+    for i, atom in enumerate(atoms):
         # Adjust OE (GLU), OD (ASP) and HH/HE (ARG)
-        if atom.residue.resname in ('GLU', 'ASP'):
+        if atom.residue.name in ('GLU', 'ASP'):
             if atom.name.startswith('OE') or atom.name.startswith('OD'):
                 radii[i] = 1.4
-        elif atom.residue.resname == 'ARG':
+        elif atom.residue.name == 'ARG':
             if atom.name.startswith('HH') or atom.name.startswith('HE'):
                 radii[i] = 1.17
         # Adjust carboxylate O radii on C-termini

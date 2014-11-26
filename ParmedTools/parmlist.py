@@ -61,7 +61,7 @@ class ParmList(object):
         self.parm = parm
         # If we have a restart file, load it
         if rst7 is not None:
-            parm.LoadRst7(rst7)
+            parm.load_rst7(rst7)
 
     def index(self, idx):
         """ See what the index of the requested parm is (can be int or str) """

@@ -2,7 +2,7 @@
 Classes helpful for reading/storing Amber parameters
 """
 from __future__ import division
-from chemistry.amber.topologyobjects import BondType, AngleType, DihedralType
+from chemistry.topologyobjects import BondType, AngleType, DihedralType
 from chemistry.amber.readparm import AmberParm
 from chemistry.amber.constants import RAD_TO_DEG, SMALL
 from chemistry.exceptions import AmberParameterWarning
@@ -20,7 +20,7 @@ class BondParam(object):
                 raise TypeError('bondtype expected to be BondType instance')
             self.type = bondtype
         else:
-            self.type = BondType(float(rk), float(req), 0)
+            self.type = BondType(float(rk), float(req))
 
     def __str__(self):
         return '%s-%s   %8.3f  %6.3f' % (self.atype1.ljust(2),
@@ -46,7 +46,7 @@ class AngleParam(object):
                 raise TypeError('angletype expected to be AngleType instance')
             self.type = angletype
         else:
-            self.type = AngleType(float(thetk), float(theteq), 0)
+            self.type = AngleType(float(thetk), float(theteq))
 
     def __str__(self):
         return '%s-%s-%s   %8.3f  %6.3f' % (self.atype1.ljust(2),
@@ -71,6 +71,7 @@ class _DihedralTerm(object):
         self.idivf = int(idivf)
         if not dihtype in ('normal', 'improper'):
             raise ValueError('dihtype must be normal or improper')
+        improper = dihtype == 'improper'
         self.dihtype = dihtype
         if dihedraltype is not None:
             if not isinstance(dihedraltype, DihedralType):
@@ -79,7 +80,8 @@ class _DihedralTerm(object):
             self.type = dihedraltype
         else:
             self.type = DihedralType(pk / self.idivf, float(periodicity),
-                                    float(phase), float(scee), float(scnb), 0)
+                                    float(phase), float(scee), float(scnb),
+                                    improper=improper)
 
     def parmline(self, multiterm=False):
         if self.dihtype == 'improper' or not multiterm:
@@ -356,42 +358,42 @@ class ParameterSet(object):
         if not isinstance(parm, AmberParm):
             raise TypeError('ParameterSet.load_from_parm() expects AmberParm')
         # Loop through all atoms, adding it to the list of atoms
-        for atom in parm.atom_list:
+        for atom in parm.atoms:
             rmin = parm.LJ_radius[atom.nb_idx-1]
             eps = parm.LJ_depth[atom.nb_idx-1]
-            self._add_atom(atom.attype, atom.mass, rmin, eps)
+            self._add_atom(atom.type, atom.mass, rmin, eps)
         # Loop through all bonds
         for bond in parm.bonds_without_h:
-            self._add_bond(bond.atom1.attype, bond.atom2.attype, 
-                           bondtype=bond.bond_type)
+            self._add_bond(bond.atom1.type, bond.atom2.type, 
+                           bondtype=bond.type)
         for bond in parm.bonds_inc_h:
-            self._add_bond(bond.atom1.attype, bond.atom2.attype,
-                           bondtype=bond.bond_type)
+            self._add_bond(bond.atom1.type, bond.atom2.type,
+                           bondtype=bond.type)
         # Loop through all angles
         for angle in parm.angles_without_h:
-            self._add_angle(angle.atom1.attype, angle.atom2.attype,
-                            angle.atom3.attype, angletype=angle.angle_type)
+            self._add_angle(angle.atom1.type, angle.atom2.type,
+                            angle.atom3.type, angletype=angle.type)
         for angle in parm.angles_inc_h:
-            self._add_angle(angle.atom1.attype, angle.atom2.attype,
-                            angle.atom3.attype, angletype=angle.angle_type)
+            self._add_angle(angle.atom1.type, angle.atom2.type,
+                            angle.atom3.type, angletype=angle.type)
         # Loop through all dihedrals
         for i, dihedral in enumerate(parm.dihedrals_without_h):
-            if dihedral.signs[0] < 0 and dihedral.signs[1] < 0:
+            if dihedral.improper:
                 term = 'improper'
             else:
                 term = 'normal'
-            self._add_dihedral(dihedral.atom1.attype, dihedral.atom2.attype,
-                               dihedral.atom3.attype, dihedral.atom4.attype,
-                               idivf=1, dihedraltype=dihedral.dihed_type,
+            self._add_dihedral(dihedral.atom1.type, dihedral.atom2.type,
+                               dihedral.atom3.type, dihedral.atom4.type,
+                               idivf=1, dihedraltype=dihedral.type,
                                dihtype=term)
         for dihedral in parm.dihedrals_inc_h:
-            if dihedral.signs[0] < 0 and dihedral.signs[1] < 0:
+            if dihedral.improper:
                 term = 'improper'
             else:
                 term = 'normal'
-            self._add_dihedral(dihedral.atom1.attype, dihedral.atom2.attype,
-                               dihedral.atom3.attype, dihedral.atom4.attype,
-                               idivf=1, dihedraltype=dihedral.dihed_type,
+            self._add_dihedral(dihedral.atom1.type, dihedral.atom2.type,
+                               dihedral.atom3.type, dihedral.atom4.type,
+                               idivf=1, dihedraltype=dihedral.type,
                                dihtype=term)
 
     def write(self, dest):
