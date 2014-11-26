@@ -2680,6 +2680,8 @@ class addpdb(Action):
                 comments=['Atom occupancies read from the PDB file'])
         self.parm.add_flag('ATOM_BFACTOR', '10F8.2', data=tempfac,
                 comments=['Atom temperature factor from the PDB file'])
+        self.parm.add_flag('ATOM_NUMBER', '10I8', data=atomnums,
+                comments=['Atom serial number from the PDB file'])
         self.parm.load_structure() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2695,7 +2697,8 @@ class deletepdb(Action):
                            'RESIDUE_ICODE' in self.parm.flag_list or
                            'ATOM_ELEMENT' in self.parm.flag_list or
                            'ATOM_BFACTOR' in self.parm.flag_list or
-                           'ATOM_OCCUPANCY' in self.parm.flag_list
+                           'ATOM_OCCUPANCY' in self.parm.flag_list or
+                           'ATOM_NUMBER' in self.parm.flag_list
         )
 
     def __str__(self):
@@ -2711,6 +2714,7 @@ class deletepdb(Action):
         self.parm.delete_flag('ATOM_ELEMENT')
         self.parm.delete_flag('ATOM_BFACTOR')
         self.parm.delete_flag('ATOM_OCCUPANCY')
+        self.parm.delete_flag('ATOM_NUMBER')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
