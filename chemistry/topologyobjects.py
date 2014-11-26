@@ -205,7 +205,7 @@ class Atom(_ListItem):
     irotat : int=0
         The `irotat` property of atoms stored in the Amber topology file.
         Unused, but included for future-proofing.
-    occupancy : str=''
+    occupancy : float=0.0
         The occupancy of the atom (see PDB file)
     bfactor : float=0.0
         The B-factor of the atom (see PDB file)

@@ -806,10 +806,14 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
         self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
+        self.assertTrue('ATOM_OCCUPANCY' in parm.flag_list)
+        self.assertTrue('ATOM_BFACTOR' in parm.flag_list)
         self.assertTrue(len(parm.parm_data['RESIDUE_ICODE']), parm.ptr('nres'))
         self.assertTrue(len(parm.parm_data['ATOM_ELEMENT']), parm.ptr('natom'))
         self.assertTrue(len(parm.parm_data['RESIDUE_NUMBER']), parm.ptr('nres'))
         self.assertTrue(len(parm.parm_data['RESIDUE_CHAINID']),parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['ATOM_OCCUPANCY']),parm.ptr('natom'))
+        self.assertTrue(len(parm.parm_data['ATOM_BFACTOR']), parm.ptr('natom'))
         for i in range(parm.ptr('nres')):
             self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i + 21)
             self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
@@ -827,6 +831,8 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
         self.assertFalse('RESIDUE_NUMBER' in parm.flag_list)
         self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
+        self.assertFalse('ATOM_OCCUPANCY' in parm.flag_list)
+        self.assertFalse('ATOM_BFACTOR' in parm.flag_list)
 
     def testHMassRepartition(self):
         """ Test HMassRepartition on AmberParm """
