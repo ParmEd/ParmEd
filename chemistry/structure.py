@@ -864,7 +864,7 @@ def read_PDB(filename):
                     chg = 0
                 atom = Atom(atomic_number=atomic_number, name=atname,
                             charge=chg, mass=mass, occupancy=occupancy,
-                            bfactor=bfactor, altloc=altloc)
+                            bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                 if _compare_atoms(last_atom, atom, resname, resid, chain):
                     atom.residue = last_atom.residue

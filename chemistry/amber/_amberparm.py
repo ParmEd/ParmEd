@@ -416,6 +416,10 @@ class AmberParm(AmberFormat, Structure):
             bfac = self.parm_data['ATOM_BFACTOR']
         except KeyError:
             bfac = zeros
+        try:
+            anum = self.parm_data['ATOM_NUMBER']
+        except KeyError:
+            anum = [-1 for atom in self.atoms]
         for i, atom in enumerate(self.atoms):
             atom.name = anam[i]
             atom.charge = chg[i]
@@ -431,6 +435,7 @@ class AmberParm(AmberFormat, Structure):
             atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
+            atom.number = anum[i]
             depth = self.LJ_depth[atom.nb_idx-1]
             radius = self.LJ_radius[atom.nb_idx-1]
             try:

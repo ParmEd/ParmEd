@@ -211,6 +211,8 @@ class Atom(_ListItem):
         The B-factor of the atom (see PDB file)
     altloc : str=''
         Alternate location indicator (see PDB file)
+    number : int=-1
+        The serial number given to the atom (see PDB file)
 
     Attributes
     ----------
@@ -310,6 +312,9 @@ class Atom(_ListItem):
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
+    number : int
+        The serial number of the atom in the input structure (e.g., PDB file).
+        If not present in the original structure, a default value of -1 is used
 
     Possible Attributes
     -------------------
@@ -391,7 +396,7 @@ class Atom(_ListItem):
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
-                 bfactor=0.0, altloc=''):
+                 bfactor=0.0, altloc='', number=-1):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -423,6 +428,7 @@ class Atom(_ListItem):
         self.tortors = []
         self.other_locations = {} # A dict of Atom instances
         self.atom_type = _UnassignedAtomType
+        self.number = number
    
     #===================================================
 

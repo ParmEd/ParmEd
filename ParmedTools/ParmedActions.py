@@ -2597,6 +2597,7 @@ class addpdb(Action):
         icodes = ['' for i in xrange(self.parm.ptr('nres'))]
         tempfac = [0.0 for i in xrange(self.parm.ptr('natom'))]
         occupancies = [0.0 for i in xrange(self.parm.ptr('natom'))]
+        atomnums = [0 for i in xrange(self.parm.ptr('natom'))]
         for i, res in enumerate(pdb.residues):
             parmres = self.parm.residues[i]
             try:
@@ -2646,6 +2647,7 @@ class addpdb(Action):
                     if atom.name == pdbatom.name:
                         tempfac[atom.idx] = pdbatom.bfactor
                         occupancies[atom.idx] = pdbatom.occupancy
+                        atomnums[atom.idx] = pdbatom.number
                         break
 
         ncmts = ['Residue number (resSeq) read from PDB file; DIMENSION(NRES)']
