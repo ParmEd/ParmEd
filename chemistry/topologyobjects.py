@@ -3063,10 +3063,14 @@ class AtomList(TrackedList):
         # Look through all of the atom types and add the nbfixes
         for i, type in enumerate(atom_type_list):
             for key in type.nbfix:
-                otype = atom_type_lookups[key]
-                obj = (otype._idx, otype.rmin, otype.epsilon,
-                       otype.rmin_14, otype.epsilon_14)
-                nbfix_list[i].add(obj)
+                rmin, eps, rmin14, eps14 = type.nbfix[key]
+                try:
+                    otype = atom_type_lookups[key]
+                except KeyError:
+                    continue
+                else:
+                    obj = (otype._idx, rmin, eps, rmin14, eps14)
+                    nbfix_list[i].add(obj)
 
         return nbfix_list
 

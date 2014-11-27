@@ -604,9 +604,11 @@ class ChamberParm(AmberParm):
         # Now make any NBFIX modifications we had
         if nbfixes is not None:
             for i, fix in enumerate(nbfixes):
-                for key in fix:
-                    j, rmin, eps, rmin14, eps14 = fix[key]
-                    i, j = min(i, j), max(i, j)
+                for terms in fix:
+                    j, rmin, eps, rmin14, eps14 = terms
+                    i, j = min(i, j-1), max(i, j-1)
+                    eps = abs(eps)
+                    eps14 = abs(eps14)
                     idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                     data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
                     data['LENNARD_JONES_BCOEF'][idx] = 2 * eps * rmin**6
