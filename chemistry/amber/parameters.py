@@ -4,7 +4,7 @@ Classes helpful for reading/storing Amber parameters
 from __future__ import division
 from chemistry.topologyobjects import BondType, AngleType, DihedralType
 from chemistry.amber.readparm import AmberParm
-from chemistry.amber.constants import RAD_TO_DEG, SMALL
+from chemistry.constants import RAD_TO_DEG, SMALL
 from chemistry.exceptions import AmberParameterWarning
 import warnings
 
