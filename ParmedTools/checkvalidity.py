@@ -7,7 +7,7 @@ from ParmedTools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
                                     FixableParmWarning, NonfatalWarning,
                                     NonUniversalWarning, MissingDisulfide,
                                     LongBondWarning)
-from chemistry.amber.constants import TINY
+from chemistry.constants import TINY
 from chemistry.amber.mask import AmberMask
 from chemistry.exceptions import MoleculeError
 from math import sqrt

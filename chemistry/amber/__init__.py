@@ -9,6 +9,6 @@ del _chemistry_version
 
 from chemistry.amber.amberformat import AmberFormat, FortranFormat
 from chemistry.amber.asciicrd import AmberAsciiRestart, AmberMdcrd
-from chemistry.amber.netcdffiles import use, NetCDFTraj, NetCDFRestart
+from chemistry.amber.netcdffiles import use, NetCDFTraj, NetCDFRestart, HAS_NETCDF
 from chemistry.amber.readparm import (AmberParm, ChamberParm, AmoebaParm,
                 Rst7, BeemanRestart, ConvertFromPSF)
