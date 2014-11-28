@@ -25,7 +25,7 @@ from __future__ import division
 from compat24 import property
 from chemistry.amber._amberparm import AmberParm
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.amber.constants import NATOM, NRES, IFBOX
+from chemistry.constants import NATOM, NRES, IFBOX
 from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
                 Dihedral, StretchBend, TorsionTorsion, ChiralFrame,

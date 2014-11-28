@@ -8,7 +8,7 @@ from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
-from chemistry.amber.constants import TINY
+from chemistry.constants import TINY
 from chemistry.periodic_table import Mass, Element as _Element
 from compat24 import all, property
 import copy

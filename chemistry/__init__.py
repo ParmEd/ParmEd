@@ -6,6 +6,6 @@ between standard and amber file formats, manipulate structures, etc.
 __version__ = '2.0b'
 __author__ = 'Jason Swails'
 
-from chemistry import exceptions
+from chemistry import exceptions, periodic_table
 from chemistry.structure import Structure, read_PDB
 from chemistry.topologyobjects import *

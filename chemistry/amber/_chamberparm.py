@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from chemistry.amber._amberparm import AmberParm
-from chemistry.amber.constants import (NTYPES, CHARMM_ELECTROSTATIC, NATYP,
+from chemistry.constants import (NTYPES, CHARMM_ELECTROSTATIC, NATYP,
                     IFBOX, TINY, NATOM)
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)

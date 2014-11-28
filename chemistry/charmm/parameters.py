@@ -7,7 +7,7 @@ Author: Jason M. Swails
 Contributors:
 Date: Sep. 17, 2014
 """
-from chemistry.amber.constants import DEG_TO_RAD
+from chemistry.constants import DEG_TO_RAD
 from chemistry import (AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile

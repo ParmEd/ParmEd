@@ -4,7 +4,7 @@ Amber-style files with %FLAG/%FORMAT tags
 """
 from __future__ import division
 
-from chemistry.amber.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
+from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from chemistry.exceptions import AmberFormatWarning, FlagError

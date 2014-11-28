@@ -26,7 +26,7 @@ from chemistry.periodic_table import AtomicNum, element_by_mass, Element
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType)
 from chemistry.structure import Structure
-from chemistry.amber.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
+from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,

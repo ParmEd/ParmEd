@@ -7,15 +7,174 @@ interaction with the various NetCDF-Python APIs that are available, namely
     -  ScientificPython
     -  pynetcdf
 
-This module contains objects relevant to Amber NetCDF files. The code in
-chemistry/amber/__init__.py is responsible for selecting the API based on a
-default choice or user-selection (the latter is really only helpful for
-development to ensure that all packages work correctly---there is no difference
-from a user perspective). ALL NetCDF-file manipulation that the chemistry/amber
-package does should be contained in this module.
+This module contains objects relevant to Amber NetCDF files. The use() function
+is responsible for selecting the API based on a default choice or user-selection
+(the latter is really only helpful for development to ensure that all packages
+work correctly---there is no difference from a user perspective). ALL
+NetCDF-file manipulation that the chemistry/amber package does should be
+contained in this module.
 """
+import warnings
+# This determines which NetCDF package we're going to use...
+NETCDF_PACKAGE = None
 
-from chemistry import amber, __version__
+ALLOWED_NETCDF_PACKAGES = ('netCDF4', 'Scientific', 'pynetcdf', 'scipy')
+
+NETCDF_INITIALIZED = False
+SELECTED_NETCDF = ''
+
+_FMT = 'NETCDF3_64BIT'
+
+open_netcdf = get_int_dimension = get_float = None
+
+try:
+    from netCDF4 import Dataset as nc4NetCDFFile
+    nc4open_netcdf = lambda name, mode: nc4NetCDFFile(name, mode, format=_FMT)
+    nc4get_int_dimension = lambda obj, name: len(obj.dimensions[name])
+    # Support 1-dimension arrays as scalars (since that's how Python-NetCDF
+    # bindings write out scalars in Amber files)
+    def nc4get_float(obj, name):
+        try:
+            val = obj.variables[name].getValue()
+            if hasattr(val, '__iter__'):
+                return val[0]
+            return val
+        except IndexError:
+            return obj.variables[name][0]
+        raise RuntimeError('Should not be here')
+    _HAS_NC4 = True
+except ImportError:
+    nc4open_netcdf = nc4get_int_dimension = nc4get_float = None
+    _HAS_NC4 = False
+
+try:
+    from Scientific.IO.NetCDF import NetCDFFile as sciNetCDFFile
+    sciopen_netcdf = lambda name, mode: sciNetCDFFile(name, mode)
+    sciget_int_dimension = lambda obj, name: obj.dimensions[name]
+    sciget_float = lambda obj, name: obj.variables[name].getValue()
+    _HAS_SCIENTIFIC_PYTHON = True
+except ImportError:
+    sciopen_netcdf = sciget_int_dimension = sciget_float = None
+    _HAS_SCIENTIFIC_PYTHON = False
+
+try:
+    from pynetcdf.NetCDF import NetCDFFile as pynNetCDFFile
+    pynopen_netcdf = lambda name, mode: pynNetCDFFile(name, mode)
+    pynget_int_dimension = lambda obj, name: obj.dimensions[name]
+    pynget_float = lambda obj, name: obj.variables[name].getValue()
+    _HAS_PYNETCDF = True
+except ImportError:
+    pynopen_netcdf = pynget_int_dimension = pynget_float = None
+    _HAS_PYNETCDF = False
+
+try:
+    from scipy.io.netcdf import netcdf_file as spNetCDFFile
+    spopen_netcdf = lambda name, mode: spNetCDFFile(name, mode)
+    spget_int_dimension = lambda obj, name: obj.dimensions[name]
+    spget_float = lambda obj, name: obj.variables[name].getValue()
+    _HAS_SCIPY_NETCDF = True
+except ImportError:
+    spopen_netcdf = spget_int_dimension = spget_float = None
+    _HAS_SCIPY_NETCDF = False
+
+HAS_NETCDF = (_HAS_NC4 or _HAS_SCIENTIFIC_PYTHON or 
+              _HAS_PYNETCDF or _HAS_SCIPY_NETCDF)
+
+def use(package=None):
+    """
+    Selects the NetCDF package to use
+
+    Parameters:
+        - package (string): This specifies which package to use, and may be
+                either scipy, netCDF4, Scientific/ScientificPython, pynetcdf, or
+                None.  If None, it chooses the first available implementation
+                from the above list (in that order).
+
+    Notes:
+    - use() can only be called once, and once it is called there is no changing
+      within that Python session or program. The 'netcdffiles' module calls this
+      function to get the default NetCDF implementation if none has been
+      selected before, so calling this function is unnecessary if the default
+      implementation is sufficient. This is mostly useful for development
+      testing as the backend NetCDF choice is virtually invisible to the user.
+
+    - The pynetcdf implementation has long since been abandoned (ca.  2006), and
+      is not recommended for use. It appears to parse NetCDF files just fine,
+      but it does not seem to write them successfully according to my tests.
+    
+    - The NetCDF files have been tested against netCDF v. 1.0.4,
+      Scientific v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to
+      work barring backwards-incompatible changes. Earlier versions are expected
+      to work barring bugs or backwards-incompatible changes in the current or
+      earlier versions.
+   """
+    global open_netcdf, get_int_dimension, get_float, NETCDF_INITIALIZED
+    global HAS_NETCDF, SELECTED_NETCDF, nc4open_netcdf, nc4get_int_dimension
+    global nc4get_float, sciopen_netcdf, sciget_int_dimension, sciget_float
+    global pynopen_netcdf, pynget_int, pynget_float, ALLOWED_NETCDF_PACKAGES
+    global _HAS_NC4, _HAS_SCIENTIFIC_PYTHON, _HAS_PYNETCDF, _HAS_SCIPY_NETCDF
+
+    if package is None:
+        if _HAS_SCIPY_NETCDF:
+            open_netcdf = spopen_netcdf
+            get_int_dimension = spget_int_dimension
+            get_float = spget_float
+            SELECTED_NETCDF = 'scipy'
+        elif _HAS_NC4:
+            open_netcdf = nc4open_netcdf
+            get_int_dimension = nc4get_int_dimension
+            get_float = nc4get_float
+            SELECTED_NETCDF = 'netCDF4'
+        elif _HAS_SCIENTIFIC_PYTHON:
+            open_netcdf = sciopen_netcdf
+            get_int_dimension = sciget_int_dimension
+            get_float = sciget_float
+            SELECTED_NETCDF = 'ScientificPython'
+        elif _HAS_PYNETCDF:
+            open_netcdf = pynopen_netcdf
+            get_int_dimension = pynget_int_dimension
+            get_float = pynget_float
+            SELECTED_NETCDF = 'pynetcdf'
+    elif package == 'netCDF4':
+        if not _HAS_NC4:
+            raise ImportError('Could not find netCDF4 package')
+        open_netcdf = nc4open_netcdf
+        get_int_dimension = nc4get_int_dimension
+        get_float = nc4get_float
+        SELECTED_NETCDF = 'netCDF4'
+    elif package == 'Scientific' or package == 'ScientificPython':
+        if not _HAS_SCIENTIFIC_PYTHON:
+            raise ImportError('Could not find package ScientificPython')
+        open_netcdf = sciopen_netcdf
+        get_int_dimension = sciget_int_dimension
+        get_float = sciget_float
+        SELECTED_NETCDF = 'ScientificPython'
+    elif package == 'scipy':
+        if not _HAS_SCIPY_NETCDF:
+            raise ImportError('Could not find scipy NetCDF package')
+        open_netcdf = spopen_netcdf
+        get_int_dimension = spget_int_dimension
+        get_float = spget_float
+    elif package == 'pynetcdf':
+        if not _HAS_PYNETCDF:
+            raise ImportError('Could not find package pynetcdf')
+        warnings.warn('pynetcdf is no longer maintained and may not work '
+                      'properly. If you experience problems, try installing a '
+                      'different NetCDF package like Scientific, scipy, or '
+                      'netCDF4.')
+        open_netcdf = pynopen_netcdf
+        get_int_dimension = pynget_int_dimension
+        get_float = pynget_float
+        SELECTED_NETCDF = 'pynetcdf'
+    else:
+        raise ImportError('%s not a valid NetCDF package. Available options '
+                          'are %s' % (package, 
+                                      ', '.join(ALLOWED_NETCDF_PACKAGES))
+        )
+    
+    NETCDF_INITIALIZED = True # We have now selected a NetCDF implementation
+
+from chemistry import __version__
 from compat24 import property, wraps
 try:
     import numpy as np
@@ -24,8 +183,6 @@ except ImportError:
     # numpy is not available. np can be used inside any method since it will be
     # required for any NetCDF to work in the first place.
     np = None
-# Make sure we have registered a NetCDF implementation. If not, take the default
-if not amber.NETCDF_INITIALIZED: amber.use()
 
 def needs_netcdf(fcn):
     """
@@ -34,8 +191,10 @@ def needs_netcdf(fcn):
     """
     @wraps(fcn)
     def new_fcn(*args, **kwargs):
-        if not amber.HAS_NETCDF:
+        if not HAS_NETCDF:
             raise ImportError('No NetCDF packages are available!')
+        if not NETCDF_INITIALIZED:
+            use() # Set up a default NetCDF implementation
         return fcn(*args, **kwargs)
     return new_fcn
 
@@ -51,7 +210,7 @@ class NetCDFRestart(object):
         respectively.
         """
         self.closed = False
-        self._ncfile = amber.open_netcdf(fname, mode)
+        self._ncfile = open_netcdf(fname, mode)
    
     @classmethod
     def open_new(cls, fname, natom, box, vels, title='',
@@ -187,7 +346,7 @@ class NetCDFRestart(object):
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
             if dim == 'time': continue
-            setattr(inst, dim, amber.get_int_dimension(ncfile, dim))
+            setattr(inst, dim, get_int_dimension(ncfile, dim))
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
                         'cell_angles' in ncfile.variables)
@@ -253,7 +412,7 @@ class NetCDFRestart(object):
 
     @property
     def time(self):
-        return amber.get_float(self._ncfile, 'time')
+        return get_float(self._ncfile, 'time')
 
     @time.setter
     def time(self, stuff):
@@ -262,7 +421,7 @@ class NetCDFRestart(object):
 
     @property
     def temp0(self):
-        return amber.get_float(self._ncfile, 'temp0')
+        return get_float(self._ncfile, 'temp0')
 
     @temp0.setter
     def temp0(self, stuff):
@@ -316,7 +475,7 @@ class NetCDFTraj(object):
     def __init__(self, fname, mode):
         """ Opens a NetCDF File """
         self.closed = False
-        self._ncfile = amber.open_netcdf(fname, mode)
+        self._ncfile = open_netcdf(fname, mode)
    
     @classmethod
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,
@@ -460,7 +619,7 @@ class NetCDFTraj(object):
         inst.title = ncfile.title.decode('ascii')
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
-            setattr(inst, dim, amber.get_int_dimension(ncfile, dim))
+            setattr(inst, dim, get_int_dimension(ncfile, dim))
         inst.hascrds = 'coordinates' in ncfile.variables
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasfrcs = 'forces' in ncfile.variables

@@ -8,7 +8,7 @@ file.
 """
 from __future__ import division
 
-from chemistry.amber.constants import TINY, DEG_TO_RAD
+from chemistry.constants import TINY, DEG_TO_RAD
 from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
 from chemistry.exceptions import APIError, OpenMMError
 import chemistry.periodic_table as pt

@@ -10,10 +10,6 @@ get_fn = utils.get_fn
 class TestNetCDF(unittest.TestCase):
     """ Test NetCDF Functionality """
     
-    def setUp(self):
-        import chemistry.amber as amber
-        amber.NETCDF_INITIALIZED = False
-
     def testScipy(self):
         """ Test scipy NetCDF parsing """
         import chemistry.amber as amber
