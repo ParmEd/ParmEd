@@ -19,12 +19,6 @@ def check_validity(parm, warnings):
         kwargs['warnings'] = warnings
         return _check_exist_nvals(parm, *args, **kwargs)
 
-    if not parm.valid:
-        warnings.warn('AmberParm detects invalid prmtop file',
-                      BadParmWarning)
-        # Don't keep looking past here -- we'll see every warning here probably
-        return False
-
     # Make sure all of our sections that we expect are present and have the
     # right number of variables in it
     nttyp = parm.ptr('ntypes') * (parm.ptr('ntypes') + 1) // 2 # for LJ stuff
