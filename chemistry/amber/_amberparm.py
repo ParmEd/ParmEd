@@ -284,6 +284,7 @@ class AmberParm(AmberFormat, Structure):
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
+        inst.rediscover_molecules()
         inst._set_nonbonded_tables()
 
         return inst
@@ -685,6 +686,10 @@ class AmberParm(AmberFormat, Structure):
                 for idx in mol:
                     new_atoms.append(self.atoms[idx])
             self.atoms = new_atoms
+            # Re-sort our residues and residue list for new atom ordering
+            for residue in self.residues:
+                residue.sort()
+            self.residues.sort()
             return owner
 
         return None
@@ -1393,7 +1398,7 @@ class AmberParm(AmberFormat, Structure):
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
         if self.box is not None:
-            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
+            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
             self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=0)

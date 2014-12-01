@@ -2714,6 +2714,20 @@ class Residue(_ListItem):
         """
         return len(self) == 0
 
+    def sort(self):
+        """ Sorts the atoms in this list by atom index """
+        self.atoms.sort()
+
+    # Sort by atom indices
+    def __lt__(self, other):
+        return self.atoms[0].idx < other.atoms[0].idx
+    def __gt__(self, other):
+        return self.atoms[0].idx > other.atoms[0].idx
+    def __le__(self, other):
+        return not self.atoms[0].idx > other.atoms[0].idx
+    def __ge__(self, other):
+        return not self.atoms[0].idx < other.atoms[0].idx
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def _changes(func):
