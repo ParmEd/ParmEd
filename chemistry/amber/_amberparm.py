@@ -652,7 +652,7 @@ class AmberParm(AmberFormat, Structure):
         first_solvent = self.residues[min(indices)].atoms[0].idx
         # Find the first solvent molecule
         for i, mol in enumerate(owner):
-            if first_solvent-1 == mol[0]:
+            if first_solvent-1 in mol: # mol is a set, so it is efficient
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
         else: # this else belongs to 'for', not 'if'
@@ -666,8 +666,9 @@ class AmberParm(AmberFormat, Structure):
         # re-order atoms if they're not
         try:
             for mol in owner:
-                for i in xrange(1, len(mol)):
-                    if mol[i] != mol[i-1] + 1:
+                sortedmol = sorted(list(mol))
+                for i in xrange(1, len(sortedmol)):
+                    if sortedmol[i] != sortedmol[i-1] + 1:
                         raise StopIteration()
         except StopIteration:
             if not fix_broken:
@@ -1682,10 +1683,10 @@ def set_molecules(parm):
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)
         if not atom.marked:
-            tmp = [i]
+            tmp = set()
+            tmp.add(i)
             _set_owner(parm, tmp, i, molecule_number)
             # Make sure the atom indexes are sorted
-            tmp.sort()
             owner.append(tmp)
             molecule_number += 1
     return owner
@@ -1697,7 +1698,7 @@ def _set_owner(parm, owner_array, atm, mol_id):
     parm.atoms[atm].marked = mol_id
     for partner in parm.atoms[atm].bond_partners:
         if not partner.marked:
-            owner_array.append(partner.idx)
+            owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
             raise MoleculeError('Atom %d in multiple molecules' % 
