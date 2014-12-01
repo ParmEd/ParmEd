@@ -1156,13 +1156,13 @@ class AmberParm(AmberFormat, Structure):
         data = self.parm_data
         data['POINTERS'][NATOM] = natom
         self.pointers['NATOM'] = natom
-        data['ATOM_NAME'] = [atom.name for atom in self.atoms]
-        data['AMBER_ATOM_TYPE'] = [atom.type for atom in self.atoms]
+        data['ATOM_NAME'] = [atom.name[:4] for atom in self.atoms]
+        data['AMBER_ATOM_TYPE'] = [atom.type[:4] for atom in self.atoms]
         data['CHARGE'] = [atom.charge for atom in self.atoms]
         data['MASS'] = [atom.mass for atom in self.atoms]
         data['ATOM_TYPE_INDEX'] = [atom.nb_idx for atom in self.atoms]
         data['JOIN_ARRAY'] = [atom.join for atom in self.atoms]
-        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree for atom in self.atoms]
+        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree[:4] for atom in self.atoms]
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
         data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
