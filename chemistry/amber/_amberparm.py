@@ -284,7 +284,6 @@ class AmberParm(AmberFormat, Structure):
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
-        inst.rediscover_molecules()
         inst._set_nonbonded_tables()
 
         return inst
@@ -555,6 +554,7 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 

@@ -271,6 +271,7 @@ class AmoebaParm(AmberParm):
         self._xfer_torsion_torsion_info()
         self._xfer_frame_info()
         self._xfer_exception_info()
+        self.rediscover_molecules()
 
     #=============================================
 

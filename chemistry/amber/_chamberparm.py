@@ -186,7 +186,6 @@ class ChamberParm(AmberParm):
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         inst.remake_parm()
-        inst.rediscover_molecules()
         inst._set_nonbonded_tables(nbfixes)
 
         return inst
