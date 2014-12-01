@@ -547,6 +547,7 @@ class AmberParm(AmberFormat, Structure):
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
         self.residues.prune()
+        self.rediscover_molecules()
 
         # Transfer information from the topology lists 
         self._xfer_atom_info()
@@ -554,7 +555,6 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
-        self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
