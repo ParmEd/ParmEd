@@ -622,18 +622,18 @@ class AmberParm(AmberFormat, Structure):
 
         owner = set_molecules(self)
         ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
-                'CIO','MG2']
+                'CIO','MG2', 'SOD', 'CLA', 'POT', 'CAL']
         indices = []
-        for res in type(self).solvent_residues:
-            try:
-                indices.append(self.parm_data['RESIDUE_LABEL'].index(res))
-            except ValueError:
-                pass
+        for res in self.residues:
+            if res.name in type(self).solvent_residues:
+                indices.append(res.idx)
+                break
         # Add ions to list of solvent if necessary
         if not solute_ions:
-            for ion in ions:
-                if ion in self.parm_data['RESIDUE_LABEL']:
-                    indices.append(self.parm_data['RESIDUE_LABEL'].index(ion))
+            for res in self.residues:
+                if res.name in ions:
+                    indices.append(res.idx)
+                    break
         # If we have no water, we do not have a molecules section!
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
@@ -649,14 +649,15 @@ class AmberParm(AmberFormat, Structure):
             return None
         # Now remake our SOLVENT_POINTERS and ATOMS_PER_MOLECULE section
         self.parm_data['SOLVENT_POINTERS'] = [min(indices), len(owner), 0]
-        first_solvent = self.parm_data['RESIDUE_POINTER'][min(indices)]
+        first_solvent = self.residues[min(indices)].atoms[0].idx
         # Find the first solvent molecule
         for i, mol in enumerate(owner):
             if first_solvent-1 == mol[0]:
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
         else: # this else belongs to 'for', not 'if'
-            raise MoleculeError('Could not find first solvent atom!')
+            warn('Could not find first solvent atom. Set to 0', MoleculeWarning)
+            self.parm_data['SOLVENT_POINTERS'][2] = 0
 
         # Now set up ATOMS_PER_MOLECULE and catch any errors
         self.parm_data['ATOMS_PER_MOLECULE'] = [len(mol) for mol in owner]
