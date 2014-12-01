@@ -1661,7 +1661,7 @@ def set_molecules(parm):
     # could raise a recursion depth exceeded exception during a _Type/Atom/XList
     # creation. Therefore, set the recursion limit to the greater of the current
     # limit or the number of atoms
-    setrecursionlimit(max(parm.ptr('natom'), getrecursionlimit()))
+    setrecursionlimit(max(len(parm.atoms), getrecursionlimit()))
 
     # Unmark all atoms so we can track which molecule each goes into
     parm.atoms.unmark()
@@ -1676,11 +1676,11 @@ def set_molecules(parm):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in xrange(parm.ptr('natom')):
+    for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)
-        if not parm.atoms[i].marked:
+        if not atom.marked:
             tmp = [i]
             _set_owner(parm, tmp, i, molecule_number)
             # Make sure the atom indexes are sorted

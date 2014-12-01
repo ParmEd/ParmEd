@@ -403,10 +403,10 @@ class changeradii(Action):
         # zeroed array, since it's all about to be set here
         if not 'RADII' in self.parm.flag_list:
             self.parm.add_flag('RADII', '5E16.8',
-                               num_items=self.parm.ptr('natom'))
+                               num_items=len(self.parm.atoms))
         if not 'SCREEN' in self.parm.flag_list:
             self.parm.add_flag('SCREEN', '5E16.8',
-                               num_items=self.parm.ptr('natom'))
+                               num_items=len(self.parm.atoms))
         ChRad(self.parm, self.radii)
         self.parm.load_atom_info()
 
@@ -744,7 +744,7 @@ class printljtypes(Action):
         if self.mask:
             selection = self.mask.Selection()
         elif self.type_list:
-            selection = [0 for i in xrange(self.parm.ptr('natom'))]
+            selection = [0 for atom in self.parm.atoms]
             for item in self.type_list:
                 selection[item-1] = 1
         else:
@@ -1641,7 +1641,7 @@ class addatomicnumber(Action):
     def execute(self):
         if self.present: return
         self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                           num_items=self.parm.ptr('natom'))
+                           num_items=len(self.parm.atoms))
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
 
@@ -1854,7 +1854,7 @@ class timerge(Action):
         molsel1 = self.molmask1.Selection()
         molsel2 = self.molmask2.Selection()
 
-        natom = self.parm.ptr('natom')
+        natom = len(self.parm.atoms)
 
         if self.molmask1N is not None:
             molsel1N = self.molmask1N.Selection()
@@ -2363,7 +2363,7 @@ class interpolate(Action):
     def _check_parms(self):
         """ Makes sure that the atoms in both parms are all the same """
         parm1, parm2 = self.parm, self.parm2
-        if parm1.ptr('natom') != parm2.ptr('natom'):
+        if len(parm1.atoms) != len(parm2.atoms):
             raise IncompatibleParmsError('%s and %s have different #s of '
                                          'atoms!' % (parm1, parm2))
         ndiff = 0
@@ -2457,7 +2457,7 @@ class summary(Action):
                   'Number of atoms:       %d\n'
                   'Number of residues:    %d\n' %
                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
-                   self.parm.ptr('natom'), self.parm.ptr('nres'))
+                   len(self.parm.atoms), len(self.parm.residues))
         )
 
         if self.parm.ptr('IFBOX') == 1:
@@ -2592,12 +2592,12 @@ class addpdb(Action):
         from chemistry import read_PDB
         if self.pdbpresent: return
         pdb = read_PDB(self.pdbfile)
-        resnums = [0 for i in xrange(self.parm.ptr('nres'))]
-        chainids = ['*' for i in xrange(self.parm.ptr('nres'))]
-        icodes = ['' for i in xrange(self.parm.ptr('nres'))]
-        tempfac = [0.0 for i in xrange(self.parm.ptr('natom'))]
-        occupancies = [0.0 for i in xrange(self.parm.ptr('natom'))]
-        atomnums = [-1 for i in xrange(self.parm.ptr('natom'))]
+        resnums = [0 for res in self.parm.residues]
+        chainids = ['*' for res in self.parm.residues]
+        icodes = ['' for res in self.parm.residues]
+        tempfac = [0.0 for atom in self.parm.atoms]
+        occupancies = [0.0 for atom in self.parm.atoms]
+        atomnums = [-1 for atom in self.parm.atoms]
         for i, res in enumerate(pdb.residues):
             parmres = self.parm.residues[i]
             try:
