@@ -681,8 +681,10 @@ class AmberParm(AmberFormat, Structure):
                 molid = res.atoms[0].marked
                 for atom in res:
                     if molid != atom.marked:
-                        raise MoleculeError('Residues cannot be part of 2 '
-                                    'molecules!')
+                        warn('Residues cannot be part of 2 molecules! Molecule '
+                             'section will not be correctly set.',
+                             MoleculeWarning)
+                        return None
             new_atoms = AtomList()
             for mol in owner:
                 for idx in mol:
