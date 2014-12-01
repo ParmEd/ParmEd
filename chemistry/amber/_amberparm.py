@@ -554,7 +554,6 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
-        self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
@@ -607,7 +606,6 @@ class AmberParm(AmberFormat, Structure):
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
                 if np is not None:
                     self.vels = np.asarray(self.vels)
-        if self.ptr('IFBOX'): self.rediscover_molecules()
 
     #===================================================
 
@@ -675,6 +673,13 @@ class AmberParm(AmberFormat, Structure):
             # Non-contiguous molecules detected... time to fix (ugh!)
             warn('Molecule atoms are not contiguous! I am attempting to '
                  'reorder the atoms to fix this.', MoleculeWarning)
+            # Make sure that no residues are split up by this
+            for res in self.residues:
+                molid = res.atoms[0].marked
+                for atom in res:
+                    if molid != atom.marked:
+                        raise MoleculeError('Residues cannot be part of 2 '
+                                    'molecules!')
             new_atoms = AtomList()
             for mol in owner:
                 for idx in mol:
@@ -1433,7 +1438,6 @@ class AmberParm(AmberFormat, Structure):
         # Remake the topology file if it's changed
         if self.is_changed():
             self.remake_parm()
-            if self.ptr('ifbox'): self.rediscover_molecules()
             self.load_structure()
 
         all_bonds = []        # bond array in Molecule format
