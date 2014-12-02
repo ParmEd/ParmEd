@@ -652,7 +652,7 @@ class AmberParm(AmberFormat, Structure):
         first_solvent = self.residues[min(indices)].atoms[0].idx
         # Find the first solvent molecule
         for i, mol in enumerate(owner):
-            if first_solvent-1 in mol: # mol is a set, so it is efficient
+            if first_solvent in mol: # mol is a set, so it is efficient
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
         else: # this else belongs to 'for', not 'if'
