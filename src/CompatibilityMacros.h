@@ -10,6 +10,7 @@ int PyObject_IS_STRING(PyObject *chk) {
 // String handling is entirely unicode now
 #   define PyString_Size PyUnicode_GET_LENGTH
 #   define PyString_AsString PyUnicode_AsUTF8
+#   define PyString_FromString PyUnicode_FromString
 
 #   define PY_DESTROY_TYPE Py_TYPE(self)->tp_free((PyObject *)self)
 
