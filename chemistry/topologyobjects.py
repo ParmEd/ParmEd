@@ -3224,7 +3224,7 @@ class AtomType(object):
     >>> at2 = AtomType('CA', 2, 12.01, 6)
     >>> at2.name, at2.number
     ('CA', 2)
-    >>> print "%s: %d" % (str(at), int(at))
+    >>> print("%s: %d" % (str(at), int(at)))
     HA: 1
     """
 

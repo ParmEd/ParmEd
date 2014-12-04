@@ -1434,6 +1434,8 @@ class setbond(Action):
             # Otherwise, it doesn't exist, so we just create a new one
             else:
                 self.parm.bonds.append(Bond(atm1, atm2, new_bnd_typ))
+        # Make sure we update 1-4 exception handling if we created any rings
+        self.parm.update_dihedral_exclusions()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1514,6 +1516,8 @@ class setangle(Action):
             # If not found, create a new angle
             if not found:
                 self.parm.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
+        # Make sure we update 1-4 exception handling if we created any rings
+        self.parm.update_dihedral_exclusions()
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1525,14 +1529,12 @@ class adddihedral(Action):
     instance, a dihedral will be placed around atom1 in mask 1, atom1 in mask 2,
     atom1 in mask 3, and atom1 in mask 4.  A second dihedral will be placed
     around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in
-    mask4. dihed_type can either be "normal", "multiterm", or "improper". Note
-    for ring systems of 6 or fewer atoms, you'll need to use "multiterm" to
-    avoid double-counting 1-4 interactions for some of the dihedrals.  <phi_k>
-    is the barrier height of the dihedral term, <per> is the periodicity,
-    <phase> is the phase offset, <scee> is the 1-4 EEL scaling factor for this
-    dihedral (default for AMBER is 1.2, default for GLYCAM is 1.0), and <scnb>
-    is the 1-4 VDW scaling factor for this dihedral (default for AMBER is 2.0,
-    default for GLYCAM is 1.0)
+    mask4. dihed_type can either be "normal" or "improper". <phi_k> is the
+    barrier height of the dihedral term, <per> is the periodicity, <phase> is
+    the phase offset, <scee> is the 1-4 EEL scaling factor for this dihedral
+    (default for AMBER is 1.2, default for GLYCAM is 1.0), and <scnb> is the 1-4
+    VDW scaling factor for this dihedral (default for AMBER is 2.0, default for
+    GLYCAM is 1.0)
     """
     supported_classes = ('AmberParm', 'ChamberParm')
 
@@ -1549,16 +1551,12 @@ class adddihedral(Action):
         dihed_type = arg_list.get_key_string('type', 'normal')
         if dihed_type.lower() == 'normal'[:len(dihed_type)]:
             self.improper = False
-            self.multiterm = False
             self.type = 'a normal'
         elif dihed_type.lower() == 'improper'[:len(dihed_type)]:
             self.improper = True
-            self.multiterm = True
             self.type = 'an improper'
-        elif dihed_type.lower() == 'multiterm'[:len(dihed_type)]:
-            self.improper = False
-            self.multiterm = True
-            self.type = 'a multiterm'
+        else:
+            raise InputError('addDihedral: type must be "normal" or "improper"')
    
     def __str__(self):
         return ('Set %s dihedral between %s, %s, %s, and %s with phi_k = %f '
@@ -1613,9 +1611,13 @@ class adddihedral(Action):
             if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or
                 atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
                 raise SetParamError('addDihedral: Duplicate atoms found!')
+            # Determine if end-group interactions need to be ignored
+            ignore_end = (atm1 in atm4.bond_partners or
+                          atm1 in atm4.angle_partners or
+                          atm1 in atm4.dihedral_partners)
             self.parm.dihedrals.append(
                     Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
-                             ignore_end=self.multiterm, type=new_dih_typ)
+                             ignore_end=ignore_end, type=new_dih_typ)
             )
         self.parm.remake_parm()
 
@@ -1724,7 +1726,9 @@ class deletedihedral(Action):
         deleting_dihedrals.sort()
         # deleting_dihedrals now contains all of our dihedral indexes
         while deleting_dihedrals:
-            del self.parm.dihedrals[deleting_dihedrals.pop()]
+            idx = deleting_dihedrals.pop()
+            self.parm.dihedrals[idx].delete()
+            del self.parm.dihedrals[idx]
         self.parm.remake_parm()
         return total_diheds
 
