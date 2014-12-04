@@ -403,10 +403,10 @@ class changeradii(Action):
         # zeroed array, since it's all about to be set here
         if not 'RADII' in self.parm.flag_list:
             self.parm.add_flag('RADII', '5E16.8',
-                               num_items=self.parm.ptr('natom'))
+                               num_items=len(self.parm.atoms))
         if not 'SCREEN' in self.parm.flag_list:
             self.parm.add_flag('SCREEN', '5E16.8',
-                               num_items=self.parm.ptr('natom'))
+                               num_items=len(self.parm.atoms))
         ChRad(self.parm, self.radii)
         self.parm.load_atom_info()
 
@@ -744,7 +744,7 @@ class printljtypes(Action):
         if self.mask:
             selection = self.mask.Selection()
         elif self.type_list:
-            selection = [0 for i in xrange(self.parm.ptr('natom'))]
+            selection = [0 for atom in self.parm.atoms]
             for item in self.type_list:
                 selection[item-1] = 1
         else:
@@ -1434,6 +1434,8 @@ class setbond(Action):
             # Otherwise, it doesn't exist, so we just create a new one
             else:
                 self.parm.bonds.append(Bond(atm1, atm2, new_bnd_typ))
+        # Make sure we update 1-4 exception handling if we created any rings
+        self.parm.update_dihedral_exclusions()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1514,6 +1516,8 @@ class setangle(Action):
             # If not found, create a new angle
             if not found:
                 self.parm.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
+        # Make sure we update 1-4 exception handling if we created any rings
+        self.parm.update_dihedral_exclusions()
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1525,14 +1529,12 @@ class adddihedral(Action):
     instance, a dihedral will be placed around atom1 in mask 1, atom1 in mask 2,
     atom1 in mask 3, and atom1 in mask 4.  A second dihedral will be placed
     around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in
-    mask4. dihed_type can either be "normal", "multiterm", or "improper". Note
-    for ring systems of 6 or fewer atoms, you'll need to use "multiterm" to
-    avoid double-counting 1-4 interactions for some of the dihedrals.  <phi_k>
-    is the barrier height of the dihedral term, <per> is the periodicity,
-    <phase> is the phase offset, <scee> is the 1-4 EEL scaling factor for this
-    dihedral (default for AMBER is 1.2, default for GLYCAM is 1.0), and <scnb>
-    is the 1-4 VDW scaling factor for this dihedral (default for AMBER is 2.0,
-    default for GLYCAM is 1.0)
+    mask4. dihed_type can either be "normal" or "improper". <phi_k> is the
+    barrier height of the dihedral term, <per> is the periodicity, <phase> is
+    the phase offset, <scee> is the 1-4 EEL scaling factor for this dihedral
+    (default for AMBER is 1.2, default for GLYCAM is 1.0), and <scnb> is the 1-4
+    VDW scaling factor for this dihedral (default for AMBER is 2.0, default for
+    GLYCAM is 1.0)
     """
     supported_classes = ('AmberParm', 'ChamberParm')
 
@@ -1549,16 +1551,12 @@ class adddihedral(Action):
         dihed_type = arg_list.get_key_string('type', 'normal')
         if dihed_type.lower() == 'normal'[:len(dihed_type)]:
             self.improper = False
-            self.multiterm = False
             self.type = 'a normal'
         elif dihed_type.lower() == 'improper'[:len(dihed_type)]:
             self.improper = True
-            self.multiterm = True
             self.type = 'an improper'
-        elif dihed_type.lower() == 'multiterm'[:len(dihed_type)]:
-            self.improper = False
-            self.multiterm = True
-            self.type = 'a multiterm'
+        else:
+            raise InputError('addDihedral: type must be "normal" or "improper"')
    
     def __str__(self):
         return ('Set %s dihedral between %s, %s, %s, and %s with phi_k = %f '
@@ -1613,9 +1611,13 @@ class adddihedral(Action):
             if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or
                 atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
                 raise SetParamError('addDihedral: Duplicate atoms found!')
+            # Determine if end-group interactions need to be ignored
+            ignore_end = (atm1 in atm4.bond_partners or
+                          atm1 in atm4.angle_partners or
+                          atm1 in atm4.dihedral_partners)
             self.parm.dihedrals.append(
                     Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
-                             ignore_end=self.multiterm, type=new_dih_typ)
+                             ignore_end=ignore_end, type=new_dih_typ)
             )
         self.parm.remake_parm()
 
@@ -1641,7 +1643,7 @@ class addatomicnumber(Action):
     def execute(self):
         if self.present: return
         self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                           num_items=self.parm.ptr('natom'))
+                           num_items=len(self.parm.atoms))
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
 
@@ -1724,7 +1726,9 @@ class deletedihedral(Action):
         deleting_dihedrals.sort()
         # deleting_dihedrals now contains all of our dihedral indexes
         while deleting_dihedrals:
-            del self.parm.dihedrals[deleting_dihedrals.pop()]
+            idx = deleting_dihedrals.pop()
+            self.parm.dihedrals[idx].delete()
+            del self.parm.dihedrals[idx]
         self.parm.remake_parm()
         return total_diheds
 
@@ -1854,7 +1858,7 @@ class timerge(Action):
         molsel1 = self.molmask1.Selection()
         molsel2 = self.molmask2.Selection()
 
-        natom = self.parm.ptr('natom')
+        natom = len(self.parm.atoms)
 
         if self.molmask1N is not None:
             molsel1N = self.molmask1N.Selection()
@@ -2363,7 +2367,7 @@ class interpolate(Action):
     def _check_parms(self):
         """ Makes sure that the atoms in both parms are all the same """
         parm1, parm2 = self.parm, self.parm2
-        if parm1.ptr('natom') != parm2.ptr('natom'):
+        if len(parm1.atoms) != len(parm2.atoms):
             raise IncompatibleParmsError('%s and %s have different #s of '
                                          'atoms!' % (parm1, parm2))
         ndiff = 0
@@ -2457,7 +2461,7 @@ class summary(Action):
                   'Number of atoms:       %d\n'
                   'Number of residues:    %d\n' %
                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
-                   self.parm.ptr('natom'), self.parm.ptr('nres'))
+                   len(self.parm.atoms), len(self.parm.residues))
         )
 
         if self.parm.ptr('IFBOX') == 1:
@@ -2592,12 +2596,12 @@ class addpdb(Action):
         from chemistry import read_PDB
         if self.pdbpresent: return
         pdb = read_PDB(self.pdbfile)
-        resnums = [0 for i in xrange(self.parm.ptr('nres'))]
-        chainids = ['*' for i in xrange(self.parm.ptr('nres'))]
-        icodes = ['' for i in xrange(self.parm.ptr('nres'))]
-        tempfac = [0.0 for i in xrange(self.parm.ptr('natom'))]
-        occupancies = [0.0 for i in xrange(self.parm.ptr('natom'))]
-        atomnums = [-1 for i in xrange(self.parm.ptr('natom'))]
+        resnums = [0 for res in self.parm.residues]
+        chainids = ['*' for res in self.parm.residues]
+        icodes = ['' for res in self.parm.residues]
+        tempfac = [0.0 for atom in self.parm.atoms]
+        occupancies = [0.0 for atom in self.parm.atoms]
+        atomnums = [-1 for atom in self.parm.atoms]
         for i, res in enumerate(pdb.residues):
             parmres = self.parm.residues[i]
             try:

@@ -547,6 +547,7 @@ class AmberParm(AmberFormat, Structure):
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
         self.residues.prune()
+        self.rediscover_molecules()
 
         # Transfer information from the topology lists 
         self._xfer_atom_info()
@@ -554,7 +555,6 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
-        self.rediscover_molecules()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
@@ -607,7 +607,6 @@ class AmberParm(AmberFormat, Structure):
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
                 if np is not None:
                     self.vels = np.asarray(self.vels)
-        if self.ptr('IFBOX'): self.rediscover_molecules()
 
     #===================================================
 
@@ -623,18 +622,18 @@ class AmberParm(AmberFormat, Structure):
 
         owner = set_molecules(self)
         ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
-                'CIO','MG2']
+                'CIO','MG2', 'SOD', 'CLA', 'POT', 'CAL']
         indices = []
-        for res in type(self).solvent_residues:
-            try:
-                indices.append(self.parm_data['RESIDUE_LABEL'].index(res))
-            except ValueError:
-                pass
+        for res in self.residues:
+            if res.name in type(self).solvent_residues:
+                indices.append(res.idx)
+                break
         # Add ions to list of solvent if necessary
         if not solute_ions:
-            for ion in ions:
-                if ion in self.parm_data['RESIDUE_LABEL']:
-                    indices.append(self.parm_data['RESIDUE_LABEL'].index(ion))
+            for res in self.residues:
+                if res.name in ions:
+                    indices.append(res.idx)
+                    break
         # If we have no water, we do not have a molecules section!
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
@@ -650,14 +649,15 @@ class AmberParm(AmberFormat, Structure):
             return None
         # Now remake our SOLVENT_POINTERS and ATOMS_PER_MOLECULE section
         self.parm_data['SOLVENT_POINTERS'] = [min(indices), len(owner), 0]
-        first_solvent = self.parm_data['RESIDUE_POINTER'][min(indices)]
+        first_solvent = self.residues[min(indices)].atoms[0].idx
         # Find the first solvent molecule
         for i, mol in enumerate(owner):
-            if first_solvent-1 == mol[0]:
+            if first_solvent in mol: # mol is a set, so it is efficient
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
         else: # this else belongs to 'for', not 'if'
-            raise MoleculeError('Could not find first solvent atom!')
+            warn('Could not find first solvent atom. Set to 0', MoleculeWarning)
+            self.parm_data['SOLVENT_POINTERS'][2] = 0
 
         # Now set up ATOMS_PER_MOLECULE and catch any errors
         self.parm_data['ATOMS_PER_MOLECULE'] = [len(mol) for mol in owner]
@@ -666,8 +666,9 @@ class AmberParm(AmberFormat, Structure):
         # re-order atoms if they're not
         try:
             for mol in owner:
-                for i in xrange(1, len(mol)):
-                    if mol[i] != mol[i-1] + 1:
+                sortedmol = sorted(list(mol))
+                for i in xrange(1, len(sortedmol)):
+                    if sortedmol[i] != sortedmol[i-1] + 1:
                         raise StopIteration()
         except StopIteration:
             if not fix_broken:
@@ -675,11 +676,24 @@ class AmberParm(AmberFormat, Structure):
             # Non-contiguous molecules detected... time to fix (ugh!)
             warn('Molecule atoms are not contiguous! I am attempting to '
                  'reorder the atoms to fix this.', MoleculeWarning)
+            # Make sure that no residues are split up by this
+            for res in self.residues:
+                molid = res.atoms[0].marked
+                for atom in res:
+                    if molid != atom.marked:
+                        warn('Residues cannot be part of 2 molecules! Molecule '
+                             'section will not be correctly set.',
+                             MoleculeWarning)
+                        return None
             new_atoms = AtomList()
             for mol in owner:
                 for idx in mol:
                     new_atoms.append(self.atoms[idx])
             self.atoms = new_atoms
+            # Re-sort our residues and residue list for new atom ordering
+            for residue in self.residues:
+                residue.sort()
+            self.residues.sort()
             return owner
 
         return None
@@ -1156,13 +1170,13 @@ class AmberParm(AmberFormat, Structure):
         data = self.parm_data
         data['POINTERS'][NATOM] = natom
         self.pointers['NATOM'] = natom
-        data['ATOM_NAME'] = [atom.name for atom in self.atoms]
-        data['AMBER_ATOM_TYPE'] = [atom.type for atom in self.atoms]
+        data['ATOM_NAME'] = [atom.name[:4] for atom in self.atoms]
+        data['AMBER_ATOM_TYPE'] = [atom.type[:4] for atom in self.atoms]
         data['CHARGE'] = [atom.charge for atom in self.atoms]
         data['MASS'] = [atom.mass for atom in self.atoms]
         data['ATOM_TYPE_INDEX'] = [atom.nb_idx for atom in self.atoms]
         data['JOIN_ARRAY'] = [atom.join for atom in self.atoms]
-        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree for atom in self.atoms]
+        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree[:4] for atom in self.atoms]
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
         data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
@@ -1388,7 +1402,7 @@ class AmberParm(AmberFormat, Structure):
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
         if self.box is not None:
-            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=0)
+            self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
             self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=0)
@@ -1433,7 +1447,6 @@ class AmberParm(AmberFormat, Structure):
         # Remake the topology file if it's changed
         if self.is_changed():
             self.remake_parm()
-            if self.ptr('ifbox'): self.rediscover_molecules()
             self.load_structure()
 
         all_bonds = []        # bond array in Molecule format
@@ -1652,7 +1665,7 @@ def set_molecules(parm):
     # could raise a recursion depth exceeded exception during a _Type/Atom/XList
     # creation. Therefore, set the recursion limit to the greater of the current
     # limit or the number of atoms
-    setrecursionlimit(max(parm.ptr('natom'), getrecursionlimit()))
+    setrecursionlimit(max(len(parm.atoms), getrecursionlimit()))
 
     # Unmark all atoms so we can track which molecule each goes into
     parm.atoms.unmark()
@@ -1667,15 +1680,15 @@ def set_molecules(parm):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in xrange(parm.ptr('natom')):
+    for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)
-        if not parm.atoms[i].marked:
-            tmp = [i]
+        if not atom.marked:
+            tmp = set()
+            tmp.add(i)
             _set_owner(parm, tmp, i, molecule_number)
             # Make sure the atom indexes are sorted
-            tmp.sort()
             owner.append(tmp)
             molecule_number += 1
     return owner
@@ -1687,7 +1700,7 @@ def _set_owner(parm, owner_array, atm, mol_id):
     parm.atoms[atm].marked = mol_id
     for partner in parm.atoms[atm].bond_partners:
         if not partner.marked:
-            owner_array.append(partner.idx)
+            owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
             raise MoleculeError('Atom %d in multiple molecules' % 

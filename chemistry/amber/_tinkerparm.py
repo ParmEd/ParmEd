@@ -256,6 +256,7 @@ class AmoebaParm(AmberParm):
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
         self.residues.prune()
+        self.rediscover_molecules()
 
         # Transfer information from the topology lists
         self._xfer_atom_info()

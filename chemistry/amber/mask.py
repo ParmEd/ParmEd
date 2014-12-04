@@ -49,7 +49,7 @@ class AmberMask(object):
 
         # 0) See if we got the default "all" mask(*) and return accordingly
         if self.mask.strip() == '*':
-            return [1 for i in xrange(self.parm.ptr('natom'))]
+            return [1 for atom in self.parm.atoms]
 
         # 1) preprocess input expression
         infix = AmberMask._tokenize(self, prnlev)
@@ -279,7 +279,7 @@ class AmberMask(object):
                         pmask2 = stack.pop()
                         pmask = self._selectDistd(pmask1, pmask2)
                     except IndexError:
-                        return [0 for i in xrange(self.parm.ptr('natom'))]
+                        return [0 for a in self.parm.atoms]
                     stack.append(pmask)
             elif p == '!':
                 try:
@@ -316,7 +316,7 @@ class AmberMask(object):
         # pmask1 is either @<number> or :<number>, and represents the distance
         # criteria. pmask2 is the selection of atoms from which the distance is
         # evaluated.
-        pmask = _mask(self.parm.ptr('natom'))
+        pmask = _mask(len(self.parm.atoms))
         # Determine if we want > or <
         if pmask1[0] == '<':
             cmp = float.__lt__
@@ -371,7 +371,7 @@ class AmberMask(object):
         TYPELIST = 3
         ELEMLIST = 4
         # define the mask object and empty buffer
-        pmask = _mask(self.parm.ptr('natom'))
+        pmask = _mask(len(self.parm.atoms))
         buffer = ''
         buffer_p = 0
         # This is a residue NUMber LIST
@@ -476,7 +476,7 @@ class AmberMask(object):
 
     #======================================================
 
-    def _atom_namelist(self, instring, mask, key='ATOM_NAME'):
+    def _atom_namelist(self, instring, mask, key='name'):
         """ Fills a _mask based on atom names/types """
         buffer = ''
         pos = 0
@@ -499,7 +499,7 @@ class AmberMask(object):
 
     def _atom_typelist(self, buffer, mask):
         """ Fills a _mask based on atom types """
-        self._atom_namelist(buffer, mask, key='AMBER_ATOM_TYPE')
+        self._atom_namelist(buffer, mask, key='type')
 
     #======================================================
 
@@ -508,7 +508,7 @@ class AmberMask(object):
         Fills a _mask based on atom elements. For now it will just be Atom
         names, since elements are not stored in the prmtop anywhere.
         """
-        self._atom_namelist(self, buffer, mask, key='ATOM_NAME')
+        self._atom_namelist(self, buffer, mask, key='name')
 
     #======================================================
 
@@ -570,19 +570,21 @@ class AmberMask(object):
    
     def _resnum_select(self, res1, res2, mask):
         """ Fills a _mask array between residues res1 and res2 """
-        for i in xrange(self.parm.ptr('natom')):
-            res = self.parm.atoms[i].residue.idx + 1
+        for i, atom in enumerate(self.parm.atoms):
+            res = atom.residue.idx + 1
             if res >= res1 and res <= res2: mask[i] = 1
 
     #======================================================
    
-    def _atname_select(self, atname, mask, key='ATOM_NAME'):
+    def _atname_select(self, atname, mask, key='name'):
         """ Fills a _mask array with all atom names of a given name """
-        for i in xrange(self.parm.ptr('natom')):
-            if _nameMatch(atname, self.parm.parm_data[key][i]):
-                mask[i] = 1
-            elif atname.isdigit():
-                mask[i] = int(int(atname) == i+1)
+        if atname.isdigit():
+            atname = int(atname) - 1
+            for i, atom in enumerate(self.parm.atoms):
+                mask[i] = int(atname == i)
+        else:
+            for i, atom in enumerate(self.parm.atoms):
+                mask[i] = int(_nameMatch(atname, getattr(atom, key)))
 
     #======================================================
    

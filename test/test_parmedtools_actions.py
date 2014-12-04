@@ -655,15 +655,35 @@ class TestAmberParmActions(unittest.TestCase):
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
-        self.assertEqual(n, 12)
+        NALA = sum([res.name == 'ALA' for res in parm.residues])
+        self.assertEqual(n, NALA)
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
-                       0.1556, 3, 0, 1.2, 2.0, type='multiterm').execute()
+                       0.1556, 3, 0, 1.2, 2.0).execute()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
+        num_dihedrals = 0
+        num_ignore_ends = 0
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA' and atom.name == 'N':
+                for dih in atom.dihedrals:
+                    if dih.atom1 is atom:
+                        if (dih.atom2.name == 'CA' and dih.atom3.name == 'CB'
+                            and dih.atom4.name == 'HB1'):
+                            num_dihedrals += 1
+                            if dih.ignore_end:
+                                num_ignore_ends += 1
+                    elif dih.atom4 is atom:
+                        if (dih.atom2.name == 'CB' and dih.atom3.name == 'CA' and
+                            dih.atom1.name == 'HB1'):
+                            num_dihedrals += 1
+                            if dih.ignore_end:
+                                num_ignore_ends += 1
+        self.assertEqual(num_dihedrals, 2*NALA)
+        self.assertEqual(num_ignore_ends, 1*NALA)
 
     def testSetBond(self):
         """ Test setBond on AmberParm """
@@ -1420,15 +1440,35 @@ class TestChamberParmActions(unittest.TestCase):
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
-        self.assertEqual(n, 3)
+        NALA = sum([res.name == 'ALA' for res in parm.residues])
+        self.assertEqual(n, NALA)
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
-                       0.1556, 3, 0, 1.2, 2.0, type='multiterm').execute()
+                       0.1556, 3, 0, 1.2, 2.0).execute()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
+        num_dihedrals = 0
+        num_ignore_ends = 0
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA' and atom.name == 'N':
+                for dih in atom.dihedrals:
+                    if dih.atom1 is atom:
+                        if (dih.atom2.name == 'CA' and dih.atom3.name == 'CB'
+                            and dih.atom4.name == 'HB1'):
+                            num_dihedrals += 1
+                            if dih.ignore_end:
+                                num_ignore_ends += 1
+                    elif dih.atom4 is atom:
+                        if (dih.atom2.name == 'CB' and dih.atom3.name == 'CA'
+                            and dih.atom1.name == 'HB1'):
+                            num_dihedrals += 1
+                            if dih.ignore_end:
+                                num_ignore_ends += 1
+        self.assertEqual(num_dihedrals, 2*NALA)
+        self.assertEqual(num_ignore_ends, 1*NALA)
 
     def testSetBond(self):
         """ Test setBond for ChamberParm """

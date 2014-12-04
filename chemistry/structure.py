@@ -480,6 +480,34 @@ class Structure(object):
 
     #===================================================
 
+    def update_dihedral_exclusions(self):
+        """
+        Nonbonded exclusions and exceptions have the following priority:
+
+        bond -> angle -> dihedral
+
+        Since bonds and angles are completely excluded, any ring systems in
+        which two atoms are attached by a bond or angle as well as a dihedral
+        should be completely excluded as the bond and angle exclusion rules take
+        precedence.  If a Bond or Angle was _added_ to the structure between a
+        pair of atoms previously connected only by a dihedral term, it's
+        possible that those two atoms have both an exclusion *and* an exception
+        defined. The result of this scenario is that sander and pmemd will
+        happily compute an energy, _including_ the 1-4 nonbonded terms between
+        atoms now connected by a bond or an Angle.  OpenMM, on the other hand,
+        will complain about an exception specified multiple times. This method
+        scans through all of the dihedrals in which `ignore_end` is `False` and
+        turns it to `True` if the two end atoms are in the bond or angle
+        partners arrays
+        """
+        for dihedral in self.dihedrals:
+            if not dihedral.ignore_end: continue
+            if (dihedral.atom1 in dihedral.atom4.bond_partners or
+                dihedral.atom1 in dihedral.atom4.angle_partners):
+                dihedral.ignore_end = True
+
+    #===================================================
+
     def _prune_empty_bonds(self):
         """ Gets rid of any empty bonds """
         for i in reversed(xrange(len(self.bonds))):

@@ -40,7 +40,8 @@ if __name__ == '__main__':
         # want to preserve has_key everywhere it appears.
         from distutils.util import Mixin2to3
         from lib2to3.refactor import get_fixers_from_package as get_fixers
-        fixers = [x for x in get_fixers('lib2to3.fixes') if not 'has_key' in x]
+        fixers = [x for x in get_fixers('lib2to3.fixes')
+                    if not 'has_key' in x and not 'itertools_imports' in x]
         Mixin2to3.fixer_names = fixers
 
     setup(name='ParmEd',

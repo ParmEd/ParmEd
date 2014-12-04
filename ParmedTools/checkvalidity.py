@@ -203,7 +203,7 @@ def check_validity(parm, warnings):
                           'disulfide bond?', MissingDisulfide)
             break
 
-    if hasattr(parm, 'coords'):
+    if parm.coords is not None:
         # Check if we think any disulfide bonds might be missing.
         mask = AmberMask(parm, ':CYS,CYM@SG')
         s_atms = []
