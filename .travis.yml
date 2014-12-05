@@ -5,6 +5,7 @@ python:
 before_install:
     - sudo apt-get install libhdf5-serial-dev
     - sudo apt-get install libnetcdf-dev
+    - sudo apt-get install libblas-dev liblapack-dev libatlas-dev
 install:
     - pip install -r requirements.txt
     - python setup.py install
