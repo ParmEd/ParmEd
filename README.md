@@ -3,9 +3,14 @@ ParmEd
 
 Amber parameter topology file editor
 
+Build Status
+============
+
+[![Linux Build Status](https://travis-ci.org/swails/ParmEd.png?branch=master)](https://travis-ci.org/swails/ParmEd)
+
 License
 =======
-                    LESSER GPL LICENSE INFO                             
+                    LESSER GPL LICENSE INFO
 
 Copyright (C) 2010 - 2014 Jason Swails
 
@@ -43,35 +48,24 @@ OpenMM support so that it is able to directly create an OpenMM System instance
 with a call signature almost identical to the one provided in the OpenMM
 application layer. Improvements implemented here include:
 
-  o  Periodic box information is set up from the input coordinate file rather
-     than the parameter-topology file, since that is where the 'preferred' box
-     information is stored in Amber
-  
-  o  The parameter topology file class can read in both a topology file and a
-     coordinate file at the same time (this is required to set the default box
-     information from the inpcrd file)
-  
-  o  The restart file class/parser is capable of reading both Amber restarts as
-     well as Amber NetCDF restart files, with the format detected automatically
-  
-  o  In many cases, System creation is noticeably faster with this class for
-     large systems.
+- Periodic box information is set up from the input coordinate file rather than the parameter-topology file, since that is where the 'preferred' box information is stored in Amber
+
+- The parameter topology file class can read in both a topology file and a coordinate file at the same time (this is required to set the default box information from the inpcrd file)
+
+- The restart file class/parser is capable of reading both Amber restarts as well as Amber NetCDF restart files, with the format detected automatically
+
+- In many cases, System creation is noticeably faster with this class for large systems.
 
 Also included are a handful of OpenMM reporters in the
 chemistry.amber.openmmreporters module, including:
 
-  o  AmberStateDataReporter - Basically copied from StateDataReporter, but
-       prints out data in standard Amber units (and provides options in the call
-       signature to specify the set of units you want to use)
+- `AmberStateDataReporter` - Prints state data in standard Amber units (and provides options in the call signature to specify the set of units you want to use)
   
-  o  RestartReporter - Allows Amber-style ASCII or NetCDF restart files to be
-       written periodically during a simulation. It can either write a series of
-       numbered restarts or continually overwrite the previous one. Fully
-       compatible with all Amber programs.
+- `RestartReporter` - Allows Amber-style ASCII or NetCDF restart files to be written periodically during a simulation. It can either write a series of numbered restarts or continually overwrite the previous one. Fully compatible with all Amber programs.
   
-  o  MdcrdReporter - Allows Amber-style ASCII trajectory files to be written
+- `MdcrdReporter` - Allows Amber-style ASCII trajectory files to be written
   
-  o  NetCDFReporter - Allows Amber-style NetCDF trajectories to be written
+- `NetCDFReporter` - Allows Amber-style NetCDF trajectories to be written
 
 The principle difference between the NetCDF support included here and that
 included in MDTraj is that the NetCDF parsing here is backend agnostic,
