@@ -1,0 +1,4 @@
+numpy
+scipy
+netCDF4
+ScientificPython
