@@ -11,6 +11,7 @@ python:
     - "3.3"
     - "3.4"
 before_install:
+    - pip install virtualenv
     - pip install numpy
     - pip install scipy
     - pip install ScientificPython
