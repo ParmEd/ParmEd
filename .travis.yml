@@ -2,13 +2,9 @@ language: Python
 python:
     - "2.7"
     - "3.4"
-
-#install:
-#    - pip install numpy
-#    - pip install scipy
-#    - pip install ScientificPython
-#    - pip install netCDF4
-#    - python setup.py install
+install:
+    - pip install -r requirements.txt
+    - python setup.py install
 script:
     - cd test
     - nosetests -vs .
