@@ -559,12 +559,21 @@ class CharmmParameterSet(object):
                 self.read_parameter_file(section)
             title, section = f.next_section()
 
-    def condense(self):
+    def condense(self, do_dihedrals=True):
         """
         This function goes through each of the parameter type dicts and
         eliminates duplicate types. After calling this function, every unique
         bond, angle, dihedral, improper, or cmap type will pair with EVERY key
         in the type mapping dictionaries that points to the equivalent type
+
+        Parameters
+        ----------
+        do_dihedrals : bool=True
+            Dihedrals can take the longest time to compress since testing their
+            equality takes the longest (this is complicated by the existence of
+            multi-term torsions). This flag will allow you to *skip* condensing
+            the dihedral parameter types (for large parameter sets, this can cut
+            the compression time in half)
 
         Returns
         -------
@@ -585,23 +594,9 @@ class CharmmParameterSet(object):
         self._condense_types(self.bond_types)
         self._condense_types(self.angle_types)
         self._condense_types(self.urey_bradley_types)
-        self._condense_types(self.dihedral_types)
+        if do_dihedrals: self._condense_types(self.dihedral_types)
         self._condense_types(self.improper_types)
         self._condense_types(self.cmap_types)
-        # Dihedrals have to be handled separately, since each key corresponds to
-        # a list of (potentially multiterm) dihedral terms. Since all terms in a
-        # multiterm dihedral have to have a DIFFERENT periodicity, we don't have
-        # to condense _within_ a single list of torsions assigned to the same
-        # key (they're guaranteed to be different)
-        keylist = self.dihedral_types.keys()
-        for i in xrange(len(keylist) - 1):
-            key1 = keylist[i]
-            for dihedral in self.dihedral_types[key1]:
-                for j in xrange(i+1, len(keylist)):
-                    key2 = keylist[j]
-                    for jj, dihedral2 in enumerate(self.dihedral_types[key2]):
-                        if dihedral2 == dihedral:
-                            self.dihedral_types[key2][jj] = dihedral
         return self
 
     @staticmethod
