@@ -787,9 +787,9 @@ def read_PDB(filename):
     try:
         for line in fileobj:
             try:
-                line = line.encode('ascii')
+                line = line.decode('ascii')
             except AttributeError:
-                # ssume this is a string in Py3 which doesn't have 'decode'
+                # Assume this is a string in Py3 which doesn't have 'decode'
                 pass
             rec = line[:6]
             if rec == 'ATOM  ' or rec == 'HETATM':
