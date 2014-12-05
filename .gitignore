@@ -3,3 +3,4 @@
 .*.sw[op]
 *~
 build
+a.out
