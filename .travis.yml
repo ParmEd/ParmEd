@@ -1,0 +1,21 @@
+language: Python
+# For the extensions
+compiler:
+    - gcc
+# Try many different Python versions
+python:
+    - "2.4"
+    - "2.5"
+    - "2.6"
+    - "2.7"
+    - "3.3"
+    - "3.4"
+before_install:
+    - pip install numpy
+    - pip install scipy
+    - pip install ScientificPython
+    - pip install netCDF4
+    - python setup.py install
+script:
+    - cd tests
+    - nosetests -vs .
