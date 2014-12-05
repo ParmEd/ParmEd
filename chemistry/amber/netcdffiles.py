@@ -80,6 +80,17 @@ except ImportError:
 HAS_NETCDF = (_HAS_NC4 or _HAS_SCIENTIFIC_PYTHON or 
               _HAS_PYNETCDF or _HAS_SCIPY_NETCDF)
 
+def _coerce_to_string(string, encoding='ascii'):
+    """
+    Decodes input to a string with the specified encoding if it is a bytes
+    object. Otherwise, it just returns the input string.
+    """
+    try:
+        return string.decode(encoding)
+    except AttributeError:
+        # Assume string
+        return string
+
 def use(package=None):
     """
     Selects the NetCDF package to use
@@ -336,12 +347,12 @@ class NetCDFRestart(object):
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
-        inst.Conventions = ncfile.Conventions.decode('ascii')
-        inst.ConventionVersion = ncfile.ConventionVersion.decode('ascii')
-        inst.application = ncfile.application.decode('ascii')
-        inst.program = ncfile.program.decode('ascii')
-        inst.programVersion = ncfile.programVersion.decode('ascii')
-        inst.title = ncfile.title.decode('ascii')
+        inst.Conventions = _coerce_to_string(ncfile.Conventions)
+        inst.ConventionVersion = _coerce_to_string(ncfile.ConventionVersion)
+        inst.application = _coerce_to_string(ncfile.application)
+        inst.program = _coerce_to_string(ncfile.program)
+        inst.programVersion = _coerce_to_string(ncfile.programVersion)
+        inst.title = _coerce_to_string(ncfile.title)
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
@@ -611,12 +622,12 @@ class NetCDFTraj(object):
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
-        inst.Conventions = ncfile.Conventions.decode('ascii')
-        inst.ConventionVersion = ncfile.ConventionVersion.decode('ascii')
-        inst.application = ncfile.application.decode('ascii')
-        inst.program = ncfile.program.decode('ascii')
-        inst.programVersion = ncfile.programVersion.decode('ascii')
-        inst.title = ncfile.title.decode('ascii')
+        inst.Conventions = _coerce_to_string(ncfile.Conventions)
+        inst.ConventionVersion = _coerce_to_string(ncfile.ConventionVersion)
+        inst.application = _coerce_to_string(ncfile.application)
+        inst.program = _coerce_to_string(ncfile.program)
+        inst.programVersion = _coerce_to_string(ncfile.programVersion)
+        inst.title = _coerce_to_string(ncfile.title)
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             setattr(inst, dim, get_int_dimension(ncfile, dim))
