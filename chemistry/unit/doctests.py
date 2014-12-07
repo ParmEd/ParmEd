@@ -1,5 +1,3 @@
-#!/bin/env python
-
 """
 Module simtk.unit.doctests
 
