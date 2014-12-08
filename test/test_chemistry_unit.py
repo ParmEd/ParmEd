@@ -682,3 +682,6 @@ class TestNumpyUnits(QuantityTestCase):
         self.assertAlmostEqualQuantities(a.std(), 2.8722813232690143*u.seconds)
         b = a.reshape((5, 2))
         self.assertTrue(u.is_quantity(b))
+
+if not has_numpy():
+    del TestNumpyUnits
