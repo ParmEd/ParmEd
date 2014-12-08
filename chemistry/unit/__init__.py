@@ -20,7 +20,6 @@ __email__ = "cmbruns@stanford.edu"
 # `chemistry.unit` package can be used interchangeably with OpenMM
 
 try:
-    import nomod
     from simtk.unit import *
 except ImportError:
     from chemistry.unit.unit import Unit, is_unit
