@@ -9,3 +9,4 @@ __author__ = 'Jason Swails'
 from chemistry import exceptions, periodic_table
 from chemistry.structure import Structure, read_PDB
 from chemistry.topologyobjects import *
+from chemistry import unit

@@ -5,8 +5,12 @@ import os
 from os.path import join, split, abspath
 import sys
 import unittest
+try:
+    import numpy
+except ImportError:
+    numpy = None
 
-# Patches for older Ambers.
+# Patches for older Pythons.
 
 if not hasattr(unittest.TestCase, 'assertIsInstance'):
     class TestCase(unittest.TestCase):
@@ -86,11 +90,7 @@ def has_pynetcdf():
         return False
 
 def has_numpy():
-    try:
-        import numpy as np
-        return True
-    except ImportError:
-        return False
+    return numpy is not None
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None):
