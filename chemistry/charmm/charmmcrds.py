@@ -47,51 +47,54 @@ class CharmmCrdFile(object):
     def _parse(self, fname):
 
         crdfile = open(fname, 'r')
-        line = crdfile.readline()
-
-        while len(line.strip()) == 0:      # Skip whitespace, as a precaution
-            line = crdfile.readline()
-
-        intitle = True
-
-        while intitle:
-            self.title.append(line.strip())
-            line = crdfile.readline()
-            if len(line.strip()) == 0:
-                intitle = False
-            elif line.strip()[0] != '*':
-                intitle = False
-            else: 
-                intitle = True
-
-        while len(line.strip()) == 0:      # Skip whitespace
-            line = crdfile.readline()
-        
         try:
-            self.natom = int(line.strip().split()[0])
+            line = crdfile.readline()
+
+            while len(line.strip()) == 0:   # Skip whitespace, as a precaution
+                line = crdfile.readline()
+
+            intitle = True
+
+            while intitle:
+                self.title.append(line.strip())
+                line = crdfile.readline()
+                if len(line.strip()) == 0:
+                    intitle = False
+                elif line.strip()[0] != '*':
+                    intitle = False
+                else: 
+                    intitle = True
+
+            while len(line.strip()) == 0:      # Skip whitespace
+                line = crdfile.readline()
             
-            for row in xrange(self.natom):
-                line = crdfile.readline().strip().split()
-                self.atomno.append(int(line[0]))
-                self.resno.append(int(line[1]))
-                self.resname.append(line[2])
-                self.attype.append(line[3])
-                self.coords.append(float(line[4]))
-                self.coords.append(float(line[5]))
-                self.coords.append(float(line[6]))
-                self.segid.append(line[7])
-                self.resid.append(int(line[8]))
-                self.weighting.append(float(line[9]))
+            try:
+                self.natom = int(line.strip().split()[0])
+                
+                for row in xrange(self.natom):
+                    line = crdfile.readline().strip().split()
+                    self.atomno.append(int(line[0]))
+                    self.resno.append(int(line[1]))
+                    self.resname.append(line[2])
+                    self.attype.append(line[3])
+                    self.coords.append(float(line[4]))
+                    self.coords.append(float(line[5]))
+                    self.coords.append(float(line[6]))
+                    self.segid.append(line[7])
+                    self.resid.append(int(line[8]))
+                    self.weighting.append(float(line[9]))
 
-            if 3*self.natom != len(self.coords):
-                raise CharmmFileError("Error parsing CHARMM .crd file: %d "
-                                      "atoms requires %d coords (not %d)" %
-                                      (self.natom, 3*self.natom,
-                                       len(self.coords))
-                )
+                if 3*self.natom != len(self.coords):
+                    raise CharmmFileError("Error parsing CHARMM .crd file: %d "
+                                          "atoms requires %d coords (not %d)" %
+                                          (self.natom, 3*self.natom,
+                                           len(self.coords))
+                    )
 
-        except (ValueError, IndexError):
-            raise CharmmFileError('Error parsing CHARMM coordinate file')
+            except (ValueError, IndexError):
+                raise CharmmFileError('Error parsing CHARMM coordinate file')
+        finally:
+            crdfile.close()
 
 class CharmmRstFile(object):
     """
@@ -136,50 +139,53 @@ class CharmmRstFile(object):
     def _parse(self, fname):
 
         crdfile = open(fname, 'r')
-        readingHeader = True 
+        try:
+            readingHeader = True 
 
-        while readingHeader:
-            line = crdfile.readline()
-            if not len(line):
-                raise CharmmFileError('Premature end of file')
-            line = line.strip()
-            words = line.split()
-            if len(line) != 0:  
-                if words[0] == 'ENERGIES' or words[0] == '!ENERGIES':
-                    readingHeader = False
+            while readingHeader:
+                line = crdfile.readline()
+                if not len(line):
+                    raise CharmmFileError('Premature end of file')
+                line = line.strip()
+                words = line.split()
+                if len(line) != 0:  
+                    if words[0] == 'ENERGIES' or words[0] == '!ENERGIES':
+                        readingHeader = False
+                    else:
+                        self.header.append(line.strip())
                 else:
                     self.header.append(line.strip())
-            else:
-                self.header.append(line.strip())
 
-        for row in xrange(len(self.header)):
-            if len(self.header[row].strip()) != 0:
-                line = self.header[row].strip().split()
-                if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
-                    try:
-                        line = self.header[row+1].strip().split()
-                        self.natom = int(line[0])     
-                        self.npriv = int(line[1])     # num. previous steps
-                        self.nstep = int(line[2])     # num. steps in file  
-                        self.nsavc = int(line[3])     # coord save frequency 
-                        self.nsavv = int(line[4])     # velocities "
-                        self.jhstrt = int(line[5])    # Num total steps?
-                        break
-                   
-                    except (ValueError, IndexError):
-                        raise CharmmFileError('Problem parsing CHARMM restart')
+            for row in xrange(len(self.header)):
+                if len(self.header[row].strip()) != 0:
+                    line = self.header[row].strip().split()
+                    if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
+                        try:
+                            line = self.header[row+1].strip().split()
+                            self.natom = int(line[0])     
+                            self.npriv = int(line[1])     # num. previous steps
+                            self.nstep = int(line[2])     # num. steps in file  
+                            self.nsavc = int(line[3])     # coord save frequency 
+                            self.nsavv = int(line[4])     # velocities "
+                            self.jhstrt = int(line[5])    # Num total steps?
+                            break
+                       
+                        except (ValueError, IndexError):
+                            raise CharmmFileError('Problem parsing CHARMM restart')
 
-        self.scan(crdfile, '!XOLD')
-        self._get_formatted_crds(crdfile, self.coordsold)
+            self.scan(crdfile, '!XOLD')
+            self._get_formatted_crds(crdfile, self.coordsold)
 
-        self.scan(crdfile, '!VX')
-        self._get_formatted_crds(crdfile, self.vels)
+            self.scan(crdfile, '!VX')
+            self._get_formatted_crds(crdfile, self.vels)
 
-        self.scan(crdfile, '!X')
-        self._get_formatted_crds(crdfile, self.coords)
+            self.scan(crdfile, '!X')
+            self._get_formatted_crds(crdfile, self.coords)
 
-        # Convert velocities to angstroms/ps
-        self.vels = [v * ONE_TIMESCALE for v in self.vels]
+            # Convert velocities to angstroms/ps
+            self.vels = [v * ONE_TIMESCALE for v in self.vels]
+        finally:
+            crdfile.close()
 
     def scan(self, handle, str, r=0): # read lines in file till 'str' is found
         scanning = True
