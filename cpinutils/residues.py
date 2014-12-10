@@ -5,7 +5,7 @@ titratable residue treated.
 """
 
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
-                       'DG', 'DT', 'AP', 'CP', 'G', 'U']
+                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'C','A','GG','UU']
 
 from cpinutils.exceptions import *
 from math import log
@@ -724,11 +724,12 @@ refene1 = _ReferenceEnergy(igb2=0, igb5=0)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
 refene1.dielc2.solvent_energies()
-refene2 = _ReferenceEnergy(igb2=14.8806, igb5=15.903)
-refene2.solvent_energies(igb2=15.471697)
+refene2 = _ReferenceEnergy(igb2=14.851840012, igb5=15.1166001033)
+refene2.solvent_energies(igb2=15.026098360790293,igb5=15.143651997474915)
+refene2.solvent_energies()
 refene2.dielc2_energies(igb2=6.953887, igb5=7.092043)
 refene2.dielc2.solvent_energies(igb2=7.544988)
-refene2.set_pKa(3.9, deprotonated=False)
+refene2.set_pKa(3.5, deprotonated=False)
 
 AP = TitratableResidue('AP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
@@ -747,17 +748,18 @@ AP.add_state(protcnt=1, refene=refene2, # protonated
              -0.5569, 0.1136, 0.5845, -0.8152, 0.4403, 0.4403, -0.5776, 0.4435,
              0.1307, -0.5201, 0.2681, 0.2022, 0.0615, 0.067, 0.0972, -0.6139,
              0.4186, -0.5246, 0.431])
+AP.check()
 
 # Cytosine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
 refene1.dielc2.solvent_energies()
-refene2 = _ReferenceEnergy(igb2=37.488, igb5=40.1407)
-refene2.solvent_energies()
+refene2 = _ReferenceEnergy(igb2=37.501800178, igb5=38.0081251132)
+refene2.solvent_energies(igb2=37.378544257354164, igb5=37.90444570773976)
 refene2.dielc2_energies(igb2=18.483513, igb5=19.016390)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(4.3, deprotonated=False)
+refene2.set_pKa(4.2, deprotonated=False)
 
 CP = TitratableResidue('CP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
@@ -776,14 +778,15 @@ CP.add_state(protcnt=2, refene=refene2, # protonated
              -0.4218, 0.2253, 0.6466, -0.8363, 0.4518, 0.4518, -0.4871, 0.5039,
              -0.4753, 0.2022, 0.0615, 0.067, 0.0972, -0.6139, 0.4186, -0.5246,
              0.4128])
+CP.check()
 
 # Guanine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
 refene1.dielc2.solvent_energies()
-refene2 = _ReferenceEnergy(igb2=-97.3187, igb5=-96.0454)
-refene2.solvent_energies(igb2=98.129740)
+refene2 = _ReferenceEnergy(igb2=-97.094725165, igb5=-96.0365352027)
+refene2.solvent_energies(igb2=-97.31657849010276, igb5=-95.95654436492156)
 refene2.dielc2_energies(igb2=-47.410980, igb5=-47.008233)
 refene2.dielc2.solvent_energies(igb2=-48.222021)
 refene2.set_pKa(9.2, deprotonated=True)
@@ -812,11 +815,11 @@ refene1 = _ReferenceEnergy(igb2=0, igb5=0)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
 refene1.dielc2.solvent_energies()
-refene2 = _ReferenceEnergy(igb2=-136.395, igb5=-134.883)
-refene2.solvent_energies()
+refene2 = _ReferenceEnergy(igb2=-136.326020191, igb5=-134.938275039)
+refene2.solvent_energies(igb2=-136.5653533428478, igb5=-135.06973320905044)
 refene2.dielc2_energies(igb2=-67.270690, igb5=-66.605330)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(9.3, deprotonated=True)
+refene2.set_pKa(9.2, deprotonated=True)
 
 U = TitratableResidue('U', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                       "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6', 'C5',
