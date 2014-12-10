@@ -39,12 +39,17 @@ except ImportError:
     has_openmm = False
 
 from chemistry.charmm.parameters import CharmmParameterSet
+from chemistry.exceptions import CharmmPSFWarning
 from copy import copy
 from math import sqrt
 import unittest
+import warnings
 import utils
     
 get_fn = utils.get_fn
+
+# Suppress warning output from bad psf file... sigh.
+warnings.filterwarnings('ignore', category=CharmmPSFWarning)
 
 if has_openmm:
     # System
@@ -52,10 +57,14 @@ if has_openmm:
     charmm_gas_crds = PDBFile(get_fn('ala_ala_ala.pdb'))
     charmm_solv = CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
     charmm_solv_crds = CharmmCrdFile(get_fn('dhfr_min_charmm.crd'))
+    charmm_nbfix = CharmmPsfFile(get_fn('ala3_solv.psf'))
+    charmm_nbfix_crds = CharmmCrdFile(get_fn('ala3_solv.crd'))
 
     # Parameter sets
     param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
                                  get_fn('par_all22_prot.inp'))
+    param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                 get_fn('toppar_water_ions.str'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -68,9 +77,12 @@ if has_openmm:
 class TestCharmmFiles(unittest.TestCase):
 
     def setUp(self):
-        if not hasattr(charmm_solv, 'box') or charmm_solv.box is None:
+        if charmm_solv.box is None:
             charmm_solv.setBox(95.387*u.angstrom, 80.381*u.angstrom,
                                80.225*u.angstrom)
+        if charmm_nbfix.box is None:
+            charmm_nbfix.setBox(3.271195e1*u.angstrom, 3.299596e1*u.angstrom,
+                                3.300715e1*u.angstrom)
 
     def assertRelativeEqual(self, val1, val2, places=7):
         if val1 == val2: return
@@ -284,6 +296,23 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertRelativeEqual(energies['improper'], 14.2418054, places=5)
         self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
         self.assertRelativeEqual(energies['nonbond'], -240681.958902, places=5)
+
+    def testNBFIX(self):
+        """ Test energies of systems with NBFIX modifications """
+        parm = charmm_nbfix
+        system = parm.createSystem(param36, nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(charmm_nbfix_crds.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
+        self.assertAlmostEqual(energies['angle'], 1.06880188, places=4)
+        self.assertAlmostEqual(energies['urey'], 0.06142407, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143025, places=4)
+        self.assertAlmostEqual(energies['improper'], 0, places=4)
+        self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
+        self.assertAlmostEqual(energies['nonbond'], 6514.283116, places=3)
 
 if has_openmm:
     def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
