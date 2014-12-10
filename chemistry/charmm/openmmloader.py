@@ -526,7 +526,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
             num_lj_types = 0
             lj_type_list = []
             for i, atom in enumerate(self.atoms):
-                atom = atom.type
+                atom = atom.atom_type
                 if lj_idx_list[i]: continue # already assigned
                 num_lj_types += 1
                 lj_idx_list[i] = num_lj_types
@@ -535,7 +535,7 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
                 lj_radii.append(atom.rmin)
                 lj_depths.append(atom.epsilon)
                 for j in xrange(i+1, len(self.atoms)):
-                    atom2 = self.atoms[j].type
+                    atom2 = self.atoms[j].atom_type
                     if lj_idx_list[j] > 0: continue # already assigned
                     if atom2 is atom:
                         lj_idx_list[j] = num_lj_types
