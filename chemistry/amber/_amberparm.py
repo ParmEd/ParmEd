@@ -687,7 +687,7 @@ class AmberParm(AmberFormat, Structure):
                         return None
             new_atoms = AtomList()
             for mol in owner:
-                for idx in mol:
+                for idx in sorted(mol):
                     new_atoms.append(self.atoms[idx])
             self.atoms = new_atoms
             # Re-sort our residues and residue list for new atom ordering

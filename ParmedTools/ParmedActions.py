@@ -1619,7 +1619,6 @@ class adddihedral(Action):
                     Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
                              ignore_end=ignore_end, type=new_dih_typ)
             )
-        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1729,7 +1728,6 @@ class deletedihedral(Action):
             idx = deleting_dihedrals.pop()
             self.parm.dihedrals[idx].delete()
             del self.parm.dihedrals[idx]
-        self.parm.remake_parm()
         return total_diheds
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3100,7 +3098,6 @@ class deletebond(Action):
         for oopbend in self.del_oopbends: oopbend.delete()
         for tortor in self.del_tortors: tortor.delete()
         for strbnd in self.del_strbnds: strbnd.delete()
-        # If we had anything to do, remake the parm
         self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
