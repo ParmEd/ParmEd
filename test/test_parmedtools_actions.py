@@ -667,16 +667,19 @@ class TestAmberParmActions(unittest.TestCase):
         """ Test addDihedral and deleteDihedral on AmberParm """
         parm = copy(gasparm)
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
         NALA = sum([res.name == 'ALA' for res in parm.residues])
         self.assertEqual(n, NALA)
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 3, 0, 1.2, 2.0).execute()
+        parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
+        parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
         num_dihedrals = 0
@@ -1452,16 +1455,19 @@ class TestChamberParmActions(unittest.TestCase):
         """ Test the addDihedral and deleteDihedral actions for ChamberParm """
         parm = copy(gascham)
         n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        parm.remake_parm()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
         NALA = sum([res.name == 'ALA' for res in parm.residues])
         self.assertEqual(n, NALA)
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 3, 0, 1.2, 2.0).execute()
+        parm.remake_parm()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
         PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
                        0.1556, 1, 0, 1.2, 2.0, type='normal').execute()
+        parm.remake_parm()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') - n)
         num_dihedrals = 0
@@ -1960,7 +1966,7 @@ class TestAmoebaParmActions(unittest.TestCase):
                 PT.deleteDihedral(parm, '@1 @2 @3 @4').execute())
         self.assertRaises(exc.ParmError, lambda:
                 PT.addDihedral(parm, '@1 @2 @3 @4 0.1556 3 0 1.2 2.0',
-                               type='multiterm').execute()
+                               type='normal').execute()
         )
 
     def testSetBond(self):
