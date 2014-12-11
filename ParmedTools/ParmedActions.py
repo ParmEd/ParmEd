@@ -2990,10 +2990,6 @@ class deletebond(Action):
     atom comes from <mask2>. This action will also delete any other valence term
     (like angles and dihedrals) that would get severed by the deletion of one of
     the bonds.
-
-    When used through the API, the changes are not flushed to the actual data in
-    the prmtop unless you call remake_parm() on the object (this is done for
-    performance reasons)
     """
     supported_classes = ('AmberParm', 'ChamberParm', 'AmoebaParm')
 
@@ -3102,6 +3098,7 @@ class deletebond(Action):
         for oopbend in self.del_oopbends: oopbend.delete()
         for tortor in self.del_tortors: tortor.delete()
         for strbnd in self.del_strbnds: strbnd.delete()
+        self.parm.remake_parm()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
