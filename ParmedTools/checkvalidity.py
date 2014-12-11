@@ -100,9 +100,26 @@ def check_validity(parm, warnings):
         # See if we have any CMAP terms
         has_cmap = 'CHARMM_CMAP_COUNT' in parm.flag_list
         # Ugh, don't want short-circuiting, so have to do this...
-        hasallkeys = checkme('FORCE_FIELD_TYPE', 1, True, False, None, str)
-        hk = checkme('CHARMM_UREY_BRADLEY_COUNT', 2, False, False, None, int)
-        hasallkeys = hasallkeys and hk
+        try:
+            nvals = parm.parm_data['FORCE_FIELD_TYPE'][0]
+            nvals = int(nvals)
+        except IndexError:
+            warnings.warn('%FLAG FORCE_FIELD_TYPE is empty', BadParmWarning)
+        except ValueError:
+            warnings.warn('%FLAG FORCE_FIELD_TYPE does not have integer first',
+                          BadParmWarning)
+        if len(parm.parm_data['FORCE_FIELD_TYPE']) - 1 < nvals:
+            warnings.warn('Not enough lines in %FLAG FORCE_FIELD_TYPE',
+                          BadParmWarning)
+        else:
+            for i, val in enumerate(parm.parm_data['FORCE_FIELD_TYPE']):
+                if i % 2 == 0 and not isinstance(val, int):
+                    warnings.warn('int type mismatch in FORCE_FIELD_TYPE',
+                                  BadParmWarning)
+                elif i % 2 == 1 and not isinstance(val, str):
+                    warnings.warn('str type mismatch in FORCE_FIELD_TYPE',
+                                  BadParmWarning)
+        hasallkeys = checkme('CHARMM_UREY_BRADLEY_COUNT', 2, False, False, None, int)
         hk = checkme('CHARMM_NUM_IMPROPERS', 1, True, False, None, int)
         hasallkeys = hasallkeys and hk
         hk = checkme('CHARMM_NUM_IMPR_TYPES', 1, True, False, None, int)
@@ -161,9 +178,8 @@ def check_validity(parm, warnings):
                       'in Amber programs!', AmberIncompatibleWarning)
 
     # Check that we didn't change off-diagonal LJ pairs, since this will not
-    # work for all programs (like the OpenMM bindings in ParmEd, for example)
-    # Check relative error, though, since Lennard Jones coefficients are very
-    # large
+    # work for all programs necessarily...  Check relative error, though, since
+    # Lennard Jones coefficients are very large
     parm.fill_LJ()
     ntypes = parm.ptr('ntypes')
     try:
@@ -177,14 +193,12 @@ def check_validity(parm, warnings):
                 if acoef == 0 or bcoef == 0:
                     if acoef != 0 or bcoef != 0 or (wdij != 0 and rij != 0):
                         warnings.warn('Modified off-diagonal LJ parameters '
-                                      'detected! Will not work with OpenMM.',
-                                      NonUniversalWarning)
+                                      'detected', NonUniversalWarning)
                         raise StopIteration
                 elif (abs((acoef - (wdij * rij**12)) / acoef) > TINY or
                       abs((bcoef - (2 * wdij * rij**6)) / bcoef) > TINY):
                     warnings.warn('Modified off-diagonal LJ parameters '
-                                  'detected! Will not work with OpenMM.',
-                                  NonUniversalWarning)
+                                  'detected', NonUniversalWarning)
                     raise StopIteration
     except StopIteration:
         pass
