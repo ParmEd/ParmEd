@@ -51,6 +51,12 @@ class TestChemistryResidue(unittest.TestCase):
         self.assertIs(residue.AminoAcidResidue.get('D'), residue.ASP)
         self.assertIs(residue.AminoAcidResidue.get('A'), residue.ALA)
 
+    def testReprOutput(self):
+        """ Test the %r representation of the Amino Acids """
+        for res in residue.AminoAcidResidue.all_residues:
+            self.assertEquals('<Amino Acid Residue %s: %s [%s]>' % (res.name,
+                res.abbr, res.symbol), repr(res))
+
     def testBadLookup(self):
         """ Test that lookups of non-existent residues fails """
         self.assertRaises(KeyError,

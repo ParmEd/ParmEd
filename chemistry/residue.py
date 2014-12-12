@@ -19,6 +19,7 @@ class AminoAcidResidue(object):
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
     _all_residues_by_symbol = dict()
+    all_residues = []
 
     def __init__(self, name, abbr, symbol):
         self.name = name
@@ -27,6 +28,11 @@ class AminoAcidResidue(object):
         AminoAcidResidue._all_residues_by_name[name.upper()] = self
         AminoAcidResidue._all_residues_by_abbr[abbr.upper()] = self
         AminoAcidResidue._all_residues_by_symbol[symbol.upper()] = self
+        AminoAcidResidue.all_residues.append(self)
+
+    def __repr__(self):
+        return '<Amino Acid Residue %s: %s [%s]>' % (self.name, self.abbr,
+                self.symbol)
 
     @classmethod
     def get(cls, key):
@@ -55,22 +61,22 @@ class AminoAcidResidue(object):
         return cls._all_residues_by_name[key.upper()]
 
 ALA = AminoAcidResidue('Alanine', 'ALA', 'A')
+ARG = AminoAcidResidue('Arginine', 'ARG', 'R')
+ASN = AminoAcidResidue('Asparagine', 'ASN', 'N')
+ASP = AminoAcidResidue('Aspartate' ,'ASP', 'D')
+CYS = AminoAcidResidue('Cysteine', 'CYS', 'C')
+GLU = AminoAcidResidue('Glutamate', 'GLU', 'E')
+GLN = AminoAcidResidue('Glutamine', 'GLN', 'Q')
 GLY = AminoAcidResidue('Glycine', 'GLY', 'G')
-VAL = AminoAcidResidue('Valine', 'VAL', 'V')
-LEU = AminoAcidResidue('Leucine', 'LEU', 'L')
+HIS = AminoAcidResidue('Histidine', 'HIS', 'H')
 ILE = AminoAcidResidue('Isoleucine', 'ILE', 'I')
+LEU = AminoAcidResidue('Leucine', 'LEU', 'L')
+LYS = AminoAcidResidue('Lysine', 'LYS', 'K')
 MET = AminoAcidResidue('Methionine', 'MET', 'M')
 PHE = AminoAcidResidue('Phenylalanine', 'PHE', 'F')
-TRP = AminoAcidResidue('Tryptophan', 'TRP', 'W')
 PRO = AminoAcidResidue('Proline', 'PRO', 'P')
 SER = AminoAcidResidue('Serine', 'SER', 'S')
 THR = AminoAcidResidue('Threonine', 'THR', 'T')
-CYS = AminoAcidResidue('Cysteine', 'CYS', 'C')
+TRP = AminoAcidResidue('Tryptophan', 'TRP', 'W')
 TYR = AminoAcidResidue('Tyrosine', 'TYR', 'Y')
-ASN = AminoAcidResidue('Asparagine', 'ASN', 'N')
-GLN = AminoAcidResidue('Glutamine', 'GLN', 'Q')
-ASP = AminoAcidResidue('Aspartate' ,'ASP', 'D')
-GLU = AminoAcidResidue('Glutamate', 'GLU', 'E')
-LYS = AminoAcidResidue('Lysine', 'LYS', 'K')
-ARG = AminoAcidResidue('Arginine', 'ARG', 'R')
-HIS = AminoAcidResidue('Histidine', 'HIS', 'H')
+VAL = AminoAcidResidue('Valine', 'VAL', 'V')
