@@ -1427,14 +1427,12 @@ class printdihedrals(Action):
                 if atom1.idx not in atomsel and atom1.idx not in atomsel4:
                     continue
                 found = False
-                if atom1.idx in atomsel:
-                    if (atom2.idx in atomsel2 and atom3.idx in atomsel3 and
-                        atom4.idx in atomsel4):
-                        found = True
-                elif atom4.idx in atomsel:
-                    if (atom3.idx in atomsel2 and atom3.idx in atomsel2 and
-                        atom4.idx in atomsel):
-                        found = True
+                if (atom1.idx in atomsel and atom2.idx in atomsel2 and
+                    atom3.idx in atomsel3 and atom4.idx in atomsel4):
+                    found = True
+                elif (atom1.idx in atomsel4 and atom2.idx in atomsel3 and
+                    atom3.idx in atomsel2 and atom4.idx in atomsel):
+                    found = True
                 if not found: continue
                 if isinstance(self.parm, AmoebaParm):
                     char = ' '
