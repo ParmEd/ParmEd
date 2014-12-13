@@ -587,16 +587,56 @@ class TestAmberParmActions(unittest.TestCase):
         """ Test printBonds on AmberParm """
         act = PT.printBonds(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_BONDS)
+        act = PT.printBonds(gasparm, '@1', ':*')
+        self.assertEqual(str(act), saved.PRINT_BONDS)
+        act = PT.printBonds(gasparm, '*', '@1')
+        self.assertEqual(str(act), saved.PRINT_BONDS)
+        act = PT.printBonds(gasparm, '@1', '@3')
+        self.assertEqual(str(act), saved.PRINT_BONDS_2MASKS)
+        act = PT.printBonds(gasparm, '@3', '@1')
+        self.assertEqual(str(act), saved.PRINT_BONDS_2MASKS)
 
     def testPrintAngles(self):
         """ Test printAngles on AmberParm """
         act = PT.printAngles(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLES)
+        act = PT.printAngles(gasparm, '@1', '*')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_1)
+        act = PT.printAngles(gasparm, '@1', '*', '*')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_1)
+        act = PT.printAngles(gasparm, '*', '*', '@1')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_1)
+        act = PT.printAngles(gasparm, '*', '@1')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_2)
+        act = PT.printAngles(gasparm, '*', '@1', '*')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_2)
+        act = PT.printAngles(gasparm, '@1', '@5')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
+        act = PT.printAngles(gasparm, '*', '@5', '@1')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
+        act = PT.printAngles(gasparm, '@1 @5 @7')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
+        act = PT.printAngles(gasparm, '@7 @5 @1')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
 
     def testPrintDihedrals(self):
         """ Test printDihedrals on AmberParm """
         act = PT.printDihedrals(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALS)
+        act = PT.printDihedrals(gasparm, '@1', '@5')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_2MASKS)
+        act = PT.printDihedrals(gasparm, '*', '*', '@5', '@1')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_2MASKS)
+        act = PT.printDihedrals(gasparm, '@4', '@1', '@5')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_3MASKS)
+        act = PT.printDihedrals(gasparm, '@4', '@1', '@5', '*')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_3MASKS)
+        act = PT.printDihedrals(gasparm, '*', '@5', '@1', '@4')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_3MASKS)
+        act = PT.printDihedrals(gasparm, '@7', ':1@CA', '@12', '@14')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_4MASKS)
+        act = PT.printDihedrals(gasparm, '@14', '@12', ':1@CA', '@7')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_4MASKS)
 
     def testSetMolecules(self):
         """ Test setMolecules on AmberParm """
