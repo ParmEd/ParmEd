@@ -1279,13 +1279,12 @@ class printbonds(Action):
         atomsel2 = set(self.mask2.Selected())
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
-            if not (atom1.idx in atomsel or atom2.idx in atomsel):
-                continue
-            if atom1.idx in atomsel and atom2.idx not in atomsel2:
-                if atom2.idx in atomsel and atom1.idx not in atomsel2:
-                    continue
-                elif atom2.idx not in atomsel:
-                    continue
+            found = False
+            if atom1.idx in atomsel and atom2.idx in atomsel2:
+                found = True
+            elif atom2.idx in atomsel and atom.idx in atomsel2:
+                found = True
+            if not found: continue
             retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
                     atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                     atom2.name, atom2.type, bond.type.req, bond.type.k)
