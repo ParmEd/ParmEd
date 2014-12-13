@@ -1296,27 +1296,63 @@ class printbonds(Action):
 class printangles(Action):
     """
     Prints all of the angles (with their details) for the given atoms in the
-    mask
+    mask. If additional masks are given, only the angles in which the three
+    atoms are specified in each of the given mask (with the central atom
+    required to be in the second mask) are printed.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        arg2 = arg_list.get_next_mask(optional=True)
+        arg3 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_arg = True
+        else:
+            self.one_arg = False
+            self.mask2 = AmberMask(self.parm, arg2)
+            if arg3 is None: arg3 = '*'
+            self.mask3 = AmberMask(self.parm, arg3)
 
     def __str__(self):
         retstr = '%-20s %-20s %-20s %-10s %-10s\n' % (
                         'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')
-        # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
-        for angle in self.parm.angles:
-            atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                    atomsel[atom3.idx]):
-                continue
-            retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                       '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
-                       atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                       atom3.name, atom3.type, angle.type.k,
-                       angle.type.theteq*180/math.pi)
-            )
+        if self.one_arg:
+            atomsel = self.mask.Selection()
+            for angle in self.parm.angles:
+                atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
+                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                        atomsel[atom3.idx]):
+                    continue
+                retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
+                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
+                           atom3.name, atom3.type, angle.type.k,
+                           angle.type.theteq*180/math.pi)
+                )
+        else:
+            atomsel = set(self.mask.Selected())
+            atomsel2 = set(self.mask2.Selected())
+            atomsel3 = set(self.mask3.Selected())
+            for angle in self.parm.angles:
+                atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
+                if atom1.idx not in atomsel and atom1.idx not in atomsel3:
+                    continue
+                if atom3.idx not in atomsel and atom3.idx not in atomsel3:
+                    continue
+                if atom2.idx not in atomsel2:
+                    continue
+                if atom1.idx in atomsel and atom3.idx not in atomsel3:
+                    if atom3.idx in atomsel and not atom1.idx in atomsel3:
+                        continue
+                    elif atom3.idx not in atomsel:
+                        continue
+                elif atom1.idx not in atomsel:
+                    continue
+                retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
+                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
+                           atom3.name, atom3.type, angle.type.k,
+                           angle.type.theteq*180/math.pi)
+                )
         return retstr
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
