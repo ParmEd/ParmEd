@@ -91,10 +91,10 @@ Usages = {
                        'parm copy <filename>|<index> || parm select '
                        '<filename>|<index>',
            'parmout' : 'parmout <prmtop_name> [<inpcrd_name>] [netcdf]',
-       'printangles' : 'printAngles <mask>',
-        'printbonds' : 'printBonds <mask>',
+       'printangles' : 'printAngles <mask> [<mask> [<mask>] ]',
+        'printbonds' : 'printBonds <mask> [<mask>]',
       'printdetails' : 'printDetails <mask>',
-    'printdihedrals' : 'printDihedrals <mask>',
+    'printdihedrals' : 'printDihedrals <mask> [<mask> [<mask> [<mask>] ] ]',
         'printflags' : 'printFlags',
      'printpointers' : 'printPointers',
          'printinfo' : 'printInfo <flag>',
@@ -1263,19 +1263,28 @@ class addexclusions(Action):
 class printbonds(Action):
     """
     Prints all of the bonds (with their details) for the given atoms in the
-    mask
+    mask. If a second mask is given, only bonds in which one atom appears in
+    each list will be printed.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        self.mask2 = AmberMask(self.parm,
+                        arg_list.get_next_mask(optional=True, default='*'))
 
     def __str__(self):
         retstr = '%-20s %-20s %-10s %-10s\n' % (
                                     'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')
         # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
+        atomsel = set(self.mask.Selected())
+        atomsel2 = set(self.mask2.Selected())
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx]): continue
+            found = False
+            if atom1.idx in atomsel and atom2.idx in atomsel2:
+                found = True
+            elif atom2.idx in atomsel and atom1.idx in atomsel2:
+                found = True
+            if not found: continue
             retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
                     atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                     atom2.name, atom2.type, bond.type.req, bond.type.k)
@@ -1286,27 +1295,60 @@ class printbonds(Action):
 class printangles(Action):
     """
     Prints all of the angles (with their details) for the given atoms in the
-    mask
+    mask. If additional masks are given, only the angles in which the three
+    atoms are specified in each of the given mask (with the central atom
+    required to be in the second mask) are printed.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        arg2 = arg_list.get_next_mask(optional=True)
+        arg3 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_arg = True
+        else:
+            self.one_arg = False
+            self.mask2 = AmberMask(self.parm, arg2)
+            if arg3 is None: arg3 = '*'
+            self.mask3 = AmberMask(self.parm, arg3)
 
     def __str__(self):
         retstr = '%-20s %-20s %-20s %-10s %-10s\n' % (
                         'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')
-        # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
-        for angle in self.parm.angles:
-            atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                    atomsel[atom3.idx]):
-                continue
-            retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                       '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
-                       atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                       atom3.name, atom3.type, angle.type.k,
-                       angle.type.theteq*180/math.pi)
-            )
+        if self.one_arg:
+            atomsel = self.mask.Selection()
+            for angle in self.parm.angles:
+                atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
+                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                        atomsel[atom3.idx]):
+                    continue
+                retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
+                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
+                           atom3.name, atom3.type, angle.type.k,
+                           angle.type.theteq*180/math.pi)
+                )
+        else:
+            atomsel = set(self.mask.Selected())
+            atomsel2 = set(self.mask2.Selected())
+            atomsel3 = set(self.mask3.Selected())
+            for angle in self.parm.angles:
+                atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
+                if atom2.idx not in atomsel2:
+                    continue
+                if atom1.idx not in atomsel and atom1.idx not in atomsel3:
+                    continue
+                found = False
+                if atom1.idx in atomsel and atom3.idx in atomsel3:
+                    found = True
+                elif atom3.idx in atomsel and atom1.idx in atomsel3:
+                    found = True
+                if not found: continue
+                retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
+                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
+                           atom3.name, atom3.type, angle.type.k,
+                           angle.type.theteq*180/math.pi)
+                )
         return retstr
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1314,50 +1356,109 @@ class printangles(Action):
 class printdihedrals(Action):
     """
     Prints all of the dihedrals (with their details) for the given atoms in the
-    mask
+    mask. If multiple masks are given, only dihedrals that have one atom in each
+    mask are printed. Ordering is important here, so the first atom must be in
+    the first mask, the second atom in the second, etc. The order can be
+    precisely reversed, but no other ordering is recognized.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        arg2 = arg_list.get_next_mask(optional=True)
+        arg3 = arg_list.get_next_mask(optional=True)
+        arg4 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_mask = True
+        else:
+            self.one_mask = False
+            self.mask2 = AmberMask(self.parm, arg2)
+            if arg3 is None: arg3 = '*'
+            self.mask3 = AmberMask(self.parm, arg3)
+            if arg4 is None: arg4 = '*'
+            self.mask4 = AmberMask(self.parm, arg4)
 
     def __str__(self):
         retstr = '%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
                 'Phase', 'EEL Scale', 'VDW Scale')
         # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
-        for dihedral in self.parm.dihedrals:
-            atom1 = dihedral.atom1
-            atom2 = dihedral.atom2
-            atom3 = dihedral.atom3
-            atom4 = dihedral.atom4
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                    atomsel[atom3.idx] or atomsel[atom4.idx]):
-                continue
+        if self.one_mask:
+            atomsel = self.mask.Selection()
+            for dihedral in self.parm.dihedrals:
+                atom1 = dihedral.atom1
+                atom2 = dihedral.atom2
+                atom3 = dihedral.atom3
+                atom4 = dihedral.atom4
+                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                        atomsel[atom3.idx] or atomsel[atom4.idx]):
+                    continue
 
-            # Determine if it's an Improper, Multiterm, or neither
-            if isinstance(self.parm, AmoebaParm):
-                char = ' '
-                scee = scnb = 'N/A'
-            elif dihedral.signs[1] < 0:
-                char = 'I'
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            elif dihedral.signs[0] < 0:
-                char = 'M'
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            else:
-                char = ' '
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
-                       (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                        atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                        dihedral.type.phi_k, dihedral.type.per,
-                        dihedral.type.phase*180/math.pi, scee, scnb)
-            )
+                # Determine if it's an Improper, Multiterm, or neither
+                if isinstance(self.parm, AmoebaParm):
+                    char = ' '
+                    scee = scnb = 'N/A'
+                elif dihedral.signs[1] < 0:
+                    char = 'I'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                elif dihedral.signs[0] < 0:
+                    char = 'M'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                else:
+                    char = ' '
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
+                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
+                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
+                            dihedral.type.phi_k, dihedral.type.per,
+                            dihedral.type.phase*180/math.pi, scee, scnb)
+                )
+        else:
+            atomsel = set(self.mask.Selected())
+            atomsel2 = set(self.mask2.Selected())
+            atomsel3 = set(self.mask3.Selected())
+            atomsel4 = set(self.mask4.Selected())
+            for dihedral in self.parm.dihedrals:
+                atom1 = dihedral.atom1
+                atom2 = dihedral.atom2
+                atom3 = dihedral.atom3
+                atom4 = dihedral.atom4
+                if atom1.idx not in atomsel and atom1.idx not in atomsel4:
+                    continue
+                found = False
+                if (atom1.idx in atomsel and atom2.idx in atomsel2 and
+                    atom3.idx in atomsel3 and atom4.idx in atomsel4):
+                    found = True
+                elif (atom1.idx in atomsel4 and atom2.idx in atomsel3 and
+                    atom3.idx in atomsel2 and atom4.idx in atomsel):
+                    found = True
+                if not found: continue
+                if isinstance(self.parm, AmoebaParm):
+                    char = ' '
+                    scee = scnb = 'N/A'
+                elif dihedral.signs[1] < 0:
+                    char = 'I'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                elif dihedral.signs[0] < 0:
+                    char = 'M'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                else:
+                    char = ' '
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
+                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
+                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
+                            dihedral.type.phi_k, dihedral.type.per,
+                            dihedral.type.phase*180/math.pi, scee, scnb)
+                )
 
         return retstr
 

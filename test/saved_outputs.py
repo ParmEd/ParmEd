@@ -450,3 +450,59 @@ Number of residues:    820
 System volume (ang^3): 27031.52
 System density (g/mL): 0.909751
 """
+
+PRINT_BONDS_2MASKS = """\
+Atom 1               Atom 2               R eq       Frc Cnst  
+      1    N (  N3)       3   H2 (   H)     1.0100   434.0000
+"""
+
+PRINT_ANGLES_2MASKS_1 = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      1    N (  N3)        5   CA (  CT)        7   CB (  CT)    80.0000   111.2000
+      1    N (  N3)        5   CA (  CT)       12    C (   C)    80.0000   111.2000
+      1    N (  N3)        5   CA (  CT)        6   HA (  HP)    50.0000   109.5000
+"""
+
+PRINT_ANGLES_2MASKS_2 = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      4   H3 (   H)        1    N (  N3)        5   CA (  CT)    50.0000   109.5000
+      3   H2 (   H)        1    N (  N3)        4   H3 (   H)    35.0000   109.5000
+      3   H2 (   H)        1    N (  N3)        5   CA (  CT)    50.0000   109.5000
+      2   H1 (   H)        1    N (  N3)        3   H2 (   H)    35.0000   109.5000
+      2   H1 (   H)        1    N (  N3)        4   H3 (   H)    35.0000   109.5000
+      2   H1 (   H)        1    N (  N3)        5   CA (  CT)    50.0000   109.5000
+"""
+
+PRINT_ANGLES_2MASKS_3 = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      1    N (  N3)        5   CA (  CT)        7   CB (  CT)    80.0000   111.2000
+      1    N (  N3)        5   CA (  CT)       12    C (   C)    80.0000   111.2000
+      1    N (  N3)        5   CA (  CT)        6   HA (  HP)    50.0000   109.5000
+"""
+
+PRINT_ANGLES_3MASKS = """\
+Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+      1    N (  N3)        5   CA (  CT)        7   CB (  CT)    80.0000   111.2000
+"""
+
+PRINT_DIHEDRALS_2MASKS = """\
+Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+        1    N (  N3)        5   CA (  CT)        7   CB (  CT)       10   OG (  OH)     0.1556     3.0000     0.0000     1.2000     2.0000
+        1    N (  N3)        5   CA (  CT)       12    C (   C)       13    O (   O)     0.0000     2.0000     0.0000     1.2000     2.0000
+        1    N (  N3)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.0000     2.0000     0.0000     1.2000     2.0000
+        1    N (  N3)        5   CA (  CT)        7   CB (  CT)        8  HB2 (  H1)     0.1556     3.0000     0.0000     1.2000     2.0000
+        1    N (  N3)        5   CA (  CT)        7   CB (  CT)        9  HB3 (  H1)     0.1556     3.0000     0.0000     1.2000     2.0000
+"""
+
+PRINT_DIHEDRALS_3MASKS = """\
+Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+        4   H3 (   H)        1    N (  N3)        5   CA (  CT)        6   HA (  HP)     0.1556     3.0000     0.0000     1.2000     2.0000
+        4   H3 (   H)        1    N (  N3)        5   CA (  CT)        7   CB (  CT)     0.1556     3.0000     0.0000     1.2000     2.0000
+        4   H3 (   H)        1    N (  N3)        5   CA (  CT)       12    C (   C)     0.1556     3.0000     0.0000     1.2000     2.0000
+"""
+
+PRINT_DIHEDRALS_4MASKS = """\
+Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+        7   CB (  CT)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.0700     2.0000     0.0000     1.2000     2.0000
+M       7   CB (  CT)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.1000     4.0000     0.0000     1.2000     2.0000
+"""
