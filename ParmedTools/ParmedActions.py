@@ -91,10 +91,10 @@ Usages = {
                        'parm copy <filename>|<index> || parm select '
                        '<filename>|<index>',
            'parmout' : 'parmout <prmtop_name> [<inpcrd_name>] [netcdf]',
-       'printangles' : 'printAngles <mask>',
-        'printbonds' : 'printBonds <mask>',
+       'printangles' : 'printAngles <mask> [<mask> [<mask>] ]',
+        'printbonds' : 'printBonds <mask> [<mask>]',
       'printdetails' : 'printDetails <mask>',
-    'printdihedrals' : 'printDihedrals <mask>',
+    'printdihedrals' : 'printDihedrals <mask> [<mask> [<mask> [<mask>] ] ]',
         'printflags' : 'printFlags',
      'printpointers' : 'printPointers',
          'printinfo' : 'printInfo <flag>',
@@ -1263,19 +1263,29 @@ class addexclusions(Action):
 class printbonds(Action):
     """
     Prints all of the bonds (with their details) for the given atoms in the
-    mask
+    mask. If a second mask is given, only bonds in which one atom appears in
+    each list will be printed.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        self.mask2 = AmberMask(self.parm,
+                        arg_list.get_next_mask(optional=True, default='*'))
 
     def __str__(self):
         retstr = '%-20s %-20s %-10s %-10s\n' % (
                                     'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')
         # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
+        atomsel = set(self.mask.Selected())
+        atomsel2 = set(self.mask2.Selected())
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx]): continue
+            if not (atom1.idx in atomsel or atom2.idx in atomsel):
+                continue
+            if atom1.idx in atomsel and atom2.idx not in atomsel2:
+                if atom2.idx in atomsel and atom1.idx not in atomsel2:
+                    continue
+                elif atom2.idx not in atomsel:
+                    continue
             retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
                     atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                     atom2.name, atom2.type, bond.type.req, bond.type.k)
