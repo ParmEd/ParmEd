@@ -1334,19 +1334,16 @@ class printangles(Action):
             atomsel3 = set(self.mask3.Selected())
             for angle in self.parm.angles:
                 atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
-                if atom1.idx not in atomsel and atom1.idx not in atomsel3:
-                    continue
-                if atom3.idx not in atomsel and atom3.idx not in atomsel3:
-                    continue
                 if atom2.idx not in atomsel2:
                     continue
-                if atom1.idx in atomsel and atom3.idx not in atomsel3:
-                    if atom3.idx in atomsel and not atom1.idx in atomsel3:
-                        continue
-                    elif atom3.idx not in atomsel:
-                        continue
-                elif atom1.idx not in atomsel:
+                if atom1.idx not in atomsel and atom1.idx not in atomsel3:
                     continue
+                found = False
+                if atom1.idx in atomsel and atom3.idx in atomsel3:
+                    found = True
+                elif atom3.idx in atomsel and atom1.idx in atomsel3:
+                    found = True
+                if not found: continue
                 retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
                            '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
                            atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
