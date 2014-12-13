@@ -1282,7 +1282,7 @@ class printbonds(Action):
             found = False
             if atom1.idx in atomsel and atom2.idx in atomsel2:
                 found = True
-            elif atom2.idx in atomsel and atom.idx in atomsel2:
+            elif atom2.idx in atomsel and atom1.idx in atomsel2:
                 found = True
             if not found: continue
             retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
