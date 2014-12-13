@@ -1364,46 +1364,104 @@ class printdihedrals(Action):
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        arg2 = arg_list.get_next_mask(optional=True)
+        arg3 = arg_list.get_next_mask(optional=True)
+        arg4 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_mask = True
+        else:
+            self.one_mask = False
+            self.mask2 = AmberMask(self.parm, arg2)
+            if arg3 is None: arg3 = '*'
+            self.mask3 = AmberMask(self.parm, arg3)
+            if arg4 is None: arg4 = '*'
+            self.mask4 = AmberMask(self.parm, arg4)
 
     def __str__(self):
         retstr = '%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
                 'Phase', 'EEL Scale', 'VDW Scale')
         # Loop through all of the bonds without and inc hydrogen
-        atomsel = self.mask.Selection()
-        for dihedral in self.parm.dihedrals:
-            atom1 = dihedral.atom1
-            atom2 = dihedral.atom2
-            atom3 = dihedral.atom3
-            atom4 = dihedral.atom4
-            if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                    atomsel[atom3.idx] or atomsel[atom4.idx]):
-                continue
+        if self.one_mask:
+            atomsel = self.mask.Selection()
+            for dihedral in self.parm.dihedrals:
+                atom1 = dihedral.atom1
+                atom2 = dihedral.atom2
+                atom3 = dihedral.atom3
+                atom4 = dihedral.atom4
+                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
+                        atomsel[atom3.idx] or atomsel[atom4.idx]):
+                    continue
 
-            # Determine if it's an Improper, Multiterm, or neither
-            if isinstance(self.parm, AmoebaParm):
-                char = ' '
-                scee = scnb = 'N/A'
-            elif dihedral.signs[1] < 0:
-                char = 'I'
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            elif dihedral.signs[0] < 0:
-                char = 'M'
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            else:
-                char = ' '
-                scee = '%10.4f' % dihedral.type.scee
-                scnb = '%10.4f' % dihedral.type.scnb
-            retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                       '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
-                       (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                        atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                        dihedral.type.phi_k, dihedral.type.per,
-                        dihedral.type.phase*180/math.pi, scee, scnb)
-            )
+                # Determine if it's an Improper, Multiterm, or neither
+                if isinstance(self.parm, AmoebaParm):
+                    char = ' '
+                    scee = scnb = 'N/A'
+                elif dihedral.signs[1] < 0:
+                    char = 'I'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                elif dihedral.signs[0] < 0:
+                    char = 'M'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                else:
+                    char = ' '
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
+                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
+                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
+                            dihedral.type.phi_k, dihedral.type.per,
+                            dihedral.type.phase*180/math.pi, scee, scnb)
+                )
+        else:
+            atomsel = set(self.mask.Selected())
+            atomsel2 = set(self.mask2.Selected())
+            atomsel3 = set(self.mask3.Selected())
+            atomsel4 = set(self.mask4.Selected())
+            for dihedral in self.parm.dihedrals:
+                atom1 = dihedral.atom1
+                atom2 = dihedral.atom2
+                atom3 = dihedral.atom3
+                atom4 = dihedral.atom4
+                if atom1.idx not in atomsel and atom1.idx not in atomsel4:
+                    continue
+                found = False
+                if atom1.idx in atomsel:
+                    if (atom2.idx in atomsel2 and atom3.idx in atomsel3 and
+                        atom4.idx in atomsel4):
+                        found = True
+                elif atom4.idx in atomsel:
+                    if (atom3.idx in atomsel2 and atom3.idx in atomsel2 and
+                        atom4.idx in atomsel):
+                        found = True
+                if not found: continue
+                if isinstance(self.parm, AmoebaParm):
+                    char = ' '
+                    scee = scnb = 'N/A'
+                elif dihedral.signs[1] < 0:
+                    char = 'I'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                elif dihedral.signs[0] < 0:
+                    char = 'M'
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                else:
+                    char = ' '
+                    scee = '%10.4f' % dihedral.type.scee
+                    scnb = '%10.4f' % dihedral.type.scnb
+                retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
+                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
+                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
+                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
+                            dihedral.type.phi_k, dihedral.type.per,
+                            dihedral.type.phase*180/math.pi, scee, scnb)
+                )
 
         return retstr
 
