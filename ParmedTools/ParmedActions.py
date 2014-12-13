@@ -1356,7 +1356,10 @@ class printangles(Action):
 class printdihedrals(Action):
     """
     Prints all of the dihedrals (with their details) for the given atoms in the
-    mask
+    mask. If multiple masks are given, only dihedrals that have one atom in each
+    mask are printed. Ordering is important here, so the first atom must be in
+    the first mask, the second atom in the second, etc. The order can be
+    precisely reversed, but no other ordering is recognized.
     """
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
