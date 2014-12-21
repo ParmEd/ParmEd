@@ -132,6 +132,7 @@ class Structure(object):
         self.bonds = TrackedList()
         self.angles = TrackedList()
         self.dihedrals = TrackedList()
+        self.rb_torsions = TrackedList()
         self.urey_bradleys = TrackedList()
         self.impropers = TrackedList()
         self.cmaps = TrackedList()
@@ -155,6 +156,7 @@ class Structure(object):
         self.dihedral_types = TrackedList()
         self.urey_bradley_types = TrackedList()
         self.improper_types = TrackedList()
+        self.rb_torsion_types = TrackedList()
         self.cmap_types = TrackedList()
         self.trigonal_angle_types = TrackedList()
         self.out_of_plane_bend_types = TrackedList()
@@ -242,6 +244,9 @@ class Structure(object):
         for it in self.improper_types:
             c.improper_types.append(ImproperType(it.psi_k, it.psi_eq,
                                                  c.improper_types))
+        for rt in self.rb_torsion_types:
+            c.rb_torsion_types.append(RBTorsionType(rt.c0, rt.c1, rt.c2,
+                                                    rt.c3, rt.c4, rt.c5))
         for ct in self.cmap_types:
             c.cmap_types.append(CmapType(ct.resolution, list(ct.grid),
                                          list=c.cmap_types))
@@ -327,6 +332,12 @@ class Structure(object):
                     Improper(atoms[i.atom1.idx], atoms[i.atom2.idx],
                              atoms[i.atom3.idx], atoms[i.atom4.idx],
                              c.improper_types[i.type.idx])
+            )
+        for r in self.rb_torsions:
+            c.rb_torsions.append(
+                    Dihedral(atoms[r.atom1.idx], atoms[r.atom2.idx],
+                             atoms[r.atom3.idx], atoms[r.atom4.idx],
+                             c.rb_torsion_types[r.type.idx])
             )
         for cm in self.cmaps:
             c.cmaps.append(

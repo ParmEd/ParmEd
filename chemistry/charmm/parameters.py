@@ -5,21 +5,22 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 Contributors:
-Date: Sep. 17, 2014
+Date: Dec. 19, 2014
 """
 from chemistry.constants import DEG_TO_RAD
 from chemistry import (AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
-from chemistry.periodic_table import AtomicNum, Mass, Element
+from chemistry.parameters import ParameterSet
+from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
 import compat24 # needs to be before collections
 from collections import OrderedDict
 import math
 import os
 import warnings
 
-class CharmmParameterSet(object):
+class CharmmParameterSet(ParameterSet):
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
@@ -39,9 +40,11 @@ class CharmmParameterSet(object):
 
     Attributes
     ----------
-    atom_types_str : dict(str:AtomType)
+    atom_types : dict(str:AtomType)
         Dictionary mapping the names of the atom types to the corresponding
         AtomType instances
+    atom_types_str : dict(str:AtomType)
+        alias for atom_types
     atom_types_int : dict(int:AtomType)
         Dictionary mapping the serial indexes of the atom types to the
         corresponding AtomType instances
@@ -89,17 +92,7 @@ class CharmmParameterSet(object):
 
     def __init__(self, *args):
         # Instantiate the list types
-        self.atom_types_str = OrderedDict()
-        self.atom_types_int = OrderedDict()
-        self.atom_types_tuple = OrderedDict()
-        self.bond_types = OrderedDict()
-        self.angle_types = OrderedDict()
-        self.urey_bradley_types = OrderedDict()
-        self.dihedral_types = OrderedDict()
-        self.improper_types = OrderedDict()
-        self.cmap_types = OrderedDict()
-        self.nbfix_types = OrderedDict()
-        self.parametersets = []
+        super(CharmmParameterSet, self).__init__(self)
 
         # Load all of the files
         tops, pars, strs = [], [], []
@@ -558,77 +551,3 @@ class CharmmParameterSet(object):
                 # This is a Parameter file section
                 self.read_parameter_file(section)
             title, section = f.next_section()
-
-    def condense(self, do_dihedrals=True):
-        """
-        This function goes through each of the parameter type dicts and
-        eliminates duplicate types. After calling this function, every unique
-        bond, angle, dihedral, improper, or cmap type will pair with EVERY key
-        in the type mapping dictionaries that points to the equivalent type
-
-        Parameters
-        ----------
-        do_dihedrals : bool=True
-            Dihedrals can take the longest time to compress since testing their
-            equality takes the longest (this is complicated by the existence of
-            multi-term torsions). This flag will allow you to *skip* condensing
-            the dihedral parameter types (for large parameter sets, this can cut
-            the compression time in half)
-
-        Returns
-        -------
-        self
-            The instance that is being condensed
-
-        Notes
-        -----
-        The return value allows you to condense the types at construction time.
-
-        Example
-        -------
-        >>> params = CharmmParameterSet('charmm.prm').condense()
-        >>> params
-        <chemistry.charmm.parameters.CharmmParameterSet at 0x7f88757de090>
-        """
-        # First scan through all of the bond types
-        self._condense_types(self.bond_types)
-        self._condense_types(self.angle_types)
-        self._condense_types(self.urey_bradley_types)
-        if do_dihedrals: self._condense_types(self.dihedral_types)
-        self._condense_types(self.improper_types)
-        self._condense_types(self.cmap_types)
-        return self
-
-    @staticmethod
-    def _condense_types(typedict):
-        """
-        Loops through the given dict and condenses all types.
-
-        Parameter
-        ---------
-        typedict : dict
-            Type dictionary to condense
-        """
-        keylist = typedict.keys()
-        for i in xrange(len(keylist) - 1):
-            key1 = keylist[i]
-            for j in xrange(i+1, len(keylist)):
-                key2 = keylist[j]
-                if typedict[key1] == typedict[key2]:
-                    typedict[key2] = typedict[key1]
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def element_by_mass(mass):
-    """ Determines what element the given atom is based on its mass """
-
-    diff = mass
-    best_guess = 'EP'
-
-    for element in Element:
-        if abs(Mass[element] - mass) < diff:
-            best_guess = element
-            diff = abs(Mass[element] - mass)
-
-    return best_guess
-

@@ -9,7 +9,8 @@ from __future__ import division
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
 from chemistry.constants import TINY
-from chemistry.periodic_table import Mass, Element as _Element
+from chemistry import unit as u
+from chemistry.periodic_table import Mass
 from compat24 import all, property
 import copy
 import warnings
@@ -26,6 +27,31 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
            'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley']
+
+# Create the AKMA unit system which is the unit system used by Amber and CHARMM
+
+scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
+scale_factor = scale_factor.value_in_unit(u.picoseconds)
+akma_time_unit = u.BaseUnit(u.picosecond_base_unit.dimension, 'akma time',
+                            symbol='aks')
+akma_time_unit.define_conversion_factor_to(u.picosecond_base_unit, scale_factor)
+akma_unit_system = u.UnitSystem([
+        u.angstrom_base_unit, u.dalton_base_unit, akma_time_unit,
+        u.elementary_charge_base_unit, u.kelvin_base_unit,
+        u.mole_base_unit, u.radian_base_unit]
+)
+
+def _strip_units(value):
+    """
+    Strips any units from the given value by casting them into the AKMA unit
+    system
+    """
+    if u.is_quantity(value):
+        # special-case angles, since pure angles are always in degrees
+        if value.unit.is_compatible_with(u.degrees):
+            return value.value_in_unit(u.degrees)
+        return value.value_in_unit_system(akma_unit_system)
+    return value
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -405,10 +431,10 @@ class Atom(_ListItem):
             self.type = type.strip()
         except AttributeError:
             self.type = type
-        self.charge = charge
-        self.mass = mass
+        self.charge = _strip_units(charge)
+        self.mass = _strip_units(mass)
         self.nb_idx = nb_idx
-        self.radii = radii
+        self.radii = _strip_units(radii)
         self.screen = screen
         self.tree = tree
         self.join = join
@@ -884,8 +910,8 @@ class BondType(_ListItem, _ParameterType):
 
     def __init__(self, k, req, list=None):
         _ParameterType.__init__(self)
-        self.k = k
-        self.req = req
+        self.k = _strip_units(k)
+        self.req = _strip_units(req)
         self.list = list
         self._idx = -1
 
@@ -1023,8 +1049,8 @@ class AngleType(_ListItem, _ParameterType):
     """
     def __init__(self, k, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = k
-        self.theteq = theteq
+        self.k = _strip_units(k)
+        self.theteq = _strip_units(theteq)
         self._idx = -1
         self.list = list
 
@@ -1266,7 +1292,7 @@ class DihedralType(_ListItem, _ParameterType):
     def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
-        self.phi_k = phi_k
+        self.phi_k = _strip_units(phi_k)
         self.per = per
         self.phase = phase
         self.scee = scee
@@ -1274,30 +1300,89 @@ class DihedralType(_ListItem, _ParameterType):
         self.list = list
         self._idx = -1
 
-   #===================================================
-
-    def write_info(self, parm):
-        """ Write out the dihedral parameters """
-        # If our idx == -1, we're not being used, so just return
-        if self.idx == -1: return
-        parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][self.idx] = self.phi_k
-        parm.parm_data['DIHEDRAL_PERIODICITY'][self.idx] = self.per
-        parm.parm_data['DIHEDRAL_PHASE'][self.idx] = self.phase
-        try:
-            parm.parm_data['SCEE_SCALE_FACTOR'][self.idx] = self.scee
-        except KeyError:
-            pass
-        try:
-            parm.parm_data['SCNB_SCALE_FACTOR'][self.idx] = self.scnb
-        except KeyError:
-            pass
-   
     #===================================================
 
     def __eq__(self, other):
         return (self.phi_k == other.phi_k and self.per == other.per and 
                 self.phase == other.phase and self.scee == other.scee and
                 self.scnb == other.scnb)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class RBTorsionType(_ListItem, _ParameterType):
+    """
+    A Ryckaert-Bellemans type with a set of dihedral parameters
+
+    Parameters (and Attributes)
+    ---------------------------
+    c0 : float
+        The coefficient of the constant term in kcal/mol
+    c1 : float
+        The coefficient of the linear term in kcal/mol
+    c2 : float
+        The coefficient of the quadratic term in kcal/mol
+    c3 : float
+        The coefficient of the cubic term in kcal/mol
+    c4 : float
+        The coefficient of the quartic term in kcal/mol
+    c5 : float
+        The coefficient of the quintic term in kcal/mol
+    list : TrackedList=None
+        A list of `RBTorsionType`s in which this is a member
+
+    Inherited Attributes
+    --------------------
+    idx : int
+        The index of this RBTorsionType inside its containing list
+
+    Notes
+    -----
+    Two `RBTorsionType`s are equal if their coefficients are all equal
+
+    Examples
+    --------
+    >>> dt1 = RBTorsionType(10.0, 20.0, 30.0, 40.0, 50.0, 60.0)
+    >>> dt2 = RBTorsionType(10.0, 20.0, 30.0, 40.0, 50.0, 60.0)
+    >>> dt1 is dt2
+    False
+    >>> dt1 == dt2
+    True
+    >>> dt1.idx # not part of any list or iterable
+    -1
+
+    As part of a list, they can be indexed
+
+    >>> rb_torsion_list = []
+    >>> rb_torsion_list.append(RBTorsionType(10.0, 20.0, 30.0, 40.0, 50.0, 60.0,
+    ...                                      list=rb_torsion_list))
+    >>> rb_torsion_list.append(RBTorsionType(10.0, 20.0, 30.0, 40.0, 50.0, 60.0,
+    ...                                      list=rb_torsion_list))
+    >>> rb_torsion_list[0].idx
+    0
+    >>> rb_torsion_list[1].idx
+    1
+    """
+
+    #===================================================
+   
+    def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
+        """ RBTorsionType constructor """
+        _ParameterType.__init__(self)
+        self.c0 = _strip_units(c0)
+        self.c1 = _strip_units(c1)
+        self.c2 = _strip_units(c2)
+        self.c3 = _strip_units(c3)
+        self.c4 = _strip_units(c4)
+        self.c5 = _strip_units(c5)
+        self.list = list
+        self._idx = -1
+
+    #===================================================
+
+    def __eq__(self, other):
+        return (self.c0 == other.c0 and self.c1 == other.c1 and
+                self.c2 == other.c2 and self.c3 == other.c3 and
+                self.c4 == other.c4 and self.c5 == other.c5)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1577,8 +1662,8 @@ class ImproperType(_ListItem, _ParameterType):
     """
     def __init__(self, psi_k, psi_eq, list=None):
         _ParameterType.__init__(self)
-        self.psi_k = psi_k
-        self.psi_eq = psi_eq
+        self.psi_k = _strip_units(psi_k)
+        self.psi_eq = _strip_units(psi_eq)
         self.list = list
         self._idx = -1
 
@@ -1854,7 +1939,7 @@ class _CmapGrid(object):
         if data is None:
             self._data = [0 for i in xrange(self.resolution*self.resolution)]
         else:
-            self._data = data
+            self._data = _strip_units(data)
 
     @property
     def transpose(self):
@@ -2085,7 +2170,7 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k, list=None):
         _ParameterType.__init__(self)
-        self.k = k
+        self.k = _strip_units(k)
         self._idx = -1
         self.list = list
 
@@ -2265,10 +2350,10 @@ class StretchBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = k
-        self.req1 = req1
-        self.req2 = req2
-        self.theteq = theteq
+        self.k = _strip_units(k)
+        self.req1 = _strip_units(req1)
+        self.req2 = _strip_units(req2)
+        self.theteq = _strip_units(theteq)
         self._idx = -1
         self.list = list
 
@@ -2417,7 +2502,7 @@ class _TorTorTable(object):
             raise AmoebaError('Coupled torsion parameter size mismatch. %dx%d '
                               'grid expects %d elements (got %d)' % (len(ang1),
                               len(ang2), len(ang1)*len(ang2), len(data)))
-        self.data = data
+        self.data = _strip_units(data)
         self._indexes = dict()
         i = 0
         for a1 in ang1:
@@ -2432,11 +2517,11 @@ class _TorTorTable(object):
 
     def __setitem__(self, idx, second, third=None):
         if third is not None:
-            idx = self._indexes[(idx, second)]
-            value = third
+            idx = self._indexes[(_strip_units(idx), _strip_units(second))]
+            value = _strip_units(third)
         else:
-            idx = self._indexes[idx]
-            value = second
+            idx = self._indexes[_strip_units(idx)]
+            value = _strip_units(second)
         self.data[idx] = value
 
     def __eq__(self, other):
@@ -2508,8 +2593,8 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         if len(ang1) != dims[0] or len(ang2) != dims[1]:
             raise ValueError('dims does match the angle definitions')
         self.dims = tuple(dims)
-        self.ang1 = ang1
-        self.ang2 = ang2
+        self.ang1 = _strip_units(ang1)
+        self.ang2 = _strip_units(ang2)
         self.f = _TorTorTable(ang1, ang2, f)
         if dfda1 is None:
             self.dfda1 = None
@@ -3369,21 +3454,6 @@ class Group(object):
         self.bs = bs
         self.type = type
         self.move = move
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def Element(mass):
-    """ Determines what element the given atom is based on its mass """
-
-    diff = mass
-    best_guess = 'EP'
-
-    for element in _Element:
-        if abs(Mass[element] - mass) < diff:
-            best_guess = element
-            diff = abs(Mass[element] - mass)
-
-    return best_guess
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
