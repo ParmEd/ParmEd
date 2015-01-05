@@ -83,11 +83,6 @@ def main():
     fname = split(prmtop_name)[1]
     root.title('xParmED: Editing/viewing [%s] Choose an operation' % fname)
 
-    # Make sure our topology file is valid
-    if not amber_prmtop.parm.valid:
-        raise ParmError('Bad (or non-existent) topology file [%s]' %
-                        prmtop_name)
-
     # Now build the action list on root
     app = ParmedApp(root, amber_prmtop)
     app.pack(fill=tk.BOTH, expand=1)
