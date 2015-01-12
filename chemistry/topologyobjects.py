@@ -2718,6 +2718,9 @@ class Residue(_ListItem):
         """ Sorts the atoms in this list by atom index """
         self.atoms.sort()
 
+    def __getitem__(self, idx):
+        return self.atoms.__getitem__(idx)
+
     # Sort by atom indices
     def __lt__(self, other):
         return self.atoms[0].idx < other.atoms[0].idx
