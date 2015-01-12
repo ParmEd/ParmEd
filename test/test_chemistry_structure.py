@@ -1,7 +1,11 @@
 """
 Tests the chemistry/structure module
 """
-import cStringIO as StringIO
+try:
+    import cStringIO as StringIO
+except ImportError:
+    # Must be Python 3
+    import io as StringIO
 import chemistry.structure as structure
 import unittest
 from utils import get_fn
