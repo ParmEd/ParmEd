@@ -10,13 +10,14 @@ try:
 except ImportError:
     bz2 = None
 from chemistry.exceptions import PDBError, PDBWarning
-from chemistry.periodic_table import AtomicNum, Mass
+from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.topologyobjects import *
 import copy
 try:
     import gzip
 except ImportError:
     gzip = None
+import itertools
 import re
 import warnings
 
@@ -107,6 +108,8 @@ class Structure(object):
     box : list of 6 floats
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
         box is defined, `box` is set to `None`
+    space_group : str
+        The space group of the structure (default is "P 1")
 
     This class also has a handful of type lists for each of the attributes above
     (excluding `atoms`, `residues`, `chiral_frames`, and `multipole_frames`).
@@ -164,6 +167,7 @@ class Structure(object):
         self.adjust_types = TrackedList()
 
         self.box = None
+        self.space_group = "P 1"
 
     #===================================================
 
@@ -505,6 +509,99 @@ class Structure(object):
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
                 dihedral.atom1 in dihedral.atom4.angle_partners):
                 dihedral.ignore_end = True
+
+    #===================================================
+
+    def write_pdb(self, dest, renumber=True, coordinates=None):
+        """
+        Write a PDB file from the current Structure instance
+
+        Parameters
+        ----------
+        dest : str or file-like
+            Either a file name or a file-like object containing a `write`
+            method to which to write the PDB file. If it is a filename that
+            ends with .gz or .bz2, a compressed version will be written using
+            either gzip or bzip2, respectively.
+        renumber : bool=True
+            If True, renumber the atoms and residues sequentially as they are
+            stored in the structure.  If False, use the original numbering if
+            it was assigned previously
+        coordinates : array-like of float=None
+            If provided, these coordinates will be written to the PDB file
+            instead of the coordinates stored in the structure. These
+            coordinates should line up with the atom order in the structure
+            (not necessarily the order of the "original" PDB file if they
+            differ)
+        """
+        own_handle = False
+        if not hasattr(dest, 'write'):
+            if dest.endswith('.gz'):
+                dest = gz.open(
+            dest = open(dest, 'w')
+            own_handle = True
+        atomrec = ('ATOM  %5d %-4s%-1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                   '%6.2f          %2s%-2s')
+        nchains = len(set([res.chain for res in self.residues if res.chain]))
+        if self.box is not None:
+            a, b, c, alpha, beta, gamma = self.box
+            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d' % (
+                       self.box[0], self.box[1], self.box[2], self.box[3],
+                       self.box[4], self.box[5], self.space_groups, nchains))
+        if coordinates is not None:
+            try:
+                crdsize = len(coordinates)
+            except TypeError:
+                raise TypeError("Cannot find length of coordinates")
+            if crdsize == len(self.atoms):
+                try:
+                    coords = coordinates.flatten()
+                except AttributeError:
+                    try:
+                        coords = itertools.chain(*coordinates)
+                    except TypeError:
+                        raise TypeError("Unsupported coordinate dimensionality")
+                if len(coords) != len(self.atoms) * 3:
+                    raise TypeError("Unsupported coordinate shape")
+            elif crdsize == len(self.atoms) * 3:
+                coords = coordinates
+            else:
+                raise TypeError("Coordinates has unexpected shape")
+        else:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+            coords = itertools.chain(*coords)
+        if renumber:
+            for i, atom in enumerate(self.atoms):
+                i3 = i * 3
+                x, y, z = coords[i3:i3+3]
+                dest.write(atomrec % (atom.idx % 100000, atom.name, atom.altloc,
+                           atom.residue.name, atom.residue.chain,
+                           atom.residue.idx % 10000,
+                           atom.residue.insertion_code, x, y, z,
+                           atom.occupancy, atom.bfactor,
+                           Element[atom.atomic_number].upper(), ''))
+        else:
+            def acmp(x, y):
+                xn = x.number or x.idx
+                yn = y.number or y.idx
+                return yn - xn
+            last_number = 0
+            last_rnumber = 0
+            for res in self.residues:
+                for atom in sorted(res.atoms, cmp=acmp):
+                    i3 = atom.idx * 3
+                    x, y, z = coords[i3:i3+3]
+                    num = atom.number or last_number + 1
+                    rnum = atom.residue.number or last_rnumber + 1
+                    dest.write(atomrec % (num % 100000, atom.name, atom.altloc,
+                               res.name, res.chain, rnum % 10000,
+                               res.insertion_code, x, y, z,
+                               atom.occupancy, atom.bfactor,
+                               Element[atom.atomic_number].upper(), ''))
+                    last_number = num
+                    last_rnumber = rnum
+        if own_handle:
+            dest.close()
 
     #===================================================
 
@@ -955,6 +1052,10 @@ def read_PDB(filename):
                 except (IndexError, ValueError):
                     A = B = C = 90.0
                 struct.box = [a, b, c, A, B, C]
+                try:
+                    struct.space_group = line[55:66].strip()
+                except IndexError:
+                    pass
             elif rec == 'EXPDTA':
                 struct.experimental = line[6:].strip()
             elif rec == 'AUTHOR':
@@ -1005,3 +1106,28 @@ def read_PDB(filename):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def write_PDB(struct, dest, renumber=True, coordinates=None):
+    """
+    Write a PDB file from a structure instance
+
+    Parameters
+    ----------
+    struct : Structure
+        A Structure instance from which to write the PDB file
+    dest : str or file-like
+        Either a file name or a file-like object containing a `write`
+        method to which to write the PDB file
+    renumber : bool=True
+        If True, renumber the atoms and residues sequentially as they are
+        stored in the structure.  If False, use the original numbering if
+        it was assigned previously
+    coordinates : array-like of float=None
+        If provided, these coordinates will be written to the PDB file
+        instead of the coordinates stored in the structure. These
+        coordinates should line up with the atom order in the structure
+        (not necessarily the order of the "original" PDB file if they
+        differ)
+    """
+    struct.write_pdb(dest, renumber, coordinates)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
