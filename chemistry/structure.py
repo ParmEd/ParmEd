@@ -537,17 +537,21 @@ class Structure(object):
         own_handle = False
         if not hasattr(dest, 'write'):
             if dest.endswith('.gz'):
-                dest = gz.open(
-            dest = open(dest, 'w')
+                dest = gz.open(dest, 'w')
+            elif dest.endswith('.bz2'):
+                dest = bz2.BZ2File(dest, 'w')
+            else:
+                dest = open(dest, 'w')
             own_handle = True
         atomrec = ('ATOM  %5d %-4s%-1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
-                   '%6.2f          %2s%-2s')
+                   '%6.2f          %2s%-2s\n')
+        terrec = ('TER   %5d      %-3s %1s%4d\n')
         nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
             a, b, c, alpha, beta, gamma = self.box
-            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d' % (
+            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n' % (
                        self.box[0], self.box[1], self.box[2], self.box[3],
-                       self.box[4], self.box[5], self.space_groups, nchains))
+                       self.box[4], self.box[5], self.space_group, nchains))
         if coordinates is not None:
             try:
                 crdsize = len(coordinates)
@@ -558,7 +562,7 @@ class Structure(object):
                     coords = coordinates.flatten()
                 except AttributeError:
                     try:
-                        coords = itertools.chain(*coordinates)
+                        coords = list(itertools.chain(*coordinates))
                     except TypeError:
                         raise TypeError("Unsupported coordinate dimensionality")
                 if len(coords) != len(self.atoms) * 3:
@@ -569,21 +573,35 @@ class Structure(object):
                 raise TypeError("Coordinates has unexpected shape")
         else:
             coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
-            coords = itertools.chain(*coords)
+            coords = list(itertools.chain(*coords))
         if renumber:
-            for i, atom in enumerate(self.atoms):
-                i3 = i * 3
-                x, y, z = coords[i3:i3+3]
-                dest.write(atomrec % (atom.idx % 100000, atom.name, atom.altloc,
-                           atom.residue.name, atom.residue.chain,
-                           atom.residue.idx % 10000,
-                           atom.residue.insertion_code, x, y, z,
-                           atom.occupancy, atom.bfactor,
-                           Element[atom.atomic_number].upper(), ''))
+            nmore = 0 # how many *extra* atoms have been added?
+            for res in self.residues:
+                for atom in res.atoms:
+                    i3 = atom.idx * 3
+                    x, y, z = coords[i3:i3+3]
+                    anum = (atom.idx + 1 + nmore) % 100000
+                    rnum = (res.idx + 1) % 10000
+                    dest.write(atomrec % (anum , atom.name, atom.altloc,
+                               res.name, res.chain, rnum, res.insertion_code,
+                               x, y, z, atom.occupancy, atom.bfactor,
+                               Element[atom.atomic_number].upper(), ''))
+                    for key in sorted(atom.other_locations):
+                        oatom = atom.other_locations[key]
+                        nmore += 1
+                        anum = (atom.idx + 1 + nmore) % 100000
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        dest.write(atomrec % (anum, oatom.name, key, res.name,
+                                   res.chain, rnum, res.insertion_code, x, y,
+                                   z, oatom.occupancy, oatom.bfactor,
+                                   Element[oatom.atomic_number].upper(), ''))
+                if res.ter:
+                    dest.write(terrec % (anum+1, res.name, res.chain, rnum))
+                    nmore += 1
         else:
             def acmp(x, y):
-                xn = x.number or x.idx
-                yn = y.number or y.idx
+                xn = x.number or x.idx + 1
+                yn = y.number or y.idx + 1
                 return yn - xn
             last_number = 0
             last_rnumber = 0
@@ -599,7 +617,21 @@ class Structure(object):
                                atom.occupancy, atom.bfactor,
                                Element[atom.atomic_number].upper(), ''))
                     last_number = num
-                    last_rnumber = rnum
+                    for key in sorted(atom.other_locations):
+                        oatom = atom.other_locations[key]
+                        anum = oatom.number or last_number + 1
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        dest.write(atomrec % (anum % 100000, oatom.name, key,
+                                   res.name, res.chain, rnum,
+                                   res.insertion_code, x, y, z,
+                                   oatom.occupancy, oatom.bfactor,
+                                   Element[oatom.atomic_number].upper(), ''))
+                        last_number = anum
+                if res.ter:
+                    dest.write(terrec % (last_number+1, res.name, res.chain,
+                               rnum))
+                    last_number += 1
+                last_rnumber = rnum
         if own_handle:
             dest.close()
 

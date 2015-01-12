@@ -1,6 +1,7 @@
 """
 Tests the chemistry/structure module
 """
+import cStringIO as StringIO
 import chemistry.structure as structure
 import unittest
 from utils import get_fn
@@ -13,6 +14,7 @@ class TestChemistryStructure(unittest.TestCase):
         self.pdbbz2 = get_fn('4lzt.pdb.bz2')
         self.models = get_fn('2koc.pdb')
         self.overflow = get_fn('4lyt_vmd.pdb')
+        self.simple = get_fn('ala_ala_ala.pdb')
 
     def testAscii(self):
         """ Test PDB file parsing """
@@ -38,11 +40,90 @@ class TestChemistryStructure(unittest.TestCase):
         self.assertEqual(len(pdbfile.residues), 35697)
         self.assertEqual(pdbfile.box, [0, 0, 0, 90, 90, 90])
 
+    def testPdbWriteSimple(self):
+        """ Test PDB file writing on a very simple input structure """
+        pdbfile = structure.read_PDB(self.simple)
+        self.assertEqual(len(pdbfile.atoms), 33)
+        self.assertEqual(len(pdbfile.residues), 3)
+        output = StringIO.StringIO()
+        pdbfile.write_pdb(output)
+        output.seek(0)
+        pdbfile2 = structure.read_PDB(output)
+        self.assertEqual(len(pdbfile2.atoms), 33)
+        self.assertEqual(len(pdbfile2.residues), 3)
+        self._compareInputOutputPDBs(pdbfile, pdbfile2)
+
+    def testPdbWriteModels(self):
+        """ Test PDB file writing from NMR structure with models """
+        pdbfile = structure.read_PDB(self.models)
+        self.assertEqual(len(pdbfile.pdbxyz), 20)
+        self.assertEqual(len(pdbfile.atoms), 451)
+        output = StringIO.StringIO()
+        structure.write_PDB(pdbfile, output)
+        output.seek(0)
+        pdbfile2 = structure.read_PDB(output)
+        self.assertEqual(len(pdbfile2.atoms), 451)
+        self._compareInputOutputPDBs(pdbfile, pdbfile2)
+
+    def testPdbWriteXtal(self):
+        """ Test PDB file writing from a Xtal structure """
+        pdbfile = structure.read_PDB(self.pdb)
+        self._check4lyt(pdbfile)
+        output = StringIO.StringIO()
+        pdbfile.write_pdb(output, renumber=False)
+        output.seek(0)
+        pdbfile2 = structure.read_PDB(output)
+        self._check4lyt(pdbfile)
+        self._compareInputOutputPDBs(pdbfile, pdbfile2)
+
+    def _compareInputOutputPDBs(self, pdbfile, pdbfile2):
+        # Now go through all atoms and compare their attributes
+        for a1, a2 in zip(pdbfile.atoms, pdbfile2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.occupancy, a2.occupancy)
+            self.assertEqual(a1.bfactor, a2.bfactor)
+            self.assertEqual(a1.altloc, a2.altloc)
+            self.assertEqual(a1.idx, a2.idx)
+            self.assertEqual(set(a1.other_locations.keys()),
+                             set(a2.other_locations.keys()))
+            self.assertEqual(a1.number, a2.number)
+            self.assertEqual(a1.xx, a2.xx)
+            self.assertEqual(a1.xy, a2.xy)
+            self.assertEqual(a1.xz, a2.xz)
+            # Search all alternate locations as well
+            for k1, k2 in zip(sorted(a1.other_locations.keys()),
+                              sorted(a2.other_locations.keys())):
+                self.assertEqual(k1, k2)
+                oa1 = a1.other_locations[k1]
+                oa2 = a2.other_locations[k2]
+                self.assertEqual(oa1.atomic_number, oa2.atomic_number)
+                self.assertEqual(oa1.name, oa2.name)
+                self.assertEqual(oa1.type, oa2.type)
+                self.assertEqual(oa1.mass, oa2.mass)
+                self.assertEqual(oa1.charge, oa2.charge)
+                self.assertEqual(oa1.occupancy, oa2.occupancy)
+                self.assertEqual(oa1.bfactor, oa2.bfactor)
+                self.assertEqual(oa1.altloc, oa2.altloc)
+                self.assertEqual(oa1.idx, oa2.idx)
+        # Now compare all residues
+        for r1, r2 in zip(pdbfile.residues, pdbfile2.residues):
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.idx, r2.idx)
+            self.assertEqual(r1.ter, r2.ter)
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.insertion_code, r2.insertion_code)
+            self.assertEqual(r1.number, r2.number)
+
     # Private helper test functions
     def _check4lyt(self, obj):
         self.assertEqual(len(obj.pdbxyz), 1)
         self.assertEqual(obj.box,
                          [27.24, 31.87, 34.23, 88.52, 108.53, 111.89])
+        self.assertEqual(obj.space_group, 'P 1')
         self.assertEqual(len(obj.atoms), 1164)
         self.assertEqual(len(obj.residues[0]), 9)
         # Check that alternate conformations are taken into account
