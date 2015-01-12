@@ -641,14 +641,10 @@ class Structure(object):
                     dest.write(terrec % (anum+1, res.name, res.chain, rnum))
                     nmore += 1
         else:
-            def acmp(x, y):
-                xn = x.number or x.idx + 1
-                yn = y.number or y.idx + 1
-                return xn - yn
             last_number = 0
             last_rnumber = 0
             for res in self.residues:
-                for atom in sorted(res.atoms, cmp=acmp):
+                for atom in sorted(res.atoms, key=lambda atom: atom.number):
                     i3 = atom.idx * 3
                     rnum = atom.residue.number or last_rnumber + 1
                     pa, others, (x, y, z) = print_atoms(atom, coords)
