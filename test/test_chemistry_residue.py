@@ -54,7 +54,7 @@ class TestChemistryResidue(unittest.TestCase):
     def testReprOutput(self):
         """ Test the %r representation of the Amino Acids """
         for res in residue.AminoAcidResidue.all_residues:
-            self.assertEquals('<Amino Acid Residue %s: %s [%s]>' % (res.name,
+            self.assertEqual('<Amino Acid Residue %s: %s [%s]>' % (res.name,
                 res.abbr, res.symbol), repr(res))
 
     def testBadLookup(self):

@@ -10,13 +10,14 @@ try:
 except ImportError:
     bz2 = None
 from chemistry.exceptions import PDBError, PDBWarning
-from chemistry.periodic_table import AtomicNum, Mass
+from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.topologyobjects import *
 import copy
 try:
     import gzip
 except ImportError:
     gzip = None
+import itertools
 import re
 import warnings
 
@@ -107,6 +108,8 @@ class Structure(object):
     box : list of 6 floats
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
         box is defined, `box` is set to `None`
+    space_group : str
+        The space group of the structure (default is "P 1")
 
     This class also has a handful of type lists for each of the attributes above
     (excluding `atoms`, `residues`, `chiral_frames`, and `multipole_frames`).
@@ -164,6 +167,7 @@ class Structure(object):
         self.adjust_types = TrackedList()
 
         self.box = None
+        self.space_group = "P 1"
 
     #===================================================
 
@@ -505,6 +509,169 @@ class Structure(object):
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
                 dihedral.atom1 in dihedral.atom4.angle_partners):
                 dihedral.ignore_end = True
+
+    #===================================================
+
+    def write_pdb(self, dest, renumber=True, coordinates=None,
+                  altlocs='all'):
+        """
+        Write a PDB file from the current Structure instance
+
+        Parameters
+        ----------
+        dest : str or file-like
+            Either a file name or a file-like object containing a `write`
+            method to which to write the PDB file. If it is a filename that
+            ends with .gz or .bz2, a compressed version will be written using
+            either gzip or bzip2, respectively.
+        renumber : bool=True
+            If True, renumber the atoms and residues sequentially as they are
+            stored in the structure.  If False, use the original numbering if
+            it was assigned previously
+        coordinates : array-like of float=None
+            If provided, these coordinates will be written to the PDB file
+            instead of the coordinates stored in the structure. These
+            coordinates should line up with the atom order in the structure
+            (not necessarily the order of the "original" PDB file if they
+            differ)
+        altlocs : str='all'
+            Keyword controlling which alternate locations are printed to the
+            resulting PDB file. Allowable options are:
+                - 'all' : (default) print all alternate locations
+                - 'first' : print only the first alternate locations
+                - 'occupancy' : print the one with the largest occupancy. If two
+                  conformers have the same occupancy, the first one to occur is
+                  printed
+            Input is case-insensitive, and partial strings are permitted as long
+            as it is a substring of one of the above options that uniquely
+            identifies the choice.
+        """
+        if altlocs.lower() == 'all'[:len(altlocs)]:
+            altlocs = 'all'
+        elif altlocs.lower() == 'first'[:len(altlocs)]:
+            altlocs = 'first'
+        elif altlocs.lower() == 'occupancy'[:len(altlocs)]:
+            altlocs = 'occupancy'
+        else:
+            raise ValueError("Illegal value of occupancy [%s]; expected 'all', "
+                             "'first', or 'occupancy'" % altlocs)
+        own_handle = False
+        if not hasattr(dest, 'write'):
+            if dest.endswith('.gz'):
+                dest = gz.open(dest, 'w')
+            elif dest.endswith('.bz2'):
+                dest = bz2.BZ2File(dest, 'w')
+            else:
+                dest = open(dest, 'w')
+            own_handle = True
+        atomrec = ('ATOM  %5d %-4s%-1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                   '%6.2f          %2s%-2s\n')
+        terrec = ('TER   %5d      %-3s %1s%4d\n')
+        nchains = len(set([res.chain for res in self.residues if res.chain]))
+        if self.box is not None:
+            a, b, c, alpha, beta, gamma = self.box
+            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n' % (
+                       self.box[0], self.box[1], self.box[2], self.box[3],
+                       self.box[4], self.box[5], self.space_group, nchains))
+        if coordinates is not None:
+            try:
+                crdsize = len(coordinates)
+            except TypeError:
+                raise TypeError("Cannot find length of coordinates")
+            if crdsize == len(self.atoms):
+                try:
+                    coords = coordinates.flatten()
+                except AttributeError:
+                    try:
+                        coords = list(itertools.chain(*coordinates))
+                    except TypeError:
+                        raise TypeError("Unsupported coordinate dimensionality")
+                if len(coords) != len(self.atoms) * 3:
+                    raise TypeError("Unsupported coordinate shape")
+            elif crdsize == len(self.atoms) * 3:
+                coords = coordinates
+            else:
+                raise TypeError("Coordinates has unexpected shape")
+        else:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+            coords = list(itertools.chain(*coords))
+        # Create a function to process each atom and return which one we want
+        # to print, based on our alternate location choice
+        if altlocs == 'all':
+            def print_atoms(atom, coords):
+                i3 = atom.idx * 3
+                return atom, atom.other_locations, coords[i3:i3+3]
+        elif altlocs == 'first':
+            def print_atoms(atom, coords):
+                i3 = atom.idx * 3
+                return atom, dict(), coords[i3:i3+3]
+        elif altlocs == 'occupancy':
+            def print_atoms(atom, coords):
+                occ = atom.occupancy
+                a = atom
+                for key, item in atom.other_locations.iteritems():
+                    if item.occupancy > occ:
+                        occ = item.occupancy
+                        a = item
+                return a, dict(), [a.xx, a.xy, a.xz]
+        else:
+            raise Exception("Should not be here!")
+        if renumber:
+            nmore = 0 # how many *extra* atoms have been added?
+            for res in self.residues:
+                for atom in res.atoms:
+                    i3 = atom.idx * 3
+                    anum = (atom.idx + 1 + nmore) % 100000
+                    rnum = (res.idx + 1) % 10000
+                    pa, others, (x, y, z) = print_atoms(atom, coords)
+                    dest.write(atomrec % (anum , pa.name, pa.altloc,
+                               res.name, res.chain, rnum, res.insertion_code,
+                               x, y, z, pa.occupancy, pa.bfactor,
+                               Element[atom.atomic_number].upper(), ''))
+                    for key in sorted(others.keys()):
+                        oatom = others[key]
+                        nmore += 1
+                        anum = (pa.idx + 1 + nmore) % 100000
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        dest.write(atomrec % (anum, oatom.name, key, res.name,
+                                   res.chain, rnum, res.insertion_code, x, y,
+                                   z, oatom.occupancy, oatom.bfactor,
+                                   Element[oatom.atomic_number].upper(), ''))
+                if res.ter:
+                    dest.write(terrec % (anum+1, res.name, res.chain, rnum))
+                    nmore += 1
+        else:
+            last_number = 0
+            last_rnumber = 0
+            for res in self.residues:
+                for atom in sorted(res.atoms, key=lambda atom: atom.number):
+                    i3 = atom.idx * 3
+                    rnum = atom.residue.number or last_rnumber + 1
+                    pa, others, (x, y, z) = print_atoms(atom, coords)
+                    num = pa.number or last_number + 1
+                    dest.write(atomrec % (num % 100000, pa.name, pa.altloc,
+                               res.name, res.chain, rnum % 10000,
+                               res.insertion_code, x, y, z,
+                               pa.occupancy, pa.bfactor,
+                               Element[atom.atomic_number].upper(), ''))
+                    last_number = num
+                    for key in sorted(others.keys()):
+                        oatom = others[key]
+                        anum = oatom.number or last_number + 1
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        dest.write(atomrec % (anum % 100000, oatom.name, key,
+                                   res.name, res.chain, rnum,
+                                   res.insertion_code, x, y, z,
+                                   oatom.occupancy, oatom.bfactor,
+                                   Element[oatom.atomic_number].upper(), ''))
+                        last_number = anum
+                if res.ter:
+                    dest.write(terrec % (last_number+1, res.name, res.chain,
+                               rnum))
+                    last_number += 1
+                last_rnumber = rnum
+        if own_handle:
+            dest.close()
 
     #===================================================
 
@@ -955,6 +1122,10 @@ def read_PDB(filename):
                 except (IndexError, ValueError):
                     A = B = C = 90.0
                 struct.box = [a, b, c, A, B, C]
+                try:
+                    struct.space_group = line[55:66].strip()
+                except IndexError:
+                    pass
             elif rec == 'EXPDTA':
                 struct.experimental = line[6:].strip()
             elif rec == 'AUTHOR':
@@ -1005,3 +1176,39 @@ def read_PDB(filename):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all'):
+    """
+    Write a PDB file from a structure instance
+
+    Parameters
+    ----------
+    struct : Structure
+        A Structure instance from which to write the PDB file
+    dest : str or file-like
+        Either a file name or a file-like object containing a `write`
+        method to which to write the PDB file
+    renumber : bool=True
+        If True, renumber the atoms and residues sequentially as they are
+        stored in the structure.  If False, use the original numbering if
+        it was assigned previously
+    coordinates : array-like of float=None
+        If provided, these coordinates will be written to the PDB file
+        instead of the coordinates stored in the structure. These
+        coordinates should line up with the atom order in the structure
+        (not necessarily the order of the "original" PDB file if they
+        differ)
+    altlocs : str='all'
+        Keyword controlling which alternate locations are printed to the
+        resulting PDB file. Allowable options are:
+            - 'all' : (default) print all alternate locations
+            - 'first' : print only the first alternate locations
+            - 'occupancy' : print the one with the largest occupancy. If two
+              conformers have the same occupancy, the first one to occur is
+              printed
+        Input is case-insensitive, and partial strings are permitted as long
+        as it is a substring of one of the above options that uniquely
+        identifies the choice.
+    """
+    struct.write_pdb(dest, renumber, coordinates, altlocs)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
