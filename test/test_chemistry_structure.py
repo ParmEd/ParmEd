@@ -140,7 +140,7 @@ class TestChemistryStructure(unittest.TestCase):
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in a1.other_locations.iteritems():
+                for key, oa in a1.other_locations.items():
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa
