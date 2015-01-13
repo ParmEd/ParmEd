@@ -564,7 +564,8 @@ class TestTopologyObjects(unittest.TestCase):
         bonds = [Bond(atoms[0], atoms[2]), Bond(atoms[1], atoms[2]),
                  Bond(atoms[2], atoms[3]), Bond(atoms[3], atoms[4]),
                  Bond(atoms[3], atoms[5])]
-        pit = PiTorsion(*atoms, type=DihedralType(10.0, 2, 180.0))
+        pit = PiTorsion(atoms[0], atoms[1], atoms[2], atoms[3], atoms[4],
+                        atoms[5], type=DihedralType(10.0, 2, 180.0))
         for atom in atoms:
             self.assertIn(atom, pit)
         for bond in bonds:
@@ -616,9 +617,12 @@ class TestTopologyObjects(unittest.TestCase):
                     data[pre+'03_DFUNC_DANGLE2'],
                     data[pre+'03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
         ])
-        tortor1 = TorsionTorsion(*atoms[:5], type=tortor_types[0])
-        tortor2 = TorsionTorsion(*atoms[5:10], type=tortor_types[1])
-        tortor3 = TorsionTorsion(*atoms[10:], type=tortor_types[2])
+        tortor1 = TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3],
+                                 atoms[4], type=tortor_types[0])
+        tortor2 = TorsionTorsion(atoms[5], atoms[6], atoms[7], atoms[8],
+                                 atoms[9], type=tortor_types[1])
+        tortor3 = TorsionTorsion(atoms[10], atoms[11], atoms[12], atoms[13],
+                                 atoms[14], type=tortor_types[2])
 
         # Check the container properties of the torsion-torsion
         for i, atom in enumerate(atoms):
@@ -683,7 +687,12 @@ class TestTopologyObjects(unittest.TestCase):
         """ Running the topologyobjects docstring examples/tests """
         import doctest
         results = doctest.testmod(topologyobjects)
-        self.assertEqual(results.failed, 0)
+        try:
+            self.assertEqual(results.failed, 0)
+        except AttributeError:
+            # Python 2.4 does not return a "results" record, but instead a tuple
+            # of (failed, succeeded)
+            self.assertEqual(results[0], 0)
 
     #=============================================
 
@@ -794,3 +803,6 @@ class TestTopologyObjects(unittest.TestCase):
             for item in items:
                 self.assertIsNot(item, atom)
             self.assertEqual(atom.idx, -1)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -8,10 +8,6 @@ from __future__ import division
 from chemistry.amber.asciicrd import AmberMdcrd
 from chemistry.amber.mask import AmberMask
 from chemistry.amber.netcdffiles import NetCDFTraj
-from chemistry.amber.openmmloader import OpenMMRst7 as Rst7
-from chemistry.amber.openmmreporters import (AmberStateDataReporter,
-               NetCDFReporter, MdcrdReporter, RestartReporter, ProgressReporter,
-               EnergyMinimizerReporter)
 from math import sqrt
 from chemistry.amber.mdin import mdin as Mdin
 from timer import Timer
@@ -26,6 +22,10 @@ try:
     from simtk.openmm.app import (forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2,
                                   Simulation, DCDReporter, amberprmtopfile)
     import simtk.openmm as mm
+    from chemistry.amber.openmmloader import OpenMMRst7 as Rst7
+    from chemistry.amber.openmmreporters import (AmberStateDataReporter,
+                   NetCDFReporter, MdcrdReporter, RestartReporter,
+                   ProgressReporter, EnergyMinimizerReporter)
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False

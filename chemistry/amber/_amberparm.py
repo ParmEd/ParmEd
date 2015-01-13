@@ -1127,12 +1127,12 @@ class AmberParm(AmberFormat, Structure):
             scnb = self.parm_data['SCNB_SCALE_FACTOR']
         except KeyError:
             scnb = [2.0 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
-        for terms in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
-                         self.parm_data['DIHEDRAL_PERIODICITY'],
-                         self.parm_data['DIHEDRAL_PHASE'],
-                         scee, scnb):
+        for k, per, ph, e, n in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
+                                    self.parm_data['DIHEDRAL_PERIODICITY'],
+                                    self.parm_data['DIHEDRAL_PHASE'],
+                                    scee, scnb):
             self.dihedral_types.append(
-                    DihedralType(*terms, list=self.dihedral_types)
+                    DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
         dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
         for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):

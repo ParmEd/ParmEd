@@ -3,6 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
+from compat24 import all
 from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
 import os
@@ -221,6 +222,7 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertFalse(restart.hasvels)
         if has_numpy():
             import numpy as np
+            self.assertIsInstance(restart.coordinates, np.ndarray)
             # Hack numpy off so we test that code path, too
             asciicrd.np = None
             asciicrd.array = array
@@ -232,7 +234,7 @@ class TestCoordinateFiles(unittest.TestCase):
         else:
             restartarray = restart
             crdsum = sum(restart.coordinates)
-        self.assertIsInstance(restart.coordinates, np.ndarray)
+        self.assertIsInstance(restartarray.coordinates, array)
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
 class TestAmberMask(unittest.TestCase):
@@ -544,3 +546,6 @@ class TestObjectAPIs(unittest.TestCase):
 
 if not has_numpy():
     del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
+
+if __name__ == '__main__':
+    unittest.main()

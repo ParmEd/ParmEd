@@ -18,7 +18,49 @@ if not hasattr(unittest.TestCase, 'assertIsInstance'):
         def assertIsInstance(self, thing, type):
             if not isinstance(thing, type):
                 standardMsg = '%s is not an instance of %r' % (obj, type)
-                self.fail(self._formatMessage(msg, standardMsg))
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertIs(self, first, second):
+            if first is not second:
+                standardMsg = "%s is not the same as %s" % (first, second)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertGreaterEqual(self, first, second):
+            if not first >= second:
+                standardMsg = "%s is not greater than or equal to %s" % (first,
+                        second)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertLessEqual(self, first, second):
+            if not first <= second:
+                standardMsg = "%s is not less than or equal to %s" % (first,
+                        second)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertIsNot(self, first, second):
+            if first is second:
+                standardMsg = "%s is the same as %s" (first, second)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertIn(self, first, container):
+            if not first in container:
+                standardMsg = "%s is not contained in %s" % (first, container)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertNotIn(self, first, container):
+            if first in container:
+                standardMsg = "%s is contained in %s" % (first, container)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertGreater(self, first, second):
+            if not first > second:
+                standardMsg = "%s is not greater than %s" % (first, second)
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertLess(self, first, second):
+            if not first < second:
+                standardMsg = "%s is not less than %s" % (first, second)
+                self.fail(self._formatMessage(None, standardMsg))
 
     unittest.TestCase = TestCase
 

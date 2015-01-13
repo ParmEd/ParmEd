@@ -2,6 +2,7 @@
 Tests the functionality in chemistry.residue
 """
 
+import utils
 import unittest
 from chemistry import residue
 
@@ -61,3 +62,6 @@ class TestChemistryResidue(unittest.TestCase):
         """ Test that lookups of non-existent residues fails """
         self.assertRaises(KeyError,
                 lambda: residue.AminoAcidResidue.get('NoResidue'))
+
+if __name__ == '__main__':
+    unittest.main()

@@ -242,3 +242,6 @@ class TestChemistryStructure(unittest.TestCase):
                 self.assertTrue(residue.ter)
             else:
                 self.assertFalse(residue.ter)
+
+if __name__ == '__main__':
+    unittest.main()
