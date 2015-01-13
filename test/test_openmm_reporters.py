@@ -319,3 +319,6 @@ if not has_openmm:
     del TestStateDataReporter, TestTrajRestartReporter
 elif not HAS_NETCDF:
     del TestTrajReporter.TestNetCDFReporter
+
+if __name__ == '__main__':
+    unittest.main()

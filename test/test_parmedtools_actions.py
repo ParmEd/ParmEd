@@ -2149,3 +2149,6 @@ class TestAmoebaParmActions(unittest.TestCase):
                 self.assertEqual(atom.mass, 3.0)
         self.assertAlmostEqual(sum(amoebaparm.parm_data['MASS']),
                                sum(parm.parm_data['MASS']), places=6)
+
+if __name__ == '__main__':
+    unittest.main()

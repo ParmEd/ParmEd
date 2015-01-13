@@ -18,7 +18,12 @@ if not hasattr(unittest.TestCase, 'assertIsInstance'):
         def assertIsInstance(self, thing, type):
             if not isinstance(thing, type):
                 standardMsg = '%s is not an instance of %r' % (obj, type)
-                self.fail(self._formatMessage(msg, standardMsg))
+                self.fail(self._formatMessage(None, standardMsg))
+
+        def assertIs(self, first, second):
+            if id(first) != id(second):
+                standardMsg = "%s is not the same as %s" % (first, second)
+                self.fail(self._formatMessage(None, standardMsg))
 
     unittest.TestCase = TestCase
 

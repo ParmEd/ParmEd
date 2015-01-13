@@ -5,6 +5,7 @@ Tests for the chemistry/charmm subpackage
 from chemistry.charmm import charmmcrds, parameters, psf
 from chemistry import topologyobjects as to
 from chemistry import exceptions
+from compat24 import all
 import os
 import unittest
 import utils
@@ -456,3 +457,6 @@ class TestFileWriting(unittest.TestCase):
         finally:
             f.close()
         self.assertFalse(has_key)
+
+if __name__ == '__main__':
+    unittest.main()

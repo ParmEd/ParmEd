@@ -351,3 +351,6 @@ if has_openmm:
 
 if not has_openmm:
     del TestCharmmFiles
+
+if __name__ == '__main__':
+    unittest.main()

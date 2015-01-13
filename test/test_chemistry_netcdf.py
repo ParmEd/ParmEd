@@ -88,3 +88,6 @@ class TestNetCDF(unittest.TestCase):
                              for x, y in zip(rst.cell_lengths, rst.box[:3])]))
         self.assertTrue(all([round(x-y, 7) == 0 
                              for x, y in zip(rst.cell_angles, rst.box[3:])]))
+
+if __name__ == '__main__':
+    unittest.main()

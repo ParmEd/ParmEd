@@ -686,3 +686,6 @@ class TestNumpyUnits(QuantityTestCase):
 
 if not has_numpy():
     del TestNumpyUnits
+
+if __name__ == '__main__':
+    unittest.main()

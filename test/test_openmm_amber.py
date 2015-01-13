@@ -1223,3 +1223,6 @@ if not has_openmm:
     # don't try to test anything (nor does it count in the final tally, giving
     # us a sense of false achievement)
     del TestAmberParm, TestChamberParm
+
+if __name__ == '__main__':
+    unittest.main()

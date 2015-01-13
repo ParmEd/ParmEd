@@ -794,3 +794,6 @@ class TestTopologyObjects(unittest.TestCase):
             for item in items:
                 self.assertIsNot(item, atom)
             self.assertEqual(atom.idx, -1)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -117,3 +117,6 @@ class TestTinkerFiles(unittest.TestCase):
 
         self.assertAlmostEqual(dyn.positions[10], [-0.1099425448789507,
                                -1.83499212341286, 6.089155631551154])
+
+if __name__ == '__main__':
+    unittest.main()

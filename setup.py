@@ -32,19 +32,16 @@ supports_omm = major > 2 or minor >= 6
 def delete_omm_files():
     """ Deletes OpenMM modules in chemistry """
     join = os.path.join
-    files = [join('chemistry', 'amber', 'openmmloader'),
-             join('chemistry', 'charmm', 'openmmloader'),
-             join('chemistry', 'amber', 'openmmreporters')]
+    files = [join('chemistry', 'amber', 'openmmloader.py'),
+             join('chemistry', 'charmm', 'openmmloader.py'),
+             join('chemistry', 'amber', 'openmmreporters.py'),
+             join('chemistry', 'unit', 'doctests.py')]
     ret = dict()
-    try:
-        for f in files:
-            ret[f] = open(f, 'r').read()
-        return ret
-    except:
-        raise RuntimeError("Something went wrong reading files")
-    finally:
-        for f in files:
-            os.unlink(f)
+    for f in files:
+        ret[f] = open(f, 'r').read()
+    for f in files:
+        os.unlink(f)
+    return ret
 
 def restore_omm_files(filemap):
     """
@@ -78,8 +75,8 @@ if __name__ == '__main__':
         Mixin2to3.fixer_names = fixers
 
     if not supports_omm:
+        filemap = delete_omm_files()
         try:
-            filemap = delete_omm_files()
             setup(name='ParmEd',
                   version='SA_1.1.1', # standalone release version
                   description='Amber parameter file editor',

@@ -573,7 +573,7 @@ class AmoebaParm(AmberParm):
                               data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'],
                               data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']):
             self.stretch_bend_types.append(
-                    StretchBendType(a, b, c, d, e, list=self.stretch_bend_types)
+                    StretchBendType(a, b, c, d, list=self.stretch_bend_types)
             )
         nstrbnd = data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]
         slist = data['AMOEBA_STRETCH_BEND_LIST']
