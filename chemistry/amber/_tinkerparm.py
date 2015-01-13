@@ -568,12 +568,12 @@ class AmoebaParm(AmberParm):
         data = self.parm_data
         del self.stretch_bends[:]
         del self.stretch_bend_types[:]
-        for terms in zip(data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'],
-                         data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'],
-                         data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'],
-                         data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']):
+        for a, b, c, d in zip(data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'],
+                              data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'],
+                              data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'],
+                              data['AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE']):
             self.stretch_bend_types.append(
-                    StretchBendType(*terms, list=self.stretch_bend_types)
+                    StretchBendType(a, b, c, d, e, list=self.stretch_bend_types)
             )
         nstrbnd = data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]
         slist = data['AMOEBA_STRETCH_BEND_LIST']
@@ -658,13 +658,13 @@ class AmoebaParm(AmberParm):
         del self.adjusts[:]
         data = self.parm_data
         try:
-            for terms in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
-                             data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
-                             data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
-                             data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
-                             data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
+            for a,b,c,d,e in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
+                                 data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
+                                 data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
+                                 data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
+                                 data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
                 self.adjust_types.append(
-                        NonbondedExceptionType(*terms, list=self.adjust_types)
+                        NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
                 )
             nadj = data['AMOEBA_ADJUST_NUM_LIST'][0]
             adjlist = data['AMOEBA_ADJUST_LIST']
