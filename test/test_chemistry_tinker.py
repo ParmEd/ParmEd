@@ -2,6 +2,7 @@
 Tests the functionality in the tinker subpackage
 """
 
+from compat24 import any
 import utils
 import unittest
 from chemistry.tinker import parameterfile, system, tinkerfiles
@@ -115,8 +116,9 @@ class TestTinkerFiles(unittest.TestCase):
                      'velocities'):
             self.assertTrue(hasattr(dyn, attr))
 
-        self.assertAlmostEqual(dyn.positions[10], [-0.1099425448789507,
-                               -1.83499212341286, 6.089155631551154])
+        for x, y in zip(dyn.positions[10],
+                [-0.1099425448789507, -1.83499212341286, 6.089155631551154]):
+            self.assertAlmostEqual(x, y)
 
 if __name__ == '__main__':
     unittest.main()

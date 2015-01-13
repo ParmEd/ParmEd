@@ -6,6 +6,7 @@ from __future__ import division
 from chemistry import periodic_table
 from chemistry.amber.readparm import AmberParm, ChamberParm, AmoebaParm
 from chemistry.exceptions import MoleculeWarning, CharmmPSFWarning
+from compat24 import all
 from copy import copy
 try:
     from itertools import izip as zip
