@@ -9,7 +9,7 @@ try:
     import bz2
 except ImportError:
     bz2 = None
-from chemistry.exceptions import PDBError, PDBWarning
+from chemistry.exceptions import PDBError, PDBWarning, AnisouWarning
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.topologyobjects import *
 import copy
@@ -20,6 +20,11 @@ except ImportError:
 import itertools
 import re
 import warnings
+try:
+    import numpy as np
+    create_array = lambda x: np.array(x, dtype=np.float64)
+except ImportError:
+    create_array = lambda x: [float(v) for v in x]
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -513,7 +518,7 @@ class Structure(object):
     #===================================================
 
     def write_pdb(self, dest, renumber=True, coordinates=None,
-                  altlocs='all'):
+                  altlocs='all', write_anisou=False):
         """
         Write a PDB file from the current Structure instance
 
@@ -545,6 +550,9 @@ class Structure(object):
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
+        write_anisou : bool=False
+            If True, an ANISOU record is written for every atom that has one. If
+            False, ANISOU records are not written
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -564,8 +572,10 @@ class Structure(object):
             else:
                 dest = open(dest, 'w')
             own_handle = True
-        atomrec = ('ATOM  %5d %-4s%-1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+        atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                    '%6.2f          %2s%-2s\n')
+        anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                     '      %2s%-2s\n')
         terrec = ('TER   %5d      %-3s %1s%4d\n')
         nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
@@ -627,7 +637,14 @@ class Structure(object):
                     dest.write(atomrec % (anum , pa.name, pa.altloc,
                                res.name, res.chain, rnum, res.insertion_code,
                                x, y, z, pa.occupancy, pa.bfactor,
-                               Element[atom.atomic_number].upper(), ''))
+                               Element[pa.atomic_number].upper(), ''))
+                    if write_anisou and pa.anisou is not None:
+                        anisou = [int(x*1e4) for x in pa.anisou]
+                        dest.write(anisourec % (anum, pa.name, pa.altloc,
+                                   res.name, res.chain, rnum,
+                                   res.insertion_code, anisou[0], anisou[1],
+                                   anisou[2], anisou[3], anisou[4], anisou[5],
+                                   Element[pa.atomic_number],upper(), ''))
                     for key in sorted(others.keys()):
                         oatom = others[key]
                         nmore += 1
@@ -637,6 +654,13 @@ class Structure(object):
                                    res.chain, rnum, res.insertion_code, x, y,
                                    z, oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
+                        if write_anisou and oatom.anisou is not None:
+                            anisou = [int(x*1e4) for x in oatom.anisou]
+                            dest.write(anisourec % (anum, oatom.name,
+                                oatom.altloc, res.name, res.chain, rnum,
+                                res.insertion_code, anisou[0], anisou[1],
+                                anisou[2], anisou[3], anisou[4], anisou[5],
+                                Element[oatom.atomic_number],upper(), ''))
                 if res.ter:
                     dest.write(terrec % (anum+1, res.name, res.chain, rnum))
                     nmore += 1
@@ -645,7 +669,6 @@ class Structure(object):
             last_rnumber = 0
             for res in self.residues:
                 for atom in sorted(res.atoms, key=lambda atom: atom.number):
-                    i3 = atom.idx * 3
                     rnum = atom.residue.number or last_rnumber + 1
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     num = pa.number or last_number + 1
@@ -653,7 +676,14 @@ class Structure(object):
                                res.name, res.chain, rnum % 10000,
                                res.insertion_code, x, y, z,
                                pa.occupancy, pa.bfactor,
-                               Element[atom.atomic_number].upper(), ''))
+                               Element[pa.atomic_number].upper(), ''))
+                    if write_anisou and pa.anisou is not None:
+                        anisou = [int(x*1e4) for x in pa.anisou]
+                        dest.write(anisourec % (num % 100000, pa.name,
+                                pa.altloc, res.name, res.chain, rnum % 10000,
+                                res.insertion_code, anisou[0], anisou[1],
+                                anisou[2], anisou[3], anisou[4], anisou[5],
+                                Element[pa.atomic_number].upper(), ''))
                     last_number = num
                     for key in sorted(others.keys()):
                         oatom = others[key]
@@ -664,6 +694,13 @@ class Structure(object):
                                    res.insertion_code, x, y, z,
                                    oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
+                        if write_anisou and oatom.anisou is not None:
+                            anisou = [int(x*1e4) for x in oatom.anisou]
+                            dest.write(anisourec % (anum % 100000, oatom.name,
+                                    key, res.name, res.chain, rnum,
+                                    res.insertion_code, anisou[0], anisou[1],
+                                    anisou[2], anisou[3], anisou[4], anisou[5],
+                                    Element[oatom.atomic_number].upper(), ''))
                         last_number = anum
                 if res.ter:
                     dest.write(terrec % (last_number+1, res.name, res.chain,
@@ -945,6 +982,7 @@ def read_PDB(filename):
 
     # Support hexadecimal numbering like that printed by VMD
     last_atom = Atom()
+    last_atom_added = None
     last_resid = 1
     resend = 26
     res_hex = False
@@ -1064,8 +1102,9 @@ def read_PDB(filename):
                 if _compare_atoms(last_atom, atom, resname, resid, chain):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
+                    last_atom_added = atom
                     continue
-                last_atom = atom
+                last_atom = last_atom_added = atom
                 if modelno == 1:
                     struct.residues.add_atom(atom, resname, resid,
                                              chain, inscode)
@@ -1085,6 +1124,49 @@ def read_PDB(filename):
                                        orig_atom.residue.name, orig_atom.name,
                                        resname, atname))
                 coordinates.extend([atom.xx, atom.xy, atom.xz])
+            elif rec == 'ANISOU':
+                try:
+                    atnum = int(line[6:11])
+                except ValueError:
+                    warnings.warn('Problem parsing atom number from ANISOU '
+                                  'record', AnisouWarning)
+                    continue # Skip the rest of this record
+                aname = line[12:16].strip()
+                altloc = line[16]
+                rname = line[17:20].strip()
+                chain = line[21]
+                try:
+                    resid = int(line[22:26])
+                except ValueError:
+                    warnings.warn('Problem parsing residue number from ANISOU '
+                                  'record', AnisouWarning)
+                    continue # Skip the rest of this record
+                icode = line[27].strip()
+                try:
+                    u11 = int(line[28:35])
+                    u22 = int(line[35:42])
+                    u33 = int(line[42:49])
+                    u12 = int(line[49:56])
+                    u13 = int(line[56:63])
+                    u23 = int(line[63:70])
+                except ValueError:
+                    warnings.warn('Problem parsing anisotropic factors from '
+                                  'ANISOU record', AnisouWarning)
+                    continue
+                if last_atom_added is None:
+                    warnings.warn('Orphaned ANISOU record. Poorly formatted '
+                                  'PDB file', AnisouWarning)
+                    continue
+                la = last_atom_added
+                if (la.name != aname or la.number != atnum or
+                        la.altloc != altloc or la.residue.name != rname or
+                        la.residue.chain != chain or
+                        la.residue.insertion_code != icode):
+                    warnings.warn('ANISOU record does not match previous atom',
+                                  AnisouWarning)
+                    continue
+                la.anisou = create_array([u11/1e4, u22/1e4, u33/1e4,
+                                          u12/1e4, u13/1e4, u23/1e4])
             elif rec.strip() == 'TER':
                 if modelno == 1: last_atom.residue.ter = True
             elif rec == 'ENDMDL':
@@ -1176,7 +1258,8 @@ def read_PDB(filename):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all'):
+def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
+              write_anisou=False):
     """
     Write a PDB file from a structure instance
 
@@ -1208,7 +1291,10 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all'):
         Input is case-insensitive, and partial strings are permitted as long
         as it is a substring of one of the above options that uniquely
         identifies the choice.
+    write_anisou : bool=False
+        If True, an ANISOU record is written for every atom that has one. If
+        False, ANISOU records are not written
     """
-    struct.write_pdb(dest, renumber, coordinates, altlocs)
+    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

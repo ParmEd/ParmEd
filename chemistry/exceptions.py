@@ -113,3 +113,6 @@ class CharmmPsfEOF(ChemError):
 
 class MissingParameter(ChemError):
     """ If a parameter is missing from a database """
+
+class AnisouWarning(ChemWarning):
+    """ If there was a problem parsing an ANISOU record """
