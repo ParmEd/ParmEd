@@ -518,7 +518,7 @@ class Structure(object):
     #===================================================
 
     def write_pdb(self, dest, renumber=True, coordinates=None,
-                  altlocs='all'):
+                  altlocs='all', write_anisou=False):
         """
         Write a PDB file from the current Structure instance
 
@@ -550,6 +550,9 @@ class Structure(object):
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
+        write_anisou : bool=False
+            If True, an ANISOU record is written for every atom that has one. If
+            False, ANISOU records are not written
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -569,8 +572,10 @@ class Structure(object):
             else:
                 dest = open(dest, 'w')
             own_handle = True
-        atomrec = ('ATOM  %5d %-4s%-1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+        atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                    '%6.2f          %2s%-2s\n')
+        anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                     '      %2s%-2s\n')
         terrec = ('TER   %5d      %-3s %1s%4d\n')
         nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
@@ -632,7 +637,14 @@ class Structure(object):
                     dest.write(atomrec % (anum , pa.name, pa.altloc,
                                res.name, res.chain, rnum, res.insertion_code,
                                x, y, z, pa.occupancy, pa.bfactor,
-                               Element[atom.atomic_number].upper(), ''))
+                               Element[pa.atomic_number].upper(), ''))
+                    if write_anisou and pa.anisou is not None:
+                        anisou = [int(x*1e4) for x in pa.anisou]
+                        dest.write(anisourec % (anum, pa.name, pa.altloc,
+                                   res.name, res.chain, rnum,
+                                   res.insertion_code, anisou[0], anisou[1],
+                                   anisou[2], anisou[3], anisou[4], anisou[5],
+                                   Element[pa.atomic_number],upper(), ''))
                     for key in sorted(others.keys()):
                         oatom = others[key]
                         nmore += 1
@@ -642,6 +654,13 @@ class Structure(object):
                                    res.chain, rnum, res.insertion_code, x, y,
                                    z, oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
+                        if write_anisou and oatom.anisou is not None:
+                            anisou = [int(x*1e4) for x in oatom.anisou]
+                            dest.write(anisourec % (anum, oatom.name,
+                                oatom.altloc, res.name, res.chain, rnum,
+                                res.insertion_code, anisou[0], anisou[1],
+                                anisou[2], anisou[3], anisou[4], anisou[5],
+                                Element[oatom.atomic_number],upper(), ''))
                 if res.ter:
                     dest.write(terrec % (anum+1, res.name, res.chain, rnum))
                     nmore += 1
@@ -657,7 +676,14 @@ class Structure(object):
                                res.name, res.chain, rnum % 10000,
                                res.insertion_code, x, y, z,
                                pa.occupancy, pa.bfactor,
-                               Element[atom.atomic_number].upper(), ''))
+                               Element[pa.atomic_number].upper(), ''))
+                    if write_anisou and pa.anisou is not None:
+                        anisou = [int(x*1e4) for x in pa.anisou]
+                        dest.write(anisourec % (num % 100000, pa.name,
+                                pa.altloc, res.name, res.chain, rnum % 10000,
+                                res.insertion_code, anisou[0], anisou[1],
+                                anisou[2], anisou[3], anisou[4], anisou[5],
+                                Element[pa.atomic_number].upper(), ''))
                     last_number = num
                     for key in sorted(others.keys()):
                         oatom = others[key]
@@ -668,6 +694,13 @@ class Structure(object):
                                    res.insertion_code, x, y, z,
                                    oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
+                        if write_anisou and oatom.anisou is not None:
+                            anisou = [int(x*1e4) for x in oatom.anisou]
+                            dest.write(anisourec % (anum % 100000, oatom.name,
+                                    key, res.name, res.chain, rnum,
+                                    res.insertion_code, anisou[0], anisou[1],
+                                    anisou[2], anisou[3], anisou[4], anisou[5],
+                                    Element[oatom.atomic_number].upper(), ''))
                         last_number = anum
                 if res.ter:
                     dest.write(terrec % (last_number+1, res.name, res.chain,
@@ -1225,7 +1258,8 @@ def read_PDB(filename):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all'):
+def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
+              write_anisou=False):
     """
     Write a PDB file from a structure instance
 
@@ -1257,7 +1291,10 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all'):
         Input is case-insensitive, and partial strings are permitted as long
         as it is a substring of one of the above options that uniquely
         identifies the choice.
+    write_anisou : bool=False
+        If True, an ANISOU record is written for every atom that has one. If
+        False, ANISOU records are not written
     """
-    struct.write_pdb(dest, renumber, coordinates, altlocs)
+    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

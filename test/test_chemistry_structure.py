@@ -8,9 +8,14 @@ try:
 except ImportError:
     # Must be Python 3
     import io as StringIO
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass # Must by py3
+
 import chemistry.structure as structure
 import unittest
-from utils import get_fn
+from utils import get_fn, has_numpy
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -148,6 +153,54 @@ class TestChemistryStructure(unittest.TestCase):
         self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
         for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
             self.assertEqual(x/10000, y)
+
+    def testAnisouWrite(self):
+        """ Tests that write_PDB properly writes ANISOU records """
+        def check_aniso(pdbfile):
+            aniso1 = [2066, 1204, 1269, 44, 126, 191]
+            aniso2 = [2090, 1182, 921, 46, 64, 60]
+            aniso3 = [3057, 3932, 5304, 126, -937, -661]
+            self.assertEqual(len(aniso1), len(pdbfile.atoms[0].anisou))
+            for x, y in zip(aniso1, pdbfile.atoms[0].anisou):
+                self.assertEqual(x/10000, y)
+            self.assertEqual(len(aniso2), len(pdbfile.atoms[1].anisou))
+            for x, y in zip(aniso2, pdbfile.atoms[1].anisou):
+                self.assertEqual(x/10000, y)
+            self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
+            for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
+                self.assertEqual(x/10000, y)
+        pdbfile = structure.read_PDB(self.pdb)
+        check_aniso(pdbfile)
+        output = StringIO.StringIO()
+        pdbfile.write_pdb(output)
+        output.seek(0)
+        pdbfile2 = structure.read_PDB(output)
+        # Should have no anisou records, since by default they are not written
+        for atom in pdbfile2.atoms:
+            self.assertIs(atom.anisou, None)
+        output = reset_stringio(output)
+        pdbfile.write_pdb(output, renumber=False, write_anisou=True)
+        output.seek(0)
+        # This one should have anisou records
+        pdbfile3 = structure.read_PDB(output)
+        self._compareInputOutputPDBs(pdbfile, pdbfile3)
+        for a1, a2 in zip(pdbfile.atoms, pdbfile3.atoms):
+            if has_numpy():
+                self.assertEqual(a1.anisou.shape, a2.anisou.shape)
+            else:
+                self.assertEqual(len(a1.anisou), len(a2.anisou))
+            for x, y in zip(a1.anisou, a2.anisou):
+                self.assertAlmostEqual(x, y, delta=1e-4)
+            self.assertEqual(len(a1.other_locations), len(a2.other_locations))
+            for key in sorted(a1.other_locations.keys()):
+                oa1 = a1.other_locations[key]
+                oa2 = a2.other_locations[key]
+                if has_numpy():
+                    self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
+                else:
+                    self.assertEqual(len(oa1.anisou), len(oa2.anisou))
+                for x, y in zip(oa1.anisou, oa2.anisou):
+                    self.assertAlmostEqual(x, y, delta=1e-4)
 
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
