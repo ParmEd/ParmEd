@@ -9,7 +9,7 @@ try:
     import bz2
 except ImportError:
     bz2 = None
-from chemistry.exceptions import PDBError, PDBWarning
+from chemistry.exceptions import PDBError, PDBWarning, AnisouWarning
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.topologyobjects import *
 import copy
@@ -20,6 +20,11 @@ except ImportError:
 import itertools
 import re
 import warnings
+try:
+    import numpy as np
+    create_array = lambda x: np.array(x, dtype=np.float64)
+except ImportError:
+    create_array = lambda x: [float(v) for v in x]
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -645,7 +650,6 @@ class Structure(object):
             last_rnumber = 0
             for res in self.residues:
                 for atom in sorted(res.atoms, key=lambda atom: atom.number):
-                    i3 = atom.idx * 3
                     rnum = atom.residue.number or last_rnumber + 1
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     num = pa.number or last_number + 1
@@ -945,6 +949,7 @@ def read_PDB(filename):
 
     # Support hexadecimal numbering like that printed by VMD
     last_atom = Atom()
+    last_atom_added = None
     last_resid = 1
     resend = 26
     res_hex = False
@@ -1064,8 +1069,9 @@ def read_PDB(filename):
                 if _compare_atoms(last_atom, atom, resname, resid, chain):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
+                    last_atom_added = atom
                     continue
-                last_atom = atom
+                last_atom = last_atom_added = atom
                 if modelno == 1:
                     struct.residues.add_atom(atom, resname, resid,
                                              chain, inscode)
@@ -1085,6 +1091,49 @@ def read_PDB(filename):
                                        orig_atom.residue.name, orig_atom.name,
                                        resname, atname))
                 coordinates.extend([atom.xx, atom.xy, atom.xz])
+            elif rec == 'ANISOU':
+                try:
+                    atnum = int(line[6:11])
+                except ValueError:
+                    warnings.warn('Problem parsing atom number from ANISOU '
+                                  'record', AnisouWarning)
+                    continue # Skip the rest of this record
+                aname = line[12:16].strip()
+                altloc = line[16]
+                rname = line[17:20].strip()
+                chain = line[21]
+                try:
+                    resid = int(line[22:26])
+                except ValueError:
+                    warnings.warn('Problem parsing residue number from ANISOU '
+                                  'record', AnisouWarning)
+                    continue # Skip the rest of this record
+                icode = line[27].strip()
+                try:
+                    u11 = int(line[28:35])
+                    u22 = int(line[35:42])
+                    u33 = int(line[42:49])
+                    u12 = int(line[49:56])
+                    u13 = int(line[56:63])
+                    u23 = int(line[63:70])
+                except ValueError:
+                    warnings.warn('Problem parsing anisotropic factors from '
+                                  'ANISOU record', AnisouWarning)
+                    continue
+                if last_atom_added is None:
+                    warnings.warn('Orphaned ANISOU record. Poorly formatted '
+                                  'PDB file', AnisouWarning)
+                    continue
+                la = last_atom_added
+                if (la.name != aname or la.number != atnum or
+                        la.altloc != altloc or la.residue.name != rname or
+                        la.residue.chain != chain or
+                        la.residue.insertion_code != icode):
+                    warnings.warn('ANISOU record does not match previous atom',
+                                  AnisouWarning)
+                    continue
+                la.anisou = create_array([u11/1e4, u22/1e4, u33/1e4,
+                                          u12/1e4, u13/1e4, u23/1e4])
             elif rec.strip() == 'TER':
                 if modelno == 1: last_atom.residue.ter = True
             elif rec == 'ENDMDL':

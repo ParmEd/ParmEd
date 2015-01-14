@@ -1,6 +1,8 @@
 """
 Tests the chemistry/structure module
 """
+from __future__ import division
+
 try:
     import cStringIO as StringIO
 except ImportError:
@@ -130,6 +132,22 @@ class TestChemistryStructure(unittest.TestCase):
         # A that has an occupancy of 0.37 and conformer B with occupancy 0.63
         self.assertEqual(pdbfile3.residues[84][4].xx, -4.162)
         self.assertEqual(pdbfile4.residues[84][4].xx, -4.157)
+
+    def testAnisouRead(self):
+        """ Tests that read_PDB properly reads ANISOU records """
+        pdbfile = structure.read_PDB(self.pdb)
+        aniso1 = [2066, 1204, 1269, 44, 126, 191] # first atom's ANISOU record
+        aniso2 = [2090, 1182, 921, 46, 64, 60]    # second atom's ANISOU record
+        aniso3 = [3057, 3932, 5304, 126, -937, -661] # last atom's ANISOU
+        self.assertEqual(len(aniso1), len(pdbfile.atoms[0].anisou))
+        for x, y in zip(aniso1, pdbfile.atoms[0].anisou):
+            self.assertEqual(x/10000, y)
+        self.assertEqual(len(aniso2), len(pdbfile.atoms[1].anisou))
+        for x, y in zip(aniso2, pdbfile.atoms[1].anisou):
+            self.assertEqual(x/10000, y)
+        self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
+        for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
+            self.assertEqual(x/10000, y)
 
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):

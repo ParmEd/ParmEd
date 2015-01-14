@@ -257,6 +257,11 @@ class Atom(_ListItem):
         The intrinsic solvation radius of the atom
     screen : float
         The GB screening factor of the atom
+    anisou : numpy.ndarray(float64) (or list of floats)
+        Anisotropic temperature scaling factors. This is a 6-element numpy array
+        (if numpy is not available, it is a 6-element list) of floating point
+        numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),
+        U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.
     idx : int
         The index of this atom in the list. Set to -1 if this atom is not part
         of a list or the index cannot otherwise be determined (i.e., if the
@@ -429,6 +434,7 @@ class Atom(_ListItem):
         self.other_locations = {} # A dict of Atom instances
         self.atom_type = _UnassignedAtomType
         self.number = number
+        self.anisou = None
    
     #===================================================
 
