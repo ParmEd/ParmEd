@@ -1134,7 +1134,7 @@ def read_PDB(filename):
                 aname = line[12:16].strip()
                 altloc = line[16]
                 rname = line[17:20].strip()
-                chain = line[21]
+                chain = line[21].strip()
                 try:
                     resid = int(line[22:26])
                 except ValueError:
@@ -1162,8 +1162,6 @@ def read_PDB(filename):
                         la.altloc != altloc or la.residue.name != rname or
                         la.residue.chain != chain or
                         la.residue.insertion_code != icode):
-                    if la.residue.chain != chain:
-                      print "hahah ", la.residue.chain, chain
                     warnings.warn('ANISOU record does not match previous atom',
                                   AnisouWarning)
                     continue
