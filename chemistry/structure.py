@@ -644,7 +644,7 @@ class Structure(object):
                                    res.name, res.chain, rnum,
                                    res.insertion_code, anisou[0], anisou[1],
                                    anisou[2], anisou[3], anisou[4], anisou[5],
-                                   Element[pa.atomic_number],upper(), ''))
+                                   Element[pa.atomic_number].upper(), ''))
                     for key in sorted(others.keys()):
                         oatom = others[key]
                         nmore += 1
@@ -660,7 +660,7 @@ class Structure(object):
                                 oatom.altloc, res.name, res.chain, rnum,
                                 res.insertion_code, anisou[0], anisou[1],
                                 anisou[2], anisou[3], anisou[4], anisou[5],
-                                Element[oatom.atomic_number],upper(), ''))
+                                Element[oatom.atomic_number].upper(), ''))
                 if res.ter:
                     dest.write(terrec % (anum+1, res.name, res.chain, rnum))
                     nmore += 1
@@ -1134,7 +1134,7 @@ def read_PDB(filename):
                 aname = line[12:16].strip()
                 altloc = line[16]
                 rname = line[17:20].strip()
-                chain = line[21]
+                chain = line[21].strip()
                 try:
                     resid = int(line[22:26])
                 except ValueError:
