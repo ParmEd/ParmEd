@@ -644,7 +644,7 @@ class Structure(object):
                                    res.name, res.chain, rnum,
                                    res.insertion_code, anisou[0], anisou[1],
                                    anisou[2], anisou[3], anisou[4], anisou[5],
-                                   Element[pa.atomic_number],upper(), ''))
+                                   Element[pa.atomic_number].upper(), ''))
                     for key in sorted(others.keys()):
                         oatom = others[key]
                         nmore += 1
@@ -660,7 +660,7 @@ class Structure(object):
                                 oatom.altloc, res.name, res.chain, rnum,
                                 res.insertion_code, anisou[0], anisou[1],
                                 anisou[2], anisou[3], anisou[4], anisou[5],
-                                Element[oatom.atomic_number],upper(), ''))
+                                Element[oatom.atomic_number].upper(), ''))
                 if res.ter:
                     dest.write(terrec % (anum+1, res.name, res.chain, rnum))
                     nmore += 1
@@ -1162,6 +1162,8 @@ def read_PDB(filename):
                         la.altloc != altloc or la.residue.name != rname or
                         la.residue.chain != chain or
                         la.residue.insertion_code != icode):
+                    if la.residue.chain != chain:
+                      print "hahah ", la.residue.chain, chain
                     warnings.warn('ANISOU record does not match previous atom',
                                   AnisouWarning)
                     continue
