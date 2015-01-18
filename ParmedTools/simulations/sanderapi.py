@@ -88,8 +88,10 @@ def energy(parm, args, output=sys.stdout):
         output.write('Bond     = %20.7f     Angle    = %20.7f\n'
                      'Dihedral = %20.7f     1-4 vdW  = %20.7f\n'
                      '1-4 Elec = %20.7f     vdWaals  = %20.7f\n'
-                     'Elec.    = %20.7f\n'
-                     'TOTAL    = %20.7f\n' % (e.bond, e.angle, e.dihedral,
-                      e.vdw_14, e.elec_14, e.vdw, e.elec, e.tot))
+                     'Elec.    = %20.7f' % (e.bond, e.angle, e.dihedral,
+                      e.vdw_14, e.elec_14, e.vdw, e.elec))
+        if igb != 0 and inp.ntb == 0:
+            output.write('     Egb      = %20.7f' % e.gb)
+        output.write('\nTOTAL    = %20.7f\n' % e.tot)
 
     sander.cleanup()
