@@ -635,7 +635,7 @@ class Structure(object):
                     rnum = (res.idx + 1) % 10000
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                        pa.name = ' %-3s' %pa.name
+                        pa.name = ' %-3s' %pa.name[:4]
                     dest.write(atomrec % (anum , pa.name, pa.altloc,
                                res.name, res.chain, rnum, res.insertion_code,
                                x, y, z, pa.occupancy, pa.bfactor,
@@ -653,7 +653,7 @@ class Structure(object):
                         anum = (pa.idx + 1 + nmore) % 100000
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
                         if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
-                            oatom.name = ' %-3s' %oatom.name
+                            oatom.name = ' %-3s' %oatom.name[:4]
                         dest.write(atomrec % (anum, oatom.name, key, res.name,
                                    res.chain, rnum, res.insertion_code, x, y,
                                    z, oatom.occupancy, oatom.bfactor,
@@ -677,7 +677,7 @@ class Structure(object):
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     num = pa.number or last_number + 1
                     if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                        pa.name = ' %-3s' %pa.name
+                        pa.name = ' %-3s' %pa.name[:4]
                     dest.write(atomrec % (num % 100000, pa.name, pa.altloc,
                                res.name, res.chain, rnum % 10000,
                                res.insertion_code, x, y, z,
@@ -696,7 +696,7 @@ class Structure(object):
                         anum = oatom.number or last_number + 1
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
                         if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
-                            oatom.name = ' %-3s' %oatom.name
+                            oatom.name = ' %-3s' %oatom.name[:4]
                         dest.write(atomrec % (anum % 100000, oatom.name, key,
                                    res.name, res.chain, rnum,
                                    res.insertion_code, x, y, z,
