@@ -1005,6 +1005,12 @@ def read_PDB(filename):
                 x, y, z = line[30:38], line[38:46], line[47:54]
                 occupancy, bfactor = line[54:60], line[60:66]
                 elem, chg = line[76:78], line[78:80]
+                atname = atname.strip()
+                altloc = altloc.strip()
+                resname = resname.strip()
+                chain = chain.strip()
+                inscode = inscode.strip()
+
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '
                 try:
@@ -1132,7 +1138,7 @@ def read_PDB(filename):
                                   'record', AnisouWarning)
                     continue # Skip the rest of this record
                 aname = line[12:16].strip()
-                altloc = line[16]
+                altloc = line[16].strip()
                 rname = line[17:20].strip()
                 chain = line[21].strip()
                 try:
