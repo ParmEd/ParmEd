@@ -626,11 +626,6 @@ class Structure(object):
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
-        # atom names justified according to pdb specs
-        for atom in self.atoms:
-            if not len(atom.name) == 4 and \
-               not len(Element[atom.atomic_number]) == 2:
-                atom.name = ' '+atom.name
         if renumber:
             nmore = 0 # how many *extra* atoms have been added?
             for res in self.residues:
@@ -639,6 +634,8 @@ class Structure(object):
                     anum = (atom.idx + 1 + nmore) % 100000
                     rnum = (res.idx + 1) % 10000
                     pa, others, (x, y, z) = print_atoms(atom, coords)
+                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                        pa.name = ' %-3s' %pa.name
                     dest.write(atomrec % (anum , pa.name, pa.altloc,
                                res.name, res.chain, rnum, res.insertion_code,
                                x, y, z, pa.occupancy, pa.bfactor,
@@ -655,6 +652,8 @@ class Structure(object):
                         nmore += 1
                         anum = (pa.idx + 1 + nmore) % 100000
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
+                            oatom.name = ' %-3s' %oatom.name
                         dest.write(atomrec % (anum, oatom.name, key, res.name,
                                    res.chain, rnum, res.insertion_code, x, y,
                                    z, oatom.occupancy, oatom.bfactor,
@@ -677,6 +676,8 @@ class Structure(object):
                     rnum = atom.residue.number or last_rnumber + 1
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     num = pa.number or last_number + 1
+                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                        pa.name = ' %-3s' %pa.name
                     dest.write(atomrec % (num % 100000, pa.name, pa.altloc,
                                res.name, res.chain, rnum % 10000,
                                res.insertion_code, x, y, z,
@@ -694,6 +695,8 @@ class Structure(object):
                         oatom = others[key]
                         anum = oatom.number or last_number + 1
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
+                            oatom.name = ' %-3s' %oatom.name
                         dest.write(atomrec % (anum % 100000, oatom.name, key,
                                    res.name, res.chain, rnum,
                                    res.insertion_code, x, y, z,
@@ -1011,7 +1014,7 @@ def read_PDB(filename):
                 x, y, z = line[30:38], line[38:46], line[47:54]
                 occupancy, bfactor = line[54:60], line[60:66]
                 elem, chg = line[76:78], line[78:80]
-                atname = atname.strip()
+                atname = atname.strip()[:4]
                 altloc = altloc.strip()
                 resname = resname.strip()
                 chain = chain.strip()
@@ -1143,7 +1146,7 @@ def read_PDB(filename):
                     warnings.warn('Problem parsing atom number from ANISOU '
                                   'record', AnisouWarning)
                     continue # Skip the rest of this record
-                aname = line[12:16].strip()
+                aname = line[12:16].strip()[:4]
                 altloc = line[16].strip()
                 rname = line[17:20].strip()
                 chain = line[21].strip()
