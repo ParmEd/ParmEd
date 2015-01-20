@@ -626,6 +626,11 @@ class Structure(object):
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
+        # atom names justified according to pdb specs
+        for atom in self.atoms:
+            if not len(atom.name) == 4 and \
+               not len(Element[atom.atomic_number]) == 2:
+                atom.name = ' '+atom.name
         if renumber:
             nmore = 0 # how many *extra* atoms have been added?
             for res in self.residues:
@@ -708,6 +713,7 @@ class Structure(object):
                     last_number += 1
                 last_rnumber = rnum
         if own_handle:
+            dest.write("%-80s" %"END")
             dest.close()
 
     #===================================================
