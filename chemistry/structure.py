@@ -580,9 +580,9 @@ class Structure(object):
         nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
             a, b, c, alpha, beta, gamma = self.box
-            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n' % (
+            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                        self.box[0], self.box[1], self.box[2], self.box[3],
-                       self.box[4], self.box[5], self.space_group, nchains))
+                       self.box[4], self.box[5], self.space_group, ''))
         if coordinates is not None:
             try:
                 crdsize = len(coordinates)
@@ -623,6 +623,7 @@ class Structure(object):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item
+                myvar = 10
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
@@ -634,13 +635,17 @@ class Structure(object):
                     anum = (atom.idx + 1 + nmore) % 100000
                     rnum = (res.idx + 1) % 10000
                     pa, others, (x, y, z) = print_atoms(atom, coords)
-                    dest.write(atomrec % (anum , pa.name, pa.altloc,
+                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                        aname = ' %-3s' %pa.name
+                    else:
+                        aname = pa.name[:4]
+                    dest.write(atomrec % (anum , aname, pa.altloc,
                                res.name, res.chain, rnum, res.insertion_code,
                                x, y, z, pa.occupancy, pa.bfactor,
                                Element[pa.atomic_number].upper(), ''))
                     if write_anisou and pa.anisou is not None:
                         anisou = [int(x*1e4) for x in pa.anisou]
-                        dest.write(anisourec % (anum, pa.name, pa.altloc,
+                        dest.write(anisourec % (anum, aname, pa.altloc,
                                    res.name, res.chain, rnum,
                                    res.insertion_code, anisou[0], anisou[1],
                                    anisou[2], anisou[3], anisou[4], anisou[5],
@@ -650,13 +655,17 @@ class Structure(object):
                         nmore += 1
                         anum = (pa.idx + 1 + nmore) % 100000
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
-                        dest.write(atomrec % (anum, oatom.name, key, res.name,
+                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
+                            aname = ' %-3s' %oatom.name
+                        else:
+                            aname = oatom.name[:4]
+                        dest.write(atomrec % (anum, aname, key, res.name,
                                    res.chain, rnum, res.insertion_code, x, y,
                                    z, oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
                         if write_anisou and oatom.anisou is not None:
                             anisou = [int(x*1e4) for x in oatom.anisou]
-                            dest.write(anisourec % (anum, oatom.name,
+                            dest.write(anisourec % (anum, aname,
                                 oatom.altloc, res.name, res.chain, rnum,
                                 res.insertion_code, anisou[0], anisou[1],
                                 anisou[2], anisou[3], anisou[4], anisou[5],
@@ -672,14 +681,18 @@ class Structure(object):
                     rnum = atom.residue.number or last_rnumber + 1
                     pa, others, (x, y, z) = print_atoms(atom, coords)
                     num = pa.number or last_number + 1
-                    dest.write(atomrec % (num % 100000, pa.name, pa.altloc,
+                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                        aname = ' %-3s' %pa.name
+                    else:
+                        aname = pa.name[:4]
+                    dest.write(atomrec % (num % 100000, aname, pa.altloc,
                                res.name, res.chain, rnum % 10000,
                                res.insertion_code, x, y, z,
                                pa.occupancy, pa.bfactor,
                                Element[pa.atomic_number].upper(), ''))
                     if write_anisou and pa.anisou is not None:
                         anisou = [int(x*1e4) for x in pa.anisou]
-                        dest.write(anisourec % (num % 100000, pa.name,
+                        dest.write(anisourec % (num % 100000, aname,
                                 pa.altloc, res.name, res.chain, rnum % 10000,
                                 res.insertion_code, anisou[0], anisou[1],
                                 anisou[2], anisou[3], anisou[4], anisou[5],
@@ -689,14 +702,18 @@ class Structure(object):
                         oatom = others[key]
                         anum = oatom.number or last_number + 1
                         x, y, z = oatom.xx, oatom.xy, oatom.xz
-                        dest.write(atomrec % (anum % 100000, oatom.name, key,
+                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
+                            aname = ' %-3s' %oatom.name
+                        else:
+                            aname = oatom.name[:4]
+                        dest.write(atomrec % (anum % 100000, aname, key,
                                    res.name, res.chain, rnum,
                                    res.insertion_code, x, y, z,
                                    oatom.occupancy, oatom.bfactor,
                                    Element[oatom.atomic_number].upper(), ''))
                         if write_anisou and oatom.anisou is not None:
                             anisou = [int(x*1e4) for x in oatom.anisou]
-                            dest.write(anisourec % (anum % 100000, oatom.name,
+                            dest.write(anisourec % (anum % 100000, aname,
                                     key, res.name, res.chain, rnum,
                                     res.insertion_code, anisou[0], anisou[1],
                                     anisou[2], anisou[3], anisou[4], anisou[5],
@@ -708,6 +725,7 @@ class Structure(object):
                     last_number += 1
                 last_rnumber = rnum
         if own_handle:
+            dest.write("%-80s" %"END")
             dest.close()
 
     #===================================================
@@ -1005,6 +1023,12 @@ def read_PDB(filename):
                 x, y, z = line[30:38], line[38:46], line[47:54]
                 occupancy, bfactor = line[54:60], line[60:66]
                 elem, chg = line[76:78], line[78:80]
+                atname = atname.strip()
+                altloc = altloc.strip()
+                resname = resname.strip()
+                chain = chain.strip()
+                inscode = inscode.strip()
+
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '
                 try:
@@ -1132,7 +1156,7 @@ def read_PDB(filename):
                                   'record', AnisouWarning)
                     continue # Skip the rest of this record
                 aname = line[12:16].strip()
-                altloc = line[16]
+                altloc = line[16].strip()
                 rname = line[17:20].strip()
                 chain = line[21].strip()
                 try:

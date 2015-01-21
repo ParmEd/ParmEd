@@ -15,7 +15,8 @@ except ImportError:
 
 import chemistry.structure as structure
 import unittest
-from utils import get_fn, has_numpy
+import os
+from utils import get_fn, has_numpy, diff_files, get_saved_fn
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -32,6 +33,19 @@ class TestChemistryStructure(unittest.TestCase):
         self.models = get_fn('2koc.pdb')
         self.overflow = get_fn('4lyt_vmd.pdb')
         self.simple = get_fn('ala_ala_ala.pdb')
+        self.format_test = get_fn('SCM_A.pdb')
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
 
     def testAscii(self):
         """ Test PDB file parsing """
@@ -201,6 +215,13 @@ class TestChemistryStructure(unittest.TestCase):
                     self.assertEqual(len(oa1.anisou), len(oa2.anisou))
                 for x, y in zip(oa1.anisou, oa2.anisou):
                     self.assertAlmostEqual(x, y, delta=1e-4)
+
+    def testPDBWriteFormat(self):
+        """ Test PDB atom names are properly justified per PDB standard """
+        pdbfile = structure.read_PDB(self.format_test)
+        f = get_fn('pdb_format_test.pdb', written=True)
+        pdbfile.write_pdb(f, write_anisou=True)
+        self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
