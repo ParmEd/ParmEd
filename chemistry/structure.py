@@ -580,9 +580,9 @@ class Structure(object):
         nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
             a, b, c, alpha, beta, gamma = self.box
-            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n' % (
+            dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                        self.box[0], self.box[1], self.box[2], self.box[3],
-                       self.box[4], self.box[5], self.space_group, nchains))
+                       self.box[4], self.box[5], self.space_group, ''))
         if coordinates is not None:
             try:
                 crdsize = len(coordinates)
