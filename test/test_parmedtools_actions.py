@@ -452,6 +452,12 @@ class TestAmberParmActions(unittest.TestCase):
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(atom.screen, parm.parm_data['SCREEN'][i])
             self.assertEqual(atom.screen, 0.0)
+        PT.change(parm, 'TREE_CHAIN_CLASSIFICATION', ':1-2', 'ABC').execute()
+        for i, atom in enumerate(parm.atoms):
+            self.assertEqual(atom.tree,
+                             parm.parm_data['TREE_CHAIN_CLASSIFICATION'][i])
+            if atom.residue.idx < 2:
+                self.assertEqual(atom.tree, 'ABC')
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
