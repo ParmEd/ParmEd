@@ -406,8 +406,10 @@ class AmberParm(AmberFormat, Structure):
             screen = zeros
         try:
             atnum = self.parm_data['ATOMIC_NUMBER']
+            replace_atnum = True
         except KeyError:
             atnum = [AtomicNum[element_by_mass(m)] for m in mass]
+            replace_atnum = False
         try:
             occu = self.parm_data['ATOM_OCCUPANCY']
         except KeyError:
@@ -431,7 +433,8 @@ class AmberParm(AmberFormat, Structure):
             atom.tree = tree[i]
             atom.radii = radii[i]
             atom.screen = screen[i]
-            atom.atomic_number = atnum[i]
+            if replace_atnum or atom.atomic_number == 0:
+                atom.atomic_number = atnum[i]
             atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
