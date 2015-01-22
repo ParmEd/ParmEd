@@ -2790,7 +2790,7 @@ class addpdb(Action):
                 comments=['Atom temperature factor from the PDB file'])
         self.parm.add_flag('ATOM_NUMBER', '10I8', data=atomnums,
                 comments=['Atom serial number from the PDB file'])
-        self.parm.load_atom_info() # Get that information saved
+        self.parm.load_structure() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
