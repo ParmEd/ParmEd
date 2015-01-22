@@ -2649,13 +2649,14 @@ class addpdb(Action):
     ------------------
         RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)
         RESIDUE_ICODE: Insertion code, if it exists
-        RESIDUE_NUMBER: Original residue number in the PDB
+        RESIDUE_NUMBER: Original residue serial number in the PDB
 
     Atom Properties
     ---------------
         ATOM_ELEMENT: Atomic element (redundant now, not printed by default)
         ATOM_OCCUPANCY: The occupancy of each atom
         ATOM_BFACTOR: The temperature factor of each atom
+        ATOM_NUMBER: The original atom serial number in the PDB
 
     The 'strict' keyword turns residue mismatches (NOT solvent) into errors
     The 'elem' keyword will force printing of the element names.
@@ -2682,7 +2683,10 @@ class addpdb(Action):
         self.pdbpresent = ('RESIDUE_NUMBER' in self.parm.flag_list or
                            'RESIDUE_CHAINID' in self.parm.flag_list or
                            'RESIDUE_ICODE' in self.parm.flag_list or
-                           'ATOM_ELEMENT' in self.parm.flag_list
+                           'ATOM_ELEMENT' in self.parm.flag_list or
+                           'ATOM_OCCUPANCY' in self.parm.flag_list or
+                           'ATOM_BFACTOR' in self.parm.flag_list or
+                           'ATOM_NUMBER' in self.parm.flag_list
         )
 
     def __str__(self):
