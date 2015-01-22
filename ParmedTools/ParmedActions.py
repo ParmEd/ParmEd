@@ -559,7 +559,8 @@ class change(Action):
         elif self.prop in ('ATOM_TYPE_INDEX', 'ATOMIC_NUMBER'):
             self.new_val = arg_list.get_next_int()
             self.new_val_str = '%4i' % self.new_val
-        elif self.prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE'):
+        elif self.prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE',
+                           'TREE_CHAIN_CLASSIFICATION'):
             self.new_val = arg_list.get_next_string()
             if len(self.new_val) > 4:
                 warnings.warn('Only 4 letters allowed for %s entries!'
@@ -571,7 +572,7 @@ class change(Action):
             raise ParmedChangeError(
                         'You may only use "change" with CHARGE, MASS, RADII, '
                         'SCREEN, ATOM_NAME, AMBER_ATOM_TYPE, ATOM_TYPE_INDEX, '
-                        'or ATOMIC_NUMBER!')
+                        'ATOMIC_NUMBER, or TREE_CHAIN_CLASSIFICATION')
         if 'AmoebaParm' in type(self.parm).__name__:
             # Catch illegal values for Amoeba topologies
             if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'ATOM_TYPE_INDEX'):
