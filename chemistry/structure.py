@@ -3,7 +3,8 @@ This module contains the core base class for all of the chemical structures with
 various topological and force field features.
 
 Author: Jason Swails
-Date: November 10, 2014
+Contributors: Pawel Janowski
+Date: 2014 - 2015
 """
 try:
     import bz2
@@ -623,109 +624,78 @@ class Structure(object):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item
-                myvar = 10
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
-        if renumber:
-            nmore = 0 # how many *extra* atoms have been added?
-            for res in self.residues:
-                for atom in res.atoms:
-                    i3 = atom.idx * 3
+        nmore = 0 # how many *extra* atoms have been added?
+        last_number = 0
+        last_rnumber = 0
+        for res in self.residues:
+            if renumber:
+                atoms = res.atoms
+            else:
+                atoms = sorted(res.atoms, key=lambda atom: atom.number)
+            for atom in atoms:
+                pa, others, (x, y, z) = print_atoms(atom, coords)
+                # Figure out the serial numbers we want to print
+                if renumber:
                     anum = (atom.idx + 1 + nmore) % 100000
                     rnum = (res.idx + 1) % 10000
-                    pa, others, (x, y, z) = print_atoms(atom, coords)
-                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                        aname = ' %-3s' %pa.name
-                    else:
-                        aname = pa.name[:4]
-                    dest.write(atomrec % (anum , aname, pa.altloc,
-                               res.name, res.chain, rnum, res.insertion_code,
-                               x, y, z, pa.occupancy, pa.bfactor,
+                else:
+                    anum = (pa.number or last_number + 1) % 100000
+                    rnum = (atom.residue.number or last_rnumber + 1) % 10000
+                    last_number = anum
+                    last_rnumber = rnum
+                # Do any necessary name munging to respect the PDB spec
+                if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                    aname = ' %-3s' % pa.name
+                else:
+                    aname = pa.name[:4]
+                dest.write(atomrec % (anum , aname, pa.altloc,
+                           res.name, res.chain, rnum, res.insertion_code,
+                           x, y, z, pa.occupancy, pa.bfactor,
+                           Element[pa.atomic_number].upper(), ''))
+                if write_anisou and pa.anisou is not None:
+                    anisou = [int(x*1e4) for x in pa.anisou]
+                    dest.write(anisourec % (anum, aname, pa.altloc,
+                               res.name, res.chain, rnum,
+                               res.insertion_code, anisou[0], anisou[1],
+                               anisou[2], anisou[3], anisou[4], anisou[5],
                                Element[pa.atomic_number].upper(), ''))
-                    if write_anisou and pa.anisou is not None:
-                        anisou = [int(x*1e4) for x in pa.anisou]
-                        dest.write(anisourec % (anum, aname, pa.altloc,
-                                   res.name, res.chain, rnum,
-                                   res.insertion_code, anisou[0], anisou[1],
-                                   anisou[2], anisou[3], anisou[4], anisou[5],
-                                   Element[pa.atomic_number].upper(), ''))
-                    for key in sorted(others.keys()):
-                        oatom = others[key]
+                for key in sorted(others.keys()):
+                    oatom = others[key]
+                    x, y, z = oatom.xx, oatom.xy, oatom.xz
+                    if renumber:
                         nmore += 1
                         anum = (pa.idx + 1 + nmore) % 100000
-                        x, y, z = oatom.xx, oatom.xy, oatom.xz
-                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
-                            aname = ' %-3s' %oatom.name
-                        else:
-                            aname = oatom.name[:4]
-                        dest.write(atomrec % (anum, aname, key, res.name,
-                                   res.chain, rnum, res.insertion_code, x, y,
-                                   z, oatom.occupancy, oatom.bfactor,
-                                   Element[oatom.atomic_number].upper(), ''))
-                        if write_anisou and oatom.anisou is not None:
-                            anisou = [int(x*1e4) for x in oatom.anisou]
-                            dest.write(anisourec % (anum, aname,
-                                oatom.altloc, res.name, res.chain, rnum,
-                                res.insertion_code, anisou[0], anisou[1],
-                                anisou[2], anisou[3], anisou[4], anisou[5],
-                                Element[oatom.atomic_number].upper(), ''))
-                if res.ter:
-                    dest.write(terrec % (anum+1, res.name, res.chain, rnum))
-                    nmore += 1
-        else:
-            last_number = 0
-            last_rnumber = 0
-            for res in self.residues:
-                for atom in sorted(res.atoms, key=lambda atom: atom.number):
-                    rnum = atom.residue.number or last_rnumber + 1
-                    pa, others, (x, y, z) = print_atoms(atom, coords)
-                    num = pa.number or last_number + 1
-                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                        aname = ' %-3s' %pa.name
                     else:
-                        aname = pa.name[:4]
-                    dest.write(atomrec % (num % 100000, aname, pa.altloc,
-                               res.name, res.chain, rnum % 10000,
-                               res.insertion_code, x, y, z,
-                               pa.occupancy, pa.bfactor,
-                               Element[pa.atomic_number].upper(), ''))
-                    if write_anisou and pa.anisou is not None:
-                        anisou = [int(x*1e4) for x in pa.anisou]
-                        dest.write(anisourec % (num % 100000, aname,
-                                pa.altloc, res.name, res.chain, rnum % 10000,
-                                res.insertion_code, anisou[0], anisou[1],
-                                anisou[2], anisou[3], anisou[4], anisou[5],
-                                Element[pa.atomic_number].upper(), ''))
-                    last_number = num
-                    for key in sorted(others.keys()):
-                        oatom = others[key]
                         anum = oatom.number or last_number + 1
-                        x, y, z = oatom.xx, oatom.xy, oatom.xz
-                        if len(oatom.name) < 4 and len(Element[oatom.atomic_number]) != 2:
-                            aname = ' %-3s' %oatom.name
-                        else:
-                            aname = oatom.name[:4]
-                        dest.write(atomrec % (anum % 100000, aname, key,
-                                   res.name, res.chain, rnum,
-                                   res.insertion_code, x, y, z,
-                                   oatom.occupancy, oatom.bfactor,
-                                   Element[oatom.atomic_number].upper(), ''))
-                        if write_anisou and oatom.anisou is not None:
-                            anisou = [int(x*1e4) for x in oatom.anisou]
-                            dest.write(anisourec % (anum % 100000, aname,
-                                    key, res.name, res.chain, rnum,
-                                    res.insertion_code, anisou[0], anisou[1],
-                                    anisou[2], anisou[3], anisou[4], anisou[5],
-                                    Element[oatom.atomic_number].upper(), ''))
                         last_number = anum
-                if res.ter:
-                    dest.write(terrec % (last_number+1, res.name, res.chain,
-                               rnum))
+                    if (len(oatom.name) < 4 and
+                            len(Element[oatom.atomic_number]) != 2):
+                        aname = ' %-3s' % oatom.name
+                    else:
+                        aname = oatom.name[:4]
+                    dest.write(atomrec % (anum, aname, key, res.name,
+                               res.chain, rnum, res.insertion_code, x, y,
+                               z, oatom.occupancy, oatom.bfactor,
+                               Element[oatom.atomic_number].upper(), ''))
+                    if write_anisou and oatom.anisou is not None:
+                        anisou = [int(x*1e4) for x in oatom.anisou]
+                        dest.write(anisourec % (anum, aname,
+                            oatom.altloc, res.name, res.chain, rnum,
+                            res.insertion_code, anisou[0], anisou[1],
+                            anisou[2], anisou[3], anisou[4], anisou[5],
+                            Element[oatom.atomic_number].upper(), ''))
+            if res.ter:
+                dest.write(terrec % (anum+1, res.name, res.chain, rnum))
+                if renumber:
+                    nmore += 1
+                else:
                     last_number += 1
-                last_rnumber = rnum
+
+        dest.write("%-80s" % "END")
         if own_handle:
-            dest.write("%-80s" %"END")
             dest.close()
 
     #===================================================
