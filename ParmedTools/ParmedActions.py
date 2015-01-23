@@ -3461,6 +3461,11 @@ class chamber(Action):
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
                                    3*len(psf.atoms)))
+            # Set the coordinates now, since creating the parm may re-order the
+            # atoms in order to maintain contiguous molecules
+            for i, atom in enumerate(psf.atoms):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
                 psf.set_box(*crdbox[:])
@@ -3505,8 +3510,6 @@ class chamber(Action):
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset).view(ChamberParm)
-        if self.crdfile is not None:
-            parm.load_coordinates(coords)
         parm.prm_name = self.psf
         changeradii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
