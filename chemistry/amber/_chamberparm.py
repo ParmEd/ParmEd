@@ -185,6 +185,14 @@ class ChamberParm(AmberParm):
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+        try:
+            coords = []
+            for atom in struct.atoms:
+                coords.extend([atom.xx, atom.xy, atom.xz])
+        except AttributeError:
+            raise
+        else:
+            inst.load_coordinates(coords)
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
 
@@ -651,16 +659,7 @@ def ConvertFromPSF(struct, params, title=''):
         fftype.extend([len(params.parametersets), pset])
     if not fftype:
         fftype.extend([1, 'CHARMM force field: No FF information parsed...'])
-    # Set the coords attribute if applicable
-    try:
-        coords = []
-        for atom in parm.atoms:
-            coords.extend([atom.xx, atom.xy, atom.xz])
-    except AttributeError:
-        # No coordinates... that's OK
-        pass
-    else:
-        parm.coords = coords
+
     # Convert atom types back to integers if that's how they started
     if int_starting:
         for atom in struct.atoms:
