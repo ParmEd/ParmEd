@@ -37,11 +37,11 @@ class OpenMMAmberParm(AmberParm):
     # to be turned on and off selectively. This is a way to implement per-term
     # energy decomposition to compare individual components
 
-    BOND_FORCE_GROUP = 0
-    ANGLE_FORCE_GROUP = 1
-    DIHEDRAL_FORCE_GROUP = 2
-    NONBONDED_FORCE_GROUP = 3
-    GB_FORCE_GROUP = 3
+#   BOND_FORCE_GROUP = 0
+#   ANGLE_FORCE_GROUP = 1
+#   DIHEDRAL_FORCE_GROUP = 2
+#   NONBONDED_FORCE_GROUP = 3
+#   GB_FORCE_GROUP = 3
 
     def openmm_LJ(self):
         """
@@ -760,7 +760,7 @@ class OpenMMAmberParm(AmberParm):
                 gb.setCutoffDistance(cutoff)
             else:
                 raise ValueError('Illegal nonbonded method for use with GBSA')
-            gb.setForceGroup(self.GB_FORCE_GROUP)
+            gb.setForceGroup(self.NONBONDED_FORCE_GROUP)
             system.addForce(gb)
             force.setReactionFieldDielectric(1.0) # applies to NonbondedForce
 
@@ -880,14 +880,14 @@ class OpenMMChamberParm(ChamberParm, OpenMMAmberParm):
     # to be turned on and off selectively. This is a way to implement per-term
     # energy decomposition to compare individual components
 
-    BOND_FORCE_GROUP = 0
-    ANGLE_FORCE_GROUP = 1
-    DIHEDRAL_FORCE_GROUP = 2
-    UREY_BRADLEY_FORCE_GROUP = 3
-    IMPROPER_FORCE_GROUP = 4
-    CMAP_FORCE_GROUP = 5
-    NONBONDED_FORCE_GROUP = 6
-    GB_FORCE_GROUP = 6
+#   BOND_FORCE_GROUP = 0
+#   ANGLE_FORCE_GROUP = 1
+#   DIHEDRAL_FORCE_GROUP = 2
+#   UREY_BRADLEY_FORCE_GROUP = 3
+#   IMPROPER_FORCE_GROUP = 4
+#   CMAP_FORCE_GROUP = 5
+#   NONBONDED_FORCE_GROUP = 6
+#   GB_FORCE_GROUP = 6
 
     def openmm_14_LJ(self):
         """

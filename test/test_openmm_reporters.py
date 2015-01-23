@@ -6,7 +6,7 @@ try:
     import simtk.openmm as mm
     from simtk.openmm import app
     import simtk.unit as u
-    from chemistry.amber.openmmreporters import (NetCDFReporter, MdcrdReporter,
+    from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                     ProgressReporter, RestartReporter, AmberStateDataReporter,
                     EnergyMinimizerReporter)
     from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm

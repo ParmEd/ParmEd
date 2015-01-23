@@ -171,6 +171,7 @@ class Structure(object):
     PI_TORSION_FORCE_GROUP = 8
     STRETCH_BEND_FORCE_GROUP = 9
     TORSION_TORSION_FORCE_GROUP = 10
+    NONBONDED_FORCE_GROUP = 11
 
     #===================================================
 
@@ -916,6 +917,7 @@ class Structure(object):
                                         implicitSolventSaltConc, temperature,
                                         useSASA)
             )
+        return system
 
     #===================================================
 
@@ -1240,6 +1242,7 @@ class Structure(object):
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         force = mm.NonbondedForce()
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
         if u.is_quantity(nonbondedCutoff):
             nonbondedCutoff = nonbondedCutoff.value_in_unit(u.nanometers)
         if nonbondedMethod is None or nonbondedMethod is app.NoCutoff:
@@ -1287,22 +1290,22 @@ class Structure(object):
                         ene_conv / scnb)
             sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
             force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
-                               sigprod, epsprod, replace=True)
+                               sigprod, epsprod, True)
         # Now add the bonds, angles, and exclusions. These will always wipe out
         # existing exceptions and 0 out that exception
         for bond in self.bonds:
-            force.addException(bond.atom1.idx, bond.atom2.idx, 0.0, 0.5, 0.0,
-                               replace=True)
+            force.addException(bond.atom1.idx, bond.atom2.idx,
+                               0.0, 0.5, 0.0, True)
         for angle in self.angles:
-            force.addException(angle.atom1.idx, angle.atom2.idx, 0.0, 0.5, 0.0,
-                               replace=True)
-            force.addException(angle.atom2.idx, angle.atom3.idx, 0.0, 0.5, 0.0,
-                               replace=True)
-            force.addException(angle.atom1.idx, angle.atom3.idx, 0.0, 0.5, 0.0,
-                               replace=True)
+            force.addException(angle.atom1.idx, angle.atom2.idx,
+                               0.0, 0.5, 0.0, True)
+            force.addException(angle.atom2.idx, angle.atom3.idx,
+                               0.0, 0.5, 0.0, True)
+            force.addException(angle.atom1.idx, angle.atom3.idx,
+                               0.0, 0.5, 0.0, True)
         for a1 in self.atoms:
             for a2 in atom.exclusion_partners:
-                force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, replace=True)
+                force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, True)
 
         return force
 
@@ -1415,6 +1418,7 @@ class Structure(object):
         else: # cutoff periodic (PME, CutoffPeriodic, Ewald)
             force.setNonbondedMethod(mm.CustomGBForce.CutoffPeriodic)
             force.setCutoffDistance(cutoff)
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
 
         return force
 
@@ -1737,7 +1741,7 @@ class Structure(object):
     @staticmethod
     def _add_force_to_system(system, force):
         """ Adds an OpenMM force to a system IFF the force is not None """
-        if force is not None: return
+        if force is None: return
         if isinstance(force, tuple) or isinstance(force, list):
             # It's possible we got multiple forces to add
             for f in force:
