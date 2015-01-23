@@ -116,3 +116,6 @@ class MissingParameter(ChemError):
 
 class AnisouWarning(ChemWarning):
     """ If there was a problem parsing an ANISOU record """
+
+class MissingParameterWarning(ChemWarning):
+    """ If a type of parameter is missing, but you don't want it to be fatal """

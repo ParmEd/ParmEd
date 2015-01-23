@@ -80,3 +80,6 @@ THR = AminoAcidResidue('Threonine', 'THR', 'T')
 TRP = AminoAcidResidue('Tryptophan', 'TRP', 'W')
 TYR = AminoAcidResidue('Tyrosine', 'TYR', 'Y')
 VAL = AminoAcidResidue('Valine', 'VAL', 'V')
+
+WATER_NAMES = ['WAT', 'HOH', 'TIP3']
+EXTRA_POINT_NAMES = ['EP', 'LP']

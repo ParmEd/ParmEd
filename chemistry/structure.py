@@ -6,19 +6,32 @@ Author: Jason Swails
 Contributors: Pawel Janowski
 Date: 2014 - 2015
 """
+from __future__ import division
+
 try:
     import bz2
 except ImportError:
     bz2 = None
-from chemistry.exceptions import PDBError, PDBWarning, AnisouWarning
+from chemistry.exceptions import (PDBError, PDBWarning, AnisouWarning,
+        ChemError, MissingParameter, MissingParameterWarning)
 from chemistry.periodic_table import AtomicNum, Mass, Element
-from chemistry.topologyobjects import *
+from chemistry.residue import WATER_NAMES
+from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
+        AngleType, DihedralType, DihedralTypeList, BondType, ImproperType,
+        CmapType, OutOfPlaneBendType, StretchBendType, TorsionTorsionType,
+        NonbondedExceptionType, Bond, Angle, Dihedral, UreyBradley, Improper,
+        Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
+        TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
+        AcceptorDonor, Group, Atom)
+from chemistry import unit as u
+from compat24 import wraps
 import copy
 try:
     import gzip
 except ImportError:
     gzip = None
 import itertools
+import math
 import re
 import warnings
 try:
@@ -26,6 +39,21 @@ try:
     create_array = lambda x: np.array(x, dtype=np.float64)
 except ImportError:
     create_array = lambda x: [float(v) for v in x]
+
+# Try to import the OpenMM modules
+try:
+    from simtk.openmm import app
+    from simtk import openmm as mm
+except ImportError:
+    app = mm = None
+
+def needs_openmm(func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        if app is None or mm is None:
+            raise ImportError('Could not find OpenMM Python bindings')
+        return func(*args, **kwargs)
+    return wrapped
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -131,6 +159,19 @@ class Structure(object):
     dihedral_types _may_ be a list of DihedralType instances, since torsion
     profiles are often represented by a Fourier series with multiple terms
     """
+    # Force groups assigned to each type of force
+    BOND_FORCE_GROUP = 0
+    ANGLE_FORCE_GROUP = 1
+    DIHEDRAL_FORCE_GROUP = 2
+    UREY_BRADLEY_FORCE_GROUP = 3
+    IMPROPER_FORCE_GROUP = 4
+    CMAP_FORCE_GROUP = 5
+    TRIGONAL_ANGLE_FORCE_GROUP = 6
+    OUT_OF_PLANE_BEND_FORCE_GROUP = 7
+    PI_TORSION_FORCE_GROUP = 8
+    STRETCH_BEND_FORCE_GROUP = 9
+    TORSION_TORSION_FORCE_GROUP = 10
+
     #===================================================
 
     def __init__(self):
@@ -327,10 +368,10 @@ class Structure(object):
                                  improper=d.improper, ignore_end=d.ignore_end,
                                  type=c.dihedral_types[d.type.idx])
                 )
-        for u in self.urey_bradleys:
+        for ub in self.urey_bradleys:
             c.urey_bradleys.append(
-                    UreyBradley(atoms[u.atom1.idx], atoms[u.atom2.idx],
-                                c.urey_bradley_types[u.type.idx])
+                    UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
+                                c.urey_bradley_types[ub.type.idx])
             )
         for i in self.impropers:
             c.impropers.append(
@@ -567,7 +608,7 @@ class Structure(object):
         own_handle = False
         if not hasattr(dest, 'write'):
             if dest.endswith('.gz'):
-                dest = gz.open(dest, 'w')
+                dest = gzip.open(dest, 'w')
             elif dest.endswith('.bz2'):
                 dest = bz2.BZ2File(dest, 'w')
             else:
@@ -578,7 +619,6 @@ class Structure(object):
         anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
                      '      %2s%-2s\n')
         terrec = ('TER   %5d      %-3s %1s%4d\n')
-        nchains = len(set([res.chain for res in self.residues if res.chain]))
         if self.box is not None:
             a, b, c, alpha, beta, gamma = self.box
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
@@ -697,6 +737,742 @@ class Structure(object):
         dest.write("%-80s" % "END")
         if own_handle:
             dest.close()
+
+    #===================================================
+
+    @property
+    @needs_openmm
+    def topology(self):
+        """
+        The OpenMM Topology object. Cached when possible, but any changes to the
+        Structure instance results in the topology being deleted and rebuilt
+        """
+        if not self.is_changed():
+            try:
+                return self._topology
+            except AttributeError:
+                pass
+        else:
+            self.prune_empty_terms()
+
+        self._topology = top = app.Topology()
+        chain = top.addChain()
+        try:
+            last_chain = self.residues[0].chain
+            last_residue = None
+            last_omm_residue = None
+        except IndexError:
+            raise ChemError('No residues and/or atoms exist; '
+                            'cannot create Topology')
+        # Add the atoms
+        for i, atom in enumerate(self.atoms):
+            # See if we need to add a new residue
+            if atom.residue is not last_residue:
+                # See if we need a new chain
+                if last_chain != atom.residue.chain:
+                    last_chain = atom.residue.chain
+                    chain = top.addChain()
+                last_residue = atom.residue
+                last_omm_residue = top.addResidue(atom.residue.name, chain)
+            try:
+                elem = app.element.Element.getByAtomicNumber(atom.atomic_number)
+            except KeyError:
+                elem = None
+            top.addAtom(atom.name, elem, last_omm_residue)
+        # Add the bonds
+        atoms = list(top.atoms())
+        for bond in self.bonds:
+            top.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
+        # Set the unit cell dimensions
+        if self.box is not None:
+            top.setUnitCellDimensions(self.box[:3]*u.angstroms)
+        return top
+
+    #===================================================
+
+    @needs_openmm
+    def createSystem(self, nonbondedMethod=None,
+                     nonbondedCutoff=8.0*u.angstroms,
+                     constraints=None,
+                     rigidWater=True,
+                     implicitSolvent=None,
+                     implicitSolventKappa=None,
+                     implicitSolventSaltConc=0.0*u.moles/u.liters,
+                     temperature=298.15*u.kelvin,
+                     soluteDielectric=1.0,
+                     solventDielectric=78.5,
+                     useSASA=True,
+                     removeCMMotion=True,
+                     hydrogenMass=None,
+                     ewaldErrorTolerance=0.0005,
+                     flexibleConstraints=True,
+                     verbose=False,
+                     forceNBFIX=False):
+        """
+        Construct an OpenMM System representing the topology described by the
+        prmtop file.
+
+        Parameters
+        ----------
+        nonbondedMethod : cutoff method
+            This is the cutoff method. It can be either the NoCutoff,
+            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+            simtk.openmm.app namespace
+        nonbondedCutoff : float or distance Quantity
+            The nonbonded cutoff must be either a floating point number
+            (interpreted as nanometers) or a Quantity with attached units. This
+            is ignored if nonbondedMethod is NoCutoff.
+        constraints : None, app.HBonds, app.HAngles, or app.AllBonds
+            Which type of constraints to add to the system (e.g., SHAKE). None
+            means no bonds are constrained. HBonds means bonds with hydrogen are
+            constrained
+        rigidWater : bool=True
+            If True, water is kept rigid regardless of the value of constraints.
+            A value of False is ignored if constraints is not None.
+        implicitSolvent : None, app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2
+            The Generalized Born implicit solvent model to use.
+        implicitSolventKappa : float or 1/distance Quantity = None
+            This is the Debye kappa property related to modeling saltwater
+            conditions in GB. It should have units of 1/distance (1/nanometers
+            is assumed if no units present). A value of None means that kappa
+            will be calculated from implicitSolventSaltConc (below)
+        implicitSolventSaltConc : float or amount/volume Quantity=0 moles/liter
+            If implicitSolventKappa is None, the kappa will be computed from the
+            salt concentration. It should have units compatible with mol/L
+        temperature : float or temperature Quantity = 298.15 kelvin
+            This is only used to compute kappa from implicitSolventSaltConc
+        soluteDielectric : float=1.0
+            The dielectric constant of the protein interior used in GB
+        solventDielectric : float=78.5
+            The dielectric constant of the water used in GB
+        useSASA : bool=True
+            If True, use the ACE non-polar solvation model. Otherwise, use no
+            SASA-based nonpolar solvation model.
+        removeCMMotion : bool=True
+            If True, the center-of-mass motion will be removed periodically
+            during the simulation. If False, it will not.
+        hydrogenMass : float or mass quantity = None
+            If not None, hydrogen masses will be changed to this mass and the
+            difference subtracted from the attached heavy atom (hydrogen mass
+            repartitioning)
+        ewaldErrorTolerance : float=0.0005
+            When using PME or Ewald, the Ewald parameters will be calculated
+            from this value
+        flexibleConstraints : bool=True
+            If False, the energies and forces from the constrained degrees of
+            freedom will NOT be computed. If True, they will (but those degrees
+            of freedom will *still* be constrained).
+        verbose : bool=False
+            If True, the progress of this subroutine will be printed to stdout
+        """
+        # Establish defaults
+        if nonbondedMethod is None:
+            nonbondedMethod = app.NoCutoff
+        system = mm.System()
+        for atom in self.atoms: system.addParticle(atom.mass)
+        self.omm_add_constraints(system, constraints, rigidWater)
+        # Add the various types of forces
+        if verbose: print('Adding bonds...')
+        self._add_force_to_system(system,
+                self.omm_bond_force(constraints, rigidWater,
+                                    flexibleConstraints)
+        )
+        if verbose: print('Adding angles...')
+        self._add_force_to_system(system,
+                self.omm_angle_force(constraints, flexibleConstraints)
+        )
+        if verbose: print('Adding dihedrals...')
+        self._add_force_to_system(system, self.omm_dihedral_force())
+        if verbose: print('Adding Urey-Bradleys...')
+        self._add_force_to_system(system, self.omm_urey_bradley_force())
+        if verbose: print('Adding improper torsions...')
+        self._add_force_to_system(system, self.omm_improper_force())
+        if verbose: print('Adding CMAP torsions...')
+        self._add_force_to_system(system, self.omm_cmap_force())
+        if verbose: print('Adding trigonal angle terms...')
+        self._add_force_to_system(system, self.omm_trigonal_angle_force())
+        if verbose: print('Adding out-of-plane bends...')
+        self._add_force_to_system(system, self.omm_out_of_plane_bend_force())
+        if verbose: print('Adding pi-torsions...')
+        self._add_force_to_system(system, self.omm_pi_torsion_force())
+        if verbose: print('Adding stretch-bends...')
+        self._add_force_to_system(system, self.omm_stretch_bend_force())
+        if verbose: print('Adding torsion-torsions...')
+        self._add_force_to_system(system, self.omm_torsion_torsion_force())
+        if verbose: print('Adding Nonbonded force...')
+        if implicitSolvent is not None:
+            rf_dielc = 1.0
+        else:
+            rf_dielc = 78.5
+        self._add_force_to_system(system,
+                self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff,
+                                         ewaldErrorTolerance, rf_dielc)
+        )
+        if implicitSolvent is not None:
+            if verbose: print('Adding GB force...')
+            self._add_force_to_system(system,
+                    self.omm_gbsa_force(implicitSolvent, nonbondedMethod,
+                                        nonbondedCutoff, soluteDielectric,
+                                        solventDielectric, implicitSolventKappa,
+                                        implicitSolventSaltConc, temperature,
+                                        useSASA)
+            )
+
+    #===================================================
+
+    @needs_openmm
+    def omm_add_constraints(self, system, constraints, rigidWater):
+        """ Adds constraints to a given system
+
+        Parameters
+        ----------
+        system : mm.System
+            The OpenMM system for which constraints should be added
+        constraints : None, app.HBonds, app.AllBonds, or app.HAngles
+            Which kind of constraints should be used
+        rigidWater : bool
+            If True, water bonds are constrained regardless of whether
+            constrains is None
+        """
+        if constraints is None and not rigidWater: return
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        deg_to_rad = math.pi / 180.0
+        # Rigid water only
+        if constraints is None:
+            for bond in self.bonds:
+                if (bond.atom1.residue.name in WATER_NAMES or
+                        bond.atom2.residue.name in WATER_NAMES):
+                    system.addConstraint(bond.atom1.idx, bond.atom2.idx,
+                                         bond.type.req*length_conv)
+            return
+        # Other types of constraints
+        for bond in self.bonds:
+            if constraints is not app.HBonds or (bond.atom1.element == 1
+                    or bond.atom2.element == 1):
+                system.addConstraint(bond.atom1.idx, bond.atom2.idx,
+                                     bond.type.req*length_conv)
+        if constraints is app.HAngles:
+            for angle in self.angles:
+                num_h = (angle.atom1.element == 1 + angle.atom2.element == 1 +
+                         angle.atom3.element == 1)
+                if num_h >= 2 or (num_h == 1 and angle.atom2.element == 8):
+                    # Constrain this angle
+                    l1 = l2 = None
+                    for bond in angle.atom2.bonds:
+                        if bond in angle and angle.atom1 in bond:
+                            l1 = bond.type.req * length_conv
+                        elif bond in angle and angle.atom3 in bond:
+                            l2 = bond.type.req * length_conv
+                    # Law of cosines to find the constraint distance
+                    if l1 is None or l2 is None: continue # no bonds found...
+                    cost = math.cos(angle.type.theteq*deg_to_rad)
+                    length = math.sqrt(l1*l1 + l2*l2 - 2*l1*l2*cost)*length_conv
+                    system.addConstraint(angle.atom1, angle.atom3, length)
+
+    #===================================================
+
+    @needs_openmm
+    def omm_bond_force(self, constraints=None, rigidWater=True,
+                       flexibleConstraints=True):
+        """
+        Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
+        for an Amoeba-parametrized system)
+
+        Parameters
+        ----------
+        constraints : None, app.HBonds, app.AllBonds, or app.HAngles
+            The types of constraints that are on the system. If
+            flexibleConstraints is False, then the constrained bonds will not be
+            added to the resulting Force
+        rigidWater : bool=True
+            Should water-H bonds be constrained regardless of `constraints`?
+        flexibleConstraints : bool=True
+            If True, all bonds are added to the force regardless of
+            `constraints`
+
+        Returns
+        -------
+        force
+            HarmonicBondForce (or AmoebaBondForce if this is an Amoeba system),
+            or None if there are no bonds to add
+        """
+        if not flexibleConstraints and constraints in (app.HAngles,
+                app.AllBonds) or not self.bonds:
+            return None # No bonds to add
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
+        _ommfrc = u.kilojoule_per_mole/u.nanometer**2
+        frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
+        # See if we need to add Amoeba bonds or regular bonds
+        if (hasattr(self.bond_types, 'degree') and
+                hasattr(self.bond_types, 'coeffs')):
+            force = mm.AmoebaBondForce()
+            force.setGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
+            force.setGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
+        else:
+            force = mm.HarmonicBondForce()
+        force.setForceGroup(self.BOND_FORCE_GROUP)
+        # Add the bonds
+        for bond in self.bonds:
+            if (bond.atom1.element == 1 or bond.atom2.element == 1) and (
+                    not flexibleConstraints and constraints is app.HBonds):
+                continue
+            if bond.type is None:
+                raise MissingParameter('Cannot find necessary parameters')
+            force.addBond(bond.atom1.idx, bond.atom2.idx,
+                          bond.type.req*length_conv, 2*bond.type.k*frc_conv)
+        # Done adding the force
+        if force.getNumBonds() == 0:
+            return None
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_angle_force(self, constraints=None, flexibleConstraints=True):
+        """
+        Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
+        angles are for an Amoeba-parametrized system)
+
+        Parameters
+        ----------
+        constraints : None, app.HBonds, app.AllBonds, or app.HAngles
+            The types of constraints that are on the system. If
+            flexibleConstraints is False, then the constrained bonds will not be
+            added to the resulting Force
+        flexibleConstraints : bool=True
+            If True, all bonds are added to the force regardless of
+            `constraints`
+
+        Returns
+        -------
+        force
+            HarmonicAngleForce (or AmoebaAngleForce if this is an Amoeba
+            system), or None if there are no angles to add
+        """
+        if not self.angles: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        if (hasattr(self.angle_types, 'degree') and
+                hasattr(self.angle_types, 'coeffs')):
+            c = self.angle_types.coeffs
+            force = mm.AmoebaAngleForce()
+            force.setAmoebaGlobalAngleCubic(c[3])
+            force.setAmoebaGlobalAngleQuartic(c[4])
+            force.setAmoebaGlobalAnglePentic(c[5])
+            force.setAmoebaGlobalAngleSextic(c[6])
+        else:
+            force = mm.HarmonicAngleForce()
+        force.setForceGroup(self.ANGLE_FORCE_GROUP)
+        for angle in self.angles:
+            num_h = (angle.atom1.element == 1 + angle.atom2.element == 1 +
+                     angle.atom3.element == 1)
+            if constraints is app.HAngles and (num_h >= 2 or (num_h == 1 and
+                    angle.atom2.element == 8) and not flexibleConstraints):
+                continue
+            if angle.type is None:
+                raise MissingParameter('Cannot find angle parameters')
+            force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
+                           angle.type.theteq, 2*angle.type.k*frc_conv)
+        if force.getNumAngles() == 0:
+            return None
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_dihedral_force(self):
+        """ Creates the OpenMM PeriodicTorsionForce modeling dihedrals
+
+        Returns
+        -------
+        PeriodicTorsionForce
+            Or None if no torsions are present in this system
+        """
+        if not self.dihedrals: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.PeriodicTorsionForce()
+        force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        for tor in self.dihedrals:
+            if tor.type is None:
+                raise MissingParameter('Cannot find torsion parameters')
+            if isinstance(tor.type, DihedralTypeList):
+                for typ in tor.type:
+                    force.addTorsion(tor.atom1.idx, tor.atom2.idx,
+                                     tor.atom3.idx, tor.atom4.idx,
+                                     int(typ.per), typ.phase,
+                                     typ.phi_k*frc_conv)
+            else:
+                force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                                 tor.atom4.idx, int(tor.type.per),
+                                 tor.type.phase, tor.type.phi_k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_urey_bradley_force(self):
+        """ Creates the OpenMM Urey-Bradley force
+
+        Returns
+        -------
+        HarmonicBondForce
+            Or None, if no urey-bradleys are present
+        """
+        if not self.urey_bradleys: return None
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
+        _ommfrc = u.kilojoule_per_mole/u.nanometer**2
+        frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
+        force = mm.HarmonicBondForce()
+        force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
+        for urey in self.urey_bradleys:
+            if urey.type is None:
+                raise MissingParameter('Cannot find urey-bradley parameters')
+            force.addBond(urey.atom1.idx, urey.atom2.idx,
+                          urey.type.req*length_conv, 2*urey.type.k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_improper_force(self):
+        """ Creates the OpenMM improper torsion force (quadratic bias)
+
+        Returns
+        -------
+        CustomTorsionForce
+            With the formula k*(phi-phi0)^2, or None if there are no impropers
+        """
+        if not self.impropers: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.CustomTorsionForce("k*(theta-theta0)^2")
+        force.addPerTorsionParameter('k')
+        force.addPerTorsionParameter('theta0')
+        force.setForceGroup(self.IMPROPER_FORCE_GROUP)
+        for imp in self.impropers:
+            if imp.type is None:
+                raise MissingParameter('Cannot find improper torsion '
+                                       'parameters')
+            force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
+                             imp.atom4.idx, (imp.type.psi_k*frc_conv,
+                             imp.type.psi_eq))
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_cmap_force(self):
+        """ Creates the OpenMM CMAP torsion force
+
+        Returns
+        -------
+        CMAPTorsionForce
+            Or None, if no CMAP terms are present
+        """
+        if not self.cmaps: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.CMAPTorsionForce()
+        force.setForceGroup(self.CMAP_FORCE_GROUP)
+        # First get the list of cmap maps we're going to use. Just store the IDs
+        # so we have simple integer comparisons to do later
+        cmap_type_list = []
+        cmap_map = dict()
+        for cmap in self.cmaps:
+            if cmap.type is None:
+                raise MissingParameter('Cannot find CMAP torsion parameters')
+            if not id(cmap.type) in cmap_type_list:
+                ct = cmap.type
+                cmap_type_list.append(id(ct))
+                # OpenMM takes the correction maps in the range 0 to 360
+                # degrees, but we store it in -180 -- 180 (and in the transpose
+                # of what OpenMM expects).
+                grid = ct.grid.switch_range().T
+                m = force.addMap(ct.resolution, [x*frc_conv for x in grid])
+                cmap_map[id(ct)] = m
+        # Now add all of the cmaps
+        for cmap in self.cmaps:
+            force.addTorsion(cmap_map[id(cmap.type)],
+                             cmap.atom1.idx, cmap.atom2.idx, cmap.atom3.idx,
+                             cmap.atom4.idx, cmap.atom2.idx, cmap.atom3.idx,
+                             cmap.atom4.idx, cmap.atom5.idx)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_nonbonded_force(self, nonbondedMethod=None,
+                            nonbondedCutoff=8*u.angstroms,
+                            ewaldErrorTolerance=0.0005,
+                            reactionFieldDielectric=78.5):
+        """ Creates the OpenMM NonbondedForce instance
+
+        Parameters
+        ----------
+        nonbondedMethod : cutoff method
+            This is the cutoff method. It can be either the NoCutoff,
+            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+            simtk.openmm.app namespace
+        nonbondedCutoff : float or distance Quantity
+            The nonbonded cutoff must be either a floating point number
+            (interpreted as nanometers) or a Quantity with attached units. This
+            is ignored if nonbondedMethod is NoCutoff.
+        ewaldErrorTolerance : float=0.0005
+            When using PME or Ewald, the Ewald parameters will be calculated
+            from this value
+        reactionFieldDielectric : float=78.5
+            If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+            region beyond the cutoff is treated using a reaction field method
+            with this dielectric constant. It should be set to 1 if another
+            implicit solvent model is being used (e.g., GB)
+
+        Returns
+        -------
+        NonbondedForce [, CustomNonbondedForce]
+            This is a virtual method that must be overridden in subclasses
+        """
+        return None
+
+    #===================================================
+
+    @needs_openmm
+    def omm_gbsa_force(self, implicitSolvent,
+                       nonbondedMethod=None,
+                       nonbondedCutoff=30.0*u.angstroms,
+                       soluteDielectric=1.0,
+                       solventDielectric=78.5,
+                       implicitSolventKappa=None,
+                       implicitSolventSaltConc=0.0*u.moles/u.liter,
+                       temperature=298.15*u.kelvin,
+                       useSASA=True):
+        """
+        Creates a Generalized Born force for running implicit solvent
+        calculations
+
+        Parameters
+        ----------
+        implicitSolvent : app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2
+            The Generalized Born implicit solvent model to use.
+        nonbondedMethod : cutoff method
+            This is the cutoff method. It can be either the NoCutoff,
+            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+            simtk.openmm.app namespace. Default is NoCutoff
+        nonbondedCutoff : float or distance Quantity
+            The nonbonded cutoff must be either a floating opint number
+            (interpreted as nanometers) or a Quantity with attached units. This
+            is ignored if nonbondedMethod is NoCutoff
+        implicitSolventKappa : float or 1/distance Quantity = None
+            This is the Debye kappa property related to modeling saltwater
+            conditions in GB. It should have units of 1/distance (1/nanometers
+            is assumed if no units present). A value of None means that kappa
+            will be calculated from implicitSolventSaltConc (below)
+        implicitSolventSaltConc : float or amount/volume Quantity=0 moles/liter
+            If implicitSolventKappa is None, the kappa will be computed from the
+            salt concentration. It should have units compatible with mol/L
+        temperature : float or temperature Quantity = 298.15 kelvin
+            This is only used to compute kappa from implicitSolventSaltConc
+        soluteDielectric : float=1.0
+            The dielectric constant of the protein interior used in GB
+        solventDielectric : float=78.5
+            The dielectric constant of the water used in GB
+        """
+        from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
+                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force,
+                convertParameters)
+        if implicitSolvent is None: return None
+        if useSASA:
+            sasa = 'ACE'
+        else:
+            sasa = None
+        if nonbondedMethod is None:
+            nonbondedMethod = app.NoCutoff
+        if implicitSolvent not in (app.HCT, app.OBC1, app.OBC2, app.GBn,
+                app.GBn2):
+            raise ValueError('Unrecognized implicit solvent model')
+        gb_parms = convertParameters(self._get_gb_parameters(implicitSolvent),
+                                     str(implicitSolvent))
+        if implicitSolventKappa is None:
+            if u.is_quantity(implicitSolventSaltConc):
+                sc = implicitSolventSaltConc.value_in_unit(u.moles/u.liter)
+                implicitSolventSaltConc = sc
+            if u.is_quantity(temperature):
+                temperature = temperature.value_in_unit(u.kelvin)
+            # The constant is 1 / sqrt(eps_0 * kB / (2*NA*q^2*1000)) where NA is
+            # Avogadro's number, eps_0 is the permittivity of free space, q is
+            # the charge (this # matches Amber's conversion factor)
+            implicitSolventKappa = 50.33355 * math.sqrt(implicitSolventSaltConc
+                                          / solventDielectric / temperature)
+            # Multiply by 0.73 to account for ion exclusions, and multiply by 10
+            # to convert to 1/nm from 1/angstroms
+            implicitSolventKappa *= 7.3
+        elif u.is_quantity(implicitSolventKappa):
+            implicitSolventKappa = implicitSolventKappa.value_in_unit(
+                    u.nanometer**-1)
+
+        if u.is_quantity(nonbondedCutoff):
+            cutoff = nonbondedCutoff.value_in_unit(u.nanometers)
+        else:
+            cutoff = nonbondedCutoff
+        if implicitSolvent is app.HCT:
+            force = GBSAHCTForce(solventDielectric, soluteDielectric, sasa,
+                                 cutoff, kappa=implicitSolventKappa)
+        elif implicitSolvent is app.OBC1:
+            force = GBSAOBC1Force(solventDielectric, soluteDielectric, sasa,
+                                  cutoff, kappa=implicitSolventKappa)
+        elif implicitSolvent is app.OBC2:
+            force = GBSAOBC2Force(solventDielectric, soluteDielectric, sasa,
+                                  cutoff, kappa=implicitSolventKappa)
+        elif implicitSolvent is app.GBn:
+            force = GBSAGBnForce(solventDielectric, soluteDielectric, sasa,
+                                 cutoff, kappa=implicitSolventKappa)
+        elif implicitSolvent is app.GBn2:
+            force = GBSAGBn2Force(solventDielectric, soluteDielectric, sasa,
+                                  cutoff, kappa=implicitSolventKappa)
+        else:
+            raise ValueError('Unexpected implicit solvent model... '
+                             'should not be here')
+        for i, atom in enumerate(self.atoms):
+            force.addParticle([atom.charge] + list(gb_parms[i]))
+        # Set cutoff method
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomGBForce.CutoffNonPeriodic)
+            force.setCutoffDistance(cutoff)
+        else: # cutoff periodic (PME, CutoffPeriodic, Ewald)
+            force.setNonbondedMethod(mm.CustomGBForce.CutoffPeriodic)
+            force.setCutoffDistance(cutoff)
+
+        return force
+
+    #===================================================
+
+    # Amoeba-specific forces below
+
+    @needs_openmm
+    def omm_trigonal_angle_force(self):
+        """ Creates the Amoeba trigonal-angle force
+
+        Returns
+        -------
+        AmoebaInPlaneAngleForce
+            The trigonal in-plane Angle force
+        """
+        if not self.trigonal_angles: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        if (not hasattr(self.trigonal_angle_types, 'degree') or not
+                hasattr(self.trigonal_angle_types, 'coeffs')):
+            raise MissingParameter('Do not have the trigonal angle force '
+                                   'table parameters')
+        force = mm.AmoebaInPlaneAngleForce()
+        c = self.trigonal_angle_types.coeffs
+        force.setAmoebaGlobalInPlaneAngleCubic(c[3])
+        force.setAmoebaGlobalInPlaneAngleQuartic(c[4])
+        force.setAmoebaGlobalInPlaneAngleQuintic(c[5])
+        force.setAmoebaGlobalInPlaneAngleSextic(c[6])
+        force.setForceGroup(self.TRIGONAL_ANGLE_FORCE_GROUP)
+        for ang in self.trigonal_angles:
+            if ang.type is None:
+                raise MissingParameter('Missing trigonal angle parameters')
+            force.addAngle(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
+                           ang.atom4.idx, ang.type.theteq,
+                           ang.type.k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_out_of_plane_bend_force(self):
+        """ Creates the Amoeba out-of-plane bend force
+
+        Returns
+        -------
+        AmoebaOutOfPlaneBendForce
+            The out-of-plane bend Angle force
+        """
+        if not self.out_of_plane_bends: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        if (not hasattr(self.out_of_plane_bend_types, 'degree') or not
+                hasattr(self.out_of_plane_bend_types, 'coeffs')):
+            raise MissingParameter('Do not have the trigonal angle force '
+                                   'table parameters')
+        force = mm.AmoebaOutOfPlaneBendForce()
+        c = self.out_of_plane_bend_types.coeffs
+        force.setAmoebaGlobalOutOfPlaneBendCubic(c[3])
+        force.setAmoebaGlobalOutOfPlaneBendQuartic(c[4])
+        force.setAmoebaGlobalOutOfPlaneBendQuintic(c[5])
+        force.setAmoebaGlobalOutOfPlaneBendSextic(c[6])
+        force.setForceGroup(self.OUT_OF_PLANE_BEND_FORCE_GROUP)
+        for ang in self.out_of_plane_bends:
+            if ang.type is None:
+                raise MissingParameter('Missing out-of-plane bend parameters')
+            force.addOutOfPlaneBend(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
+                                    ang.atom4.idx, 2*ang.type.k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_pi_torsion_force(self):
+        """ Creates the Amoeba pi-torsion force
+
+        Returns
+        -------
+        AmoebaPiTorsionForce
+            The pi-torsion force
+        """
+        if not self.pi_torsions: return None
+        frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.AmoebaPiTorsionForce()
+        force.setForceGroup(self.PI_TORSION_FORCE_GROUP)
+        for ang in self.pi_torsions:
+            if ang.type is None:
+                raise MissingParameter('Missing pi-torsion parameters')
+            force.addPiTorsion(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
+                               ang.atom4.idx, ang.atom5.idx, ang.atom6.idx,
+                               ang.type.phi_k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_stretch_bend_force(self):
+        """ Create the OpenMM Amoeba stretch-bend force for this system
+
+        Returns
+        -------
+        AmoebaStretchBendForce
+            The stretch-bend force containing all terms in this system
+        """
+        if not self.stretch_bends: return None
+        # Conversion factor taken from pyopenmm/processTinkerForceField.py
+        frc_conv = math.pi / 180 * 41.84 # 4.184 * 10
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        force = mm.AmoebaStretchBendForce()
+        force.setForceGroup(self.STRETCH_BEND_FORCE_GROUP)
+        for strbnd in self.stretch_bends:
+            if strbnd.type is None:
+                raise MissingParameter("Missing stretch-bend parameters")
+            force.addStretchBend(strbnd.atom1.idx, strbnd.atom2.idx,
+                                 strbnd.atom3.idx, strbnd.type.req1*length_conv,
+                                 strbnd.type.req2*length_conv,
+                                 strbnd.type.k*frc_conv)
+
+    #===================================================
+
+    @needs_openmm
+    def omm_torsion_torsion_force(self):
+        """ Create the OpenMM Amoeba coupled-torsion (CMAP) force
+
+        Returns
+        -------
+        AmoebaTorsionTorsionForce
+            The torsion-torsion (CMAP) force with all coupled-torsion parameters
+            for this system
+        """
+        if not self.torsion_torsions: return None
+        # Not implemented yet...
+        warnings.warn("Torsion-torsions found, but not yet implemented!",
+                      MissingParameterWarning)
 
     #===================================================
 
@@ -881,6 +1657,19 @@ class Structure(object):
                 del self.adjusts[i]
             elif adj.atom1.idx == -1 or adj.atom2.idx == -1:
                 del self.adjusts[i]
+
+    #===================================================
+
+    @staticmethod
+    def _add_force_to_system(system, force):
+        """ Adds an OpenMM force to a system IFF the force is not None """
+        if force is not None: return
+        if isinstance(force, tuple) or isinstance(force, list):
+            # It's possible we got multiple forces to add
+            for f in force:
+                system.addForce(f)
+            return
+        system.addForce(force)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
