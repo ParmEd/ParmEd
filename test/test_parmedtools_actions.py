@@ -76,8 +76,25 @@ class TestNonParmActions(unittest.TestCase):
         self.assertTrue(parm.has_cmap)
         self.assertEqual(parm.ptr('ifbox'), 0)
 
+    def testChamberGlobbing(self):
+        """ Test globbing in the chamber action """
+        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+                                module='psf')
+        a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                       '-toppar', get_fn('*_all22_prot.inp'),
+                       '-crd', get_fn('ala_ala_ala.pdb'))
+        a.execute()
+        parm = a.parm
+        self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
+        self.assertTrue(parm.chamber)
+        self.assertTrue(parm.has_cmap)
+        self.assertEqual(parm.ptr('ifbox'), 0)
+
     def testChamberNbfix(self):
         """ Test the chamber action with a complex system using NBFIX """
+        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+                                module='psf')
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
                        '-param %s' % get_fn('par_all36_prot.prm'),
                        '-str %s' % get_fn('toppar_water_ions.str'),
