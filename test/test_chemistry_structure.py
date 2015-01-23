@@ -34,6 +34,7 @@ class TestChemistryStructure(unittest.TestCase):
         self.overflow = get_fn('4lyt_vmd.pdb')
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
+        self.overflow2 = get_fn('overflow.pdb')
         try:
             os.makedirs(get_fn('writes'))
         except OSError:
@@ -70,6 +71,15 @@ class TestChemistryStructure(unittest.TestCase):
         self.assertEqual(len(pdbfile.atoms), 110237)
         self.assertEqual(len(pdbfile.residues), 35697)
         self.assertEqual(pdbfile.box, [0, 0, 0, 90, 90, 90])
+
+    def testRegularOverflow(self):
+        """ Test PDB file where atom number goes to ***** after 99999 """
+        pdbfile = structure.read_PDB(self.overflow2)
+        self.assertEqual(len(pdbfile.atoms), 114277)
+        self.assertEqual(len(pdbfile.residues), 25042)
+        for i, atom in enumerate(pdbfile.atoms):
+            self.assertEqual(atom.number, i+1)
+            self.assertEqual(atom.idx, i)
 
     def testPdbWriteSimple(self):
         """ Test PDB file writing on a very simple input structure """

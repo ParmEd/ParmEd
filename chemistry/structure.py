@@ -975,6 +975,7 @@ def read_PDB(filename):
     resend = 26
     res_hex = False
     atom_hex = False
+    atom_overflow = False
     ZEROSET = set('0')
 
     try:
@@ -1064,13 +1065,27 @@ def read_PDB(filename):
                     resid = int(resid)
                 # If the number has cycled, it too may be hexadecimal
                 if atom_hex:
-                    atnum = int(atnum, 16)
+                    try:
+                        atnum = int(atnum, 16)
+                    except ValueError:
+                        if set(atnum) == set('*'):
+                            atom_overflow = True
+                            atnum = last_atom_added.number + 1
+                        else:
+                            raise ValueError('Could not convert %s to int' %
+                                             atnum)
+                elif atom_overflow:
+                    atnum = last_atom_added.number + 1
                 else:
                     try:
                         atnum = int(atnum)
                     except ValueError:
-                        atnum = int(atnum, 16)
-                        atom_hex = True
+                        if set(atnum) == set('*'):
+                            atom_overflow = True
+                            atnum = last_atom_added.number + 1
+                        else:
+                            atnum = int(atnum, 16)
+                            atom_hex = True
                 # It's possible that the residue number has cycled so much that
                 # it is now filled with ****'s. In that case, start a new
                 # residue if the current residue repeats the same atom name as
@@ -1175,6 +1190,7 @@ def read_PDB(filename):
                 atomno = 0
                 coordinates = []
                 resend = 26
+                atom_overflow = False
             elif rec == 'MODEL ':
                 if modelno == 1 and len(struct.atoms) == 0: continue
                 if len(coordinates) > 0:
@@ -1187,6 +1203,7 @@ def read_PDB(filename):
                 modelno += 1
                 atomno = 0
                 resend = 26
+                atom_overflow = False
             elif rec == 'CRYST1':
                 a = float(line[6:15])
                 b = float(line[15:24])
