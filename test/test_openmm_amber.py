@@ -6,7 +6,6 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    import simtk.unit as u
     from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
                 OpenMMChamberParm as ChamberParm, OpenMMRst7 as Rst7)
     has_openmm = True
@@ -14,6 +13,7 @@ except ImportError:
     from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
+import chemistry.unit as u
 from copy import copy
 from math import sqrt
 import ParmedTools as PT

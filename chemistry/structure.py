@@ -620,7 +620,6 @@ class Structure(object):
                      '      %2s%-2s\n')
         terrec = ('TER   %5d      %-3s %1s%4d\n')
         if self.box is not None:
-            a, b, c, alpha, beta, gamma = self.box
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                        self.box[0], self.box[1], self.box[2], self.box[3],
                        self.box[4], self.box[5], self.space_group, ''))
@@ -696,7 +695,7 @@ class Structure(object):
                            x, y, z, pa.occupancy, pa.bfactor,
                            Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
-                    anisou = [int(x*1e4) for x in pa.anisou]
+                    anisou = [int(ani*1e4) for ani in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
                                res.name, res.chain, rnum,
                                res.insertion_code, anisou[0], anisou[1],
@@ -721,7 +720,7 @@ class Structure(object):
                                z, oatom.occupancy, oatom.bfactor,
                                Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
-                        anisou = [int(x*1e4) for x in oatom.anisou]
+                        anisou = [int(ani*1e4) for ani in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
                             oatom.altloc, res.name, res.chain, rnum,
                             res.insertion_code, anisou[0], anisou[1],
@@ -1227,10 +1226,85 @@ class Structure(object):
 
         Returns
         -------
-        NonbondedForce [, CustomNonbondedForce]
-            This is a virtual method that must be overridden in subclasses
+        NonbondedForce
+            This just implements the very basic NonbondedForce with the typical
+            charge-charge and 12-6 Lennard-Jones interactions with the
+            Lorentz-Berthelot combining rules.
+
+        Notes
+        -----
+        Subclasses of Structure for which this nonbonded treatment is inadequate
+        should override this method to implement what is needed
         """
-        return None
+        if not self.atoms: return None
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.NonbondedForce()
+        if u.is_quantity(nonbondedCutoff):
+            nonbondedCutoff = nonbondedCutoff.value_in_unit(u.nanometers)
+        if nonbondedMethod is None or nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.NonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.NonbondedForce.CutoffNonPeriodic)
+            force.setCutoffDistance(nonbondedCutoff)
+        elif nonbondedMethod is app.CutoffPeriodic:
+            force.setNonbondedMethod(mm.NonbondedForce.CutoffPeriodic)
+            force.setCutoffDistance(nonbondedCutoff)
+        elif nonbondedMethod is app.PME:
+            force.setNonbondedMethod(mm.NonbondedForce.PME)
+            force.setCutoffDistance(nonbondedCutoff)
+            force.setEwaldErrorTolerance(ewaldErrorTolerance)
+        elif nonbondedMethod is app.Ewald:
+            force.setNonbondedMethod(mm.NonbondedForce.Ewald)
+            force.setCutoffDistance(nonbondedCutoff)
+            force.setEwaldErrorTolerance(ewaldErrorTolerance)
+        force.setReactionFieldDielectric(reactionFieldDielectric)
+        # Now add the particles
+        sigma_scale = length_conv * 2 * 2**(-1/6)
+        for atom in self.atoms:
+            force.addParticle(atom.charge, atom.rmin*sigma_scale,
+                              atom.epsilon*ene_conv)
+        # Now add the exceptions. First add potential 1-4's from the dihedrals.
+        # If dihedral.ignore_end is False, a 1-4 is added with the appropriate
+        # scaling factor
+        sigma_scale = 2**(-1/6) * length_conv
+        for dih in self.dihedrals:
+            if dih.ignore_end: continue
+            if isinstance(dih.type, DihedralTypeList):
+                scee = scnb = 0
+                i = 0
+                while scee != 0 and scnb != 0 and i < len(dih.type):
+                    scee = dih.type[i].scee
+                    scnb = dih.type[i].scnb
+                    i += 1
+                # No scaling factors indicates omission
+                if scee == 0 or scnb == 0: continue
+            else:
+                scee = dih.type.scee
+                scnb = dih.type.scnb
+            chgprod = dih.atom1.charge * dih.atom4.charge / scee
+            epsprod = (math.sqrt(dih.atom1.epsilon_14 * dih.atom4.epsilon_14) *
+                        ene_conv / scnb)
+            sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+            force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
+                               sigprod, epsprod, replace=True)
+        # Now add the bonds, angles, and exclusions. These will always wipe out
+        # existing exceptions and 0 out that exception
+        for bond in self.bonds:
+            force.addException(bond.atom1.idx, bond.atom2.idx, 0.0, 0.5, 0.0,
+                               replace=True)
+        for angle in self.angles:
+            force.addException(angle.atom1.idx, angle.atom2.idx, 0.0, 0.5, 0.0,
+                               replace=True)
+            force.addException(angle.atom2.idx, angle.atom3.idx, 0.0, 0.5, 0.0,
+                               replace=True)
+            force.addException(angle.atom1.idx, angle.atom3.idx, 0.0, 0.5, 0.0,
+                               replace=True)
+        for a1 in self.atoms:
+            for a2 in atom.exclusion_partners:
+                force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, replace=True)
+
+        return force
 
     #===================================================
 

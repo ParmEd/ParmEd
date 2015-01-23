@@ -21,7 +21,6 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    import simtk.unit as u
     from chemistry.charmm.openmmloader import (
                 OpenMMCharmmPsfFile as CharmmPsfFile,
                 OpenMMCharmmCrdFile as CharmmCrdFile,
@@ -40,6 +39,7 @@ except ImportError:
 
 from chemistry.charmm.parameters import CharmmParameterSet
 from chemistry.exceptions import CharmmPSFWarning
+from chemistry import unit as u
 from copy import copy
 from math import sqrt
 import unittest

@@ -213,6 +213,17 @@ class Atom(_ListItem):
         Alternate location indicator (see PDB file)
     number : int=-1
         The serial number given to the atom (see PDB file)
+    rmin : float=None
+        The Rmin/2 Lennard-Jones parameter for this atom. Default evaluates to 0
+    epsilon : float=None
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        evaluates to 0
+    rmin14 : float=None
+        The Rmin/2 Lennard-Jones parameter for this atom in 1-4 interactions.
+        Default evaluates to 0
+    epsilon14 : float=None
+        The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
+        interactions. Default evaluates to 0
 
     Attributes
     ----------
@@ -320,6 +331,21 @@ class Atom(_ListItem):
     number : int
         The serial number of the atom in the input structure (e.g., PDB file).
         If not present in the original structure, a default value of -1 is used
+    rmin : float
+        The Rmin/2 Lennard-Jones parameter for this atom. Default value is 0.
+        If not set, it is taken from the `atom_type` attribute (if available)
+    epsilon : float
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        value is 0. If not set, it is taken from the `atom_type` attribute (if
+        available)
+    rmin_14 : float
+        The Rmin/2 L-J parameter for 1-4 pairs. Default value is `rmin` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
+    epsilon_14 : float
+        The epsilon L-J parameter for 1-4 pairs. Default value is `epsilon` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
 
     Possible Attributes
     -------------------
@@ -401,7 +427,8 @@ class Atom(_ListItem):
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
-                 bfactor=0.0, altloc='', number=-1):
+                 bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
+                 rmin14=None, epsilon14=None):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -435,6 +462,10 @@ class Atom(_ListItem):
         self.atom_type = _UnassignedAtomType
         self.number = number
         self.anisou = None
+        self._rmin = rmin
+        self._epsilon = epsilon
+        self._rmin14 = rmin14
+        self._epsilon14 = epsilon14
    
     #===================================================
 
@@ -527,6 +558,71 @@ class Atom(_ListItem):
         ap = set(self._angle_partners)
         bp = set(self._bond_partners)
         return sorted(list(ep - tp - dp - ap - bp))
+
+    #===================================================
+
+    # Lennard-Jones parameters... can be taken from atom_type if it is set.
+    # Otherwise take it from _rmin and _epsilon attributes
+
+    @property
+    def rmin(self):
+        """ Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) """
+        if self._rmin is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin is None):
+                return 0.0
+            return self.atom_type.rmin
+        return self._rmin
+
+    @rmin.setter
+    def rmin(self, value):
+        """ Lennard-Jones Rmin/2 parameter (the Lennard-Jones radius) """
+        self._rmin = value
+
+    @property
+    def epsilon(self):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        if self._epsilon is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon is None):
+                return 0.0
+            return self.atom_type.epsilon
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        self._epsilon = value
+
+    @property
+    def rmin_14(self):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        if self._rmin14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin_14 is None):
+                return self.rmin
+            return self.atom_type.rmin_14
+        return self._rmin14
+
+    @rmin_14.setter
+    def rmin_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
+
+    @property
+    def epsilon_14(self):
+        """ The 1-4 Lennard-Jones epsilon parameter """
+        if self._epsilon14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon_14 is None):
+                return self.epsilon
+            return self.atom_type.epsilon_14
+        return self._epsilon14
+
+    @rmin_14.setter
+    def rmin_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
 
     #===================================================
 
@@ -3215,6 +3311,16 @@ class AtomType(object):
         The mass of the atom type
     atomic_number : int
         The atomic number of the element of the atom type
+    epsilon : float=None
+        If set, it is the Lennard-Jones well depth of this atom type
+    rmin : float=None
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type
+    epsilon_14 : float=None
+        If set, it is the Lennard-Jones well depth of this atom type in 1-4
+        nonbonded interactions
+    rmin_14 : float=None
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
+        1-4 nonbonded interactions
     nbfix : dict(str:tuple)
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms

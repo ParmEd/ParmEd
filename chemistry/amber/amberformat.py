@@ -7,7 +7,7 @@ from __future__ import division
 from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
-from chemistry.exceptions import AmberFormatWarning, FlagError
+from chemistry.exceptions import FlagError
 from compat24 import wraps
 from fortranformat import FortranRecordReader, FortranRecordWriter
 from copy import copy

@@ -10,9 +10,9 @@ from __future__ import division
 
 from chemistry.constants import TINY, DEG_TO_RAD
 from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
-from chemistry.exceptions import APIError, OpenMMError
+from chemistry.exceptions import OpenMMError
 import chemistry.periodic_table as pt
-from math import asin, cos, sin, sqrt, pi
+from math import cos, sin, sqrt, pi
 import simtk.openmm as mm
 from simtk.openmm.vec3 import Vec3
 import simtk.unit as u

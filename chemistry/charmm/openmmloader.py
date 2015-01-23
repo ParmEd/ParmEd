@@ -11,8 +11,6 @@ from compat24 import property
 from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
 from chemistry.charmm.parameters import element_by_mass
 from chemistry.charmm.psf import CharmmPsfFile
-from chemistry import TrackedList
-from chemistry.exceptions import APIError
 from math import sqrt, cos, pi, sin, acos
 import re
 import simtk.openmm as mm

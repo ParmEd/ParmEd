@@ -1386,7 +1386,7 @@ class AmberParm(AmberFormat, Structure):
         self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
         self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
         self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
-        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
+        self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=1)
         self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', num_items=0)
         self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', num_items=0)
