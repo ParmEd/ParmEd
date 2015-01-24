@@ -476,7 +476,7 @@ class AmberMask(object):
 
     #======================================================
 
-    def _atom_namelist(self, instring, mask, key='name'):
+    def _atom_namelist(self, instring, mask, key='ATOM_NAME'):
         """ Fills a _mask based on atom names/types """
         buffer = ''
         pos = 0
@@ -499,7 +499,7 @@ class AmberMask(object):
 
     def _atom_typelist(self, buffer, mask):
         """ Fills a _mask based on atom types """
-        self._atom_namelist(buffer, mask, key='type')
+        self._atom_namelist(buffer, mask, key='AMBER_ATOM_TYPE')
 
     #======================================================
 
@@ -508,7 +508,7 @@ class AmberMask(object):
         Fills a _mask based on atom elements. For now it will just be Atom
         names, since elements are not stored in the prmtop anywhere.
         """
-        self._atom_namelist(self, buffer, mask, key='name')
+        self._atom_namelist(self, buffer, mask, key='ATOM_NAME')
 
     #======================================================
 
@@ -576,15 +576,13 @@ class AmberMask(object):
 
     #======================================================
    
-    def _atname_select(self, atname, mask, key='name'):
+    def _atname_select(self, atname, mask, key='ATOM_NAME'):
         """ Fills a _mask array with all atom names of a given name """
-        if atname.isdigit():
-            atname = int(atname) - 1
-            for i, atom in enumerate(self.parm.atoms):
-                mask[i] = int(atname == i)
-        else:
-            for i, atom in enumerate(self.parm.atoms):
-                mask[i] = int(_nameMatch(atname, getattr(atom, key)))
+        for i in xrange(self.parm.ptr('natom')):
+            if _nameMatch(atname, self.parm.parm_data[key][i]):
+                mask[i] = 1
+            elif atname.isdigit():
+                mask[i] = int(int(atname) == i+1)
 
     #======================================================
    

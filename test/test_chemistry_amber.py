@@ -254,23 +254,65 @@ class TestAmberMask(unittest.TestCase):
         for idx in mask_res1.Selected():
             self.assertEqual(parm.atoms[idx].residue.idx, 0)
         self.assertEqual(list(range(13)), list(mask_res1.Selected()))
+        sel = mask_res1.Selection()
+        for atom in parm.atoms:
+            if atom.residue.idx == 0:
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
             self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
+        sel = mask_resala.Selection()
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
         
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
+        sel = mask_atname.Selection()
+        for atom in parm.atoms:
+            if atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_resat.Selection()), 12)
         for idx in mask_resat.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
             self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
+        sel = mask_resat.Selection()
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA' and atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_attyp.Selection()), 341)
         for idx in mask_attyp.Selected():
             self.assertEqual(parm.atoms[idx].type, 'CT')
+        sel = mask_attyp.Selection()
+        for atom in parm.atoms:
+            if atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+    def testCompoundMask(self):
+        """ Tests compound/complex Amber selection masks """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        mask1 = mask.AmberMask(parm, ':1-6@CA,C,O,N')
+
+        sel = mask1.Selection()
+        for atom in parm.atoms:
+            if (atom.residue.idx < 6 and atom.name in ('CA', 'C', 'O', 'N')):
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
 class TestWriteFiles(unittest.TestCase):
     
@@ -544,6 +586,7 @@ class TestObjectAPIs(unittest.TestCase):
         mylist *= 2
         self.assertTrue(mylist.changed)
 
+del TestReadParm, TestCoordinateFiles, TestWriteFiles, TestObjectAPIs
 if not has_numpy():
     del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
 
