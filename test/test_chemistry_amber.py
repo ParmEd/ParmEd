@@ -306,6 +306,8 @@ class TestAmberMask(unittest.TestCase):
         """ Tests compound/complex Amber selection masks """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         mask1 = mask.AmberMask(parm, ':1-6@CA,C,O,N')
+        mask2 = mask.AmberMask(parm, ':1-6,ALA,10@%CT | @O')
+        mask3 = mask.AmberMask(parm, '(:1-9,ALA,GLY@CA,H*)|@%CT')
 
         sel = mask1.Selection()
         for atom in parm.atoms:
@@ -313,6 +315,63 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask2.Selection()
+        for atom in parm.atoms:
+            if (atom.residue.idx < 6 or atom.residue.name == 'ALA' or
+                    atom.residue.idx == 9) and atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            elif atom.name == 'O':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask3.Selection()
+        for atom in parm.atoms:
+            res = atom.residue
+            if ((res.idx < 9 or res.name in ('ALA', 'GLY')) and
+                    (atom.name == 'CA' or atom.name.startswith('H'))):
+                self.assertEqual(sel[atom.idx], 1)
+            elif atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+    def testDistanceBasedMask(self):
+        """ Test distance-based mask selections """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        # All atoms within 5 A of residue 8
+        mask1 = mask.AmberMask(parm, ':8<@5')
+        # All atoms more than 10 A away from residue 1
+        mask2 = mask.AmberMask(parm, ':1>:10')
+
+        sel = mask1.Selection()
+        for i, atom in enumerate(parm.atoms):
+            within = 0
+            for atom2 in parm.residues[7].atoms:
+                dx = atom2.xx - atom.xx
+                dy = atom2.xy - atom.xy
+                dz = atom2.xz - atom.xz
+                if (dx*dx + dy*dy + dz*dz) < 25:
+                    within = 1
+                    break
+            self.assertEqual(sel[i], within)
+
+        sel = mask2.Selection()
+        self.assertEqual(sum(sel), 1588)
+        for i, res in enumerate(parm.residues):
+            within = 0
+            for atom in res.atoms:
+                for atom2 in parm.residues[0].atoms:
+                    dx = atom2.xx - atom.xx
+                    dy = atom2.xy - atom.xy
+                    dz = atom2.xz - atom.xz
+                    if (dx*dx + dy*dy + dz*dz) > 100:
+                        within = 1
+                        break
+                if within: break
+            for atom in res.atoms:
+                self.assertEqual(sel[atom.idx], within)
 
 class TestWriteFiles(unittest.TestCase):
     

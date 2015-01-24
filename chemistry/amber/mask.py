@@ -578,11 +578,13 @@ class AmberMask(object):
    
     def _atname_select(self, atname, mask, key='name'):
         """ Fills a _mask array with all atom names of a given name """
-        for i, atom in enumerate(self.parm.atoms):
-            if _nameMatch(atname, getattr(atom, key)):
-                mask[i] = 1
-            elif atname.isdigit():
-                mask[i] = int(int(atname) == i+1)
+        if atname.isdigit():
+            atname = int(atname) - 1
+            for i, atom in enumerate(self.parm.atoms):
+                mask[i] = mask[i] | int(atname == i)
+        else:
+            for i, atom in enumerate(self.parm.atoms):
+                mask[i] = mask[i] | int(_nameMatch(atname, getattr(atom, key)))
 
     #======================================================
    
@@ -592,7 +594,7 @@ class AmberMask(object):
             if _nameMatch(resname, atm.residue.name):
                 mask[i] = 1
             elif resname.isdigit():
-                mask[i] = int(int(resname) == atm.residue.idx + 1)
+                mask[i] = mask[i] | int(int(resname) == atm.residue.idx + 1)
             
     #======================================================
    
