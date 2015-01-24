@@ -645,7 +645,6 @@ class TestObjectAPIs(unittest.TestCase):
         mylist *= 2
         self.assertTrue(mylist.changed)
 
-del TestReadParm, TestCoordinateFiles, TestWriteFiles, TestObjectAPIs
 if not has_numpy():
     del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
 
