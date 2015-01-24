@@ -3218,12 +3218,17 @@ class chamber(Action):
     the order they are specified), followed by all parameter files, and finally
     all stream files are read in.  Topology files are only necessary if the
     parameter files do not define the atom types (newer CHARMM force fields
-    define atom types directly in the parameter file.
+    define atom types directly in the parameter file. Environment variables and
+    shell wild-cards (* and ?), as well as the home shortcut character ~ are
+    properly expanded when looking for files.
 
     Options:
         -top        CHARMM topology, or Residue Topology File (RTF) file
         -param      CHARMM parameter file
         -str        CHARMM stream file. Only RTF and parameter sections are read
+        -toppar     CHARMM topology, parameter, and/or stream file(s). File type
+                    is detected from extension (or in the case of .inp files,
+                    the presence of 'top', 'par' in the name)
         -psf        CHARMM PSF file
         -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
         -nocmap     Do not use any CMAP parameters
@@ -3235,6 +3240,10 @@ class chamber(Action):
         -radii      Implicit solvent solvation radii. <radiusset> can be
                     amber6, bondi, mbondi, mbondi2, mbondi3
                     Same effect as the changeRadii command. Default is mbondi.
+        nocondense  This prevents chamber from condensing the parameter set
+                    before applying it. This might lead to larger prmtop files,
+                    but for large parameter sets will dramatically shorten the
+                    running time of the chamber action
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3244,35 +3253,67 @@ class chamber(Action):
 
     def init(self, arg_list):
         from os.path import expandvars, expanduser
+        import glob
         # First get all of the topology files
         self.topfiles, self.paramfiles, self.streamfiles = [], [], []
         while arg_list.has_key('-top', mark=False):
             topfile = expanduser(arg_list.get_key_string('-top', None))
             topfile = expandvars(topfile)
-            if not os.path.exists(topfile):
+            topfiles = glob.glob(topfile)
+            if not topfiles:
                 raise FileDoesNotExist('CHARMM RTF file %s does not exist' %
                                        topfile)
-            self.topfiles.append(topfile)
+            self.topfiles.extend(topfiles)
         while arg_list.has_key('-param', mark=False):
             param = expanduser(arg_list.get_key_string('-param', None))
             param = expandvars(param)
-            if not os.path.exists(param):
+            params = glob.glob(param)
+            if not params:
                 raise FileDoesNotExist('CHARMM parameter file %s does not exist'
                                        % param)
-            self.paramfiles.append(param)
+            self.paramfiles.extend(params)
         while arg_list.has_key('-str', mark=False):
             stream = expanduser(arg_list.get_key_string('-str', None))
             stream = expandvars(stream)
-            if not os.path.exists(stream):
+            streams = glob.glob(stream)
+            if not streams:
                 raise FileDoesNotExist('CHARMM stream file %s does not exist' %
                                        stream)
-            self.streamfiles.append(stream)
+            self.streamfiles.extend(streams)
+        while arg_list.has_key('-toppar', mark=False):
+            toppar = expanduser(arg_list.get_key_string('-toppar', None))
+            toppar = expandvars(toppar)
+            toppars = glob.glob(toppar)
+            if not toppars:
+                raise FileDoesNotExist('CHARMM toppar file %s does not exist' %
+                                       toppar)
+            for fname in toppars:
+                base = os.path.split(fname)[1] # ignore the directory name
+                if base.endswith('.rtf') or base.endswith('.top'):
+                    self.topfiles.append(fname)
+                elif base.endswith('.par') or base.endswith('.prm'):
+                    self.paramfiles.append(fname)
+                elif base.endswith('.str'):
+                    self.streamfiles.append(fname)
+                elif base.endswith('.inp'):
+                    if 'par' in fname:
+                        self.paramfiles.append(fname)
+                    elif 'top' in fname:
+                        self.topfiles.append(fname)
+                    else:
+                        raise InputError('Cannot detect filetype of %s' % fname)
+                else:
+                    raise InputError('Cannot detect filetype of %s' % fname)
         crdfile = arg_list.get_key_string('-crd', None)
         if crdfile is not None:
-            self.crdfile = expanduser(expandvars(crdfile))
-            if not os.path.exists(self.crdfile):
+            crdfiles = glob.glob(expanduser(expandvars(crdfile)))
+            if not crdfiles:
                 raise FileDoesNotExist('Coordinate file %s does not exist' %
                                        self.crdfile)
+            if len(crdfiles) > 1:
+                raise InputError('Too many coordinate files selected through '
+                                 'globbing')
+            self.crdfile = crdfiles[0]
         else:
             self.crdfile = None
         self.cmap = not arg_list.has_key('-nocmap')
@@ -3280,9 +3321,12 @@ class chamber(Action):
         psf = arg_list.get_key_string('-psf', None)
         if psf is None:
             raise InputError('chamber requires a PSF file')
-        self.psf = expanduser(expandvars(psf))
-        if not os.path.exists(self.psf):
-            raise InputError('chamber PSF file %s cannot be found' % self.psf)
+        self.psf = glob.glob(expanduser(expandvars(psf)))
+        if not self.psf:
+            raise FileDoesNotExist('chamber PSF file %s cannot be found' % psf)
+        if len(self.psf) > 1:
+            raise InputError('Too many PSF files selected through globbing')
+        self.psf = self.psf[0]
         box = arg_list.get_key_string('-box', None)
 
         if box is None:
@@ -3316,6 +3360,7 @@ class chamber(Action):
                                  '(topology) and PAR (parameter) files.')
             if not self.crdfile:
                 raise InputError('The chamber program requires a CRD file.')
+        self.condense = not arg_list.has_key('nocondense')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3384,7 +3429,7 @@ class chamber(Action):
             for sfile in self.streamfiles:
                 parmset.read_stream_file(sfile)
             # All parameters are loaded, now condense the types
-            parmset.condense()
+            if self.condense: parmset.condense()
         except ChemError, e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
@@ -3416,6 +3461,11 @@ class chamber(Action):
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
                                    3*len(psf.atoms)))
+            # Set the coordinates now, since creating the parm may re-order the
+            # atoms in order to maintain contiguous molecules
+            for i, atom in enumerate(psf.atoms):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
                 psf.set_box(*crdbox[:])
@@ -3460,8 +3510,6 @@ class chamber(Action):
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset).view(ChamberParm)
-        if self.crdfile is not None:
-            parm.load_coordinates(coords)
         parm.prm_name = self.psf
         changeradii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)

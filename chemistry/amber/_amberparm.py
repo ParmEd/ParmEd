@@ -229,10 +229,10 @@ class AmberParm(AmberFormat, Structure):
         inst.initialize_topology()
         # See if the rawdata has any kind of structural attributes, like
         # coordinates and an atom list with positions and/or velocities
-        if hasattr(rawdata, 'coords'):
-            inst.coords = copy.copy(rawdata.coords)
-        if hasattr(rawdata, 'vels'):
-            inst.vels = copy.copy(rawdata.vels)
+        if hasattr(rawdata, 'coords') and rawdata.coords is not None:
+            inst.load_coordinates(copy.copy(rawdata.coords))
+        if hasattr(rawdata, 'vels') and rawdata.vels is not None:
+            inst.load_velocities(copy.copy(rawdata.vels))
         if hasattr(rawdata, 'box'):
             inst.box = copy.copy(rawdata.box)
         if hasattr(rawdata, 'hasbox'):
@@ -283,6 +283,14 @@ class AmberParm(AmberFormat, Structure):
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+        try:
+            coords = []
+            for atom in struct.atoms:
+                coords.extend([atom.xx, atom.xy, atom.xz])
+        except AttributeError:
+            raise
+        else:
+            inst.load_coordinates(coords)
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
