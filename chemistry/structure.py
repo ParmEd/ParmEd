@@ -811,9 +811,31 @@ class Structure(object):
     def positions(self):
         """
         A list of 3-element Quantity tuples of dimension length representing the
-        atomic positions for every atom in the system
+        atomic positions for every atom in the system. If set with unitless
+        numbers, those numbers are assumed to be in angstroms
         """
         return [(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+
+    @positions.setter
+    def positions(self, value):
+        """
+        A list of 3-element Quantity tuples of dimension length representing the
+        atomic positions for every atom in the system. If set with unitless
+        numbers, those numbers are assumed to be in angstroms
+        """
+        if u.is_quantity(value):
+            value = value.value_in_unit(u.angstroms)
+        # See if the array is flattened
+        if len(value) == len(self.atoms):
+            # It had better all be 3-length iterables
+            for i, atom in enumerate(self.atoms):
+                atom.xx, atom.xy, atom.xz = value[i]
+        elif len(value) == 3 * len(self.atoms):
+            for i, atom in enumerate(self.atoms):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = value[i3:i3+3]
+        else:
+            raise ValueError('Wrong shape for position array')
 
     #===================================================
 
@@ -824,6 +846,26 @@ class Structure(object):
         atomic velocities for every atom in the system
         """
         return [(a.vx,a.vy,a.vz) for a in self.atoms] * u.angstrom/u.picosecond
+
+    @velocities.setter
+    def velocities(self, value):
+        """
+        A list of 3-element Quantity tuples of dimension length representing the
+        atomic velocities for every atom in the system
+        """
+        if u.is_quantity(value):
+            value = value.value_in_unit(u.angstroms/u.picoseconds)
+        # See if the array is flattened
+        if len(value) == len(self.atoms):
+            # It had better all be 3-length iterables
+            for i, atom in enumerate(self.atoms):
+                atom.vx, atom.vy, atom.vz = value[i]
+        elif len(value) == 3 * len(self.atoms):
+            for i, atom in enumerate(self.atoms):
+                i3 = i * 3
+                atom.vx, atom.vy, atom.vz = value[i3:i3+3]
+        else:
+            raise ValueError('Wrong shape for velocities array')
 
     #===================================================
 
@@ -856,6 +898,7 @@ class Structure(object):
     @needs_openmm
     def createSystem(self, nonbondedMethod=None,
                      nonbondedCutoff=8.0*u.angstroms,
+                     switchDistance=0.0*u.angstroms,
                      constraints=None,
                      rigidWater=True,
                      implicitSolvent=None,
@@ -885,6 +928,11 @@ class Structure(object):
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
             is ignored if nonbondedMethod is NoCutoff.
+        switchDistance : float or distance Quantity
+            The distance at which the switching function is turned on for van
+            der Waals interactions. This is ignored when no cutoff is used, and
+            no switch is used if switchDistance is 0, negative, or greater than
+            the cutoff
         constraints : None, app.HBonds, app.HAngles, or app.AllBonds
             Which type of constraints to add to the system (e.g., SHAKE). None
             means no bonds are constrained. HBonds means bonds with hydrogen are
@@ -973,7 +1021,8 @@ class Structure(object):
             rf_dielc = 78.5
         self._add_force_to_system(system,
                 self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff,
-                                         ewaldErrorTolerance, rf_dielc)
+                                         switchDistance,ewaldErrorTolerance,
+                                         rf_dielc)
         )
         if implicitSolvent is not None:
             if verbose: print('Adding GB force...')
@@ -1274,6 +1323,7 @@ class Structure(object):
     @needs_openmm
     def omm_nonbonded_force(self, nonbondedMethod=None,
                             nonbondedCutoff=8*u.angstroms,
+                            switchDistance=0*u.angstroms,
                             ewaldErrorTolerance=0.0005,
                             reactionFieldDielectric=78.5):
         """ Creates the OpenMM NonbondedForce instance
@@ -1288,6 +1338,11 @@ class Structure(object):
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
             is ignored if nonbondedMethod is NoCutoff.
+        switchDistance : float or distance Quantity
+            The distance at which the switching function is turned on for van
+            der Waals interactions. This is ignored when no cutoff is used, and
+            no switch is used if switchDistance is 0, negative, or greater than
+            the cutoff
         ewaldErrorTolerance : float=0.0005
             When using PME or Ewald, the Ewald parameters will be calculated
             from this value
@@ -1377,6 +1432,13 @@ class Structure(object):
         for a1 in self.atoms:
             for a2 in atom.exclusion_partners:
                 force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, True)
+
+        if switchDistance and nonbondedMethod is not app.NoCutoff:
+            if u.is_quantity(switchDistance):
+                switchDistance = switchDistance.value_in_unit(u.nanometers)
+            if 0 < switchDistance < nonbondedCutoff:
+                force.setUseSwitchingFunction(True)
+                force.setSwitchingDistance(switchDistance)
 
         return force
 

@@ -95,30 +95,30 @@ def use(package=None):
     """
     Selects the NetCDF package to use
 
-    Parameters:
-        - package (string): This specifies which package to use, and may be
-                either scipy, netCDF4, Scientific/ScientificPython, pynetcdf, or
-                None.  If None, it chooses the first available implementation
-                from the above list (in that order).
+    Parameters
+    ----------
+    package : str
+        This specifies which package to use, and may be either scipy, netCDF4,
+        Scientific/ScientificPython, pynetcdf, or None.  If None, it chooses the
+        first available implementation from the above list (in that order).
 
-    Notes:
-    - use() can only be called once, and once it is called there is no changing
-      within that Python session or program. The 'netcdffiles' module calls this
-      function to get the default NetCDF implementation if none has been
-      selected before, so calling this function is unnecessary if the default
-      implementation is sufficient. This is mostly useful for development
-      testing as the backend NetCDF choice is virtually invisible to the user.
+    Notes
+    -----
+    The 'netcdffiles' module calls this function to get the default NetCDF
+    implementation if none has been selected before, so calling this function is
+    unnecessary if the default implementation is sufficient. This is mostly
+    useful for development testing as the backend NetCDF choice is virtually
+    invisible to the user.
 
-    - The pynetcdf implementation has long since been abandoned (ca.  2006), and
-      is not recommended for use. It appears to parse NetCDF files just fine,
-      but it does not seem to write them successfully according to my tests.
+    The pynetcdf implementation has long since been abandoned (ca. 2006), and is
+    not recommended for use. It appears to parse NetCDF files just fine, but it
+    does not seem to write them successfully according to my tests.
     
-    - The NetCDF files have been tested against netCDF v. 1.0.4,
-      Scientific v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to
-      work barring backwards-incompatible changes. Earlier versions are expected
-      to work barring bugs or backwards-incompatible changes in the current or
-      earlier versions.
-   """
+    The NetCDF files have been tested against netCDF v. 1.0.4, Scientific
+    v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to work barring
+    backwards-incompatible changes. Other versions are expected to work barring
+    bugs or backwards-incompatible changes in the current or earlier versions.
+    """
     global open_netcdf, get_int_dimension, get_float, NETCDF_INITIALIZED
     global HAS_NETCDF, SELECTED_NETCDF, nc4open_netcdf, nc4get_int_dimension
     global nc4get_float, sciopen_netcdf, sciget_int_dimension, sciget_float
@@ -224,6 +224,7 @@ class NetCDFRestart(object):
         self._ncfile = open_netcdf(fname, mode)
    
     @classmethod
+    @needs_netcdf
     def open_new(cls, fname, natom, box, vels, title='',
                  remd=None, temp=None, remd_indices=None,
                  remd_groups=None, remd_dimtypes=None):
@@ -341,6 +342,7 @@ class NetCDFRestart(object):
         return inst
 
     @classmethod
+    @needs_netcdf
     def open_old(cls, fname):
         """
         Opens the NetCDF file and sets the global attributes that the file sets
@@ -489,6 +491,7 @@ class NetCDFTraj(object):
         self._ncfile = open_netcdf(fname, mode)
    
     @classmethod
+    @needs_netcdf
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,
                  remd=None, remd_dimension=None, title=''):
         """
@@ -612,6 +615,7 @@ class NetCDFTraj(object):
         return inst
 
     @classmethod
+    @needs_netcdf
     def open_old(cls, fname):
         """
         Opens the NetCDF file and sets the global attributes that the file sets

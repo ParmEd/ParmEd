@@ -924,6 +924,11 @@ class AmberParm(AmberFormat, Structure):
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
             is ignored if nonbondedMethod is NoCutoff.
+        switchDistance : float or distance Quantity
+            The distance at which the switching function is turned on for van
+            der Waals interactions. This is ignored when no cutoff is used, and
+            no switch is used if switchDistance is 0, negative, or greater than
+            the cutoff
         ewaldErrorTolerance : float=0.0005
             When using PME or Ewald, the Ewald parameters will be calculated
             from this value
@@ -942,8 +947,8 @@ class AmberParm(AmberFormat, Structure):
         """
         if not self.atoms: return None
         nonbfrc = super(AmberParm, self).omm_nonbonded_force(
-                nonbondedMethod, nonbondedCutoff, ewaldErrorTolerance,
-                reactionFieldDielectric
+                nonbondedMethod, nonbondedCutoff, switchDistance,
+                ewaldErrorTolerance, reactionFieldDielectric
         )
         hasnbfix = self.has_NBFIX()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
@@ -1023,6 +1028,11 @@ class AmberParm(AmberFormat, Structure):
             for ii in xrange(nonbfrc.getNumExceptions()):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
                 force.addExclusion(i, j)
+        # Copy the switching function information to the CustomNonbondedForce
+        if nbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+
         return nonbfrc, force
 
     #===================================================

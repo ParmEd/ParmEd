@@ -683,35 +683,18 @@ class CharmmPsfFile(Structure):
         This method loads the coordinates and velocity information from an
         external object or passed data.
 
-        Parameters:
-            - positions (list of floats) : A 3-N length iterable with all of the
-                coordinates in the order [x1, y1, z1, x2, y2, z2, ...].
-            - velocities (list of floats) : If not None, is the velocity
-                equivalent of the positions
+        Parameters
+        ----------
+        positions : list of floats or distance Quantity
+            A list of atomic positions for all atoms. Can be a 3N-length array
+            of the form [x1, y1, z1, x2, y2, z2, ...] or a N-length array of the
+            form [ [x1, y1, z1], [x2, y2, z2], ... ]
+        velocities : list of floats or distance/time Quantity, optional
+            A list of partial atomic velocities for all atoms. If provided, it
+            must follow the same requirements as positions, above
         """
-        if len(positions) / 3 != len(self.atoms):
-            raise ValueError('Coordinates given for %s atoms, but %d atoms '
-                             'exist in this structure.' %
-                             (len(positions)/3, len(self.atoms)))
-        # Now assign all of the atoms positions
-        for i, atom in enumerate(self.atoms):
-            atom.xx = positions[3*i  ]
-            atom.xy = positions[3*i+1]
-            atom.xz = positions[3*i+2]
-
-        # Do velocities if given
-        if velocities is not None:
-            if len(velocities) / 3 != len(self.atoms):
-                raise ValueError('Velocities given for %s atoms, but %d atoms '
-                                 'exist in this structure.' %
-                                 (len(velocities)/3, len(self.atoms)))
-            for i, atom in enumerate(self.atoms):
-                atom.vx = velocities[3*i  ]
-                atom.vy = velocities[3*i+1]
-                atom.vz = velocities[3*i+2]
-            self.velocities = velocities
-
         self.positions = positions
+        self.velocities = velocities
 
     def set_box(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
         """
