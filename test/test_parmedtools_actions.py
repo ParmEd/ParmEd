@@ -2067,7 +2067,7 @@ class TestAmoebaParmActions(unittest.TestCase):
         objs_with_bond = []
         for attribute in dir(parm):
             # skip descriptors
-            if attr in ('topology', 'positions', 'box_vectors'): continue
+            if attribute in ('topology', 'positions', 'box_vectors'): continue
             attr = getattr(parm, attribute)
             if not isinstance(attr, TrackedList): continue
             for obj in attr:
