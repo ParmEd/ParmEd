@@ -126,5 +126,9 @@ def box_vectors_to_lengths_and_angles(a, b, c):
     alpha = math.acos((b[0]*c[0] + b[1]*c[1] + b[2]*c[2]) / (lb*lc))
     beta = math.acos((a[0]*c[0] + a[1]*c[1] + a[2]*c[2]) / (la*lc))
     gamma = math.acos((b[0]*a[0] + b[1]*a[1] + b[2]*a[2]) / (lb*la))
+    # Convert to degrees
+    alpha *= RAD_TO_DEG
+    beta *= RAD_TO_DEG
+    gamma *= RAD_TO_DEG
 
     return (la, lb, lc) * u.angstroms, (alpha, beta, gamma) * u.degrees

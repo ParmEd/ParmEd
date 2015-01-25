@@ -416,7 +416,8 @@ class TestFileWriting(unittest.TestCase):
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
-            if attr == 'topology': continue # skip descriptor
+            # Skip descriptors
+            if attr in ('topology', 'positions', 'box_vectors'): continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
@@ -442,7 +443,7 @@ class TestFileWriting(unittest.TestCase):
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
-            if attr == 'topology': continue # skip descriptor
+            if attr in ('topology', 'positions', 'box_vectors'): continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
