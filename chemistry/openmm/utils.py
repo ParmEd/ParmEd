@@ -44,4 +44,7 @@ def energy_decomposition(structure, context):
         state = context.getState(getEnergy=True, groups=1<<grp)
         energy_components[name] = state.getPotentialEnergy().value_in_unit(kcal)
 
+    e = context.getState(getEnergy=True).getPotentialEnergy()
+    energy_components['total'] = e.value_in_unit(kcal)
+
     return energy_components

@@ -3,19 +3,19 @@ This module contains a chamber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
 
-Copyright (C) 2010 - 2014  Jason Swails
+Copyright (C) 2010 - 2015  Jason Swails
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Lesser General Public License for more details.
    
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
@@ -24,6 +24,7 @@ from __future__ import division
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
+from chemistry.structure import needs_openmm
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
 from chemistry.exceptions import AmberParmError
@@ -199,69 +200,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _load_urey_brad_info(self):
-        """ Loads the Urey-Bradley types and array """
-        del self.urey_bradleys[:]
-        del self.urey_bradley_types[:]
-        for k, req in zip(self.parm_data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT'],
-                          self.parm_data['CHARMM_UREY_BRADLEY_EQUIL_VALUE']):
-            self.urey_bradley_types.append(
-                    BondType(k, req, self.urey_bradley_types)
-            )
-        ulist = self.parm_data['CHARMM_UREY_BRADLEY']
-        for i in xrange(0, 3*self.pointers['NUB'], 3):
-            self.urey_bradleys.append(
-                    UreyBradley(self.atoms[ulist[i  ]-1],
-                                self.atoms[ulist[i+1]-1],
-                                self.urey_bradley_types[ulist[i+2]-1])
-            )
-
-    #===================================================
-
-    def _load_improper_info(self):
-        """ Loads the CHARMM Improper types and array """
-        del self.impropers[:]
-        del self.improper_types[:]
-        for k, eq in zip(self.parm_data['CHARMM_IMPROPER_FORCE_CONSTANT'],
-                         self.parm_data['CHARMM_IMPROPER_PHASE']):
-            self.improper_types.append(
-                    ImproperType(k, eq, self.improper_types)
-            )
-        ilist = self.parm_data['CHARMM_IMPROPERS']
-        for i in xrange(0, 5*self.pointers['NIMPHI'], 5):
-            self.impropers.append(
-                    Improper(self.atoms[ilist[i  ]-1],
-                             self.atoms[ilist[i+1]-1],
-                             self.atoms[ilist[i+2]-1],
-                             self.atoms[ilist[i+3]-1],
-                             self.improper_types[ilist[i+4]-1])
-            )
-
-    #===================================================
-
-    def _load_cmap_info(self):
-        """ Loads the CHARMM CMAP types and array """
-        if not self.has_cmap: return
-        del self.cmaps[:]
-        del self.cmap_types[:]
-        for i in xrange(self.pointers['CMAP_TYPES']):
-            resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-            grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            self.cmap_types.append(
-                    CmapType(resolution, grid, cmts, list=self.cmap_types)
-            )
-        clist = self.parm_data['CHARMM_CMAP_INDEX']
-        for i in xrange(0, 6*self.pointers['CMAP'], 6):
-            self.cmaps.append(
-                    Cmap(self.atoms[clist[i  ]-1], self.atoms[clist[i+1]-1],
-                         self.atoms[clist[i+2]-1], self.atoms[clist[i+3]-1],
-                         self.atoms[clist[i+4]-1],
-                         self.cmap_types[clist[i+5]-1])
-            )
-
-    #===================================================
-
     def remake_parm(self):
         """
         Re-fills the topology file arrays if we have changed the underlying
@@ -331,6 +269,39 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
+    @needs_openmm
+    def _modify_nonb_exceptions(self, nonbfrc, customforce):
+        """
+        Modifies the nonbonded force exceptions and the custom nonbonded force
+        exclusions. The exceptions on the nonbonded force might need to be
+        adjusted if off-diagonal modifications on the L-J matrix are present
+        """
+        # To get into this routine, we already needed to know that nbfix is
+        # present
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        atoms = self.atoms
+        acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
+        bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
+        nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        sigma_scale = 2**(-1/6) * length_conv
+        for ii in xrange(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            id1 = atoms[i].nb_idx
+            id2 = atoms[j].nb_idx
+            idx = nbidx[ntypes*id1+id2] - 1
+            a = acoef[idx]
+            b = bcoef[idx]
+            # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
+            rmin = (a / b * 2)**(1/6)
+            epsilon = b / (2 * rmin**6) * ene_conv
+            sigma = rmin * sigma_scale
+            nonbfrc.setExceptionParameters(qq, sigma, epsilon)
+            customforce.addExclusion(i, j)
+
+    #===================================================
+
     @property
     def chamber(self):
         return True
@@ -344,6 +315,69 @@ class ChamberParm(AmberParm):
         return len(self.cmaps) > 0 or 'CHARMM_CMAP_COUNT' in self.parm_data
 
     #===========  PRIVATE INSTANCE METHODS  ============
+
+    def _load_urey_brad_info(self):
+        """ Loads the Urey-Bradley types and array """
+        del self.urey_bradleys[:]
+        del self.urey_bradley_types[:]
+        for k, req in zip(self.parm_data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT'],
+                          self.parm_data['CHARMM_UREY_BRADLEY_EQUIL_VALUE']):
+            self.urey_bradley_types.append(
+                    BondType(k, req, self.urey_bradley_types)
+            )
+        ulist = self.parm_data['CHARMM_UREY_BRADLEY']
+        for i in xrange(0, 3*self.pointers['NUB'], 3):
+            self.urey_bradleys.append(
+                    UreyBradley(self.atoms[ulist[i  ]-1],
+                                self.atoms[ulist[i+1]-1],
+                                self.urey_bradley_types[ulist[i+2]-1])
+            )
+
+    #===================================================
+
+    def _load_improper_info(self):
+        """ Loads the CHARMM Improper types and array """
+        del self.impropers[:]
+        del self.improper_types[:]
+        for k, eq in zip(self.parm_data['CHARMM_IMPROPER_FORCE_CONSTANT'],
+                         self.parm_data['CHARMM_IMPROPER_PHASE']):
+            self.improper_types.append(
+                    ImproperType(k, eq, self.improper_types)
+            )
+        ilist = self.parm_data['CHARMM_IMPROPERS']
+        for i in xrange(0, 5*self.pointers['NIMPHI'], 5):
+            self.impropers.append(
+                    Improper(self.atoms[ilist[i  ]-1],
+                             self.atoms[ilist[i+1]-1],
+                             self.atoms[ilist[i+2]-1],
+                             self.atoms[ilist[i+3]-1],
+                             self.improper_types[ilist[i+4]-1])
+            )
+
+    #===================================================
+
+    def _load_cmap_info(self):
+        """ Loads the CHARMM CMAP types and array """
+        if not self.has_cmap: return
+        del self.cmaps[:]
+        del self.cmap_types[:]
+        for i in xrange(self.pointers['CMAP_TYPES']):
+            resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
+            grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
+            cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
+            self.cmap_types.append(
+                    CmapType(resolution, grid, cmts, list=self.cmap_types)
+            )
+        clist = self.parm_data['CHARMM_CMAP_INDEX']
+        for i in xrange(0, 6*self.pointers['CMAP'], 6):
+            self.cmaps.append(
+                    Cmap(self.atoms[clist[i  ]-1], self.atoms[clist[i+1]-1],
+                         self.atoms[clist[i+2]-1], self.atoms[clist[i+3]-1],
+                         self.atoms[clist[i+4]-1],
+                         self.cmap_types[clist[i+5]-1])
+            )
+
+    #===================================================
 
     def _check_section_lengths(self):
         """ Make sure each section has the necessary number of entries """

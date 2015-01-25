@@ -4,7 +4,22 @@ various topological and force field features.
 
 Author: Jason Swails
 Contributors: Pawel Janowski
-Date: 2014 - 2015
+
+Copyright (C) 2014 - 2015  Jason Swails
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330
+Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
@@ -14,6 +29,8 @@ except ImportError:
     bz2 = None
 from chemistry.exceptions import (PDBError, PDBWarning, AnisouWarning,
         ChemError, MissingParameter, MissingParameterWarning)
+from chemistry.geometry import (box_lengths_and_angles_to_vectors,
+        box_vectors_to_lengths_and_angles)
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.residue import WATER_NAMES
 from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
@@ -790,6 +807,52 @@ class Structure(object):
 
     #===================================================
 
+    @property
+    def positions(self):
+        """
+        A list of 3-element Quantity tuples of dimension length representing the
+        atomic positions for every atom in the system
+        """
+        return [(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+
+    #===================================================
+
+    @property
+    def velocities(self):
+        """
+        A list of 3-element Quantity tuples of dimension length representing the
+        atomic velocities for every atom in the system
+        """
+        return [(a.vx,a.vy,a.vz) for a in self.atoms] * u.angstrom/u.picosecond
+
+    #===================================================
+
+    @property
+    def box_vectors(self):
+        """
+        3, 3-element tuple of unit cell vectors that are Quantity objects of
+        dimension length
+        """
+        if self.box is None: return None
+        return box_lengths_and_angles_to_vectors(*self.box)
+
+    @box_vectors.setter
+    def box_vectors(self, value):
+        """
+        3, 3-element tuple of unit cell vectors that are Quantity objects of
+        dimension length
+        """
+        (a, b, c), (A, B, G) = box_vectors_to_lengths_and_angles(*value)
+        a = a.value_in_unit(u.angstroms)
+        b = b.value_in_unit(u.angstroms)
+        c = c.value_in_unit(u.angstroms)
+        A = A.value_in_unit(u.degrees)
+        B = B.value_in_unit(u.degrees)
+        G = G.value_in_unit(u.degrees)
+        self.box = create_array([a, b, c, A, B, G])
+
+    #===================================================
+
     @needs_openmm
     def createSystem(self, nonbondedMethod=None,
                      nonbondedCutoff=8.0*u.angstroms,
@@ -869,6 +932,10 @@ class Structure(object):
         if nonbondedMethod is None:
             nonbondedMethod = app.NoCutoff
         system = mm.System()
+        # Make sure periodic simulations have a box
+        if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald):
+            if self.box is None:
+                raise ValueError('No periodic boundary conditions detected')
         for atom in self.atoms: system.addParticle(atom.mass)
         self.omm_add_constraints(system, constraints, rigidWater)
         # Add the various types of forces
@@ -917,6 +984,10 @@ class Structure(object):
                                         implicitSolventSaltConc, temperature,
                                         useSASA)
             )
+        if removeCMMotion is not None:
+            system.addForce(mm.CMMotionRemover())
+        if self.box is not None:
+            system.setDefaultPeriodicBoxVectors(*self.box_vectors)
         return system
 
     #===================================================
@@ -1385,7 +1456,9 @@ class Structure(object):
             implicitSolventKappa = implicitSolventKappa.value_in_unit(
                     u.nanometer**-1)
 
-        if u.is_quantity(nonbondedCutoff):
+        if nonbondedMethod is app.NoCutoff:
+            cutoff = None
+        elif u.is_quantity(nonbondedCutoff):
             cutoff = nonbondedCutoff.value_in_unit(u.nanometers)
         else:
             cutoff = nonbondedCutoff
@@ -1735,6 +1808,77 @@ class Structure(object):
                 del self.adjusts[i]
             elif adj.atom1.idx == -1 or adj.atom2.idx == -1:
                 del self.adjusts[i]
+
+    #===================================================
+
+    @needs_openmm
+    def _get_gb_parameters(self, implicitSolvent):
+        """ Gets the GB parameters for the requested GB model used by OpenMM
+
+        Parameters
+        ----------
+        implicitSolvent : app.HCT, app.OBC1, app.OBC2, app.GBn, or app.GBn2
+            The object specifying a particular GB model in OpenMM
+
+        Returns
+        -------
+        parameters : list of float
+            List of parameters for the requested GB model
+        """
+        if implicitSolvent is app.GBn:
+            screen = [0.5 for atom in self.atoms]
+            for i, atom in enumerate(self.atoms):
+                if atom.element == 6:
+                    screen[i] = 0.48435382330
+                elif atom.element == 1:
+                    screen[i] = 1.09085413633
+                elif atom.element == 7:
+                    screen[i] = 0.700147318409
+                elif atom.element == 8:
+                    screen[i] = 1.06557401132
+                elif atom.element == 16:
+                    screen[i] = 0.602256336067
+        elif implicitSolvent is app.GBn2:
+            # Add non-optimized values as defaults
+            alpha = [1.0 for i in self.atoms]
+            beta = [0.8 for i in self.atoms]
+            gamma = [4.85 for i in self.atoms]
+            screen = [0.5 for i in self.atoms]
+            for i, atom in enumerate(self.atoms):
+                if atom.element == 6:
+                    screen[i] = 1.058554
+                    alpha[i] = 0.733756
+                    beta[i] = 0.506378
+                    gamma[i] = 0.205844
+                elif atom.element == 1:
+                    screen[i] = 1.425952
+                    alpha[i] = 0.788440
+                    beta[i] = 0.798699
+                    gamma[i] = 0.437334
+                elif atom.element == 7:
+                    screen[i] = 0.733599
+                    alpha[i] = 0.503364
+                    beta[i] = 0.316828
+                    gamma[i] = 0.192915
+                elif atom.element == 8:
+                    screen[i] = 1.061039
+                    alpha[i] = 0.867814
+                    beta[i] = 0.876635
+                    gamma[i] = 0.387882
+                elif atom.element == 16:
+                    screen[i] = -0.703469
+                    alpha[i] = 0.867814
+                    beta[i] = 0.876635
+                    gamma[i] = 0.387882
+        else:
+            screen = [atom.screen for atom in self.atoms]
+
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        radii = [a.radii * length_conv for a in self.atoms]
+
+        if implicitSolvent is app.GBn2:
+            return zip(radii, screen, alpha, beta, gamma)
+        return zip(radii, screen)
 
     #===================================================
 
