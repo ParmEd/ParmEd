@@ -904,6 +904,7 @@ class AmberParm(AmberFormat, Structure):
     @needs_openmm
     def omm_nonbonded_force(self, nonbondedMethod=None,
                             nonbondedCutoff=8*u.angstroms,
+                            switchDistance=0*u.angstroms,
                             ewaldErrorTolerance=0.0005,
                             reactionFieldDielectric=78.5):
         """
@@ -1004,7 +1005,7 @@ class AmberParm(AmberFormat, Structure):
             # Lennard-Jones parameters, but keep the charge parameters in place.
             for i in xrange(nonbfrc.getNumParticles()):
                 chg, sig, eps = nonbfrc.getParticleParameters(i)
-                nonbfrc.setParticleParameters(chg, 0.5, 0.0)
+                nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
             # We still let the NonbondedForce handle our nonbonded exceptions,
             # but we may have to modify the Lennard-Jones part with
             # off-diagonal modifications. Offload this to a private method so it
@@ -1650,7 +1651,7 @@ class AmberParm(AmberFormat, Structure):
             rmin = (a / b * 2)**(1/6)
             epsilon = b / (2 * rmin**6) * ene_conv
             sigma = rmin * sigma_scale
-            nonbfrc.setExceptionParameters(qq, sigma, epsilon)
+            nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)
 
     #===================================================

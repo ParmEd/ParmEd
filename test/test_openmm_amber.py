@@ -13,6 +13,7 @@ except ImportError:
     from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
+from chemistry.amber import AmberParm, ChamberParm
 import chemistry.unit as u
 from copy import copy
 from math import sqrt

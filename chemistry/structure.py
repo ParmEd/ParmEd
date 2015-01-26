@@ -941,7 +941,7 @@ class Structure(object):
                      temperature=298.15*u.kelvin,
                      soluteDielectric=1.0,
                      solventDielectric=78.5,
-                     useSASA=True,
+                     useSASA=False,
                      removeCMMotion=True,
                      hydrogenMass=None,
                      ewaldErrorTolerance=0.0005,
@@ -990,7 +990,7 @@ class Structure(object):
             The dielectric constant of the protein interior used in GB
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
-        useSASA : bool=True
+        useSASA : bool=False
             If True, use the ACE non-polar solvation model. Otherwise, use no
             SASA-based nonpolar solvation model.
         removeCMMotion : bool=True
@@ -1067,7 +1067,7 @@ class Structure(object):
                                         implicitSolventSaltConc, temperature,
                                         useSASA)
             )
-        if removeCMMotion is not None:
+        if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
         if self.box is not None:
             system.setDefaultPeriodicBoxVectors(*self.box_vectors)

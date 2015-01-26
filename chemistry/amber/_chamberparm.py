@@ -297,7 +297,7 @@ class ChamberParm(AmberParm):
             rmin = (a / b * 2)**(1/6)
             epsilon = b / (2 * rmin**6) * ene_conv
             sigma = rmin * sigma_scale
-            nonbfrc.setExceptionParameters(qq, sigma, epsilon)
+            nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)
 
     #===================================================
