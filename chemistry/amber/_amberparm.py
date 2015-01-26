@@ -1029,7 +1029,7 @@ class AmberParm(AmberFormat, Structure):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
                 force.addExclusion(i, j)
         # Copy the switching function information to the CustomNonbondedForce
-        if nbfrc.getUseSwitchingFunction():
+        if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
             force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
 
