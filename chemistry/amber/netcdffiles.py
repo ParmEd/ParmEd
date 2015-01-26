@@ -14,6 +14,9 @@ work correctly---there is no difference from a user perspective). ALL
 NetCDF-file manipulation that the chemistry/amber package does should be
 contained in this module.
 """
+from __future__ import division
+
+from chemistry import unit as u
 import warnings
 # This determines which NetCDF package we're going to use...
 NETCDF_PACKAGE = None
@@ -231,20 +234,29 @@ class NetCDFRestart(object):
         """
         Opens a new NetCDF file and sets the attributes
 
-        Parameters:
+        Parameters
+        ----------
+        fname : str
+            Name of the new file to open (overwritten)
+        natom : int
+            The number of atoms in the system
+        box : bool
+            Whether unit cell information is written or not
+        vels : bool
+            Whether velocity information is written or not
+        title : str=''
+            The title to write to the NetCDF restart file
+        remd : str=None
+            None -- No REMD information is written
+            'T[emperature]' -- target temperature (or pH) will be written
+            'M[ulti-D]' -- remd_indices and remd_groups will be written
+        remd_dimtypes : iterable of int=None
+            Array of exchange types for each group. The length will be the REMD
+            dimension (if `remd` above is "M[ulti-D]")
 
-            fname (string): Name of the new file to open (overwritten)
-            natom (int): Number of atoms in the restart
-            box (bool): Write box information or not?
-            vels (bool): Write velocities or not?
-            title (string): title of the NetCDF file
-            remd (string): Whether REMD information needs to be written. Can be
-                None - No REMD information is written
-                T(emperature) - Target temperature (or pH) will be written
-                M(ulti-D) - remd_indices and remd_groups will be written
-            remd_dimtypes (int array): Array of exchange types for each group.
-
-        remd is case-insensitive, and done based on first-letter matching, only
+        Notes
+        -----
+        `remd` is case-insensitive, and done based on first-letter matching
         """
         if remd is not None:
             if remd[0] in 'tT':
@@ -346,6 +358,11 @@ class NetCDFRestart(object):
     def open_old(cls, fname):
         """
         Opens the NetCDF file and sets the global attributes that the file sets
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to read
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
@@ -482,7 +499,22 @@ class NetCDFRestart(object):
             pass
 
 class NetCDFTraj(object):
-    """ Class to read or write NetCDF restart files """
+    """ Class to read or write NetCDF restart files
+
+    Parameters
+    ----------
+    fname : str
+        Name of the file to open
+    mode : str
+        Mode to open in:
+            - 'w' means write-mode
+            - 'r' means read-mode
+
+    Notes
+    -----
+    You should use the open_new and open_old alternative constructors instead of
+    the default constructor
+    """
 
     @needs_netcdf
     def __init__(self, fname, mode):
@@ -497,21 +529,28 @@ class NetCDFTraj(object):
         """
         Opens a new NetCDF file and sets the attributes
 
-        Parameters:
-
-            fname (string): Name of the new file to open (overwritten)
-            natom (int): Number of atoms in the restart
-            box (bool): Write box information or not?
-            crds (bool): Write coordinates or not?
-            vels (bool): Write velocities or not?
-            frcs (bool): Write forces or not?
-            remd (string): What kind of REMD are we doing. Allowed values are:
-                  None - No REMD
-                  T[emperature] - Temperature or Constant pH REMD
-                  M[ulti-D] - Multi-dimensional REMD
-            remd_dimension (int): Number of dimensions for multi-D REMD. None
-                                  for non-multi-D REMD
-            title (string): title of the NetCDF file
+        Parameters
+        ----------
+        fname : str
+            Name of the new file to open (overwritten)
+        natom : int
+            Number of atoms in the restart
+        box : bool
+            Indicates if cell lengths and angles are written to the NetCDF file
+        crds : bool=True
+            Indicates if coordinates are written to the NetCDF file
+        vels : bool=False
+            Indicates if velocities are written to the NetCDF file
+        frcs : bool=False
+            Indicates if forces are written to the NetCDF file
+        remd : str=None
+            'T[emperature]' if replica temperature is written
+            'M[ulti]' if Multi-D REMD information is written
+            None if no REMD information is written
+        remd_dimension : int=None
+            If remd above is 'M[ulti]', this is how many REMD dimensions exist
+        title : str=''
+            The title of the NetCDF trajectory file
         """
         inst = cls(fname, 'w')
         ncfile = inst._ncfile
@@ -620,9 +659,10 @@ class NetCDFTraj(object):
         """
         Opens the NetCDF file and sets the global attributes that the file sets
 
-        Parameters:
-            -  fname (string): File name of the trajectory to open. It must
-                               exist
+        Parameters
+        ----------
+        fname : str
+            File name of the trajectory to open. It must exist
         """
         inst = cls(fname, 'r')
         ncfile = inst._ncfile
@@ -663,11 +703,16 @@ class NetCDFTraj(object):
         """
         Get the coordinates of a particular frame in the trajectory
     
-        Parameters:
-            -  frame (int): Which snapshot to get (first snapshot is frame 0)
+        Parameters
+        ----------
+        frame : int
+            Which snapshot to get (first snapshot is frame 0)
     
-        Returns:
-            numpy array of length 3*natom with the given coordinates
+        Returns
+        -------
+        coordinates
+            numpy array of length 3*natom with the given coordinates in the
+            format [x1, y1, z1, x2, y2, z2, ...] in Angstroms
         """
         return self._ncfile.variables['coordinates'][frame][:].flatten()
 
@@ -677,13 +722,17 @@ class NetCDFTraj(object):
         should only be called on objects created with the "open_new"
         constructor.
 
-        Parameters:
-            -  stuff (array): This array of floats is converted into a numpy
-                    array of shape (natom, 3). It can be passed either in the
-                    2-D format of [ [x1, y1, z1], [x2, y2, z2], ... ] or in the
-                    1-D format of [x1, y1, z1, x2, y2, z2, ... ].
+        Parameters
+        ----------
+        stuff : iterable of floats or distance Quantity
+            This array of floats is converted into a numpy array of shape
+            (natom, 3). It can be passed either in the 2-D format of
+            [ [x1, y1, z1], [x2, y2, z2], ... ] or in the 1-D format of
+            [x1, y1, z1, x2, y2, z2, ... ].
         """
-        if not isinstance(stuff, np.ndarray): stuff = np.asarray(stuff)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.angstroms)
+        stuff = np.asarray(stuff)
         self._ncfile.variables['coordinates'][self._last_crd_frame] = \
                 np.reshape(stuff, (self.atom, 3))
         self._last_crd_frame += 1
@@ -693,10 +742,14 @@ class NetCDFTraj(object):
         """
         Get the velocities of a particular frame in the trajectory
 
-        Parameters:
-            -  frame (int): Which snapshot to get (first snapshot is frame 0)
+        Parameters
+        ----------
+        frame : int
+            Which snapshot to get (first snapshot is frame 0)
 
-        Returns:
+        Returns
+        -------
+        velocities
             numpy array of length 3*atom with the given velocities properly
             scaled to be of units angstrom/picosecond
         """
@@ -709,13 +762,17 @@ class NetCDFTraj(object):
         should only be called on objects created with the "open_new"
         constructor.
 
-        Parameters:
-            -  stuff (array): This array of floats is converted into a numpy
-                    array of shape (natom, 3). It can be passed either in the
-                    2-D format of [ [x1, y1, z1], [x2, y2, z2], ... ] or in the
-                    1-D format of [x1, y1, z1, x2, y2, z2, ... ].
+        Parameters
+        ----------
+        stuff : iterable of floats or distance/time Quantity
+            This array of floats is converted into a numpy array of shape
+            (natom, 3). It can be passed either in the 2-D format of
+            [ [x1, y1, z1], [x2, y2, z2], ... ] or in the 1-D format of
+            [x1, y1, z1, x2, y2, z2, ... ].
         """
-        if not isinstance(stuff, np.ndarray): stuff = np.asarray(stuff)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.angstrom/u.picosecond)
+        stuff = np.asarray(stuff)
         self._ncfile.variables['velocities'][self._last_vel_frame] = \
                 np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
         self._last_vel_frame += 1
@@ -725,12 +782,16 @@ class NetCDFTraj(object):
         """
         Get the forces of a particular frame in the trajectory
 
-        Parameters:
-            -  frame (int): Which snapshot to get (first snapshot is frame 0)
+        Parameters
+        ----------
+        frame : int
+            Which snapshot to get (first snapshot is frame 0)
 
-        Returns:
+        Returns
+        -------
+        forces
             numpy array of length 3*atom with the given forces properly
-            scaled to be of units amu*angstrom/picosecond^2
+            scaled to be of kcal/mol/Angstroms
         """
         return (self._ncfile.variables['forces'][frame][:].flatten())
 
@@ -740,13 +801,16 @@ class NetCDFTraj(object):
         should only be called on objects created with the "open_new"
         constructor.
 
-        Parameters:
-            -  stuff (array): This array of floats is converted into a numpy
-                    array of shape (natom, 3). It can be passed either in the
-                    2-D format of [ [x1, y1, z1], [x2, y2, z2], ... ] or in the
-                    1-D format of [x1, y1, z1, x2, y2, z2, ... ].
+        Parameters
+        ----------
+        stuff : iterable of floats or energy/distance Quantity
+            This array of floats is converted into a numpy array of shape
+            (natom, 3). It can be passed either in the 2-D format of
+            [ [x1, y1, z1], [x2, y2, z2], ... ] or in the 1-D format of
+            [x1, y1, z1, x2, y2, z2, ... ].
         """
-        if not isinstance(stuff, np.ndarray): stuff = np.asarray(stuff)
+        if u.is_quantity(stuff):
+            stuff.value_in_unit(u.kilocalories_per_mole/u.angstroms)
         self._ncfile.variables['forces'][self._last_frc_frame] = \
                 np.reshape(stuff, (self.atom, 3))
         self._last_frc_frame += 1
@@ -757,12 +821,16 @@ class NetCDFTraj(object):
         Get the cell lengths and cell angles of a particular frame in the
         trajectory
 
-        Parameters:
-            -  frame (int): Which snapshot to get (first snapshot is frame 0)
+        Parameters
+        ----------
+        frame : int
+            Which snapshot to get (first snapshot is frame 0)
 
-        Returns:
+        Returns
+        -------
+        lengths, angles
             2-element tuple: (length-3 numpy array of cell lengths, length-3
-            numpy array of cell angles)
+            numpy array of cell angles) in Angstroms
         """
         return (self._ncfile.variables['cell_lengths'][frame][:],
                 self._ncfile.variables['cell_angles'][frame][:])
@@ -788,15 +856,20 @@ class NetCDFTraj(object):
         trajectory.  This should only be called on objects created with the
         "open_new" constructor.
 
-        Parameters:
-            -  lengths (array): This should be a 1-D array of 3 or 6 elements.
-                        If 6 elements, angles should be None and the first 3
-                        elements are the box lengths (angstroms) and the last 3
-                        are the box angles (degrees).
-            -  angles (array): These are the box angles (if lengths contains
-                        only 3 elements) in degrees. Must be a 1-D array of 3
-                        elements or None if lengths includes angles as well.
+        Parameters
+        ----------
+        lengths : array of 3 (or 6) floats (or Quantities)
+            This should be a 1-D array of 3 or 6 elements.  If 6 elements,
+            `angles` should be None (below) and the first 3 elements are the box
+            lengths (angstroms) and the last 3 are the box angles (degrees).
+        angles : 3-item iterable = None
+            These are the box angles (if lengths contains only 3 elements) in
+            degrees. Must be a 1-D array of 3 elements or None if lengths
+            includes angles as well.
         """
+        def strip_units(x, desired_units):
+            if u.is_quantity(x): return x.value_in_unit(desired_units)
+            return x
         if len(lengths) == 3 and angles is None:
             raise ValueError('Both lengths and angles are required.')
         if len(lengths) == 6 and angles is not None:
@@ -804,8 +877,8 @@ class NetCDFTraj(object):
         if len(lengths) != 6 and (len(lengths) != 3 or len(angles) != 3):
             raise ValueError('6 numbers expected -- 3 lengths and 3 angles.')
         if angles is None:
-            angles = lengths[3:]
-        lengths = lengths[:3]
+            angles = [strip_units(x, u.degrees) for x in lengths[3:]]
+        lengths = [strip_units(x, u.angstroms) for x in lengths[:3]]
         self._ncfile.variables['cell_lengths'][self._last_box_frame] = \
                 np.asarray(lengths)
         self._ncfile.variables['cell_angles'][self._last_box_frame] = \
@@ -817,32 +890,73 @@ class NetCDFTraj(object):
         """
         Get the time of a particular frame in the trajectory
 
-        Parameters:
-            -  frame (int): Which snapshot to get (first snapshot is frame 0)
+        Parameters
+        ----------
+        frame : int
+            Which snapshot to get (first snapshot is frame 0)
 
-        Returns:
-            float: time of the given frame
+        Returns
+        -------
+        time : float
+            The time of the given frame in ps
         """
         return self._ncfile.variables['time'][frame]
 
     def add_time(self, stuff):
+        """ Adds the time to the current frame of the NetCDF file
+
+        Parameters
+        ----------
+        stuff : float or time-dimension Quantity
+            The time to add to the current frame
+        """
+        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.picoseconds)
         self._ncfile.variables['time'][self._last_time_frame] = float(stuff)
         self._last_time_frame += 1
         self.flush()
 
     def remd_indices(self, frame):
+        """ Returns the REMD indices for the desired frame
+
+        Parameters
+        ----------
+        frame : int
+            The frame to get the REMD indices from (0 is the first frame)
+        """
         return self._ncfile.variables['remd_indices'][frame][:]
 
     def add_remd_indices(self, stuff):
+        """ Add REMD indices to the current frame of the NetCDF file
+
+        Parameters
+        ----------
+        stuff : iterable of int
+            The indices in each REMD dimension
+        """
         self._ncfile.variables['remd_indices'][self._last_remd_frame] = \
                 np.asarray(stuff, dtype='i')
         self._last_remd_frame += 1
         self.flush()
 
     def temp0(self, frame):
+        """ Returns the temperature of the current frame in kelvin
+
+        Parameters
+        ----------
+        frame : int
+            The frame to get the temperature from (0 is the first frame)
+        """
         return self._ncfile.variables['temp0'][frame]
 
     def add_temp0(self, stuff):
+        """ The temperature to add to the current frame of the NetCDF file
+
+        Parameters
+        ----------
+        stuff : float or temperature Quantity
+            The temperature to add to the current NetCDF file
+        """
+        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.kelvin)
         self._ncfile.variables['temp0'][self._last_remd_frame] = float(stuff)
         self._last_remd_frame += 1
         self.flush()

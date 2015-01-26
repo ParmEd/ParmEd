@@ -35,6 +35,7 @@ from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType)
 from chemistry import unit as u
+from chemistry.utils import chemistry_deprecated
 import copy
 try:
     from itertools import izip as zip
@@ -589,27 +590,21 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def delete_mask(self, mask):
+    def strip(self, selection):
         """
-        Deletes all of the atoms corresponding to an entire Amber mask
+        Deletes a subset of the atoms corresponding to an atom-based selection.
 
         Parameters
         ----------
-        mask : str or AmberMask
-            The Amber mask defining the selection of atoms that will be deleted
-            from this topology
+        selection : AmberMask, str, or iterable of bool
+            This is the selection of atoms that will be deleted from this
+            structure. If it is a string, it will be interpreted as an
+            AmberMask. If it is an AmberMask, it will be converted to a
+            selection of atoms. If it is an iterable, it must be the same length
+            as the `atoms` list.
         """
         from chemistry.amber.mask import AmberMask
-        # Get the atom selection
-        if isinstance(mask, AmberMask):
-            if mask.parm is not self:
-                raise AmberParmError('Mask belongs to different prmtop!')
-            selection = reversed(list(mask.Selected()))
-        else:
-            selection = reversed(list(AmberMask(self, mask).Selected()))
-        # Delete the atoms and rebuild the topology and coordinates
-        for i in selection:
-            del self.atoms[i]
+        super(AmberParm, self).strip(selection)
         self.remake_parm()
         if self.coords is not None:
             self.coords = []
@@ -624,6 +619,10 @@ class AmberParm(AmberFormat, Structure):
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
                 if np is not None:
                     self.vels = np.asarray(self.vels)
+
+    #===================================================
+
+    delete_mask = chemistry_deprecated("delete_mask", "strip")(strip)
 
     #===================================================
 

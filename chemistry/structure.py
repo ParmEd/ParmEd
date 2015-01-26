@@ -577,6 +577,40 @@ class Structure(object):
 
     #===================================================
 
+    def strip(self, selection):
+        """
+        Deletes a subset of the atoms corresponding to an atom-based selection.
+
+        Parameters
+        ----------
+        selection : AmberMask, str, or iterable of bool
+            This is the selection of atoms that will be deleted from this
+            structure. If it is a string, it will be interpreted as an
+            AmberMask. If it is an AmberMask, it will be converted to a
+            selection of atoms. If it is an iterable, it must be the same length
+            as the `atoms` list.
+        """
+        from chemistry.amber import AmberMask
+        if isinstance(selection, AmberMask):
+            if selection.parm is not self:
+                raise TypeError('passed mask does not belong to Structure')
+            sel = selection.Selection()
+        elif isinstance(selection, basestring):
+            sel = AmberMask(self, selection).Selection()
+        else:
+            try:
+                sel = list(selection)
+            except TypeError:
+                raise TypeError('Selection not a supported type [%s]' %
+                                type(selection))
+            if len(sel) != self.atoms:
+                raise ValueError('Selection iterable wrong length')
+        atomlist = sorted([i for i, s in enumerate(sel) if s])
+        for i in reversed(atomlist):
+            del self.atoms[i]
+
+    #===================================================
+
     def write_pdb(self, dest, renumber=True, coordinates=None,
                   altlocs='all', write_anisou=False):
         """
