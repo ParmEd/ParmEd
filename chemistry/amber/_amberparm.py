@@ -1642,15 +1642,20 @@ class AmberParm(AmberFormat, Structure):
         sigma_scale = 2**(-1/6) * length_conv
         for ii in xrange(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            if qq == 0 and (ss == 0 or ee == 0): continue # This is skipped!
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
             a = acoef[idx]
             b = bcoef[idx]
-            # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
-            rmin = (a / b * 2)**(1/6)
-            epsilon = b / (2 * rmin**6) * ene_conv
-            sigma = rmin * sigma_scale
+            if b == 0:
+                epsilon = 0.0
+                sigma = 0.5
+            else:
+                # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
+                rmin = (a / b * 2)**(1/6)
+                epsilon = b / (2 * rmin**6) * ene_conv
+                sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)
 
