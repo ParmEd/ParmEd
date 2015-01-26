@@ -288,8 +288,8 @@ class ChamberParm(AmberParm):
         sigma_scale = 2**(-1/6) * length_conv
         for ii in xrange(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
-            id1 = atoms[i].nb_idx
-            id2 = atoms[j].nb_idx
+            id1 = atoms[i].nb_idx - 1
+            id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
             a = acoef[idx]
             b = bcoef[idx]
