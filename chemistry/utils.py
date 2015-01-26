@@ -6,7 +6,7 @@ import warnings
 
 def chemistry_deprecated(old_func, new_func):
     """ Decorator indicating that something is deprecated
-    
+
     Parameters
     ----------
     old_func : str

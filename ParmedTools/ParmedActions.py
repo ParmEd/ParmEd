@@ -1204,7 +1204,7 @@ class strip(Action):
                                     self.mask, self.num_atms)
 
     def execute(self):
-        self.parm.delete_mask(self.mask)
+        self.parm.strip(self.mask)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2146,7 +2146,7 @@ class timerge(Action):
         self.parm.atoms.changed = True
 
         if nremove > 0:
-            self.parm.delete_mask(remove_str)
+            self.parm.strip(remove_str)
 
         new_sc_atm1 = []
         new_sc_atm2 = []
