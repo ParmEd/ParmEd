@@ -967,7 +967,12 @@ class AmberParm(AmberFormat, Structure):
                                             'r2=r^2; a=acoef(type1, type2);'
                                             'b=bcoef(type1, type2);')
         elif has1264:
-            force = mm.CustomNonbondedFroce('-c/r^4; c=ccoef(type1, type2);')
+            force = mm.CustomNonbondedForce('-c/r^4; c=ccoef(type1, type2);')
+
+        # Set up the force with all of the particles
+        force.addPerParticleParameter('type')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        for atom in self.atoms: force.addParticle([atom.nb_idx-1])
 
         # Now construct the lookup tables
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
@@ -1032,6 +1037,8 @@ class AmberParm(AmberFormat, Structure):
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
             force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+        # Set the dispersion correction on (by default)
+        force.setUseLongRangeCorrection(True)
 
         return nonbfrc, force
 
@@ -1188,6 +1195,10 @@ class AmberParm(AmberFormat, Structure):
         natom = self.parm_data['POINTERS'][NATOM]
         res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom+1]
         try:
+            atnums = self.parm_data['ATOMIC_NUMBER']
+        except KeyError:
+            atnums = [1 for i in xrange(natom)]
+        try:
             res_icd = self.parm_data['RESIDUE_ICODE']
         except KeyError:
             res_icd = ['' for i in xrange(self.parm_data['POINTERS'][NRES])]
@@ -1199,7 +1210,13 @@ class AmberParm(AmberFormat, Structure):
             resstart = res_ptr[i] - 1
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
-                atom = Atom()
+                if self.parm_data['ATOM_NAME'][j] in ('EP', 'LP'): # extra point
+                    if atnum[j] == 0:
+                        atom = ExtraPoint()
+                    else:
+                        atom = Atom()
+                else:
+                    atom = Atom()
                 self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
                 self.atoms.append(atom)
 

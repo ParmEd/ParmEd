@@ -328,6 +328,8 @@ class Atom(_ListItem):
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
+    children : list of ExtraPoint
+        This is the list of "child" ExtraPoint objects bonded to this atom
     number : int
         The serial number of the atom in the input structure (e.g., PDB file).
         If not present in the original structure, a default value of -1 is used
@@ -466,24 +468,29 @@ class Atom(_ListItem):
         self._epsilon = epsilon
         self._rmin14 = rmin14
         self._epsilon14 = epsilon14
+        self.children = []
    
     #===================================================
 
-    def __copy__(self):
-        """ Returns a deep copy of this atom, but not attached to any list """
-        new = type(self)(atomic_number=self.atomic_number, name=self.name,
-                         type=self.type, charge=self.charge, mass=self.mass,
-                         nb_idx=self.nb_idx, radii=self.radii,
-                         screen=self.screen, tree=self.tree, join=self.join,
-                         irotat=self.irotat, occupancy=self.occupancy,
-                         bfactor=self.bfactor, altloc=self.altloc)
-        new.atom_type = self.atom_type
-        for key in self.other_locations:
-            new.other_locations[key] = copy.copy(self.other_locations[key])
-        _safe_assigns(new, self, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
+    @classmethod
+    def _copy(cls, item):
+        new = cls(atomic_number=item.atomic_number, name=item.name,
+                  type=item.type, charge=item.charge, mass=item.mass,
+                  nb_idx=item.nb_idx, radii=item.radii,
+                  screen=item.screen, tree=item.tree, join=item.join,
+                  irotat=item.irotat, occupancy=item.occupancy,
+                  bfactor=item.bfactor, altloc=item.altloc)
+        new.atom_type = item.atom_type
+        for key in item.other_locations:
+            new.other_locations[key] = copy.copy(item.other_locations[key])
+        _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
                       'vdw_parent', 'vdw_weight'))
         return new
+
+    def __copy__(self):
+        """ Returns a deep copy of this atom, but not attached to any list """
+        return type(self)._copy(self)
 
     #===================================================
 
@@ -518,22 +525,31 @@ class Atom(_ListItem):
     def bond_partners(self):
         """ Go through all bonded partners """
         bp = set(self._bond_partners)
+        for p in bp:
+            for c in p.children:
+                bp.add(c)
         return sorted(list(bp))
 
     @property
     def angle_partners(self):
         """ List of all angle partners that are NOT bond partners """
         bp = set(self._bond_partners)
-        ap = set(self._angle_partners)
-        return sorted(list(ap - bp))
+        ap = set(self._angle_partners) - bp
+        for p in ap:
+            for c in p.children:
+                ap.add(c)
+        return sorted(list(ap))
 
     @property
     def dihedral_partners(self):
         " List of all dihedral partners that are NOT angle or bond partners "
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners) - ap - bp
+        for p in dp:
+            for c in p.children:
+                dp.add(c)
+        return sorted(list(dp))
 
     @property
     def tortor_partners(self):
@@ -541,23 +557,29 @@ class Atom(_ListItem):
         List of all 1-5 partners that are NOT in angle or bond partners. This is
         _only_ used in the Amoeba force field
         """
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners) - dp - ap - bp
+        for p in tp:
+            for c in p.children:
+                tp.add(c)
+        return sorted(list(tp))
 
     @property
     def exclusion_partners(self):
         """
         List of all exclusions not otherwise excluded by bonds/angles/torsions
         """
-        ep = set(self._exclusion_partners)
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(ep - tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners)
+        ep = set(self._exclusion_partners) - tp - dp - ap - bp
+        for p in ep:
+            for c in p.children:
+                ep.add(c)
+        return sorted(list(ep))
 
     #===================================================
 
@@ -665,37 +687,28 @@ class Atom(_ListItem):
         if only_greater:
             baseline = self.idx
         else:
-            baseline = 0
-        if self.atomic_number > 0:
-            excl = []
-            for atm in self.bond_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.angle_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.dihedral_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.tortor_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.exclusion_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-        else:
-            # Extra point!! Special handling required. Basically, the extra
-            # point adopts all of the exclusions of the atom it is bonded to
-            partner = self.bond_partners[0]
-            myidx = self.idx + index_from
-            excl = [a for a in partner.nonbonded_exclusions()
-                        if a != myidx]
-            excl.append(partner.idx + index_from)
+            baseline = -1
+        excl = []
+        for atm in self.bond_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.angle_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.dihedral_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.tortor_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.exclusion_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
         return sorted(excl)
 
     #===================================================
@@ -725,6 +738,10 @@ class Atom(_ListItem):
         This action adds `self` to `other.bond_partners`. Raises `BondError` if
         `other is self`
         """
+        if isinstance(other, ExtraPoint):
+            self.children.append(other)
+        elif isinstance(self, ExtraPoint):
+            other.children.append(self)
         if self is other:
             raise BondError("Cannot bond atom to itself!")
         self._bond_partners.append(other)
@@ -871,6 +888,75 @@ class Atom(_ListItem):
         if self.residue is not None:
             return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
         return start + '>'
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class ExtraPoint(Atom):
+    """
+    An extra point is a massless, virtual site that is used to extend the
+    flexibility of partial atomic charge fitting. They can be used to, for
+    instance, give atoms permanent multipoles in a fixed-charge format.
+
+    However, virtual sites are massless particles whose position is fixed with
+    respect to a particular frame of reference. As a result, they must be
+    treated specially when running dynamics. This class extends the `Atom` class
+    with extra functionality specific to these "Extra points" or "virtual
+    sites". See the documentation for the `Atom` class for more information.
+    """
+
+    #===================================================
+
+    @property
+    def parent(self):
+        """
+        The parent atom of this extra point is the atom it is bonded to (there
+        should only be 1 bond partner, but the parent is defined as its first)
+        """
+        try:
+            return self._bond_partners[0]
+        except IndexError:
+            return None
+
+    #===================================================
+
+    @property
+    def bond_partners(self):
+        """ List of all atoms bonded to this atom and its parent """
+        try:
+            return sorted([self.parent] + self.parent.bond_partners)
+        except AttributeError:
+            return []
+
+    @property
+    def angle_partners(self):
+        """ List of all atoms angled to this atom and its parent """
+        try:
+            return self.parent.angle_partners
+        except AttributeError:
+            return []
+
+    @property
+    def dihedral_partners(self):
+        try:
+            return self.parent.dihedral_partners
+        except AttributeError:
+            return []
+
+    @property
+    def tortor_partners(self):
+        try:
+            return self.parent.tortor_partners
+        except AttributeError:
+            return []
+
+    @property
+    def exclusion_partners(self):
+        try:
+            return self.parent.exclusion_partners
+        except AttributeError:
+            return []
+
+    #===================================================
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

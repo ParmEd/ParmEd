@@ -24,10 +24,11 @@ from __future__ import division
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
+from chemistry.exceptions import AmberParmError
 from chemistry.structure import needs_openmm
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
-from chemistry.exceptions import AmberParmError
+from chemistry import unit as u
 from math import sqrt
 import warnings
 

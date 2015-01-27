@@ -1018,7 +1018,24 @@ class Structure(object):
         if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald):
             if self.box is None:
                 raise ValueError('No periodic boundary conditions detected')
-        for atom in self.atoms: system.addParticle(atom.mass)
+        # Do hydrogen mass repartitioning if necessary
+        masses = [atom.mass for atom in self.atoms]
+        if hydrogenMass is not None:
+            if u.is_quantity(hydrogenMass):
+                hydrogenMass = hydrogenMass.value_in_unit(u.dalton)
+            if hydrogenMass <= 0:
+                raise ValueError('Hydrogen mass must be positive')
+            for atom in self.atoms:
+                if atom.element == 1:
+                    heavy_atom = None
+                    for a2 in atom.bond_partners:
+                        if a2.element != 1:
+                            heavy_atom = a2
+                            break
+                    if heavy_atom is not None:
+                        masses[atom.idx] = hydrogenMass
+                        masses[heavy_atom.idx] -= hydrogenMass - atom.mass
+        for mass in masses: system.addParticle(mass)
         self.omm_add_constraints(system, constraints, rigidWater)
         # Add the various types of forces
         if verbose: print('Adding bonds...')
@@ -1071,6 +1088,7 @@ class Structure(object):
             system.addForce(mm.CMMotionRemover())
         if self.box is not None:
             system.setDefaultPeriodicBoxVectors(*self.box_vectors)
+        self.omm_set_virtual_sites(system)
         return system
 
     #===================================================
@@ -1090,6 +1108,9 @@ class Structure(object):
             constrains is None
         """
         if constraints is None and not rigidWater: return
+        if constraints not in (None, app.HBonds, app.AllBonds, app.HAngles):
+            raise ValueError("Unrecognized constraints option (%s)" %
+                             constraints)
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         deg_to_rad = math.pi / 180.0
         # Rigid water only
@@ -1123,6 +1144,24 @@ class Structure(object):
                     cost = math.cos(angle.type.theteq*deg_to_rad)
                     length = math.sqrt(l1*l1 + l2*l2 - 2*l1*l2*cost)*length_conv
                     system.addConstraint(angle.atom1, angle.atom3, length)
+
+    #===================================================
+
+    @needs_openmm
+    def omm_set_virtual_sites(self, system):
+        """
+        Sets the virtual sites in a given OpenMM `System` object from the extra
+        points defined in this system
+
+        Parameters
+        ----------
+        system : mm.System
+            The system for which the virtual sites will be set. All particles
+            must have already been added to this System before calling this
+            method
+        """
+        if system.getNumParticles() != len(self.atoms):
+            raise ValueError('OpenMM System does not correspond to Structure')
 
     #===================================================
 
@@ -1421,6 +1460,9 @@ class Structure(object):
             force.setNonbondedMethod(mm.NonbondedForce.Ewald)
             force.setCutoffDistance(nonbondedCutoff)
             force.setEwaldErrorTolerance(ewaldErrorTolerance)
+        else:
+            raise ValueError('Unrecognized nonbondedMethod (%s)' %
+                             nonbondedMethod)
         force.setReactionFieldDielectric(reactionFieldDielectric)
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
@@ -1457,16 +1499,10 @@ class Structure(object):
             force.addException(bond.atom1.idx, bond.atom2.idx,
                                0.0, 0.5, 0.0, True)
         for angle in self.angles:
-            force.addException(angle.atom1.idx, angle.atom2.idx,
-                               0.0, 0.5, 0.0, True)
-            force.addException(angle.atom2.idx, angle.atom3.idx,
-                               0.0, 0.5, 0.0, True)
             force.addException(angle.atom1.idx, angle.atom3.idx,
                                0.0, 0.5, 0.0, True)
-        for a1 in self.atoms:
-            for a2 in atom.exclusion_partners:
-                force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, True)
-
+        for a2 in atom.exclusion_partners:
+            force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, True)
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
                 switchDistance = switchDistance.value_in_unit(u.nanometers)
@@ -2211,9 +2247,14 @@ def read_PDB(filename):
                     chg = float(chg)
                 except ValueError:
                     chg = 0
-                atom = Atom(atomic_number=atomic_number, name=atname,
-                            charge=chg, mass=mass, occupancy=occupancy,
-                            bfactor=bfactor, altloc=altloc, number=atnum)
+                if atname in ('EP', 'LP'): # lone pair
+                    atom = ExtraPoint(atomic_number=atomic_number, name=atname,
+                                charge=chg, mass=mass, occupancy=occupancy,
+                                bfactor=bfactor, altloc=altloc, number=atnum)
+                else:
+                    atom = Atom(atomic_number=atomic_number, name=atname,
+                                charge=chg, mass=mass, occupancy=occupancy,
+                                bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                 if _compare_atoms(last_atom, atom, resname, resid, chain):
                     atom.residue = last_atom.residue
