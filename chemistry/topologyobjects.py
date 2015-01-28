@@ -360,6 +360,10 @@ class Atom(_ListItem):
     vdw_weight : float
         In the AMOEBA force field, this is the weight of the van der Waals
         interaction on the parent atom
+    segid : str
+        In CHARMM PDB and PSF files, the SEGID behaves similarly to the residue
+        chain ID and is used to separate the total system into representative
+        parts. This will only be set if read in from the input structure.
 
     Notes
     -----

@@ -233,6 +233,32 @@ class TestChemistryStructure(unittest.TestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
+    def testSegidHandling(self):
+        """ Test handling of CHARMM-specific SEGID identifier (r/w) """
+        pdbfile = structure.read_PDB(self.overflow2)
+        allsegids = set(['PROA', 'PROB', 'CARA', 'CARE', 'CARC', 'CARD', 'CARB',
+                         'MEMB', 'TIP3', 'POT', 'CLA'])
+        foundsegids = set()
+        for atom in pdbfile.atoms:
+            self.assertTrue(hasattr(atom, 'segid'))
+            foundsegids.add(atom.segid)
+        self.assertEqual(foundsegids, allsegids)
+        self.assertEqual(pdbfile.atoms[0].segid, 'PROA')
+        self.assertEqual(pdbfile.atoms[5161].segid, 'PROA')
+        self.assertEqual(pdbfile.atoms[5162].segid, 'PROB')
+        self.assertEqual(pdbfile.atoms[-1].segid, 'CLA')
+        f = get_fn('pdb_segid_test1.pdb', written=True)
+        f2 = get_fn('pdb_segid_test2.pdb', written=True)
+        pdbfile.write_pdb(f)
+        pdbfile2 = structure.read_PDB(f)
+        for atom in pdbfile2.atoms:
+            self.assertFalse(hasattr(atom, 'segid'))
+        pdbfile.write_pdb(f2, charmm=True)
+        pdbfile3 = structure.read_PDB(f2)
+        for atom in pdbfile3.atoms:
+            self.assertTrue(hasattr(atom, 'segid'))
+            self.assertEqual(atom.segid, pdbfile.atoms[atom.idx].segid)
+
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
         # Now go through all atoms and compare their attributes

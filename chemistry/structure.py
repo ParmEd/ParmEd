@@ -519,7 +519,7 @@ class Structure(object):
     #===================================================
 
     def write_pdb(self, dest, renumber=True, coordinates=None,
-                  altlocs='all', write_anisou=False):
+                  altlocs='all', write_anisou=False, charmm=False):
         """
         Write a PDB file from the current Structure instance
 
@@ -554,6 +554,10 @@ class Structure(object):
         write_anisou : bool=False
             If True, an ANISOU record is written for every atom that has one. If
             False, ANISOU records are not written
+        charmm : bool=False
+            If True, SEGID will be written in columns 73 to 76 of the PDB file
+            in the typical CHARMM-style PDB output. This will be omitted for any
+            atom that does not contain a SEGID identifier.
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -574,7 +578,7 @@ class Structure(object):
                 dest = open(dest, 'w')
             own_handle = True
         atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
-                   '%6.2f          %2s%-2s\n')
+                   '%6.2f      %-4s%2s%-2s\n')
         anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
                      '      %2s%-2s\n')
         terrec = ('TER   %5d      %-3s %1s%4d\n')
@@ -639,27 +643,34 @@ class Structure(object):
                 pa, others, (x, y, z) = print_atoms(atom, coords)
                 # Figure out the serial numbers we want to print
                 if renumber:
-                    anum = (atom.idx + 1 + nmore) % 100000
-                    rnum = (res.idx + 1) % 10000
+                    anum = (atom.idx + 1 + nmore)
+                    rnum = (res.idx + 1)
                 else:
-                    anum = (pa.number or last_number + 1) % 100000
-                    rnum = (atom.residue.number or last_rnumber + 1) % 10000
-                    last_number = anum
-                    last_rnumber = rnum
+                    anum = (pa.number or last_number + 1)
+                    rnum = (atom.residue.number or last_rnumber + 1)
+                anum = anum - anum // 100000 * 100000
+                rnum = rnum - rnum // 10000 * 10000
+                last_number = anum
+                last_rnumber = rnum
                 # Do any necessary name munging to respect the PDB spec
                 if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
                     aname = ' %-3s' % pa.name
                 else:
                     aname = pa.name[:4]
+                if charmm and hasattr(pa, 'segid'):
+                    segid = pa.segid[:4]
+                else:
+                    segid = ''
                 dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name, res.chain, rnum, res.insertion_code,
-                           x, y, z, pa.occupancy, pa.bfactor,
+                           res.name[:3], res.chain[:1], rnum,
+                           res.insertion_code[:1], x, y, z, pa.occupancy,
+                           pa.bfactor, segid,
                            Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
                     anisou = [int(x*1e4) for x in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name, res.chain, rnum,
-                               res.insertion_code, anisou[0], anisou[1],
+                               res.name[:3], res.chain[:1], rnum,
+                               res.insertion_code[:1], anisou[0], anisou[1],
                                anisou[2], anisou[3], anisou[4], anisou[5],
                                Element[pa.atomic_number].upper(), ''))
                 for key in sorted(others.keys()):
@@ -667,24 +678,29 @@ class Structure(object):
                     x, y, z = oatom.xx, oatom.xy, oatom.xz
                     if renumber:
                         nmore += 1
-                        anum = (pa.idx + 1 + nmore) % 100000
+                        anum = (pa.idx + 1 + nmore)
                     else:
                         anum = oatom.number or last_number + 1
-                        last_number = anum
+                    anum = anum - anum // 100000 * 100000
+                    last_number = anum
                     if (len(oatom.name) < 4 and
                             len(Element[oatom.atomic_number]) != 2):
                         aname = ' %-3s' % oatom.name
                     else:
                         aname = oatom.name[:4]
+                    if charmm and hasattr(oatom, 'segid'):
+                        segid = oatom.segid[:4]
+                    else:
+                        segid = ''
                     dest.write(atomrec % (anum, aname, key, res.name,
-                               res.chain, rnum, res.insertion_code, x, y,
-                               z, oatom.occupancy, oatom.bfactor,
+                               res.chain[:1], rnum, res.insertion_code[:1],
+                               x, y, z, oatom.occupancy, oatom.bfactor, segid,
                                Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
                         anisou = [int(x*1e4) for x in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
-                            oatom.altloc, res.name, res.chain, rnum,
-                            res.insertion_code, anisou[0], anisou[1],
+                            oatom.altloc[:1], res.name[:3], res.chain[:1], rnum,
+                            res.insertion_code[:1], anisou[0], anisou[1],
                             anisou[2], anisou[3], anisou[4], anisou[5],
                             Element[oatom.atomic_number].upper(), ''))
             if res.ter:
@@ -994,6 +1010,7 @@ def read_PDB(filename):
                 x, y, z = line[30:38], line[38:46], line[47:54]
                 occupancy, bfactor = line[54:60], line[60:66]
                 elem, chg = line[76:78], line[78:80]
+                segid = line[72:76].strip() # CHARMM-specific
                 atname = atname.strip()
                 altloc = altloc.strip()
                 resname = resname.strip()
@@ -1108,6 +1125,7 @@ def read_PDB(filename):
                             charge=chg, mass=mass, occupancy=occupancy,
                             bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
+                if segid: atom.segid = segid
                 if _compare_atoms(last_atom, atom, resname, resid, chain):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
@@ -1270,7 +1288,7 @@ def read_PDB(filename):
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
-              write_anisou=False):
+              write_anisou=False, charmm=False):
     """
     Write a PDB file from a structure instance
 
@@ -1305,7 +1323,11 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
     write_anisou : bool=False
         If True, an ANISOU record is written for every atom that has one. If
         False, ANISOU records are not written
+    charmm : bool=False
+        If True, SEGID will be written in columns 73 to 76 of the PDB file in
+        the typical CHARMM-style PDB output. This will be omitted for any atom
+        that does not contain a SEGID identifier.
     """
-    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou)
+    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou, charmm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

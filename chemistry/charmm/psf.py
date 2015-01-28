@@ -213,7 +213,7 @@ class CharmmPsfFile(Structure):
             atid = int(words[0])
             if atid != i + 1:
                 raise CharmmPSFError('Nonsequential atoms detected!')
-            system = words[1]
+            segid = words[1]
             resid = conv(words[2], int, 'residue number')
             resname = words[3]
             name = words[4]
@@ -227,8 +227,9 @@ class CharmmPsfFile(Structure):
             mass = conv(words[7], float, 'atomic mass')
             props = words[8:]
             atom = Atom(name=name, type=attype, charge=charge, mass=mass)
+            atom.segid = segid
             atom.props = props
-            self.residues.add_atom(atom, resname, resid, chain=system)
+            self.residues.add_atom(atom, resname, resid)
             self.atoms.append(atom)
         # Now get the number of bonds
         nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
@@ -400,7 +401,11 @@ class CharmmPsfFile(Structure):
                 fmt = atmfmt2
             else:
                 fmt = atmfmt1
-            atmstr = fmt % (i+1, atom.residue.chain, atom.residue.number,
+            if hasattr(atom, 'segid'):
+                segid = atom.segid
+            else:
+                segid = 'SYS'
+            atmstr = fmt % (i+1, segid, atom.residue.number,
                             atom.residue.name, atom.name, atom.type,
                             atom.charge, atom.mass)
             if hasattr(atom, 'props'):
