@@ -33,7 +33,7 @@ from chemistry.exceptions import (AmberParmError, ReadError,
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
 from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
-                       BondType, AngleType, DihedralType, AtomType)
+                       BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
 from chemistry.utils import chemistry_deprecated
 import copy
@@ -603,7 +603,6 @@ class AmberParm(AmberFormat, Structure):
             selection of atoms. If it is an iterable, it must be the same length
             as the `atoms` list.
         """
-        from chemistry.amber.mask import AmberMask
         super(AmberParm, self).strip(selection)
         self.remake_parm()
         if self.coords is not None:
@@ -1211,7 +1210,7 @@ class AmberParm(AmberFormat, Structure):
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
                 if self.parm_data['ATOM_NAME'][j] in ('EP', 'LP'): # extra point
-                    if atnum[j] == 0:
+                    if atnums[j] == 0:
                         atom = ExtraPoint()
                     else:
                         atom = Atom()

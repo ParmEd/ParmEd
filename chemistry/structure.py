@@ -39,7 +39,7 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         NonbondedExceptionType, Bond, Angle, Dihedral, UreyBradley, Improper,
         Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
         TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
-        AcceptorDonor, Group, Atom)
+        AcceptorDonor, Group, Atom, ExtraPoint)
 from chemistry import unit as u
 from compat24 import wraps
 import copy
@@ -1502,7 +1502,7 @@ class Structure(object):
             force.addException(angle.atom1.idx, angle.atom3.idx,
                                0.0, 0.5, 0.0, True)
         for a2 in atom.exclusion_partners:
-            force.addException(a1.idx, a2.idx, 0.0, 0.5, 0.0, True)
+            force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
                 switchDistance = switchDistance.value_in_unit(u.nanometers)

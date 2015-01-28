@@ -2,8 +2,6 @@
 This package contains some useful functionality for common tasks in OpenMM
 """
 from chemistry import unit as u
-from simtk import openmm as mm
-from simtk.openmm import app
 
 def energy_decomposition(structure, context):
     """

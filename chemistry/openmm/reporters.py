@@ -5,7 +5,7 @@ from chemistry.geometry import box_vectors_to_lengths_and_angles
 from chemistry.amber.netcdffiles import NetCDFTraj
 from chemistry.amber.readparm import Rst7
 from functools import wraps
-from math import isnan, isinf, sqrt, acos, pi
+from math import isnan, isinf
 try:
     import simtk.openmm as mm
     import simtk.unit as u

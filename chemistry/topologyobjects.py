@@ -8,10 +8,11 @@ from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
-from chemistry.constants import TINY
+from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from chemistry.periodic_table import Mass, Element as _Element
 from compat24 import all, property
 import copy
+import math
 import warnings
 try:
     from itertools import izip as zip
@@ -328,7 +329,7 @@ class Atom(_ListItem):
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
-    children : list of ExtraPoint
+    children : list of `ExtraPoint`s
         This is the list of "child" ExtraPoint objects bonded to this atom
     number : int
         The serial number of the atom in the input structure (e.g., PDB file).
@@ -903,6 +904,9 @@ class ExtraPoint(Atom):
     with extra functionality specific to these "Extra points" or "virtual
     sites". See the documentation for the `Atom` class for more information.
     """
+    def __init__(self, *args, **kwargs):
+        super(ExtraPoint, self).__init__(*args, **kwargs)
+        self._frame_type = None
 
     #===================================================
 
@@ -925,6 +929,8 @@ class ExtraPoint(Atom):
         try:
             return sorted([self.parent] + self.parent.bond_partners)
         except AttributeError:
+            if self.parent is not None:
+                return [self.parent]
             return []
 
     @property
@@ -957,6 +963,307 @@ class ExtraPoint(Atom):
             return []
 
     #===================================================
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _determine_epframe_type(ep):
+    """
+    This is a factory used to determine which kind of extra point frame needs to
+    be used
+    """
+    parent = ep.parent
+    if len(parent.bonds) == 2:
+        return TwoParticleExtraPointFrame
+    if len(parent.bonds) == 3:
+        return ThreeParticleExtraPointFrame
+    if len(parent.bonds) == 4:
+        # We really only want to support up to 3 atoms. This case is possible in
+        # places where we have 2 lone pairs (like TIP5P)
+        num_eps = 0
+        for atom in parent.bond_partners:
+            if isinstance(atom, ExtraPoint): num_eps += 1
+        if num_eps != 2:
+            raise ValueError("Cannot determine extra point frame type")
+        return OutOfPlaneExtraPointFrame
+
+class TwoParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 2 particles
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    inside : bool=False
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside  : x1-----e--X2
+
+    Outside : x1--------X2--e
+    """
+    def __init__(self, ep, inside=False):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_weights(self):
+        """
+        Returns the weights for the two particles
+
+        Returns
+        -------
+        w1, w2 : float, float
+            w1 is the weight of particle 1 (the parent atom), whereas w2 is the
+            weight of particle 2 (the atom bonded to the parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with a 2-'
+                             'point virtual site frame')
+        b1, b2 = ep.parent.bonds
+        if ep in b1:
+            r1 = b2.type.req
+            r2 = b1.type.req
+        else:
+            r1 = b2.type.req
+            r2 = b1.type.req
+
+        if self.inside:
+            # It is closer to atom 1, but both weights are positive and add to 1
+            return ((r1 - r2) / r1), (r2 / r1)
+        else:
+            return ((r1 + r2) / r1), -(r2 / r1)
+
+class ThreeParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    inside : bool=True
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside :         X
+                    /|\
+                   / e \
+                  x     x
+    Outside :
+                     e
+                     |
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, inside=True):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : float, float, float
+            w1 is the weight of particle 1 (the parent atom), whereas w2 and w3
+            are the weights of particles 2 and 3 (the atoms bonded to the
+            parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 3:
+            raise ValueError('EP parent bond pattern inconsistent with a 3-'
+                             'point virtual site frame')
+        b1, b2, b3 = ep.parent.bonds
+        # There are 2 possibilities here -- there is an angle between the 3
+        # atoms in the frame OR there is a triangle of bonds (e.g., TIP4P).
+        # Compute the 'ideal' distance between the 3 frame-of-ref. atoms
+        if ep in b1:
+            b1, b3 = b3, b1
+        elif ep in b2:
+            b2, b3 = b3, b2
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b1.atom2
+            else:
+                a2 = b1.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+        req12 = b1.type.req
+        req13 = b2.type.req
+        weight = b3.type.req / math.sqrt(req12*req13 - 0.25*req23*req23)
+
+        if self.inside:
+            return 1 - weight, weight / 2, weight / 2
+        else:
+            return 1 + weight, -weight / 2, -weight / 2
+
+class OutOfPlaneExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles, but with the virtual site out of the
+    plane of those 3 particles. For example, TIP5P
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    angle : float=54.735
+        The angle out-of-plane that the extra point is. By default, it is half
+        of the angle of a tetrahedron. Given in degrees
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+                   e   e
+                    \ /
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, inside, angle=54.735):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+        self.angle = angle
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : float, float, float
+            w1 and w2 are the weights with respect to the second two particles
+            in the frame (i.e., NOT the parent atom). w3 is the weight of the
+            cross-product
+        """
+        ep = self.ep
+        # Find the two bonds that do not involve any extra points
+        regbonds = []
+        mybond = None
+        for bond in ep.parent.bonds:
+            if (not isinstance(bond.atom1, ExtraPoint) and
+                    not isinstance(bond.atom2, ExtraPoint)):
+                regbonds.append(bond)
+            elif ep in bond:
+                if mybond is not None:
+                    raise ValueError('multiple bonds detected to extra point')
+                mybond = bond
+        if len(regbonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with an '
+                             'out-of-plane, 3-point virtual site frame')
+        if mybond is not None:
+            raise RuntimeError('No EP bond found... should not be here')
+        b1, b2 = regbonds
+        req12 = b1.type.req
+        req13 = b2.type.req
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            t213 = angle.theteq
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b1.atom2
+            else:
+                a2 = b1.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+            # Now calculate the angle
+            t213 = 2 * math.asin(req23 / (req12 + req13)) * RAD_TO_DEG
+        # Some necessary constants
+        sinOOP = math.sin(self.angle * DEG_TO_RAD)
+        cosOOP = math.cos(self.angle * DEG_TO_RAD)
+        sin213 = math.sin(t213 * DEG_TO_RAD)
+        # Find how big the cross product is
+        lenCross = req12 * req13 * sin213
+        # Find our weights (assume symmetric)
+        weightCross = sinOOP * mybond.type.req / lenCross
+        weight = (cosOOP * mybond.type.req /
+                        math.sqrt(req12*req13 - 0.25*req23*req23))
+        return weight / 2, weight / 2, weightCross
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
