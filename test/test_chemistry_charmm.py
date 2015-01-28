@@ -91,7 +91,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 3)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 3)
+        self.assertEqual(len(a.segid), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 4)
@@ -168,7 +168,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 3)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 3)
+        self.assertEqual(len(a.segid), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 4)
@@ -261,7 +261,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 1)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 2)
+        self.assertEqual(len(a.segid), 2)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 0)

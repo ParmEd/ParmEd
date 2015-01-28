@@ -401,7 +401,11 @@ class CharmmPsfFile(Structure):
                 fmt = atmfmt2
             else:
                 fmt = atmfmt1
-            atmstr = fmt % (i+1, atom.residue.chain, atom.residue.number,
+            if hasattr(atom, 'segid'):
+                segid = atom.segid
+            else:
+                segid = 'SYS'
+            atmstr = fmt % (i+1, segid, atom.residue.number,
                             atom.residue.name, atom.name, atom.type,
                             atom.charge, atom.mass)
             if hasattr(atom, 'props'):
