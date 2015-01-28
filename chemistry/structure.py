@@ -658,18 +658,19 @@ class Structure(object):
                 else:
                     aname = pa.name[:4]
                 if charmm and hasattr(pa, 'segid'):
-                    segid = pa.segid
+                    segid = pa.segid[:4]
                 else:
                     segid = ''
                 dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name, res.chain, rnum, res.insertion_code,
-                           x, y, z, pa.occupancy, pa.bfactor, segid,
+                           res.name[:3], res.chain[:1], rnum,
+                           res.insertion_code[:1], x, y, z, pa.occupancy,
+                           pa.bfactor, segid,
                            Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
                     anisou = [int(x*1e4) for x in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name, res.chain, rnum,
-                               res.insertion_code, anisou[0], anisou[1],
+                               res.name[:3], res.chain[:1], rnum,
+                               res.insertion_code[:1], anisou[0], anisou[1],
                                anisou[2], anisou[3], anisou[4], anisou[5],
                                Element[pa.atomic_number].upper(), ''))
                 for key in sorted(others.keys()):
@@ -688,18 +689,18 @@ class Structure(object):
                     else:
                         aname = oatom.name[:4]
                     if charmm and hasattr(oatom, 'segid'):
-                        segid = oatom.segid
+                        segid = oatom.segid[:4]
                     else:
                         segid = ''
                     dest.write(atomrec % (anum, aname, key, res.name,
-                               res.chain, rnum, res.insertion_code, x, y,
-                               z, oatom.occupancy, oatom.bfactor, segid,
+                               res.chain[:1], rnum, res.insertion_code[:1],
+                               x, y, z, oatom.occupancy, oatom.bfactor, segid,
                                Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
                         anisou = [int(x*1e4) for x in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
-                            oatom.altloc, res.name, res.chain, rnum,
-                            res.insertion_code, anisou[0], anisou[1],
+                            oatom.altloc[:1], res.name[:3], res.chain[:1], rnum,
+                            res.insertion_code[:1], anisou[0], anisou[1],
                             anisou[2], anisou[3], anisou[4], anisou[5],
                             Element[oatom.atomic_number].upper(), ''))
             if res.ter:
@@ -1287,7 +1288,7 @@ def read_PDB(filename):
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
-              write_anisou=False):
+              write_anisou=False, charmm=False):
     """
     Write a PDB file from a structure instance
 
@@ -1322,7 +1323,11 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
     write_anisou : bool=False
         If True, an ANISOU record is written for every atom that has one. If
         False, ANISOU records are not written
+    charmm : bool=False
+        If True, SEGID will be written in columns 73 to 76 of the PDB file in
+        the typical CHARMM-style PDB output. This will be omitted for any atom
+        that does not contain a SEGID identifier.
     """
-    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou)
+    struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou, charmm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
