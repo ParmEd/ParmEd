@@ -1670,7 +1670,11 @@ class AmberParm(AmberFormat, Structure):
         sigma_scale = 2**(-1/6) * length_conv
         for ii in xrange(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
-            if qq == 0 and (ss == 0 or ee == 0): continue # This is skipped!
+            if qq == 0 and (ss == 0 or ee == 0):
+                # Copy this exclusion as-is... no need to modify the nonbfrc
+                # exception parameters
+                customforce.addExclusion(i, j)
+                continue
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
