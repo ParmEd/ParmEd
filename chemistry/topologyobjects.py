@@ -927,7 +927,8 @@ class ExtraPoint(Atom):
     def bond_partners(self):
         """ List of all atoms bonded to this atom and its parent """
         try:
-            return sorted([self.parent] + self.parent.bond_partners)
+            return sorted([self.parent] +
+                    [x for x in self.parent.bond_partners if x is not self])
         except AttributeError:
             if self.parent is not None:
                 return [self.parent]

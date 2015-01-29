@@ -1209,13 +1209,13 @@ class AmberParm(AmberFormat, Structure):
             resstart = res_ptr[i] - 1
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
-                if self.parm_data['ATOM_NAME'][j] in ('EP', 'LP'): # extra point
+                if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
+                    atom = ExtraPoint()
+                else:
                     if atnums[j] == 0:
                         atom = ExtraPoint()
                     else:
                         atom = Atom()
-                else:
-                    atom = Atom()
                 self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
                 self.atoms.append(atom)
 

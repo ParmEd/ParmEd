@@ -1493,16 +1493,56 @@ class Structure(object):
             sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
             force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                sigprod, epsprod, True)
+            for child in dih.atom1.children:
+                epsprod = (math.sqrt(child.epsilon_14 * dih.atom4.epsilon_14) *
+                           ene_conv / scnb)
+                sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+                force.addException(child.idx, dih.atom4.idx, chgprod, sigprod,
+                                   epsprod, True)
+            for child in dih.atom4.children:
+                epsprod = (math.sqrt(child.epsilon_14 * dih.atom1.epsilon_14) *
+                           ene_conv / scnb)
+                sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
+                force.addException(child.idx, dih.atom1.idx, chgprod, sigprod,
+                                   epsprod, True)
+            for c1 in dih.atom1.children:
+                for c2 in dih.atom2.children:
+                    epsprod = (math.sqrt(c1.epsilon_14 * c2.epsilon_14) *
+                               ene_conv / scnb)
+                    sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
+                    force.addException(c1.idx, c2.idx, chgprod, sigprod,
+                                       epsprod, True)
         # Now add the bonds, angles, and exclusions. These will always wipe out
         # existing exceptions and 0 out that exception
         for bond in self.bonds:
             force.addException(bond.atom1.idx, bond.atom2.idx,
                                0.0, 0.5, 0.0, True)
+            for c1 in bond.atom1.children:
+                force.addException(c1.idx, bond.atom2.idx, 0.0, 0.5, 0.0, True)
+            for c2 in bond.atom2.children:
+                force.addException(bond.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+            for c1 in bond.atom1.children:
+                for c2 in bond.atom2.children:
+                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
         for angle in self.angles:
             force.addException(angle.atom1.idx, angle.atom3.idx,
                                0.0, 0.5, 0.0, True)
+            for c1 in angle.atom1.children:
+                force.addException(c1.idx, angle.atom3.idx, 0.0, 0.5, 0.0, True)
+            for c2 in angle.atom3.children:
+                force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+            for c1 in angle.atom1.children:
+                for c2 in angle.atom3.children:
+                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
         for a2 in atom.exclusion_partners:
             force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
+            for c1 in atom.children:
+                force.addException(c1.idx, a2.idx, 0.0, 0.5, 0.0, True)
+            for c2 in a2.children:
+                force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+            for c1 in atom.children:
+                for c2 in a2.children:
+                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
                 switchDistance = switchDistance.value_in_unit(u.nanometers)
