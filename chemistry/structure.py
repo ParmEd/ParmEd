@@ -27,6 +27,7 @@ try:
     import bz2
 except ImportError:
     bz2 = None
+from chemistry.constants import DEG_TO_RAD
 from chemistry.exceptions import (PDBError, PDBWarning, AnisouWarning,
         ChemError, MissingParameter, MissingParameterWarning)
 from chemistry.geometry import (box_lengths_and_angles_to_vectors,
@@ -39,7 +40,8 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         NonbondedExceptionType, Bond, Angle, Dihedral, UreyBradley, Improper,
         Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
         TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
-        AcceptorDonor, Group, Atom, ExtraPoint)
+        AcceptorDonor, Group, Atom, ExtraPoint, TwoParticleExtraPointFrame,
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from chemistry import unit as u
 from compat24 import wraps
 import copy
@@ -1112,7 +1114,6 @@ class Structure(object):
             raise ValueError("Unrecognized constraints option (%s)" %
                              constraints)
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
-        deg_to_rad = math.pi / 180.0
         # Rigid water only
         if constraints is None:
             for bond in self.bonds:
@@ -1141,7 +1142,7 @@ class Structure(object):
                             l2 = bond.type.req * length_conv
                     # Law of cosines to find the constraint distance
                     if l1 is None or l2 is None: continue # no bonds found...
-                    cost = math.cos(angle.type.theteq*deg_to_rad)
+                    cost = math.cos(angle.type.theteq*DEG_TO_RAD)
                     length = math.sqrt(l1*l1 + l2*l2 - 2*l1*l2*cost)*length_conv
                     system.addConstraint(angle.atom1, angle.atom3, length)
 
@@ -1162,6 +1163,31 @@ class Structure(object):
         """
         if system.getNumParticles() != len(self.atoms):
             raise ValueError('OpenMM System does not correspond to Structure')
+        for atom in self.atoms:
+            if not isinstance(atom, ExtraPoint): continue
+            # This is a virtual site... get its frame type
+            typ = atom.frame_type
+            weights = typ.get_weights()
+            refatoms = typ.get_atoms()
+            if isinstance(typ, TwoParticleExtraPointFrame):
+                a1, a2 = refatoms
+                w1, w2 = weights
+                system.setVirtualSite(atom.idx,
+                        mm.TwoParticleAverageSite(a1.idx, a2.idx, w1, w2)
+                )
+            elif isinstance(typ, ThreeParticleExtraPointFrame):
+                a1, a2, a3 = refatoms
+                w1, w2, w3 = weights
+                system.setVirtualSite(atom.idx,
+                        mm.ThreeParticleAverageSite(a1.idx, a2.idx, a3.idx,
+                                                    w1, w2, w3)
+                )
+            elif isinstance(typ, OutOfPlaneExtraPointFrame):
+                a1, a2, a3 = refatoms
+                w1, w2, w3 = weights
+                system.setVirtualSite(atom.idx,
+                        mm.OutOfPlaneSite(a1.idx, a2.idx, a3.idx, w1, w2, w3)
+                )
 
     #===================================================
 

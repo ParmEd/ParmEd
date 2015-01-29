@@ -962,7 +962,7 @@ class AmberParm(AmberFormat, Structure):
                                             'b=bcoef(type1, type2);'
                                             'c=ccoef(type1, type2);')
         elif hasnbfix:
-            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r2*r2*r2;'
+            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2;'
                                             'r2=r^2; a=acoef(type1, type2);'
                                             'b=bcoef(type1, type2);')
         elif has1264:
@@ -1038,6 +1038,18 @@ class AmberParm(AmberFormat, Structure):
             force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
         # Set the dispersion correction on (by default)
         force.setUseLongRangeCorrection(True)
+        # Determine which nonbonded method we should use and transfer the
+        # nonbonded cutoff
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
 
         return nonbfrc, force
 

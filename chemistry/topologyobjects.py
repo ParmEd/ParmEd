@@ -26,7 +26,9 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'StretchBend', 'StretchBendType', 'TorsionTorsion',
            'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
-           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley']
+           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
+           'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
+           'OutOfPlaneExtraPointFrame']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -965,27 +967,98 @@ class ExtraPoint(Atom):
 
     #===================================================
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    @property
+    def frame_type(self):
+        """
+        The type of frame used for this extra point. Whether the EP lies
+        beyond (outside) or between (inside) the is determined from the
+        positions of each atom in the frame and the extra point. If those are
+        not set, the EP is assumed to be between the two points in the frame
+        """
+        if self._frame_type is not None:
+            return self._frame_type
+        if len(self.parent.bonds) == 2:
+            mybond = None
+            otherbond = None
+            for bond in self.parent.bonds:
+                if self in bond:
+                    mybond = bond
+                else:
+                    otherbond = bond
+            if mybond is None or otherbond is None:
+                raise RuntimeError('Strange bond pattern detected')
+            bonddist = otherbond.type.req
+            if otherbond.atom1 is self.parent:
+                otheratom = otherbond.atom2
+            else:
+                otheratom = otherbond.atom1
+            try:
+                x1, y1, z1 = self.xx, self.xy, self.xz
+                x2, y2, z2 = otheratom.xx, otheratom.xy, otheratom.xz
+            except AttributeError:
+                self._frame_type = TwoParticleExtraPointFrame(self, True)
+            else:
+                dx, dy, dz = x1-x2, y1-y2, z1-z2
+                if dx*dx + dy*dy + dz*dz > bonddist:
+                    self._frame_type = TwoParticleExtraPointFrame(self, False)
+                else:
+                    self._frame_type = TwoParticleExtraPointFrame(self, True)
+            return self._frame_type
+        elif len(self.parent.bonds) == 3:
+            # Just take 1 other atom -- an acute angle is "inside", an obtuse
+            # angle is "outside"
+            other_atom = None
+            for bond in self.parent.bonds:
+                if not self in bond:
+                    if bond.atom1 is self.parent:
+                        other_atom = bond.atom2
+                    else:
+                        other_atom = bond.atom1
+                    break
+            if other_atom is None:
+                raise RuntimeError('Strange bond pattern detected')
+            try:
+                x1, y1, z1 = other_atom.xx, other_atom.xy, other_atom.xz
+                x2, y2, z2 = self.parent.xx, self.parent.xy, self.parent.xz
+                x3, y3, z3 = self.xx, self.xy, self.xz
+            except AttributeError:
+                # See if both other atoms are hydrogens and the current atom is
+                # an oxygen. If so, this is TIP4P and we go inside. Otherwise,
+                # we go outside
+                other_atom2 = None
+                for bond in self.parent.bonds:
+                    if not self in bond and not other_atom in bond:
+                        if bond.atom1 is self.parent:
+                            other_atom2 = bond.atom2
+                        else:
+                            other_atom2 = bond.atom1
+                        break
+                if other_atom2 is None:
+                    raise RuntimeError('Strange bond pattern detected')
+                if (self.parent.element == 8 and other_atom.element == 1 and
+                        other_atom2.element == 1): # TIP4P!
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+            else:
+                vec1 = [x1-x2, y1-y2, z1-z2]
+                vec2 = [x3-x2, y3-y2, z3-z2]
+                dot11 = sum([x*y for x, y in zip(vec1, vec1)])
+                dot22 = sum([x*y for x, y in zip(vec2, vec2)])
+                dot12 = sum([x*y for x, y in zip(vec1, vec2)])
+                angle = math.acos(dot12 / (math.sqrt(dot11)*math.sqrt(dot22)))
+                if angle < math.pi / 2:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+        elif len(self.parent.bonds) == 4:
+            # Only supported option here is the OOP one (e.g., TIP5P) -- always
+            # assume tetrahedral angle
+            self._frame_type = OutOfPlaneExtraPointFrame(self)
 
-def _determine_epframe_type(ep):
-    """
-    This is a factory used to determine which kind of extra point frame needs to
-    be used
-    """
-    parent = ep.parent
-    if len(parent.bonds) == 2:
-        return TwoParticleExtraPointFrame
-    if len(parent.bonds) == 3:
-        return ThreeParticleExtraPointFrame
-    if len(parent.bonds) == 4:
-        # We really only want to support up to 3 atoms. This case is possible in
-        # places where we have 2 lone pairs (like TIP5P)
-        num_eps = 0
-        for atom in parent.bond_partners:
-            if isinstance(atom, ExtraPoint): num_eps += 1
-        if num_eps != 2:
-            raise ValueError("Cannot determine extra point frame type")
-        return OutOfPlaneExtraPointFrame
+        return self._frame_type
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class TwoParticleExtraPointFrame(object):
     r"""
@@ -1017,6 +1090,27 @@ class TwoParticleExtraPointFrame(object):
         # bonds to be generated -- only error check when trying to get weights
         self.ep = ep
         self.inside = inside
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2 : Atom, Atom
+            a1 is the parent atom of the extra point. a2 is the other atom
+            bonded to the parent atom
+        """
+        try:
+            mybond, = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError("Bad bond pattern in EP frame")
+
+        if mybond.atom1 is self.ep.parent:
+            return self.ep.parent, mybond.atom2
+        else:
+            return self.ep.parent, mybond.atom1
 
     def get_weights(self):
         """
@@ -1085,6 +1179,31 @@ class ThreeParticleExtraPointFrame(object):
         self.ep = ep
         self.inside = inside
 
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : Atom, Atom, Atom
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom1, oatom2
+
     def get_weights(self):
         """
         Returns the weights for the three particles
@@ -1128,9 +1247,9 @@ class ThreeParticleExtraPointFrame(object):
             else:
                 a1 = b1.atom1
             if b2.atom1 is ep.parent:
-                a2 = b1.atom2
+                a2 = b2.atom2
             else:
-                a2 = b1.atom1
+                a2 = b2.atom1
             if a1 not in a2.bond_partners:
                 raise RuntimeError('EP frame definition incomplete for 3-point '
                                    'virtual site... cannot determine distance '
@@ -1179,12 +1298,38 @@ class OutOfPlaneExtraPointFrame(object):
                    /   \
                   x     x
     """
-    def __init__(self, ep, inside, angle=54.735):
+    def __init__(self, ep, angle=54.735):
         # Don't do error-checking now, since we want to give it time for the
         # bonds to be generated -- only error check when trying to get weights
         self.ep = ep
-        self.inside = inside
         self.angle = angle
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : Atom, Atom, Atom
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom but are not EPs
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if (not isinstance(bond.atom1, ExtraPoint) and
+                                    not isinstance(bond.atom2, ExtraPoint))
+            ]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom1, oatom2
 
     def get_weights(self):
         """
@@ -1209,12 +1354,13 @@ class OutOfPlaneExtraPointFrame(object):
                 if mybond is not None:
                     raise ValueError('multiple bonds detected to extra point')
                 mybond = bond
+        #FIXME -- is this necessary?
         if len(regbonds) != 2:
             raise ValueError('EP parent bond pattern inconsistent with an '
                              'out-of-plane, 3-point virtual site frame')
         if mybond is not None:
             raise RuntimeError('No EP bond found... should not be here')
-        b1, b2 = regbonds
+        b1, b2 = regbonds[:2]
         req12 = b1.type.req
         req13 = b2.type.req
         # See if there is an angle with both b1 and b2 in it

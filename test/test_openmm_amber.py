@@ -124,6 +124,27 @@ class TestAmberParm(unittest.TestCase):
         self.assertAlmostEqual(energies['angle'], 0)
         self.assertAlmostEqual(energies['dihedral'], 0)
         self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
+        # Check that we have the correct number of virtual sites
+        nvirt = 0
+        for i in range(system.getNumParticles()):
+            nvirt += system.isVirtualSite(i)
+        self.assertEqual(parm.ptr('NUMEXTRA'), nvirt)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        pstate = sim.context.getState(getForces=True)
+        sstate = mm.XmlSerializer.deserialize(
+                open(utils.get_saved_fn('tip4pforces.xml'), 'r').read()
+        )
+        pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        for p, s in zip(pf, sf):
+            for x1, x2 in zip(p, s):
+                # Compare large forces relatively and small ones absolutely
+                if abs(x1) > 1 or abs(x2) > 1:
+                    self.assertRelativeEqual(x1, x2, places=3)
+                else:
+                    self.assertAlmostEqual(x1, x2, delta=5e-4)
 
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """
