@@ -528,7 +528,7 @@ class Atom(_ListItem):
     def bond_partners(self):
         """ Go through all bonded partners """
         bp = set(self._bond_partners)
-        for p in bp:
+        for p in self._bond_partners:
             for c in p.children:
                 bp.add(c)
         return sorted(list(bp))
