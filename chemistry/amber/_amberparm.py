@@ -1663,8 +1663,12 @@ class AmberParm(AmberFormat, Structure):
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         atoms = self.atoms
-        acoef = self.parm_data['LENNARD_JONES_ACOEF']
-        bcoef = self.parm_data['LENNARD_JONES_BCOEF']
+        try:
+            acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
+            bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
+        except KeyError:
+            acoef = self.parm_data['LENNARD_JONES_ACOEF']
+            bcoef = self.parm_data['LENNARD_JONES_BCOEF']
         nbidx = self.parm_data['NONBONDED_PARM_INDEX']
         ntypes = self.parm_data['POINTERS'][NTYPES]
         sigma_scale = 2**(-1/6) * length_conv
@@ -1675,6 +1679,13 @@ class AmberParm(AmberFormat, Structure):
                 # exception parameters
                 customforce.addExclusion(i, j)
                 continue
+            # Figure out what the 1-4 scaling parameters were for this pair...
+            unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
+                               self.atoms[j].epsilon_14) * ene_conv
+            try:
+                one_scnb = ee.value_in_unit(u.kilojoules_per_mole) / unscaled_ee
+            except ZeroDivisionError:
+                one_scnb = 1
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
@@ -1686,7 +1697,7 @@ class AmberParm(AmberFormat, Structure):
             else:
                 # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
                 rmin = (a / b * 2)**(1/6)
-                epsilon = b / (2 * rmin**6) * ene_conv
+                epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)

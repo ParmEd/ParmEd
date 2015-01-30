@@ -270,48 +270,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    @needs_openmm
-    def _modify_nonb_exceptions(self, nonbfrc, customforce):
-        """
-        Modifies the nonbonded force exceptions and the custom nonbonded force
-        exclusions. The exceptions on the nonbonded force might need to be
-        adjusted if off-diagonal modifications on the L-J matrix are present
-        """
-        # To get into this routine, we already needed to know that nbfix is
-        # present
-        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
-        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        atoms = self.atoms
-        acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
-        bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
-        nbidx = self.parm_data['NONBONDED_PARM_INDEX']
-        ntypes = self.parm_data['POINTERS'][NTYPES]
-        sigma_scale = 2**(-1/6) * length_conv
-        for ii in xrange(nonbfrc.getNumExceptions()):
-            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
-            if qq == 0 and (ss == 0 or ee == 0):
-                # Copy this exclusion as-is... no need to modify the nonbfrc
-                # exception parameters
-                customforce.addExclusion(i, j)
-                continue
-            id1 = atoms[i].nb_idx - 1
-            id2 = atoms[j].nb_idx - 1
-            idx = nbidx[ntypes*id1+id2] - 1
-            a = acoef[idx]
-            b = bcoef[idx]
-            if b == 0:
-                epsilon = 0.0
-                sigma = 0.5
-            else:
-                # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
-                rmin = (a / b * 2)**(1/6)
-                epsilon = b / (2 * rmin**6) * ene_conv
-                sigma = rmin * sigma_scale
-            nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
-            customforce.addExclusion(i, j)
-
-    #===================================================
-
     @property
     def chamber(self):
         return True

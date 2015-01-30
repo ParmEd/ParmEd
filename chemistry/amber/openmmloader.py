@@ -454,7 +454,7 @@ class OpenMMAmberParm(AmberParm):
                                   LJ_depth[atm.nb_idx-1]*ene_conv)
         else:
             for i, atm in enumerate(self.atoms):
-                force.addParticle(atm.charge, 1.0, 0.0)
+                force.addParticle(atm.charge, 0.5, 0.0)
 
         excluded_atom_pairs = set() # save these pairs so we don't zero them out
         sigma_scale = 2**(-1/6) * length_conv
