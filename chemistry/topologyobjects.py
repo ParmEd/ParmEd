@@ -10,6 +10,7 @@ from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from chemistry.periodic_table import Mass, Element as _Element
+import chemistry.unit as u
 from compat24 import all, property
 import copy
 import math
@@ -1401,14 +1402,18 @@ class OutOfPlaneExtraPointFrame(object):
             # Now calculate the angle
             t213 = 2 * math.asin(req23 / (req12 + req13)) * RAD_TO_DEG
         # Some necessary constants
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        req12 *= length_conv
+        req13 *= length_conv
+        req23 *= length_conv
         sinOOP = math.sin(self.angle * DEG_TO_RAD)
         cosOOP = math.cos(self.angle * DEG_TO_RAD)
         sin213 = math.sin(t213 * DEG_TO_RAD)
         # Find how big the cross product is
         lenCross = req12 * req13 * sin213
         # Find our weights (assume symmetric)
-        weightCross = sinOOP * mybond.type.req / lenCross
-        weight = (cosOOP * mybond.type.req /
+        weightCross = sinOOP * mybond.type.req * length_conv / lenCross
+        weight = (cosOOP * mybond.type.req * length_conv /
                         math.sqrt(req12*req13 - 0.25*req23*req23))
         return weight / 2, weight / 2, weightCross
 
