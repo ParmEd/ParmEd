@@ -1117,6 +1117,9 @@ class Structure(object):
         # Rigid water only
         if constraints is None:
             for bond in self.bonds:
+                # Skip all extra points... don't constrain those
+                if isinstance(bond.atom1, ExtraPoint): continue
+                if isinstance(bond.atom2, ExtraPoint): continue
                 if (bond.atom1.residue.name in WATER_NAMES or
                         bond.atom2.residue.name in WATER_NAMES):
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,

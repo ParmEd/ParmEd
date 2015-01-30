@@ -1358,7 +1358,7 @@ class OutOfPlaneExtraPointFrame(object):
         if len(regbonds) != 2:
             raise ValueError('EP parent bond pattern inconsistent with an '
                              'out-of-plane, 3-point virtual site frame')
-        if mybond is not None:
+        if mybond is None:
             raise RuntimeError('No EP bond found... should not be here')
         b1, b2 = regbonds[:2]
         req12 = b1.type.req
@@ -1384,9 +1384,9 @@ class OutOfPlaneExtraPointFrame(object):
             else:
                 a1 = b1.atom1
             if b2.atom1 is ep.parent:
-                a2 = b1.atom2
+                a2 = b2.atom2
             else:
-                a2 = b1.atom1
+                a2 = b2.atom1
             if a1 not in a2.bond_partners:
                 raise RuntimeError('EP frame definition incomplete for 3-point '
                                    'virtual site... cannot determine distance '
