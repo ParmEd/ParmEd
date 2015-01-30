@@ -22,7 +22,6 @@ try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
     from chemistry.charmm.openmmloader import (
-                OpenMMCharmmPsfFile as CharmmPsfFile,
                 OpenMMCharmmCrdFile as CharmmCrdFile,
                 OpenMMCharmmRstFile as CharmmRstFile,
     )
@@ -30,13 +29,13 @@ try:
     PDBFile = app.PDBFile
     has_openmm = True
 except ImportError:
-    from chemistry.charmm.psf import CharmmPsfFile
     from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
     from chemistry.amber.readparm import Rst7
     # To prevent NameError's
     def PDBFile(*args, **kwargs): return None
     has_openmm = False
 
+from chemistry.charmm.psf import CharmmPsfFile
 from chemistry.charmm.parameters import CharmmParameterSet
 from chemistry.exceptions import CharmmPSFWarning
 from chemistry import unit as u
@@ -78,11 +77,9 @@ class TestCharmmFiles(unittest.TestCase):
 
     def setUp(self):
         if charmm_solv.box is None:
-            charmm_solv.setBox(95.387*u.angstrom, 80.381*u.angstrom,
-                               80.225*u.angstrom)
+            charmm_solv.box = [95.387, 80.381, 80.225, 90, 90, 90]
         if charmm_nbfix.box is None:
-            charmm_nbfix.setBox(3.271195e1*u.angstrom, 3.299596e1*u.angstrom,
-                                3.300715e1*u.angstrom)
+            charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
     def assertRelativeEqual(self, val1, val2, places=7):
         if val1 == val2: return
@@ -320,31 +317,24 @@ if has_openmm:
         energies = {}
         # Get energy components
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.BOND_FORCE_GROUP)
         energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.ANGLE_FORCE_GROUP)
         energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.DIHEDRAL_FORCE_GROUP)
         energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.NONBONDED_FORCE_GROUP)
         energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
         energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.IMPROPER_FORCE_GROUP)
         energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
                              groups=2**parm.CMAP_FORCE_GROUP)
         energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         return energies

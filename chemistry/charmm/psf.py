@@ -13,6 +13,7 @@ from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                        Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
+from chemistry.structure import needs_openmm
 import os
 import warnings
 
@@ -516,7 +517,30 @@ class CharmmPsfFile(Structure):
         # If we opened our own handle, close it
         if own_handle:
             dest.close()
+
+    @needs_openmm
+    def createSystem(self, params=None, *args, **kwargs):
+        """
+        Creates an OpenMM System object from the CHARMM PSF file. This is a
+        shortcut for calling `load_parameters` followed by
+        Structure.createSystem. If params is not None, `load_parameters` will be
+        called on that parameter set, and Structure.createSystem will be called
+        with the remaining args and kwargs
+
+        Parameters
+        ----------
+        params : CharmmParameterSet=None
+            If not None, this parameter set will be loaded
         
+        See Also
+        --------
+        Structure.createSystem
+            In addition to `params`, this method also takes all arguments for
+            Structure.createSystem
+        """
+        if params is not None: self.load_parameters(params)
+        return super(CharmmPsfFile, self).createSystem(*args, **kwargs)
+
     def load_parameters(self, parmset):
         """
         Loads parameters from a parameter set that was loaded via CHARMM RTF,
@@ -677,35 +701,6 @@ class CharmmPsfFile(Structure):
         # If the types started out as integers, change them back
         if types_are_int:
             for atom in self.atoms: atom.type = int(atom.atom_type)
-
-    def set_coordinates(self, positions, velocities=None):
-        """
-        This method loads the coordinates and velocity information from an
-        external object or passed data.
-
-        Parameters
-        ----------
-        positions : list of floats or distance Quantity
-            A list of atomic positions for all atoms. Can be a 3N-length array
-            of the form [x1, y1, z1, x2, y2, z2, ...] or a N-length array of the
-            form [ [x1, y1, z1], [x2, y2, z2], ... ]
-        velocities : list of floats or distance/time Quantity, optional
-            A list of partial atomic velocities for all atoms. If provided, it
-            must follow the same requirements as positions, above
-        """
-        self.positions = positions
-        self.velocities = velocities
-
-    def set_box(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
-        """
-        Sets the periodic box boundary conditions.
-
-        Parameters:
-            - a, b, c (float) : Unit cell lengths (in angstroms)
-            - alpha, beta, gamma (float) : Angles between unit cell vectors in
-                                           degrees
-        """
-        self.box = [a, b, c, alpha, beta, gamma]
 
     def clear_cmap(self):
         " Clear the cmap list to prevent any CMAP parameters from being used "
