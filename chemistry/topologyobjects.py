@@ -1330,7 +1330,7 @@ class OutOfPlaneExtraPointFrame(object):
             oatom2 = b2.atom2
         else:
             oatom2 = b2.atom1
-        return self.ep.parent, oatom1, oatom2
+        return self.ep.parent, oatom2, oatom1
 
     def get_weights(self):
         """
@@ -1415,6 +1415,34 @@ class OutOfPlaneExtraPointFrame(object):
         weightCross = sinOOP * mybond.type.req * length_conv / lenCross
         weight = (cosOOP * mybond.type.req * length_conv /
                         math.sqrt(req12*req13 - 0.25*req23*req23))
+        # Find out of the cross product weight should be positive or negative.
+        a1, a2, a3 = self.get_atoms()
+        try:
+            v12 = (a2.xx-a1.xx, a2.xy-a1.xy, a2.xz-a1.xz)
+            v13 = (a3.xx-a1.xx, a3.xy-a1.xy, a3.xz-a1.xz)
+            v1e = (self.ep.xx-a1.xx, self.ep.xy-a1.xy, self.ep.xz-a1.xz)
+        except AttributeError:
+            # No coordinates... we have to guess. The first EP will have a
+            # positive weight, the second will have a negative (this matches
+            # what happens with Amber prmtop files...)
+            for a in self.ep.parent.bond_partners:
+                if a is self.ep:
+                    break
+                if isinstance(a, ExtraPoint):
+                    weightCross = -weightCross
+                    break
+        else:
+            # Take the cross product of v12 and v13, then dot that with the EP
+            # vector. An acute angle is a positive weightCross. An obtuse one is
+            # negative
+            cross = (v12[1]*v13[2] - v12[2]*v13[1],
+                     v12[2]*v13[0] - v12[0]*v13[2],
+                     v12[0]*v13[1] - v12[1]*v13[0])
+            lencross = math.sqrt(sum([cross[i]*cross[i] for i in xrange(3)]))
+            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in xrange(3)]))
+            v1edotcross = sum([v1e[i]*cross[i] for i in xrange(3)])
+            costheta = v1edotcross / (lenv1e*lencross)
+            if costheta < 0: weightCross = -weightCross
         return weight / 2, weight / 2, weightCross
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
