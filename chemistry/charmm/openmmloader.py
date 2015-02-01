@@ -32,14 +32,14 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
     # to be turned on and off selectively. This is a way to implement per-term
     # energy decomposition to compare individual components
 
-    BOND_FORCE_GROUP = 0
-    ANGLE_FORCE_GROUP = 1
-    DIHEDRAL_FORCE_GROUP = 2
-    UREY_BRADLEY_FORCE_GROUP = 3
-    IMPROPER_FORCE_GROUP = 4
-    CMAP_FORCE_GROUP = 5
-    NONBONDED_FORCE_GROUP = 6
-    GB_FORCE_GROUP = 6
+#   BOND_FORCE_GROUP = 0
+#   ANGLE_FORCE_GROUP = 1
+#   DIHEDRAL_FORCE_GROUP = 2
+#   UREY_BRADLEY_FORCE_GROUP = 3
+#   IMPROPER_FORCE_GROUP = 4
+#   CMAP_FORCE_GROUP = 5
+#   NONBONDED_FORCE_GROUP = 6
+#   GB_FORCE_GROUP = 6
     
     @property
     def topology(self):
@@ -830,12 +830,12 @@ class OpenMMCharmmPsfFile(CharmmPsfFile):
         self._box_vectors = _box_vectors_from_lengths_angles(a, b, c,
                                                             alpha, beta, gamma)
         # Now call "set_box" for the non-OpenMM object
-        self.set_box(a.value_in_unit(u.angstroms),
-                     b.value_in_unit(u.angstroms),
-                     c.value_in_unit(u.angstroms),
-                     alpha.value_in_unit(u.degrees),
-                     beta.value_in_unit(u.degrees),
-                     gamma.value_in_unit(u.degrees))
+        self.box = [a.value_in_unit(u.angstroms),
+                    b.value_in_unit(u.angstroms),
+                    c.value_in_unit(u.angstroms),
+                    alpha.value_in_unit(u.degrees),
+                    beta.value_in_unit(u.degrees),
+                    gamma.value_in_unit(u.degrees)]
         # If we already have a _topology instance, then we have possibly changed
         # the existence of box information (whether or not this is a periodic
         # system), so delete any cached reference to a topology so it's

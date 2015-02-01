@@ -1497,7 +1497,7 @@ class Structure(object):
         sigma_scale = length_conv * 2 * 2**(-1/6)
         for atom in self.atoms:
             force.addParticle(atom.charge, atom.rmin*sigma_scale,
-                              atom.epsilon*ene_conv)
+                              abs(atom.epsilon*ene_conv))
         # Now add the exceptions. First add potential 1-4's from the dihedrals.
         # If dihedral.ignore_end is False, a 1-4 is added with the appropriate
         # scaling factor
@@ -1507,37 +1507,39 @@ class Structure(object):
             if isinstance(dih.type, DihedralTypeList):
                 scee = scnb = 0
                 i = 0
-                while scee != 0 and scnb != 0 and i < len(dih.type):
+                while (scee == 0 or scnb == 0) and i < len(dih.type):
                     scee = dih.type[i].scee
                     scnb = dih.type[i].scnb
                     i += 1
-                # No scaling factors indicates omission
-                if scee == 0 or scnb == 0: continue
+                # Scaling factors of 0 will result in divide-by-zero errors. So
+                # force them to 1.
+                scee = scee or 1.0
+                scnb = scnb or 1.0
             else:
                 scee = dih.type.scee
                 scnb = dih.type.scnb
             chgprod = dih.atom1.charge * dih.atom4.charge / scee
-            epsprod = (math.sqrt(dih.atom1.epsilon_14 * dih.atom4.epsilon_14) *
-                        ene_conv / scnb)
+            epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
+            epsprod = math.sqrt(epsprod) * ene_conv / scnb
             sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
             force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                sigprod, epsprod, True)
             for child in dih.atom1.children:
-                epsprod = (math.sqrt(child.epsilon_14 * dih.atom4.epsilon_14) *
-                           ene_conv / scnb)
+                epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
+                epsprod = math.sqrt(epsprod) * ene_conv / scnb
                 sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
                 force.addException(child.idx, dih.atom4.idx, chgprod, sigprod,
                                    epsprod, True)
             for child in dih.atom4.children:
-                epsprod = (math.sqrt(child.epsilon_14 * dih.atom1.epsilon_14) *
-                           ene_conv / scnb)
+                epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
+                epsprod = math.sqrt(epsprod) * ene_conv / scnb
                 sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
                 force.addException(child.idx, dih.atom1.idx, chgprod, sigprod,
                                    epsprod, True)
             for c1 in dih.atom1.children:
                 for c2 in dih.atom2.children:
-                    epsprod = (math.sqrt(c1.epsilon_14 * c2.epsilon_14) *
-                               ene_conv / scnb)
+                    epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
+                    epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
                     force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                        epsprod, True)
