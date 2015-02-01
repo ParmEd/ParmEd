@@ -109,6 +109,77 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.chain != chain.strip(): return False
     return True
 
+def _bondi(atom):
+    if atom.atomic_number == 6: return 1.7
+    if atom.atomic_number == 1: return 1.2
+    if atom.atomic_number == 7: return 1.55
+    if atom.atomic_number == 14: return 2.1
+    if atom.atomic_number == 15: return 1.85
+    if atom.atomic_number == 16: return 1.8
+    return 1.5
+
+def _mbondi(atom):
+    if atom.atomic_number == 1:
+        bondeds = atom.bond_partners
+        if bondeds[0].atomic_number in (6, 7):
+            return 1.3
+        if bondeds[0].atomic_number in (8, 16):
+            return 0.8
+        return 1.2
+    return _bondi(atom)
+
+def _mbondi2(atom):
+    if atom.atomic_number == 1:
+        if atom.bond_partners[0].atomic_number == 7:
+            return 1.3
+        return 1.2
+    return _bondi(atom)
+
+def _mbondi3(atom):
+    if atom.residue.name in ('GLU', 'ASP', 'GL4', 'AS4'):
+        if atom.name.startswith('OE') or atom.name.startswith('OD'):
+            return 1.4
+    elif atom.residue.name == 'ARG':
+        if atom.name.startswith('HH') or atom.name.startswith('HE'):
+            return 1.17
+    if atom.name == 'OXT':
+        return 1.4
+    return _mbondi2(atom)
+
+@needs_openmm
+def _gb_rad_screen(atom, model):
+    """
+    Gets the default GB parameters for a given atom according to a specific
+    Generalized Born model
+
+    Parameters
+    ----------
+    atom : Atom
+        The atom to get the default GB parameters for
+    model : app.HCT, app.OBC1, or app.OBC2
+        The GB model to get the default parameters for (app.GBn and app.GBn2 are
+        already handled in Structure._get_gb_parameters)
+
+    Returns
+    -------
+    radius, screen [,alpha, beta, gamma] : float, float [,float, float, float]
+        The intrinsic radius of the atom and the screening factor of the atom.
+        If the model is GBn2, alpha, beta, and gamma parameters are also
+        returned
+    """
+    if model in (app.OBC1, app.OBC2):
+        rad = _mbondi2(atom)
+    else:
+        rad = _mbondi(atom)
+    if atom.atomic_number == 1: return rad, 0.85
+    if atom.atomic_number == 6: return rad, 0.72
+    if atom.atomic_number == 7: return rad, 0.79
+    if atom.atomic_number == 8: return rad, 0.85
+    if atom.atomic_number == 9: return rad, 0.88
+    if atom.atomic_number == 15: return rad, 0.86
+    if atom.atomic_number == 16: return rad, 0.96
+    return rad, 0.8
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Structure(object):
@@ -1518,10 +1589,17 @@ class Structure(object):
             else:
                 scee = dih.type.scee
                 scnb = dih.type.scnb
+            try:
+                rij, wdij, rij14, wdij14 = dih.atom1.atom_type.nbfix[
+                                                str(dih.atom4.atom_type)]
+            except KeyError:
+                epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
+                epsprod = math.sqrt(epsprod) * ene_conv / scnb
+                sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+            else:
+                epsprod = wdij14 * ene_conv / scnb
+                sigprod = rij * length_conv * sigma_scale
             chgprod = dih.atom1.charge * dih.atom4.charge / scee
-            epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
-            epsprod = math.sqrt(epsprod) * ene_conv / scnb
-            sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
             force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                sigprod, epsprod, True)
             for child in dih.atom1.children:
@@ -2030,6 +2108,7 @@ class Structure(object):
         """
         if implicitSolvent is app.GBn:
             screen = [0.5 for atom in self.atoms]
+            radii = [atom.radii for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 0.48435382330
@@ -2041,12 +2120,15 @@ class Structure(object):
                     screen[i] = 1.06557401132
                 elif atom.element == 16:
                     screen[i] = 0.602256336067
+                if radii[i] == 0:
+                    radii[i] = _bondi(atom)
         elif implicitSolvent is app.GBn2:
             # Add non-optimized values as defaults
             alpha = [1.0 for i in self.atoms]
             beta = [0.8 for i in self.atoms]
             gamma = [4.85 for i in self.atoms]
             screen = [0.5 for i in self.atoms]
+            radii = [atom.radii for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 1.058554
@@ -2073,11 +2155,18 @@ class Structure(object):
                     alpha[i] = 0.867814
                     beta[i] = 0.876635
                     gamma[i] = 0.387882
+                if not radii[i]:
+                    radii[i] = _mbondi3(atom)
         else:
+            radii = [atom.radii for atom in self.atoms]
             screen = [atom.screen for atom in self.atoms]
+            for i, atom in enumerate(self.atoms):
+                if not radii[i] or not screen[i]:
+                    # Replace with defaults
+                    radii[i], screen[i] = _gb_rad_screen(atom, implicitSolvent)
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
-        radii = [a.radii * length_conv for a in self.atoms]
+        radii = [x * length_conv for x in radii]
 
         if implicitSolvent is app.GBn2:
             return zip(radii, screen, alpha, beta, gamma)

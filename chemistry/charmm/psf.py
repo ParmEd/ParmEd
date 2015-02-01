@@ -13,7 +13,9 @@ from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                        Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
-from chemistry.structure import needs_openmm
+from chemistry.structure import needs_openmm, app, mm
+from chemistry import unit as u
+from math import sqrt
 import os
 import warnings
 
@@ -92,6 +94,8 @@ class CharmmPsfFile(Structure):
     32
     """
 
+    #===================================================
+
     @staticmethod
     def _convert(string, type, message):
         """
@@ -107,6 +111,8 @@ class CharmmPsfFile(Structure):
             return type(string)
         except ValueError:
             raise CharmmPSFError('Could not convert %s [%s]' % (message,string))
+
+    #===================================================
 
     @staticmethod
     def _parse_psf_section(psf):
@@ -167,6 +173,8 @@ class CharmmPsfFile(Structure):
                 data.extend([conv(w, int, 'PSF data') for w in words])
                 line = psf.readline().strip()
         return title, pointers, data
+
+    #===================================================
 
     @_catchindexerror
     def __init__(self, psf_name):
@@ -341,6 +349,8 @@ class CharmmPsfFile(Structure):
             )
         self.unchange()
         self.flags = psf_flags
+
+    #===================================================
 
     def write_psf(self, dest, vmd=False):
         """
@@ -518,6 +528,8 @@ class CharmmPsfFile(Structure):
         if own_handle:
             dest.close()
 
+    #===================================================
+
     @needs_openmm
     def createSystem(self, params=None, *args, **kwargs):
         """
@@ -540,6 +552,8 @@ class CharmmPsfFile(Structure):
         """
         if params is not None: self.load_parameters(params)
         return super(CharmmPsfFile, self).createSystem(*args, **kwargs)
+
+    #===================================================
 
     def load_parameters(self, parmset):
         """
@@ -702,9 +716,180 @@ class CharmmPsfFile(Structure):
         if types_are_int:
             for atom in self.atoms: atom.type = int(atom.atom_type)
 
+    #===================================================
+
     def clear_cmap(self):
         " Clear the cmap list to prevent any CMAP parameters from being used "
         del self.cmaps[:]
+
+    #===================================================
+
+    def has_NBFIX(self):
+        """
+        Returns whether or not any pairs of atom types have their LJ
+        interactions modified by an NBFIX definition
+
+        Returns
+        -------
+        has_nbfix : bool
+            If True, at least two atom types have NBFIX mod definitions
+        """
+        typemap = dict()
+        for a in self.atoms:
+            typemap[str(a.atom_type)] = a.atom_type
+        # Now we have a map of all atom types that we have defined in our
+        # system. Look through all of the atom types and see if any of their
+        # NBFIX definitions are also keys in typemap
+        for key, type in typemap.iteritems():
+            for key in type.nbfix:
+                if key in typemap:
+                    return True
+        return False
+
+    #===================================================
+
+    @needs_openmm
+    def omm_nonbonded_force(self, nonbondedMethod=None,
+                            nonbondedCutoff=8*u.angstroms,
+                            switchDistance=0*u.angstroms,
+                            ewaldErrorTolerance=0.0005,
+                            reactionFieldDielectric=78.5):
+        """ Creates the OpenMM NonbondedForce instance
+
+        Parameters
+        ----------
+        nonbondedMethod : cutoff method
+            This is the cutoff method. It can be either the NoCutoff,
+            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+            simtk.openmm.app namespace
+        nonbondedCutoff : float or distance Quantity
+            The nonbonded cutoff must be either a floating point number
+            (interpreted as nanometers) or a Quantity with attached units. This
+            is ignored if nonbondedMethod is NoCutoff.
+        switchDistance : float or distance Quantity
+            The distance at which the switching function is turned on for van
+            der Waals interactions. This is ignored when no cutoff is used, and
+            no switch is used if switchDistance is 0, negative, or greater than
+            the cutoff
+        ewaldErrorTolerance : float=0.0005
+            When using PME or Ewald, the Ewald parameters will be calculated
+            from this value
+        reactionFieldDielectric : float=78.5
+            If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+            region beyond the cutoff is treated using a reaction field method
+            with this dielectric constant. It should be set to 1 if another
+            implicit solvent model is being used (e.g., GB)
+
+        Returns
+        -------
+        NonbondedForce
+            This just implements the very basic NonbondedForce with the typical
+            charge-charge and 12-6 Lennard-Jones interactions with the
+            Lorentz-Berthelot combining rules.
+
+        Notes
+        -----
+        Subclasses of Structure for which this nonbonded treatment is inadequate
+        should override this method to implement what is needed
+        """
+        if not self.atoms: return None
+        nonbfrc = super(CharmmPsfFile, self).omm_nonbonded_force(
+                nonbondedMethod, nonbondedCutoff, switchDistance,
+                ewaldErrorTolerance, reactionFieldDielectric,
+        )
+        hasnbfix = self.has_NBFIX()
+        if not hasnbfix:
+            return nonbfrc
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        # We need a CustomNonbondedForce to implement the NBFIX functionality.
+        # First derive the type lookup tables
+        lj_idx_list = [0 for atom in self.atoms]
+        lj_radii, lj_depths = [], []
+        num_lj_types = 0
+        lj_type_list = []
+        for i, atom in enumerate(self.atoms):
+            atype = atom.atom_type
+            if lj_idx_list[i]: continue # already assigned
+            num_lj_types += 1
+            lj_idx_list[i] = num_lj_types
+            ljtype = (atype.rmin, abs(atype.epsilon))
+            lj_type_list.append(atype)
+            lj_radii.append(atype.rmin)
+            lj_depths.append(abs(atype.epsilon))
+            for j in xrange(i+1, len(self.atoms)):
+                atype2 = self.atoms[j].atom_type
+                if lj_idx_list[j] > 0: continue # already assigned
+                if atype2 is atype:
+                    lj_idx_list[j] = num_lj_types
+                elif not atype.nbfix:
+                    # Only non-NBFIXed atom types can be compressed
+                    ljtype2 = (atype2.rmin, abs(atype2.epsilon))
+                    if ljtype == ljtype2:
+                        lj_idx_list[j] = num_lj_types
+        # Now everything is assigned. Create the A- and B-coefficient arrays
+        acoef = [0 for i in xrange(num_lj_types*num_lj_types)]
+        bcoef = acoef[:]
+        for i in xrange(num_lj_types):
+            for j in xrange(num_lj_types):
+                namej = lj_type_list[j].name
+                try:
+                    rij, wdij, rij14, wdij14 = lj_type_list[i].nbfix[namej]
+                except KeyError:
+                    rij = (lj_radii[i] + lj_radii[j]) * length_conv
+                    wdij = sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
+                else:
+                    rij *= length_conv
+                    wdij *= ene_conv
+                rij6 = rij**6
+                acoef[i+num_lj_types*j] = sqrt(wdij) * rij6
+                bcoef[i+num_lj_types*j] = 2 * wdij * rij6
+        force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2; r2=r^2; '
+                                        'a=acoef(type1, type2); '
+                                        'b=bcoef(type1, type2)')
+        force.addTabulatedFunction('acoef',
+                mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
+        force.addTabulatedFunction('bcoef',
+                mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
+        force.addPerParticleParameter('type')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
+                nonbondedMethod is app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        elif nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        else:
+            raise ValueError('Unrecognized nonbonded method [%s]' %
+                             nonbondedMethod)
+        # Add the particles
+        for i in lj_idx_list:
+            force.addParticle((i-1,))
+        # Now wipe out the L-J parameters in the nonbonded force
+        for i in xrange(nonbfrc.getNumParticles()):
+            chg, sig, eps = nonbfrc.getParticleParameters(i)
+            nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
+        # Now transfer the exclusions
+        for ii in xrange(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+        # Now transfer the other properties (cutoff, switching function, etc.)
+        force.setUseLongRangeCorrection(True)
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
+        if nonbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+
+        return nonbfrc, force
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
