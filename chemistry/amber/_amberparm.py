@@ -522,7 +522,7 @@ class AmberParm(AmberFormat, Structure):
         # Now fill in the rst7 coordinates
         rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
         if self.vels is not None:
-            rst7.velocities = [0.0 for i in xrange(len(self.atoms)*3)]
+            rst7.vels = [0.0 for i in xrange(len(self.atoms)*3)]
 
         for i, at in enumerate(self.atoms):
             i3 = i * 3
@@ -530,9 +530,9 @@ class AmberParm(AmberFormat, Structure):
             rst7.coordinates[i3+1] = at.xy
             rst7.coordinates[i3+2] = at.xz
             if rst7.hasvels:
-                rst7.velocities[i3  ] = at.vx
-                rst7.velocities[i3+1] = at.vy
-                rst7.velocities[i3+2] = at.vz
+                rst7.vels[i3  ] = at.vx
+                rst7.vels[i3+1] = at.vy
+                rst7.vels[i3+2] = at.vz
 
         rst7.box = copy.copy(self.box)
         # Now write the restart file
@@ -873,7 +873,7 @@ class AmberParm(AmberFormat, Structure):
         if self.hasbox:
             self.box = rst7.box[:]
         if self.hasvels:
-            self.load_velocities(rst7.velocities)
+            self.load_velocities(rst7.vels)
 
     #===================================================
 
@@ -1799,7 +1799,7 @@ class Rst7(object):
         alternative constructor "open" should be used instead
         """
         self.coordinates = []
-        self.velocities = []
+        self.vels = []
         self.box = []
         self.hasvels = hasvels
         self.hasbox = hasbox
@@ -1848,7 +1848,7 @@ class Rst7(object):
         self.hasvels = f.hasvels
         self.hasbox = f.hasbox
         if f.hasvels:
-            self.velocities = f.velocities
+            self.vels = f.velocities
         if f.hasbox:
             self.box = f.box
         self.title = f.title
@@ -1861,13 +1861,6 @@ class Rst7(object):
              DeprecationWarning)
         return self.coordinates
    
-    @property
-    def vels(self):
-        """ Deprecated for velocities now """
-        warn('vels attribute of Rst7 is deprecated. Use velocities instead',
-             DeprecationWarning)
-        return self.velocities
-
     @classmethod
     def copy_from(cls, thing):
         """
@@ -1879,7 +1872,7 @@ class Rst7(object):
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
         inst.hasvels = thing.hasvels
-        if hasattr(thing, 'velocities'): inst.velocities = thing.velocities[:]
+        if hasattr(thing, 'vels'): inst.vels = thing.vels[:]
         inst.hasbox = thing.hasbox
         if hasattr(thing, 'box'): inst.box = thing.box[:]
         inst.time = thing.time
@@ -1908,10 +1901,22 @@ class Rst7(object):
         # Now write the coordinates
         f.coordinates = self.coordinates
         if self.hasvels:
-            f.velocities = self.velocities
+            f.vels = self.vels
         if self.hasbox:
             f.box = self.box
         f.close()
+
+    @property
+    def positions(self):
+        """ Atomic coordinates with units """
+        return ([self.coordinates[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
+
+    @property
+    def velocities(self):
+        """ Atomic velocities with units """
+        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms/u.picoseconds)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

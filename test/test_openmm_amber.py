@@ -6,14 +6,12 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
-                OpenMMChamberParm as ChamberParm, OpenMMRst7 as Rst7)
     has_openmm = True
 except ImportError:
     from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from chemistry.amber import AmberParm, ChamberParm
+from chemistry.amber import AmberParm, ChamberParm, Rst7
 import chemistry.unit as u
 from copy import copy
 from math import sqrt
@@ -33,13 +31,13 @@ if has_openmm:
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
 
-    # Make sure all precisions are double
-    for i in range(mm.Platform.getNumPlatforms()):
-        plat = mm.Platform.getPlatform(i)
-        if plat.getName() == 'CUDA':
-            plat.setPropertyDefaultValue('CudaPrecision', 'double')
-        if plat.getName() == 'OpenCL':
-            plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
+# Make sure all precisions are double
+for i in range(mm.Platform.getNumPlatforms()):
+    plat = mm.Platform.getPlatform(i)
+    if plat.getName() == 'CUDA':
+        plat.setPropertyDefaultValue('CudaPrecision', 'double')
+    if plat.getName() == 'OpenCL':
+        plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
 
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
@@ -50,41 +48,41 @@ if has_openmm:
 #   3 - Ewald
 #   4 - PME
 
-    def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
-        """ Gets a decomposed energy for a given system """
-        energies = {}
-        # Get energy components
+def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
+    """ Gets a decomposed energy for a given system """
+    energies = {}
+    # Get energy components
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.BOND_FORCE_GROUP)
+    energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.ANGLE_FORCE_GROUP)
+    energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.DIHEDRAL_FORCE_GROUP)
+    energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.NONBONDED_FORCE_GROUP)
+    energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    # Extra energy terms for chamber systems
+    if isinstance(parm, ChamberParm):
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.BOND_FORCE_GROUP)
-        energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+                             groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
+        energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.ANGLE_FORCE_GROUP)
-        energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+                             groups=2**parm.IMPROPER_FORCE_GROUP)
+        energies['improper']=s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.DIHEDRAL_FORCE_GROUP)
-        energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.NONBONDED_FORCE_GROUP)
-        energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        # Extra energy terms for chamber systems
-        if isinstance(parm, ChamberParm):
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
-            energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.IMPROPER_FORCE_GROUP)
-            energies['improper']=s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.CMAP_FORCE_GROUP)
-            energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        return energies
+                             groups=2**parm.CMAP_FORCE_GROUP)
+        energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    return energies
 
 class TestAmberParm(unittest.TestCase):
 
