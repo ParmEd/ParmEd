@@ -873,6 +873,7 @@ class CharmmPsfFile(Structure):
         # Now transfer the exclusions
         for ii in xrange(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            force.addExclusion(i, j)
         # Now transfer the other properties (cutoff, switching function, etc.)
         force.setUseLongRangeCorrection(True)
         if nonbondedMethod is app.NoCutoff:
