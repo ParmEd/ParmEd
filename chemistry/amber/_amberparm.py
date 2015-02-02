@@ -1228,8 +1228,7 @@ class AmberParm(AmberFormat, Structure):
                         atom = ExtraPoint()
                     else:
                         atom = Atom()
-                self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
-                self.atoms.append(atom)
+                self.add_atom(atom, resname, i, res_chn[i], res_icd[i])
 
     #===================================================
 
