@@ -21,25 +21,18 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    import simtk.unit as u
-    from chemistry.charmm.openmmloader import (
-                OpenMMCharmmPsfFile as CharmmPsfFile,
-                OpenMMCharmmCrdFile as CharmmCrdFile,
-                OpenMMCharmmRstFile as CharmmRstFile,
-    )
-    from chemistry.amber.openmmloader import OpenMMRst7 as Rst7
     PDBFile = app.PDBFile
     has_openmm = True
 except ImportError:
-    from chemistry.charmm.psf import CharmmPsfFile
-    from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
-    from chemistry.amber.readparm import Rst7
     # To prevent NameError's
     def PDBFile(*args, **kwargs): return None
     has_openmm = False
 
-from chemistry.charmm.parameters import CharmmParameterSet
+from chemistry.amber.readparm import Rst7
+from chemistry.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+                              CharmmParameterSet)
 from chemistry.exceptions import CharmmPSFWarning
+from chemistry import unit as u
 from copy import copy
 from math import sqrt
 import unittest
@@ -78,11 +71,9 @@ class TestCharmmFiles(unittest.TestCase):
 
     def setUp(self):
         if charmm_solv.box is None:
-            charmm_solv.setBox(95.387*u.angstrom, 80.381*u.angstrom,
-                               80.225*u.angstrom)
+            charmm_solv.box = [95.387, 80.381, 80.225, 90, 90, 90]
         if charmm_nbfix.box is None:
-            charmm_nbfix.setBox(3.271195e1*u.angstrom, 3.299596e1*u.angstrom,
-                                3.300715e1*u.angstrom)
+            charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
     def assertRelativeEqual(self, val1, val2, places=7):
         if val1 == val2: return
@@ -314,40 +305,26 @@ class TestCharmmFiles(unittest.TestCase):
         self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
         self.assertRelativeEqual(energies['nonbond'], 6514.283116, places=5)
 
-if has_openmm:
-    def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
-        """ Gets a decomposed energy for a given system """
-        energies = {}
-        # Get energy components
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.BOND_FORCE_GROUP)
-        energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.ANGLE_FORCE_GROUP)
-        energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.DIHEDRAL_FORCE_GROUP)
-        energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.NONBONDED_FORCE_GROUP)
-        energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
-        energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.IMPROPER_FORCE_GROUP)
-        energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.boxVectors is not None,
-                             groups=2**parm.CMAP_FORCE_GROUP)
-        energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        return energies
+def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
+    """ Gets a decomposed energy for a given system """
+    energies = {}
+    # Get energy components
+    s = context.getState(getEnergy=True, groups=1<<parm.BOND_FORCE_GROUP)
+    energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True, groups=1<<parm.ANGLE_FORCE_GROUP)
+    energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True, groups=1<<parm.DIHEDRAL_FORCE_GROUP)
+    energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True, groups=1<<parm.NONBONDED_FORCE_GROUP)
+    energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         groups=1<<parm.UREY_BRADLEY_FORCE_GROUP)
+    energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True, groups=1<<parm.IMPROPER_FORCE_GROUP)
+    energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True, groups=1<<parm.CMAP_FORCE_GROUP)
+    energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    return energies
 
 if not has_openmm:
     del TestCharmmFiles

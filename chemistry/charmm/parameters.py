@@ -15,7 +15,6 @@ from chemistry.exceptions import CharmmFileError
 from chemistry.periodic_table import AtomicNum, Mass, Element
 import compat24 # needs to be before collections
 from collections import OrderedDict
-import math
 import os
 import warnings
 

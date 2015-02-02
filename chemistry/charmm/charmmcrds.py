@@ -9,6 +9,7 @@ Date: April 18, 2014
 """
 
 from chemistry.exceptions import CharmmFileError
+from chemistry import unit as u
 
 charmlen = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
@@ -19,10 +20,22 @@ class CharmmCrdFile(object):
     Reads and parses a CHARMM coordinate file (.crd) into its components,
     namely the coordinates, CHARMM atom types, resid, resname, etc.
 
-    Main attributes:
-        - natom (int) : Number of atoms in the system
-        - resname (list) : Names of all residues
-        - coords (list) : All cartesian coordinates [x1, y1, z1, x2, ...]
+    Parameters
+    ----------
+    fname : str
+        Name of the restart file to parse
+
+    Attributes
+    ----------
+    natom : int
+        Number of atoms in the system
+    resname : list of str
+        List of all residue names in the system
+    coords : list of float
+        List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    positions : natom x 3 distance Quantity
+        2-D list of all coordinates with the appropriate distance unit attached.
+        Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
 
     Example:
     >>> chm = CharmmCrdFile('testfiles/1tnm.crd')
@@ -43,6 +56,14 @@ class CharmmCrdFile(object):
 
         self.natom = 0                     # Number of atoms specified in file
         self._parse(fname)
+
+    @property
+    def positions(self):
+        """
+        Atomic coordinates with units attached to them with the shape (natom, 3)
+        """
+        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
 
     def _parse(self, fname):
 
@@ -101,12 +122,32 @@ class CharmmRstFile(object):
     Reads and parses data, velocities and coordinates from a CHARMM restart
     file (.rst) of file name 'fname' into class attributes
 
-    Main attributes:
-        - natom (int) : Number of atoms in the system
-        - resname (list) : Names of all residues
-        - coords (list) : All cartesian coordinates [x1, y1, z1, x2, ...]
-        - coordsold (list) : Old cartesian coordinates
-        - vels (list) : List of all cartesian velocities
+    Parameters
+    ----------
+    fname : str
+        Name of the restart file to parse
+
+    Attributes
+    ----------
+    natom : int
+        Number of atoms in the system
+    resname : list of str
+        Names of all residues in the system
+    coords : list of float
+        List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    coordsold : list of float
+        List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    vels : list of float
+        List of all velocities in the format [x1, y1, z1, x2, y2, z2, ...]
+    positions : natom x 3 distance Quantity
+        2-D list of all coordinates with the appropriate distance unit attached.
+        Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
+    positionsold : natom x 3 distance Quantity
+        2-D list of all old coordinates with the appropriate distance unit
+        attached.  Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
+    velocities : natom x 3 distance/time Quantity
+        2-D list of all old coordinates with the appropriate distance unit
+        attached. Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
 
     Example:
     >>> chm = CharmmRstFile('testfiles/sample-charmm.rst')
@@ -135,6 +176,24 @@ class CharmmRstFile(object):
         self.jhstrt = 0
 
         self._parse(fname)
+
+    @property
+    def positions(self):
+        """ Atomic positions with units """
+        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
+
+    @property
+    def positionsold(self):
+        """ Old atomic positions with units """
+        return ([self.coordsold[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
+
+    @property
+    def velocities(self):
+        """ Atomic velocities with units """
+        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms / u.picoseconds)
 
     def _parse(self, fname):
 

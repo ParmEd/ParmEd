@@ -6,14 +6,13 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    import simtk.unit as u
-    from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
-                OpenMMChamberParm as ChamberParm, OpenMMRst7 as Rst7)
     has_openmm = True
 except ImportError:
     from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
+from chemistry.amber import AmberParm, ChamberParm, Rst7
+import chemistry.unit as u
 from copy import copy
 from math import sqrt
 import ParmedTools as PT
@@ -31,6 +30,7 @@ if has_openmm:
                                       get_fn('dhfr_cmap_pbc.rst7'))
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+    tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -49,41 +49,41 @@ if has_openmm:
 #   3 - Ewald
 #   4 - PME
 
-    def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
-        """ Gets a decomposed energy for a given system """
-        energies = {}
-        # Get energy components
+def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
+    """ Gets a decomposed energy for a given system """
+    energies = {}
+    # Get energy components
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.BOND_FORCE_GROUP)
+    energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.ANGLE_FORCE_GROUP)
+    energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.DIHEDRAL_FORCE_GROUP)
+    energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    s = context.getState(getEnergy=True,
+                         enforcePeriodicBox=parm.ptr('ifbox')>0,
+                         groups=2**parm.NONBONDED_FORCE_GROUP)
+    energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    # Extra energy terms for chamber systems
+    if isinstance(parm, ChamberParm):
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.BOND_FORCE_GROUP)
-        energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+                             groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
+        energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.ANGLE_FORCE_GROUP)
-        energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+                             groups=2**parm.IMPROPER_FORCE_GROUP)
+        energies['improper']=s.getPotentialEnergy().value_in_unit(NRG_UNIT)
         s = context.getState(getEnergy=True,
                              enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.DIHEDRAL_FORCE_GROUP)
-        energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.NONBONDED_FORCE_GROUP)
-        energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        # Extra energy terms for chamber systems
-        if isinstance(parm, ChamberParm):
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
-            energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.IMPROPER_FORCE_GROUP)
-            energies['improper']=s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-            s = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox')>0,
-                                 groups=2**parm.CMAP_FORCE_GROUP)
-            energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        return energies
+                             groups=2**parm.CMAP_FORCE_GROUP)
+        energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
+    return energies
 
 class TestAmberParm(unittest.TestCase):
 
@@ -123,6 +123,70 @@ class TestAmberParm(unittest.TestCase):
         self.assertAlmostEqual(energies['angle'], 0)
         self.assertAlmostEqual(energies['dihedral'], 0)
         self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
+        # Check that we have the correct number of virtual sites
+        nvirt = 0
+        for i in range(system.getNumParticles()):
+            nvirt += system.isVirtualSite(i)
+        self.assertEqual(parm.ptr('NUMEXTRA'), nvirt)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        pstate = sim.context.getState(getForces=True)
+        sstate = mm.XmlSerializer.deserialize(
+                open(utils.get_saved_fn('tip4pforces.xml'), 'r').read()
+        )
+        pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        for p, s in zip(pf, sf):
+            for x1, x2 in zip(p, s):
+                # Compare large forces relatively and small ones absolutely
+                if abs(x1) > 1 or abs(x2) > 1:
+                    self.assertRelativeEqual(x1, x2, places=3)
+                else:
+                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+
+    def testEPEnergy2(self):
+        """ Tests AmberParm handling of extra points in TIP5P water """
+        parm = tip5p_system
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 0)
+        self.assertAlmostEqual(energies['dihedral'], 0)
+        self.assertRelativeEqual(energies['nonbond'], -2142.418956, places=4)
+        # Check that we have the correct number of virtual sites
+        nvirt = 0
+        for i in range(system.getNumParticles()):
+            nvirt += system.isVirtualSite(i)
+        self.assertEqual(parm.ptr('NUMEXTRA'), nvirt)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        pstate = sim.context.getState(getForces=True)
+        sstate = mm.XmlSerializer.deserialize(
+                open(utils.get_saved_fn('tip5pforces.xml'), 'r').read()
+        )
+        pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        i = 0
+        for p, s in zip(pf, sf):
+            if system.isVirtualSite(i):
+                i += 1
+                continue # Skip forces on virtual sites
+            for x1, x2 in zip(p, s):
+                # Compare large forces relatively and small ones absolutely
+                if abs(x1) > 1 or abs(x2) > 1:
+                    self.assertRelativeEqual(x1, x2, places=3)
+                else:
+                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+            i += 1
 
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """

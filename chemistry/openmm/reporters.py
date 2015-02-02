@@ -1,10 +1,11 @@
 from __future__ import division
 
 from chemistry.amber.asciicrd import AmberMdcrd
+from chemistry.geometry import box_vectors_to_lengths_and_angles
 from chemistry.amber.netcdffiles import NetCDFTraj
 from chemistry.amber.readparm import Rst7
 from functools import wraps
-from math import isnan, isinf, sqrt, acos, pi
+from math import isnan, isinf
 try:
     import simtk.openmm as mm
     import simtk.unit as u
@@ -23,7 +24,6 @@ def needs_openmm(fcn):
 
     return new_fcn
 
-RADDEG = 180 / pi # radians to degrees
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
 
@@ -344,7 +344,7 @@ class NetCDFReporter(object):
             - simulation (Simulation) The Simulation to generate a report for
             - state (State) The current state of the simulation
         """
-        global RADDEG, VELUNIT, FRCUNIT
+        global VELUNIT, FRCUNIT
         if self.crds:
             crds = state.getPositions().value_in_unit(u.angstrom)
         if self.vels:
@@ -366,8 +366,9 @@ class NetCDFReporter(object):
             )
         if self.uses_pbc:
             vecs = state.getPeriodicBoxVectors()
-            lengths, angles = _process_box_vectors(*vecs)
-            self._out.add_cell_lengths_angles(lengths, angles)
+            lengths, angles = box_vectors_to_lengths_and_angles(*vecs)
+            self._out.add_cell_lengths_angles(lengths.value_in_unit(u.angstrom),
+                                              angles.value_in_unit(u.degree))
 
         # Add the coordinates, velocities, and/or forces as needed
         if self.crds:
@@ -465,7 +466,7 @@ class MdcrdReporter(object):
             - state (State) The current state of the simulation
         """
         from chemistry.amber.asciicrd import VELSCALE
-        global RADDEG, VELUNIT, FRCUNIT
+        global VELUNIT, FRCUNIT
         if self.crds:
             crds = state.getPositions().value_in_unit(u.angstrom)
         elif self.vels: # crds/vels/frcs are exclusive, elif works
@@ -510,8 +511,8 @@ class MdcrdReporter(object):
         # Now it's time to add the box lengths
         if self.uses_pbc:
             boxvecs = state.getPeriodicBoxVectors()
-            lengths, angles = _process_box_vectors(*boxvecs)
-            self._out.add_box(lengths)
+            lengths, angles = box_vectors_to_lengths_and_angles(*boxvecs)
+            self._out.add_box(lengths.value_in_unit(u.angstroms))
 
     def __del__(self):
         try:
@@ -605,11 +606,13 @@ class RestartReporter(object):
             for i in xrange(self.atom):
                 i3 = i*3
                 flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
-            self.rst7.velocities = flatvel
+            self.rst7.vels = flatvel
 
         if self.uses_pbc:
             boxvecs = state.getPeriodicBoxVectors()
-            lengths, angles = _process_box_vectors(*boxvecs)
+            lengths, angles = box_vectors_to_lengths_and_angles(*boxvecs)
+            lengths = lengths.value_in_unit(u.angstrom)
+            angles = angles.value_in_unit(u.degree)
             self.rst7.box = [lengths[0], lengths[1], lengths[2],
                              angles[0], angles[1], angles[2]]
 
@@ -623,27 +626,6 @@ class RestartReporter(object):
     def finalize(self):
         """ No-op here """
         pass
-
-def _process_box_vectors(a, b, c):
-    """
-    This converts 3 periodic box vectors, converting to units of angstroms,
-    and returns a 2-element tuple of box lengths and box angles. Both will be
-    3-element tuples themselves
-    """
-    global RADDEG
-    a = a.value_in_unit(u.angstrom)
-    b = b.value_in_unit(u.angstrom)
-    c = c.value_in_unit(u.angstrom)
-    # Get the lengths of the unit vectors (now in angstroms)
-    la = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
-    lb = sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2])
-    lc = sqrt(c[0] * c[0] + c[1] * c[1] + c[2] * c[2])
-    # Angles
-    alpha = acos((b[0]*c[0] + b[1]*c[1] + b[2]*c[2]) / (lb * lc)) * RADDEG
-    beta = acos((a[0]*c[0] + a[1]*c[1] + a[2]*c[2]) / (la * lc)) * RADDEG
-    gamma = acos((a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) / (la * lb)) * RADDEG
-
-    return ( (la, lb, lc), (alpha, beta, gamma) )
 
 class ProgressReporter(AmberStateDataReporter):
     """

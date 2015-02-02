@@ -1204,7 +1204,7 @@ class strip(Action):
                                     self.mask, self.num_atms)
 
     def execute(self):
-        self.parm.delete_mask(self.mask)
+        self.parm.strip(self.mask)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2146,7 +2146,7 @@ class timerge(Action):
         self.parm.atoms.changed = True
 
         if nremove > 0:
-            self.parm.delete_mask(remove_str)
+            self.parm.strip(remove_str)
 
         new_sc_atm1 = []
         new_sc_atm2 = []
@@ -3468,7 +3468,12 @@ class chamber(Action):
                 atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
-                psf.set_box(*crdbox[:])
+                if len(crdbox) == 3:
+                    psf.box = crdbox + [90.0, 90.0, 90.0]
+                elif len(crdbox) == 6:
+                    psf.box = crdbox[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
             elif self.box == 'bounding':
                 # Define the bounding box
                 xmin, ymin, zmin = coords[:3]
@@ -3481,17 +3486,27 @@ class chamber(Action):
                     ymax = max(ymax, coords[i3+1])
                     zmin = min(zmin, coords[i3+2])
                     zmax = max(zmax, coords[i3+2])
-                psf.set_box(xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0)
+                psf.box = [xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0]
             elif self.box is not None:
-                psf.set_box(*self.box[:])
+                if len(self.box) == 3:
+                    psf.box = self.box + [90.0, 90.0, 90.0]
+                elif len(crdbox) == 6:
+                    psf.box = self.box[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
             else:
                 psf.box = None
         else:
             # Set the box information
             if self.box is None:
-                psf.set_box(None)
+                psf.box = None
             else:
-                psf.set_box(*self.box)
+                if len(self.box) == 3:
+                    psf.box = self.box + [90.0, 90.0, 90.0]
+                elif len(crdbox) == 6:
+                    psf.box = self.box[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
 
         nsets = len(parmset.parametersets)
         if nsets > 0:

@@ -44,7 +44,7 @@ class TestReadParm(unittest.TestCase):
         # Now check the restart file
         rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
         coords = rst.coordinates
-        vels = rst.velocities
+        vels = rst.vels
         for i, atom in enumerate(gasparm.atoms):
             i3 = i * 3
             self.assertEqual(coords[i3  ], atom.xx)
@@ -563,14 +563,14 @@ class TestWriteFiles(unittest.TestCase):
         self.assertFalse(rst.hasbox)
         for x1, x2 in zip(rst.coordinates, range(60)):
             self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(60))):
+        for x1, x2 in zip(rst.vels, reversed(range(60))):
             self.assertAlmostEqual(x1, x2, places=5)
         rst = readparm.Rst7.open(get_fn('testcvb.rst7', written=True))
         self.assertTrue(rst.hasvels)
         self.assertTrue(rst.hasbox)
         for x1, x2 in zip(rst.coordinates, range(45)):
             self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(45))):
+        for x1, x2 in zip(rst.vels, reversed(range(45))):
             self.assertAlmostEqual(x1, x2, places=5)
         for x1, x2 in zip(rst.box, box):
             self.assertEqual(x1, x2)

@@ -8,10 +8,12 @@ from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
-from chemistry.constants import TINY
+from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from chemistry.periodic_table import Mass, Element as _Element
+import chemistry.unit as u
 from compat24 import all, property
 import copy
+import math
 import warnings
 try:
     from itertools import izip as zip
@@ -25,7 +27,9 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'StretchBend', 'StretchBendType', 'TorsionTorsion',
            'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
-           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley']
+           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
+           'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
+           'OutOfPlaneExtraPointFrame']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -213,6 +217,17 @@ class Atom(_ListItem):
         Alternate location indicator (see PDB file)
     number : int=-1
         The serial number given to the atom (see PDB file)
+    rmin : float=None
+        The Rmin/2 Lennard-Jones parameter for this atom. Default evaluates to 0
+    epsilon : float=None
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        evaluates to 0
+    rmin14 : float=None
+        The Rmin/2 Lennard-Jones parameter for this atom in 1-4 interactions.
+        Default evaluates to 0
+    epsilon14 : float=None
+        The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
+        interactions. Default evaluates to 0
 
     Attributes
     ----------
@@ -317,9 +332,26 @@ class Atom(_ListItem):
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
+    children : list of `ExtraPoint`s
+        This is the list of "child" ExtraPoint objects bonded to this atom
     number : int
         The serial number of the atom in the input structure (e.g., PDB file).
         If not present in the original structure, a default value of -1 is used
+    rmin : float
+        The Rmin/2 Lennard-Jones parameter for this atom. Default value is 0.
+        If not set, it is taken from the `atom_type` attribute (if available)
+    epsilon : float
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        value is 0. If not set, it is taken from the `atom_type` attribute (if
+        available)
+    rmin_14 : float
+        The Rmin/2 L-J parameter for 1-4 pairs. Default value is `rmin` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
+    epsilon_14 : float
+        The epsilon L-J parameter for 1-4 pairs. Default value is `epsilon` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
 
     Possible Attributes
     -------------------
@@ -405,7 +437,8 @@ class Atom(_ListItem):
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
-                 bfactor=0.0, altloc='', number=-1):
+                 bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
+                 rmin14=None, epsilon14=None):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -439,24 +472,33 @@ class Atom(_ListItem):
         self.atom_type = _UnassignedAtomType
         self.number = number
         self.anisou = None
+        self._rmin = rmin
+        self._epsilon = epsilon
+        self._rmin14 = rmin14
+        self._epsilon14 = epsilon14
+        self.children = []
    
     #===================================================
 
-    def __copy__(self):
-        """ Returns a deep copy of this atom, but not attached to any list """
-        new = type(self)(atomic_number=self.atomic_number, name=self.name,
-                         type=self.type, charge=self.charge, mass=self.mass,
-                         nb_idx=self.nb_idx, radii=self.radii,
-                         screen=self.screen, tree=self.tree, join=self.join,
-                         irotat=self.irotat, occupancy=self.occupancy,
-                         bfactor=self.bfactor, altloc=self.altloc)
-        new.atom_type = self.atom_type
-        for key in self.other_locations:
-            new.other_locations[key] = copy.copy(self.other_locations[key])
-        _safe_assigns(new, self, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
+    @classmethod
+    def _copy(cls, item):
+        new = cls(atomic_number=item.atomic_number, name=item.name,
+                  type=item.type, charge=item.charge, mass=item.mass,
+                  nb_idx=item.nb_idx, radii=item.radii,
+                  screen=item.screen, tree=item.tree, join=item.join,
+                  irotat=item.irotat, occupancy=item.occupancy,
+                  bfactor=item.bfactor, altloc=item.altloc)
+        new.atom_type = item.atom_type
+        for key in item.other_locations:
+            new.other_locations[key] = copy.copy(item.other_locations[key])
+        _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
                       'vdw_parent', 'vdw_weight'))
         return new
+
+    def __copy__(self):
+        """ Returns a deep copy of this atom, but not attached to any list """
+        return type(self)._copy(self)
 
     #===================================================
 
@@ -491,22 +533,31 @@ class Atom(_ListItem):
     def bond_partners(self):
         """ Go through all bonded partners """
         bp = set(self._bond_partners)
+        for p in self._bond_partners:
+            for c in p.children:
+                bp.add(c)
         return sorted(list(bp))
 
     @property
     def angle_partners(self):
         """ List of all angle partners that are NOT bond partners """
         bp = set(self._bond_partners)
-        ap = set(self._angle_partners)
-        return sorted(list(ap - bp))
+        ap = set(self._angle_partners) - bp
+        for p in ap:
+            for c in p.children:
+                ap.add(c)
+        return sorted(list(ap))
 
     @property
     def dihedral_partners(self):
         " List of all dihedral partners that are NOT angle or bond partners "
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners) - ap - bp
+        for p in dp:
+            for c in p.children:
+                dp.add(c)
+        return sorted(list(dp))
 
     @property
     def tortor_partners(self):
@@ -514,23 +565,94 @@ class Atom(_ListItem):
         List of all 1-5 partners that are NOT in angle or bond partners. This is
         _only_ used in the Amoeba force field
         """
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners) - dp - ap - bp
+        for p in tp:
+            for c in p.children:
+                tp.add(c)
+        return sorted(list(tp))
 
     @property
     def exclusion_partners(self):
         """
         List of all exclusions not otherwise excluded by bonds/angles/torsions
         """
-        ep = set(self._exclusion_partners)
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(ep - tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners)
+        ep = set(self._exclusion_partners) - tp - dp - ap - bp
+        for p in ep:
+            for c in p.children:
+                ep.add(c)
+        return sorted(list(ep))
+
+    #===================================================
+
+    # Lennard-Jones parameters... can be taken from atom_type if it is set.
+    # Otherwise take it from _rmin and _epsilon attributes
+
+    @property
+    def rmin(self):
+        """ Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) """
+        if self._rmin is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin is None):
+                return 0.0
+            return self.atom_type.rmin
+        return self._rmin
+
+    @rmin.setter
+    def rmin(self, value):
+        """ Lennard-Jones Rmin/2 parameter (the Lennard-Jones radius) """
+        self._rmin = value
+
+    @property
+    def epsilon(self):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        if self._epsilon is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon is None):
+                return 0.0
+            return self.atom_type.epsilon
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        self._epsilon = value
+
+    @property
+    def rmin_14(self):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        if self._rmin14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin_14 is None):
+                return self.rmin
+            return self.atom_type.rmin_14
+        return self._rmin14
+
+    @rmin_14.setter
+    def rmin_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
+
+    @property
+    def epsilon_14(self):
+        """ The 1-4 Lennard-Jones epsilon parameter """
+        if self._epsilon14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon_14 is None):
+                return self.epsilon
+            return self.atom_type.epsilon_14
+        return self._epsilon14
+
+    @epsilon_14.setter
+    def epsilon_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
 
     #===================================================
 
@@ -573,37 +695,28 @@ class Atom(_ListItem):
         if only_greater:
             baseline = self.idx
         else:
-            baseline = 0
-        if self.atomic_number > 0:
-            excl = []
-            for atm in self.bond_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.angle_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.dihedral_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.tortor_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.exclusion_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-        else:
-            # Extra point!! Special handling required. Basically, the extra
-            # point adopts all of the exclusions of the atom it is bonded to
-            partner = self.bond_partners[0]
-            myidx = self.idx + index_from
-            excl = [a for a in partner.nonbonded_exclusions()
-                        if a != myidx]
-            excl.append(partner.idx + index_from)
+            baseline = -1
+        excl = []
+        for atm in self.bond_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.angle_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.dihedral_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.tortor_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.exclusion_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
         return sorted(excl)
 
     #===================================================
@@ -633,6 +746,10 @@ class Atom(_ListItem):
         This action adds `self` to `other.bond_partners`. Raises `BondError` if
         `other is self`
         """
+        if isinstance(other, ExtraPoint):
+            self.children.append(other)
+        elif isinstance(self, ExtraPoint):
+            other.children.append(self)
         if self is other:
             raise BondError("Cannot bond atom to itself!")
         self._bond_partners.append(other)
@@ -779,6 +896,558 @@ class Atom(_ListItem):
         if self.residue is not None:
             return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
         return start + '>'
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class ExtraPoint(Atom):
+    """
+    An extra point is a massless, virtual site that is used to extend the
+    flexibility of partial atomic charge fitting. They can be used to, for
+    instance, give atoms permanent multipoles in a fixed-charge format.
+
+    However, virtual sites are massless particles whose position is fixed with
+    respect to a particular frame of reference. As a result, they must be
+    treated specially when running dynamics. This class extends the `Atom` class
+    with extra functionality specific to these "Extra points" or "virtual
+    sites". See the documentation for the `Atom` class for more information.
+    """
+    def __init__(self, *args, **kwargs):
+        super(ExtraPoint, self).__init__(*args, **kwargs)
+        self._frame_type = None
+
+    #===================================================
+
+    @property
+    def parent(self):
+        """
+        The parent atom of this extra point is the atom it is bonded to (there
+        should only be 1 bond partner, but the parent is defined as its first)
+        """
+        try:
+            return self._bond_partners[0]
+        except IndexError:
+            return None
+
+    #===================================================
+
+    @property
+    def bond_partners(self):
+        """ List of all atoms bonded to this atom and its parent """
+        try:
+            return sorted([self.parent] +
+                    [x for x in self.parent.bond_partners if x is not self])
+        except AttributeError:
+            if self.parent is not None:
+                return [self.parent]
+            return []
+
+    @property
+    def angle_partners(self):
+        """ List of all atoms angled to this atom and its parent """
+        try:
+            return self.parent.angle_partners
+        except AttributeError:
+            return []
+
+    @property
+    def dihedral_partners(self):
+        try:
+            return self.parent.dihedral_partners
+        except AttributeError:
+            return []
+
+    @property
+    def tortor_partners(self):
+        try:
+            return self.parent.tortor_partners
+        except AttributeError:
+            return []
+
+    @property
+    def exclusion_partners(self):
+        try:
+            return self.parent.exclusion_partners
+        except AttributeError:
+            return []
+
+    #===================================================
+
+    @property
+    def frame_type(self):
+        """
+        The type of frame used for this extra point. Whether the EP lies
+        beyond (outside) or between (inside) the is determined from the
+        positions of each atom in the frame and the extra point. If those are
+        not set, the EP is assumed to be between the two points in the frame
+        """
+        if self._frame_type is not None:
+            return self._frame_type
+        if len(self.parent.bonds) == 2:
+            mybond = None
+            otherbond = None
+            for bond in self.parent.bonds:
+                if self in bond:
+                    mybond = bond
+                else:
+                    otherbond = bond
+            if mybond is None or otherbond is None:
+                raise RuntimeError('Strange bond pattern detected')
+            bonddist = otherbond.type.req
+            if otherbond.atom1 is self.parent:
+                otheratom = otherbond.atom2
+            else:
+                otheratom = otherbond.atom1
+            try:
+                x1, y1, z1 = self.xx, self.xy, self.xz
+                x2, y2, z2 = otheratom.xx, otheratom.xy, otheratom.xz
+            except AttributeError:
+                self._frame_type = TwoParticleExtraPointFrame(self, True)
+            else:
+                dx, dy, dz = x1-x2, y1-y2, z1-z2
+                if dx*dx + dy*dy + dz*dz > bonddist:
+                    self._frame_type = TwoParticleExtraPointFrame(self, False)
+                else:
+                    self._frame_type = TwoParticleExtraPointFrame(self, True)
+            return self._frame_type
+        elif len(self.parent.bonds) == 3:
+            # Just take 1 other atom -- an acute angle is "inside", an obtuse
+            # angle is "outside"
+            other_atom = None
+            for bond in self.parent.bonds:
+                if not self in bond:
+                    if bond.atom1 is self.parent:
+                        other_atom = bond.atom2
+                    else:
+                        other_atom = bond.atom1
+                    break
+            if other_atom is None:
+                raise RuntimeError('Strange bond pattern detected')
+            try:
+                x1, y1, z1 = other_atom.xx, other_atom.xy, other_atom.xz
+                x2, y2, z2 = self.parent.xx, self.parent.xy, self.parent.xz
+                x3, y3, z3 = self.xx, self.xy, self.xz
+            except AttributeError:
+                # See if both other atoms are hydrogens and the current atom is
+                # an oxygen. If so, this is TIP4P and we go inside. Otherwise,
+                # we go outside
+                other_atom2 = None
+                for bond in self.parent.bonds:
+                    if not self in bond and not other_atom in bond:
+                        if bond.atom1 is self.parent:
+                            other_atom2 = bond.atom2
+                        else:
+                            other_atom2 = bond.atom1
+                        break
+                if other_atom2 is None:
+                    raise RuntimeError('Strange bond pattern detected')
+                if (self.parent.element == 8 and other_atom.element == 1 and
+                        other_atom2.element == 1): # TIP4P!
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+            else:
+                vec1 = [x1-x2, y1-y2, z1-z2]
+                vec2 = [x3-x2, y3-y2, z3-z2]
+                dot11 = sum([x*y for x, y in zip(vec1, vec1)])
+                dot22 = sum([x*y for x, y in zip(vec2, vec2)])
+                dot12 = sum([x*y for x, y in zip(vec1, vec2)])
+                angle = math.acos(dot12 / (math.sqrt(dot11)*math.sqrt(dot22)))
+                if angle < math.pi / 2:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+        elif len(self.parent.bonds) == 4:
+            # Only supported option here is the OOP one (e.g., TIP5P) -- always
+            # assume tetrahedral angle
+            self._frame_type = OutOfPlaneExtraPointFrame(self)
+
+        return self._frame_type
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TwoParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 2 particles
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    inside : bool=False
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside  : x1-----e--X2
+
+    Outside : x1--------X2--e
+    """
+    def __init__(self, ep, inside=False):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2 : Atom, Atom
+            a1 is the parent atom of the extra point. a2 is the other atom
+            bonded to the parent atom
+        """
+        try:
+            mybond, = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError("Bad bond pattern in EP frame")
+
+        if mybond.atom1 is self.ep.parent:
+            return self.ep.parent, mybond.atom2
+        else:
+            return self.ep.parent, mybond.atom1
+
+    def get_weights(self):
+        """
+        Returns the weights for the two particles
+
+        Returns
+        -------
+        w1, w2 : float, float
+            w1 is the weight of particle 1 (the parent atom), whereas w2 is the
+            weight of particle 2 (the atom bonded to the parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with a 2-'
+                             'point virtual site frame')
+        b1, b2 = ep.parent.bonds
+        if ep in b1:
+            r1 = b2.type.req
+            r2 = b1.type.req
+        else:
+            r1 = b2.type.req
+            r2 = b1.type.req
+
+        if self.inside:
+            # It is closer to atom 1, but both weights are positive and add to 1
+            return ((r1 - r2) / r1), (r2 / r1)
+        else:
+            return ((r1 + r2) / r1), -(r2 / r1)
+
+class ThreeParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    inside : bool=True
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside :         X
+                    /|\
+                   / e \
+                  x     x
+    Outside :
+                     e
+                     |
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, inside=True):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : Atom, Atom, Atom
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom1, oatom2
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : float, float, float
+            w1 is the weight of particle 1 (the parent atom), whereas w2 and w3
+            are the weights of particles 2 and 3 (the atoms bonded to the
+            parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 3:
+            raise ValueError('EP parent bond pattern inconsistent with a 3-'
+                             'point virtual site frame')
+        b1, b2, b3 = ep.parent.bonds
+        # There are 2 possibilities here -- there is an angle between the 3
+        # atoms in the frame OR there is a triangle of bonds (e.g., TIP4P).
+        # Compute the 'ideal' distance between the 3 frame-of-ref. atoms
+        if ep in b1:
+            b1, b3 = b3, b1
+        elif ep in b2:
+            b2, b3 = b3, b2
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b2.atom2
+            else:
+                a2 = b2.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+        req12 = b1.type.req
+        req13 = b2.type.req
+        weight = b3.type.req / math.sqrt(req12*req13 - 0.25*req23*req23)
+
+        if self.inside:
+            return 1 - weight, weight / 2, weight / 2
+        else:
+            return 1 + weight, -weight / 2, -weight / 2
+
+class OutOfPlaneExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles, but with the virtual site out of the
+    plane of those 3 particles. For example, TIP5P
+
+    Parameters
+    ----------
+    ep : ExtraPoint
+        The extra point defined by this frame
+    angle : float=54.735
+        The angle out-of-plane that the extra point is. By default, it is half
+        of the angle of a tetrahedron. Given in degrees
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+                   e   e
+                    \ /
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, angle=54.735):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.angle = angle
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : Atom, Atom, Atom
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom but are not EPs
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if (not isinstance(bond.atom1, ExtraPoint) and
+                                    not isinstance(bond.atom2, ExtraPoint))
+            ]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom2, oatom1
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : float, float, float
+            w1 and w2 are the weights with respect to the second two particles
+            in the frame (i.e., NOT the parent atom). w3 is the weight of the
+            cross-product
+        """
+        ep = self.ep
+        # Find the two bonds that do not involve any extra points
+        regbonds = []
+        mybond = None
+        for bond in ep.parent.bonds:
+            if (not isinstance(bond.atom1, ExtraPoint) and
+                    not isinstance(bond.atom2, ExtraPoint)):
+                regbonds.append(bond)
+            elif ep in bond:
+                if mybond is not None:
+                    raise ValueError('multiple bonds detected to extra point')
+                mybond = bond
+        #FIXME -- is this necessary?
+        if len(regbonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with an '
+                             'out-of-plane, 3-point virtual site frame')
+        if mybond is None:
+            raise RuntimeError('No EP bond found... should not be here')
+        b1, b2 = regbonds[:2]
+        req12 = b1.type.req
+        req13 = b2.type.req
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            t213 = angle.theteq
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b2.atom2
+            else:
+                a2 = b2.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+            # Now calculate the angle
+            t213 = 2 * math.asin(req23 / (req12 + req13)) * RAD_TO_DEG
+        # Some necessary constants
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        req12 *= length_conv
+        req13 *= length_conv
+        req23 *= length_conv
+        sinOOP = math.sin(self.angle * DEG_TO_RAD)
+        cosOOP = math.cos(self.angle * DEG_TO_RAD)
+        sin213 = math.sin(t213 * DEG_TO_RAD)
+        # Find how big the cross product is
+        lenCross = req12 * req13 * sin213
+        # Find our weights (assume symmetric)
+        weightCross = sinOOP * mybond.type.req * length_conv / lenCross
+        weight = (cosOOP * mybond.type.req * length_conv /
+                        math.sqrt(req12*req13 - 0.25*req23*req23))
+        # Find out of the cross product weight should be positive or negative.
+        a1, a2, a3 = self.get_atoms()
+        try:
+            v12 = (a2.xx-a1.xx, a2.xy-a1.xy, a2.xz-a1.xz)
+            v13 = (a3.xx-a1.xx, a3.xy-a1.xy, a3.xz-a1.xz)
+            v1e = (self.ep.xx-a1.xx, self.ep.xy-a1.xy, self.ep.xz-a1.xz)
+        except AttributeError:
+            # No coordinates... we have to guess. The first EP will have a
+            # positive weight, the second will have a negative (this matches
+            # what happens with Amber prmtop files...)
+            for a in self.ep.parent.bond_partners:
+                if a is self.ep:
+                    break
+                if isinstance(a, ExtraPoint):
+                    weightCross = -weightCross
+                    break
+        else:
+            # Take the cross product of v12 and v13, then dot that with the EP
+            # vector. An acute angle is a positive weightCross. An obtuse one is
+            # negative
+            cross = (v12[1]*v13[2] - v12[2]*v13[1],
+                     v12[2]*v13[0] - v12[0]*v13[2],
+                     v12[0]*v13[1] - v12[1]*v13[0])
+            lencross = math.sqrt(sum([cross[i]*cross[i] for i in xrange(3)]))
+            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in xrange(3)]))
+            v1edotcross = sum([v1e[i]*cross[i] for i in xrange(3)])
+            costheta = v1edotcross / (lenv1e*lencross)
+            if costheta < 0: weightCross = -weightCross
+        return weight / 2, weight / 2, weightCross
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3219,6 +3888,16 @@ class AtomType(object):
         The mass of the atom type
     atomic_number : int
         The atomic number of the element of the atom type
+    epsilon : float=None
+        If set, it is the Lennard-Jones well depth of this atom type
+    rmin : float=None
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type
+    epsilon_14 : float=None
+        If set, it is the Lennard-Jones well depth of this atom type in 1-4
+        nonbonded interactions
+    rmin_14 : float=None
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
+        1-4 nonbonded interactions
     nbfix : dict(str:tuple)
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
