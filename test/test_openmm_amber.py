@@ -30,6 +30,7 @@ if has_openmm:
                                       get_fn('dhfr_cmap_pbc.rst7'))
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+    tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
 
 # Make sure all precisions are double
 for i in range(mm.Platform.getNumPlatforms()):
@@ -143,6 +144,49 @@ class TestAmberParm(unittest.TestCase):
                     self.assertRelativeEqual(x1, x2, places=3)
                 else:
                     self.assertAlmostEqual(x1, x2, delta=5e-4)
+
+    def testEPEnergy2(self):
+        """ Tests AmberParm handling of extra points in TIP5P water """
+        parm = tip5p_system
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 0)
+        self.assertAlmostEqual(energies['dihedral'], 0)
+        self.assertRelativeEqual(energies['nonbond'], -2142.418956, places=4)
+        # Check that we have the correct number of virtual sites
+        nvirt = 0
+        for i in range(system.getNumParticles()):
+            nvirt += system.isVirtualSite(i)
+        self.assertEqual(parm.ptr('NUMEXTRA'), nvirt)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        pstate = sim.context.getState(getForces=True)
+        sstate = mm.XmlSerializer.deserialize(
+                open(utils.get_saved_fn('tip5pforces.xml'), 'r').read()
+        )
+        pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        i = 0
+        for p, s in zip(pf, sf):
+            if system.isVirtualSite(i):
+                i += 1
+                continue # Skip forces on virtual sites
+            for x1, x2 in zip(p, s):
+                # Compare large forces relatively and small ones absolutely
+                if abs(x1) > 1 or abs(x2) > 1:
+                    self.assertRelativeEqual(x1, x2, places=3)
+                else:
+                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+            i += 1
 
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """

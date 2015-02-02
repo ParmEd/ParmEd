@@ -21,22 +21,16 @@ from __future__ import division
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    from chemistry.charmm.openmmloader import (
-                OpenMMCharmmCrdFile as CharmmCrdFile,
-                OpenMMCharmmRstFile as CharmmRstFile,
-    )
-    from chemistry.amber.openmmloader import OpenMMRst7 as Rst7
     PDBFile = app.PDBFile
     has_openmm = True
 except ImportError:
-    from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
-    from chemistry.amber.readparm import Rst7
     # To prevent NameError's
     def PDBFile(*args, **kwargs): return None
     has_openmm = False
 
-from chemistry.charmm.psf import CharmmPsfFile
-from chemistry.charmm.parameters import CharmmParameterSet
+from chemistry.amber.readparm import Rst7
+from chemistry.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+                              CharmmParameterSet)
 from chemistry.exceptions import CharmmPSFWarning
 from chemistry import unit as u
 from copy import copy

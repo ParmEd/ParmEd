@@ -1901,7 +1901,7 @@ class Rst7(object):
         # Now write the coordinates
         f.coordinates = self.coordinates
         if self.hasvels:
-            f.vels = self.vels
+            f.velocities = self.vels
         if self.hasbox:
             f.box = self.box
         f.close()
