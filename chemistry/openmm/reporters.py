@@ -606,7 +606,7 @@ class RestartReporter(object):
             for i in xrange(self.atom):
                 i3 = i*3
                 flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
-            self.rst7.velocities = flatvel
+            self.rst7.vels = flatvel
 
         if self.uses_pbc:
             boxvecs = state.getPeriodicBoxVectors()
