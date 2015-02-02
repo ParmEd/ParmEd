@@ -3502,6 +3502,7 @@ class TrackedList(list):
 
     append = _changes(list.append)
     extend = _changes(list.extend)
+    insert = _changes(list.insert)
     __setitem__ = _changes(list.__setitem__)
     __iadd__ = _changes(list.__iadd__)
     __imul__ = _changes(list.__imul__)
