@@ -314,7 +314,7 @@ class PdbxReader(object):
 
             (category name, attribute name, quoted strings, words w/o quotes or white space)
 
-            Differentiated the reqular expression to the better handle embedded quotes.
+            Differentiated the regular expression to the better handle embedded quotes.
 
         """
         #

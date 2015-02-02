@@ -32,6 +32,7 @@ from chemistry.exceptions import (PDBError, PDBWarning, AnisouWarning,
         ChemError, MissingParameter, MissingParameterWarning)
 from chemistry.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
+from chemistry.pdbx import PdbxReader, PdbxWriter, containers
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.residue import WATER_NAMES
 from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
@@ -2301,7 +2302,7 @@ def read_PDB(filename):
     year : int=None
         Year that the article was published, from the JRNL record
     related_entries : list of (str, str)
-        List of entries in other databases 
+        List of entries in other databases
 
     Returns
     -------
@@ -2696,3 +2697,144 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
     struct.write_pdb(dest, renumber, coordinates, altlocs, write_anisou, charmm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def read_CIF(filename):
+    """
+    Read a PDBx or mmCIF file and return a populated `Structure` class
+
+    Parameters
+    ----------
+    filename : str or file-like
+        Name of PDB file to read, or a file-like object that can iterate over
+        the lines of a PDB. Compressed file names can be specified and are
+        determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)
+
+    Metadata
+    --------
+    The PDB parser also adds metadata to the returned Structure object that may
+    be present in the PDB file
+
+    experimental : str
+        EXPDTA record
+    journal : str
+        JRNL record
+    authors : str
+        AUTHOR records
+    keywords : str
+        KEYWDS records
+    doi : str
+        DOI from the JRNL record
+    pmid : str
+        PMID from the JRNL record
+    journal_authors : str
+        Author info from the JRNL record
+    volume : str
+        Volume of the published article from the JRNL record
+    page : str
+        Page of the published article from the JRNL record
+    title : str
+        TITL section of the JRNL record
+    year : int=None
+        Year that the article was published, from the JRNL record
+    related_entries : list of (str, str)
+        List of entries in other databases
+
+    Returns
+    -------
+    structure1 [, structure2 [, structure3 [, ...] ] ]
+
+    structure# : Structure
+        The Structure object initialized with all of the information from the
+        PDBx/mmCIF file.  No bonds or other topological features are added by
+        default. If multiple structures are defined in the CIF file, multiple
+        Structure instances will be returned as a tuple.
+
+    Notes
+    -----
+    The returned structure has an extra attribute, pdbxyz, that contains all of
+    the coordinates for all of the frames in the PDB file as a list of NATOM*3
+    lists.
+    """
+    if isinstance(filename, basestring):
+        own_handle = True
+        if filename.endswith('.gz'):
+            if gzip is None:
+                raise ImportError('gzip is not available for compressed PDB')
+            fileobj = gzip.open(filename, 'r')
+        elif filename.endswith('.bz2'):
+            if bz2 is None:
+                raise ImportError('bz2 is not available for compressed PDB')
+            fileobj = bz2.BZ2File(filename, 'r')
+        else:
+            fileobj = open(filename, 'r')
+    else:
+        own_handle = False
+        fileobj = filename
+
+    try:
+        cifobj = PdbxReader(fileobj)
+        data = []
+        cifobj.read(data)
+    finally:
+        if own_handle: fileobj.close()
+
+    structures = []
+    for cont in data:
+        struct = Structure()
+        structures.append(struct)
+
+        # Now we have the data. First get the metadata if it exists
+        exptl = cont.getObj('exptl')
+        if exptl is not None:
+            struct.experimental = exptl.getValue('method')
+        auth = cont.getObj('audit_author')
+        if auth is not None:
+            nameidx = auth.getAttributeIndex('name')
+            if nameidx != -1:
+                struct.author = ', '.join([t[nameidx] for t in
+                                           auth.getRowList()])
+        cite = cont.getObj('citation_author')
+        if cite is not None:
+            nameidx = cite.getAttributeIndex('name')
+            if nameidx != -1:
+                for i in xrange(cite.getRowCount()):
+                    a = cite.getRow(i)[nameidx]
+                    if a not in journal_authors:
+                        journal_authors.append(a)
+                struct.journal_authors = ', '.join(journal_authors)
+        cite = cont.getObj('citation')
+        if cite is not None:
+            doiid = cite.getAttributeIndex('pdbx_database_id_DOI')
+            pmiid = cite.getAttributeIndex('pdbx_database_id_PubMed')
+            jrnlid = cite.getAttributeIndex('title')
+            yearid = cite.getAttributeIndex('year')
+            pageid = cite.getAttributeIndex('page_first')
+            rows = cite.getRowList()
+            if doiid != -1:
+                struct.doi = ', '.join([row[doiid] for row in rows])
+            if pmiid != -1:
+                struct.pmid = ', '.join([row[pmiid] for row in rows])
+            if jrnlid != -1:
+                struct.journal = '; '.join([row[jrnlid] for row in rows])
+            if yearid != -1:
+                struct.year = ', '.join([row[yearid] for row in rows])
+            if pageid != -1:
+                struct.page = ', '.join([row[pageid] for row in rows])
+        keywds = cont.getObj('struct_keywords')
+        if keywds is not None:
+            textid = keywds.getAttributeIndex('text')
+            if textid != -1:
+                rows = keywds.getRowList()
+                struct.keywords = ', '.join([row[textid] for row in rows])
+        dbase = cont.getObj('pdbx_database_related')
+        if dbase is not None:
+            dbid = dbase.getAttributeIndex('db_id')
+            nameid = dbase.getAttributeIndex('db_name')
+            if dbid != -1 and nameid != -1:
+                rows = dbase.getRowList()
+                struct.related_entries = [(r[db_id], r[name]) for r in rows]
+
+    # Build the return value
+    if len(structures) == 1:
+        return structures[0]
+    return tuple(structures)
