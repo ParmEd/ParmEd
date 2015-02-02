@@ -32,13 +32,13 @@ if has_openmm:
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
     tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
 
-# Make sure all precisions are double
-for i in range(mm.Platform.getNumPlatforms()):
-    plat = mm.Platform.getPlatform(i)
-    if plat.getName() == 'CUDA':
-        plat.setPropertyDefaultValue('CudaPrecision', 'double')
-    if plat.getName() == 'OpenCL':
-        plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
+    # Make sure all precisions are double
+    for i in range(mm.Platform.getNumPlatforms()):
+        plat = mm.Platform.getPlatform(i)
+        if plat.getName() == 'CUDA':
+            plat.setPropertyDefaultValue('CudaPrecision', 'double')
+        if plat.getName() == 'OpenCL':
+            plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
 
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
