@@ -119,3 +119,16 @@ class AnisouWarning(ChemWarning):
 
 class MissingParameterWarning(ChemWarning):
     """ If a type of parameter is missing, but you don't want it to be fatal """
+
+class PdbxError(ChemError):
+    """ Class for catching general errors with PDBx/mmCIF parsing """
+
+class PdbxSyntaxError(ChemError):
+    """ Class for catching errors in mmCIF/PDBx syntax """
+    def __init__(self, lineNumber, text):
+        Exception.__init__(self)
+        self.lineNumber = lineNumber
+        self.text = text
+
+    def __str__(self):
+        return "%%ERROR - [at line: %d] %s" % (self.lineNumber, self.text)
