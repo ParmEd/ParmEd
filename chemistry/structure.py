@@ -366,7 +366,7 @@ class Structure(object):
         if not self.atoms or last_atom is self.atoms[-1]:
             self.atoms.append(atom)
         else:
-            self.atoms.insert(last_atom.idx + 1)
+            self.atoms.insert(last_atom.idx + 1, atom)
 
     #===================================================
 

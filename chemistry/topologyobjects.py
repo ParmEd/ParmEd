@@ -3714,6 +3714,22 @@ class AtomList(TrackedList):
             item.list = self
         return list.extend(self, items)
 
+    @_changes
+    def insert(self, idx, item):
+        """
+        Insert an Atom into the atom list
+
+        Parameters
+        ----------
+        idx : int
+            The index in front of (i.e., before) which to insert the item
+        item : Atom
+            The atom to insert in the desired index. This atom will be claimed
+            by the AtomList
+        """
+        item.list = self
+        return list.insert(self, idx, item)
+
     def assign_nbidx_from_types(self):
         """
         Assigns the nb_idx attribute of every atom inside here from the

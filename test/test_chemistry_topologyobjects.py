@@ -730,9 +730,10 @@ class TestTopologyObjects(unittest.TestCase):
         """ Tests the AtomList class """
         atoms = AtomList()
         res = Residue('ALA')
-        atoms.extend([Atom(list=atoms) for i in range(15)])
+        atoms.extend([Atom() for i in range(15)])
         for atom in atoms:
             res.add_atom(atom)
+            self.assertIs(atom.list, atoms)
         # Test the indexing
         for i, atom in enumerate(atoms):
             self.assertEqual(atom.idx, i)
@@ -746,6 +747,24 @@ class TestTopologyObjects(unittest.TestCase):
         for i, atom in enumerate(atoms):
             self.assertEqual(atom.idx, i)
             self.assertIs(atom.residue, None)
+        atoms.changed = False
+        # Tests the insertion
+        atoms.insert(2, Atom(name='TOK'))
+        self.assertTrue(atoms.changed)
+        self.assertEqual(len(atoms), 16)
+        for i, atom in enumerate(atoms):
+            self.assertEqual(atom.idx, i)
+            self.assertIs(atom.list, atoms)
+        self.assertEqual(atoms[2].name, 'TOK')
+        atoms.changed = False
+        # Tests appending
+        atoms.append(Atom(name='TOK2'))
+        self.assertTrue(atoms.changed)
+        self.assertEqual(len(atoms), 17)
+        for i, atom in enumerate(atoms):
+            self.assertEqual(atom.idx, i)
+        self.assertEqual(atoms[2].name, 'TOK')
+        self.assertEqual(atoms[-1].name, 'TOK2')
 
     #=============================================
 
