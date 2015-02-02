@@ -309,6 +309,67 @@ class Structure(object):
 
     #===================================================
 
+    def add_atom(self, atom, resname, resnum, chain='', inscode=''):
+        """
+        Adds a new atom to the Structure, adding a new residue to `residues` if
+        it has a different name or number as the last residue added and adding
+        it to the `atoms` list.
+
+        Parameters
+        ----------
+        atom : Atom
+            The atom to add to this residue list
+        resname : str
+            The name of the residue this atom belongs to
+        resnum : int
+            The number of the residue this atom belongs to
+        chain : str=''
+            The chain ID character for this residue
+        inscode : str=''
+            The insertion code ID character for this residue (it is stripped)
+
+        Notes
+        -----
+        If the residue name and number differ from the last residue in this
+        list, a new residue is added and the atom is added to that residue
+        """
+        self.residues.add_atom(atom, resname, resnum, chain, inscode)
+        self.atoms.append(atom)
+
+    #===================================================
+
+    def add_atom_to_residue(self, atom, residue):
+        """
+        Adds a new atom to the Structure at the end if the given residue
+
+        Parameters
+        ----------
+        atom : Atom
+            The atom to add to the system
+        residue : Residue
+            The residue to which to add this atom. It MUST be part of this
+            Structure instance already or a ValueError is raised
+
+        Notes
+        -----
+        This atom is added at the end of the residue and is inserted into the
+        `atoms` list in such a way that all residues are composed of atoms
+        contiguous in the atoms list. For large systems, this may be a
+        relatively expensive operation
+        """
+        # Make sure residue belongs to this list
+        if residue.list is not self.residues:
+            raise ValueError('Residue is not part of the structure')
+        last_atom = residue.atoms[-1]
+        residue.add_atom(atom)
+        # Special-case if this is going to be the last atom
+        if not self.atoms or last_atom is self.atoms[-1]:
+            self.atoms.append(atom)
+        else:
+            self.atoms.insert(last_atom.idx + 1, atom)
+
+    #===================================================
+
     def __copy__(self):
         """ A deep copy of the Structure """
         return self.copy(type(self))
@@ -339,9 +400,7 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy.copy(atom)
-            c.residues.add_atom(a, res.name, res.number, res.chain,
-                                res.insertion_code)
-            c.atoms.append(a)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(BondType(bt.k, bt.req, c.bond_types))
@@ -2441,9 +2500,7 @@ def read_PDB(filename):
                     continue
                 last_atom = last_atom_added = atom
                 if modelno == 1:
-                    struct.residues.add_atom(atom, resname, resid,
-                                             chain, inscode)
-                    struct.atoms.append(atom)
+                    struct.add_atom(atom, resname, resid, chain, inscode)
                 else:
                     try:
                         orig_atom = struct.atoms[atomno-1]

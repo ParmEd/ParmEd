@@ -3502,6 +3502,7 @@ class TrackedList(list):
 
     append = _changes(list.append)
     extend = _changes(list.extend)
+    insert = _changes(list.insert)
     __setitem__ = _changes(list.__setitem__)
     __iadd__ = _changes(list.__iadd__)
     __imul__ = _changes(list.__imul__)
@@ -3712,6 +3713,22 @@ class AtomList(TrackedList):
         for item in items:
             item.list = self
         return list.extend(self, items)
+
+    @_changes
+    def insert(self, idx, item):
+        """
+        Insert an Atom into the atom list
+
+        Parameters
+        ----------
+        idx : int
+            The index in front of (i.e., before) which to insert the item
+        item : Atom
+            The atom to insert in the desired index. This atom will be claimed
+            by the AtomList
+        """
+        item.list = self
+        return list.insert(self, idx, item)
 
     def assign_nbidx_from_types(self):
         """
