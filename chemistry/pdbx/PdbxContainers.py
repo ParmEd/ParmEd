@@ -520,7 +520,6 @@ class DataCategory(DataCategoryBase):
         self.__currentRowIndex = 0
         self.__currentAttribute=attributeName
         self.appendAttribute(attributeName)
-        currentRowIndex=self.__currentRowIndex
         #
         ind=self._attributeNameList.index(attributeName)
         if len(self._rowList) == 0:
@@ -535,7 +534,6 @@ class DataCategory(DataCategoryBase):
                 row[ind]=None
             exec method.getInline()
             self.__currentRowIndex+=1
-            currentRowIndex=self.__currentRowIndex
 
     def invokeCategoryMethod(self,type,method,db):
         self.__currentRowIndex = 0
