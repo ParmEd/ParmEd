@@ -114,6 +114,11 @@ class PdbxWriterTests(unittest.TestCase):
         if not os.path.exists(get_fn('writes')):
             os.makedirs(get_fn('writes'))
 
+    def tearDown(self):
+        if os.path.exists(get_fn('writes')):
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+
     def testWriteDataFile(self): 
         """ Test writing CIF file """
         myDataList=[]
