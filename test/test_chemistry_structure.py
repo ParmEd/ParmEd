@@ -488,7 +488,5 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
 
-del TestChemistryPDBStructure
-
 if __name__ == '__main__':
     unittest.main()
