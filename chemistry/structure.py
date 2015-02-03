@@ -2791,12 +2791,13 @@ def read_CIF(filename):
         if auth is not None:
             nameidx = auth.getAttributeIndex('name')
             if nameidx != -1:
-                struct.author = ', '.join([t[nameidx] for t in
+                struct.authors = ', '.join([t[nameidx] for t in
                                            auth.getRowList()])
         cite = cont.getObj('citation_author')
         if cite is not None:
             nameidx = cite.getAttributeIndex('name')
             if nameidx != -1:
+                journal_authors = []
                 for i in xrange(cite.getRowCount()):
                     a = cite.getRow(i)[nameidx]
                     if a not in journal_authors:
@@ -2806,20 +2807,26 @@ def read_CIF(filename):
         if cite is not None:
             doiid = cite.getAttributeIndex('pdbx_database_id_DOI')
             pmiid = cite.getAttributeIndex('pdbx_database_id_PubMed')
-            jrnlid = cite.getAttributeIndex('title')
+            titlid = cite.getAttributeIndex('title')
             yearid = cite.getAttributeIndex('year')
             pageid = cite.getAttributeIndex('page_first')
+            jrnlid = cite.getAttributeIndex('journal_abbrev')
+            volid = cite.getAttributeIndex('journal_volume')
             rows = cite.getRowList()
             if doiid != -1:
                 struct.doi = ', '.join([row[doiid] for row in rows])
             if pmiid != -1:
                 struct.pmid = ', '.join([row[pmiid] for row in rows])
-            if jrnlid != -1:
-                struct.journal = '; '.join([row[jrnlid] for row in rows])
+            if titlid != -1:
+                struct.title = '; '.join([row[titlid] for row in rows])
             if yearid != -1:
                 struct.year = ', '.join([row[yearid] for row in rows])
             if pageid != -1:
                 struct.page = ', '.join([row[pageid] for row in rows])
+            if jrnlid != -1:
+                struct.journal = '; '.join([row[jrnlid] for row in rows])
+            if volid != -1:
+                struct.volume = '; '.join([row[volid] for row in rows])
         keywds = cont.getObj('struct_keywords')
         if keywds is not None:
             textid = keywds.getAttributeIndex('text')
@@ -2832,7 +2839,107 @@ def read_CIF(filename):
             nameid = dbase.getAttributeIndex('db_name')
             if dbid != -1 and nameid != -1:
                 rows = dbase.getRowList()
-                struct.related_entries = [(r[db_id], r[name]) for r in rows]
+                struct.related_entries = [(r[dbid], r[nameid]) for r in rows]
+        # Now go through all of the atoms. Any items that do *not* exist are
+        # given an index of -1. So we append an empty string on the end of each
+        # row so that the default value for any un-specified value is the empty
+        # string. This avoids needing any conditionals inside the loop
+        atoms = cont.getObj('atom_site')
+        atnumid = atoms.getAttributeIndex('id')
+        elemid = atoms.getAttributeIndex('type_symbol')
+        atnameid = atoms.getAttributeIndex('label_atom_id')
+        altlocid = atoms.getAttributeIndex('label_alt_id')
+        resnameid = atoms.getAttributeIndex('auth_comp_id')
+        chainid = atoms.getAttributeIndex('auth_asym_id')
+        resnumid = atoms.getAttributeIndex('auth_seq_id')
+        inscodeid = atoms.getAttributeIndex('pdbx_PDB_ins_code')
+        xid = atoms.getAttributeIndex('Cartn_x')
+        yid = atoms.getAttributeIndex('Cartn_y')
+        zid = atoms.getAttributeIndex('Cartn_z')
+        occupid = atoms.getAttributeIndex('occupancy')
+        bfactorid = atoms.getAttributeIndex('B_iso_or_equiv')
+        chargeid = atoms.getAttributeIndex('pdbx_formal_charge')
+        modelid = atoms.getAttributeIndex('pdbx_PDB_model_num')
+        origmodel = None
+        lastmodel = None
+        xyz = []
+        for i in xrange(atoms.getRowCount()):
+            row = atoms.getRow() + ['']
+            atnum = int(row[atnumid])
+            elem = row[elemid]
+            atname = row[atnameid]
+            altloc = row[altlocid]
+            resname = row[resnameid]
+            chain = row[chainid]
+            resnum = int(row[resnumid])
+            inscode = row[inscodeid]
+            try:
+                model = int(row[modelid])
+            except ValueError:
+                model = 0
+            if origmodel is None:
+                origmodel = lastmodel = model
+            x, y, z = float(row[xid]), float(row[yid]), float(row[zid])
+            try:
+                occup = float(row[occupid])
+            except ValueError:
+                occup = 0.0
+            try:
+                bfactor = float(row[bfactorid])
+            except ValueError:
+                bfactor = 0.0
+            charge = row[chargeid]
+            # Try to figure out the element
+            elem = '%-2s' % elem # Make sure we have at least 2 characters
+            if elem[0] == ' ': elem = elem[1] + ' '
+            try:
+                atsym = (elem[0] + elem[1].lower()).strip()
+                atomic_number = AtomicNum[atsym]
+                mass = Mass[atsym]
+            except KeyError:
+                # Now try based on the atom name... but don't try too hard
+                # (e.g., don't try to differentiate b/w Ca and C)
+                try:
+                    atomic_number = AtomicNum[atname.strip()[0].upper()]
+                    mass = Mass[atname.strip()[0].upper()]
+                except KeyError:
+                    try:
+                        sym = atname.strip()[:2]
+                        sym = '%s%s' % (sym[0].upper(), sym[0].lower())
+                        atomic_number = AtomicNum[sym]
+                        mass = Mass[sym]
+                    except KeyError:
+                        atomic_number = 0 # give up
+                        mass = 0.0
+            if model == lastmodel:
+                # We are cycling to our past model
+                xyz.extend([x, y, z])
+            else:
+                if lastmodel == origmodel:
+                    struct.pdbxyz = [xyz]
+                else:
+                    if len(xyz) != len(struct.atoms) * 3:
+                        raise ValueError('Corrupt CIF; all models must have '
+                                         'the same atoms')
+                    struct.pdbxyz.append(xyz)
+                xyz = []
+            if model != origmodel:
+                # Only add atoms for the original model
+                continue
+            if atname.startswith('EP') or atname.startswith('LP'):
+                atom = ExtraPoint(atomic_number=atomic_number, name=atname,
+                                  charge=charge, mass=mass, occupancy=occup,
+                                  bfactor=bfactor, altloc=altloc, number=atnum)
+            else:
+                atom = Atom(atomic_number=atomic_number, name=atname,
+                            charge=charge, mass=mass, occupancy=occup,
+                            bfactor=bfactor, altloc=altloc, number=atnum)
+            struct.add_atom(atom, resname, resnum, chain, inscode)
+        if xyz:
+            if len(xyz) != len(struct.atoms) * 3:
+                raise ValueError('Corrupt CIF; all models must ahve the same '
+                                 'atoms')
+            struct.pdbxyz.append(xyz)
 
     # Build the return value
     if len(structures) == 1:
