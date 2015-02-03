@@ -399,6 +399,13 @@ class TestChemistryCIFStructure(unittest.TestCase):
             # CIF file.
             if a2.residue.ter and a2 is a2.residue.atoms[-1]:
                 nextra += 1
+        # Check the unit cell info
+        self.assertEqual(cif.box[0], 27.240)
+        self.assertEqual(cif.box[1], 31.870)
+        self.assertEqual(cif.box[2], 34.230)
+        self.assertEqual(cif.box[3], 88.520)
+        self.assertEqual(cif.box[4], 108.53)
+        self.assertEqual(cif.box[5], 111.89)
         # Check the metadata now
         self.assertEqual(cif.experimental, 'X-RAY DIFFRACTION')
         self.assertEqual(cif.authors,
