@@ -112,7 +112,7 @@ class PdbxWriterTests(unittest.TestCase):
         self.pathPdbxDataFile = get_fn("1kip.cif")
         self.pathOutputFile = get_fn("testOutputDataFile.cif", written=True)
         if not os.path.exists(get_fn('writes')):
-            os.mkdirs(get_fn('writes'))
+            os.makedirs(get_fn('writes'))
 
     def testWriteDataFile(self): 
         """ Test writing CIF file """
