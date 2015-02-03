@@ -2949,6 +2949,24 @@ def read_CIF(filename):
             if model == origmodel:
                 key = (resnum,resname,inscode,chain,atnum,altloc,atname)
                 atommap[key] = atom
+        # Check for unit cell parameters
+        cell = cont.getObj('cell')
+        if cell is not None:
+            aid = cell.getAttributeIndex('length_a')
+            bid = cell.getAttributeIndex('length_b')
+            cid = cell.getAttributeIndex('length_c')
+            alphaid = cell.getAttributeIndex('angle_alpha')
+            betaid = cell.getAttributeIndex('angle_beta')
+            gammaid = cell.getAttributeIndex('angle_gamma')
+            spaceid = cell.getAttributeIndex('space_group_name_H-M')
+            row = cell.getRow(0)
+            struct.box = create_array(
+                    [float(row[aid]), float(row[bid]), float(row[cid]),
+                     float(row[alphaid]), float(row[betaid]),
+                     float(row[gammaid])]
+            )
+            if spaceid != -1:
+                struct.space_group = row[spaceid]
         # Check for anisotropic B-factors
         anisou = cont.getObj('atom_site_anisotrop')
         if anisou is not None:
@@ -2969,7 +2987,6 @@ def read_CIF(filename):
                       u11id, u22id, u33id, u12id, u13id, u23id):
                 warnings.warn('Incomplete anisotropic B-factor CIF section. '
                               'Skipping')
-                raise RuntimeError('Bad ANISOU')
             else:
                 try:
                     for i in xrange(anisou.getRowCount()):
@@ -2999,8 +3016,6 @@ def read_CIF(filename):
                         atom.anisou = None
                     warnings.warn('Problem processing anisotropic B-factors. '
                                   'Skipping')
-                    print i
-                    raise
         if xyz:
             if len(xyz) != len(struct.atoms) * 3:
                 print len(xyz), len(struct.atoms)
