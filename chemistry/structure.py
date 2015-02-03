@@ -940,6 +940,217 @@ class Structure(object):
 
     #===================================================
 
+    def write_cif(self, dest, renumber=True, coordinates=None,
+                  altlocs='all', write_anisou=False):
+        """
+        Write a PDB file from the current Structure instance
+
+        Parameters
+        ----------
+        dest : str or file-like
+            Either a file name or a file-like object containing a `write`
+            method to which to write the PDB file. If it is a filename that
+            ends with .gz or .bz2, a compressed version will be written using
+            either gzip or bzip2, respectively.
+        renumber : bool=True
+            If True, renumber the atoms and residues sequentially as they are
+            stored in the structure.  If False, use the original numbering if
+            it was assigned previously
+        coordinates : array-like of float=None
+            If provided, these coordinates will be written to the PDB file
+            instead of the coordinates stored in the structure. These
+            coordinates should line up with the atom order in the structure
+            (not necessarily the order of the "original" PDB file if they
+            differ)
+        altlocs : str='all'
+            Keyword controlling which alternate locations are printed to the
+            resulting PDB file. Allowable options are:
+                - 'all' : (default) print all alternate locations
+                - 'first' : print only the first alternate locations
+                - 'occupancy' : print the one with the largest occupancy. If two
+                  conformers have the same occupancy, the first one to occur is
+                  printed
+            Input is case-insensitive, and partial strings are permitted as long
+            as it is a substring of one of the above options that uniquely
+            identifies the choice.
+        write_anisou : bool=False
+            If True, an ANISOU record is written for every atom that has one. If
+            False, ANISOU records are not written
+        """
+        if altlocs.lower() == 'all'[:len(altlocs)]:
+            altlocs = 'all'
+        elif altlocs.lower() == 'first'[:len(altlocs)]:
+            altlocs = 'first'
+        elif altlocs.lower() == 'occupancy'[:len(altlocs)]:
+            altlocs = 'occupancy'
+        else:
+            raise ValueError("Illegal value of occupancy [%s]; expected 'all', "
+                             "'first', or 'occupancy'" % altlocs)
+        own_handle = False
+        if not hasattr(dest, 'write'):
+            if dest.endswith('.gz'):
+                dest = gzip.open(dest, 'w')
+            elif dest.endswith('.bz2'):
+                dest = bz2.BZ2File(dest, 'w')
+            else:
+                dest = open(dest, 'w')
+            own_handle = True
+        # Make the main container
+        cont = containers.DataContainer('cell')
+        # Add cell info if applicable
+        if self.box is not None:
+            cell = containers.DataCategory('cell')
+            cell.appendAttribute('length_a')
+            cell.appendAttribute('length_b')
+            cell.appendAttribute('length_c')
+            cell.appendAttribute('angle_alpha')
+            cell.appendAttribute('angle_beta')
+            cell.appendAttribute('angle_gamma')
+            cell.append(self.box[:])
+            cont.append(cell)
+        if coordinates is not None:
+            try:
+                crdsize = len(coordinates)
+            except TypeError:
+                raise TypeError("Cannot find length of coordinates")
+            if crdsize == len(self.atoms):
+                try:
+                    coords = coordinates.flatten()
+                except AttributeError:
+                    try:
+                        coords = list(itertools.chain(*coordinates))
+                    except TypeError:
+                        raise TypeError("Unsupported coordinate dimensionality")
+                if len(coords) != len(self.atoms) * 3:
+                    raise TypeError("Unsupported coordinate shape")
+            elif crdsize == len(self.atoms) * 3:
+                coords = coordinates
+            else:
+                raise TypeError("Coordinates has unexpected shape")
+        else:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+            coords = list(itertools.chain(*coords))
+        # Create a function to process each atom and return which one we want
+        # to print, based on our alternate location choice
+        if altlocs == 'all':
+            def print_atoms(atom, coords):
+                i3 = atom.idx * 3
+                return atom, atom.other_locations, coords[i3:i3+3]
+        elif altlocs == 'first':
+            def print_atoms(atom, coords):
+                i3 = atom.idx * 3
+                return atom, dict(), coords[i3:i3+3]
+        elif altlocs == 'occupancy':
+            def print_atoms(atom, coords):
+                occ = atom.occupancy
+                a = atom
+                for key, item in atom.other_locations.iteritems():
+                    if item.occupancy > occ:
+                        occ = item.occupancy
+                        a = item
+                return a, dict(), [a.xx, a.xy, a.xz]
+        else:
+            raise Exception("Should not be here!")
+        # Now add the atom section. Include all names that the CIF standard
+        # usually includes, but put '?' in sections that contain data we don't
+        # store in the Structure, Residue, or Atom classes
+        cifatoms = containers.DataCategory('atom_site')
+        cont.append(cifatoms)
+        cifatoms.setAttributeList(
+                ['group_PDB', 'id', 'type_symbol', 'label_atom_id',
+                 'label_alt_id', 'label_comp_id', 'label_asym_id',
+                 'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code',
+                 'Cartn_x', 'Cartn_y', 'Cartn_z', 'occupancy', 'B_iso_or_equiv',
+                 'Cartn_x_esd', 'Cartn_y_esd', 'Cartn_z_esd', 'occupancy_esd',
+                 'B_iso_or_equiv_esd', 'pdbx_formal_charge', 'auth_seq_id',
+                 'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
+                 'pdbx_PDB_model_num']
+        )
+        # Generator expression here instead of list comp, since the generator
+        # need only execute until the first True (no point in wasting the time
+        # or space creating the entire list just to see if one is True...)
+        write_anisou = write_anisou and any(atom.anisou is not None
+                                            for atom in self.atoms)
+        if write_anisou:
+            cifanisou = containers.DataCategory('atom_site_anisotrop')
+            cont.append(cifanisou)
+            cifanisou.setAttributeList(
+                    ['id', 'type_symbol', 'pdbx_label_atom_id',
+                    'pdbx_label_alt_id', 'pdbx_label_comp_id',
+                    'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]',
+                    'U[2][2]', 'U[3][3]', 'U[1][2]', 'U[1][3]', 'U[2][3]',
+                    'U[1][1]_esd', 'U[2][2]_esd', 'U[3][3]_esd', 'U[1][2]_esd',
+                    'U[1][3]_esd', 'U[2][3]_esd', 'pdbx_auth_seq_id',
+                    'pdbx_auth_comp_id', 'pdbx_auth_asym_id',
+                    'pdbx_auth_atom_id']
+            )
+        nmore = 0 # how many *extra* atoms have been added?
+        last_number = 0
+        last_rnumber = 0
+        for res in self.residues:
+            if renumber:
+                atoms = res.atoms
+            else:
+                atoms = sorted(res.atoms, key=lambda atom: atom.number)
+            for atom in atoms:
+                pa, others, (x, y, z) = print_atoms(atom, coords)
+                # Figure out the serial numbers we want to print
+                if renumber:
+                    anum = (atom.idx + 1 + nmore)
+                    rnum = (res.idx + 1)
+                else:
+                    anum = (pa.number or last_number + 1)
+                    rnum = (atom.residue.number or last_rnumber + 1)
+                last_number = anum
+                last_rnumber = rnum
+                cifatoms.append(
+                        ['ATOM', anum, Element[pa.atomic_number].upper(), '?',
+                         pa.altloc, '?', '?', '?', '?', res.insertion_code, x,
+                         y, z, pa.occupancy, pa.bfactor, '?', '?', '?', '?',
+                         '?', '', rnum, res.name, res.chain, pa.name, '1']
+                )
+                if write_anisou and pa.anisou is not None:
+                    cifanisou.append(
+                            [anum, Element[pa.atomic_number].upper(), '?', '?',
+                             pa.altloc, '?', '?', '?', pa.anisou[0],
+                             pa.anisou[1], pa.anisou[2], pa.anisou[3],
+                             pa.anisou[4], pa.anisou[5], '?', '?', '?', '?',
+                             '?', '?', rnum, res.name, res.chain, pa.name]
+                    )
+                for key in sorted(others.keys()):
+                    oatom = others[key]
+                    x, y, z = oatom.xx, oatom.xy, oatom.xz
+                    if renumber:
+                        nmore += 1
+                        anum = (pa.idx + 1 + nmore)
+                    else:
+                        anum = oatom.number or last_number + 1
+                    last_number = anum
+                    cifatoms.append(
+                            ['ATOM', anum, Element[oatom.atomic_number].upper(),
+                             '?', oatom.altloc, '?', '?', '?', '?',
+                             res.insertion_code, x, y, z, oatom.occupancy,
+                             oatom.bfactor, '?', '?', '?', '?', '?', '',
+                             rnum, res.name, res.chain, oatom.name, '1']
+                    )
+                    if write_anisou and oatom.anisou is not None:
+                        cifanisou.append(
+                                [anum, Element[oatom.atomic_number].upper(),
+                                 '?', '?', oatom.altloc, '?', '?', '?',
+                                 oatom.anisou[0], oatom.anisou[1],
+                                 oatom.anisou[2], oatom.anisou[3],
+                                 oatom.anisou[4], oatom.anisou[5], '?', '?',
+                                 '?', '?', '?', '?', rnum, res.name, res.chain,
+                                 oatom.name]
+                        )
+        # Now write the PDBx file
+        writer = PdbxWriter(dest)
+        writer.write([cont])
+        if own_handle:
+            dest.close()
+
+    #===================================================
+
     @property
     @needs_openmm
     def topology(self):
