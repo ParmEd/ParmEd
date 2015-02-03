@@ -25,7 +25,7 @@ def reset_stringio(io):
     io.truncate()
     return io
 
-class TestChemistryStructure(unittest.TestCase):
+class TestChemistryPDBStructure(unittest.TestCase):
     
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
@@ -372,6 +372,58 @@ class TestChemistryStructure(unittest.TestCase):
             else:
                 self.assertFalse(residue.ter)
 
+class TestChemistryCIFStructure(unittest.TestCase):
+
+    def setUp(self):
+        self.lztpdb = get_fn('4lzt.pdb')
+        self.lzt = get_fn('4LZT.cif')
+        self.largecif = get_fn('1ffk.cif')
+
+    def test4LZT(self):
+        """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
+        cif = structure.read_CIF(self.lzt)
+        pdb = structure.read_PDB(self.lztpdb)
+        self.assertEqual(len(cif.atoms), len(pdb.atoms))
+        nextra = 0
+        for a1, a2 in zip(cif.atoms, pdb.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.number + nextra, a2.number)
+            self.assertEqual(len(a1.anisou), len(a2.anisou))
+            for x, y in zip(a1.anisou, a2.anisou):
+                self.assertEqual(x, y)
+            self.assertEqual(a1.altloc, a2.altloc)
+            self.assertEqual(len(a1.other_locations), len(a2.other_locations))
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.number, a2.residue.number)
+            # TER cards consume a serial number in the PDB file, but *not* in a
+            # CIF file.
+            if a2.residue.ter and a2 is a2.residue.atoms[-1]:
+                nextra += 1
+        # Check the metadata now
+        self.assertEqual(cif.experimental, 'X-RAY DIFFRACTION')
+        self.assertEqual(cif.authors,
+                'Walsh, M.A., Schneider, T., Sieker, L.C., Dauter, Z., '
+                'Lamzin, V., Wilson, K.S.')
+        self.assertEqual(cif.title,
+                'Refinement of triclinic hen egg-white lysozyme at atomic '
+                'resolution.; Refinement of Triclinic Lysozyme: I. Fourier '
+                'and Least-Squares Methods; Refinement of Triclinic Lysozyme: '
+                'II. The Method of Stereochemically Restrained Least Squares')
+        self.assertEqual(cif.journal,
+                'Acta Crystallogr.,Sect.D; Acta Crystallogr.,Sect.B; '
+                'Acta Crystallogr.,Sect.B')
+        self.assertEqual(cif.journal_authors,
+                'Walsh, M.A., Schneider, T.R., Sieker, L.C., Dauter, Z., '
+                'Lamzin, V.S., Wilson, K.S., Hodsdon, J.M., Brown, G.M., '
+                'Jensen, L.H., Ramanadham, M.')
+        self.assertEqual(cif.year, '1998, 1990, 1990')
+        self.assertEqual(cif.page, '522, 54, 63')
+        self.assertEqual(cif.keywords, ['HYDROLASE', 'O-GLYCOSYL',
+                                        'GLYCOSIDASE'])
+        self.assertEqual(cif.volume, '54, 46, 46')
+        self.assertEqual(cif.doi, '10.1107/S0907444997013656')
+        self.assertEqual(cif.pmid, '9761848')
+
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """
 
@@ -436,6 +488,7 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
 
+del TestChemistryPDBStructure
 
 if __name__ == '__main__':
     unittest.main()

@@ -2814,9 +2814,11 @@ def read_CIF(filename):
             volid = cite.getAttributeIndex('journal_volume')
             rows = cite.getRowList()
             if doiid != -1:
-                struct.doi = ', '.join([row[doiid] for row in rows])
+                struct.doi = ', '.join([row[doiid] for row in rows
+                                            if row[doiid] != '?'])
             if pmiid != -1:
-                struct.pmid = ', '.join([row[pmiid] for row in rows])
+                struct.pmid = ', '.join([row[pmiid] for row in rows
+                                            if row[pmiid] != '?'])
             if titlid != -1:
                 struct.title = '; '.join([row[titlid] for row in rows])
             if yearid != -1:
@@ -2826,13 +2828,15 @@ def read_CIF(filename):
             if jrnlid != -1:
                 struct.journal = '; '.join([row[jrnlid] for row in rows])
             if volid != -1:
-                struct.volume = '; '.join([row[volid] for row in rows])
+                struct.volume = ', '.join([row[volid] for row in rows])
         keywds = cont.getObj('struct_keywords')
         if keywds is not None:
             textid = keywds.getAttributeIndex('text')
             if textid != -1:
                 rows = keywds.getRowList()
                 struct.keywords = ', '.join([row[textid] for row in rows])
+                struct.keywords = [key.strip() for key in
+                        struct.keywords.split(',') if key.strip()]
         dbase = cont.getObj('pdbx_database_related')
         if dbase is not None:
             dbid = dbase.getAttributeIndex('db_id')
@@ -2863,16 +2867,20 @@ def read_CIF(filename):
         origmodel = None
         lastmodel = None
         xyz = []
+        atommap = dict()
+        last_atom = Atom()
         for i in xrange(atoms.getRowCount()):
-            row = atoms.getRow() + ['']
+            row = atoms.getRow(i) + ['']
             atnum = int(row[atnumid])
             elem = row[elemid]
             atname = row[atnameid]
             altloc = row[altlocid]
+            if altloc == '.': altloc = ''
             resname = row[resnameid]
             chain = row[chainid]
             resnum = int(row[resnumid])
             inscode = row[inscodeid]
+            if inscode == '?': inscode = ''
             try:
                 model = int(row[modelid])
             except ValueError:
@@ -2911,21 +2919,6 @@ def read_CIF(filename):
                     except KeyError:
                         atomic_number = 0 # give up
                         mass = 0.0
-            if model == lastmodel:
-                # We are cycling to our past model
-                xyz.extend([x, y, z])
-            else:
-                if lastmodel == origmodel:
-                    struct.pdbxyz = [xyz]
-                else:
-                    if len(xyz) != len(struct.atoms) * 3:
-                        raise ValueError('Corrupt CIF; all models must have '
-                                         'the same atoms')
-                    struct.pdbxyz.append(xyz)
-                xyz = []
-            if model != origmodel:
-                # Only add atoms for the original model
-                continue
             if atname.startswith('EP') or atname.startswith('LP'):
                 atom = ExtraPoint(atomic_number=atomic_number, name=atname,
                                   charge=charge, mass=mass, occupancy=occup,
@@ -2934,12 +2927,90 @@ def read_CIF(filename):
                 atom = Atom(atomic_number=atomic_number, name=atname,
                             charge=charge, mass=mass, occupancy=occup,
                             bfactor=bfactor, altloc=altloc, number=atnum)
-            struct.add_atom(atom, resname, resnum, chain, inscode)
+            atom.xx, atom.xy, atom.xz = x, y, z
+            if _compare_atoms(last_atom, atom, resname, resnum, chain):
+                atom.residue = last_atom.residue
+                last_atom.other_locations[altloc] = atom
+            else:
+                if model == origmodel:
+                    # Only add the atoms once
+                    struct.add_atom(atom, resname, resnum, chain, inscode)
+                last_atom = atom
+                if model == lastmodel:
+                    xyz.extend([x, y, z])
+                else:
+                    if lastmodel == origmodel:
+                        struct.pdbxyz = [xyz]
+                    else:
+                        struct.pdbxyz.append(xyz)
+                    xyz = []
+            # Keep a mapping in case we need to go back and add attributes, like
+            # anisotropic b-factors
+            if model == origmodel:
+                key = (resnum,resname,inscode,chain,atnum,altloc,atname)
+                atommap[key] = atom
+        # Check for anisotropic B-factors
+        anisou = cont.getObj('atom_site_anisotrop')
+        if anisou is not None:
+            atnumid = anisou.getAttributeIndex('id')
+            atnameid = anisou.getAttributeIndex('pdbx_auth_atom_id')
+            altlocid = anisou.getAttributeIndex('pdbx_label_alt_id')
+            resnameid = anisou.getAttributeIndex('pdbx_auth_comp_id')
+            chainid = anisou.getAttributeIndex('pdbx_auth_asym_id')
+            resnumid = anisou.getAttributeIndex('pdbx_auth_seq_id')
+            inscodeid = anisou.getAttributeIndex('pdbx_PDB_ins_code')
+            u11id = anisou.getAttributeIndex('U[1][1]')
+            u22id = anisou.getAttributeIndex('U[2][2]')
+            u33id = anisou.getAttributeIndex('U[3][3]')
+            u12id = anisou.getAttributeIndex('U[1][2]')
+            u13id = anisou.getAttributeIndex('U[1][3]')
+            u23id = anisou.getAttributeIndex('U[2][3]')
+            if -1 in (atnumid, atnameid, altlocid, resnameid, chainid, resnumid,
+                      u11id, u22id, u33id, u12id, u13id, u23id):
+                warnings.warn('Incomplete anisotropic B-factor CIF section. '
+                              'Skipping')
+                raise RuntimeError('Bad ANISOU')
+            else:
+                try:
+                    for i in xrange(anisou.getRowCount()):
+                        row = anisou.getRow(i) + ['']
+                        atnum = int(row[atnumid])
+                        atname = row[atnameid]
+                        altloc = row[altlocid]
+                        resname = row[resnameid]
+                        chain = row[chainid]
+                        resnum = int(row[resnumid])
+                        inscode = row[inscodeid]
+                        u11 = float(row[u11id])
+                        u22 = float(row[u22id])
+                        u33 = float(row[u33id])
+                        u12 = float(row[u12id])
+                        u13 = float(row[u13id])
+                        u23 = float(row[u23id])
+                        if altloc == '.': altloc = ''
+                        if inscode == '?': inscode = ''
+                        key = (resnum,resname,inscode,chain,atnum,altloc,atname)
+                        atommap[key].anisou = create_array(
+                                [u11, u22, u33, u12, u13, u23]
+                        )
+                except (ValueError, KeyError):
+                    # If at least one went wrong, set them all to None
+                    for key, atom in atommap.iteritems():
+                        atom.anisou = None
+                    warnings.warn('Problem processing anisotropic B-factors. '
+                                  'Skipping')
+                    print i
+                    raise
         if xyz:
             if len(xyz) != len(struct.atoms) * 3:
-                raise ValueError('Corrupt CIF; all models must ahve the same '
+                print len(xyz), len(struct.atoms)
+                raise ValueError('Corrupt CIF; all models must have the same '
                                  'atoms')
-            struct.pdbxyz.append(xyz)
+            try:
+                struct.pdbxyz.append(xyz)
+            except AttributeError:
+                # Hasn't been assigned yet
+                struct.pdbxyz = xyz
 
     # Build the return value
     if len(structures) == 1:
