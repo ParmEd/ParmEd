@@ -7,7 +7,7 @@ __version__ = '2.0b'
 __author__ = 'Jason Swails'
 
 from chemistry import exceptions, periodic_table
-from chemistry.structure import Structure, read_PDB, write_PDB
+from chemistry.structure import Structure, read_PDB, write_PDB, read_CIF
 from chemistry.topologyobjects import *
 from chemistry import unit
 from chemistry.residue import AminoAcidResidue
