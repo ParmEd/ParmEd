@@ -1056,7 +1056,7 @@ class Structure(object):
         # store in the Structure, Residue, or Atom classes
         cifatoms = containers.DataCategory('atom_site')
         cont.append(cifatoms)
-        cifatoms.setAttributeList(
+        cifatoms.setAttributeNameList(
                 ['group_PDB', 'id', 'type_symbol', 'label_atom_id',
                  'label_alt_id', 'label_comp_id', 'label_asym_id',
                  'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code',
@@ -1074,7 +1074,7 @@ class Structure(object):
         if write_anisou:
             cifanisou = containers.DataCategory('atom_site_anisotrop')
             cont.append(cifanisou)
-            cifanisou.setAttributeList(
+            cifanisou.setAttributeNameList(
                     ['id', 'type_symbol', 'pdbx_label_atom_id',
                     'pdbx_label_alt_id', 'pdbx_label_comp_id',
                     'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]',
@@ -1104,15 +1104,16 @@ class Structure(object):
                 last_number = anum
                 last_rnumber = rnum
                 cifatoms.append(
-                        ['ATOM', anum, Element[pa.atomic_number].upper(), '?',
-                         pa.altloc, '?', '?', '?', '?', res.insertion_code, x,
-                         y, z, pa.occupancy, pa.bfactor, '?', '?', '?', '?',
-                         '?', '', rnum, res.name, res.chain, pa.name, '1']
+                        ['ATOM', anum, Element[pa.atomic_number].upper(),
+                         pa.name, pa.altloc, res.name, res.chain, '?', rnum,
+                         res.insertion_code, x, y, z, pa.occupancy, pa.bfactor,
+                         '?', '?', '?', '?', '?', '', rnum, res.name, res.chain,
+                         pa.name, '1']
                 )
                 if write_anisou and pa.anisou is not None:
                     cifanisou.append(
-                            [anum, Element[pa.atomic_number].upper(), '?', '?',
-                             pa.altloc, '?', '?', '?', pa.anisou[0],
+                            [anum, Element[pa.atomic_number].upper(), pa.name,
+                             pa.altloc, res.name, res.chain, rnum, pa.anisou[0],
                              pa.anisou[1], pa.anisou[2], pa.anisou[3],
                              pa.anisou[4], pa.anisou[5], '?', '?', '?', '?',
                              '?', '?', rnum, res.name, res.chain, pa.name]
@@ -1128,16 +1129,16 @@ class Structure(object):
                     last_number = anum
                     cifatoms.append(
                             ['ATOM', anum, Element[oatom.atomic_number].upper(),
-                             '?', oatom.altloc, '?', '?', '?', '?',
-                             res.insertion_code, x, y, z, oatom.occupancy,
+                             oatom.name, oatom.altloc, res.name, res.chain, '?',
+                             rnum, res.insertion_code, x, y, z, oatom.occupancy,
                              oatom.bfactor, '?', '?', '?', '?', '?', '',
                              rnum, res.name, res.chain, oatom.name, '1']
                     )
                     if write_anisou and oatom.anisou is not None:
                         cifanisou.append(
                                 [anum, Element[oatom.atomic_number].upper(),
-                                 '?', '?', oatom.altloc, '?', '?', '?',
-                                 oatom.anisou[0], oatom.anisou[1],
+                                 oatom.name, oatom.altloc, res.name, res.chain,
+                                 rnum, oatom.anisou[0], oatom.anisou[1],
                                  oatom.anisou[2], oatom.anisou[3],
                                  oatom.anisou[4], oatom.anisou[5], '?', '?',
                                  '?', '?', '?', '?', rnum, res.name, res.chain,
@@ -3062,7 +3063,7 @@ def read_CIF(filename):
         atoms = cont.getObj('atom_site')
         atnumid = atoms.getAttributeIndex('id')
         elemid = atoms.getAttributeIndex('type_symbol')
-        atnameid = atoms.getAttributeIndex('label_atom_id')
+        atnameid = atoms.getAttributeIndex('auth_atom_id')
         altlocid = atoms.getAttributeIndex('label_alt_id')
         resnameid = atoms.getAttributeIndex('auth_comp_id')
         chainid = atoms.getAttributeIndex('auth_asym_id')
@@ -3091,7 +3092,7 @@ def read_CIF(filename):
             chain = row[chainid]
             resnum = int(row[resnumid])
             inscode = row[inscodeid]
-            if inscode == '?': inscode = ''
+            if inscode in '?.': inscode = ''
             try:
                 model = int(row[modelid])
             except ValueError:
@@ -3216,7 +3217,7 @@ def read_CIF(filename):
                         u13 = float(row[u13id])
                         u23 = float(row[u23id])
                         if altloc == '.': altloc = ''
-                        if inscode == '?': inscode = ''
+                        if inscode in '?.': inscode = ''
                         key = (resnum,resname,inscode,chain,atnum,altloc,atname)
                         atommap[key].anisou = create_array(
                                 [u11, u22, u33, u12, u13, u23]
