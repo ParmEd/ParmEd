@@ -378,6 +378,95 @@ class TestChemistryCIFStructure(unittest.TestCase):
         self.lztpdb = get_fn('4lzt.pdb')
         self.lzt = get_fn('4LZT.cif')
         self.largecif = get_fn('1ffk.cif')
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass # Already exists
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testWriteCIF(self):
+        """ Test CIF writing capabilities """
+        cif = structure.read_CIF(self.lzt)
+        written = get_fn('test.cif', written=True)
+        cif.write_cif(written, renumber=False, write_anisou=True)
+        cif2 = structure.read_CIF(written)
+        # cif and cif2 should have equivalent atom properties (basically,
+        # everything should be the same except the metadata)
+        self.assertEqual(len(cif.atoms), len(cif2.atoms))
+        self.assertEqual(len(cif.residues), len(cif2.residues))
+
+        # Check residue properties
+        for res1, res2 in zip(cif.residues, cif2.residues):
+            self.assertEqual(len(res1), len(res2))
+            self.assertEqual(res1.name, res2.name)
+            self.assertEqual(res1.chain, res2.chain)
+            self.assertEqual(res1.insertion_code, res2.insertion_code)
+            self.assertEqual(res1.number, res2.number)
+
+        # Check atom properties
+        for a1, a2 in zip(cif.atoms, cif2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.number, a2.number)
+            self.assertEqual(a1.element, a2.element)
+            self.assertEqual(a1.altloc, a2.altloc)
+            self.assertEqual(a1.xx, a2.xx)
+            self.assertEqual(a1.xy, a2.xy)
+            self.assertEqual(a1.xz, a2.xz)
+            self.assertEqual(len(a1.anisou), 6)
+            self.assertEqual(len(a2.anisou), 6)
+            for x, y in zip(a1.anisou, a2.anisou):
+                self.assertEqual(x, y)
+
+        # Check box
+        self.assertEqual(len(cif.box), len(cif2.box))
+        for x, y in zip(cif.box, cif2.box):
+            self.assertEqual(x, y)
+
+        # Now check CIF writing without anisotropic B-factors and with
+        # renumbering
+        io = StringIO.StringIO()
+        cif.write_cif(io)
+        io.seek(0)
+        cif3 = structure.read_CIF(io)
+        # cif and cif3 should have equivalent atom properties (basically,
+        # everything should be the same except the metadata)
+        self.assertEqual(len(cif.atoms), len(cif3.atoms))
+        self.assertEqual(len(cif.residues), len(cif3.residues))
+
+        # Check residue properties
+        i = 1
+        for res1, res2 in zip(cif.residues, cif3.residues):
+            self.assertEqual(len(res1), len(res2))
+            self.assertEqual(res1.name, res2.name)
+            self.assertEqual(res1.chain, res2.chain)
+            self.assertEqual(res1.insertion_code, res2.insertion_code)
+            self.assertEqual(res2.number, i)
+            i += 1
+
+        # Check atom properties
+        i = 1
+        for a1, a2 in zip(cif.atoms, cif3.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a2.number, i)
+            self.assertEqual(a1.element, a2.element)
+            self.assertEqual(a1.altloc, a2.altloc)
+            self.assertEqual(a1.xx, a2.xx)
+            self.assertEqual(a1.xy, a2.xy)
+            self.assertEqual(a1.xz, a2.xz)
+            self.assertIs(a2.anisou, None)
+            i += 1 + len(a2.other_locations)
+
+        # Check box
+        self.assertEqual(len(cif.box), len(cif3.box))
+        for x, y in zip(cif.box, cif3.box):
+            self.assertEqual(x, y)
 
     def test4LZT(self):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
