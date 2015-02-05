@@ -1425,8 +1425,8 @@ class Bond(object):
     """
     A covalent bond connecting two atoms.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom involved in the bond
     atom2 : :class:`Atom`
@@ -1492,8 +1492,8 @@ class BondType(_ListItem, _ParameterType):
     """
     A bond type with a set of bond parameters
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     k : ``float``
         Force constant in kcal/mol/Angstrom^2
     req : ``float``
@@ -1548,8 +1548,8 @@ class Angle(object):
     """
     A valence angle between 3 atoms separated by two covalent bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         An atom one end of the valence angle
     atom2 : :class:`Atom`
@@ -1632,8 +1632,8 @@ class AngleType(_ListItem, _ParameterType):
     """
     An angle type with a set of angle parameters
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     k : ``float``
         Force constant in kcal/mol/radians^2
     theteq : ``float``
@@ -1687,8 +1687,8 @@ class Dihedral(_FourAtomTerm):
     """
     A valence dihedral between 4 atoms separated by three covalent bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         An atom on one end of the valence dihedral bonded to atom 2
     atom2 : :class:`Atom`
@@ -1865,8 +1865,8 @@ class DihedralType(_ListItem, _ParameterType):
     """
     A dihedral type with a set of dihedral parameters
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     phi_k : ``float``
         The force constant in kcal/mol
     per : ``int``
@@ -1985,8 +1985,8 @@ class UreyBradley(object):
     functional form as a bond, but it is defined between two atoms forming a
     valence angle separated by two bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom involved in the Urey-Bradley bond
     atom2 : :class:`Atom`
@@ -2189,8 +2189,8 @@ class ImproperType(_ListItem, _ParameterType):
     """
     An improper type with a set of improper torsion parameters
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     psi_k : ``float``
         Force constant in kcal/mol/radians^2
     psi_eq : ``float``
@@ -2247,8 +2247,8 @@ class Cmap(object):
     four covalent bonds. This is a coupled-torsion potential in which the
     torsions are consecutive.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         An atom on one end of the valence coupled-torsion bonded to atom2
     atom2 : :class:`Atom`
@@ -2619,8 +2619,8 @@ class TrigonalAngle(_FourAtomTerm):
                                 |
                           A4----A2----A3
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
     atom2 : :class:`Atom`
@@ -2660,8 +2660,8 @@ class OutOfPlaneBend(_FourAtomTerm):
     Out-of-plane bending term in the AMOEBA force field. The bond pattern is the
     same as `TrigonalAngle`
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
     atom2 : :class:`Atom`
@@ -2700,8 +2700,8 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     """
     An angle type with a set of angle parameters
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     k : ``float``
         Force constant in kcal/mol/radians^2
     list : :class:`TrackedList`
@@ -2767,8 +2767,8 @@ class PiTorsion(object):
     are bonded *only* to A3 and A4, respectively. Atoms A1 and A5 are each
     bonded to 3 other atoms.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         atom A1 in the schematic above
     atom2 : :class:`Atom`
@@ -2827,8 +2827,8 @@ class StretchBend(object):
     This term models the stretching and bending of a standard valence angle, and
     is used in the AMOEBA force field
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom on one end of the angle
     atom2 : :class:`Atom`
@@ -2871,8 +2871,8 @@ class StretchBendType(_ListItem, _ParameterType):
     """
     A stretch-bend type with two distances and an angle in AMOEBA
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     k : ``float``
         Force constant in kcal/mol/radians^2
     req1 : ``float``
@@ -2937,8 +2937,8 @@ class TorsionTorsion(Cmap):
     This is a coupled-torsion map used in the AMOEBA force field similar to the
     correction-map (CMAP) potential used by the CHARMM force field
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         An atom on one end of the valence torsion-torsion bonded to atom2
     atom2 : :class:`Atom`
@@ -3035,8 +3035,8 @@ class _TorTorTable(object):
     Contains an interpolating potential grid for a coupled-torsion in the AMOEBA
     force field.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     ang1 : ``list of floats``
         Angles in the first dimension of the interpolation table
     ang2 : ``list of floats``
@@ -3194,8 +3194,8 @@ class ChiralFrame(object):
     A chiral frame as defined in the AMOEBA force field. It defines the frame of
     reference for a chiral center
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         The first atom defined in the chiral frame
     atom2 : :class:`Atom`
@@ -3225,8 +3225,8 @@ class MultipoleFrame(object):
     This defines the frame of reference for computing multipole interactions in
     the AMOEBA force field.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom : :class:`Atom`
         The atom for which the frame of reference is defined
     frame_pt_num : ``int``
@@ -3774,8 +3774,8 @@ class NonbondedException(object):
     to as "adjustments" in the Amber-converted files). This class stores
     per-particle exceptions.
 
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         One of the atoms in the exclusion pair
     atom2 : :class:`Atom`
@@ -3992,8 +3992,8 @@ class AcceptorDonor(object):
     """
     Just a holder for donors and acceptors in CHARMM speak
     
-    Parameters (and Attributes)
-    ---------------------------
+    Parameters
+    ----------
     atom1 : :class:`Atom`
         First atom in the donor/acceptor group
     atom2 : :class:`Atom`

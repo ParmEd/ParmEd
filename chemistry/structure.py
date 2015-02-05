@@ -194,41 +194,41 @@ class Structure(object):
         List of all atoms in the structure
     residues : :class:`ResidueList`
         List of all residues in the structure
-    bonds : :class:`TrackedList`(:class:`Bond`)
+    bonds : :class:`TrackedList` (:class:`Bond`)
         List of all bonds in the structure
-    angles : :class:`TrackedList`(:class:`Angle`)
+    angles : :class:`TrackedList` (:class:`Angle`)
         List of all angles in the structure
-    dihedrals : :class:`TrackedList`(:class:`Dihedral`)
+    dihedrals : :class:`TrackedList` (:class:`Dihedral`)
         List of all dihedrals in the structure -- only one term per dihedral, so
         multi-term dihedral parameters will have the same 4 atoms appear
         multiple times in the list
-    urey_bradleys : :class:`TrackedList`(:class:`UreyBradley`)
+    urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
         List of all Urey-Bradley angle bends in the structure
-    impropers : :class:`TrackedList`(:class:`Improper`)
+    impropers : :class:`TrackedList` (:class:`Improper`)
         List of all CHARMM-style improper torsions in the structure
-    cmaps : :class:`TrackedList`(:class:`Cmap`)
+    cmaps : :class:`TrackedList` (:class:`Cmap`)
         List of all CMAP objects in the structure
-    trigonal_angles : :class:`TrackedList`(:class:`TrigonalAngle`)
+    trigonal_angles : :class:`TrackedList` (:class:`TrigonalAngle`)
         List of all AMOEBA-style trigonal angles in the structure
-    out_of_plane_bends : :class:`TrackedList`(:class:`OutOfPlaneBends`)
+    out_of_plane_bends : :class:`TrackedList` (:class:`OutOfPlaneBends`)
         List of all AMOEBA-style out-of-plane bending angles
-    pi_torsions : :class:`TrackedList`(:class:`PiTorsion`)
+    pi_torsions : :class:`TrackedList` (:class:`PiTorsion`)
         List of all AMOEBA-style pi-torsion angles
-    stretch_bends : :class:`TrackedList`(:class:`StretchBend`)
+    stretch_bends : :class:`TrackedList` (:class:`StretchBend`)
         List of all AMOEBA-style stretch-bend compound bond/angle terms
-    torsion_torsions : :class:`TrackedList`(:class:`TorsionTorsion`)
+    torsion_torsions : :class:`TrackedList` (:class:`TorsionTorsion`)
         List of all AMOEBA-style coupled torsion-torsion terms
-    chiral_frames : :class:`TrackedList`(:class:`ChiralFrame`)
+    chiral_frames : :class:`TrackedList` (:class:`ChiralFrame`)
         List of all AMOEBA-style chiral frames defined in the structure
-    multipole_frames : :class:`TrackedList`(:class:`MultipoleFrame`)
+    multipole_frames : :class:`TrackedList` (:class:`MultipoleFrame`)
         List of all AMOEBA-style multipole frames defined in the structure
-    adjusts : :class:`TrackedList`(:class:`NonbondedException`)
+    adjusts : :class:`TrackedList` (:class:`NonbondedException`)
         List of all AMOEBA-style nonbonded pair-exception rules
-    acceptors : :class:`TrackedList`(:class:`AcceptorDonor`)
+    acceptors : :class:`TrackedList` (:class:`AcceptorDonor`)
         List of all H-bond acceptors, if that information is present
-    donors : :class:`TrackedList`(:class:`AcceptorDonor`)
+    donors : :class:`TrackedList` (:class:`AcceptorDonor`)
         List of all H-bond donors, if that information is present
-    groups : :class:`TrackedList`(:class:`Group`)
+    groups : :class:`TrackedList` (:class:`Group`)
         List of all CHARMM-style GROUP objects (whatever those are used for)
     box : ``list of 6 floats``
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
@@ -770,11 +770,13 @@ class Structure(object):
         altlocs : ``str``
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
+
                 - 'all' : (default) print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
                   printed
+
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
@@ -966,11 +968,13 @@ class Structure(object):
         altlocs : ``str``
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
+
                 - 'all' : (default) print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
                   printed
+
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.

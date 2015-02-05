@@ -576,6 +576,14 @@ class ScaledUnit(object):
                 + ", symbol=" + repr(self.symbol) + ")"
 
 class UnitSystem(object):
+    """
+    A complete system of units defining the *base* unit in each dimension
+
+    Parameters
+    ----------
+    units: ``list``
+        List of base units from which to construct the unit system
+    """
     def __init__(self, units):
         self.units = units
         self._unit_conversion_cache = {}
