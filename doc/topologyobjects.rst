@@ -1,4 +1,4 @@
-The ``topologyobjects`` module
+The :mod:`topologyobjects` module
 ==============================
 
 The :mod:`topologyobjects` module contains a wide array of classes used
@@ -331,7 +331,7 @@ applicable, force constants and equilibrium values for the various parameter
 types.
 
 Amoeba-specific terms
-=====================
+---------------------
 
 The AMOEBA force field has nominal support in ParmEd (with improved support
 planned). This force field contains a large number of additional terms and
