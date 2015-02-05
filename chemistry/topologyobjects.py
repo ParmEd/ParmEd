@@ -43,7 +43,7 @@ class _ListItem(object):
 
     Attributes
     ----------
-    idx : int
+    idx : ``int``
         This is intended to be a read-only variable that determines where in the
         list this particular object is. If there is no `list` attribute for this
         object, or the item is not in the list at all, `idx` is -1
@@ -55,8 +55,8 @@ class _ListItem(object):
     indexing only needs to be done once, at most, for the entire list (until
     changes are made that could change the indexing).
 
-    The `idx` lookup in a TrackedList is therefore an O(1) operation, while it
-    is O(N^2) for standard containers.
+    The ``idx`` lookup in a TrackedList is therefore an O(1) operation, while
+    it is O(N) for standard containers (O(N^2) for looking up *all* indexes).
     """
 
     @property
@@ -95,13 +95,13 @@ class _FourAtomTerm(object):
 
     Parameters
     ----------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom in the term
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The second atom in the term
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom in the term
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom in the term
 
     Notes
@@ -137,9 +137,9 @@ class _ParameterType(object):
 
     Attributes
     ----------
-    used : bool
-        If True, then this parameter type should be considered `used`. If False,
-        it is not being used and does not need to be printed.
+    used : ``bool``
+        If ``True``, then this parameter type should be considered *used*. If
+        ``False``, it is not being used and does not need to be printed.
     """
 
     def __init__(self):
@@ -152,9 +152,9 @@ def _delete_from_list(list, item):
 
     Parameters
     ----------
-    list : list
+    list : ``list``
         The list from which an item will be deleted
-    item : object
+    item : ``object``
         The object to delete from the list
     """
     list.pop(list.index(item))
@@ -174,225 +174,194 @@ def _safe_assigns(dest, source, attrs):
 class Atom(_ListItem):
     """ 
     An atom. Only use these as elements in AtomList instances, since AtomList
-    will keep track of when indexes and other stuff needs to be updated.
+    will keep track of when indexes and other stuff needs to be updated. All
+    parameters are optional.
 
     Parameters
     ----------
-    list : AtomList=None
+    atomic_number : ``int``
+        The atomic number of this atom
+    name : ``str``
+        The name of this atom
+    type : ``str``
+        The type name of this atom
+    charge : ``float``
+        The partial atomic charge of this atom in fractions of an electron
+    mass : ``float``
+        The atomic mass of this atom in daltons
+    nb_idx : ``int``
+        The nonbonded index. This is a pointer that is relevant in the context
+        of an Amber topology file and identifies its Lennard-Jones atom type
+    radii : ``float``
+        The intrinsic solvation radius of this atom.
+    screen : ``float``
+        The Generalized Born screening factor for this atom.
+    occupancy : ``float``
+        The occupancy of the atom (see PDB file)
+    bfactor : ``float``
+        The B-factor of the atom (see PDB file)
+    altloc : ``str``
+        Alternate location indicator (see PDB file)
+
+    Other Parameters
+    ----------------
+    list : :class:`AtomList`
         The AtomList that this atom belongs to. If None, this atom does not
         belong to any list. This can be any iterable, but should typically be an
         AtomList or None
-    atomic_number : int=0
-        The atomic number of this atom
-    name : str=''
-        The name of this atom
-    type : str=''
-        The type name of this atom
-    charge : float=0.0
-        The partial atomic charge of this atom in fractions of an electron
-    mass : float=0.0
-        The atomic mass of this atom in daltons
-    nb_idx : int=0
-        The nonbonded index. This is a pointer that is relevant in the context
-        of an Amber topology file and identifies its Lennard-Jones atom type
-    radii : float=0.0
-        The intrinsic solvation radius of this atom.
-    screen : float=0.0
-        The Generalized Born screening factor for this atom.
-    tree : str='BLA'
+    tree : ``str``
         The tree chain identifier assigned to this atom. Relevant in the context
         of an Amber topology file, and not used for very much.
-    join : int=0
+    join : ``int``
         The 'join` property of atoms stored in the Amber topology file. At the
         time of writing this class, `join` is unused, but still oddly required.
         Add support for future-proofing
-    irotat : int=0
+    irotat : ``int``
         The `irotat` property of atoms stored in the Amber topology file.
         Unused, but included for future-proofing.
-    occupancy : float=0.0
-        The occupancy of the atom (see PDB file)
-    bfactor : float=0.0
-        The B-factor of the atom (see PDB file)
-    altloc : str=''
-        Alternate location indicator (see PDB file)
-    number : int=-1
+    number : ``int``
         The serial number given to the atom (see PDB file)
-    rmin : float=None
+    rmin : ``float``
         The Rmin/2 Lennard-Jones parameter for this atom. Default evaluates to 0
-    epsilon : float=None
+    epsilon : ``float``
         The epsilon (well depth) Lennard-Jones parameter for this atom. Default
         evaluates to 0
-    rmin14 : float=None
+    rmin14 : ``float``
         The Rmin/2 Lennard-Jones parameter for this atom in 1-4 interactions.
         Default evaluates to 0
-    epsilon14 : float=None
+    epsilon14 : ``float``
         The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
         interactions. Default evaluates to 0
 
-    Attributes
-    ----------
-    atomic_number : int
-        The atomic number of this atom
-    list : AtomList (or other iterable)
-        The iterable that (possibly) contains this atom
-    element : int
+    Other Attributes
+    ----------------
+    element : ``int``
         This is an alias for atomic_number
-    name : str
-        The name of this atom
-    type : str
-        The name of the atom type assigned to this atom
-    atom_type : AtomType
+    atom_type : :class:`AtomType`
         In some cases, "type" is an ambiguous choice of an integer serial number
         or a string descriptor. In this case, atom_type is an AtomType instance
         that disambiguates this discrepancy.
-    mass : float
-        The mass, in daltons, of this atom
-    charge : float
-        The charge, in fractions of an electron, of this atom
-    nb_idx : int
-        The nonbonded Lennard-Jones index. Required when it is part of an Amber
-        topology file instance
-    tree : str
-        The tree chain classification string. Applies to the Amber topology file
-        instance, but is not used for much.
-    join : int=0
-        The 'join` property of atoms stored in the Amber topology file. At the
-        time of writing this class, `join` is unused, but still oddly required.
-        Add support for future-proofing
-    irotat : int=0
-        The `irotat` property of atoms stored in the Amber topology file.
-        Unused, but included for future-proofing.
-    occupancy : float
-        The occupancy of the atom (see PDB file)
-    bfactor : float
-        The B-factor of the atom (see PDB file)
-    altloc : str
-        The alternate location indicator (see PDB file)
-    radii : float
-        The intrinsic solvation radius of the atom
-    screen : float
-        The GB screening factor of the atom
-    anisou : numpy.ndarray(float64) (or list of floats)
+    anisou : ``numpy.ndarray(float64) (or list of floats)``
         Anisotropic temperature scaling factors. This is a 6-element numpy array
         (if numpy is not available, it is a 6-element list) of floating point
         numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),
         U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.
-    idx : int
+    idx : ``int``
         The index of this atom in the list. Set to -1 if this atom is not part
         of a list or the index cannot otherwise be determined (i.e., if the
         containing list does not support indexing its members)
-    residue : Residue
+    residue : :class:`Residue`
         The Residue that this atom belongs to. This is assigned when this atom
         is passed to `Residue.add_atom` -- see below for more information. Until
         it is set there, it is None
-    other_locations : dict of Atoms
+    other_locations : ``dict`` of :class:`Atom`
         A dict of Atom instances that represent alternate conformers of this
         atom. The keys are the `altloc` characters for those Atoms.
-    bonds : list of Bond instances
+    bonds : ``list`` of :class:`Bond`
         list of Bond objects in which this atom is a member. This attribute
         should not be modified.
-    angles : list of Angle instances
+    angles : ``list`` of :class:`Angle`
         list of Angle objects in which this atom is a member. This attribute
         should not be modified.
-    dihedrals : list of Dihedral instances
+    dihedrals : ``list`` of :class:`Dihedral`
         list of Dihedral objects in which this atom is a member. This attribute
         should not be modified.
-    urey_bradleys : list of UreyBradley instances
+    urey_bradleys : ``list`` of :class:`UreyBradley`
         list of UreyBradley objects in which this atom is a member (CHARMM,
         AMOEBA). This attribute should not be modified.
-    impropers : list of Improper instances
+    impropers : ``list`` of :class:`Improper`
         list of Improper objects in which the atom is a member (CHARMM). This
         attribute should not be modified.
-    cmaps : list of Cmap instances
+    cmaps : ``list`` of :class:`Cmap`
         list of Cmap objects in which the atom is a member (CHARMM, AMOEBA).
         This attribute should not be modified.
-    tortors : list of TorsionTorsion instances
+    tortors : ``list`` of :class:`TorsionTorsion`
         list of TorsionTorsion objects in which the atom is a member (AMOEBA).
         This attribute should not be modified.
-    bond_partners : list of Atom instances
+    bond_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom is bonded. Do not modify this
         attribute -- it will almost certainly not do what you think it will
-    angle_partners : list of Atom instances
+    angle_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms an angle, but not a bond. Do not
         modify this attribute -- it will almost certainly not do what you think
         it will
-    dihedral_partners : list of Atom instances
+    dihedral_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms an dihedral, but not a bond or
         angle. Do not modify this attribute -- it will almost certainly not do
         what you think it will
-    tortor_partners : list of Atom instances
+    tortor_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms a coupled Torsion-Torsion, but
         not a bond or angle (AMOEBA). Do not modify this attribute -- it will
         almost certainly not do what you think it will
-    exclusion_partners : list of Atom instances
+    exclusion_partners : ``list`` of :class:`Atom`
         list of Atoms with which this atom is excluded, but not bonded, angled,
         or dihedraled to. Do not modify this attribute -- it will almost
         certainly not do what you think it will
-    marked : int
+    marked : ``int``
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
-    children : list of `ExtraPoint`s
+    children : ``list`` of :class:`ExtraPoint`
         This is the list of "child" ExtraPoint objects bonded to this atom
-    number : int
+    number : ``int``
         The serial number of the atom in the input structure (e.g., PDB file).
         If not present in the original structure, a default value of -1 is used
-    rmin : float
+    rmin : ``float``
         The Rmin/2 Lennard-Jones parameter for this atom. Default value is 0.
         If not set, it is taken from the `atom_type` attribute (if available)
-    epsilon : float
+    epsilon : ``float``
         The epsilon (well depth) Lennard-Jones parameter for this atom. Default
         value is 0. If not set, it is taken from the `atom_type` attribute (if
         available)
-    rmin_14 : float
+    rmin_14 : ``float``
         The Rmin/2 L-J parameter for 1-4 pairs. Default value is `rmin` (see
         above). If not set, it is taken from the `atom_type` attribute (if
         available).
-    epsilon_14 : float
+    epsilon_14 : ``float``
         The epsilon L-J parameter for 1-4 pairs. Default value is `epsilon` (see
         above). If not set, it is taken from the `atom_type` attribute (if
         available).
 
     Possible Attributes
     -------------------
-    xx : float
+    xx : ``float``
         The X-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    xy : float
+    xy : ``float``
         The Y-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    xz : float
+    xz : ``float``
         The Z-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    vx : float
+    vx : ``float``
         The X-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    vy : float
+    vy : ``float``
         The Y-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    vz : float
+    vz : ``float``
         The Z-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    type_idx : int
+    type_idx : ``int``
         The AMOEBA atom type index. Only present if initialized with the AMOEBA
         force field. Otherwise raises AttributeError.
-    class_idx : int
+    class_idx : ``int``
         The AMOEBA class type index Only present if initialized with the AMOEBA
         force field. Otherwise raises AttributeError.
-    multipoles : list(float)
+    multipoles : ``list(float)``
         The list of the 10 multipole moments up through quadrupoles Only present
         if initialized with the AMOEBA force field. Otherwise raises
         AttributeError.
-    polarizability : list(float)
+    polarizability : ``list(float)``
         The polarizability of the atom. Only present if initialized with the
         AMOEBA force field. Otherwise raises AttributeError.
-    vdw_parent : Atom
+    vdw_parent : :class:`Atom`
         In the AMOEBA force field, this is the parent atom for the van der Waals
         term
-    vdw_weight : float
+    vdw_weight : ``float``
         In the AMOEBA force field, this is the weight of the van der Waals
         interaction on the parent atom
-    segid : str
+    segid : ``str``
         In CHARMM PDB and PSF files, the SEGID behaves similarly to the residue
         chain ID and is used to separate the total system into representative
         parts. This will only be set if read in from the input structure.
@@ -563,7 +532,7 @@ class Atom(_ListItem):
     def tortor_partners(self):
         """
         List of all 1-5 partners that are NOT in angle or bond partners. This is
-        _only_ used in the Amoeba force field
+        *only* used in the Amoeba force field
         """
         bp = set(self._bond_partners)
         ap = set(self._angle_partners)
@@ -738,7 +707,7 @@ class Atom(_ListItem):
         
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `bond_partners`
 
         Notes
@@ -763,7 +732,7 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `angle_partners`
 
         Notes
@@ -784,7 +753,7 @@ class Atom(_ListItem):
         
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `dihedral_partners`
 
         Notes
@@ -805,7 +774,7 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `tortor_partners`
 
         Notes
@@ -826,7 +795,7 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `exclusion_partners`.
 
         Notes
@@ -1457,9 +1426,9 @@ class Bond(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom involved in the bond
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom involved in the bond
     type : BondType=None
         The bond type that defines the parameters for this bond
@@ -1579,11 +1548,11 @@ class Angle(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         An atom one end of the valence angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The atom in the middle of the valence angle bonded to both other atoms
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom on the other end of the valence angle to atom1
     type : AngleType=None
         The AngleType object containing the parameters for this angle
@@ -1718,17 +1687,17 @@ class Dihedral(_FourAtomTerm):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         An atom on one end of the valence dihedral bonded to atom 2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the valence dihedral bonded to atom1 and atom3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the valence dihedral bonded to atom2 and atom4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom on the other end of the valence dihedral bonded to atom 3
     improper : bool=False
         If True, this is an Amber-style improper torsion, where atom3 is the
-        "central" atom bonded to atoms 1, 2, and 4 (atoms 1, 2, and 4 are _only_
+        "central" atom bonded to atoms 1, 2, and 4 (atoms 1, 2, and 4 are *only*
         bonded to atom 3 in this instance)
     ignore_end : bool=False
         If True, the end-group interactions for this torsion are ignored, either
@@ -2013,9 +1982,9 @@ class UreyBradley(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom involved in the Urey-Bradley bond
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom involved in the Urey-Bradley bond
     type : BondType=None
         The Urey-Bradley bond type that defines the parameters for this bond
@@ -2115,13 +2084,13 @@ class Improper(_FourAtomTerm):
 
     Parameters
     ----------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The central atom A1 in the schematic above
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the improper, A2 in the schematic above
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the improper, A3 in the schematic above
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the improper, A4 in the schematic above
     type : ImproperType=None
         The ImproperType object containing the parameters for this improper
@@ -2274,15 +2243,15 @@ class Cmap(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         An atom on one end of the valence coupled-torsion bonded to atom2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 1 and 3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 2 and 4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 3 and 5
-    atom5 : Atom
+    atom5 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atom 4
     type : CmapType=None
         The CmapType object containing the parameter map for this term
@@ -2339,21 +2308,21 @@ class Cmap(object):
 
         Parameters
         ----------
-        atom1 : Atom
+        atom1 : :class:`Atom`
             The first atom of the first torsion
-        atom2 : Atom
+        atom2 : :class:`Atom`
             The second atom of the first torsion
-        atom3 : Atom
+        atom3 : :class:`Atom`
             The third atom of the first torsion
-        atom4 : Atom
+        atom4 : :class:`Atom`
             The fourth atom of the first torsion
-        atom5 : Atom
+        atom5 : :class:`Atom`
             The first atom of the second torsion
-        atom6 : Atom
+        atom6 : :class:`Atom`
             The second atom of the second torsion
-        atom7 : Atom
+        atom7 : :class:`Atom`
             The third atom of the second torsion
-        atom8 : Atom
+        atom8 : :class:`Atom`
             The fourth atom of the second torsion
         type : CmapType=None
             The CmapType object containing the parameter map for this term
@@ -2646,13 +2615,13 @@ class TrigonalAngle(_FourAtomTerm):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom involved in the trigonal angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom involved in the trigonal angle
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom involved in the trigonal angle
     type : AngleType=None
         The angle type containing the parameters
@@ -2687,13 +2656,13 @@ class OutOfPlaneBend(_FourAtomTerm):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom involved in the trigonal angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom involved in the trigonal angle
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom involved in the trigonal angle
     type : OutOfPlaneBendType=None
         The angle type containing the parameters
@@ -2789,29 +2758,29 @@ class PiTorsion(object):
      AAA-A1           A6
 
     In the above schematic, A3 and A4 are sp2-hybridized, and atoms A2 and A6
-    are bonded _only_ to A3 and A4, respectively. Atoms A1 and A5 are each
+    are bonded *only* to A3 and A4, respectively. Atoms A1 and A5 are each
     bonded to 3 other atoms.
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         atom A1 in the schematic above
-    atom2 : Atom
+    atom2 : :class:`Atom`
         atom A2 in the schematic above
-    atom3 : Atom
+    atom3 : :class:`Atom`
         atom A3 in the schematic above
-    atom4 : Atom
+    atom4 : :class:`Atom`
         atom A4 in the schematic above
-    atom5 : Atom
+    atom5 : :class:`Atom`
         atom A5 in the schematic above
-    atom6 : Atom
+    atom6 : :class:`Atom`
         atom A6 in the schematic above
-    type : DihedralType=None
+    type : :class:`DihedralType`
         The parameters for this Pi-torsion
 
     Notes
     -----
-    Both `Bond`s and `Atom`s can be contained in a pi-torsion
+    Both :class:`Bond`s and :class:`Atom`s can be contained in a pi-torsion
     """
     def __init__(self, atom1, atom2, atom3, atom4, atom5, atom6, type=None):
         self.atom1 = atom1
@@ -2854,18 +2823,18 @@ class StretchBend(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom on one end of the angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom in the angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The atom on the other end of the angle
-    type : StretchBendType=None
+    type : :class:`StretchBendType`
         The type containing the stretch-bend parameters
 
     Notes
     -----
-    Both `Bond`s and `Atom`s can be contained in a stretch-bend term
+    Both :class:`Bond`s and :class:`Atom`s can be contained in a stretch-bend term
     """
     def __init__(self, atom1, atom2, atom3, type=None):
         self.atom1 = atom1
@@ -2964,15 +2933,15 @@ class TorsionTorsion(Cmap):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         An atom on one end of the valence torsion-torsion bonded to atom2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 1 and 3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 2 and 4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 3 and 5
-    atom5 : Atom
+    atom5 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atom 4
     type : TorsionTorsionType=None
         The TorsionTorsionType object containing the parameter map for this term
@@ -3221,9 +3190,9 @@ class ChiralFrame(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom defined in the chiral frame
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The second atom defined in the chiral frame
     chirality : int
         Either 1 or -1 to identify directionality. A ValueError is raised if a
@@ -3252,7 +3221,7 @@ class MultipoleFrame(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom : Atom
+    atom : :class:`Atom`
         The atom for which the frame of reference is defined
     frame_pt_num : int
         The frame point number
@@ -3352,7 +3321,7 @@ class Residue(_ListItem):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to this residue
         
         Notes
@@ -3574,7 +3543,7 @@ class ResidueList(TrackedList):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to this residue list
         resname : str
             The name of the residue this atom belongs to
@@ -3680,7 +3649,7 @@ class AtomList(TrackedList):
 
         Parameters
         ----------
-        item : Atom
+        item : :class:`Atom`
             The atom to add to this list
 
         Notes
@@ -3723,7 +3692,7 @@ class AtomList(TrackedList):
         ----------
         idx : int
             The index in front of (i.e., before) which to insert the item
-        item : Atom
+        item : :class:`Atom`
             The atom to insert in the desired index. This atom will be claimed
             by the AtomList
         """
@@ -3800,9 +3769,9 @@ class NonbondedException(object):
 
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         One of the atoms in the exclusion pair
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom in the exclusion pair
     type : NonbondedExceptionType=None
         The nonbonded exception type that describes how the various nonbonded
@@ -4038,9 +4007,9 @@ class AcceptorDonor(object):
     
     Parameters (and Attributes)
     ---------------------------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         First atom in the donor/acceptor group
-    atom2 : Atom
+    atom2 : :class:`Atom`
         Second atom in the donor/acceptor group
     """
     def __init__(self, atom1, atom2):
