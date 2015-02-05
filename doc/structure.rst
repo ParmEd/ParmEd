@@ -9,23 +9,27 @@ class look intimidating, but its core features are the ``atoms`` attribute
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.
 
-------
-
 :class:`Structure` class
 ------------------------
+.. currentmodule:: chemistry.structure
+.. autosummary::
+    :toctree: structobj/
 
-.. autoclass:: chemistry.structure.Structure
-    :members: add_atom, add_atom_to_residue, copy, is_changed, unchange,
-              prune_empty_terms, update_dihedral_exclusions, strip, write_pdb,
-              write_cif, topology, createSystem
+    Structure
 
-------
+The :class:`Structure` class may be instantiated directly, but is more often
+created by one of the parsers (see below for :func:`read_PDB` and
+:func:`read_CIF` which both return a :class:`Structure` instance) or extended to
+support the structure files of various computational chemistry programs.
 
 :func:`read_PDB` and :func:`read_CIF` functions
 -----------------------------------------------
-.. automodule:: chemistry.structure
-    :members: read_PDB, read_CIF
+.. currentmodule:: chemistry.structure
+.. autosummary::
+    :toctree: structobj/
 
+    read_PDB
+    read_CIF
 
 PDB files and mmCIF files downloaded from the RCSB Protein Data Bank or the
 world wide Protein Data Bank often contain a large amount of metadata describing
@@ -37,8 +41,6 @@ anisotropic B-factors.
 
 The following sections will briefly demonstrate parsing a PDB file and a mmCIF
 file to a :class:`Structure` instance.
-
-------
 
 Examples
 --------

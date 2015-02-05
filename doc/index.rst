@@ -71,11 +71,13 @@ Contents
    :maxdepth: 1
 
    Core classes used to represent topologies <topologyobjects>
-   structure
-   dimensional_analysis
-   parmed
-   xparmed
-   api/index
+   The core Structure class <structure>
+   Working with units <dimensional_analysis>
+.. Using the text-based ParmEd program (``parmed.py``) <parmed>
+.. Using the GUI ParmEd program (``xparmed.py``) <xparmed>
+.. The Amber file classes <amber>
+.. The CHARMM file classes <charmm>
+.. Full API reference <api/full>
 
 Search
 ------

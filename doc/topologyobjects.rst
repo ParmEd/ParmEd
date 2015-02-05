@@ -1,5 +1,5 @@
 The :mod:`topologyobjects` module
-==============================
+=================================
 
 The :mod:`topologyobjects` module contains a wide array of classes used
 extensively in the core :class:`structure.Structure` class.
