@@ -66,7 +66,30 @@ file::
 The :class:`AmberParm`, :class:`ChamberParm`, and :class:`AmoebaParm` classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Insert description about these classes here
+These classes are subclasses of both :class:`Structure
+<chemistry.structure.Structure>` and :class:`AmberFormat`. (The special classes
+:class:`ChamberParm` and :class:`AmoebaParm`, implementing the CHARMM and Amoeba
+force fields, respectively, both inherit from :class:`AmberParm`.) You need to
+make sure that you use the correct class for the variant of *prmtop* file you
+are using.  If you are unsure, the :func:`LoadParm` function will automatically
+determine the correct class and return an instance of it (see below).
+
+The :class:`AmberParm` class parses a *prmtop* object and stores both the raw
+data (see the :class:`AmberFormat` description, above), as well as the standard
+topological data structures used in the :class:`Structure
+<chemistry.structure.Structure>` class. Different subclasses of
+:class:`AmberParm` will populate different term and parameter lists depending on
+the terms present in the force field.
+
+Since the raw data and topological features are inextricably linked, there are
+risks associated with modifying the raw data in :py:attr:`AmberParm.parm_data`
+*and* the parameters and properties of the topological data structures in the
+lists inherited from :class:`Structure <chemistry.structure.Structure>`.
+
+The required overhead to keep :py:attr:`AmberParm.parm_data` and the topology
+structures synchronized at all times introduces too great a cost, so keeping
+them synchronized largely falls on the programmer, although there is
+functionality introduced to help.
 
 Generalizing with :func:`LoadParm`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
