@@ -220,11 +220,15 @@ class AmberParm(AmberFormat, Structure):
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
 
-        Parameters:
-            - rawdata (AmberFormat): Already has a parsed file
+        Parameters
+        ----------
+        rawdata : :class:`AmberFormat`
+            An AmberFormat instance that has already been instantiated
 
-        Returns:
-            Populated AmberParm instance
+        Returns
+        -------
+        parm : :class:`AmberParm`
+            An instance of this type from the data in rawdata
         """
         inst = cls()
         inst.prm_name = rawdata.prm_name
@@ -258,7 +262,7 @@ class AmberParm(AmberFormat, Structure):
 
         Parameters
         ----------
-        struct : Structure
+        struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
         """
         inst = struct.copy(cls, split_dihedrals=True)

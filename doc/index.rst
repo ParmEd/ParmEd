@@ -73,10 +73,11 @@ Contents
    Core classes used to represent topologies <topologyobjects>
    The core Structure class <structure>
    Working with units <dimensional_analysis>
+   The Amber file classes <amber>
+.. The CHARMM file classes <charmm>
 .. Using the text-based ParmEd program (``parmed.py``) <parmed>
 .. Using the GUI ParmEd program (``xparmed.py``) <xparmed>
-.. The Amber file classes <amber>
-.. The CHARMM file classes <charmm>
+.. The ParmEd API <parmed_api>
 .. Full API reference <api/full>
 
 Search

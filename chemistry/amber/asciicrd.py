@@ -44,17 +44,24 @@ class _AmberAsciiCoordinateFile(object):
         Opens a new Mdcrd file and either parses it (loading everything into
         memory) or sets it up for writing.
 
-        Parameters:
-            fname (string): File name to open
-            natom (int): # of atoms in the system
-            hasbox (bool): Does the system have PBCs?
-            mode (string): 'r' or 'w'
-            title (string): Title to write to a new trajectory (when mode='r')
+        Parameters
+        ----------
+        fname : str
+            File name to open
+        natom : int
+            Number of atoms in the system
+        hasbox : bool
+            Does the system have PBCs?
+        mode : str={'r', 'w'}
+            Whether to open this file for 'r'eading or 'w'riting
+        title : str, optional
+            Title to write to a new trajectory (when mode='w')
 
-        Notes:
-            This module automatically handles compressed files using either gzip
-            or bzip2, and compression is determined automatically by filename
-            extension (.gz for gzip and .bz2 for bzip2 files).
+        Notes
+        -----
+        This module automatically handles compressed files using either gzip or
+        bzip2, and compression is determined automatically by filename extension
+        (.gz for gzip and .bz2 for bzip2 files).
         """
 
         if mode == 'r':
@@ -115,6 +122,24 @@ class _AmberAsciiCoordinateFile(object):
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberAsciiRestart(_AmberAsciiCoordinateFile):
+    """
+    Parser for the Amber ASCII inpcrd/restart file format
+
+    Parameters
+    ----------
+        fname : str
+            File name to open
+        mode : str={'r', 'w'}
+            Whether to open this file for 'r'eading or 'w'riting
+        natom : int, optional
+            Number of atoms in the system (necessary when mode='w')
+        hasbox : bool, optional
+            Does the system have PBCs? Necessary when mode='w'
+        title : str, optional
+            Title to write to a new trajectory (when mode='w')
+        time : float, optional
+            The time to write to the restart file in ps. Default is 0.
+    """
    
     CRDS_PER_LINE = 6
     DEFAULT_TITLE = 'restart created by ParmEd'
@@ -385,6 +410,11 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberMdcrd(_AmberAsciiCoordinateFile):
+    """
+    A class to parse Amber ASCII trajectory files. This is *much* slower than
+    parsing NetCDF files (or the equivalent parsing done in a compiled language
+    like C or C++). For large trajectories, this may be significant.
+    """
 
     CRDS_PER_LINE = 10
     DEFAULT_TITLE = 'trajectory created by ParmEd'

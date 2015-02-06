@@ -230,21 +230,22 @@ Available :class:`UnitSystem` options
 
 The :mod:`unit` module contains a number of :class:`UnitSystem` instances
 available in the ``chemistry.unit`` namespace. They are summarized in the table
-below, along with the units defining them
+below, along with the units defining them (the energy unit is a composite of the
+mass unit times the square of the ratio of the length-to-time units):
 
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
-| :class:`UnitSystem`    | Length unit | Mass unit | Time unit     | Charge unit [1] | Temperature unit | Amount unit | Angle unit |
-+========================+=============+===========+===============+=================+==================+=============+============+
-| ``si_unit_system``     |   meters    | kilograms |  second       |    Ampere       |      kelvin      |    mole     |   radian   |
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
-| ``cgs_unit_system``    | centimeters |   gram    |  second       |    Ampere       |      kelvin      |    mole     |   radian   |
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
-| ``md_unit_system``     | nanometers  |  daltons  | picosecond    |  q electron     |      kelvin      |    mole     |   radian   |
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
-| ``planck_unit_system`` | pl. length  | pl. mass  | pl. time      | pl. charge      | pl. temperature  |    item     |   radian   |
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
-| ``akma_unit_system``   | angstroms   |  daltons  | akma time [2] |  q electron     |      kelvin      |    mole     |   radian   |
-+------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+------------+
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
+| :class:`UnitSystem`    | Length unit | Mass unit | Time unit     | Charge unit [1] | Temperature unit | Amount unit | Energy unit |
++========================+=============+===========+===============+=================+==================+=============+=============+
+| ``si_unit_system``     |   meters    | kilograms |  second       |    Ampere       |      kelvin      |    mole     |    joule    |
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
+| ``cgs_unit_system``    | centimeters |   gram    |  second       |    Ampere       |      kelvin      |    mole     | 1e-7 joule  |
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
+| ``md_unit_system``     | nanometers  |  daltons  | picosecond    |  q electron     |      kelvin      |    mole     |  kilojoule  |
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
+| ``planck_unit_system`` | pl. length  | pl. mass  | pl. time      | pl. charge      | pl. temperature  |    item     | pl. energy  |
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
+| ``akma_unit_system``   | angstroms   |  daltons  | akma time [2] |  q electron     |      kelvin      |    mole     | kilocalorie |
++------------------------+-------------+-----------+---------------+-----------------+------------------+-------------+-------------+
 
 [1] Some unit systems use current instead of charge as a base unit, while others
 use the charge.
@@ -265,7 +266,17 @@ the table below summarizes a subset of programs and the unit systems they use:
 +---------+----------------------+
 | Tinker  | ``akma_unit_system`` |
 +---------+----------------------+
-| GROMACS | ``md_unit_system``   |
+| Desmond | ``akma_unit_system`` |
++---------+----------------------+
+| LAMMPS  | ``akma_unit_system`` |
++---------+----------------------+
+|  NAMD   | ``akma_unit_system`` |
++---------+----------------------+
+|  AceMD  | ``akma_unit_system`` |
 +---------+----------------------+
 | OpenMM  | ``md_unit_system``   |
++---------+----------------------+
+| Gromacs | ``md_unit_system``   |
++---------+----------------------+
+| Gromos  | ``md_unit_system``   |
 +---------+----------------------+
