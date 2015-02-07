@@ -570,6 +570,7 @@ class AmberParm(AmberFormat, Structure):
         self.prune_empty_terms()
         self.residues.prune()
         self.rediscover_molecules()
+        self.load_pointers()
 
         # Transfer information from the topology lists 
         self._xfer_atom_info()
