@@ -81,6 +81,9 @@ topological data structures used in the :class:`Structure
 :class:`AmberParm` will populate different term and parameter lists depending on
 the terms present in the force field.
 
+WARNING
+~~~~~~~
+
 Since the raw data and topological features are inextricably linked, there are
 risks associated with modifying the raw data in :py:attr:`AmberParm.parm_data`
 *and* the parameters and properties of the topological data structures in the
@@ -89,7 +92,28 @@ lists inherited from :class:`Structure <chemistry.structure.Structure>`.
 The required overhead to keep :py:attr:`AmberParm.parm_data` and the topology
 structures synchronized at all times introduces too great a cost, so keeping
 them synchronized largely falls on the programmer, although there is
-functionality introduced to help.
+functionality introduced to help:
+
+* Changes to the size or contents of any of the lists in the structure will
+  trigger :py:meth:`AmberParm.remake_parm` to be called inside
+  :py:meth:`AmberParm.write_parm` to make sure that new topology files are
+  written with the updated parameter definitions.
+* There are a handful of synchronization routines designed to copy information
+  from the parameter and topology arrays into :py:attr:`AmberParm.parm_data` and
+  vice-versa. These are summarized in the table below. These are not called
+  automatically (with the exception of :py:meth:`AmberParm.remake_parm` prior to
+  writing a new *prmtop* file) for performance reasons.
+* To modify an :class:`AmberParm` instance safely, follow these guidelines:
+
+    - Modify the attributes on the parameter and topology objects, and call
+      :py:attr:`AmberParm.remake_parm` if you ever need to access the contents
+      of :py:attr:`AmberParm.parm_data` (but try to avoid using the raw data if
+      possible)
+    - Use an available class from :py:mod:`ParmedTools` from the ParmEd API when
+      available, as those classes ensure that the raw data and topology objects
+      are always synchronized when the action completes.
+    - Feel free to use the :class:`Action <ParmedTools.ParmedActions.Action>`
+      classes as examples for working with an :class:`AmberParm`.
 
 Generalizing with :func:`LoadParm`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

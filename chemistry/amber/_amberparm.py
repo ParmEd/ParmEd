@@ -563,8 +563,8 @@ class AmberParm(AmberFormat, Structure):
 
     def remake_parm(self):
         """
-        Re-fills the topology file arrays if we have changed the underlying
-        structure
+        Fills :attr:`parm_data` from the data in the parameter and topology
+        arrays (e.g., :attr:`atoms`, :attr:`bonds`, :attr:`bond_types`, ...)
         """
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
@@ -759,9 +759,12 @@ class AmberParm(AmberFormat, Structure):
 
     def fill_LJ(self):
         """
-        Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data
-        from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop
-        files, by undoing the canonical combining rules.
+        Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each
+        atom type by computing their values from the A and B coefficients of
+        each atom interacting with itself.
+
+        This fills the :attr:`LJ_radius`, :attr:`LJ_depth`, and :attr:`LJ_types`
+        data structures.
         """
         self.LJ_radius = []  # empty LJ_radii so it can be re-filled
         self.LJ_depth = []   # empty LJ_depths so it can be re-filled
@@ -790,9 +793,8 @@ class AmberParm(AmberFormat, Structure):
 
     def fill_14_LJ(self):
         """
-        Fills the LJ_14_radius, LJ_14_depth arrays with data (LJ_types is
-        identical) from LENNARD_JONES_14_ACOEF and LENNARD_JONES_14_BCOEF
-        sections of the prmtop files, by undoing the canonical combining rules.
+        Same as :meth:`fill_LJ`, but for the 1-4 Lennard-Jones parameters (only
+        used for the CHARMM force field currently).
         """
         if not self.chamber:
             raise TypeError('fill_14_LJ() only valid on a chamber prmtop!')
@@ -820,9 +822,15 @@ class AmberParm(AmberFormat, Structure):
 
     def recalculate_LJ(self):
         """
-        Takes the values of the LJ_radius and LJ_depth arrays and recalculates
-        the LENNARD_JONES_A/BCOEF topology sections from the canonical combining
-        rules.
+        Fills the ``LENNARD_JONES_ACOEF`` and ``LENNARD_JONES_BCOEF`` arrays in
+        the :attr:`parm_data` raw data dictionary by applying the canonical
+        Lorentz-Berthelot combining rules to the values in :attr:`LJ_radius` and
+        :attr:`LJ_depth`.
+
+        Note
+        ----
+        This will undo any off-diagonal L-J modifications you may have made, so
+        call this function with care.
         """
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
@@ -868,7 +876,14 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_rst7(self, rst7):
-        """ Loads coordinates into the AmberParm class """
+        """ Loads coordinates into the AmberParm class
+
+        Parameters
+        ----------
+        rst7 : str or :class:`Rst7`
+            The Amber coordinate file (either ASCII restart or NetCDF restart)
+            object or filename to assign atomic coordinates from.
+        """
         if not hasattr(rst7, 'coordinates'):
             rst7 = Rst7.open(rst7)
         self.load_coordinates(rst7.coordinates)
@@ -882,7 +897,14 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_coordinates(self, coords):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        coords : list of floats
+            A 1-dimensional iterable of coordinates of shape (natom*3,) from
+            which all atomic coordinates are assigned. In Angstroms
+        """
         self.coords = coords
         for i, atom in enumerate(self.atoms):
             i3 = 3 * i
@@ -893,7 +915,14 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_velocities(self, vels):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        vels : list of floats
+            A 1-dimensional iterable of velocities of shape (natom*3,) from
+            which all atomic velocities are assigned. In Angstroms/picosecond
+        """
         self.hasvels = True
         self.vels = vels
         for i, atom in enumerate(self.atoms):
@@ -1119,14 +1148,17 @@ class AmberParm(AmberFormat, Structure):
 
     @property
     def chamber(self):
+        """ Whether this instance uses the CHARMM force field """
         return False
 
     @property
     def amoeba(self):
+        """ Whether this instance uses the Amoeba force field """
         return False
 
     @property
     def has_cmap(self):
+        """ Whether this instance has correction map terms or not """
         return False
 
     #===========  PRIVATE INSTANCE METHODS  ============
