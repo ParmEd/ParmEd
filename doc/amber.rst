@@ -363,6 +363,127 @@ below:
     AmberMdcrd
     NetCDFTraj
 
+First we will discuss the ASCII trajectory file (:class:`AmberMdcrd`). We will
+first demonstrate how to *parse* an existing mdcrd file, then we will
+demonstrate how to *write* a new one.
+
+You must specify---for both an existing mdcrd and one that you wish to
+create---the total number of atoms specified by the system and whether or not
+the trajectory will contain unit cell dimensions.  The :meth:`coordinates
+<AmberMdcrd.coordinates>` method, which takes as an optional argument a frame
+number, returns either all or just the requested coordinates. The analogous
+:meth:`box <AmberMdcrd.box>` method returns the unit cell lengths. The example
+below uses the file ``tz2.truncoct.crd`` from the ParmEd unit tests, which has
+5827 atoms and box lengths::
+
+    >>> from chemistry.amber import AmberMdcrd
+    >>> crd = AmberMdcrd('tz2.truncoct.crd', natom=5827, hasbox=True, mode='r')
+    >>> crd.coordinates(0)
+    array([ 0.078,  3.174, -8.844, ...,  2.178, -5.224,  8.991])
+    >>> len(crd.coordinates()) # number of total frames
+    10
+    >>> crd.coordinates(0).shape
+    (17481,)
+    >>> crd.coordinates(0).reshape((5827, 3)) # It is a numpy array
+    array([[ 0.078,  3.174, -8.844],
+           [ 0.999,  3.431, -8.521],
+           [-0.183,  2.306, -8.398],
+           ..., 
+           [ 1.761, -6.031,  8.689],
+           [ 2.047, -6.123,  7.781],
+           [ 2.178, -5.224,  8.991]])
+    >>> crd.box(0)
+    array([ 42.439,  42.439,  42.439])
+    >>> len(crd.box()) # Should also be the number of frames
+    10
+
+When you are writing an :class:`AmberMdcrd` file, you need to use the methods
+:meth:`add_coordinates <AmberMdcrd.add_coordinates>` and :meth:`add_box
+<AmberMdcrd.add_box>` instead of :meth:`coordinates <AmberMdcrd.coordinates>`
+and :meth:`box <AmberMdcrd.box>`, as shown in the example below::
+
+    import numpy as np
+    from chemistry.amber import AmberMdcrd
+    crd = AmberMdcrd('new.mdcrd', natom=30, hasbox=True, mode='w')
+    # Add the first frame
+    crd.add_coordinates(np.random.random((30,3)))
+    crd.add_box([1, 1, 1])
+    # Add the second frame
+    crd.add_coordinates(np.random.random((30,3)))
+    crd.add_box([1.1, 1.1, 1.1])
+    # Close the file
+    crd.close()
+
+You should be able to open the file ``new.mdcrd`` and see 90 numbers spread over
+9 lines (10 numbers per line), then a line with the three box dimensions,
+followed by 9 more lines with 90 total numbers and another line with box
+dimensions.
+
+Now I will demonstrate the use of the :class:`NetCDFTraj` class, which is
+designed to be very similar to the :class:`AmberMdcrd` class. Creating an
+instance is different, but querying and adding coordinates (and unit cell
+dimensions, velocities, and forces) is done in the same way.
+
+To parse an existing NetCDF trajectory, use the :meth:`open_old
+<NetCDFTraj.open_old>` constructor. To write a new one, use :meth:`open_new
+<NetCDFTraj.open_new>`. An example parsing an existing NetCDF trajectory (using
+the ``tz2.truncoct.nc`` file in the ParmEd unit tests) is shown below::
+
+    >>> from chemistry.amber import NetCDFTraj
+    >>> traj = NetCDFTraj.open_old('tz2.truncoct.nc')
+    >>> traj.atom  # number of atoms in the file
+    5827
+    >>> traj.frame # number of frames currently in the file
+    10
+    >>> traj.coordinates(0)
+    array([ 0.07762779,  3.1744082 , -8.84385777, ...,  2.17817903,
+           -5.22395372,  8.99102497], dtype=float32)
+    >>> traj.coordinates(9)
+    array([ 0.33575553,  4.19061375, -9.66586971, ...,  2.48203635,
+           -3.30589318,  8.45326519], dtype=float32)
+    >>> traj.box(0)
+    array([  42.43884853,   42.43884853,   42.43884853,  109.471219  ,
+            109.471219  ,  109.471219  ])
+    >>> traj.box(9)
+    array([  42.42843203,   42.42843203,   42.42843203,  109.471219  ,
+            109.471219  ,  109.471219  ])
+
+One thing you'll notice is that the :class:`NetCDFTraj` class has the
+:attr:`atom <NetCDFTraj.atom>` and :attr:`frame <NetCDFTraj.frame>` attributes
+that indicate how many atoms are in the trajectory and how many frames are
+present. Furthermore, unlike the :class:`AmberMdcrd` format---which stores only
+the unit cell lengths---the :class:`NetCDFTraj` stores both unit cell lengths
+*and* angles.
+
+Furthermore, velocities and forces can be saved in NetCDF trajectory files,
+allowing you to extract them with the analogous :meth:`velocities
+<NetCDFTraj.velocities>` and :meth:`forces <NetCDFTraj.forces>` methods.
+Likewise, you can set them with :meth:`add_velocities
+<NetCDFTraj.add_velocities>` and :meth:`add_forces <NetCDFTraj.add_forces>`.
+
+An example of writing a NetCDF trajectory (with velocities and forces) is shown
+below::
+
+    from chemistry.amber import NetCDFTraj
+    import numpy as np
+    # Open the NetCDF trajectory file for writing
+    crd = NetCDFTraj.open_new('new_crd.nc', natom=30, box=True,
+                              crds=True, vels=True, frcs=True)
+    # Add random coordinates, velocities, and forces for first frame
+    crd.add_coordinates(np.random.random((30,3)))
+    crd.add_velocities(np.random.random((30,3)) * 10)
+    crd.add_forces(np.random.random((30,3)) / 10)
+    crd.add_box([1, 1, 1, 90, 90, 90])
+    # Add random second frame
+    crd.add_coordinates(np.random.random((30,3)))
+    crd.add_velocities(np.random.random((30,3)) * 10)
+    crd.add_forces(np.random.random((30,3)) / 10)
+    crd.add_box([1.1, 1.1, 1.1, 90, 90, 90])
+    # Close the file
+    crd.close()
+
+As an exercise, try using :meth:`NetCDFTraj.open_old` to check the contents of
+``new_crd.nc`` and verify that it contains the information you expect.
 
 Reading and writing NetCDF files
 --------------------------------
@@ -374,5 +495,37 @@ can extend a file convention to include more data *without* breaking existing
 parsers).
 
 Python cannot read NetCDF files without the support of an external package. In
-particular, the following packages
+particular, the following packages provide Python bindings to the NetCDF API:
 
+    1. `scipy <http://www.scipy.org/>`_
+    2. `netCDF4 <https://github.com/Unidata/netcdf4-python>`_
+    3. `ScientificPython <http://dirac.cnrs-orleans.fr/plone/software/scientificpython/>`_
+
+All three of these files provide similar, although not identical interfaces. The
+ParmEd API supports all three NetCDF backends. You can swap out backends at any
+time using the :func:`use <chemistry.amber.netcdffiles.use>` function. If you do
+not choose one, one will be picked automatically based on the available
+packages.  If several of those packages are available, the first one in the
+above list that is available will be picked.
+
+For most users, simply ensuring that at least one of the above packages is
+available and working and using the default will suffice. For the other small
+percentage that may want more fine-grained control, the :func:`use
+<chemistry.amber.netcdffiles.use>` function will let you specify a particular
+implementation to use.  You can change the back-end at any time, but note that
+the behavior of a NetCDF object *created* with one implementation is undefined
+if you switch to a different one. So you are cautioned against switching NetCDF
+implementations when open NetCDF file handles are still open.
+
+An example of switching between NetCDF implementations is shown below::
+
+    from chemistry.amber import netcdffiles
+    # Use the default NetCDF package (if one is already selected,
+    # this does nothing)
+    netcdffiles.use() # You can also pass "None"
+    # Use scipy for NetCDF files
+    netcdffiles.use('scipy')
+    # Use ScientificPython for NetCDF files
+    netcdffiles.use('Scientific') # Can also be ScientificPython
+    # Use netCDF4
+    netcdffiles.use('netCDF4')
