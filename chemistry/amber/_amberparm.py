@@ -30,6 +30,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NNB, TINY)
 from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
+from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
 from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
@@ -520,8 +521,7 @@ class AmberParm(AmberFormat, Structure):
 
         # Check that we have a rst7 loaded, then overwrite it with a new one if
         # necessary
-        rst7 = Rst7(natom=len(self.atoms), hasvels=self.vels is not None,
-                    hasbox=self.box is not None)
+        rst7 = Rst7(natom=len(self.atoms))
 
         # Now fill in the rst7 coordinates
         rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
@@ -889,9 +889,8 @@ class AmberParm(AmberFormat, Structure):
             rst7 = Rst7.open(rst7)
         self.load_coordinates(rst7.coordinates)
         self.hasvels = rst7.hasvels
-        self.hasbox = rst7.hasbox
-        if self.hasbox:
-            self.box = rst7.box[:]
+        self.box = copy.copy(rst7.box)
+        self.hasbox = self.box is not None
         if self.hasvels:
             self.load_velocities(rst7.vels)
 
@@ -1826,6 +1825,27 @@ class Rst7(object):
     """
     Amber input coordinate (or restart coordinate) file. Front-end for the
     readers and writers, supports both NetCDF and ASCII restarts.
+
+    Parameters
+    ----------
+    filename : str, optional
+        If a filename is provided, this file is parsed and the Rst7 data
+        populated from that file. The format (ASCII or NetCDF) is autodetected
+    natom : int, optional
+        If no filename is provided, this value is required. If a filename is
+        provided, this value is ignored (and instead set to the value of natom
+        from the coordinate file). This is the number of atoms for which we have
+        coordinates. If not provided for a new file, it *must* be set later.
+    title : str, optional
+        For a file that is to be written, this is the title that will be given
+        to that file. Default is an empty string
+    hasvels : bool, deprecated
+        This variable has no effect. The presence of vels is detected by whether
+        or not velocities have been set
+    hasbox : bool, deprecated
+        This variable has no effect (see the reason for hasvels, above)
+    time : float, optional
+        The time to write to the restart file. This is cosmetic. Default is 0
     """
 
     def __init__(self, filename=None, natom=None, title='', hasvels=False,
@@ -1837,21 +1857,21 @@ class Rst7(object):
         self.coordinates = []
         self.vels = []
         self.box = []
-        self.hasvels = hasvels
-        self.hasbox = hasbox
         self.natom = natom
         self.title = title
         self.time = 0
         if filename is not None:
             self.filename = filename
-            warn('Use Rst7.open() constructor instead of default constructor '
-                 'to parse restart files.', DeprecationWarning)
             self._read(filename)
 
     @classmethod
     def open(cls, filename):
-        """
-        Constructor that opens and parses an input coordinate file
+        """ Constructor that opens and parses an input coordinate file
+        
+        Parameters
+        ----------
+        filename : str
+            Name of the file to parse
         """
         inst = cls()
         inst.filename = filename
@@ -1881,8 +1901,6 @@ class Rst7(object):
                 raise ReadError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
-        self.hasvels = f.hasvels
-        self.hasbox = f.hasbox
         if f.hasvels:
             self.vels = f.velocities
         if f.hasbox:
@@ -1907,7 +1925,6 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        inst.hasvels = thing.hasvels
         if hasattr(thing, 'vels'): inst.vels = thing.vels[:]
         inst.hasbox = thing.hasbox
         if hasattr(thing, 'box'): inst.box = thing.box[:]
@@ -1936,23 +1953,57 @@ class Rst7(object):
         f.time = self.time
         # Now write the coordinates
         f.coordinates = self.coordinates
-        if self.hasvels:
+        if self.vels:
             f.velocities = self.vels
-        if self.hasbox:
+        if self.box:
             f.box = self.box
         f.close()
 
     @property
     def positions(self):
         """ Atomic coordinates with units """
-        return ([self.coordinates[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        try:
+            return u.Quantity(self.coordinates.reshape(self.natom, 3),
+                              u.angstroms)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.coordinates[i:i+3] for i in xrange(0, natom3, 3)] *
                         u.angstroms)
 
     @property
     def velocities(self):
         """ Atomic velocities with units """
-        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        try:
+            return u.Quantity(self.vels.reshape(self.natom, 3),
+                              u.angstroms/u.picoseconds)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.vels[i:i+3] for i in xrange(0, natom3, 3)] *
                         u.angstroms/u.picoseconds)
+
+    @property
+    def box_vectors(self):
+        """ Unit cell vectors with units """
+        if self.box is None: return None
+        return box_lengths_and_angles_to_vectors(*self.box)
+
+    @property
+    def hasbox(self):
+        """ Whether or not this Rst7 has unit cell information """
+        try:
+            return bool(self.box)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
+
+    @property
+    def hasvels(self):
+        """ Whether or not this Rst7 has velocities """
+        try:
+            return bool(self.vels)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

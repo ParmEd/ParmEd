@@ -261,6 +261,21 @@ Note that no data is explicitly *copied* during this conversion, though.
 The coordinate and trajectory files
 -----------------------------------
 
+ParmEd also supplies classes for parsing all of the various formats of Amber
+coordinate files, including both restarts and trajectories (in both ASCII and
+NetCDF format). If ``numpy`` is available, all coordinates, velocities, and/or
+forces are added to ``numpy`` arrays. If not, ``array.array`` is the return
+object. These classes have *very* different APIs, so the onus is on you to
+only use these arrays as ``numpy`` arrays if you are sure ``numpy`` is
+available. (Since all NetCDF-capable libraries are built on ``numpy``, this
+warning really only applies to ASCII files... see below).
+
+Note that the :mod:`chemistry.amber` package needs some help from third-party
+packages to read NetCDF-format files.  For more information on NetCDF support,
+see the last section of this page.
+
+The corresponding classes are:
+
 .. currentmodule:: chemistry.amber
 .. autosummary::
     :toctree: amberobj/
@@ -271,3 +286,93 @@ The coordinate and trajectory files
     NetCDFTraj
     AmberMdcrd
     netcdffiles.use
+
+Inpcrd and Restart files
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main class that deals with this is the :class:`Rst7` class.  This class will
+automatically detect the file format of any inpcrd/restart file, and whether
+velocities and/or unit cell information is present.  There are 2 ways you can
+instantiate a Rst7.
+
+To read a restart file, provide a filename to the :class:`Rst7` constructor. If
+you plan on setting the data in order to *write* a restart file, you should
+provide the argument ``natom`` to the :class:`Rst7` constructor. Examples using
+the NetCDF restart file ``ncinpcrd.rst7`` from the ParmEd unit tests are shown
+below (you are, of course, free to use an ASCII restart file instead)::
+
+    >>> # Read an Amber NetCDF restart file
+    >>> ncrst = Rst7("ncinpcrd.rst7")
+    >>> ncrst.natom
+    2101
+    >>> ncrst.coordinates[:3]
+    array([ 6.82122493,  6.62762507, -8.51669   ])
+    >>> ncrst.vels[:3]
+    array([-2.87565556, -3.02095312,  3.73882771])
+    >>> ncrst.box
+    array([  30.2642725,   30.2642725,   30.2642725,  109.471219 ,
+            109.471219 ,  109.471219 ])
+
+For OpenMM, coordinates and velocities need to have a specific shape as well as
+units (since the OpenMM core unit system is different than the one used by
+Amber). To facilitate this, the ``positions``, ``velocities``, and
+``box_vectors`` attributes of the :class:`Rst7` class satisfy this requirement::
+
+    >>> ncrst.positions[0]
+    Quantity(value=array([ 6.82122493,  6.62762507, -8.51669   ]), unit=angstrom)
+    >>> ncrst.velocities[0]
+    Quantity(value=array([-2.87565556, -3.02095312,  3.73882771]), unit=angstrom/picosecond)
+    >>> print('\n'.join(repr(x) for x in ncrst.box_vectors)) # Prettier printing
+    Quantity(value=[30.264272500000001, 0.0, 0.0], unit=angstrom)
+    Quantity(value=[-10.088090019353215, 28.533430037688813, 0.0], unit=angstrom)
+    Quantity(value=[-10.088090019353215, -13.45078642114427, 25.164120774794483], unit=angstrom)
+
+The :class:`Rst7` class uses the :class:`AmberAsciiRestart` and
+:class:`NetCDFRestart` classes internally with a much simpler interface. Unless
+you need the flexibility afforded by the raw classes, you are encouraged to use
+:class:`Rst7` instead.
+
+Writing a restart file is easy as well.  If you provide velocities, velocities
+will be written.  If you supply unit cell dimensions, unit cell dimensions will
+be written.  For example::
+
+    >>> import numpy as np
+    >>> new_rst7 = Rst7(natom=10)
+    >>> new_rst7.coordinates = np.random.random(30)
+    >>> new_rst7.box = [1, 1, 1, 90, 90, 90]
+    >>> new_rst7.write('new_rst7.ncrst', netcdf=True) # Write NetCDF format
+    >>> new_rst7.write('new_rst7.rst7')               # Write ASCII format
+
+After this short script, you will have two coordinate files, one in NetCDF
+format (``new_rst7.ncrst``) and one in ASCII format (``new_rst7.rst7``) with the
+same (fake) coordinates. You can use ``ncdump`` to print the contents of the
+NetCDF file to compare, if you wish.
+
+Trajectory files
+~~~~~~~~~~~~~~~~
+
+Amber generates two different formats of trajectory files: *NetCDF* trajectory
+files and a standardized ASCII-format (raw text) trajectory files. The
+:mod:`chemistry` package contains classes that support both formats, described
+below:
+
+.. currentmodule:: chemistry.amber
+.. autosummary::
+    :toctree: amberobj/
+
+    AmberMdcrd
+    NetCDFTraj
+
+
+Reading and writing NetCDF files
+--------------------------------
+
+NetCDF---standing for *Net*\ work *C*\ ommon *D*\ ata *F*\ ormat---is a binary
+file format that is flexible, portable (i.e., between `big endian and little
+endian <http://en.wikipedia.org/wiki/Endianness>`_), and extensible (i.e., you
+can extend a file convention to include more data *without* breaking existing
+parsers).
+
+Python cannot read NetCDF files without the support of an external package. In
+particular, the following packages
+
