@@ -105,7 +105,7 @@ class _AmberAsciiCoordinateFile(object):
 
     def _parse(self):
         """ Handles actual file parsing """
-        raise NotImplemented('%s must be subclassed.' % type(self).__name__)
+        raise NotImplementedError('virtual method not overwritten')
 
     def close(self):
         """ Close the open file handler """
@@ -486,7 +486,21 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
     def coordinates(self, frame=None):
         """
-        Returns the frame'th frame of the coordinates as a 3*natom-length array
+        Returns the requested coordinates
+
+        Parameters
+        ----------
+        frame : int, optional
+            If provided, this is the frame number whose coordinates will be
+            returned. If not provided, all of the coordinates are returned as a
+            list in which each entry is a 3*natom-length array of coordinates
+
+        Returns
+        -------
+        coordinates : array or list of array
+            If ``frame`` is None, the coordinates will be a list of length the
+            number of frames in the trajectory with each item being an array
+            (numpy if available) of 3*natom length of coordinates.
         """
         if not self._status == 'old':
             raise RuntimeError('Cannot access coordinates of a new mdcrd')
@@ -497,6 +511,20 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
     def box(self, frame=None):
         """
         Returns the frame'th frame of the box lengths as a length-3 array
+
+        Parameters
+        ----------
+        frame : int, optional
+            If provided, this is the frame number whose box dimensions will be
+            returned. If not provided, all of the box dimensions are returned as
+            a list in which each entry is a length-3 array of box lengths
+
+        Returns
+        -------
+        box_lengths : array or list of array
+            If ``frame`` is None, the box lengths will be a list of length the
+            number of frames in the trajectory with each item being an array
+            (numpy if available) of box lengths.
         """
         if not self._status == 'old':
             raise RuntimeError('Cannot access box of a new mdcrd')
@@ -508,7 +536,22 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         """
         Prints 'stuff' (which must be either an iterable of 3*natom or have an
         attribute 'flatten' that converts it into an iterable of 3*natom) to the
-        open file handler. Can only be called on a 'new' mdcrd
+        open file handler. Can only be called on a 'new' mdcrd, and adds these
+        coordinates to the current end of the file.
+
+        Parameters
+        ----------
+        stuff : array or iterable
+            This must be an iterable of length 3*natom or a numpy array that can
+            be flattened to a 3*natom-length array
+
+        Raises
+        ------
+        If the coordinate file is an old one being parsed or if you are
+        currently expected to provide unit cell dimensions, a RuntimeError is
+        raised. If the provided coordinate data does not have length 3*natom, or
+        cannot be ``flatten()``ed to create a 3*natom array, a ValueError is
+        raised.
         """
         # Make sure we can write the coordinates right now
         if not self._status == 'new':
@@ -542,6 +585,18 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         """
         Prints 'stuff' (which must be a 3-element list, array.array, tuple, or
         np.ndarray) as the box lengths for this frame
+
+        Parameters
+        ----------
+        stuff : array or iterable
+            This must be an iterable of length 3 with the box lengths
+
+        Raises
+        ------
+        If the coordinate file is an old one being parsed or if you are
+        currently expected to provide coordinates, a RuntimeError is raised.
+        raised. If the provided box lengths are not length 3, a ValueError is
+        raised.
         """
         # First make sure we should be writing our box now
         if not self._status == 'new':
