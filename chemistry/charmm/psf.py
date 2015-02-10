@@ -61,29 +61,17 @@ class _ZeroDict(dict):
 
 class CharmmPsfFile(Structure):
     """
-    A chemical structure instantiated from CHARMM files.
+    A chemical :class:`Structure` instantiated from CHARMM files.
 
-    This structure has numerous attributes that are lists of the elements of
-    this structure, including atoms, bonds, torsions, etc. The attributes are
-        - residues
-        - atoms
-        - bonds
-        - angles
-        - dihedrals
-        - dihedral_parameters
-        - impropers
-        - cmaps
-        - donors    # hbonds donors?
-        - acceptors # hbond acceptors?
-        - groups    # list of nonbonded interaction groups
+    Parameters
+    ----------
+    psf_name : str
+        Name of the PSF file (it must exist)
 
-    Additional attribute is available if a CharmmParameterSet is loaded into
-    this structure.
-        
-        - urey_bradleys
-
-    The lengths of each of these lists gives the pointers (e.g., natom, nres,
-    etc.)
+    Raises
+    ------
+    IOError : If file ``psf_name`` does not exist
+    CharmmPsfError : If any parsing errors are encountered
 
     Examples
     --------
@@ -181,13 +169,6 @@ class CharmmPsfFile(Structure):
         """
         Opens and parses a PSF file, then instantiates a CharmmPsfFile
         instance from the data.
-            
-        Parameters:
-            psf_name (str) : Name of the PSF file (it must exist)
-        
-        Exceptions Raised:
-            IOError : If file "psf_name" does not exist
-            CharmmPSFError: If any parsing errors are encountered
         """
         Structure.__init__(self)
         conv = CharmmPsfFile._convert
@@ -550,9 +531,9 @@ class CharmmPsfFile(Structure):
         
         See Also
         --------
-        Structure.createSystem
+        :meth:`chemistry.structure.Structure.createSystem`
             In addition to `params`, this method also takes all arguments for
-            Structure.createSystem
+            :meth:`chemistry.structure.Structure.createSystem`
         """
         if params is not None: self.load_parameters(params)
         return super(CharmmPsfFile, self).createSystem(*args, **kwargs)
@@ -566,7 +547,7 @@ class CharmmPsfFile(Structure):
 
         Parameters
         ----------
-        parmset : CharmmParameterSet
+        parmset : :class:`CharmmParameterSet`
             List of all parameters
 
         Notes
