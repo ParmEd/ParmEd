@@ -89,15 +89,15 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
 
     Parameters
     ----------
-    old_atom : Atom
+    old_atom : :class:`Atom`
         The original atom that has been added to the structure already
-    new_atom : Atom
+    new_atom : :class:`Atom`
         The new atom that we want to see if it is the same as the old atom
-    resname : str
+    resname : ``str``
         The name of the residue that the new atom would belong to
-    resid : int
+    resid : ``int``
         The number of the residue that the new atom would belong to
-    chain : str
+    chain : ``str``
         The chain identifier that the new atom would belong to
 
     Returns
@@ -155,15 +155,15 @@ def _gb_rad_screen(atom, model):
 
     Parameters
     ----------
-    atom : Atom
+    atom : :class:`Atom`
         The atom to get the default GB parameters for
-    model : app.HCT, app.OBC1, or app.OBC2
+    model : ``app.HCT, app.OBC1, or app.OBC2``
         The GB model to get the default parameters for (app.GBn and app.GBn2 are
         already handled in Structure._get_gb_parameters)
 
     Returns
     -------
-    radius, screen [,alpha, beta, gamma] : float, float [,float, float, float]
+    radius, screen [,alpha, beta, gamma] : ``float, float [,float, float, float]``
         The intrinsic radius of the atom and the screening factor of the atom.
         If the model is GBn2, alpha, beta, and gamma parameters are also
         returned
@@ -190,50 +190,50 @@ class Structure(object):
 
     Attributes
     ----------
-    atoms : AtomList
+    atoms : :class:`AtomList`
         List of all atoms in the structure
-    residues : ResidueList
+    residues : :class:`ResidueList`
         List of all residues in the structure
-    bonds : TrackedList(Bond)
+    bonds : :class:`TrackedList` (:class:`Bond`)
         List of all bonds in the structure
-    angles : TrackedList(Angle)
+    angles : :class:`TrackedList` (:class:`Angle`)
         List of all angles in the structure
-    dihedrals : TrackedList(Dihedral)
+    dihedrals : :class:`TrackedList` (:class:`Dihedral`)
         List of all dihedrals in the structure -- only one term per dihedral, so
         multi-term dihedral parameters will have the same 4 atoms appear
         multiple times in the list
-    urey_bradleys : TrackedList(UreyBradley)
+    urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
         List of all Urey-Bradley angle bends in the structure
-    impropers : TrackedList(Improper)
+    impropers : :class:`TrackedList` (:class:`Improper`)
         List of all CHARMM-style improper torsions in the structure
-    cmaps : TrackedList(Cmap)
+    cmaps : :class:`TrackedList` (:class:`Cmap`)
         List of all CMAP objects in the structure
-    trigonal_angles : TrackedList(TrigonalAngle)
+    trigonal_angles : :class:`TrackedList` (:class:`TrigonalAngle`)
         List of all AMOEBA-style trigonal angles in the structure
-    out_of_plane_bends : TrackedList(OutOfPlaneBends)
+    out_of_plane_bends : :class:`TrackedList` (:class:`OutOfPlaneBends`)
         List of all AMOEBA-style out-of-plane bending angles
-    pi_torsions : TrackedList(PiTorsion)
+    pi_torsions : :class:`TrackedList` (:class:`PiTorsion`)
         List of all AMOEBA-style pi-torsion angles
-    stretch_bends : TrackedList(StretchBend)
+    stretch_bends : :class:`TrackedList` (:class:`StretchBend`)
         List of all AMOEBA-style stretch-bend compound bond/angle terms
-    torsion_torsions : TrackedList(TorsionTorsion)
+    torsion_torsions : :class:`TrackedList` (:class:`TorsionTorsion`)
         List of all AMOEBA-style coupled torsion-torsion terms
-    chiral_frames : TrackedList(ChiralFrame)
+    chiral_frames : :class:`TrackedList` (:class:`ChiralFrame`)
         List of all AMOEBA-style chiral frames defined in the structure
-    multipole_frames : TrackedList(MultipoleFrame)
+    multipole_frames : :class:`TrackedList` (:class:`MultipoleFrame`)
         List of all AMOEBA-style multipole frames defined in the structure
-    adjusts : TrackedList(NonbondedException)
+    adjusts : :class:`TrackedList` (:class:`NonbondedException`)
         List of all AMOEBA-style nonbonded pair-exception rules
-    acceptors : TrackedList(AcceptorDonor)
+    acceptors : :class:`TrackedList` (:class:`AcceptorDonor`)
         List of all H-bond acceptors, if that information is present
-    donors : TrackedList(AcceptorDonor)
+    donors : :class:`TrackedList` (:class:`AcceptorDonor`)
         List of all H-bond donors, if that information is present
-    groups : TrackedList(Group)
+    groups : :class:`TrackedList` (:class:`Group`)
         List of all CHARMM-style GROUP objects (whatever those are used for)
-    box : list of 6 floats
+    box : ``list of 6 floats``
         Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no
         box is defined, `box` is set to `None`
-    space_group : str
+    space_group : ``str``
         The space group of the structure (default is "P 1")
 
     This class also has a handful of type lists for each of the attributes above
@@ -247,8 +247,9 @@ class Structure(object):
 
     Notes
     -----
-    dihedral_types _may_ be a list of DihedralType instances, since torsion
-    profiles are often represented by a Fourier series with multiple terms
+    dihedral_types _may_ be a list of :class:`DihedralType` instances, since
+    torsion profiles are often represented by a Fourier series with multiple
+    terms
     """
     # Force groups assigned to each type of force
     BOND_FORCE_GROUP = 0
@@ -318,15 +319,15 @@ class Structure(object):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to this residue list
-        resname : str
+        resname : ``str``
             The name of the residue this atom belongs to
-        resnum : int
+        resnum : ``int``
             The number of the residue this atom belongs to
-        chain : str=''
+        chain : ``str``
             The chain ID character for this residue
-        inscode : str=''
+        inscode : ``str``
             The insertion code ID character for this residue (it is stripped)
 
         Notes
@@ -345,9 +346,9 @@ class Structure(object):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to the system
-        residue : Residue
+        residue : :class:`Residue`
             The residue to which to add this atom. It MUST be part of this
             Structure instance already or a ValueError is raised
 
@@ -386,14 +387,14 @@ class Structure(object):
         ----------
         cls : Structure subclass
             The returned object is a copy of this structure as a `cls` instance
-        split_dihedrals : bool=False
+        split_dihedrals : ``bool``
             If True, then the Dihedral entries will be split up so that each one
             is paired with a single DihedralType (rather than a
             DihedralTypeList)
 
         Returns
         -------
-        cls instance
+        *cls* instance
             The instance of the Structure subclass `cls` with a copy of the
             current Structure's topology information
         """
@@ -716,7 +717,7 @@ class Structure(object):
 
         Parameters
         ----------
-        selection : AmberMask, str, or iterable of bool
+        selection : :class:`AmberMask`, ``str``, or ``iterable``
             This is the selection of atoms that will be deleted from this
             structure. If it is a string, it will be interpreted as an
             AmberMask. If it is an AmberMask, it will be converted to a
@@ -751,36 +752,38 @@ class Structure(object):
 
         Parameters
         ----------
-        dest : str or file-like
+        dest : ``str or file-like``
             Either a file name or a file-like object containing a `write`
             method to which to write the PDB file. If it is a filename that
             ends with .gz or .bz2, a compressed version will be written using
             either gzip or bzip2, respectively.
-        renumber : bool=True
+        renumber : ``bool``
             If True, renumber the atoms and residues sequentially as they are
             stored in the structure.  If False, use the original numbering if
             it was assigned previously
-        coordinates : array-like of float=None
+        coordinates : ``array-like of float``
             If provided, these coordinates will be written to the PDB file
             instead of the coordinates stored in the structure. These
             coordinates should line up with the atom order in the structure
             (not necessarily the order of the "original" PDB file if they
             differ)
-        altlocs : str='all'
+        altlocs : ``str``
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
+
                 - 'all' : (default) print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
                   printed
+
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
-        write_anisou : bool=False
+        write_anisou : ``bool``
             If True, an ANISOU record is written for every atom that has one. If
             False, ANISOU records are not written
-        charmm : bool=False
+        charmm : ``bool``
             If True, SEGID will be written in columns 73 to 76 of the PDB file
             in the typical CHARMM-style PDB output. This will be omitted for any
             atom that does not contain a SEGID identifier.
@@ -947,33 +950,35 @@ class Structure(object):
 
         Parameters
         ----------
-        dest : str or file-like
+        dest : ``str or file-like``
             Either a file name or a file-like object containing a `write`
             method to which to write the PDB file. If it is a filename that
             ends with .gz or .bz2, a compressed version will be written using
             either gzip or bzip2, respectively.
-        renumber : bool=True
+        renumber : ``bool``
             If True, renumber the atoms and residues sequentially as they are
             stored in the structure.  If False, use the original numbering if
             it was assigned previously
-        coordinates : array-like of float=None
+        coordinates : ``array-like of float``
             If provided, these coordinates will be written to the PDB file
             instead of the coordinates stored in the structure. These
             coordinates should line up with the atom order in the structure
             (not necessarily the order of the "original" PDB file if they
             differ)
-        altlocs : str='all'
+        altlocs : ``str``
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
+
                 - 'all' : (default) print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
                   printed
+
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
-        write_anisou : bool=False
+        write_anisou : ``bool``
             If True, an ANISOU record is written for every atom that has one. If
             False, ANISOU records are not written
         """
@@ -2481,7 +2486,7 @@ def read_PDB(filename):
 
     Parameters
     ----------
-    filename : str or file-like
+    filename : ``str or file-like``
         Name of PDB file to read, or a file-like object that can iterate over
         the lines of a PDB. Compressed file names can be specified and are
         determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)
@@ -2491,36 +2496,36 @@ def read_PDB(filename):
     The PDB parser also adds metadata to the returned Structure object that may
     be present in the PDB file
 
-    experimental : str
+    experimental : ``str``
         EXPDTA record
-    journal : str
+    journal : ``str``
         JRNL record
-    authors : str
+    authors : ``str``
         AUTHOR records
-    keywords : str
+    keywords : ``str``
         KEYWDS records
-    doi : str
+    doi : ``str``
         DOI from the JRNL record
-    pmid : str
+    pmid : ``str``
         PMID from the JRNL record
-    journal_authors : str
+    journal_authors : ``str``
         Author info from the JRNL record
-    volume : str
+    volume : ``str``
         Volume of the published article from the JRNL record
-    page : str
+    page : ``str``
         Page of the published article from the JRNL record
-    title : str
+    title : ``str``
         TITL section of the JRNL record
-    year : int=None
+    year : ``int``
         Year that the article was published, from the JRNL record
-    related_entries : list of (str, str)
+    related_entries : ``list of (str, str)``
         List of entries in other databases
 
     Returns
     -------
     structure
     
-    structure : Structure
+    structure : :class:`Structure`
         The Structure object initialized with all of the information from the
         PDB file.  No bonds or other topological features are added by default.
 
@@ -2872,22 +2877,22 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
 
     Parameters
     ----------
-    struct : Structure
+    struct : :class:`Structure`
         A Structure instance from which to write the PDB file
-    dest : str or file-like
+    dest : ``str or file-like``
         Either a file name or a file-like object containing a `write`
         method to which to write the PDB file
-    renumber : bool=True
+    renumber : ``bool``
         If True, renumber the atoms and residues sequentially as they are
         stored in the structure.  If False, use the original numbering if
         it was assigned previously
-    coordinates : array-like of float=None
+    coordinates : ``array-like of float``
         If provided, these coordinates will be written to the PDB file
         instead of the coordinates stored in the structure. These
         coordinates should line up with the atom order in the structure
         (not necessarily the order of the "original" PDB file if they
         differ)
-    altlocs : str='all'
+    altlocs : ``str``
         Keyword controlling which alternate locations are printed to the
         resulting PDB file. Allowable options are:
             - 'all' : (default) print all alternate locations
@@ -2898,10 +2903,10 @@ def write_PDB(struct, dest, renumber=True, coordinates=None, altlocs='all',
         Input is case-insensitive, and partial strings are permitted as long
         as it is a substring of one of the above options that uniquely
         identifies the choice.
-    write_anisou : bool=False
+    write_anisou : ``bool``
         If True, an ANISOU record is written for every atom that has one. If
         False, ANISOU records are not written
-    charmm : bool=False
+    charmm : ``bool``
         If True, SEGID will be written in columns 73 to 76 of the PDB file in
         the typical CHARMM-style PDB output. This will be omitted for any atom
         that does not contain a SEGID identifier.
@@ -2916,7 +2921,7 @@ def read_CIF(filename):
 
     Parameters
     ----------
-    filename : str or file-like
+    filename : ``str or file-like``
         Name of PDB file to read, or a file-like object that can iterate over
         the lines of a PDB. Compressed file names can be specified and are
         determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)
@@ -2926,36 +2931,36 @@ def read_CIF(filename):
     The PDB parser also adds metadata to the returned Structure object that may
     be present in the PDB file
 
-    experimental : str
+    experimental : ``str``
         EXPDTA record
-    journal : str
+    journal : ``str``
         JRNL record
-    authors : str
+    authors : ``str``
         AUTHOR records
-    keywords : str
+    keywords : ``str``
         KEYWDS records
-    doi : str
+    doi : ``str``
         DOI from the JRNL record
-    pmid : str
+    pmid : ``str``
         PMID from the JRNL record
-    journal_authors : str
+    journal_authors : ``str``
         Author info from the JRNL record
-    volume : str
+    volume : ``str``
         Volume of the published article from the JRNL record
-    page : str
+    page : ``str``
         Page of the published article from the JRNL record
-    title : str
+    title : ``str``
         TITL section of the JRNL record
-    year : int=None
+    year : ``str``
         Year that the article was published, from the JRNL record
-    related_entries : list of (str, str)
+    related_entries : ``list of (str, str)``
         List of entries in other databases
 
     Returns
     -------
     structure1 [, structure2 [, structure3 [, ...] ] ]
 
-    structure# : Structure
+    structure# : :class:`Structure`
         The Structure object initialized with all of the information from the
         PDBx/mmCIF file.  No bonds or other topological features are added by
         default. If multiple structures are defined in the CIF file, multiple

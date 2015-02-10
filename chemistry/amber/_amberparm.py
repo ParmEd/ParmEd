@@ -30,6 +30,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NNB, TINY)
 from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
+from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
 from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
@@ -220,11 +221,15 @@ class AmberParm(AmberFormat, Structure):
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
 
-        Parameters:
-            - rawdata (AmberFormat): Already has a parsed file
+        Parameters
+        ----------
+        rawdata : :class:`AmberFormat`
+            An AmberFormat instance that has already been instantiated
 
-        Returns:
-            Populated AmberParm instance
+        Returns
+        -------
+        parm : :class:`AmberParm`
+            An instance of this type from the data in rawdata
         """
         inst = cls()
         inst.prm_name = rawdata.prm_name
@@ -258,7 +263,7 @@ class AmberParm(AmberFormat, Structure):
 
         Parameters
         ----------
-        struct : Structure
+        struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
         """
         inst = struct.copy(cls, split_dihedrals=True)
@@ -516,8 +521,7 @@ class AmberParm(AmberFormat, Structure):
 
         # Check that we have a rst7 loaded, then overwrite it with a new one if
         # necessary
-        rst7 = Rst7(natom=len(self.atoms), hasvels=self.vels is not None,
-                    hasbox=self.box is not None)
+        rst7 = Rst7(natom=len(self.atoms))
 
         # Now fill in the rst7 coordinates
         rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
@@ -559,8 +563,8 @@ class AmberParm(AmberFormat, Structure):
 
     def remake_parm(self):
         """
-        Re-fills the topology file arrays if we have changed the underlying
-        structure
+        Fills :attr:`parm_data` from the data in the parameter and topology
+        arrays (e.g., :attr:`atoms`, :attr:`bonds`, :attr:`bond_types`, ...)
         """
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
@@ -573,6 +577,8 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        # Load the pointers dict
+        self.load_pointers()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
@@ -755,9 +761,12 @@ class AmberParm(AmberFormat, Structure):
 
     def fill_LJ(self):
         """
-        Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data
-        from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop
-        files, by undoing the canonical combining rules.
+        Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each
+        atom type by computing their values from the A and B coefficients of
+        each atom interacting with itself.
+
+        This fills the :attr:`LJ_radius`, :attr:`LJ_depth`, and :attr:`LJ_types`
+        data structures.
         """
         self.LJ_radius = []  # empty LJ_radii so it can be re-filled
         self.LJ_depth = []   # empty LJ_depths so it can be re-filled
@@ -784,41 +793,17 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def fill_14_LJ(self):
-        """
-        Fills the LJ_14_radius, LJ_14_depth arrays with data (LJ_types is
-        identical) from LENNARD_JONES_14_ACOEF and LENNARD_JONES_14_BCOEF
-        sections of the prmtop files, by undoing the canonical combining rules.
-        """
-        if not self.chamber:
-            raise TypeError('fill_14_LJ() only valid on a chamber prmtop!')
-
-        pd = self.parm_data
-        acoef = pd['LENNARD_JONES_14_ACOEF']
-        bcoef = pd['LENNARD_JONES_14_BCOEF']
-        ntypes = self.pointers['NTYPES']
-
-        self.LJ_14_radius = []  # empty LJ_radii so it can be re-filled
-        self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
-        one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
-
-        for i in xrange(ntypes):
-            lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if acoef[lj_index] < 1.0e-6:
-                self.LJ_14_radius.append(0)
-                self.LJ_14_depth.append(0)
-            else:
-                factor = 2 * acoef[lj_index] / bcoef[lj_index]
-                self.LJ_14_radius.append(pow(factor, one_sixth) * 0.5)
-                self.LJ_14_depth.append(bcoef[lj_index] / 2 / factor)
-
-    #===================================================
-
     def recalculate_LJ(self):
         """
-        Takes the values of the LJ_radius and LJ_depth arrays and recalculates
-        the LENNARD_JONES_A/BCOEF topology sections from the canonical combining
-        rules.
+        Fills the ``LENNARD_JONES_ACOEF`` and ``LENNARD_JONES_BCOEF`` arrays in
+        the :attr:`parm_data` raw data dictionary by applying the canonical
+        Lorentz-Berthelot combining rules to the values in :attr:`LJ_radius` and
+        :attr:`LJ_depth`.
+
+        Note
+        ----
+        This will undo any off-diagonal L-J modifications you may have made, so
+        call this function with care.
         """
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
@@ -864,21 +849,34 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_rst7(self, rst7):
-        """ Loads coordinates into the AmberParm class """
+        """ Loads coordinates into the AmberParm class
+
+        Parameters
+        ----------
+        rst7 : str or :class:`Rst7`
+            The Amber coordinate file (either ASCII restart or NetCDF restart)
+            object or filename to assign atomic coordinates from.
+        """
         if not hasattr(rst7, 'coordinates'):
             rst7 = Rst7.open(rst7)
         self.load_coordinates(rst7.coordinates)
         self.hasvels = rst7.hasvels
-        self.hasbox = rst7.hasbox
-        if self.hasbox:
-            self.box = rst7.box[:]
+        self.box = copy.copy(rst7.box)
+        self.hasbox = self.box is not None
         if self.hasvels:
             self.load_velocities(rst7.vels)
 
     #===================================================
 
     def load_coordinates(self, coords):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        coords : list of floats
+            A 1-dimensional iterable of coordinates of shape (natom*3,) from
+            which all atomic coordinates are assigned. In Angstroms
+        """
         self.coords = coords
         for i, atom in enumerate(self.atoms):
             i3 = 3 * i
@@ -889,7 +887,14 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_velocities(self, vels):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        vels : list of floats
+            A 1-dimensional iterable of velocities of shape (natom*3,) from
+            which all atomic velocities are assigned. In Angstroms/picosecond
+        """
         self.hasvels = True
         self.vels = vels
         for i, atom in enumerate(self.atoms):
@@ -1115,14 +1120,17 @@ class AmberParm(AmberFormat, Structure):
 
     @property
     def chamber(self):
+        """ Whether this instance uses the CHARMM force field """
         return False
 
     @property
     def amoeba(self):
+        """ Whether this instance uses the Amoeba force field """
         return False
 
     @property
     def has_cmap(self):
+        """ Whether this instance has correction map terms or not """
         return False
 
     #===========  PRIVATE INSTANCE METHODS  ============
@@ -1789,6 +1797,27 @@ class Rst7(object):
     """
     Amber input coordinate (or restart coordinate) file. Front-end for the
     readers and writers, supports both NetCDF and ASCII restarts.
+
+    Parameters
+    ----------
+    filename : str, optional
+        If a filename is provided, this file is parsed and the Rst7 data
+        populated from that file. The format (ASCII or NetCDF) is autodetected
+    natom : int, optional
+        If no filename is provided, this value is required. If a filename is
+        provided, this value is ignored (and instead set to the value of natom
+        from the coordinate file). This is the number of atoms for which we have
+        coordinates. If not provided for a new file, it *must* be set later.
+    title : str, optional
+        For a file that is to be written, this is the title that will be given
+        to that file. Default is an empty string
+    hasvels : bool, deprecated
+        This variable has no effect. The presence of vels is detected by whether
+        or not velocities have been set
+    hasbox : bool, deprecated
+        This variable has no effect (see the reason for hasvels, above)
+    time : float, optional
+        The time to write to the restart file. This is cosmetic. Default is 0
     """
 
     def __init__(self, filename=None, natom=None, title='', hasvels=False,
@@ -1799,22 +1828,22 @@ class Rst7(object):
         """
         self.coordinates = []
         self.vels = []
-        self.box = []
-        self.hasvels = hasvels
-        self.hasbox = hasbox
+        self.box = None
         self.natom = natom
         self.title = title
         self.time = 0
         if filename is not None:
             self.filename = filename
-            warn('Use Rst7.open() constructor instead of default constructor '
-                 'to parse restart files.', DeprecationWarning)
             self._read(filename)
 
     @classmethod
     def open(cls, filename):
-        """
-        Constructor that opens and parses an input coordinate file
+        """ Constructor that opens and parses an input coordinate file
+        
+        Parameters
+        ----------
+        filename : str
+            Name of the file to parse
         """
         inst = cls()
         inst.filename = filename
@@ -1844,8 +1873,6 @@ class Rst7(object):
                 raise ReadError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
-        self.hasvels = f.hasvels
-        self.hasbox = f.hasbox
         if f.hasvels:
             self.vels = f.velocities
         if f.hasbox:
@@ -1870,7 +1897,6 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        inst.hasvels = thing.hasvels
         if hasattr(thing, 'vels'): inst.vels = thing.vels[:]
         inst.hasbox = thing.hasbox
         if hasattr(thing, 'box'): inst.box = thing.box[:]
@@ -1899,23 +1925,57 @@ class Rst7(object):
         f.time = self.time
         # Now write the coordinates
         f.coordinates = self.coordinates
-        if self.hasvels:
+        if self.vels:
             f.velocities = self.vels
-        if self.hasbox:
+        if self.box is not None:
             f.box = self.box
         f.close()
 
     @property
     def positions(self):
         """ Atomic coordinates with units """
-        return ([self.coordinates[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        try:
+            return u.Quantity(self.coordinates.reshape(self.natom, 3),
+                              u.angstroms)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.coordinates[i:i+3] for i in xrange(0, natom3, 3)] *
                         u.angstroms)
 
     @property
     def velocities(self):
         """ Atomic velocities with units """
-        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        try:
+            return u.Quantity(self.vels.reshape(self.natom, 3),
+                              u.angstroms/u.picoseconds)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.vels[i:i+3] for i in xrange(0, natom3, 3)] *
                         u.angstroms/u.picoseconds)
+
+    @property
+    def box_vectors(self):
+        """ Unit cell vectors with units """
+        if self.box is None: return None
+        return box_lengths_and_angles_to_vectors(*self.box)
+
+    @property
+    def hasbox(self):
+        """ Whether or not this Rst7 has unit cell information """
+        try:
+            return bool(self.box)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
+
+    @property
+    def hasvels(self):
+        """ Whether or not this Rst7 has velocities """
+        try:
+            return bool(self.vels)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
