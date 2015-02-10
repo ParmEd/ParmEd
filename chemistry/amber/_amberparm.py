@@ -1955,7 +1955,7 @@ class Rst7(object):
         f.coordinates = self.coordinates
         if self.vels:
             f.velocities = self.vels
-        if self.box:
+        if self.box is not None:
             f.box = self.box
         f.close()
 
