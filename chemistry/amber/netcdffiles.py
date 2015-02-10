@@ -129,6 +129,8 @@ def use(package=None):
     global _HAS_NC4, _HAS_SCIENTIFIC_PYTHON, _HAS_PYNETCDF, _HAS_SCIPY_NETCDF
 
     if package is None:
+        if NETCDF_INITIALIZED:
+            return
         if _HAS_SCIPY_NETCDF:
             open_netcdf = spopen_netcdf
             get_int_dimension = spget_int_dimension
@@ -885,6 +887,8 @@ class NetCDFTraj(object):
                 np.asarray(angles)
         self._last_box_frame += 1
         self.flush()
+
+    add_box = add_cell_lengths_angles
 
     def time(self, frame):
         """

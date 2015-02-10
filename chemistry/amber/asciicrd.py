@@ -44,17 +44,24 @@ class _AmberAsciiCoordinateFile(object):
         Opens a new Mdcrd file and either parses it (loading everything into
         memory) or sets it up for writing.
 
-        Parameters:
-            fname (string): File name to open
-            natom (int): # of atoms in the system
-            hasbox (bool): Does the system have PBCs?
-            mode (string): 'r' or 'w'
-            title (string): Title to write to a new trajectory (when mode='r')
+        Parameters
+        ----------
+        fname : str
+            File name to open
+        natom : int
+            Number of atoms in the system
+        hasbox : bool
+            Does the system have PBCs?
+        mode : str={'r', 'w'}
+            Whether to open this file for 'r'eading or 'w'riting
+        title : str, optional
+            Title to write to a new trajectory (when mode='w')
 
-        Notes:
-            This module automatically handles compressed files using either gzip
-            or bzip2, and compression is determined automatically by filename
-            extension (.gz for gzip and .bz2 for bzip2 files).
+        Notes
+        -----
+        This module automatically handles compressed files using either gzip or
+        bzip2, and compression is determined automatically by filename extension
+        (.gz for gzip and .bz2 for bzip2 files).
         """
 
         if mode == 'r':
@@ -98,7 +105,7 @@ class _AmberAsciiCoordinateFile(object):
 
     def _parse(self):
         """ Handles actual file parsing """
-        raise NotImplemented('%s must be subclassed.' % type(self).__name__)
+        raise NotImplementedError('virtual method not overwritten')
 
     def close(self):
         """ Close the open file handler """
@@ -115,6 +122,24 @@ class _AmberAsciiCoordinateFile(object):
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberAsciiRestart(_AmberAsciiCoordinateFile):
+    """
+    Parser for the Amber ASCII inpcrd/restart file format
+
+    Parameters
+    ----------
+        fname : str
+            File name to open
+        mode : str={'r', 'w'}
+            Whether to open this file for 'r'eading or 'w'riting
+        natom : int, optional
+            Number of atoms in the system (necessary when mode='w')
+        hasbox : bool, optional
+            Does the system have PBCs? Necessary when mode='w'
+        title : str, optional
+            Title to write to a new trajectory (when mode='w')
+        time : float, optional
+            The time to write to the restart file in ps. Default is 0.
+    """
    
     CRDS_PER_LINE = 6
     DEFAULT_TITLE = 'restart created by ParmEd'
@@ -385,6 +410,11 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmberMdcrd(_AmberAsciiCoordinateFile):
+    """
+    A class to parse Amber ASCII trajectory files. This is *much* slower than
+    parsing NetCDF files (or the equivalent parsing done in a compiled language
+    like C or C++). For large trajectories, this may be significant.
+    """
 
     CRDS_PER_LINE = 10
     DEFAULT_TITLE = 'trajectory created by ParmEd'
@@ -456,7 +486,21 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
     def coordinates(self, frame=None):
         """
-        Returns the frame'th frame of the coordinates as a 3*natom-length array
+        Returns the requested coordinates
+
+        Parameters
+        ----------
+        frame : int, optional
+            If provided, this is the frame number whose coordinates will be
+            returned. If not provided, all of the coordinates are returned as a
+            list in which each entry is a 3*natom-length array of coordinates
+
+        Returns
+        -------
+        coordinates : array or list of array
+            If ``frame`` is None, the coordinates will be a list of length the
+            number of frames in the trajectory with each item being an array
+            (numpy if available) of 3*natom length of coordinates.
         """
         if not self._status == 'old':
             raise RuntimeError('Cannot access coordinates of a new mdcrd')
@@ -467,6 +511,20 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
     def box(self, frame=None):
         """
         Returns the frame'th frame of the box lengths as a length-3 array
+
+        Parameters
+        ----------
+        frame : int, optional
+            If provided, this is the frame number whose box dimensions will be
+            returned. If not provided, all of the box dimensions are returned as
+            a list in which each entry is a length-3 array of box lengths
+
+        Returns
+        -------
+        box_lengths : array or list of array
+            If ``frame`` is None, the box lengths will be a list of length the
+            number of frames in the trajectory with each item being an array
+            (numpy if available) of box lengths.
         """
         if not self._status == 'old':
             raise RuntimeError('Cannot access box of a new mdcrd')
@@ -478,7 +536,22 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         """
         Prints 'stuff' (which must be either an iterable of 3*natom or have an
         attribute 'flatten' that converts it into an iterable of 3*natom) to the
-        open file handler. Can only be called on a 'new' mdcrd
+        open file handler. Can only be called on a 'new' mdcrd, and adds these
+        coordinates to the current end of the file.
+
+        Parameters
+        ----------
+        stuff : array or iterable
+            This must be an iterable of length 3*natom or a numpy array that can
+            be flattened to a 3*natom-length array
+
+        Raises
+        ------
+        If the coordinate file is an old one being parsed or if you are
+        currently expected to provide unit cell dimensions, a RuntimeError is
+        raised. If the provided coordinate data does not have length 3*natom, or
+        cannot be ``flatten()``ed to create a 3*natom array, a ValueError is
+        raised.
         """
         # Make sure we can write the coordinates right now
         if not self._status == 'new':
@@ -512,6 +585,18 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         """
         Prints 'stuff' (which must be a 3-element list, array.array, tuple, or
         np.ndarray) as the box lengths for this frame
+
+        Parameters
+        ----------
+        stuff : array or iterable
+            This must be an iterable of length 3 with the box lengths
+
+        Raises
+        ------
+        If the coordinate file is an old one being parsed or if you are
+        currently expected to provide coordinates, a RuntimeError is raised.
+        raised. If the provided box lengths are not length 3, a ValueError is
+        raised.
         """
         # First make sure we should be writing our box now
         if not self._status == 'new':
