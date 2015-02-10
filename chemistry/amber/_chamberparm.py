@@ -201,13 +201,26 @@ class ChamberParm(AmberParm):
 
     def remake_parm(self):
         """
-        Re-fills the topology file arrays if we have changed the underlying
-        structure
+        Fills :attr:`parm_data` from the data in the parameter and topology
+        arrays (e.g., :attr:`atoms`, :attr:`bonds`, :attr:`bond_types`, ...)
         """
-        super(ChamberParm, self).remake_parm()
+        # Get rid of terms containing deleted atoms and empty residues
+        self.prune_empty_terms()
+        self.residues.prune()
+        self.rediscover_molecules()
+
+        # Transfer information from the topology lists 
+        self._xfer_atom_info()
+        self._xfer_residue_info()
+        self._xfer_bond_info()
+        self._xfer_angle_info()
+        self._xfer_dihedral_info()
         self._xfer_urey_bradley_properties()
         self._xfer_improper_properties()
         self._xfer_cmap_properties()
+        # Load the pointers dict
+        self.load_pointers()
+        # Mark atom list as unchanged
         super(ChamberParm, self).unchange()
 
     #===================================================

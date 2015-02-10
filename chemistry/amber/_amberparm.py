@@ -570,7 +570,6 @@ class AmberParm(AmberFormat, Structure):
         self.prune_empty_terms()
         self.residues.prune()
         self.rediscover_molecules()
-        self.load_pointers()
 
         # Transfer information from the topology lists 
         self._xfer_atom_info()
@@ -578,6 +577,8 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        # Load the pointers dict
+        self.load_pointers()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
@@ -789,35 +790,6 @@ class AmberParm(AmberFormat, Structure):
                 factor = 2 * acoef[lj_index] / bcoef[lj_index]
                 self.LJ_radius.append(pow(factor, one_sixth) * 0.5)
                 self.LJ_depth.append(bcoef[lj_index] / 2 / factor)
-
-    #===================================================
-
-    def fill_14_LJ(self):
-        """
-        Same as :meth:`fill_LJ`, but for the 1-4 Lennard-Jones parameters (only
-        used for the CHARMM force field currently).
-        """
-        if not self.chamber:
-            raise TypeError('fill_14_LJ() only valid on a chamber prmtop!')
-
-        pd = self.parm_data
-        acoef = pd['LENNARD_JONES_14_ACOEF']
-        bcoef = pd['LENNARD_JONES_14_BCOEF']
-        ntypes = self.pointers['NTYPES']
-
-        self.LJ_14_radius = []  # empty LJ_radii so it can be re-filled
-        self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
-        one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
-
-        for i in xrange(ntypes):
-            lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if acoef[lj_index] < 1.0e-6:
-                self.LJ_14_radius.append(0)
-                self.LJ_14_depth.append(0)
-            else:
-                factor = 2 * acoef[lj_index] / bcoef[lj_index]
-                self.LJ_14_radius.append(pow(factor, one_sixth) * 0.5)
-                self.LJ_14_depth.append(bcoef[lj_index] / 2 / factor)
 
     #===================================================
 
@@ -1856,7 +1828,7 @@ class Rst7(object):
         """
         self.coordinates = []
         self.vels = []
-        self.box = []
+        self.box = None
         self.natom = natom
         self.title = title
         self.time = 0
