@@ -1486,6 +1486,10 @@ class Bond(object):
 
         self.atom1 = self.atom2 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class BondType(_ListItem, _ParameterType):
@@ -1541,6 +1545,10 @@ class BondType(_ListItem, _ParameterType):
 
     def __eq__(self, other):
         return self.k == other.k and self.req == other.req
+
+    def __repr__(self):
+        return '<%s; k=%.3f, Req=%.3f>' % (type(self).__name__,
+                self.k, self.req)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1626,6 +1634,10 @@ class Angle(object):
 
         self.atom1 = self.atom2 = self.atom3 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AngleType(_ListItem, _ParameterType):
@@ -1680,6 +1692,10 @@ class AngleType(_ListItem, _ParameterType):
 
     def __eq__(self, other):
         return self.k == other.k and self.theteq == other.theteq
+
+    def __repr__(self):
+        return '<%s; k=%.3f, THETAeq=%.3f>' % (type(self).__name__,
+                self.k, self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1827,10 +1843,6 @@ class Dihedral(_FourAtomTerm):
                 self.atom3.idx == thing[1] and
                 self.atom4.idx == thing[0]) )
 
-    def __repr__(self):
-        return "<Dihedral %r--%r--%r--%r>" % (self.atom1, self.atom2,
-                self.atom3, self.atom4)
-
     def delete(self):
         """
         Deletes this dihedral from the atoms that make it up. This method
@@ -1858,6 +1870,16 @@ class Dihedral(_FourAtomTerm):
             _delete_from_list(self.atom4._dihedral_partners, self.atom3)
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
+
+    def __repr__(self):
+        if self.improper:
+            name = '%s [imp]' % (type(self).__name__)
+        elif self.ignore_end:
+            name = '%s [ign]' % (type(self).__name__)
+        else:
+            name = type(self).__name__
+        return '<%s; %r--%r--%r--%r; type=%r>' % (name, self.atom1,
+                self.atom2, self.atom3, self.atom4, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1952,6 +1974,11 @@ class DihedralType(_ListItem, _ParameterType):
                 self.phase == other.phase and self.scee == other.scee and
                 self.scnb == other.scnb)
 
+    def __repr__(self):
+        return ('<%s; k=%.3f, periodicity=%d, phase=%.3f, '
+                'scee=%.3f, scnb=%.3f>' % (type(self).__name__, self.phi_k,
+                    self.per, self.phase, self.scee, self.scnb))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralTypeList(list, _ListItem):
@@ -1976,6 +2003,9 @@ class DihedralTypeList(list, _ListItem):
             if not t1 == t2:
                 return False
         return True
+
+    def __repr__(self):
+        return 'DihedralTypes %s' % (super(DihedralTypeList, self).__repr__())
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2075,6 +2105,10 @@ class UreyBradley(object):
         _delete_from_list(self.atom2.urey_bradleys, self)
 
         self.atom1 = self.atom2 = self.type = None
+
+    def __repr__(self):
+        return '<%s %r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2183,6 +2217,10 @@ class Improper(_FourAtomTerm):
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ImproperType(_ListItem, _ParameterType):
@@ -2238,6 +2276,10 @@ class ImproperType(_ListItem, _ParameterType):
 
     def __eq__(self, other):
         return self.psi_k == other.psi_k and self.psi_eq == other.psi_eq
+
+    def __repr__(self):
+        return '<%s; k=%.3f, PSIeq=%.3f>' % (type(self).__name__,
+                self.psi_k, self.psi_eq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2399,6 +2441,11 @@ class Cmap(object):
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = None
         self.type = None
 
+    def __repr__(self):
+        return '<%s; %r--%r--%r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
+                self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class CmapType(_ListItem, _ParameterType):
@@ -2471,6 +2518,9 @@ class CmapType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return (self.resolution == other.resolution and
                 all([abs(i - j) < TINY for i, j in zip(self.grid, other.grid)]))
+
+    def __repr__(self):
+        return '<%s; res=%d>' % (type(self).__name__, self.resolution)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2653,12 +2703,16 @@ class TrigonalAngle(_FourAtomTerm):
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
 
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom2, self.atom1, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class OutOfPlaneBend(_FourAtomTerm):
     """
     Out-of-plane bending term in the AMOEBA force field. The bond pattern is the
-    same as `TrigonalAngle`
+    same as :class:`TrigonalAngle`
 
     Parameters
     ----------
@@ -2693,6 +2747,10 @@ class OutOfPlaneBend(_FourAtomTerm):
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
+
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom2, self.atom1, self.atom3, self.atom4, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2745,6 +2803,9 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
 
     def __eq__(self, other):
         return self.k == other.k
+
+    def __repr__(self):
+        return '<%s; k=%.3f>' % (type(self).__name__, self.k)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2820,6 +2881,11 @@ class PiTorsion(object):
         self.type = self.atom1 = self.atom2 = self.atom3 = None
         self.atom4 = self.atom5 = self.atom6 = None
 
+    def __repr__(self):
+        return '<%s; (%r,%r)--%r--%r--(%r,%r); type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
+                self.atom6, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class StretchBend(object):
@@ -2865,6 +2931,10 @@ class StretchBend(object):
         """ Sets all of the atoms and parameter type to None """
         self.atom1 = self.atom2 = self.atom3 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class StretchBendType(_ListItem, _ParameterType):
@@ -2873,8 +2943,10 @@ class StretchBendType(_ListItem, _ParameterType):
 
     Parameters
     ----------
-    k : ``float``
-        Force constant in kcal/mol/radians^2
+    k1 : ``float``
+        First force constant in kcal/mol/(radians*angstroms)
+    k2 : ``float``
+        Second force constant in kcal/mol/(radians*angstroms)
     req1 : ``float``
         Equilibrium bond distance for bond between the first and second atoms in
         Angstroms
@@ -2898,8 +2970,8 @@ class StretchBendType(_ListItem, _ParameterType):
 
     Examples
     --------
-    >>> sbt1 = StretchBendType(10.0, 1.0, 1.0, 180.0)
-    >>> sbt2 = StretchBendType(10.0, 1.0, 1.0, 180.0)
+    >>> sbt1 = StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0)
+    >>> sbt2 = StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0)
     >>> sbt1 is sbt2
     False
     >>> sbt1 == sbt2
@@ -2910,16 +2982,17 @@ class StretchBendType(_ListItem, _ParameterType):
     As part of a list, they can be indexed
 
     >>> strbnd_list = []
-    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
-    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list.append(StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list.append(StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0, strbnd_list))
     >>> strbnd_list[0].idx
     0
     >>> strbnd_list[1].idx
     1
     """
-    def __init__(self, k, req1, req2, theteq, list=None):
+    def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = k
+        self.k1 = k1
+        self.k2 = k2
         self.req1 = req1
         self.req2 = req2
         self.theteq = theteq
@@ -2927,8 +3000,14 @@ class StretchBendType(_ListItem, _ParameterType):
         self.list = list
 
     def __eq__(self, other):
-        return (self.k == other.k and self.req1 == other.req1 and
-                self.req2 == other.req2 and self.theteq == other.theteq)
+        return (self.k1 == other.k1 and self.k2 == other.k2 and
+                self.req1 == other.req1 and self.req2 == other.req2 and
+                self.theteq == other.theteq)
+
+    def __repr__(self):
+        return '<%s; Req_1=%.3f, Req_2=%.3f, THETAeq=%.3f, k1=%.3f, k2=%.3f>' \
+                % (type(self).__name__, self.req1, self.req2, self.theteq,
+                   self.k1, self.k2)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3187,6 +3266,9 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         return (self.f == other.f and self.dfda1 == other.dfda1 and
                 self.dfda2 == other.dfda2 and self.d2fda1da2 == other.d2fda1da2)
 
+    def __repr__(self):
+        return '<%s; %dx%d>' % (type(self).__name__, self.dims[0], self.dims[1])
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChiralFrame(object):
@@ -3217,6 +3299,10 @@ class ChiralFrame(object):
 
     def __contains__(self, thing):
         return thing is self.atom1 or thing is self.atom2
+
+    def __repr__(self):
+        return '<%s; %r--%r, direction=%d>' % (type(self).__name__, self.atom1,
+                self.atom2, self.chirality)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3385,6 +3471,18 @@ class Residue(_ListItem):
         return not self.atoms[0].idx > other.atoms[0].idx
     def __ge__(self, other):
         return not self.atoms[0].idx < other.atoms[0].idx
+
+    def __repr__(self):
+        if self.number == -1:
+            num = self.idx
+        else:
+            num = self.number
+        rep = '<%s %s[%d]' % (type(self).__name__, self.name, num)
+        if self.chain:
+            rep += '; chain=%s' % self.chain
+        if self.insertion_code:
+            rep += '; insertion_code=%s' % self.insertion_code
+        return rep + '>'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -69,7 +69,7 @@ rules summarized in the table below:
 +-----------------+-------------------------------------------+
 | Filename suffix | File type                                 |
 +=================+===========================================+
-| ``.rtf, .top``  | RTF                                       |
+| ``.rtf, .top``  | Residue topology file                     |
 +-----------------+-------------------------------------------+
 | ``.par, .prm``  | Parameter file                            |
 +-----------------+-------------------------------------------+
@@ -80,10 +80,49 @@ rules summarized in the table below:
 |                 | Otherwise ``ValueError`` is raised.       |
 +-----------------+-------------------------------------------+
 
-An example is shown processing the sample CHARMM 22 and CHARMM 36 force field
-files provided in the ParmEd unit test files::
+If your file name does not match one of the patterns above, you need to either
+rename your file or use alternate ways to read in each file (see
+:meth:`CharmmParameterSet.load_set` as well as the sections below).
 
+An example is shown processing the sample CHARMM 22 force field files provided
+in the ParmEd unit test files::
 
+    >>> from chemistry.charmm import CharmmParameterSet
+    >>> params = CharmmParameterSet('par_all22_prot.inp', 'top_all22_prot.inp')
+    >>> params.bond_types[('CE1', 'CE1')]
+    <BondType; k=440.000, Req=1.340>
+    >>> params.angle_types[('H', 'NH2', 'CT1')]
+    <AngleType; k=50.000, THETAeq=1.937>
+    >>> # Note that the reverse is an equivalent angle
+    >>> params.angle_types[('CT1', 'NH2', 'H')]
+    <AngleType; k=50.000, THETAeq=1.937>
+    >>> params.improper_types[('CE1', 'CPB', 'X', 'X')]
+    <ImproperType; k=90.000, PSIeq=0.000>
+
+Notice that the dictionaries have keys matching all permutations of the atom
+types defining a parameter. In the example above, the angle type keys ``('H',
+'NH2', 'CT1')`` and ``('CT1', 'NH2', 'H')`` both point to the same
+:class:`AngleType <chemistry.topologyobjects.AngleType>`. In fact, they point to
+the exact same *object*, so that if you modify that angle type, it is changed
+for both keys::
+
+    >>> params.angle_types[('CT1', 'NH2', 'H')].k = 60.0
+    >>> params.angle_types[('CT1', 'NH2', 'H')]
+    <AngleType; k=60.000, THETAeq=1.937>
+    >>> params.angle_types[('H', 'NH2', 'CT1')]
+    <AngleType; k=60.000, THETAeq=1.937>
+
+Notice how the force constant has changed from 50 to 60 for *both* keys.
+
+One thing I'll point out is that for older force fields (like CHARMM 22, for
+instance), the various force field atom types (e.g., those for *prot*\ teins,
+*carb*\ ohydrates, etc.) are incompatible with each other---you must pick *one*
+pair of parameter and topology files and use that.
+
+For the newer force fields, (e.g., CHARMM 36), you should load all of the
+parameter files that are relevant for your system (e.g., both the lipid and
+protein force fields, along with the water and ion stream file, for a lipid
+bilayer with an embedded protein).
 
 Residue Topology File (RTF)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,4 +136,59 @@ used to modify the residues. This information is *not* currently processed by
 that :class:`CharmmParameterSet` makes use of is the listing of atom types.
 
 As of the CHARMM 36 parameter set, however, this information is now stored in
-the 
+the parameter files, so the RTF files are not strictly required by the
+:class:`CharmmParameterSet` for these newer force fields.
+
+When they *are* required, however, they must be loaded into the
+:class:`CharmmParameterSet` *before* the corresponding parameter file, since the
+atom types need to be defined before they can be used.
+
+To specifically load a topology file, use
+:meth:`CharmmParameterSet.read_topology_file`. Note, this should only be
+necessary when adding on to an existing parameter set or when the default name
+recognition does not appropriately classify your file as an RTF.
+
+Parameter File (PAR)
+~~~~~~~~~~~~~~~~~~~~
+
+The PAR file contains a database with all of the different parameter types
+defined between specific atom type names. For newer force fields, they also
+include the atom type name to type index mapping as well as atom masses.
+
+To specifically load a parameter file, use
+:meth:`CharmmParameterSet.read_parameter_file`.
+
+Stream Files (STR)
+~~~~~~~~~~~~~~~~~~
+
+Stream files contain *extra* information and CHARMM directives. The CHARMM
+directives are ignored, but any *rtf* or *par* sections will be read to augment
+a parameter set with additional atom types and parameters.
+
+To specifically load a stream file, use
+:meth:`CharmmParameterSet.read_stream_file`.
+
+Add to an existing parameter set
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have an existing :class:`CharmmParameterSet` instance and want to read in
+another parameter, topology, and/or stream file(s), you can use the
+:meth:`CharmmParameterSet.load_set` as a shortcut for reading parameter, RTF,
+and stream files separately.
+
+CHARMM coordinate files
+-----------------------
+
+ParmEd provides classes to parse two kinds of CHARMM coordinate files---standard
+coordinate files and restart files, summarized below.
+
+.. currentmodule:: chemistry.charmm
+.. autosummary::
+    :toctree: charmmobj/
+
+    CharmmCrdFile
+    CharmmRstFile
+
+Both of these file types are read-only and can be instantiated directly via the
+constructor. The coordinates (and for restarts, velocities, accelerations, and
+old coordinates) are available as attributes to the objects.
