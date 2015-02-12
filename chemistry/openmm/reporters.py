@@ -4,11 +4,11 @@ from chemistry.amber.asciicrd import AmberMdcrd
 from chemistry.geometry import box_vectors_to_lengths_and_angles
 from chemistry.amber.netcdffiles import NetCDFTraj
 from chemistry.amber.readparm import Rst7
+from chemistry import unit as u
 from functools import wraps
 from math import isnan, isinf
 try:
     import simtk.openmm as mm
-    import simtk.unit as u
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False
