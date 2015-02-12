@@ -1622,7 +1622,7 @@ class AmberParm(AmberFormat, Structure):
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
-            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
+            self.add_flag('BOX_DIMENSIONS', '5E16.8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=0)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)
