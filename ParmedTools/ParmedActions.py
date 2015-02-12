@@ -822,7 +822,7 @@ class changeljsingletype(Action):
     """
     Allows you to change the radius/well depth of a single LJ type specified by
     <mask>. Note, this may change more than the atoms selected in just the mask!
-    To find out what else will be changed, look at the output of "printLJTypes".
+    To find out what else will be changed, look at the output of printLJTypes.
 
     Use addLJType to change the Lennard-Jones parameters on a set of specific
     atoms.
@@ -1033,7 +1033,7 @@ class setmolecules(Action):
             if self.parm.coords is None:
                 warnings.warn(
                         'The atoms in %s were reordered to correct molecule '
-                        'ordering. Any topology printed from now on will _not_ '
+                        'ordering. Any topology printed from now on will *not* '
                         'work with the original inpcrd or trajectory files '
                         'created with this prmtop! Consider quitting and '
                         'loading a restart prior to using setMolecules' %
@@ -1909,7 +1909,7 @@ class timerge(Action):
     created using leap, with the two molecules to be merged adjacent to each
     other in residue number. This improves the efficiency for pmemd TI when only
     part of a molecule is being perturbed.
-       
+
     <scmask1/2N> are for softcore molecules that are not going to be merged.
     These options will just add these atoms to the timask output, correcting for
     any changes in atom number.
@@ -2647,23 +2647,23 @@ class addpdb(Action):
 
     Residue Properties
     ------------------
-        RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)
-        RESIDUE_ICODE: Insertion code, if it exists
-        RESIDUE_NUMBER: Original residue serial number in the PDB
+        - RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)
+        - RESIDUE_ICODE: Insertion code, if it exists
+        - RESIDUE_NUMBER: Original residue serial number in the PDB
 
     Atom Properties
     ---------------
-        ATOM_ELEMENT: Atomic element (redundant now, not printed by default)
-        ATOM_OCCUPANCY: The occupancy of each atom
-        ATOM_BFACTOR: The temperature factor of each atom
-        ATOM_NUMBER: The original atom serial number in the PDB
+        - ATOM_ELEMENT: Atomic element (redundant now, not printed by default)
+        - ATOM_OCCUPANCY: The occupancy of each atom
+        - ATOM_BFACTOR: The temperature factor of each atom
+        - ATOM_NUMBER: The original atom serial number in the PDB
 
     The 'strict' keyword turns residue mismatches (NOT solvent) into errors
     The 'elem' keyword will force printing of the element names.
     The 'allicodes' keyword forces insertion codes to be printed, even if every
     one will be blank (so that parsers can count on that section existing).
 
-    Residues _not_ in the PDB will be assigned a CHAINID of '*' and
+    Residues *not* in the PDB will be assigned a CHAINID of '*' and
     RESIDUE_NUMBER of 0. Any occupancy or temperature (B) factor that is not
     present in the input PDB file is assigned a number of 0
 
@@ -3019,37 +3019,46 @@ class energy(Action):
     must use 'loadRestart' prior to this command to load coordinates). The
     following options and keywords are supported:
 
-    The options are:
+    Options
+    -------
 
-    cutoff <cut> : The size of the non-bonded cutoff, in Angstroms. Default 8 A
-         for periodic systems or infinite for nonperiodic systems
+        - cutoff <cut> : The size of the non-bonded cutoff, in Angstroms.
+                         Default 8 A for periodic systems or infinite for
+                         nonperiodic systems
 
-    For systems with no periodic box information:
+    For systems with no periodic box information
+    --------------------------------------------
 
-    igb <IGB> : An integer corresponding to the desired GB model. May be 1, 2,
-         5, 7, or 8 as described by the sander and pmemd manual. Default 5
-    saltcon <conc> : The salt concentration, in mol/L, modeled by a Debye
-         screening parameter. Default 0.0
+        - igb <IGB> : An integer corresponding to the desired GB model. May be
+                      1, 2, 5, 7, or 8 as described by the sander and pmemd
+                      manual. Default 5.
+        - saltcon <conc> : The salt concentration, in mol/L, modeled by a Debye
+                           screening parameter. Default 0.0
 
-    For periodic systems:
+    For periodic systems
+    --------------------
 
-    Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME
-    nodisper : Do not use a long-range vdW dispersion correction
+        - Ewald : Use an Ewald sum to compute long-range electrostatics instead
+                  of PME
+        - nodisper : Do not use a long-range vdW dispersion correction
 
-    OpenMM-specific options:
+    OpenMM-specific options
+    -----------------------
 
-    omm : If present, this keyword will instruct ParmEd to use OpenMM to compute
-         the energies (and optionally forces) using OpenMM instead of sander.
-    platform <platform> : OpenMM compute platform to use. Options are CUDA,
-            OpenCL, Reference, and CPU. Consult the OpenMM manual for details
-            (only used if 'omm' is provided)
-    precision <precision model> : Precision model to use. Options are single,
-         double, and mixed. Reference platform is always double and CPU platform
-         is always single. Mixed (default) uses single precision for
-         calculations and double for accumulation (only used if 'omm' is
-         provided)
-    decompose : Print bond, angle, dihedral, and nonbonded energies separately
-    applayer : Use OpenMM's class to compute the energy
+        - omm : If present, this keyword will instruct ParmEd to use OpenMM to
+                compute the energies (and optionally forces) using OpenMM
+                instead of sander.
+        - platform <platform> : OpenMM compute platform to use. Options are
+                CUDA, OpenCL, Reference, and CPU. Consult the OpenMM manual for
+                details (only used if 'omm' is provided)
+        - precision <precision model> : Precision model to use. Options are
+                single, double, and mixed. Reference platform is always double
+                and CPU platform is always single. Mixed (default) uses single
+                precision for calculations and double for accumulation (only
+                used if 'omm' is provided)
+        - decompose : Print bond, angle, dihedral, and nonbonded energies
+                      separately
+        - applayer : Use OpenMM's class to compute the energy
     """
     supported_classes = ('AmberParm', 'ChamberParm')
 
@@ -3087,10 +3096,10 @@ class deletebond(Action):
     """
     This action deletes any bonds that occur between the atoms in two masks.
 
-    <mask1> : Amber mask defining one of the atoms in a bond
-    <mask2> : Amber mask defining the other atom in the bond
-    [verbose] : Print out every bond that is deleted as well as the number of
-                other valence terms that were eliminated.
+        - <mask1> : Amber mask defining one of the atoms in a bond
+        - <mask2> : Amber mask defining the other atom in the bond
+        - [verbose] : Print out every bond that is deleted as well as the
+                      number of other valence terms that were eliminated.
 
     All bonds will be matched in which one atom comes from <mask1> and the other
     atom comes from <mask2>. This action will also delete any other valence term
@@ -3222,28 +3231,29 @@ class chamber(Action):
     shell wild-cards (* and ?), as well as the home shortcut character ~ are
     properly expanded when looking for files.
 
-    Options:
-        -top        CHARMM topology, or Residue Topology File (RTF) file
-        -param      CHARMM parameter file
-        -str        CHARMM stream file. Only RTF and parameter sections are read
-        -toppar     CHARMM topology, parameter, and/or stream file(s). File type
-                    is detected from extension (or in the case of .inp files,
-                    the presence of 'top', 'par' in the name)
-        -psf        CHARMM PSF file
-        -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
-        -nocmap     Do not use any CMAP parameters
-        usechamber  Use the 'chamber' program to write a topology file instead
-        -box        Box dimensions. If no angles are defined, they are assumed
-                    to be 90 degrees (orthorhombic box). Alternatively, you can
-                    use the word 'bounding' to define a box that encloses the
-                    centers of all atoms.
-        -radii      Implicit solvent solvation radii. <radiusset> can be
-                    amber6, bondi, mbondi, mbondi2, mbondi3
-                    Same effect as the changeRadii command. Default is mbondi.
-        nocondense  This prevents chamber from condensing the parameter set
-                    before applying it. This might lead to larger prmtop files,
-                    but for large parameter sets will dramatically shorten the
-                    running time of the chamber action
+    Options
+    -------
+        - -top        CHARMM topology, or Residue Topology File (RTF) file
+        - -param      CHARMM parameter file
+        - -str        CHARMM stream file. Only RTF and parameter sections read
+        - -toppar     CHARMM topology, parameter, and/or stream file(s). File
+                      type is detected from extension (or in the case of .inp
+                      files, the presence of 'top', 'par' in the name)
+        - -psf        CHARMM PSF file
+        - -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
+        - -nocmap     Do not use any CMAP parameters
+        - usechamber  Use the 'chamber' program to write a topology file instead
+        - -box        Box dimensions. If no angles are defined, they are assumed
+                      to be 90 degrees (orthorhombic box). Alternatively, you
+                      can use the word 'bounding' to define a box that encloses
+                      the centers of all atoms.
+        - -radii      Implicit solvent solvation radii. <radiusset> can be
+                      amber6, bondi, mbondi, mbondi2, mbondi3
+                      Same effect as the changeRadii command. Default is mbondi.
+        - nocondense  This prevents chamber from condensing the parameter set
+                      before applying it. This might lead to larger prmtop
+                      files, but for large parameter sets will dramatically
+                      shorten the running time of the chamber action
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3490,7 +3500,7 @@ class chamber(Action):
             elif self.box is not None:
                 if len(self.box) == 3:
                     psf.box = self.box + [90.0, 90.0, 90.0]
-                elif len(crdbox) == 6:
+                elif len(self.box) == 6:
                     psf.box = self.box[:]
                 else:
                     raise ValueError('Unexpected box array shape')
@@ -3537,25 +3547,27 @@ class minimize(Action):
     This action takes a structure and minimizes the energy using OpenMM.
     Following this action, the coordinates stored in the topology will be the
     minimized structure
-    
-    General Options:
-        cutoff <cutoff>     Nonbonded cutoff in Angstroms
-        restrain <mask>     Selection of atoms to restrain
-        weight <k>          Weight of positional restraints (kcal/mol/A^2)
-        norun               Do not run the calculation
-        script <script>     Name of the Python script to write to run this
-                            calculation
-        tol <tolerance>     The largest energy difference between successive
-                            steps in the minimization allow the minimization to
-                            stop (Default 0.001)
-        maxcyc <cycles>     The maximum number of minimization cycles permitted.
-                            No limit by default (minimization stops when
-                            tolerance is satisfied)
 
-    Implicit Solvent options:
-        igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
-                            Amber models)
-        saltcon <conc>      Salt concentration for GB in Molarity
+    General Options
+    ---------------
+        - cutoff <cutoff>     Nonbonded cutoff in Angstroms
+        - restrain <mask>     Selection of atoms to restrain
+        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
+        - norun               Do not run the calculation
+        - script <script>     Name of the Python script to write to run this
+                              calculation
+        - tol <tolerance>     The largest energy difference between successive
+                              steps in the minimization allow the minimization
+                              to stop (Default 0.001)
+        - maxcyc <cycles>     The maximum number of minimization cycles
+                              permitted.  No limit by default (minimization
+                              stops when tolerance is satisfied)
+
+    Implicit Solvent options
+    ------------------------
+        - igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
+                              Amber models)
+        - saltcon <conc>      Salt concentration for GB in Molarity
 
     The implicit solvent options will be ignored for systems with periodic
     boundary conditions

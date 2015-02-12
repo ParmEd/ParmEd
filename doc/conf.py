@@ -274,3 +274,473 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# Create the .rst file for the ParmEd reference automatically from the
+# docstrings
+
+from ParmedTools import ParmedActions as act
+
+help_args = []
+
+actnames = [act.Usages[key].split()[0] for key in act.Usages
+                if key not in 'go']
+
+def _process_docstring(doc, currcmd):
+    """
+    Processes the docstring to remove the leading indentation but preserve
+    overall structure. This regularizes its structure suitable for incorporation
+    into the sphinx docs
+    """
+    def addlinkfmt(wordlist):
+        # Go through a word list and add links if necessary... but not to the
+        # current command
+        for i, w in enumerate(wordlist):
+            end = ''
+            if w[-1] in '.,;':
+                end = w[-1]
+                w = w[:-1] # Drop the trailing punctuation
+            if w in actnames and w != 'go' and w != 'change' and w != currcmd:
+                wordlist[i] = w + '_' + end
+            if w.startswith('$') and '/' in w:
+                wordlist[i] = "``%s``" % wordlist[i]
+            if w.startswith('<') and w.endswith('>'):
+                wordlist[i] = '``%s``' % w
+            if w.startswith('[') and w.endswith(']'):
+                wordlist[i] = '``%s``' % w
+        return wordlist
+
+    doclines = doc.split('\n')
+    if not doclines[0].strip(): doclines.pop(0)
+    if not doclines[-1].strip(): doclines.pop()
+    lines = []
+    tabsize = min([len(line)-len(line.lstrip()) for line in doclines
+        if line.strip()])
+    doclines = [line[tabsize:] for line in doclines]
+    combined_words = []
+    tabbed = False
+    for i, line in enumerate(doclines):
+        if i == 0 and not line.strip(): continue
+        # Blank line (and ----- divider) treated as a spacer
+        if not line.strip() or set(line.strip()) == set(['-']):
+            if tabbed:
+                lines.append('    ' + ' '.join(addlinkfmt(combined_words)))
+                lines.append('')
+                combined_words = []
+                tabbed = False
+                continue
+            else:
+                lines.append(' '.join(addlinkfmt(combined_words)))
+                lines.append('')
+                combined_words = []
+                continue
+        if tabbed:
+            if line[0] in '\t ':
+                # Still tabbed
+                # See if it's the next bullet
+                if line.lstrip()[0] in '-*':
+                    lines.append('    ' + ' '.join(addlinkfmt(combined_words)))
+                    combined_words = ['-'] + line.split()[1:]
+                else:
+                    combined_words.extend(line.split())
+                continue
+            else:
+                # No longer tabbed
+                lines.append('    ' + ' '.join(addlinkfmt(combined_words)))
+                tabbed = False
+                combined_words = line.split()
+                continue
+        else:
+            # Not tabbed... see if we are tabbed, though
+            if line[0] in ' \t':
+                tabbed = True
+                lines.append(' '.join(addlinkfmt(combined_words)))
+                combined_words = line.split()
+                continue
+            combined_words.extend(line.split())
+    if combined_words:
+        if tabbed:
+            lines.append('    ' + ' '.join(addlinkfmt(combined_words)))
+        else:
+            lines.append(' '.join(addlinkfmt(combined_words)))
+    return '\n'.join(lines)
+
+keylist = sorted(act.Usages.keys())
+# Construct the docs from ParmedActions
+for action in keylist:
+    usage = act.Usages[action.lower()]
+    actname = usage.split()[0]
+    # Some actions are part of the interpreter, NOT members of ParmedTools.
+    # Special-case those here
+    if action == 'help':
+        help_args.append("""
+help
+~~~~
+
+.. code-block:: none
+
+    %s
+
+Provides help on the requested action. If no action name is provided, a list of
+all available options is given. The character '?' can be used instead of the
+word 'help' as well.
+
+""" % usage)
+        continue
+    elif action == 'go':
+        help_args.append("""
+go
+~~
+
+.. code-block:: none
+
+    %s
+
+Runs the last specified parmout_ command and quits
+
+""" % usage)
+        continue
+    elif action == 'quit':
+        help_args.append("""
+quit
+~~~~
+
+.. code-block: none
+
+    %s
+
+Quits ``parmed.py`` *without* running any final parmout_ command.
+
+""" % usage)
+        continue
+    # Except for the special-cases, pull the remaining documentation from the
+    # docstrings
+    actionobj = getattr(act, action)
+    h = '%s\n%s\n\n.. code-block:: none\n\n    %s\n\n%s\n\n' % (actname,
+            '~'*len(actname), usage,
+            _process_docstring(actionobj.__doc__, actname))
+    help_args.append(h)
+
+with open('parmed.rst', 'w') as f:
+    f.write(r""".. Do NOT modify this file directly. conf.py creates it.
+.. modify conf.py instead
+
+Using ``parmed.py``
+===================
+
+This page details using the command-line version of ParmEd, which is the
+primary front-end program using the :mod:`chemistry` and :mod:`ParmedTools`
+packages to provide a set of *Actions* by which you can modify a system topology
+and parameters (it currently only works for Amber topology files, although
+support for the entire :class:`Structure <chemistry.structure.Structure>`
+hierarchy is planned).
+
+There are two ways in which ParmEd can be run---in batch reading from an input
+file or *script*, and with an interactive interpreter. A script can either be
+given to ``parmed.py`` on the command-line, or fed via pipes through standard
+input. You can provide an input file using the ``-i/--input`` flag.
+
+Command syntax
+--------------
+
+All actions should be specified on the ``parmed.py`` command-line in the
+following format:
+
+.. code-block:: none
+
+    ActionName arg1 arg2 arg3 ... argN [parm <idx|name>]
+
+Arguments should be whitespace-delimited, the ``ActionName`` is
+case-insensitive, and every action (if it uses a ``parm`` object) can be applied
+to a specific parameter-topology instance that has been loaded.
+
+Note that in many Actions, you need to select a subset of the atoms upon which
+to perform the action. The way in which these atom selections are specified is
+using the Amber mask syntax described in the section `Atom Selection Masks`_
+below.
+
+Available commands
+------------------
+
+The following ``Action`` commands are available in ParmEd. The information here
+is available via the help_ command in the ``parmed.py`` interpreter.
+
+%s
+
+Atom Selection Masks
+--------------------
+
+Atoms within a system are selected according to the Amber mask specification.
+The selection syntax is described in detail in the Amber user's manual, with
+numerous examples in the *cpptraj* and *ambmask* sections.  I will include a
+brief primer here for reference.
+
+Residue Selections
+~~~~~~~~~~~~~~~~~~
+
+The ``:`` character is used to select specific residues by name and/or number.
+The residues you wish to select may be a comma-separated list of numbers, number
+ranges, names, or a mixed list of both.  Note that the residue number selections
+apply to a numbering scheme in which the first residue is residue 1 and the
+numbers increment sequentially from there (*i.e.*\ , any original numbering in
+the starting file is ignored in standard mask selections). Examples are shown
+below:
+
+.. code-block:: none
+
+    :1-5,10,ALA,TYR
+    :101
+    :ASP,GLU,HIS,LYS,TYR
+
+The first example selects all atoms in residues 1 through 5, residue 10, and any
+residues with the names "ALA" or "TYR" in the system. The second example selects
+*only* residue number 101. The final mask selects all residues with names ASP,
+GLU, HIS, LYS, or TYR.
+
+Atom selections
+~~~~~~~~~~~~~~~
+
+The ``@`` character is used to select specific atoms by name and/or number. The
+atoms you wish to select may be a comma-separated list of numbers, number
+ranges, names, or a mixed list of both. Like the residue selection above, atoms
+are numbered sequentially starting from 1. Examples are shown below:
+
+.. code-block:: none
+
+    @1-5,10,CA,CB
+    @101
+    @CA,CB,HA1,HA2,HA3
+
+The first example selects the first five atoms, the 10th atom, and all atoms
+with the names "CA" or "CB". The second mask selects only the 101st atom. The
+final mask selects all atoms with names CA, CB, HA1, HA2, or HA3.
+
+Many atoms also have *type* names associated with them, that are often used to
+distinguish chemical environments. These are really just force field
+implementation details, as types often change between generations of force
+fields to allow for increased parameter fitting flexibility. However, the two
+characters ``@%%`` allow you to select atoms based on *type name* instead of
+name (note, integer indices have no meaning for atom *type names*, so every type
+in the list following ``@%%`` is interpreted as a string-like name).  Examples
+include:
+
+.. code-block:: none
+
+    @%%CT,CX
+    @%%N,H
+
+The first example selects all atom *types* with the label "CT" or "CX", while
+the second chooses the atom types "N" or "H".
+
+Wild-cards
+~~~~~~~~~~
+
+You can also use so-called *wild-cards* when selecting atoms. For instance,
+suppose you want to select all hydrogen atoms, which you know all start with the
+letter 'H', or all carbons which you know start with 'C'. The following masks
+will do these two tasks:
+
+.. code-block: none
+
+    @H=
+    @C=
+
+The "=" character works as a wild-card, as does the '*' (so the above examples
+could have been written with a '*' instead). If either '=' or '*' is part of the
+atom name, you can use the "\" character to escape it and have the mask parser
+interpret it as a character literal.
+
+Residue-Atom Selections
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A frequent requirement is to select all atoms of a particular *name* from a
+given residue (or set of residues). This can be done with the ``|`` binary
+operator (see below), but it is so common that there is a shortcut for doing
+this, shown below:
+
+.. code-block:: none
+
+    :ALA@CA,CB
+    :ASP@OD=
+
+The first mask selects all CA and CB atoms from all ALA residues. The second
+selects all atoms whose names start with the two letters OD (such as OD1 and
+OD2) from all ASP residues.
+
+Distance-based masks
+~~~~~~~~~~~~~~~~~~~~
+
+Still other times you want to select all atoms (or all residues) within a
+particular *distance* around a particular subset of atoms. This syntax can be
+confusing, so I will try to walk through it carefully.
+
+Limited Embedded Python Interpreter
+-----------------------------------
+
+``parmed.py`` also comes equipped with a fully-fledged Python interpreter under
+the hood.  You can run individual Python commands by starting the command with a
+bang (``!``).  A double-bang (``!!``) indicates to ``parmed.py`` that a
+multi-line Python code segment follows, and to interpret everything that comes
+afterwards as Python code until another double-bang line (``!!``) appears. If
+you are typing at the prompt inside the interpreter, the prompt changes to
+``py >>>`` to indicate you are in the Python interpreter.
+
+Note that running Python code can be insecure if the source of that code is
+untrusted.  As a result, ``parmed.py`` will refuse to execute raw Python code
+unless you explicitly give the interpreter permission to do so with the ``-e``
+command-line flag.
+
+A simple example is shown below (input follows the prompts ``>`` and ``py
+>>>``):
+
+.. code-block:: none
+
+    $ parmed.py -e
+    
+                                      /^^^/           /]
+                                     /   ]           / ]
+                             _______/    ]___       /  ]
+                            /                \_____/   /
+                          _/   [@]  \ \                \
+                         /..         | |                ]
+                          VVVvvv\    | |         _/\    ]
+              P A R M E D       |               /    \  ]
+                         AAA^^^^^              /       \]
+                          \_________\   \_____/
+                                    \    \
+                                     \____\
+    
+    ParmEd: a Parameter file Editor
+    
+    
+    Reading input from STDIN...
+    > !!
+    py >>> def print_hello_world():
+    py >>>     print "Hello World"
+    py >>> 
+    py >>> print_hello_world()
+    py >>> !!
+    Hello World
+    > !print "7 + 4 = %%d" %% (7 + 4)
+    7 + 4 = 11
+    
+Notice that immediately after the closing ``!!`` in the first Python code block,
+the Python code is executed. The interpreter takes the entire code typed between
+the ``!!`` lines and interprets it as one string, preserving indentation, then
+executes it.  On the other hand, a single ``!`` immediately runs that one line
+of Python.
+
+One "gotcha" here is that Python objects that you create in this interpreter are
+not persistent---that is, the function ``print_hello_world`` no longer exists
+after that code block closes, so you can't use it in a later Python code block:
+
+.. code-block:: none
+
+    > !print_hello_world()
+    NameError: name 'print_hello_world' is not defined
+
+So the lesson here is that you either need to be able to encapsulate all Python
+activity in a single code block, use the ParmEd API directly in your own Python
+script, or make use of `A very dirty trick`_ that should make any Pythonista
+wince.
+
+Perhaps of the most importance, however, is that the topology file list is made
+available to you in the Python interpreter namespace as the name
+``amber_prmtop``, which is an instance of :class:`ParmList
+<ParmedTools.parmlist.ParmList>`. So ``amber_prmtop.parm`` is the currently
+active parameter-topology object.
+
+Let's have a look at how we might be able to use that:
+
+.. code-block:: none
+
+    > !print amber_prmtop.parm.bonds[0].type
+    <BondType; k=570.000, Req=1.229>
+    > !!
+    py >>> amber_prmtop.parm.bonds[0].type.k = 500.0
+    py >>> print amber_prmtop.parm.bonds[0].type
+    py >>> print amber_prmtop.parm.bonds[0]
+    py >>> !!
+    <BondType; k=500.000, Req=1.229>
+    <Bond <Atom C [11]; In SER 0>--<Atom O [12]; In SER 0>; type=<BondType; k=500.000, Req=1.229>>
+    > printBonds @12 @13
+    Atom 1               Atom 2               R eq       Frc Cnst  
+         12    C (   C)      13    O (   O)     1.2290   500.0000
+
+Notice here how we changed our active prmtop by changing the bond force constant
+of the first bond in the system (between atoms 12 and 13 when indexing from 1)
+from 570 kcal/mol to 500 kcal/mol!
+
+A very dirty trick
+~~~~~~~~~~~~~~~~~~
+
+There is a small trick you can play to get objects you create to persist. I only
+include this section because I find it entertaining and a possibly helpful
+pedagogical diversion. I would *highly* recommend that you use the ParmEd API in
+your own script before resorting to anything shown in this section.
+
+The three objects available to you are ``amber_prmtop``, ``line``, and ``self``.
+The ``line`` object is the currently parsed input line (not very useful), and
+``self`` is the instance of the Python interpreter that is collecting your
+input (and will be destroyed after the interpreter is finished).
+
+So the only object that will persist past the destruction of the temporary
+Python interpreter is ``amber_prmtop`` (and ``type(self)``, but only in Python
+3, since it is an old-style class in Python 2 by virtue of deriving from
+``cmd.Cmd``).
+
+So you can attach your function to the :class:`ParmList
+<ParmedTools.parmlist.ParmList>` object ``amber_prmtop`` and retrieve it from
+there later.  Be careful not to clobber a critical attribute of that class,
+though!  This trick is demonstrated continuing from the interpreter session from
+above:
+
+.. code-block:: none
+
+    > !!
+    py >>> def print_hello_world():
+    py >>>     print "Hello world!"
+    py >>> 
+    py >>> amber_prmtop.custom_func = print_hello_world
+    py >>> !!
+    > !amber_prmtop.custom_func()
+    Hello world!
+
+Notice that by keeping a reference to our function in the ``amber_prmtop``
+namespace, we could refer back to it later.
+
+The clever Pythonista could figure out how to use other introspective commands
+to gain control of other mechanisms as well---for instance, I used to disallow
+import by blocking ``import foo`` or ``from foo import bar``, but quickly found
+that this alternative also worked:
+
+.. code-block:: none
+
+    > !!
+    py >>> sys = __builtins__['__import__']('sys')
+    py >>> print repr(sys.version_info)
+    py >>> !!
+    sys.version_info(major=2, minor=7, micro=9, releaselevel='final', serial=0)
+
+So it seemed rather fruitless to prohibit behavior that was so easy to work
+around!
+
+Using ``xparmed.py``
+====================
+
+An alternative to running the command-line-based ``parmed.py`` program is to use
+the *Tkinter*\ -based GUI front-end, ``xparmed.py``.  Note that not all actions
+have been implemented in ``xparmed.py``---if the one you need gives a message to
+this effect, you will need to use ``parmed.py`` instead.
+
+``xparmed.py`` is significantly more limited.  It cannot be scripted, and it
+cannot process multiple topology files in the same session.  It may, however,
+help you learn ParmEd better as well as lessen the learning curve for performing
+basic tasks.
+
+You can find more extensive documentation `by clicking here to go to my wiki
+<http://jswails.wikidot.com/parmed#toc3>`_.
+
+You can right-click on any of the buttons to get the same help printed above on
+that action.
+
+""" % ''.join(help_args))
