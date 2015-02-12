@@ -75,10 +75,9 @@ Program and API Reference
    Working with units <dimensional_analysis>
    The Amber file classes <amber>
    The CHARMM file classes <charmm>
-   Using the text-based ParmEd program (``parmed.py``) <parmed>
-.. Using the GUI ParmEd program (``xparmed.py``) <xparmed>
-.. The ParmEd API <parmed_api>
-.. Full API reference <api/full>
+   Using the ParmEd programs (``parmed.py`` and ``xparmed.py``) <parmed>
+   The ParmEd API <parmed_api>
+   Full API reference <api/full>
 
 Search
 ------
