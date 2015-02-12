@@ -3500,7 +3500,7 @@ class chamber(Action):
             elif self.box is not None:
                 if len(self.box) == 3:
                     psf.box = self.box + [90.0, 90.0, 90.0]
-                elif len(crdbox) == 6:
+                elif len(self.box) == 6:
                     psf.box = self.box[:]
                 else:
                     raise ValueError('Unexpected box array shape')
