@@ -583,10 +583,12 @@ class TestTopologyObjects(unittest.TestCase):
         atoms.extend([Atom(list=atoms) for i in range(3)])
         bonds = [Bond(atoms[0], atoms[1]), Bond(atoms[1], atoms[2])]
         strbnd = StretchBend(atoms[0], atoms[1], atoms[2],
-                             StretchBendType(10.0, 1.1, 1.2, 109.0))
+                             StretchBendType(10.0, 11.0, 1.1, 1.2, 109.0))
         for obj in atoms + bonds:
             self.assertIn(obj, strbnd)
         self.assertEqual(strbnd.type.idx, -1)
+        self.assertEqual(strbnd.type.k1, 10)
+        self.assertEqual(strbnd.type.k2, 11)
         self.assertEqual(strbnd.type.req1, 1.1)
         self.assertEqual(strbnd.type.req2, 1.2)
         self.assertEqual(strbnd.type.theteq, 109.0)
