@@ -703,7 +703,8 @@ class AmberParm(AmberFormat, Structure):
                 for atom in res:
                     if molid != atom.marked:
                         warn('Residues cannot be part of 2 molecules! Molecule '
-                             'section will not be correctly set.',
+                             'section will not be correctly set. [Offending '
+                             'residue is %d: %r]' % (res.idx, res),
                              MoleculeWarning)
                         return None
             new_atoms = AtomList()
@@ -1436,7 +1437,7 @@ class AmberParm(AmberFormat, Structure):
         nres = len(self.residues)
         data['POINTERS'][NRES] = nres
         self.pointers['NRES'] = nres
-        data['RESIDUE_LABEL'] = [res.name for res in self.residues]
+        data['RESIDUE_LABEL'] = [res.name[:4] for res in self.residues]
         data['RESIDUE_POINTER'] = [res.atoms[0].idx+1 for res in self.residues]
         if 'RESIDUE_NUMBER' in data:
             data['RESIDUE_NUMBER'] = [res.number for res in self.residues]
