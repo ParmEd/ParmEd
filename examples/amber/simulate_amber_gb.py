@@ -4,16 +4,15 @@ from __future__ import division, print_function
 import sys
 
 # OpenMM Imports
-import simtk.unit as u
 import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
-from chemistry.amber.openmmreporters import (
-            AmberStateDataReporter, NetCDFReporter)
+from chemistry.amber import AmberParm
+from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
+from chemistry import unit as u
 
-# Load the CHARMM files
+# Load the Amber files
 print('Loading Amber files...')
 ala5_gas = AmberParm('ala5_gas.parm7', 'ala5_gas.rst7')
 
