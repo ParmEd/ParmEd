@@ -77,7 +77,7 @@ Program and API Reference
    The CHARMM file classes <charmm>
    Using the ParmEd programs (``parmed.py`` and ``xparmed.py``) <parmed>
    The ParmEd API <parmed_api>
-.. OpenMM Functionality
+   OpenMM Functionality <openmm>
 
 Click the "modules" link at the top of the page for a full API reference.
 

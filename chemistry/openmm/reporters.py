@@ -27,10 +27,11 @@ def needs_openmm(fcn):
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
 
-class AmberStateDataReporter(object):
+class StateDataReporter(object):
     """
     This class acts as a state data reporter for OpenMM simulations, but it is a
     little more generalized. Notable differences are:
+
       -  It allows the units of the output to be specified, with defaults being
          those used in Amber (e.g., kcal/mol, angstroms^3, etc.)
       -  It will write to any object containing a 'write' method; not just
@@ -46,50 +47,40 @@ class AmberStateDataReporter(object):
         Destination to write the state data (file name or file object)
     reportInterval : int
         Number of steps between state data reports
-    step : bool=True
-        Print out the step number
-    time : bool=True
-        Print out the simulation time
-    potentialEnergy : bool=True
-        Print out the potential energy of the structure
-    kineticEnergy : bool=True
-        Print out the kinetic energy of the structure
-    totalEnergy : bool=True
-        Print out the total energy of the system
-    temperature : bool=True
-        Print out the temperature of the system
-    volume : bool=False
+    step : bool, optional
+        Print out the step number (Default True)
+    time : bool, optional
+        Print out the simulation time (Defaults True)
+    potentialEnergy : bool, optional
+        Print out the potential energy of the structure (Default True)
+    kineticEnergy : bool, optional
+        Print out the kinetic energy of the structure (Default True)
+    totalEnergy : bool, optional
+        Print out the total energy of the system (Default True)
+    temperature : bool, optional
+        Print out the temperature of the system (Default True)
+    volume : bool, optional
         Print out the volume of the unit cell. If the system is not periodic,
-        the value is meaningless
-    density : bool=False
+        the value is meaningless (Default False)
+    density : bool, optional
         Print out the density of the unit cell. If the system is not periodic,
-        the value is meaningless
-    separator : str=','
-        The string to separate data fields
-    systemMass : float=None
+        the value is meaningless (Default False)
+    separator : str, optional
+        The string to separate data fields (Default ',')
+    systemMass : float, optional
         If not None, the density will be computed from this mass, since setting
-        a mass to 0 is used to constrain the position of that particle
-    energyUnit : unit=kilocalories_per_mole
-        The unit to print energies in
-    temperatureUnit : unit=kelvin
-        The unit to print temperature in
-    volumeUnit : unit=angstrom**3
-        The unit to print volumes in
-    densityUnit : unit=grams/item/milliliter
-        The unit to print densities in
-    timeUnit : unit=picosecond
-        The unit to print times in
+        a mass to 0 is used to constrain the position of that particle. (Default
+        None)
+    unit_system : :class:`UnitSystem`, optional
+        The unit system to which to convert all of the resulting quantities to.
+        Default is ``akma_unit_system``.
     """
 
     @needs_openmm
     def __init__(self, f, reportInterval, step=True, time=True,
                  potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
                  temperature=True, volume=False, density=False, separator=',',
-                 systemMass=None, energyUnit=u.kilocalories_per_mole,
-                 temperatureUnit=u.kelvin,
-                 volumeUnit=u.angstrom**3,
-                 densityUnit=u.grams/u.item/u.milliliter,
-                 timeUnit=u.picosecond):
+                 systemMass=None, unit_system=u.akma_unit_system):
         """ Create a StateDataReporter.  """
 
         self._reportInterval = reportInterval
@@ -114,11 +105,7 @@ class AmberStateDataReporter(object):
         self._needsForces = False
         self._needEnergy = (potentialEnergy or kineticEnergy or
                             totalEnergy or temperature)
-        self.energyUnit = energyUnit
-        self.temperatureUnit = temperatureUnit
-        self.volumeUnit = volumeUnit
-        self.densityUnit = densityUnit
-        self.timeUnit = timeUnit
+        self.unit_system = unit_system
 
     def describeNextReport(self, simulation):
         """
@@ -189,19 +176,22 @@ class AmberStateDataReporter(object):
         if self._step:
             values.append(simulation.currentStep)
         if self._time:
-            values.append(time.value_in_unit(self.timeUnit))
+            if self.unit_system is u.akma_unit_system:
+                values.append(time.value_in_unit(u.picoseconds))
+            else:
+                values.append(time.value_in_unit_system(self.unit_system))
         if self._potentialEnergy:
-            values.append(pe.value_in_unit(self.energyUnit))
+            values.append(pe.value_in_unit_system(self.unit_system))
         if self._kineticEnergy:
-            values.append(ke.value_in_unit(self.energyUnit))
+            values.append(ke.value_in_unit_system(self.unit_system))
         if self._totalEnergy:
-            values.append((pe + ke).value_in_unit(self.energyUnit))
+            values.append((pe + ke).value_in_unit_system(self.unit_system))
         if self._temperature:
-            values.append(temp.value_in_unit(self.temperatureUnit))
+            values.append(temp.value_in_unit_system(self.unit_system))
         if self._volume:
-            values.append(volume.value_in_unit(self.volumeUnit))
+            values.append(volume.value_in_unit_system(self.unit_system))
         if self._density:
-            values.append(density.value_in_unit(self.densityUnit))
+            values.append(density.value_in_unit_system(self.densityUnit))
         return values
 
     def _initializeConstants(self, simulation):
@@ -209,7 +199,9 @@ class AmberStateDataReporter(object):
         Initialize a set of constants required for the reports
 
         Parameters
-            - simulation (Simulation) The simulation to generate a report for
+        ----------
+        simulation : Simulation
+            The simulation to generate a report for
         """
         system = simulation.system
         frclist = system.getForces()
