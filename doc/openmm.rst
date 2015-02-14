@@ -125,3 +125,14 @@ classes in addition to the small number provided by ParmEd:
 
 Examples
 --------
+
+Right now, the two main pathways to run an OpenMM simulation starting from a
+fully parametrized molecular mechanical model (click on either option to view
+the annotated and explained example):
+
+.. toctree::
+    :maxdepth: 2
+
+    Starting from AMBER prmtop and inpcrd files <omm_amber>
+    Starting from CHARMM PSF and coordinate files <omm_charmm>
+
