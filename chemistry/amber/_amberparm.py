@@ -1812,23 +1812,17 @@ class Rst7(object):
     title : str, optional
         For a file that is to be written, this is the title that will be given
         to that file. Default is an empty string
-    hasvels : bool, deprecated
-        This variable has no effect. The presence of vels is detected by whether
-        or not velocities have been set
-    hasbox : bool, deprecated
-        This variable has no effect (see the reason for hasvels, above)
     time : float, optional
         The time to write to the restart file. This is cosmetic. Default is 0
     """
 
-    def __init__(self, filename=None, natom=None, title='', hasvels=False,
-                 hasbox=False, time=0.0):
+    def __init__(self, filename=None, natom=None, title='', time=0.0):
         """
         Optionally takes a filename to read. This is deprecated, though, as the
         alternative constructor "open" should be used instead
         """
         self.coordinates = []
-        self.vels = []
+        self.vels = None
         self.box = None
         self.natom = natom
         self.title = title
@@ -1898,9 +1892,8 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        if hasattr(thing, 'vels'): inst.vels = thing.vels[:]
-        inst.hasbox = thing.hasbox
-        if hasattr(thing, 'box'): inst.box = thing.box[:]
+        if hasattr(thing, 'vels'): inst.vels = copy.deepcopy(thing.vels)
+        if hasattr(thing, 'box'): inst.box = copy.deepcopy(thing.box)
         inst.time = thing.time
 
         return inst
@@ -1917,8 +1910,8 @@ class Rst7(object):
             if self.natom is None:
                 raise RuntimeError('Number of atoms must be set for NetCDF '
                                    'Restart files before write time')
-            f = NetCDFRestart.open_new(fname, self.natom, self.hasbox,
-                                       self.hasvels, self.title)
+            f = NetCDFRestart.open_new(fname, self.natom, self.box is not None,
+                                       self.vels is not None, self.title)
         else:
             f = AmberAsciiRestart(fname, 'w', natom=self.natom,
                                   title=self.title)
@@ -1926,7 +1919,7 @@ class Rst7(object):
         f.time = self.time
         # Now write the coordinates
         f.coordinates = self.coordinates
-        if self.vels:
+        if self.vels is not None:
             f.velocities = self.vels
         if self.box is not None:
             f.box = self.box

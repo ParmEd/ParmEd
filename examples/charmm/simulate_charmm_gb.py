@@ -4,16 +4,13 @@ from __future__ import division, print_function
 import sys
 
 # OpenMM Imports
-import simtk.unit as u
 import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.charmm.openmmloader import (OpenMMCharmmPsfFile as CharmmPsfFile,
-                                           OpenMMCharmmCrdFile as CharmmCrdFile)
-from chemistry.charmm.parameters import CharmmParameterSet
-from chemistry.amber.openmmreporters import (
-            AmberStateDataReporter as AKMAStateDataReporter)
+from chemistry.charmm import CharmmPsfFile, CharmmCrdFile, CharmmParameterSet
+from chemistry.openmm import StateDataReporter
+from chemistry import unit as u
 
 # Load the CHARMM files
 print('Loading CHARMM files...')
@@ -60,9 +57,9 @@ sim.minimizeEnergy(maxIterations=500)
 
 # Set up the reporters to report energies and coordinates every 100 steps
 sim.reporters.append(
-        AKMAStateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
-                              kineticEnergy=True, temperature=True,
-                              volume=True, density=True)
+        StateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
+                          kineticEnergy=True, temperature=True,
+                          volume=True, density=True)
 )
 sim.reporters.append(app.DCDReporter('ala5_gb.dcd', 100))
 

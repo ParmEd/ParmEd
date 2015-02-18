@@ -4,17 +4,16 @@ from __future__ import division, print_function
 import sys
 
 # OpenMM Imports
-import simtk.unit as u
 import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
+from chemistry.amber.openmmloader import AmberParm
 from chemistry.charmm.parameters import CharmmParameterSet
-from chemistry.amber.openmmreporters import (AmberStateDataReporter,
-                                             NetCDFReporter)
+from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
+from chemistry import unit as u
 
-# Load the CHARMM files
+# Load the Amber files
 print('Loading AMBER files...')
 ala2_solv = AmberParm('ala2_solv.parm7', 'ala2_solv.rst7')
 
@@ -49,13 +48,11 @@ sim.minimizeEnergy(maxIterations=500)
 
 # Set up the reporters to report energies and coordinates every 100 steps
 sim.reporters.append(
-        AmberStateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
-                              kineticEnergy=True, temperature=True,
-                              volume=True, density=True)
+        StateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
+                          kineticEnergy=True, temperature=True, volume=True,
+                          density=True)
 )
-sim.reporters.append(
-        NetCDFReporter('ala2_solv.nc', 100, crds=True)
-)
+sim.reporters.append(NetCDFReporter('ala2_solv.nc', 100, crds=True))
 
 # Run dynamics
 print('Running dynamics')
