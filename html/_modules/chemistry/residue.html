@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.residue &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.residue</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains basic information and functionality related to individual</span>
+<span class="sd">residues in typical biopolymers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AminoAcidResidue"><a class="viewcode-back" href="../../api/chemistry/chemistry.residue.html#chemistry.residue.AminoAcidResidue">[docs]</a><span class="k">class</span> <span class="nc">AminoAcidResidue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An individual amino acid residue.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the residue</span>
+<span class="sd">    abbr : str</span>
+<span class="sd">        The 3-letter abbreviation of the amino acid residue</span>
+<span class="sd">    symbol : str</span>
+<span class="sd">        The 1-letter symbol of the amino acid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_all_residues_by_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">_all_residues_by_abbr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">_all_residues_by_symbol</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">all_residues</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abbr</span> <span class="o">=</span> <span class="n">abbr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">_all_residues_by_name</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">[</span><span class="n">abbr</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">_all_residues_by_symbol</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">all_residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;Amino Acid Residue </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s"> [</span><span class="si">%s</span><span class="s">]&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AminoAcidResidue.get"><a class="viewcode-back" href="../../api/chemistry/chemistry.residue.html#chemistry.residue.AminoAcidResidue.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the amino acid corresponding to either the residue name, 3-letter</span>
+<span class="sd">        abbreviation or 1-letter symbol. It is case-insensitive.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            1-letter symbol, 3-letter abbreviation, or residue name</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residue : AminoAcidResidue</span>
+<span class="sd">            The residue corresponding to the given key</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the symbol is not defined, a KeyError is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_all_residues_by_symbol</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_all_residues_by_name</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+</div></div>
+<span class="n">ALA</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Alanine&#39;</span><span class="p">,</span> <span class="s">&#39;ALA&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">)</span>
+<span class="n">ARG</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Arginine&#39;</span><span class="p">,</span> <span class="s">&#39;ARG&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">)</span>
+<span class="n">ASN</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Asparagine&#39;</span><span class="p">,</span> <span class="s">&#39;ASN&#39;</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">)</span>
+<span class="n">ASP</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Aspartate&#39;</span> <span class="p">,</span><span class="s">&#39;ASP&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">)</span>
+<span class="n">CYS</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Cysteine&#39;</span><span class="p">,</span> <span class="s">&#39;CYS&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">GLU</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Glutamate&#39;</span><span class="p">,</span> <span class="s">&#39;GLU&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">)</span>
+<span class="n">GLN</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Glutamine&#39;</span><span class="p">,</span> <span class="s">&#39;GLN&#39;</span><span class="p">,</span> <span class="s">&#39;Q&#39;</span><span class="p">)</span>
+<span class="n">GLY</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Glycine&#39;</span><span class="p">,</span> <span class="s">&#39;GLY&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">)</span>
+<span class="n">HIS</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Histidine&#39;</span><span class="p">,</span> <span class="s">&#39;HIS&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">)</span>
+<span class="n">ILE</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Isoleucine&#39;</span><span class="p">,</span> <span class="s">&#39;ILE&#39;</span><span class="p">,</span> <span class="s">&#39;I&#39;</span><span class="p">)</span>
+<span class="n">LEU</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Leucine&#39;</span><span class="p">,</span> <span class="s">&#39;LEU&#39;</span><span class="p">,</span> <span class="s">&#39;L&#39;</span><span class="p">)</span>
+<span class="n">LYS</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Lysine&#39;</span><span class="p">,</span> <span class="s">&#39;LYS&#39;</span><span class="p">,</span> <span class="s">&#39;K&#39;</span><span class="p">)</span>
+<span class="n">MET</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Methionine&#39;</span><span class="p">,</span> <span class="s">&#39;MET&#39;</span><span class="p">,</span> <span class="s">&#39;M&#39;</span><span class="p">)</span>
+<span class="n">PHE</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Phenylalanine&#39;</span><span class="p">,</span> <span class="s">&#39;PHE&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">)</span>
+<span class="n">PRO</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Proline&#39;</span><span class="p">,</span> <span class="s">&#39;PRO&#39;</span><span class="p">,</span> <span class="s">&#39;P&#39;</span><span class="p">)</span>
+<span class="n">SER</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Serine&#39;</span><span class="p">,</span> <span class="s">&#39;SER&#39;</span><span class="p">,</span> <span class="s">&#39;S&#39;</span><span class="p">)</span>
+<span class="n">THR</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Threonine&#39;</span><span class="p">,</span> <span class="s">&#39;THR&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">)</span>
+<span class="n">TRP</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Tryptophan&#39;</span><span class="p">,</span> <span class="s">&#39;TRP&#39;</span><span class="p">,</span> <span class="s">&#39;W&#39;</span><span class="p">)</span>
+<span class="n">TYR</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Tyrosine&#39;</span><span class="p">,</span> <span class="s">&#39;TYR&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
+<span class="n">VAL</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s">&#39;Valine&#39;</span><span class="p">,</span> <span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;V&#39;</span><span class="p">)</span>
+
+<span class="n">WATER_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;WAT&#39;</span><span class="p">,</span> <span class="s">&#39;HOH&#39;</span><span class="p">,</span> <span class="s">&#39;TIP3&#39;</span><span class="p">]</span>
+<span class="n">EXTRA_POINT_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;EP&#39;</span><span class="p">,</span> <span class="s">&#39;LP&#39;</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

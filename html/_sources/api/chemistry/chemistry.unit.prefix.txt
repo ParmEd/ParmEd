@@ -1,0 +1,7 @@
+chemistry.unit.prefix module
+============================
+
+.. automodule:: chemistry.unit.prefix
+    :members:
+    :undoc-members:
+    :show-inheritance:

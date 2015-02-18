@@ -1,0 +1,7 @@
+ParmedTools.add1264 module
+==========================
+
+.. automodule:: ParmedTools.add1264
+    :members:
+    :undoc-members:
+    :show-inheritance:

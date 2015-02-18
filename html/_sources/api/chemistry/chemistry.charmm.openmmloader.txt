@@ -1,0 +1,7 @@
+chemistry.charmm.openmmloader module
+====================================
+
+.. automodule:: chemistry.charmm.openmmloader
+    :members:
+    :undoc-members:
+    :show-inheritance:

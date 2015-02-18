@@ -1,0 +1,1032 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.charmm.psf &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="chemistry.charmm" href="../charmm.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../charmm.html" accesskey="U">chemistry.charmm</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.charmm.psf</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Provides a Python class for parsing a PSF file and setting up a system</span>
+<span class="sd">structure for it</span>
+
+<span class="sd">Author: Jason M. Swails</span>
+<span class="sd">Contributors:</span>
+<span class="sd">Date: April 20, 2014</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span>
+                       <span class="n">Cmap</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Atom</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CharmmPSFError</span><span class="p">,</span> <span class="n">MoleculeError</span><span class="p">,</span>
+                <span class="n">CharmmPSFWarning</span><span class="p">,</span> <span class="n">MissingParameter</span><span class="p">,</span> <span class="n">CharmmPsfEOF</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">chemistry.structure</span> <span class="kn">import</span> <span class="n">needs_openmm</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">mm</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="k">def</span> <span class="nf">_catchindexerror</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Protects a function from raising an index error, and replace that exception</span>
+<span class="sd">    with a CharmmPSFError instead</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">newfunc</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Catch the index error &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Array is too short: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">newfunc</span>
+
+<span class="k">class</span> <span class="nc">_ZeroDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains a dict that returns dummy (zero) arguments when a key is not</span>
+<span class="sd">    present rather than raising a KeyError.  The return value for non-existent</span>
+<span class="sd">    items is (0, []). It also special-case sections that have multiple pointers</span>
+<span class="sd">    to avoid index errors if those are not present in the PSF file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NGRP&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NGRP&#39;</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NUMLP&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NUMLP&#39;</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[]</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<div class="viewcode-block" id="CharmmPsfFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile">[docs]</a><span class="k">class</span> <span class="nc">CharmmPsfFile</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A chemical :class:`Structure` instantiated from CHARMM files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psf_name : str</span>
+<span class="sd">        Name of the PSF file (it must exist)</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError : If file ``psf_name`` does not exist</span>
+<span class="sd">    CharmmPsfError : If any parsing errors are encountered</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; cs = CharmmPsfFile(&quot;testfiles/test.psf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; len(cs.atoms)</span>
+<span class="sd">    33</span>
+<span class="sd">    &gt;&gt;&gt; len(cs.bonds)</span>
+<span class="sd">    32</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a string to a specific type, making sure to raise</span>
+<span class="sd">        CharmmPSFError with the given message in the event of a failure.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            - string (str) : Input string to process</span>
+<span class="sd">            - type (type) : Type of data to convert to</span>
+<span class="sd">            - message (str) : Error message to put in exception if failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Could not convert </span><span class="si">%s</span><span class="s"> [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="n">string</span><span class="p">))</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_psf_section</span><span class="p">(</span><span class="n">psf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method parses a section of the PSF file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        psf : file</span>
+<span class="sd">            Open file that is pointing to the first line of the section that is</span>
+<span class="sd">            to be parsed</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        title : str </span>
+<span class="sd">            The label of the PSF section we are parsing</span>
+<span class="sd">        pointers : (int/tuple of ints) </span>
+<span class="sd">            If one pointer is set, pointers is simply the integer that is value</span>
+<span class="sd">            of that pointer. Otherwise it is a tuple with every pointer value</span>
+<span class="sd">            defined in the first line</span>
+<span class="sd">        data : list</span>
+<span class="sd">            A list of all data in the parsed section converted to integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_convert</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CharmmPsfEOF</span><span class="p">(</span><span class="s">&#39;Unexpected EOF in PSF file&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;!&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;!&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;!&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="c"># Strip out description</span>
+            <span class="k">if</span> <span class="s">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">title</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="p">[:</span><span class="n">title</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Could not determine section title&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pointers</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;pointer&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pointers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">conv</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;pointer&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">title</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NNB&#39;</span><span class="p">):</span>
+            <span class="c"># This will correctly handle the NNB section (which has a spurious</span>
+            <span class="c"># blank line) as well as any sections that have 0 members.</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="o">==</span> <span class="s">&#39;NATOM&#39;</span> <span class="ow">or</span> <span class="n">title</span> <span class="o">==</span> <span class="s">&#39;NTITLE&#39;</span><span class="p">:</span>
+            <span class="c"># Store these two sections as strings (ATOM section we will parse</span>
+            <span class="c"># later). The rest of the sections are integer pointers</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">conv</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;PSF data&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">pointers</span><span class="p">,</span> <span class="n">data</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="nd">@_catchindexerror</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psf_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens and parses a PSF file, then instantiates a CharmmPsfFile</span>
+<span class="sd">        instance from the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Structure</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_convert</span>
+        <span class="c"># Make sure the file exists</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">psf_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Could not find PSF file </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">psf_name</span><span class="p">)</span>
+        <span class="c"># Open the PSF and read the first line. It must start with &quot;PSF&quot;</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;PSF&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Unrecognized PSF file. First line is </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                 <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="c"># Store the flags</span>
+        <span class="n">psf_flags</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="c"># Now get all of the sections and store them in a dict</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="c"># Now get all of the sections</span>
+        <span class="n">psfsections</span> <span class="o">=</span> <span class="n">_ZeroDict</span><span class="p">()</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sec</span><span class="p">,</span> <span class="n">ptr</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_parse_psf_section</span><span class="p">(</span><span class="n">psf</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">CharmmPsfEOF</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">psfsections</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="c"># store the title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NTITLE&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c"># Next is the number of atoms</span>
+        <span class="n">natom</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NATOM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;natom&#39;</span><span class="p">)</span>
+        <span class="c"># Parse all of the atoms</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NATOM&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">atid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">atid</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Nonsequential atoms detected!&#39;</span><span class="p">)</span>
+            <span class="n">segid</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">resid</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;residue number&#39;</span><span class="p">)</span>
+            <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">attype</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+            <span class="c"># Try to convert the atom type to an integer a la CHARMM</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">attype</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">attype</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">charge</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;partial charge&#39;</span><span class="p">)</span>
+            <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;atomic mass&#39;</span><span class="p">)</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">attype</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="n">props</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="n">segid</span><span class="p">)</span>
+        <span class="c"># Now get the number of bonds</span>
+        <span class="n">nbond</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NBOND&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of bonds&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NBOND&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nbond</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> bonds&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">nbond</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">nbond</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Bond</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c"># Now get the number of angles and the angle list</span>
+        <span class="n">ntheta</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NTHETA&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of angles&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NTHETA&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ntheta</span> <span class="o">*</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> angles&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">ntheta</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">ntheta</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c"># Now get the number of torsions and the torsion list</span>
+        <span class="n">nphi</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NPHI&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of torsions&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NPHI&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nphi</span> <span class="o">*</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> torsions&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">nphi</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">nphi</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Dihedral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span>  <span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Now get the number of improper torsions</span>
+        <span class="n">nimphi</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NIMPHI&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of impropers&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NIMPHI&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nimphi</span> <span class="o">*</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> impropers&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">nimphi</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">nimphi</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Improper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span>  <span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c"># Now handle the donors (what is this used for??)</span>
+        <span class="n">ndon</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NDON&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of donors&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NDON&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndon</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> donors&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">ndon</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">ndon</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">AcceptorDonor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c"># Now handle the acceptors (what is this used for??)</span>
+        <span class="n">nacc</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NACC&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of acceptors&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NACC&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nacc</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> acceptors&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">ndon</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">nacc</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">AcceptorDonor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c"># Now get the group sections</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ngrp</span><span class="p">,</span> <span class="n">nst2</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NGRP NST2&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Could not unpack GROUP pointers&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NGRP NST2&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">nst2</span> <span class="o">=</span> <span class="n">nst2</span>
+        <span class="c"># Now handle the groups</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ngrp</span> <span class="o">*</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> indexes for </span><span class="si">%d</span><span class="s"> groups&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">ngrp</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">ngrp</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Group</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="c"># Assign all of the atoms to molecules recursively</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;MOLNT&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">set_molecules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">molecule_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">marked</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">molecule_list</span> <span class="o">!=</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Detected PSF molecule section that is WRONG. &#39;</span>
+                              <span class="s">&#39;Resetting molecularity.&#39;</span><span class="p">,</span> <span class="n">CharmmPSFWarning</span><span class="p">)</span>
+            <span class="c"># We have a CHARMM PSF file; now do NUMLP/NUMLPH sections</span>
+            <span class="n">numlp</span><span class="p">,</span> <span class="n">numlph</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NUMLP NUMLPH&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">numlp</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">numlph</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;Cannot currently handle PSFs with &#39;</span>
+                                          <span class="s">&#39;lone pairs defined in the NUMLP/&#39;</span>
+                                          <span class="s">&#39;NUMLPH section.&#39;</span><span class="p">)</span>
+        <span class="c"># Now do the CMAPs</span>
+        <span class="n">ncrterm</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NCRTERM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;Number of cross-terms&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NCRTERM&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ncrterm</span> <span class="o">*</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> CMAP indexes for </span><span class="si">%d</span><span class="s"> cmap terms&#39;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">ncrterm</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="n">ncrterm</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Cmap</span><span class="o">.</span><span class="n">extended</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span>  <span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">6</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">7</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">psf_flags</span>
+
+    <span class="c">#===================================================</span>
+
+<div class="viewcode-block" id="CharmmPsfFile.write_psf"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.write_psf">[docs]</a>    <span class="k">def</span> <span class="nf">write_psf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a PSF file from the stored molecule</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dest : str or file-like</span>
+<span class="sd">            The place to write the output PSF file.  If it has a &quot;write&quot;</span>
+<span class="sd">            attribute, it will be used to print the PSF file. Otherwise, it will</span>
+<span class="sd">            be treated like a string and a file will be opened, printed, then</span>
+<span class="sd">            closed</span>
+<span class="sd">        vmd : bool </span>
+<span class="sd">            If True, it will write out a PSF in the format that VMD prints it in</span>
+<span class="sd">            (i.e., no NUMLP/NUMLPH or MOLNT sections)</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; cs = CharmmPsfFile(&#39;testfiles/test.psf&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; cs.write_psf(&#39;testfiles/test2.psf&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># See if this is an extended format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s">&#39;EXT&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Index the atoms and residues</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+
+        <span class="c"># Assign the formats we need to write with</span>
+        <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
+            <span class="n">atmfmt1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%10d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8i</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%4d</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">atmfmt2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%10d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8i</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">intfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%10d</span><span class="s">&#39;</span> <span class="c"># For pointers</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atmfmt1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4i</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%4d</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">atmfmt2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4i</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">intfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%8d</span><span class="s">&#39;</span> <span class="c"># For pointers</span>
+
+        <span class="c"># Now print the header then the title</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;PSF &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;flags&#39;</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;EXT&#39;</span><span class="p">)</span> <span class="c"># EXT is always active</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NTITLE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Now time for the atoms</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NATOM</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># atmfmt1 is for CHARMM format (i.e., atom types are integers)</span>
+        <span class="c"># atmfmt is for XPLOR format (i.e., atom types are strings)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="n">atmfmt2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="n">atmfmt1</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
+                <span class="n">segid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;SYS&#39;</span>
+            <span class="n">atmstr</span> <span class="o">=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
+                            <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                            <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s">&#39;props&#39;</span><span class="p">):</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atmstr</span> <span class="o">+</span> <span class="s">&#39;   &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">props</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Bonds</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NBOND: bonds</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bond</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># Write 4 bonds per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Angles</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NTHETA: angles</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c"># Write 3 angles per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Dihedrals</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NPHI: dihedrals</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dih</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Write 2 dihedrals per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Impropers</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NIMPHI: impropers</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">imp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Write 2 dihedrals per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Donor section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NDON: donors</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">don</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">don</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">don</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># 4 donors per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Acceptor section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NACC: acceptors</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">acc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">acc</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">acc</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># 4 donors per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># NNB section ??</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span> <span class="o">+</span> <span class="s">&#39; !NNB</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="c"># Write 8 0&#39;s per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Group section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">nst2</span><span class="p">))</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; !NGRP NST2</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="n">gp</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">gp</span><span class="o">.</span><span class="n">move</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># The next two sections are never found in VMD prmtops...</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vmd</span><span class="p">:</span>
+            <span class="c"># Molecule section; first set molecularity</span>
+            <span class="n">set_molecules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+            <span class="n">mollist</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">marked</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">max</span><span class="p">(</span><span class="n">mollist</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !MOLNT</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">marked</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="c"># NUMLP/NUMLPH section</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NUMLP NUMLPH</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># CMAP section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NCRTERM: cross-terms</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Done!</span>
+        <span class="c"># If we opened our own handle, close it</span>
+        <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@needs_openmm</span>
+<div class="viewcode-block" id="CharmmPsfFile.createSystem"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an OpenMM System object from the CHARMM PSF file. This is a</span>
+<span class="sd">        shortcut for calling `load_parameters` followed by</span>
+<span class="sd">        Structure.createSystem. If params is not None, `load_parameters` will be</span>
+<span class="sd">        called on that parameter set, and Structure.createSystem will be called</span>
+<span class="sd">        with the remaining args and kwargs</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : CharmmParameterSet=None</span>
+<span class="sd">            If not None, this parameter set will be loaded</span>
+<span class="sd">        </span>
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`chemistry.structure.Structure.createSystem`</span>
+<span class="sd">            In addition to `params`, this method also takes all arguments for</span>
+<span class="sd">            :meth:`chemistry.structure.Structure.createSystem`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
+<div class="viewcode-block" id="CharmmPsfFile.load_parameters"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parmset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads parameters from a parameter set that was loaded via CHARMM RTF,</span>
+<span class="sd">        PAR, and STR files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parmset : :class:`CharmmParameterSet`</span>
+<span class="sd">            List of all parameters</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If any parameters that are necessary cannot be found, MissingParameter</span>
+<span class="sd">          is raised.</span>
+
+<span class="sd">        - If any dihedral or improper parameters cannot be found, I will try</span>
+<span class="sd">          inserting wildcards (at either end for dihedrals and as the two</span>
+<span class="sd">          central atoms in impropers) and see if that matches.  Wild-cards will</span>
+<span class="sd">          apply ONLY if specific parameters cannot be found.</span>
+
+<span class="sd">        - This method will expand the dihedrals attribute by adding a separate</span>
+<span class="sd">          Dihedral object for each term for types that have a multi-term</span>
+<span class="sd">          expansion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># First load the atom types</span>
+        <span class="n">types_are_int</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">atype</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+                    <span class="n">types_are_int</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># if we have to change back</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">atype</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">atom_types_str</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;Could not find atom type for </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                       <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span> <span class="o">=</span> <span class="n">atype</span>
+            <span class="c"># Change to string type to look up the rest of the parameters</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">=</span> <span class="n">atype</span><span class="o">.</span><span class="n">atomic_number</span>
+
+        <span class="c"># Next load all of the bonds</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="c"># Construct the key</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
+                   <span class="nb">max</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bond</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;Missing bond type for </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">bond</span><span class="p">)</span>
+            <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Build the bond_types list</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span>
+        <span class="c"># Next load all of the angles. If a Urey-Bradley term is defined for</span>
+        <span class="c"># this angle, also build the urey_bradley and urey_bradley_type lists</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">ang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
+            <span class="c"># Construct the key</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ang</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">ang</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">ang</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="nb">max</span><span class="p">(</span><span class="n">ang</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">ang</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ang</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">ang</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">ubt</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ubt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NoUreyBradley</span><span class="p">:</span>
+                    <span class="n">ub</span> <span class="o">=</span> <span class="n">UreyBradley</span><span class="p">(</span><span class="n">ang</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">ang</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">ubt</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ub</span><span class="p">)</span>
+                    <span class="n">ubt</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;Missing angle type for </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">ang</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[:]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">ub</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ub</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">ub</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">ub</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span>
+        <span class="k">for</span> <span class="n">ang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ang</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">ang</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ang</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">ang</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span>
+        <span class="c"># Next load all of the dihedrals.</span>
+        <span class="n">active_dih_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">dih</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
+            <span class="c"># Store the atoms</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="c"># First see if the exact dihedral is specified</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
+                <span class="c"># Check for wild-cards</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;X&#39;</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;No dihedral parameters found for &#39;</span>
+                                           <span class="s">&#39;</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">dih</span><span class="p">)</span>
+            <span class="n">dih</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">dih</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">pair</span> <span class="o">=</span> <span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span> <span class="c"># To determine exclusions</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">bond_partners</span> <span class="ow">or</span>
+                <span class="n">dih</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">angle_partners</span><span class="p">):</span>
+                <span class="n">dih</span><span class="o">.</span><span class="n">ignore_end</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">active_dih_list</span><span class="p">:</span>
+                <span class="n">dih</span><span class="o">.</span><span class="n">ignore_end</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">active_dih_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+                <span class="n">active_dih_list</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">))</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">dihedral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span>
+        <span class="c"># Now do the impropers</span>
+        <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
+            <span class="c"># Store the atoms</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span>
+            <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a4</span><span class="o">.</span><span class="n">type</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
+                <span class="c"># Check for wild-cards</span>
+                <span class="k">for</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="p">(</span><span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span><span class="p">):</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">at1</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">]))</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
+                        <span class="k">break</span> <span class="c"># This is the right key</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;No improper parameters found for </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span>
+                                       <span class="n">imp</span><span class="p">)</span>
+            <span class="n">imp</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">improper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span>
+        <span class="c"># Now do the cmaps. These will not have wild-cards</span>
+        <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cmap</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MissingParameter</span><span class="p">(</span><span class="s">&#39;No CMAP parameters found for </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">cmap</span><span class="p">)</span>
+            <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span>
+        <span class="c"># If the types started out as integers, change them back</span>
+        <span class="k">if</span> <span class="n">types_are_int</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
+<div class="viewcode-block" id="CharmmPsfFile.clear_cmap"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.clear_cmap">[docs]</a>    <span class="k">def</span> <span class="nf">clear_cmap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot; Clear the cmap list to prevent any CMAP parameters from being used &quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">[:]</span>
+
+    <span class="c">#===================================================</span>
+</div>
+<div class="viewcode-block" id="CharmmPsfFile.has_NBFIX"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.has_NBFIX">[docs]</a>    <span class="k">def</span> <span class="nf">has_NBFIX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns whether or not any pairs of atom types have their LJ</span>
+<span class="sd">        interactions modified by an NBFIX definition</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        has_nbfix : bool</span>
+<span class="sd">            If True, at least two atom types have NBFIX mod definitions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">typemap</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">atom_type</span><span class="p">)]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">atom_type</span>
+        <span class="c"># Now we have a map of all atom types that we have defined in our</span>
+        <span class="c"># system. Look through all of the atom types and see if any of their</span>
+        <span class="c"># NBFIX definitions are also keys in typemap</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">typemap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">type</span><span class="o">.</span><span class="n">nbfix</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@needs_openmm</span>
+<div class="viewcode-block" id="CharmmPsfFile.omm_nonbonded_force"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                            <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
+                            <span class="n">switchDistance</span><span class="o">=</span><span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
+                            <span class="n">ewaldErrorTolerance</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
+                            <span class="n">reactionFieldDielectric</span><span class="o">=</span><span class="mf">78.5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates the OpenMM NonbondedForce instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nonbondedMethod : cutoff method</span>
+<span class="sd">            This is the cutoff method. It can be either the NoCutoff,</span>
+<span class="sd">            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the</span>
+<span class="sd">            simtk.openmm.app namespace</span>
+<span class="sd">        nonbondedCutoff : float or distance Quantity</span>
+<span class="sd">            The nonbonded cutoff must be either a floating point number</span>
+<span class="sd">            (interpreted as nanometers) or a Quantity with attached units. This</span>
+<span class="sd">            is ignored if nonbondedMethod is NoCutoff.</span>
+<span class="sd">        switchDistance : float or distance Quantity</span>
+<span class="sd">            The distance at which the switching function is turned on for van</span>
+<span class="sd">            der Waals interactions. This is ignored when no cutoff is used, and</span>
+<span class="sd">            no switch is used if switchDistance is 0, negative, or greater than</span>
+<span class="sd">            the cutoff</span>
+<span class="sd">        ewaldErrorTolerance : float=0.0005</span>
+<span class="sd">            When using PME or Ewald, the Ewald parameters will be calculated</span>
+<span class="sd">            from this value</span>
+<span class="sd">        reactionFieldDielectric : float=78.5</span>
+<span class="sd">            If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the</span>
+<span class="sd">            region beyond the cutoff is treated using a reaction field method</span>
+<span class="sd">            with this dielectric constant. It should be set to 1 if another</span>
+<span class="sd">            implicit solvent model is being used (e.g., GB)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        NonbondedForce</span>
+<span class="sd">            This just implements the very basic NonbondedForce with the typical</span>
+<span class="sd">            charge-charge and 12-6 Lennard-Jones interactions with the</span>
+<span class="sd">            Lorentz-Berthelot combining rules.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Subclasses of Structure for which this nonbonded treatment is inadequate</span>
+<span class="sd">        should override this method to implement what is needed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span> <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">nonbfrc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">omm_nonbonded_force</span><span class="p">(</span>
+                <span class="n">nonbondedMethod</span><span class="p">,</span> <span class="n">nonbondedCutoff</span><span class="p">,</span> <span class="n">switchDistance</span><span class="p">,</span>
+                <span class="n">ewaldErrorTolerance</span><span class="p">,</span> <span class="n">reactionFieldDielectric</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">hasnbfix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_NBFIX</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">hasnbfix</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nonbfrc</span>
+        <span class="n">length_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
+        <span class="n">ene_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoules</span><span class="p">)</span>
+        <span class="c"># We need a CustomNonbondedForce to implement the NBFIX functionality.</span>
+        <span class="c"># First derive the type lookup tables</span>
+        <span class="n">lj_idx_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">lj_radii</span><span class="p">,</span> <span class="n">lj_depths</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">num_lj_types</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">lj_type_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="n">atype</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span>
+            <span class="k">if</span> <span class="n">lj_idx_list</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="k">continue</span> <span class="c"># already assigned</span>
+            <span class="n">num_lj_types</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">lj_idx_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_lj_types</span>
+            <span class="n">ljtype</span> <span class="o">=</span> <span class="p">(</span><span class="n">atype</span><span class="o">.</span><span class="n">rmin</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">atype</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+            <span class="n">lj_type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atype</span><span class="p">)</span>
+            <span class="n">lj_radii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atype</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span>
+            <span class="n">lj_depths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">atype</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="n">atype2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">atom_type</span>
+                <span class="k">if</span> <span class="n">lj_idx_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span> <span class="c"># already assigned</span>
+                <span class="k">if</span> <span class="n">atype2</span> <span class="ow">is</span> <span class="n">atype</span><span class="p">:</span>
+                    <span class="n">lj_idx_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_lj_types</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">atype</span><span class="o">.</span><span class="n">nbfix</span><span class="p">:</span>
+                    <span class="c"># Only non-NBFIXed atom types can be compressed</span>
+                    <span class="n">ljtype2</span> <span class="o">=</span> <span class="p">(</span><span class="n">atype2</span><span class="o">.</span><span class="n">rmin</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">atype2</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">ljtype</span> <span class="o">==</span> <span class="n">ljtype2</span><span class="p">:</span>
+                        <span class="n">lj_idx_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_lj_types</span>
+        <span class="c"># Now everything is assigned. Create the A- and B-coefficient arrays</span>
+        <span class="n">acoef</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_lj_types</span><span class="o">*</span><span class="n">num_lj_types</span><span class="p">)]</span>
+        <span class="n">bcoef</span> <span class="o">=</span> <span class="n">acoef</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_lj_types</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_lj_types</span><span class="p">):</span>
+                <span class="n">namej</span> <span class="o">=</span> <span class="n">lj_type_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rij</span><span class="p">,</span> <span class="n">wdij</span><span class="p">,</span> <span class="n">rij14</span><span class="p">,</span> <span class="n">wdij14</span> <span class="o">=</span> <span class="n">lj_type_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">nbfix</span><span class="p">[</span><span class="n">namej</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">rij</span> <span class="o">=</span> <span class="p">(</span><span class="n">lj_radii</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">lj_radii</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="n">length_conv</span>
+                    <span class="n">wdij</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">lj_depths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">lj_depths</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="n">ene_conv</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rij</span> <span class="o">*=</span> <span class="n">length_conv</span>
+                    <span class="n">wdij</span> <span class="o">*=</span> <span class="n">ene_conv</span>
+                <span class="n">rij6</span> <span class="o">=</span> <span class="n">rij</span><span class="o">**</span><span class="mi">6</span>
+                <span class="n">acoef</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">num_lj_types</span><span class="o">*</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">wdij</span><span class="p">)</span> <span class="o">*</span> <span class="n">rij6</span>
+                <span class="n">bcoef</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">num_lj_types</span><span class="o">*</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">wdij</span> <span class="o">*</span> <span class="n">rij6</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="s">&#39;(a/r6)^2-b/r6; r6=r2*r2*r2; r2=r^2; &#39;</span>
+                                        <span class="s">&#39;a=acoef(type1, type2); &#39;</span>
+                                        <span class="s">&#39;b=bcoef(type1, type2)&#39;</span><span class="p">)</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s">&#39;acoef&#39;</span><span class="p">,</span>
+                <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">num_lj_types</span><span class="p">,</span> <span class="n">num_lj_types</span><span class="p">,</span> <span class="n">acoef</span><span class="p">))</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s">&#39;bcoef&#39;</span><span class="p">,</span>
+                <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">num_lj_types</span><span class="p">,</span> <span class="n">num_lj_types</span><span class="p">,</span> <span class="n">bcoef</span><span class="p">))</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NONBONDED_FORCE_GROUP</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">PME</span> <span class="ow">or</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">Ewald</span> <span class="ow">or</span>
+                <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">):</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Unrecognized nonbonded method [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>
+                             <span class="n">nonbondedMethod</span><span class="p">)</span>
+        <span class="c"># Add the particles</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lj_idx_list</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addParticle</span><span class="p">((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="c"># Now wipe out the L-J parameters in the nonbonded force</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nonbfrc</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+            <span class="n">chg</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="n">nonbfrc</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">nonbfrc</span><span class="o">.</span><span class="n">setParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chg</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="c"># Now transfer the exclusions</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nonbfrc</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()):</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">ee</span> <span class="o">=</span> <span class="n">nonbfrc</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addExclusion</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="c"># Now transfer the other properties (cutoff, switching function, etc.)</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nonbondedMethod</span> <span class="ow">in</span> <span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">Ewald</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">):</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Unsupported nonbonded method </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                             <span class="n">nonbondedMethod</span><span class="p">)</span>
+        <span class="n">force</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">nonbfrc</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">nonbfrc</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">():</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">nonbfrc</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">nonbfrc</span><span class="p">,</span> <span class="n">force</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div></div>
+<div class="viewcode-block" id="set_molecules"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.set_molecules">[docs]</a><span class="k">def</span> <span class="nf">set_molecules</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Correctly sets the molecularity of the system based on connectivity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">setrecursionlimit</span><span class="p">,</span> <span class="n">getrecursionlimit</span>
+    <span class="c"># Since we use a recursive function here, we make sure that the recursion</span>
+    <span class="c"># limit is large enough to handle the maximum possible recursion depth we&#39;ll</span>
+    <span class="c"># need (NATOM). We don&#39;t want to shrink it, though, since we use list</span>
+    <span class="c"># comprehensions in list constructors in some places that have an implicit</span>
+    <span class="c"># (shallow) recursion, therefore, reducing the recursion limit too much here</span>
+    <span class="c"># could raise a recursion depth exceeded exception during a _Type/Atom/XList</span>
+    <span class="c"># creation. Therefore, set the recursion limit to the greater of the current</span>
+    <span class="c"># limit or the number of atoms</span>
+    <span class="n">setrecursionlimit</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">),</span> <span class="n">getrecursionlimit</span><span class="p">()))</span>
+
+    <span class="c"># Unmark all atoms so we can track which molecule each goes into</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">unmark</span><span class="p">()</span>
+
+    <span class="c"># The molecule &quot;ownership&quot; list</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># The way I do this is via a recursive algorithm, in which</span>
+    <span class="c"># the &quot;set_owner&quot; method is called for each bonded partner an atom</span>
+    <span class="c"># has, which in turn calls set_owner for each of its partners and </span>
+    <span class="c"># so on until everything has been assigned.</span>
+    <span class="n">molecule_number</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># which molecule number we are on</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)):</span>
+        <span class="c"># If this atom has not yet been &quot;owned&quot;, make it the next molecule</span>
+        <span class="c"># However, we only increment which molecule number we&#39;re on if </span>
+        <span class="c"># we actually assigned a new molecule (obviously)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">marked</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">_set_owner</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">molecule_number</span><span class="p">)</span>
+            <span class="c"># Make sure the atom indexes are sorted</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="n">owner</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">molecule_number</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">owner</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<span class="k">def</span> <span class="nf">_set_owner</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">owner_array</span><span class="p">,</span> <span class="n">atm</span><span class="p">,</span> <span class="n">mol_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Recursively sets ownership of given atom and all bonded partners &quot;&quot;&quot;</span>
+    <span class="n">atoms</span><span class="p">[</span><span class="n">atm</span><span class="p">]</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="n">mol_id</span>
+    <span class="k">for</span> <span class="n">partner</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">[</span><span class="n">atm</span><span class="p">]</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">partner</span><span class="o">.</span><span class="n">marked</span><span class="p">:</span>
+            <span class="n">owner_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partner</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">_set_owner</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">owner_array</span><span class="p">,</span> <span class="n">partner</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">mol_id</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">partner</span><span class="o">.</span><span class="n">marked</span> <span class="o">!=</span> <span class="n">mol_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MoleculeError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%d</span><span class="s"> in multiple molecules&#39;</span> <span class="o">%</span> 
+                                <span class="n">partner</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../charmm.html" >chemistry.charmm</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

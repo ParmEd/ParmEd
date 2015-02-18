@@ -1,0 +1,7 @@
+chemistry.amber.mdin.ewald module
+=================================
+
+.. automodule:: chemistry.amber.mdin.ewald
+    :members:
+    :undoc-members:
+    :show-inheritance:

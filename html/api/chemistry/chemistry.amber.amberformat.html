@@ -8,8 +8,8 @@
     
     <title>chemistry.amber.amberformat module &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../static/jquery.js"></script>
-    <script type="text/javascript" src="../../static/underscore.js"></script>
-    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
@@ -51,7 +51,7 @@
 Amber-style files with %FLAG/%FORMAT tags</p>
 <dl class="class">
 <dt id="chemistry.amber.amberformat.AmberFormat">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.amberformat.</tt><tt class="descname">AmberFormat</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.amber.amberformat.</tt><tt class="descname">AmberFormat</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A class that can parse and print files stored in the Amber topology or MDL
 format. In particular, these files have the general form:</p>
@@ -199,7 +199,7 @@ be raised</p>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.add_flag">
-<tt class="descname">add_flag</tt><big>(</big><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.add_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.add_flag" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_flag</tt><big>(</big><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.add_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.add_flag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new flag with the given flag name and Fortran format string and
 initializes the array with the values given, or as an array of 0s
 of length num_items</p>
@@ -250,39 +250,39 @@ be raised</p>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.delete_flag">
-<tt class="descname">delete_flag</tt><big>(</big><em>flag_name</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.delete_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.delete_flag" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete_flag</tt><big>(</big><em>flag_name</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.delete_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.delete_flag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a flag from the topology file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.rdparm">
-<tt class="descname">rdparm</tt><big>(</big><em>fname</em>, <em>slow=False</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.rdparm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rdparm</tt><big>(</big><em>fname</em>, <em>slow=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the Amber format file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.rdparm_old">
-<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm_old" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm_old" title="Permalink to this definition">¶</a></dt>
 <dd><p>This reads an old-style topology file and stores the results in the
 same data structures as a new-style topology file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.rdparm_slow">
-<tt class="descname">rdparm_slow</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm_slow" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rdparm_slow</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.rdparm_slow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the Amber format file. This parser is written in pure Python and
 is therefore slower than the C++-optimized version</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.set_version">
-<tt class="descname">set_version</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.set_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.set_version" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_version</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.set_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.set_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the version string</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.view">
-<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a view of the current object as another object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -306,12 +306,12 @@ be converted into</p>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.writeParm">
-<tt class="descname">writeParm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.writeParm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.writeParm" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">writeParm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.writeParm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.writeParm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.AmberFormat.write_parm">
-<tt class="descname">write_parm</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#AmberFormat.write_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.write_parm" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_parm</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.write_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.write_parm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the current data in parm_data into a new topology file with
 the given name</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -332,7 +332,7 @@ the given name</p>
 
 <dl class="class">
 <dt id="chemistry.amber.amberformat.FortranFormat">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.amberformat.</tt><tt class="descname">FortranFormat</tt><big>(</big><em>format_string</em>, <em>strip_strings=True</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#FortranFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.amber.amberformat.</tt><tt class="descname">FortranFormat</tt><big>(</big><em>format_string</em>, <em>strip_strings=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#FortranFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Processes Fortran format strings according to the Fortran specification for
 such formats. This object handles reading and writing data with any valid
@@ -387,33 +387,33 @@ replaced by any number) are optimized:</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.floatre">
-<tt class="descname">floatre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7ff8ab339af0&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">floatre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7fb1de1f1af0&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.floatre2">
-<tt class="descname">floatre2</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7ff89abfb5d0&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">floatre2</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7fb1cdab35d0&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.intre">
-<tt class="descname">intre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7ff89ab61558&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">intre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7fb1cda19558&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.FortranFormat.read">
-<tt class="descname">read</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#FortranFormat.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.read" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#FortranFormat.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the line and returns the converted data</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.strre">
-<tt class="descname">strre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7ff89ab61450&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">strre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7fb1cda19450&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.amberformat.FortranFormat.write">
-<tt class="descname">write</tt><big>(</big><em>items</em>, <em>dest</em><big>)</big><a class="reference internal" href="../../modules/chemistry/amber/amberformat.html#FortranFormat.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.write" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write</tt><big>(</big><em>items</em>, <em>dest</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#FortranFormat.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes an iterable of data (or a single item) to the passed file-like
 object</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -454,7 +454,7 @@ same for each of those functions.</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../sources/api/chemistry/chemistry.amber.amberformat.txt"
+    <li><a href="../../_sources/api/chemistry/chemistry.amber.amberformat.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

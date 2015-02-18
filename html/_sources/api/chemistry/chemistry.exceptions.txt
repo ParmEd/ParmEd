@@ -1,0 +1,7 @@
+chemistry.exceptions module
+===========================
+
+.. automodule:: chemistry.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+chemistry.unit.unit_operators module
+====================================
+
+.. automodule:: chemistry.unit.unit_operators
+    :members:
+    :undoc-members:
+    :show-inheritance:

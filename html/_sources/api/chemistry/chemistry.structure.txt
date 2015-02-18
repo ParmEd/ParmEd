@@ -1,0 +1,7 @@
+chemistry.structure module
+==========================
+
+.. automodule:: chemistry.structure
+    :members:
+    :undoc-members:
+    :show-inheritance:

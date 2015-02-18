@@ -1,0 +1,20 @@
+chemistry.tinker package
+========================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.tinker.parameterfile
+   chemistry.tinker.system
+   chemistry.tinker.tinkerfiles
+   chemistry.tinker.topologyobjects
+
+Module contents
+---------------
+
+.. automodule:: chemistry.tinker
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+chemistry.periodic_table module
+===============================
+
+.. automodule:: chemistry.periodic_table
+    :members:
+    :undoc-members:
+    :show-inheritance:

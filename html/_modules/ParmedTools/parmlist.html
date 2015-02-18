@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.parmlist &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="ParmedTools" href="../ParmedTools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" accesskey="U">ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ParmedTools.parmlist</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">List of topology file objects that can be edited in ParmEd. They can be indexed</span>
+<span class="sd">via either the name of the topology file or by the order in which they were</span>
+<span class="sd">loaded.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">chemistry.amber.amberformat</span> <span class="kn">import</span> <span class="n">AmberFormat</span>
+<span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">AmoebaParm</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">chemistry.amber.openmmloader</span> <span class="kn">import</span> <span class="p">(</span><span class="n">OpenMMAmberParm</span> <span class="k">as</span> <span class="n">AmberParm</span><span class="p">,</span>
+                                              <span class="n">OpenMMChamberParm</span> <span class="k">as</span> <span class="n">ChamberParm</span><span class="p">)</span>
+    <span class="n">_HAS_OPENMM</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span>
+    <span class="n">_HAS_OPENMM</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="n">DuplicateParm</span><span class="p">,</span> <span class="n">ParmIndexError</span>
+
+<div class="viewcode-block" id="ParmList"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList">[docs]</a><span class="k">class</span> <span class="nc">ParmList</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    List of AmberParm objects index-able via either prmtop name or prmtop index</span>
+<span class="sd">    (based on order added)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">openmm_enabled</span> <span class="o">=</span> <span class="n">_HAS_OPENMM</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Must be instantiated by itself &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># The active parm instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="ParmList.set_new_active"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList.set_new_active">[docs]</a>    <span class="k">def</span> <span class="nf">set_new_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets a new active parm &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_index</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="ParmList.add_parm"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList.add_parm">[docs]</a>    <span class="k">def</span> <span class="nf">add_parm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">,</span> <span class="n">rst7</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a parm to the list &quot;&quot;&quot;</span>
+        <span class="c"># Make sure this parm is not part of the list already</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DuplicateParm</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> already in ParmList&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
+        <span class="c"># Convert a string to an AmberParm or add an AmberParm directly</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">AmberFormat</span><span class="p">):</span>
+            <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+            <span class="c"># From the parm data, we should be able to tell whether it was a</span>
+            <span class="c"># chamber topology or regular topology. Take the proper view and</span>
+            <span class="c"># add it to the list</span>
+            <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
+                <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s">&#39;AMOEBA_FORCEFIELD&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
+                <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">AmoebaParm</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">)</span>
+        <span class="c"># Otherwise, add in the new parm&#39;s name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">parm</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+        <span class="c"># A newly added topology file is the currently active parm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span>
+        <span class="c"># If we have a restart file, load it</span>
+        <span class="k">if</span> <span class="n">rst7</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">load_rst7</span><span class="p">(</span><span class="n">rst7</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ParmList.index"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See what the index of the requested parm is (can be int or str) &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ParmIndexError</span><span class="p">(</span><span class="s">&#39;index out of range for ParmList&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">idx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParmIndexError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> prmtop not in ParmList&#39;</span> <span class="o">%</span> <span class="n">idx</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Allow an integer index or string index to identify a parm &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See if a given parm name is in the list &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">name</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span>
+   
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterate through the prmtop names &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ParmList.empty"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parm_instances</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" >ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

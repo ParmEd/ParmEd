@@ -1,0 +1,7 @@
+chemistry.amber.openmmloader module
+===================================
+
+.. automodule:: chemistry.amber.openmmloader
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -8,8 +8,8 @@
     
     <title>chemistry.charmm.psf module &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../static/jquery.js"></script>
-    <script type="text/javascript" src="../../static/underscore.js"></script>
-    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
@@ -54,8 +54,8 @@ Contributors:
 Date: April 20, 2014</p>
 <dl class="class">
 <dt id="chemistry.charmm.psf.CharmmPsfFile">
-<em class="property">class </em><tt class="descclassname">chemistry.charmm.psf.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.structure.Structure</span></tt></a></p>
+<em class="property">class </em><tt class="descclassname">chemistry.charmm.psf.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="chemistry.structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.structure.Structure</span></tt></a></p>
 <p>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -337,7 +337,7 @@ dimension length</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.clear_cmap">
-<tt class="descname">clear_cmap</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.clear_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.clear_cmap" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">clear_cmap</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.clear_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.clear_cmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the cmap list to prevent any CMAP parameters from being used</p>
 </dd></dl>
 
@@ -375,7 +375,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.createSystem">
-<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.createSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.createSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM System object from the CHARMM PSF file. This is a
 shortcut for calling <cite>load_parameters</cite> followed by
 Structure.createSystem. If params is not None, <cite>load_parameters</cite> will be
@@ -396,15 +396,15 @@ with the remaining args and kwargs</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dt>
-<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dd>
+<dt><a class="reference internal" href="chemistry.structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dt>
+<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="chemistry.structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.has_NBFIX">
-<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.has_NBFIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.has_NBFIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether or not any pairs of atom types have their LJ
 interactions modified by an NBFIX definition</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -429,7 +429,7 @@ interactions modified by an NBFIX definition</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.load_parameters">
-<tt class="descname">load_parameters</tt><big>(</big><em>parmset</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.load_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.load_parameters" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">load_parameters</tt><big>(</big><em>parmset</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.load_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.load_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads parameters from a parameter set that was loaded via CHARMM RTF,
 PAR, and STR files.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -666,7 +666,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.omm_nonbonded_force">
-<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1050,7 +1050,7 @@ atom that does not contain a SEGID identifier.</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.write_psf">
-<tt class="descname">write_psf</tt><big>(</big><em>dest</em>, <em>vmd=False</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#CharmmPsfFile.write_psf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_psf</tt><big>(</big><em>dest</em>, <em>vmd=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.write_psf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a PSF file from the stored molecule</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1083,7 +1083,7 @@ closed</p>
 
 <dl class="function">
 <dt id="chemistry.charmm.psf.set_molecules">
-<tt class="descclassname">chemistry.charmm.psf.</tt><tt class="descname">set_molecules</tt><big>(</big><em>atoms</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/psf.html#set_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.set_molecules" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">chemistry.charmm.psf.</tt><tt class="descname">set_molecules</tt><big>(</big><em>atoms</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#set_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.set_molecules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Correctly sets the molecularity of the system based on connectivity.</p>
 </dd></dl>
 
@@ -1097,7 +1097,7 @@ closed</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../sources/api/chemistry/chemistry.charmm.psf.txt"
+    <li><a href="../../_sources/api/chemistry/chemistry.charmm.psf.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

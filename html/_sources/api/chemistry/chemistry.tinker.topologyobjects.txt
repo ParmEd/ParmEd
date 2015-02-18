@@ -1,0 +1,7 @@
+chemistry.tinker.topologyobjects module
+=======================================
+
+.. automodule:: chemistry.tinker.topologyobjects
+    :members:
+    :undoc-members:
+    :show-inheritance:
