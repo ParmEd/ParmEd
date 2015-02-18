@@ -21,8 +21,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.
 """
+from __future__ import division
+
 from chemistry import unit as u
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass # Py3, zip is already izip
 from math import pi, cos, sin, sqrt, acos
 import warnings
 
@@ -86,6 +92,11 @@ def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     if abs(cx) < TINY: cv[0] = 0
     if abs(cy) < TINY: cv[1] = 0
     if abs(cz) < TINY: cv[2] = 0
+
+    # Put it in a reduced form
+    cv = [x - round(cv[1]/bv[1])*y for x, y in zip(cv, bv)]
+    cv = [x - round(cv[0]/av[0])*y for x, y in zip(cv, av)]
+    bv = [x - round(bv[0]/av[0])*y for x, y in zip(bv, av)]
 
     return av*u.angstroms, bv*u.angstroms, cv*u.angstroms
 
