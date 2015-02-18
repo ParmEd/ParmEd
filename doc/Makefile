@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXAPIDOC  = sphinx-apidoc
 PAPER         =
-BUILDDIR      = _build
+BUILDDIR      = ../gh-pages
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)

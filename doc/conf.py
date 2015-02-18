@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # ParmEd documentation build configuration file, created by
-# sphinx-quickstart on Wed Feb  4 09:24:43 2015.
+# sphinx-quickstart on Wed Feb 18 11:45:07 2015.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -47,7 +47,7 @@ autosummary_generate = True
 autodoc_default_flags = ['members', 'inherited-members']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -83,7 +83,7 @@ release = '2.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['build']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -143,7 +143,7 @@ html_theme = 'nature'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
