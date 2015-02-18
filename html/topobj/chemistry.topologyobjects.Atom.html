@@ -8,8 +8,8 @@
     
     <title>chemistry.topologyobjects.Atom &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
@@ -51,7 +51,7 @@
 <h1>chemistry.topologyobjects.Atom<a class="headerlink" href="#chemistry-topologyobjects-atom" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.Atom">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>An atom. Only use these as elements in AtomList instances, since AtomList
 will keep track of when indexes and other stuff needs to be updated. All
 parameters are optional.</p>
@@ -274,7 +274,7 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -366,13 +366,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.angle_partners">
-<tt class="descname">angle_partners</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_partners</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all angle partners that are NOT bond partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.angle_to">
-<tt class="descname">angle_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.angle_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.angle_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as angled to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -393,13 +393,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.bond_partners">
-<tt class="descname">bond_partners</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_partners</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>Go through all bonded partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.bond_to">
-<tt class="descname">bond_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as bonded to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -420,13 +420,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.dihedral_partners">
-<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all dihedral partners that are NOT angle or bond partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.dihedral_to">
-<tt class="descname">dihedral_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.dihedral_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihedral_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.dihedral_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as dihedral-ed to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -447,19 +447,19 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.epsilon">
-<tt class="descname">epsilon</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">epsilon</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones epsilon parameter (the Lennard-Jones well depth)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.epsilon_14">
-<tt class="descname">epsilon_14</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.epsilon_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon_14" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">epsilon_14</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.epsilon_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon_14" title="Permalink to this definition">¶</a></dt>
 <dd><p>The 1-4 Lennard-Jones epsilon parameter</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.exclude">
-<tt class="descname">exclude</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclude" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exclude</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add one atom to my arbitrary exclusion list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -480,13 +480,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.exclusion_partners">
-<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclusion_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclusion_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all exclusions not otherwise excluded by bonds/angles/torsions</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.nonbonded_exclusions">
-<tt class="descname">nonbonded_exclusions</tt><big>(</big><em>only_greater=True</em>, <em>index_from=0</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.nonbonded_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.nonbonded_exclusions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">nonbonded_exclusions</tt><big>(</big><em>only_greater=True</em>, <em>index_from=0</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.nonbonded_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.nonbonded_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total number of nonbonded atom exclusions for this atom. The
 general rules for building the exclusion list is to include both
 exceptions AND exclusions (i.e., the Amber scaling of 1-4 interactions
@@ -529,7 +529,7 @@ routine may raise a <tt class="docutils literal"><span class="pre">RuntimeError<
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.prune_exclusions">
-<tt class="descname">prune_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.prune_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.prune_exclusions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prune_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.prune_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.prune_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>For extra points, the exclusion partners may be filled before the bond,
 angle, dihedral, and tortor partners. Since we don&#8217;t want memory of
 these exclusions if any of those topological features were to break, we
@@ -540,7 +540,7 @@ the exclusion list.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.reset_topology">
-<tt class="descname">reset_topology</tt><big>(</big><em>keep_exclusions=True</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.reset_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.reset_topology" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">reset_topology</tt><big>(</big><em>keep_exclusions=True</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.reset_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.reset_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Empties all of the bond, angle, and dihedral partners so they can be set
 up again with updated data.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -560,26 +560,26 @@ up again with updated data.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.rmin">
-<tt class="descname">rmin</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.rmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rmin</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.rmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.rmin_14">
-<tt class="descname">rmin_14</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.rmin_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin_14" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rmin_14</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.rmin_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin_14" title="Permalink to this definition">¶</a></dt>
 <dd><p>The 1-4 Lennard-Jones Rmin/2 parameter</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.tortor_partners">
-<tt class="descname">tortor_partners</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_partners</tt><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all 1-5 partners that are NOT in angle or bond partners. This is
 <em>only</em> used in the Amoeba force field</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.tortor_to">
-<tt class="descname">tortor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Atom.tortor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#Atom.tortor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as 1-5 partners to another atom</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -610,7 +610,7 @@ up again with updated data.</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/chemistry.topologyobjects.Atom.txt"
+    <li><a href="../sources/topobj/chemistry.topologyobjects.Atom.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

@@ -8,8 +8,8 @@
     
     <title>chemistry.topologyobjects module &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
@@ -52,7 +52,7 @@ as atoms, residues, bonds, angles, etc.</p>
 <p>by Jason Swails</p>
 <dl class="class">
 <dt id="chemistry.topologyobjects.Angle">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Angle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Angle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A valence angle between 3 atoms separated by two covalent bonds.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -119,12 +119,12 @@ between atoms 1 and 2 or atoms 2 and 3.</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Angle.angle_type">
-<tt class="descname">angle_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Angle.angle_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle.angle_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Angle.angle_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle.angle_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Angle.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Angle.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Angle.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Angle.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this angle from the atoms that make it up. This method removes
 this angle from the <cite>angles</cite> list for atom1, atom2, and atom3 as well as
 removing each atom form each others&#8217; angle partner lists</p>
@@ -134,7 +134,7 @@ removing each atom form each others&#8217; angle partner lists</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.AngleType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AngleType</tt><big>(</big><em>k</em>, <em>theteq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AngleType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AngleType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AngleType</tt><big>(</big><em>k</em>, <em>theteq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AngleType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AngleType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>An angle type with a set of angle parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -201,7 +201,7 @@ removing each atom form each others&#8217; angle partner lists</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Atom">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt></p>
 <p>An atom. Only use these as elements in AtomList instances, since AtomList
 will keep track of when indexes and other stuff needs to be updated. All
@@ -425,13 +425,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.angle_partners">
-<tt class="descname">angle_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all angle partners that are NOT bond partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.angle_to">
-<tt class="descname">angle_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.angle_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.angle_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.angle_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as angled to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -452,23 +452,23 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.atname">
-<tt class="descname">atname</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.atname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.atname" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">atname</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.atname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.atname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.attype">
-<tt class="descname">attype</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.attype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.attype" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">attype</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.attype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.attype" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.bond_partners">
-<tt class="descname">bond_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>Go through all bonded partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.bond_to">
-<tt class="descname">bond_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as bonded to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -489,13 +489,13 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.dihedral_partners">
-<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all dihedral partners that are NOT angle or bond partners</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.dihedral_to">
-<tt class="descname">dihedral_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.dihedral_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihedral_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.dihedral_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.dihedral_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as dihedral-ed to another atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -516,24 +516,24 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.element">
-<tt class="descname">element</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.element" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">element</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.element" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.epsilon">
-<tt class="descname">epsilon</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">epsilon</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones epsilon parameter (the Lennard-Jones well depth)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.epsilon_14">
-<tt class="descname">epsilon_14</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.epsilon_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon_14" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">epsilon_14</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.epsilon_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.epsilon_14" title="Permalink to this definition">¶</a></dt>
 <dd><p>The 1-4 Lennard-Jones epsilon parameter</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.exclude">
-<tt class="descname">exclude</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclude" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exclude</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add one atom to my arbitrary exclusion list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -554,7 +554,7 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.exclusion_partners">
-<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclusion_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.exclusion_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all exclusions not otherwise excluded by bonds/angles/torsions</p>
 </dd></dl>
 
@@ -565,7 +565,7 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.nonbonded_exclusions">
-<tt class="descname">nonbonded_exclusions</tt><big>(</big><em>only_greater=True</em>, <em>index_from=0</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.nonbonded_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.nonbonded_exclusions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">nonbonded_exclusions</tt><big>(</big><em>only_greater=True</em>, <em>index_from=0</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.nonbonded_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.nonbonded_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total number of nonbonded atom exclusions for this atom. The
 general rules for building the exclusion list is to include both
 exceptions AND exclusions (i.e., the Amber scaling of 1-4 interactions
@@ -608,7 +608,7 @@ routine may raise a <tt class="docutils literal"><span class="pre">RuntimeError<
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.prune_exclusions">
-<tt class="descname">prune_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.prune_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.prune_exclusions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prune_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.prune_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.prune_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>For extra points, the exclusion partners may be filled before the bond,
 angle, dihedral, and tortor partners. Since we don&#8217;t want memory of
 these exclusions if any of those topological features were to break, we
@@ -619,7 +619,7 @@ the exclusion list.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.reset_topology">
-<tt class="descname">reset_topology</tt><big>(</big><em>keep_exclusions=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.reset_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.reset_topology" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">reset_topology</tt><big>(</big><em>keep_exclusions=True</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.reset_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.reset_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Empties all of the bond, angle, and dihedral partners so they can be set
 up again with updated data.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -639,31 +639,31 @@ up again with updated data.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.rmin">
-<tt class="descname">rmin</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.rmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rmin</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.rmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.rmin_14">
-<tt class="descname">rmin_14</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.rmin_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin_14" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rmin_14</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.rmin_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.rmin_14" title="Permalink to this definition">¶</a></dt>
 <dd><p>The 1-4 Lennard-Jones Rmin/2 parameter</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.starting_index">
-<tt class="descname">starting_index</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.starting_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.starting_index" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">starting_index</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.starting_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.starting_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Atom.tortor_partners">
-<tt class="descname">tortor_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all 1-5 partners that are NOT in angle or bond partners. This is
 <em>only</em> used in the Amoeba force field</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Atom.tortor_to">
-<tt class="descname">tortor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Atom.tortor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_to" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Atom.tortor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Atom.tortor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log this atom as 1-5 partners to another atom</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -686,7 +686,7 @@ up again with updated data.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.AtomList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#chemistry.topologyobjects.TrackedList" title="chemistry.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects.TrackedList</span></tt></a></p>
 <p>Array of Atoms</p>
 <p class="rubric">Notes</p>
@@ -745,12 +745,12 @@ it belongs to.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.append">
-<tt class="descname">append</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.append" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">append</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.assign_nbidx_from_types">
-<tt class="descname">assign_nbidx_from_types</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.assign_nbidx_from_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.assign_nbidx_from_types" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_nbidx_from_types</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.assign_nbidx_from_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.assign_nbidx_from_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns the nb_idx attribute of every atom inside here from the
 atom_type definition. If the atom_type is not assigned, RuntimeError is
 raised.</p>
@@ -784,7 +784,7 @@ subsequently indexes all of its items.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.extend">
-<tt class="descname">extend</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.extend" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">extend</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.extend" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -802,12 +802,12 @@ the list, if the members of this list permit</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.insert">
-<tt class="descname">insert</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.insert" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">insert</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.insert" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.pop">
-<tt class="descname">pop</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -839,7 +839,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.unmark">
-<tt class="descname">unmark</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomList.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.unmark" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">unmark</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomList.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.unmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unmark all atoms in this list</p>
 </dd></dl>
 
@@ -847,7 +847,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Bond">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Bond</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Bond</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A covalent bond connecting two atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -909,12 +909,12 @@ collection</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Bond.bond_type">
-<tt class="descname">bond_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Bond.bond_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond.bond_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Bond.bond_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond.bond_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Bond.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Bond.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Bond.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Bond.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this bond from the atoms that make it up. This method removes
 this bond from the <cite>bonds</cite> list for both atom1 and atom2 as well as
 removing atom1 from atom2.bond_partners and vice versa.</p>
@@ -924,7 +924,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.BondType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">BondType</tt><big>(</big><em>k</em>, <em>req</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#BondType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.BondType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">BondType</tt><big>(</big><em>k</em>, <em>req</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#BondType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.BondType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>A bond type with a set of bond parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -991,7 +991,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.ChiralFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ChiralFrame</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>chirality</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ChiralFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ChiralFrame</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>chirality</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ChiralFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A chiral frame as defined in the AMOEBA force field. It defines the frame of
 reference for a chiral center</p>
@@ -1022,7 +1022,7 @@ different value is provided</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Cmap">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Cmap</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Cmap</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A coupled-torsion correction map term defined between 5 atoms connected by
 four covalent bonds. This is a coupled-torsion potential in which the
@@ -1104,19 +1104,19 @@ atoms 4 and 5.</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Cmap.cmap_type">
-<tt class="descname">cmap_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Cmap.cmap_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.cmap_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">cmap_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Cmap.cmap_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.cmap_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Cmap.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Cmap.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Cmap.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Cmap from the atoms that make it up. This method removes
 the Cmap from the <cite>cmaps</cite> list for atom1, atom2, atom3, atom4, and atom5</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.topologyobjects.Cmap.extended">
-<em class="property">classmethod </em><tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Cmap.extended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.extended" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Cmap.extended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.extended" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alternative constructor for correction maps defined with 8 atoms (each
 torsion being separately specified). Correction maps are, to the best of
 my knowledge, used to parametrized &#8220;consecutive&#8221; torsions (i.e., atoms
@@ -1172,7 +1172,7 @@ not the same as atoms 5, 6, and 7), NotImplementedError is raised.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Cmap.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Cmap.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.same_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Cmap.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>A coupled-torsion is equivalent if the 5 atoms are in the same or
 reverse order Allow comparison with another type of cmap or with a
 sequence of 5 indexes</p>
@@ -1182,7 +1182,7 @@ sequence of 5 indexes</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.CmapType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">CmapType</tt><big>(</big><em>resolution</em>, <em>grid</em>, <em>comments=None</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#CmapType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.CmapType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">CmapType</tt><big>(</big><em>resolution</em>, <em>grid</em>, <em>comments=None</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#CmapType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.CmapType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>A CMAP type with a potential energy interpoloation grid mapping out the 2-D
 potential of coupled torsions.</p>
@@ -1262,7 +1262,7 @@ interpolating grid data.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Dihedral">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Dihedral</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Dihedral</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._FourAtomTerm</span></tt></p>
 <p>A valence dihedral between 4 atoms separated by three covalent bonds.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1359,7 +1359,7 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Dihedral.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Dihedral.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Dihedral.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this dihedral from the atoms that make it up. This method
 removes this dihedral from the <cite>dihedrals</cite> list for atom1, atom2, atom3,
 and atom4 as well as removing each atom form each others&#8217; dihedral
@@ -1368,12 +1368,12 @@ partner lists</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Dihedral.dihed_type">
-<tt class="descname">dihed_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Dihedral.dihed_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.dihed_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihed_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Dihedral.dihed_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.dihed_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Dihedral.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Dihedral.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Dihedral.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if this dihedral has the same atoms (or atom indexes) as
 another object</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1405,7 +1405,7 @@ iterable</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.DihedralType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">DihedralType</tt><big>(</big><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#DihedralType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">DihedralType</tt><big>(</big><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#DihedralType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>A dihedral type with a set of dihedral parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1497,7 +1497,7 @@ iterable</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralType.write_info">
-<tt class="descname">write_info</tt><big>(</big><em>parm</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#DihedralType.write_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralType.write_info" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_info</tt><big>(</big><em>parm</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#DihedralType.write_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralType.write_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write out the dihedral parameters</p>
 </dd></dl>
 
@@ -1505,7 +1505,7 @@ iterable</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.DihedralTypeList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">DihedralTypeList</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">DihedralTypeList</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt></p>
 <p>Dihedral types are a Fourier expansion of terms. In some cases, they are
 stored in a list like this one inside another TrackedList. In other cases,
@@ -1625,7 +1625,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Improper">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Improper</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Improper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Improper</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Improper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._FourAtomTerm</span></tt></p>
 <p>A CHARMM-style improper torsion between 4 atoms. The first atom must be the
 central atom, as shown in the schematic below</p>
@@ -1707,7 +1707,7 @@ of the atoms are duplicates.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Improper.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Improper.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Improper.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Improper from the atoms that make it up. This method
 removes this Improper from the <cite>impropers</cite> list for atom1, atom2, atom3,
 and atom4</p>
@@ -1715,12 +1715,12 @@ and atom4</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.Improper.improp_type">
-<tt class="descname">improp_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Improper.improp_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.improp_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">improp_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Improper.improp_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.improp_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Improper.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Improper.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.same_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Improper.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Improper.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>An improper has the same 4 atoms if atom1 is the same for both and the
 other 3 can be in any order</p>
 </dd></dl>
@@ -1729,7 +1729,7 @@ other 3 can be in any order</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.ImproperType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ImproperType</tt><big>(</big><em>psi_k</em>, <em>psi_eq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ImproperType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ImproperType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ImproperType</tt><big>(</big><em>psi_k</em>, <em>psi_eq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ImproperType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ImproperType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>An improper type with a set of improper torsion parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1797,7 +1797,7 @@ equal</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.MultipoleFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">MultipoleFrame</tt><big>(</big><em>atom</em>, <em>frame_pt_num</em>, <em>vectail</em>, <em>vechead</em>, <em>nvec</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#MultipoleFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.MultipoleFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">MultipoleFrame</tt><big>(</big><em>atom</em>, <em>frame_pt_num</em>, <em>vectail</em>, <em>vechead</em>, <em>nvec</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#MultipoleFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.MultipoleFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This defines the frame of reference for computing multipole interactions in
 the AMOEBA force field.</p>
@@ -1848,7 +1848,7 @@ the AMOEBA force field.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.OutOfPlaneBend">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBend" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._FourAtomTerm</span></tt></p>
 <p>Out-of-plane bending term in the AMOEBA force field. The bond pattern is the
 same as <a class="reference internal" href="../../topobj/chemistry.topologyobjects.TrigonalAngle.html#chemistry.topologyobjects.TrigonalAngle" title="chemistry.topologyobjects.TrigonalAngle"><tt class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></tt></a></p>
@@ -1914,14 +1914,14 @@ same as <a class="reference internal" href="../../topobj/chemistry.topologyobjec
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.OutOfPlaneBend.oopbend_type">
-<tt class="descname">oopbend_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneBend.oopbend_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBend.oopbend_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">oopbend_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneBend.oopbend_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBend.oopbend_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.PiTorsion">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">PiTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#PiTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">PiTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#PiTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Defines a pi-torsion term in the AMOEBA force field. The Pi-torsion is
 defined around a sp2-hybridized pi-delocalized orbital (like an amide) by 6
@@ -2012,20 +2012,20 @@ bonded to 3 other atoms.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.PiTorsion.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#PiTorsion.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#PiTorsion.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets all atoms to None and deletes the type</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.PiTorsion.pitor_type">
-<tt class="descname">pitor_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#PiTorsion.pitor_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion.pitor_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pitor_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#PiTorsion.pitor_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.PiTorsion.pitor_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Residue">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt></p>
 <p>A single residue that is composed of a small number of atoms</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2120,7 +2120,7 @@ equivalent to iterating over the <cite>atoms</cite> attribute</li>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Residue.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Residue.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.add_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Residue.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds an atom to this residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2140,7 +2140,7 @@ equivalent to iterating over the <cite>atoms</cite> attribute</li>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Residue.delete_atom">
-<tt class="descname">delete_atom</tt><big>(</big><em>atom</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Residue.delete_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.delete_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete_atom</tt><big>(</big><em>atom</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Residue.delete_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.delete_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>If an atom is present in this residue, delete it from the list of
 atoms. No change if an atom is not present in this residue.</p>
 </dd></dl>
@@ -2152,7 +2152,7 @@ atoms. No change if an atom is not present in this residue.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Residue.is_empty">
-<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Residue.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.is_empty" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Residue.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.is_empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if there are any atoms in this residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2170,7 +2170,7 @@ atoms. No change if an atom is not present in this residue.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Residue.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Residue.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.sort" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Residue.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Residue.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sorts the atoms in this list by atom index</p>
 </dd></dl>
 
@@ -2178,7 +2178,7 @@ atoms. No change if an atom is not present in this residue.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.ResidueList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ResidueList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ResidueList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#chemistry.topologyobjects.TrackedList" title="chemistry.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects.TrackedList</span></tt></a></p>
 <p>Array of <cite>Residue</cite> instances</p>
 <p class="rubric">Methods</p>
@@ -2234,7 +2234,7 @@ atoms. No change if an atom is not present in this residue.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.ResidueList.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the ResidueList, adding a new residue to this list if
 it has a different name or number as the last residue</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2317,7 +2317,7 @@ the list, if the members of this list permit</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.ResidueList.prune">
-<tt class="descname">prune</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ResidueList.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList.prune" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prune</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ResidueList.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ResidueList.prune" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function goes through the residue list and removes all empty
 residues from the list. This isn&#8217;t done automatically when atoms are
 deleted, since it will become very slow. You must remember to do this to
@@ -2355,7 +2355,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.StretchBend">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">StretchBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#StretchBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">StretchBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#StretchBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This term models the stretching and bending of a standard valence angle, and
 is used in the AMOEBA force field</p>
@@ -2411,20 +2411,20 @@ is used in the AMOEBA force field</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.StretchBend.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#StretchBend.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#StretchBend.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets all of the atoms and parameter type to None</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.StretchBend.strbnd_type">
-<tt class="descname">strbnd_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#StretchBend.strbnd_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend.strbnd_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">strbnd_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#StretchBend.strbnd_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBend.strbnd_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.StretchBendType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">StretchBendType</tt><big>(</big><em>k1</em>, <em>k2</em>, <em>req1</em>, <em>req2</em>, <em>theteq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#StretchBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBendType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">StretchBendType</tt><big>(</big><em>k1</em>, <em>k2</em>, <em>req1</em>, <em>req2</em>, <em>theteq</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#StretchBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.StretchBendType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>A stretch-bend type with two distances and an angle in AMOEBA</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2506,7 +2506,7 @@ attributes are equal</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.TorsionTorsion">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TorsionTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TorsionTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TorsionTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TorsionTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../topobj/chemistry.topologyobjects.Cmap.html#chemistry.topologyobjects.Cmap" title="chemistry.topologyobjects.Cmap"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects.Cmap</span></tt></a></p>
 <p>This is a coupled-torsion map used in the AMOEBA force field similar to the
 correction-map (CMAP) potential used by the CHARMM force field</p>
@@ -2595,7 +2595,7 @@ or between atoms 4 and 5.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TorsionTorsion.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TorsionTorsion.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TorsionTorsion.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this TorsionTorsion from the atoms that make it up. This method
 removes the TorsionTorsion from the <cite>tortors</cite> list for atom1, atom2,
 atom3, atom4, and atom5, and removes each atom from the others&#8217;
@@ -2668,14 +2668,14 @@ sequence of 5 indexes</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.TorsionTorsion.tortor_type">
-<tt class="descname">tortor_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TorsionTorsion.tortor_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion.tortor_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TorsionTorsion.tortor_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsion.tortor_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.TorsionTorsionType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TorsionTorsionType</tt><big>(</big><em>dims</em>, <em>ang1</em>, <em>ang2</em>, <em>f</em>, <em>dfda1=None</em>, <em>dfda2=None</em>, <em>d2fda1da2=None</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TorsionTorsionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsionType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TorsionTorsionType</tt><big>(</big><em>dims</em>, <em>ang1</em>, <em>ang2</em>, <em>f</em>, <em>dfda1=None</em>, <em>dfda2=None</em>, <em>d2fda1da2=None</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TorsionTorsionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TorsionTorsionType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>The type containing the parameter maps for the Amoeba torsion-torsion
 potentials. It contains the original potential as well as interpolated first
@@ -2765,7 +2765,7 @@ and second derivatives for the AMOEBA force field.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.TrigonalAngle">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TrigonalAngle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrigonalAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrigonalAngle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TrigonalAngle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrigonalAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrigonalAngle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._FourAtomTerm</span></tt></p>
 <p>A trigonal-angle term in the AMOEBA force field. It exists in a pattern like
 the one shown below</p>
@@ -2838,14 +2838,14 @@ the one shown below</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.TrigonalAngle.trigang_type">
-<tt class="descname">trigang_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrigonalAngle.trigang_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrigonalAngle.trigang_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">trigang_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrigonalAngle.trigang_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrigonalAngle.trigang_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.TrackedList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TrackedList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrackedList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TrackedList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrackedList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
 <p>This creates a list type that allows you to see if anything has changed</p>
 <p class="rubric">Examples</p>
@@ -2930,7 +2930,7 @@ the one shown below</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TrackedList.claim">
-<tt class="descname">claim</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrackedList.claim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.claim" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">claim</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrackedList.claim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.claim" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
@@ -2953,7 +2953,7 @@ subsequently indexes all of its items.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TrackedList.index_members">
-<tt class="descname">index_members</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrackedList.index_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.index_members" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">index_members</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrackedList.index_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.index_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns the idx variable for every member of this list to its place in
 the list, if the members of this list permit</p>
 </dd></dl>
@@ -2965,12 +2965,12 @@ the list, if the members of this list permit</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TrackedList.pop">
-<tt class="descname">pop</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrackedList.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrackedList.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TrackedList.prune_unused">
-<tt class="descname">prune_unused</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TrackedList.prune_unused"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.prune_unused" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prune_unused</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TrackedList.prune_unused"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TrackedList.prune_unused" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method inspects the <cite>used</cite> attribute of all of its members, if it
 has one, and deletes any item in which it is set to <cite>False</cite></p>
 </dd></dl>
@@ -2999,7 +2999,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.UreyBradley">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">UreyBradley</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">UreyBradley</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A Urey-Bradley angle type with a set of parameters. It has the same
 functional form as a bond, but it is defined between two atoms forming a
@@ -3067,7 +3067,7 @@ Urey-Bradley valence angle</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.UreyBradley.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#UreyBradley.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#UreyBradley.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Urey-Bradley from the atoms that make it up. This method
 removes this urey-bradley from the <cite>urey_bradleys</cite> list for atom1 and
 atom2.</p>
@@ -3075,14 +3075,14 @@ atom2.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.UreyBradley.ub_type">
-<tt class="descname">ub_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#UreyBradley.ub_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley.ub_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">ub_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#UreyBradley.ub_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.UreyBradley.ub_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.OutOfPlaneBendType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneBendType</tt><big>(</big><em>k</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneBendType</tt><big>(</big><em>k</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ParameterType</span></tt></p>
 <p>An angle type with a set of angle parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3145,7 +3145,7 @@ atom2.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.NonbondedException">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">NonbondedException</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#NonbondedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.NonbondedException" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">NonbondedException</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#NonbondedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.NonbondedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>The AMOEBA force field has complex exclusion and exception rules (referred
 to as &#8220;adjustments&#8221; in the Amber-converted files). This class stores
@@ -3178,7 +3178,7 @@ used with the binary <cite>in</cite> operator</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.NonbondedExceptionType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">NonbondedExceptionType</tt><big>(</big><em>vdw_weight</em>, <em>multipole_weight</em>, <em>direct_weight</em>, <em>polar_weight</em>, <em>mutual_weight</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#NonbondedExceptionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.NonbondedExceptionType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">NonbondedExceptionType</tt><big>(</big><em>vdw_weight</em>, <em>multipole_weight</em>, <em>direct_weight</em>, <em>polar_weight</em>, <em>mutual_weight</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#NonbondedExceptionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.NonbondedExceptionType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects._ListItem</span></tt></p>
 <p>A parameter describing how the various nonbonded interactions between a
 particular pair of atoms is scaled in the AMOEBA force field</p>
@@ -3235,7 +3235,7 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.AcceptorDonor">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AcceptorDonor</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AcceptorDonor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AcceptorDonor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AcceptorDonor</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AcceptorDonor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AcceptorDonor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Just a holder for donors and acceptors in CHARMM speak</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3258,7 +3258,7 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.Group">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Group</tt><big>(</big><em>bs</em>, <em>type</em>, <em>move</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#Group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Group" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Group</tt><big>(</big><em>bs</em>, <em>type</em>, <em>move</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#Group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>An &#8216;interacting&#8217; group defined by CHARMM PSF files</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3285,7 +3285,7 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.AtomType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomType</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomType</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Atom types can either be compared by indexes or names. Can be assigned with
 a string, integer, (string is not automatically cast) or with both.</p>
@@ -3344,13 +3344,13 @@ files</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomType.add_nbfix">
-<tt class="descname">add_nbfix</tt><big>(</big><em>typename</em>, <em>rmin</em>, <em>epsilon</em>, <em>rmin14</em>, <em>epsilon14</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomType.add_nbfix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_nbfix</tt><big>(</big><em>typename</em>, <em>rmin</em>, <em>epsilon</em>, <em>rmin14</em>, <em>epsilon14</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomType.add_nbfix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new NBFIX exclusion for this atom</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomType.set_lj_params">
-<tt class="descname">set_lj_params</tt><big>(</big><em>eps</em>, <em>rmin</em>, <em>eps14=None</em>, <em>rmin14=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#AtomType.set_lj_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_lj_params</tt><big>(</big><em>eps</em>, <em>rmin</em>, <em>eps14=None</em>, <em>rmin14=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#AtomType.set_lj_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets Lennard-Jones parameters on this atom type</p>
 </dd></dl>
 
@@ -3358,7 +3358,7 @@ files</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.ExtraPoint">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ExtraPoint</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ExtraPoint</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects.Atom</span></tt></a></p>
 <p>An extra point is a massless, virtual site that is used to extend the
 flexibility of partial atomic charge fitting. They can be used to, for
@@ -3461,7 +3461,7 @@ information.</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.angle_partners">
-<tt class="descname">angle_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.angle_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">angle_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.angle_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all atoms angled to this atom and its parent</p>
 </dd></dl>
 
@@ -3498,7 +3498,7 @@ information.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.bond_partners">
-<tt class="descname">bond_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.bond_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">bond_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.bond_partners" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all atoms bonded to this atom and its parent</p>
 </dd></dl>
 
@@ -3525,7 +3525,7 @@ information.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.dihedral_partners">
-<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.dihedral_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.dihedral_partners" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3589,12 +3589,12 @@ information.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.exclusion_partners">
-<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.exclusion_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.exclusion_partners" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.frame_type">
-<tt class="descname">frame_type</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.frame_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.frame_type" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">frame_type</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.frame_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.frame_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of frame used for this extra point. Whether the EP lies
 beyond (outside) or between (inside) the is determined from the
 positions of each atom in the frame and the extra point. If those are
@@ -3651,7 +3651,7 @@ routine may raise a <tt class="docutils literal"><span class="pre">RuntimeError<
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.parent">
-<tt class="descname">parent</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.parent" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">parent</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>The parent atom of this extra point is the atom it is bonded to (there
 should only be 1 bond partner, but the parent is defined as its first)</p>
 </dd></dl>
@@ -3706,7 +3706,7 @@ up again with updated data.</p>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.ExtraPoint.tortor_partners">
-<tt class="descname">tortor_partners</tt><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ExtraPoint.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.tortor_partners" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tortor_partners</tt><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ExtraPoint.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ExtraPoint.tortor_partners" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3734,7 +3734,7 @@ up again with updated data.</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.TwoParticleExtraPointFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TwoParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">TwoParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=False</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 2 particles</p>
@@ -3773,7 +3773,7 @@ curve. See figures below for example</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.TwoParticleExtraPointFrame.get_atoms">
-<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the particles involved in the frame</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3792,7 +3792,7 @@ bonded to the parent atom</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.TwoParticleExtraPointFrame.get_weights">
-<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#TwoParticleExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.TwoParticleExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the weights for the two particles</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3813,7 +3813,7 @@ weight of particle 2 (the atom bonded to the parent atom)</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.ThreeParticleExtraPointFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ThreeParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ThreeParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=True</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 3 particles</p>
@@ -3852,7 +3852,7 @@ curve. See figures below for example</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_atoms">
-<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the particles involved in the frame</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3871,7 +3871,7 @@ atoms that are both bonded to the parent atom</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_weights">
-<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#ThreeParticleExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ThreeParticleExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the weights for the three particles</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3893,7 +3893,7 @@ parent atom)</p>
 
 <dl class="class">
 <dt id="chemistry.topologyobjects.OutOfPlaneExtraPointFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneExtraPointFrame</tt><big>(</big><em>ep</em>, <em>angle=54.735</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneExtraPointFrame</tt><big>(</big><em>ep</em>, <em>angle=54.735</em><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 3 particles, but with the virtual site out of the
@@ -3932,7 +3932,7 @@ of the angle of a tetrahedron. Given in degrees</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_atoms">
-<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_atoms</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame.get_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the particles involved in the frame</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3951,7 +3951,7 @@ atoms that are both bonded to the parent atom but are not EPs</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_weights">
-<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_weights</tt><big>(</big><big>)</big><a class="reference internal" href="../../modules/chemistry/topologyobjects.html#OutOfPlaneExtraPointFrame.get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneExtraPointFrame.get_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the weights for the three particles</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3981,7 +3981,7 @@ cross-product</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.topologyobjects.txt"
+    <li><a href="../../sources/api/chemistry/chemistry.topologyobjects.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

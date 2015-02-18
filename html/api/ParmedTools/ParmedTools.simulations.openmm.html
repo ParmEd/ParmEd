@@ -8,8 +8,8 @@
     
     <title>ParmedTools.simulations.openmm module &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
@@ -51,27 +51,27 @@
 parameters defined in an input file for sander and pmemd.</p>
 <dl class="function">
 <dt id="ParmedTools.simulations.openmm.energy">
-<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">energy</tt><big>(</big><em>parm</em>, <em>args</em>, <em>output=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x7f5d127b6150&gt;</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.energy" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">energy</tt><big>(</big><em>parm</em>, <em>args</em>, <em>output=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x7ff8ae948150&gt;</em><big>)</big><a class="reference internal" href="../../modules/ParmedTools/simulations/openmm.html#energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a single-point energy using OpenMM and prints the result to the
 desired output destination (defaults to stdout)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ParmedTools.simulations.openmm.minimize">
-<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">minimize</tt><big>(</big><em>parm</em>, <em>igb</em>, <em>saltcon</em>, <em>cutoff</em>, <em>restraintmask</em>, <em>weight</em>, <em>script</em>, <em>platform</em>, <em>precision</em>, <em>norun</em>, <em>tol</em>, <em>maxcyc</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.minimize" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">minimize</tt><big>(</big><em>parm</em>, <em>igb</em>, <em>saltcon</em>, <em>cutoff</em>, <em>restraintmask</em>, <em>weight</em>, <em>script</em>, <em>platform</em>, <em>precision</em>, <em>norun</em>, <em>tol</em>, <em>maxcyc</em><big>)</big><a class="reference internal" href="../../modules/ParmedTools/simulations/openmm.html#minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.minimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Minimizes a snapshot. Use the existing System if it exists</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ParmedTools.simulations.openmm.positional_restraints">
-<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">positional_restraints</tt><big>(</big><em>mask</em>, <em>weights</em>, <em>refc</em>, <em>scriptfile=None</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#positional_restraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.positional_restraints" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">positional_restraints</tt><big>(</big><em>mask</em>, <em>weights</em>, <em>refc</em>, <em>scriptfile=None</em><big>)</big><a class="reference internal" href="../../modules/ParmedTools/simulations/openmm.html#positional_restraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.positional_restraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a positional restraint force from CustomExternalForce using the
 coordinates given in the refc restart file for the atoms specified in &#8216;mask&#8217;</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ParmedTools.simulations.openmm.simulate">
-<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">simulate</tt><big>(</big><em>parm</em>, <em>args</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.simulate" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">simulate</tt><big>(</big><em>parm</em>, <em>args</em><big>)</big><a class="reference internal" href="../../modules/ParmedTools/simulations/openmm.html#simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.simulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a simulation using OpenMM</p>
 </dd></dl>
 
@@ -85,7 +85,7 @@ coordinates given in the refc restart file for the atoms specified in &#8216;mas
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../_sources/api/ParmedTools/ParmedTools.simulations.openmm.txt"
+    <li><a href="../../sources/api/ParmedTools/ParmedTools.simulations.openmm.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

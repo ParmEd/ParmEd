@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.addljtype &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="ParmedTools" href="../ParmedTools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" accesskey="U">ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ParmedTools.addljtype</h1><div class="highlight"><pre>
+<span class="s">&quot; This command adds a new Lennard Jones atom type from the selected atoms. &quot;</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="n">NTYPES</span>
+
+<div class="viewcode-block" id="AddLJType"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.addljtype.html#ParmedTools.addljtype.AddLJType">[docs]</a><span class="k">def</span> <span class="nf">AddLJType</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">sel_atms</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">radius14</span><span class="p">,</span> <span class="n">epsilon14</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Adds a new Lennard Jones type to a topology file &quot;&quot;&quot;</span>
+    <span class="c"># Set the new atom type</span>
+    <span class="n">old_type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel_atms</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">sel_atms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">old_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">old_type</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c"># Now increment NTYPES</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NTYPES</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;NTYPES&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+   
+    <span class="c"># Now create a whole new array for NONBONDED_PARM_INDEX</span>
+    <span class="n">start_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">current_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">old_ntypes</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">old_ntypes</span><span class="p">):</span>
+        <span class="c"># Copy over the first ntypes terms</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                                    <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">current_idx</span><span class="p">)</span>
+        <span class="n">current_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c"># Now add the interaction of the last type with every other</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">old_ntypes</span><span class="p">):</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_idx</span><span class="p">)</span>
+        <span class="n">start_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c"># New type interacting with itself</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_idx</span><span class="p">)</span>
+
+    <span class="c"># Now we need to add onto the ACOEF and BCOEF arrays</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">old_ntypes</span><span class="p">):</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">LJ_radius</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">LJ_depth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_ACOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_BCOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span>
+    <span class="c"># Do the same for the 1-4 interactions if we&#39;re doing a chamber prmtop</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">chamber</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">old_ntypes</span><span class="p">):</span>
+            <span class="n">rad</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">LJ_14_radius</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius14</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">LJ_14_depth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">epsilon14</span><span class="p">)</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span>
+   
+    <span class="c"># Now add the last type interacting with itself, and add it to the</span>
+    <span class="c"># LJ_radius/depth arrays</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">epsilon</span>
+    <span class="n">rad</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_ACOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_BCOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">LJ_radius</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">LJ_depth</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
+
+    <span class="c"># Do the same for chamber prmtops</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">chamber</span><span class="p">:</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="n">epsilon14</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius14</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">rad</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">LJ_14_radius</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">radius14</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">LJ_14_depth</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">epsilon14</span><span class="p">)</span>
+
+    <span class="c"># If our prmtop had a C-coefficient array, just copy the terms from the old</span>
+    <span class="c"># atom type to the new atom type, as defined by the type of the first atom</span>
+    <span class="c"># that got assigned the &quot;new&quot; type.</span>
+    <span class="k">if</span> <span class="s">&#39;LENNARD_JONES_CCOEF&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
+        <span class="n">ccoeffs</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_CCOEF&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">old_ntypes</span><span class="p">):</span>
+            <span class="n">nbi</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">old_type</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">nbi</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">ccoeffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ccoeffs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="c"># Now the last type interacting with itself</span>
+        <span class="n">nbi</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">old_type</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">old_type</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">nbi</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ccoeffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ccoeffs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" >ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

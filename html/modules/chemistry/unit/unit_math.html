@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.unit.unit_math &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="chemistry.unit" href="../unit.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" accesskey="U">chemistry.unit</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.unit.unit_math</h1><div class="highlight"><pre>
+<span class="c">#!/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module simtk.unit.math</span>
+
+<span class="sd">Arithmetic methods on Quantities and Units</span>
+
+<span class="sd">This is part of the OpenMM molecular simulation toolkit originating from</span>
+<span class="sd">Simbios, the NIH National Center for Physics-Based Simulation of</span>
+<span class="sd">Biological Structures at Stanford, funded under the NIH Roadmap for</span>
+<span class="sd">Medical Research, grant U54 GM072970. See https://simtk.org.</span>
+
+<span class="sd">Portions copyright (c) 2012 Stanford University and the Authors.</span>
+<span class="sd">Authors: Christopher M. Bruns</span>
+<span class="sd">Contributors: Peter Eastman</span>
+
+<span class="sd">Permission is hereby granted, free of charge, to any person obtaining a</span>
+<span class="sd">copy of this software and associated documentation files (the &quot;Software&quot;),</span>
+<span class="sd">to deal in the Software without restriction, including without limitation</span>
+<span class="sd">the rights to use, copy, modify, merge, publish, distribute, sublicense,</span>
+<span class="sd">and/or sell copies of the Software, and to permit persons to whom the</span>
+<span class="sd">Software is furnished to do so, subject to the following conditions:</span>
+
+<span class="sd">The above copyright notice and this permission notice shall be included in</span>
+<span class="sd">all copies or substantial portions of the Software.</span>
+
+<span class="sd">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="sd">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="sd">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</span>
+<span class="sd">THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,</span>
+<span class="sd">DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR</span>
+<span class="sd">OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE</span>
+<span class="sd">USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.5&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">quantity</span> <span class="kn">import</span> <span class="n">is_quantity</span>
+<span class="kn">from</span> <span class="nn">unit_definitions</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c">####################</span>
+<span class="c">### TRIGONOMETRY ###</span>
+<span class="c">####################</span>
+
+<div class="viewcode-block" id="sin"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.sin">[docs]</a><span class="k">def</span> <span class="nf">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Examples</span>
+
+<span class="sd">    &gt;&gt;&gt; sin(90*degrees)</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="sinh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.sinh">[docs]</a><span class="k">def</span> <span class="nf">sinh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="cos"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.cos">[docs]</a><span class="k">def</span> <span class="nf">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Examples</span>
+
+<span class="sd">    &gt;&gt;&gt; cos(180*degrees)</span>
+<span class="sd">    -1.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="cosh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.cosh">[docs]</a><span class="k">def</span> <span class="nf">cosh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="tan"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.tan">[docs]</a><span class="k">def</span> <span class="nf">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="tanh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.tanh">[docs]</a><span class="k">def</span> <span class="nf">tanh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="acos"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.acos">[docs]</a><span class="k">def</span> <span class="nf">acos</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; acos(1.0)</span>
+<span class="sd">    Quantity(value=0.0, unit=radian)</span>
+<span class="sd">    &gt;&gt;&gt; print(acos(1.0))</span>
+<span class="sd">    0.0 rad</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="acosh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.acosh">[docs]</a><span class="k">def</span> <span class="nf">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="asin"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.asin">[docs]</a><span class="k">def</span> <span class="nf">asin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="asinh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.asinh">[docs]</a><span class="k">def</span> <span class="nf">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="atan"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.atan">[docs]</a><span class="k">def</span> <span class="nf">atan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="atanh"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.atanh">[docs]</a><span class="k">def</span> <span class="nf">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+</div>
+<div class="viewcode-block" id="atan2"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.atan2">[docs]</a><span class="k">def</span> <span class="nf">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+
+<span class="c">###################</span>
+<span class="c">### SQUARE ROOT ###</span>
+<span class="c">###################</span>
+</div>
+<div class="viewcode-block" id="sqrt"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.sqrt">[docs]</a><span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; sqrt(9.0)</span>
+<span class="sd">    3.0</span>
+<span class="sd">    &gt;&gt;&gt; print(sqrt(meter*meter))</span>
+<span class="sd">    meter</span>
+<span class="sd">    &gt;&gt;&gt; sqrt(9.0*meter*meter)</span>
+<span class="sd">    Quantity(value=3.0, unit=meter)</span>
+<span class="sd">    &gt;&gt;&gt; sqrt(9.0*meter*meter*meter)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    ArithmeticError: Exponents in Unit.sqrt() must be even.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+<span class="c">###########</span>
+<span class="c">### SUM ###</span>
+<span class="c">###########</span>
+</div>
+<div class="viewcode-block" id="sum"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.sum">[docs]</a><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; sum((1.0, 2.0))</span>
+<span class="sd">    3.0</span>
+<span class="sd">    &gt;&gt;&gt; sum((2.0*meter, 3.0*meter))</span>
+<span class="sd">    Quantity(value=5.0, unit=meter)</span>
+<span class="sd">    &gt;&gt;&gt; sum((2.0*meter, 30.0*centimeter))</span>
+<span class="sd">    Quantity(value=2.3, unit=meter)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)):</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c">###################</span>
+<span class="c">### VECTOR MATH ###</span>
+<span class="c">###################</span>
+</div>
+<div class="viewcode-block" id="dot"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.dot">[docs]</a><span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; dot((2, 3)*meter, (4, 5)*meter)</span>
+<span class="sd">    Quantity(value=23, unit=meter**2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">sum</span>
+</div>
+<div class="viewcode-block" id="norm"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit_math.html#chemistry.unit.unit_math.norm">[docs]</a><span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; norm((3, 4)*meter)</span>
+<span class="sd">    Quantity(value=5.0, unit=meter)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+
+<span class="c"># run module directly for testing</span></div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c"># Test the examples in the docstrings</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" >chemistry.unit</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

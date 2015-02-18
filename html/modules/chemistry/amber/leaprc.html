@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.amber.leaprc &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="chemistry.amber" href="../amber.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../amber.html" accesskey="U">chemistry.amber</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.amber.leaprc</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; Creates a leaprc file for use in amberParm-created OFF and frcmod files &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<div class="viewcode-block" id="MakeLeaprc"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.leaprc.html#chemistry.amber.leaprc.MakeLeaprc">[docs]</a><span class="k">def</span> <span class="nf">MakeLeaprc</span><span class="p">(</span><span class="n">frcmod</span><span class="p">,</span> <span class="n">off</span><span class="p">,</span> <span class="n">leaprc</span><span class="p">,</span> <span class="n">radius_set</span><span class="o">=</span><span class="s">&#39;modified Bondi radii (mbondi)&#39;</span><span class="p">,</span>
+               <span class="n">logfile</span> <span class="o">=</span> <span class="s">&#39;leap.log&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Writes out the leaprc file from the given parm, OFF files &quot;&quot;&quot;</span>
+
+    <span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">leaprc</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">radius_set</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Bondi radii (bondi)&quot;</span><span class="p">:</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="s">&quot;bondi&quot;</span>
+    <span class="k">elif</span> <span class="n">radius_set</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;amber6 modified Bondi radii (amber6)&quot;</span><span class="p">:</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="s">&quot;amber6&quot;</span>
+    <span class="k">elif</span> <span class="n">radius_set</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;modified Bondi radii (mbondi)&quot;</span><span class="p">:</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="s">&#39;mbondi&#39;</span>
+    <span class="k">elif</span> <span class="n">radius_set</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;H(N)-modified Bondi radii (mbondi2)&quot;</span><span class="p">:</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="s">&#39;mbondi2&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unknown GB Radius set! [ </span><span class="si">%s</span><span class="s"> ]; GB radii are assigned a default &#39;</span>
+             <span class="s">&#39;of mbondi&#39;</span> <span class="o">%</span> <span class="n">radius_set</span><span class="p">)</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="s">&#39;mbondi&#39;</span>
+
+
+    <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&quot;&quot;logFile </span><span class="si">%s</span><span class="s"></span>
+<span class="s">#</span>
+<span class="s"># ----- leaprc for loading the prmtop-based force field</span>
+<span class="s"># ----- NOTE: this is designed for PDB format 3!</span>
+<span class="s">#</span>
+<span class="s">#  Load the main parameter set.</span>
+<span class="s">#</span>
+<span class="s">parm = loadamberparams </span><span class="si">%s</span><span class="s"></span>
+
+<span class="s">#</span>
+<span class="s">#  Load main library file</span>
+<span class="s">#</span>
+<span class="s">loadOFF </span><span class="si">%s</span><span class="s"></span>
+
+<span class="s">#</span>
+<span class="s">#  This needs to be kept to properly recognize termini</span>
+<span class="s">#</span>
+<span class="s">addPdbResMap {</span>
+<span class="s">  { 0 &quot;ALA&quot; &quot;NALA&quot; } { 1 &quot;ALA&quot; &quot;CALA&quot; }</span>
+<span class="s">  { 0 &quot;ARG&quot; &quot;NARG&quot; } { 1 &quot;ARG&quot; &quot;CARG&quot; }</span>
+<span class="s">  { 0 &quot;ASN&quot; &quot;NASN&quot; } { 1 &quot;ASN&quot; &quot;CASN&quot; }</span>
+<span class="s">  { 0 &quot;ASP&quot; &quot;NASP&quot; } { 1 &quot;ASP&quot; &quot;CASP&quot; }</span>
+<span class="s">  { 0 &quot;CYS&quot; &quot;NCYS&quot; } { 1 &quot;CYS&quot; &quot;CCYS&quot; }</span>
+<span class="s">  { 0 &quot;CYX&quot; &quot;NCYX&quot; } { 1 &quot;CYX&quot; &quot;CCYX&quot; }</span>
+<span class="s">  { 0 &quot;GLN&quot; &quot;NGLN&quot; } { 1 &quot;GLN&quot; &quot;CGLN&quot; }</span>
+<span class="s">  { 0 &quot;GLU&quot; &quot;NGLU&quot; } { 1 &quot;GLU&quot; &quot;CGLU&quot; }</span>
+<span class="s">  { 0 &quot;GLY&quot; &quot;NGLY&quot; } { 1 &quot;GLY&quot; &quot;CGLY&quot; }</span>
+<span class="s">  { 0 &quot;HID&quot; &quot;NHID&quot; } { 1 &quot;HID&quot; &quot;CHID&quot; }</span>
+<span class="s">  { 0 &quot;HIE&quot; &quot;NHIE&quot; } { 1 &quot;HIE&quot; &quot;CHIE&quot; }</span>
+<span class="s">  { 0 &quot;HIP&quot; &quot;NHIP&quot; } { 1 &quot;HIP&quot; &quot;CHIP&quot; }</span>
+<span class="s">  { 0 &quot;ILE&quot; &quot;NILE&quot; } { 1 &quot;ILE&quot; &quot;CILE&quot; }</span>
+<span class="s">  { 0 &quot;LEU&quot; &quot;NLEU&quot; } { 1 &quot;LEU&quot; &quot;CLEU&quot; }</span>
+<span class="s">  { 0 &quot;LYS&quot; &quot;NLYS&quot; } { 1 &quot;LYS&quot; &quot;CLYS&quot; }</span>
+<span class="s">  { 0 &quot;MET&quot; &quot;NMET&quot; } { 1 &quot;MET&quot; &quot;CMET&quot; }</span>
+<span class="s">  { 0 &quot;PHE&quot; &quot;NPHE&quot; } { 1 &quot;PHE&quot; &quot;CPHE&quot; }</span>
+<span class="s">  { 0 &quot;PRO&quot; &quot;NPRO&quot; } { 1 &quot;PRO&quot; &quot;CPRO&quot; }</span>
+<span class="s">  { 0 &quot;SER&quot; &quot;NSER&quot; } { 1 &quot;SER&quot; &quot;CSER&quot; }</span>
+<span class="s">  { 0 &quot;THR&quot; &quot;NTHR&quot; } { 1 &quot;THR&quot; &quot;CTHR&quot; }</span>
+<span class="s">  { 0 &quot;TRP&quot; &quot;NTRP&quot; } { 1 &quot;TRP&quot; &quot;CTRP&quot; }</span>
+<span class="s">  { 0 &quot;TYR&quot; &quot;NTYR&quot; } { 1 &quot;TYR&quot; &quot;CTYR&quot; }</span>
+<span class="s">  { 0 &quot;VAL&quot; &quot;NVAL&quot; } { 1 &quot;VAL&quot; &quot;CVAL&quot; }</span>
+<span class="s">  { 0 &quot;HIS&quot; &quot;NHIS&quot; } { 1 &quot;HIS&quot; &quot;CHIS&quot; }</span>
+<span class="s">  { 0 &quot;G&quot; &quot;G5&quot;  } { 1 &quot;G&quot; &quot;G3&quot;  } </span>
+<span class="s">  { 0 &quot;A&quot; &quot;A5&quot;  } { 1 &quot;A&quot; &quot;A3&quot;  } </span>
+<span class="s">  { 0 &quot;C&quot; &quot;C5&quot;  } { 1 &quot;C&quot; &quot;C3&quot;  } </span>
+<span class="s">  { 0 &quot;U&quot; &quot;U5&quot;  } { 1 &quot;U&quot; &quot;U3&quot;  } </span>
+<span class="s">  { 0 &quot;DG&quot; &quot;DG5&quot;  } { 1 &quot;DG&quot; &quot;DG3&quot;  }  </span>
+<span class="s">  { 0 &quot;DA&quot; &quot;DA5&quot;  } { 1 &quot;DA&quot; &quot;DA3&quot;  }  </span>
+<span class="s">  { 0 &quot;DC&quot; &quot;DC5&quot;  } { 1 &quot;DC&quot; &quot;DC3&quot;  }  </span>
+<span class="s">  { 0 &quot;DT&quot; &quot;DT5&quot;  } { 1 &quot;DT&quot; &quot;DT3&quot;  }  </span>
+<span class="s">#  some old Amber residue names for RNA:</span>
+<span class="s">  { 0  &quot;RA&quot; &quot;RA5&quot; } { 1 &quot;RA&quot; &quot;RA3&quot;} </span>
+<span class="s">  { 0  &quot;RC&quot; &quot;RC5&quot; } { 1 &quot;RC&quot; &quot;RC3&quot;} </span>
+<span class="s">  { 0  &quot;RG&quot; &quot;RG5&quot; } { 1 &quot;RG&quot; &quot;RG3&quot;} </span>
+<span class="s">  { 0  &quot;RU&quot; &quot;RU5&quot; } { 1 &quot;RU&quot; &quot;RU3&quot;} </span>
+<span class="s">}</span>
+
+<span class="s"># Set the proper radius set</span>
+<span class="s">set default PBRadii </span><span class="si">%s</span><span class="s"></span>
+<span class="s">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">logfile</span><span class="p">,</span> <span class="n">frcmod</span><span class="p">,</span> <span class="n">off</span><span class="p">,</span> <span class="n">radii</span><span class="p">))</span>
+
+    <span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../amber.html" >chemistry.amber</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -8,8 +8,8 @@
     
     <title>chemistry.charmm.parameters module &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
@@ -55,7 +55,7 @@ Contributors:
 Date: Sep. 17, 2014</p>
 <dl class="class">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet">
-<em class="property">class </em><tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">CharmmParameterSet</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">CharmmParameterSet</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Stores a parameter set defined by CHARMM files. It stores the equivalent of
 the information found in the MASS section of the CHARMM topology file
@@ -148,7 +148,7 @@ Otherwise, ValueError is raised.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.condense">
-<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.condense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet.condense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function goes through each of the parameter type dicts and
 eliminates duplicate types. After calling this function, every unique
 bond, angle, dihedral, improper, or cmap type will pair with EVERY key
@@ -181,7 +181,7 @@ the compression time in half)</p>
 
 <dl class="classmethod">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.load_set">
-<em class="property">classmethod </em><tt class="descname">load_set</tt><big>(</big><em>tfile=None</em>, <em>pfile=None</em>, <em>sfiles=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.load_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.load_set" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">load_set</tt><big>(</big><em>tfile=None</em>, <em>pfile=None</em>, <em>sfiles=None</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet.load_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.load_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiates a CharmmParameterSet from a Topology file and a Parameter
 file (or just a Parameter file if it has all information)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -217,7 +217,7 @@ simply append to the existing set if they are different)</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">
-<tt class="descname">read_parameter_file</tt><big>(</big><em>pfile</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_parameter_file</tt><big>(</big><em>pfile</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads all of the parameters from a parameter file. Versions 36 and
 later of the CHARMM force field files have an ATOMS section defining
 all of the atom types.  Older versions need to load this information
@@ -242,7 +242,7 @@ file first. Failure to do so will result in a raised RuntimeError.</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.read_stream_file">
-<tt class="descname">read_stream_file</tt><big>(</big><em>sfile</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_stream_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_stream_file</tt><big>(</big><em>sfile</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_stream_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads RTF and PAR sections from a stream file and dispatches the
 sections to read_topology_file or read_parameter_file</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -261,7 +261,7 @@ sections to read_topology_file or read_parameter_file</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.read_topology_file">
-<tt class="descname">read_topology_file</tt><big>(</big><em>tfile</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_topology_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_topology_file</tt><big>(</big><em>tfile</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_topology_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads _only_ the atom type definitions from a topology file. This is
 unnecessary for versions 36 and later of the CHARMM force field.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -282,7 +282,7 @@ unnecessary for versions 36 and later of the CHARMM force field.</p>
 
 <dl class="function">
 <dt id="chemistry.charmm.parameters.element_by_mass">
-<tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">element_by_mass</tt><big>(</big><em>mass</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#element_by_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.element_by_mass" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">element_by_mass</tt><big>(</big><em>mass</em><big>)</big><a class="reference internal" href="../../modules/chemistry/charmm/parameters.html#element_by_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.element_by_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines what element the given atom is based on its mass</p>
 </dd></dl>
 
@@ -296,7 +296,7 @@ unnecessary for versions 36 and later of the CHARMM force field.</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.charmm.parameters.txt"
+    <li><a href="../../sources/api/chemistry/chemistry.charmm.parameters.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

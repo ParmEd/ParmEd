@@ -8,8 +8,8 @@
     
     <title>chemistry.structure.Structure &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The structure module" href="../structure.html" />
@@ -55,7 +55,7 @@
 <h1>chemistry.structure.Structure<a class="headerlink" href="#chemistry-structure-structure" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.structure.Structure">
-<em class="property">class </em><tt class="descclassname">chemistry.structure.</tt><tt class="descname">Structure</tt><a class="reference internal" href="../_modules/chemistry/structure.html#Structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.structure.</tt><tt class="descname">Structure</tt><a class="reference internal" href="../modules/chemistry/structure.html#Structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>A chemical structure composed of atoms, bonds, angles, torsions, and other
 topological features</p>
 <p class="rubric">Notes</p>
@@ -235,7 +235,7 @@ terms</p>
 </table>
 <dl class="method">
 <dt id="chemistry.structure.Structure.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -387,7 +387,7 @@ terms</p>
 </table>
 <dl class="method">
 <dt id="chemistry.structure.Structure.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.add_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
 it has a different name or number as the last residue added and adding
 it to the <cite>atoms</cite> list.</p>
@@ -426,7 +426,7 @@ list, a new residue is added and the atom is added to that residue</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.add_atom_to_residue">
-<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.add_atom_to_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.add_atom_to_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure at the end if the given residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -454,14 +454,14 @@ relatively expensive operation</p>
 
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.box_vectors">
-<tt class="descname">box_vectors</tt><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.box_vectors" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">box_vectors</tt><a class="reference internal" href="../modules/chemistry/structure.html#Structure.box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.box_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
 dimension length</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.copy">
-<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.copy" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a copy of the current structure as an instance of a specified
 subclass</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -493,7 +493,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.createSystem">
-<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.createSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.createSystem" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.createSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -597,13 +597,13 @@ of freedom will <em>still</em> be constrained).</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.is_changed">
-<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.is_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.is_changed" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.is_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.is_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if any of the topology has changed for this structure</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_add_constraints">
-<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -630,7 +630,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_angle_force">
-<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_angle_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_angle_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -663,7 +663,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_bond_force">
-<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_bond_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_bond_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -700,7 +700,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_cmap_force">
-<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_cmap_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_cmap_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -718,7 +718,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_dihedral_force">
-<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_dihedral_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_dihedral_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -736,7 +736,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_gbsa_force">
-<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_gbsa_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_gbsa_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -791,7 +791,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_improper_force">
-<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_improper_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_improper_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -809,7 +809,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_nonbonded_force">
-<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -865,7 +865,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_out_of_plane_bend_force">
-<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_out_of_plane_bend_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_out_of_plane_bend_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -883,7 +883,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_pi_torsion_force">
-<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_pi_torsion_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_pi_torsion_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -901,7 +901,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_set_virtual_sites">
-<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_set_virtual_sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_set_virtual_sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -922,7 +922,7 @@ method</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_stretch_bend_force">
-<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_stretch_bend_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_stretch_bend_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -940,7 +940,7 @@ method</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_torsion_torsion_force">
-<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_torsion_torsion_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_torsion_torsion_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -959,7 +959,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_trigonal_angle_force">
-<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_trigonal_angle_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_trigonal_angle_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -977,7 +977,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.omm_urey_bradley_force">
-<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.omm_urey_bradley_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.omm_urey_bradley_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -995,7 +995,7 @@ for this system</p>
 
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.positions">
-<tt class="descname">positions</tt><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.positions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">positions</tt><a class="reference internal" href="../modules/chemistry/structure.html#Structure.positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic positions for every atom in the system. If set with unitless
 numbers, those numbers are assumed to be in angstroms</p>
@@ -1003,7 +1003,7 @@ numbers, those numbers are assumed to be in angstroms</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.prune_empty_terms">
-<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.prune_empty_terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.prune_empty_terms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Looks through all of the topological lists and gets rid of terms
 in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
 to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
@@ -1011,7 +1011,7 @@ to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.strip">
-<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.strip" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.strip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1033,20 +1033,20 @@ as the <cite>atoms</cite> list.</p>
 
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.topology">
-<tt class="descname">topology</tt><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.topology" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">topology</tt><a class="reference internal" href="../modules/chemistry/structure.html#Structure.topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
 Structure instance results in the topology being deleted and rebuilt</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.unchange">
-<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.unchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.unchange" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.unchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.unchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggles all lists so that they do not indicate any changes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.update_dihedral_exclusions">
-<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.update_dihedral_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.update_dihedral_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
 <p>bond -&gt; angle -&gt; dihedral</p>
 <p>Since bonds and angles are completely excluded, any ring systems in
@@ -1066,14 +1066,14 @@ partners arrays</p>
 
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.velocities">
-<tt class="descname">velocities</tt><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.velocities" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">velocities</tt><a class="reference internal" href="../modules/chemistry/structure.html#Structure.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.velocities" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic velocities for every atom in the system</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.write_cif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.write_cif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1130,7 +1130,7 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="reference internal" href="../_modules/chemistry/structure.html#Structure.write_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_pdb" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_pdb</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#Structure.write_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1203,7 +1203,7 @@ atom that does not contain a SEGID identifier.</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../_sources/structobj/chemistry.structure.Structure.txt"
+    <li><a href="../sources/structobj/chemistry.structure.Structure.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

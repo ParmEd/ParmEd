@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.amber.mdin.qmmm &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="chemistry.amber.mdin" href="../mdin.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../amber.html" >chemistry.amber</a> &raquo;</li>
+          <li><a href="../mdin.html" accesskey="U">chemistry.amber.mdin</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.amber.mdin.qmmm</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains all of the qmmm namelist variables for the      </span>
+<span class="sd">amber programs and automatically loads those dictionaries with the   </span>
+<span class="sd">default values found in that program (sander only).                  </span>
+
+<span class="sd">                           GPL LICENSE INFO                             </span>
+
+<span class="sd">Copyright (C) 2010  Jason Swails and Ben Roberts</span>
+
+<span class="sd">This program is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">This program is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU General Public License</span>
+<span class="sd">along with this program; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 59 Temple Place - Suite 330,</span>
+<span class="sd">Boston, MA 02111-1307, USA.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="qmmm"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.amber.mdin.qmmm.html#chemistry.amber.mdin.qmmm.qmmm">[docs]</a><span class="k">class</span> <span class="nc">qmmm</span><span class="p">:</span>
+
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">sander</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;qmcut&#39;</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;iqmatoms&#39;</span> <span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;qmmask&#39;</span> <span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;qmgb&#39;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                      <span class="s">&#39;qm_theory&#39;</span> <span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;qmcharge&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;qmqmdx&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;verbosity&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;tight_p_conv&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;scfconv&#39;</span> <span class="p">:</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+                      <span class="s">&#39;errconv&#39;</span> <span class="p">:</span> <span class="mf">1e-1</span><span class="p">,</span><span class="s">&#39;ndiis_matrices&#39;</span> <span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="s">&#39;ndiis_attempts&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s">&#39;printcharges&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;printdipole&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;peptide_corr&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s">&#39;itrmax&#39;</span> <span class="p">:</span> <span class="mi">1000</span><span class="p">,</span><span class="s">&#39;qmshake&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s">&#39;qmqm_erep_incore&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;qmmmrij_incore&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s">&#39;lnk_dis&#39;</span> <span class="p">:</span> <span class="mf">1.09</span><span class="p">,</span><span class="s">&#39;lnk_atomic_no&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;lnk_method&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s">&#39;spin&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;pseudo_diag&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;pseudo_diag_criteria&#39;</span> <span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span><span class="s">&#39;qm_ewald&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s">&#39;qm_pme&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;kmaxqx&#39;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="s">&#39;kmaxqy&#39;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="s">&#39;kmaxqz&#39;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="s">&#39;ksqmaxq&#39;</span> <span class="p">:</span> <span class="mi">27</span><span class="p">,</span>
+                      <span class="s">&#39;writepdb&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;qmmm_int&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s">&#39;adjust_q&#39;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                      <span class="s">&#39;diag_routine&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;density_predict&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s">&#39;fock_predict&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;fockp_d1&#39;</span> <span class="p">:</span> <span class="mf">2.4</span><span class="p">,</span><span class="s">&#39;fockp_d2&#39;</span> <span class="p">:</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span>
+                      <span class="s">&#39;fockp_d3&#39;</span> <span class="p">:</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span><span class="s">&#39;fockp_d4&#39;</span> <span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span><span class="s">&#39;idc&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;divpb&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> 
+                      <span class="s">&#39;dftb_maxiter&#39;</span> <span class="p">:</span> <span class="mi">70</span><span class="p">,</span><span class="s">&#39;dftb_disper&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s">&#39;dftb_3rd_order&#39;</span> <span class="p">:</span> <span class="s">&#39;NONE&#39;</span><span class="p">,</span><span class="s">&#39;dftb_chg&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> 
+                      <span class="s">&#39;dftb_telec&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;dftb_telec_step&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s">&#39;qmmm_omp_max_threads&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;chg_lambda&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s">&#39;nearest_qm_solvent&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s">&#39;nearest_qm_solvent_fq&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> 
+                      <span class="s">&#39;nearest_qm_solvent_resname&#39;</span> <span class="p">:</span> <span class="s">&#39;WAT &#39;</span><span class="p">}</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../amber.html" >chemistry.amber</a> &raquo;</li>
+          <li><a href="../mdin.html" >chemistry.amber.mdin</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

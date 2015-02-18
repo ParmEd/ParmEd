@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.gui.guitools &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="ParmedTools" href="../../ParmedTools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../ParmedTools.html" accesskey="U">ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ParmedTools.gui.guitools</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The GUI components of xparmed.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">tkMessageBox</span>
+<span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.gui.guiactions</span> <span class="kn">import</span> <span class="n">gui_action_dispatcher</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.gui._guiwidgets</span> <span class="kn">import</span> <span class="n">MessageWindow</span>
+
+<span class="n">BPR</span> <span class="o">=</span> <span class="mi">3</span> <span class="c"># Buttons Per Row</span>
+
+<span class="c">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
+
+<div class="viewcode-block" id="ParmedApp"><a class="viewcode-back" href="../../../api/ParmedTools/ParmedTools.gui.guitools.html#ParmedTools.gui.guitools.ParmedApp">[docs]</a><span class="k">class</span> <span class="nc">ParmedApp</span><span class="p">(</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Main Parmed App Window &quot;&quot;&quot;</span>
+    <span class="n">skipped_actions</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;parmout&#39;</span><span class="p">,</span> <span class="s">&#39;go&#39;</span><span class="p">,</span> <span class="s">&#39;quit&#39;</span><span class="p">,</span> <span class="s">&#39;help&#39;</span><span class="p">,</span> <span class="s">&#39;setoverwrite&#39;</span><span class="p">,</span> <span class="s">&#39;ls&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;interpolate&#39;</span><span class="p">,</span> <span class="s">&#39;listparms&#39;</span><span class="p">,</span> <span class="s">&#39;parm&#39;</span><span class="p">,</span> <span class="s">&#39;source&#39;</span><span class="p">,</span> <span class="s">&#39;cd&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">amber_prmtop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Instantiates the window &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">math</span>
+        <span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">ParmedActions</span>
+        <span class="k">global</span> <span class="n">BPR</span>
+        <span class="n">Frame</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="n">amber_prmtop</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">action_name</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">[</span><span class="n">action</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c"># Skip actions that don&#39;t get buttons</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_actions</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="c"># Save outparm for later</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;outparm&#39;</span><span class="p">:</span>
+                <span class="n">outparm_action</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span>
+                                    <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">actions</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span>
+                                    <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_frame</span> <span class="o">=</span> <span class="n">MessageWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c"># Now make the action button frame and put a title on it</span>
+        <span class="n">action_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">action_frame</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s">&#39;ParmEd Actions (right-click for help)&#39;</span><span class="p">)</span>
+        <span class="n">action_keys</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">keys</span><span class="p">();</span> <span class="n">action_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="c"># Number of Items Per Column</span>
+        <span class="n">IPC</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">action_keys</span><span class="p">)</span> <span class="o">/</span> <span class="n">BPR</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">action_keys</span><span class="p">):</span>
+            <span class="n">button</span> <span class="o">=</span> <span class="n">ActionButton</span><span class="p">(</span><span class="n">action_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_frame</span><span class="p">,</span>
+                                  <span class="n">actions</span><span class="p">[</span><span class="n">action</span><span class="p">])</span>
+            <span class="n">button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">i</span><span class="o">//</span><span class="n">IPC</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">i</span><span class="o">%</span><span class="n">IPC</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
+                        <span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="n">action_frame</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_frame</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">columnspan</span><span class="o">=</span><span class="n">BPR</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="c"># Add the two final buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outparm</span> <span class="o">=</span> <span class="n">OutparmButton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_frame</span><span class="p">,</span>
+                                     <span class="n">outparm_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outparm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s">&#39;Exit xParmEd&#39;</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">master</span><span class="o">.</span><span class="n">destroy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">N</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="n">E</span><span class="o">+</span><span class="n">W</span><span class="p">)</span>
+        <span class="c"># Control expandability of root window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columnconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columnconfigure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowconfigure</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowconfigure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c"># Control expandability of action frame</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">action_keys</span><span class="p">)</span><span class="o">/</span><span class="n">BPR</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">action_frame</span><span class="o">.</span><span class="n">rowconfigure</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">BPR</span><span class="p">):</span>
+            <span class="n">action_frame</span><span class="o">.</span><span class="n">columnconfigure</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
+</div>
+<span class="k">class</span> <span class="nc">_Description</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="s">&quot; This formats a description so it can be displayed in different places &quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">,</span> <span class="n">desc_string</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc_string</span> <span class="o">=</span> <span class="n">desc_string</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_name</span> <span class="o">=</span> <span class="n">action_name</span>
+
+
+    <span class="k">def</span> <span class="nf">info_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Display an info button &quot;&quot;&quot;</span>
+        <span class="n">tkMessageBox</span><span class="o">.</span><span class="n">showinfo</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_name</span><span class="p">,</span> 
+                        <span class="n">message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">desc_string</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+<span class="c">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
+
+<div class="viewcode-block" id="ActionButton"><a class="viewcode-back" href="../../../api/ParmedTools/ParmedTools.gui.guitools.html#ParmedTools.gui.guitools.ActionButton">[docs]</a><span class="k">class</span> <span class="nc">ActionButton</span><span class="p">(</span><span class="n">Button</span><span class="p">):</span>
+    <span class="s">&quot; A button to dispatch the command to a particular function in guiactions &quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">amber_prmtop</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">action_desc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amber_prmtop</span> <span class="o">=</span> <span class="n">amber_prmtop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_desc</span> <span class="o">=</span> <span class="n">action_desc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="n">messages</span>
+        <span class="n">Button</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">action_desc</span><span class="o">.</span><span class="n">action_name</span><span class="p">,</span>
+                        <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s">&quot;&lt;Button-3&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_desc</span><span class="o">.</span><span class="n">info_box</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ActionButton.execute"><a class="viewcode-back" href="../../../api/ParmedTools/ParmedTools.gui.guitools.html#ParmedTools.gui.guitools.ActionButton.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sends the action name to the GUI dispatcher &quot;&quot;&quot;</span>
+        <span class="n">gui_action_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">master</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amber_prmtop</span><span class="p">,</span> 
+                              <span class="bp">self</span><span class="o">.</span><span class="n">action_desc</span><span class="o">.</span><span class="n">action_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
+
+<span class="c">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
+</div></div>
+<div class="viewcode-block" id="OutparmButton"><a class="viewcode-back" href="../../../api/ParmedTools/ParmedTools.gui.guitools.html#ParmedTools.gui.guitools.OutparmButton">[docs]</a><span class="k">class</span> <span class="nc">OutparmButton</span><span class="p">(</span><span class="n">ActionButton</span><span class="p">):</span>
+    <span class="s">&quot; An ActionButton specifically for outparm &quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">amber_prmtop</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">action_desc</span><span class="p">):</span>
+        <span class="n">ActionButton</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">amber_prmtop</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">action_desc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s">&#39;Write a New Topology File Now (can be used any &#39;</span>
+                         <span class="s">&#39;number of times)&#39;</span><span class="p">)</span>
+
+<span class="c">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../ParmedTools.html" >ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
