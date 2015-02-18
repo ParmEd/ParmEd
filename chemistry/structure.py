@@ -1202,7 +1202,9 @@ class Structure(object):
             top.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
         # Set the unit cell dimensions
         if self.box is not None:
-            top.setUnitCellDimensions(self.box[:3]*u.angstroms)
+            top.setPeriodicBoxVectors(
+                    box_lengths_and_angles_to_vectors(*self.box)
+            )
         return top
 
     #===================================================
