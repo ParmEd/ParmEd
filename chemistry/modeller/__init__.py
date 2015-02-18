@@ -8,4 +8,4 @@ __date__ = '2015'
 __license__ = 'LGPL'
 
 from chemistry.modeller.residue import ResidueTemplate
-#from chemistry.amber import AmberOFFLibrary
+from chemistry.modeller.offlib import AmberOFFLibrary
