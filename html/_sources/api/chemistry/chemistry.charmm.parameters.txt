@@ -1,0 +1,7 @@
+chemistry.charmm.parameters module
+==================================
+
+.. automodule:: chemistry.charmm.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

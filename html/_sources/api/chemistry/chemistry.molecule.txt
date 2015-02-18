@@ -1,0 +1,7 @@
+chemistry.molecule module
+=========================
+
+.. automodule:: chemistry.molecule
+    :members:
+    :undoc-members:
+    :show-inheritance:

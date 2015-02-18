@@ -1,0 +1,7 @@
+chemistry.pdbx.PdbxReader module
+================================
+
+.. automodule:: chemistry.pdbx.PdbxReader
+    :members:
+    :undoc-members:
+    :show-inheritance:

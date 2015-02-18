@@ -1,0 +1,7 @@
+chemistry.unit.mymatrix module
+==============================
+
+.. automodule:: chemistry.unit.mymatrix
+    :members:
+    :undoc-members:
+    :show-inheritance:

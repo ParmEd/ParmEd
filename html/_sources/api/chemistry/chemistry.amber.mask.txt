@@ -1,0 +1,7 @@
+chemistry.amber.mask module
+===========================
+
+.. automodule:: chemistry.amber.mask
+    :members:
+    :undoc-members:
+    :show-inheritance:

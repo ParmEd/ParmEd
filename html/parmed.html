@@ -1,0 +1,960 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using parmed.py &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="next" title="The ParmEd API" href="parmed_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed_api.html" title="The ParmEd API"
+             accesskey="N">next</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-parmed-py">
+<h1>Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt><a class="headerlink" href="#using-parmed-py" title="Permalink to this headline">¶</a></h1>
+<p>This page details using the command-line version of ParmEd, which is the
+primary front-end program using the <a class="reference internal" href="api/chemistry/chemistry.html#module-chemistry" title="chemistry"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry</span></tt></a> and <a class="reference internal" href="api/ParmedTools/ParmedTools.html#module-ParmedTools" title="ParmedTools"><tt class="xref py py-mod docutils literal"><span class="pre">ParmedTools</span></tt></a>
+packages to provide a set of <em>Actions</em> by which you can modify a system topology
+and parameters (it currently only works for Amber topology files, although
+support for the entire <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+hierarchy is planned).</p>
+<p>There are two ways in which ParmEd can be run&#8212;in batch reading from an input
+file or <em>script</em>, and with an interactive interpreter. A script can either be
+given to <tt class="docutils literal"><span class="pre">parmed.py</span></tt> on the command-line, or fed via pipes through standard
+input. You can provide an input file using the <tt class="docutils literal"><span class="pre">-i/--input</span></tt> flag.</p>
+<div class="section" id="command-syntax">
+<h2>Command syntax<a class="headerlink" href="#command-syntax" title="Permalink to this headline">¶</a></h2>
+<p>All actions should be specified on the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> command-line in the
+following format:</p>
+<div class="highlight-none"><div class="highlight"><pre>ActionName arg1 arg2 arg3 ... argN [parm &lt;idx|name&gt;]
+</pre></div>
+</div>
+<p>Arguments should be whitespace-delimited, the <tt class="docutils literal"><span class="pre">ActionName</span></tt> is
+case-insensitive, and every action (if it uses a <tt class="docutils literal"><span class="pre">parm</span></tt> object) can be applied
+to a specific parameter-topology instance that has been loaded.</p>
+<p>Note that in many Actions, you need to select a subset of the atoms upon which
+to perform the action. The way in which these atom selections are specified is
+using the Amber mask syntax described in the section <a class="reference internal" href="#atom-selection-masks">Atom Selection Masks</a>
+below.</p>
+</div>
+<div class="section" id="available-commands">
+<h2>Available commands<a class="headerlink" href="#available-commands" title="Permalink to this headline">¶</a></h2>
+<p>The following <tt class="docutils literal"><span class="pre">Action</span></tt> commands are available in ParmEd. The information here
+is available via the <a class="reference internal" href="#help">help</a> command in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> interpreter.</p>
+<div class="section" id="add12-6-4">
+<h3>add12_6_4<a class="headerlink" href="#add12-6-4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>add12_6_4 [&lt;divalent ion mask&gt;] [c4file &lt;C4 Param. File&gt; | watermodel &lt;water model&gt;] [polfile &lt;Pol. Param File&gt;] [tunfactor &lt;tunfactor&gt;]
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Adds the LENNARD_JONES_CCOEF term for the new divalent metal ion 12-6-4 Lennard-Jones potential term. If provided, the mask will allow you to specify which ions are divalent. The C4 parameter between the metal ion and water can either be taken from Ref. <tt class="docutils literal"><span class="pre">[1]</span></tt> for the requested <tt class="docutils literal"><span class="pre">[watermodel]</span></tt> (TIP3P, TIP4PEW, or SPCE) or provided in the file specified by the c4file keyword. The polarizabilities must be present in the the polfile file. The chemical symbol of the element will be used to determine the atom type. Parameters are expected in a file with 2 columns:</dt>
+<dd>&lt;atom type&gt; <tt class="docutils literal"><span class="pre">&lt;parameter&gt;</span></tt></dd>
+</dl>
+<p>All defaults come from Ref. <tt class="docutils literal"><span class="pre">[1]</span></tt></p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">[1]</span></tt> Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,</dt>
+<dd>289-297</dd>
+</dl>
+</div>
+<div class="section" id="addatomicnumber">
+<h3>addAtomicNumber<a class="headerlink" href="#addatomicnumber" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>addAtomicNumber
+</pre></div>
+</div>
+<p>Adds the atomic number of each atom to a new section titled &#8220;ATOMIC_NUMBER&#8221; in the topology file. Elements are identified by the atomic mass found in the MASS section of the topology files. Elements are matched by picking the element whose average atomic mass in the periodic table is closest to each atom, which should work appropriately for all isotopes of all atoms, except possibly Tritium</p>
+</div>
+<div class="section" id="adddihedral">
+<h3>addDihedral<a class="headerlink" href="#adddihedral" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>addDihedral &lt;mask1&gt; &lt;mask2&gt; &lt;mask3&gt; &lt;mask4&gt; &lt;phi_k&gt; &lt;per&gt; &lt;phase&gt; [&lt;scee&gt;] [&lt;scnb&gt;] [type &lt;type&gt;]
+</pre></div>
+</div>
+<p>Adds a dihedral between mask1, mask2, mask3, and mask4. Each mask must specify the same number of atoms, and the dihedral is defined around the bond between atoms in mask 2 and 3. If each mask selects 2 atoms, for instance, a dihedral will be placed around atom1 in mask 1, atom1 in mask 2, atom1 in mask 3, and atom1 in mask 4. A second dihedral will be placed around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in mask4. dihed_type can either be &#8220;normal&#8221; or &#8220;improper&#8221;. <tt class="docutils literal"><span class="pre">&lt;phi_k&gt;</span></tt> is the barrier height of the dihedral term, <tt class="docutils literal"><span class="pre">&lt;per&gt;</span></tt> is the periodicity, <tt class="docutils literal"><span class="pre">&lt;phase&gt;</span></tt> is the phase offset, <tt class="docutils literal"><span class="pre">&lt;scee&gt;</span></tt> is the 1-4 EEL scaling factor for this dihedral (default for AMBER is 1.2, default for GLYCAM is 1.0), and <tt class="docutils literal"><span class="pre">&lt;scnb&gt;</span></tt> is the 1-4 VDW scaling factor for this dihedral (default for AMBER is 2.0, default for GLYCAM is 1.0)</p>
+</div>
+<div class="section" id="addexclusions">
+<h3>addExclusions<a class="headerlink" href="#addexclusions" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>addExclusions &lt;mask1&gt; &lt;mask2&gt;
+</pre></div>
+</div>
+<p>Allows you to add arbitrary exclusions to the exclusion list. Every atom in <tt class="docutils literal"><span class="pre">&lt;mask2&gt;</span></tt> is added to the exclusion list for each atom in <tt class="docutils literal"><span class="pre">&lt;mask1&gt;</span></tt> so that non-bonded interactions between those atom pairs will not be computed. NOTE that this ONLY applies to direct-space (short-range) non-bonded potentials. For PME simulations, long-range electrostatics between these atom pairs are still computed (in different unit cells).</p>
+</div>
+<div class="section" id="addljtype">
+<h3>addLJType<a class="headerlink" href="#addljtype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>addLJType &lt;mask&gt; [radius &lt;new_radius&gt;] [epsilon &lt;new_epsilon&gt;] [radius_14 &lt;new_radius14&gt;] [epsilon_14 &lt;new_epsilon14&gt;]
+</pre></div>
+</div>
+<p>Turns given mask into a new LJ atom type. It uses the radius and Rmin from the first atom type in <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> if new_radius or new_epsilon aren&#8217;t provided</p>
+</div>
+<div class="section" id="addpdb">
+<h3>addPDB<a class="headerlink" href="#addpdb" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>addPDB &lt;filename&gt; [elem] [strict] [allicodes]
+</pre></div>
+</div>
+<p>Adds PDB information to new flags in the topology file to enable analyses based on the original residue information in the PDB file, <tt class="docutils literal"><span class="pre">&lt;filename&gt;</span></tt> It adds the flags:</p>
+<p>Residue Properties</p>
+<blockquote>
+<div><ul class="simple">
+<li>RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)</li>
+<li>RESIDUE_ICODE: Insertion code, if it exists</li>
+<li>RESIDUE_NUMBER: Original residue serial number in the PDB</li>
+</ul>
+</div></blockquote>
+<p>Atom Properties</p>
+<blockquote>
+<div><ul class="simple">
+<li>ATOM_ELEMENT: Atomic element (redundant now, not printed by default)</li>
+<li>ATOM_OCCUPANCY: The occupancy of each atom</li>
+<li>ATOM_BFACTOR: The temperature factor of each atom</li>
+<li>ATOM_NUMBER: The original atom serial number in the PDB</li>
+</ul>
+</div></blockquote>
+<p>The &#8216;strict&#8217; keyword turns residue mismatches (NOT solvent) into errors The &#8216;elem&#8217; keyword will force printing of the element names. The &#8216;allicodes&#8217; keyword forces insertion codes to be printed, even if every one will be blank (so that parsers can count on that section existing).</p>
+<p>Residues <em>not</em> in the PDB will be assigned a CHAINID of &#8216;*&#8217; and RESIDUE_NUMBER of 0. Any occupancy or temperature (B) factor that is not present in the input PDB file is assigned a number of 0</p>
+<dl class="docutils">
+<dt>Historical info:</dt>
+<dd>This action is based on, and reproduces the key results of, the historical &#8216;add_pdb&#8217; program. It is a bit more flexible, though.</dd>
+</dl>
+</div>
+<div class="section" id="cd">
+<h3>cd<a class="headerlink" href="#cd" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>cd &lt;directory&gt;
+</pre></div>
+</div>
+<p>Changes to a new directory like UNIX &#8216;cd&#8217;</p>
+</div>
+<div class="section" id="chamber">
+<h3>chamber<a class="headerlink" href="#chamber" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>chamber -top &lt;CHARMM.top&gt; -param &lt;CHARMM.par&gt; [-str &lt;CHARMM.str&gt;] -psf &lt;CHARMM.psf&gt; [-crd &lt;CHARMM.pdb&gt;] [-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]][-radii &lt;radiusset&gt;]
+</pre></div>
+</div>
+<p>This action will read CHARMM parameter, topology (RTF), and stream (STR) files and apply those parameters to a structure defined in a CHARMM PSF (protein structure file). XPLOR, CHARMM, and VMD-generated PSF files are all supported. You may specify -top, -param, and -str as many times as you want to provide multiple parameter files. All topology files are read first (in the order they are specified), followed by all parameter files, and finally all stream files are read in. Topology files are only necessary if the parameter files do not define the atom types (newer CHARMM force fields define atom types directly in the parameter file. Environment variables and shell wild-cards (* and ?), as well as the home shortcut character ~ are properly expanded when looking for files.</p>
+<p>Options</p>
+<blockquote>
+<div><ul class="simple">
+<li>-top CHARMM topology, or Residue Topology File (RTF) file</li>
+<li>-param CHARMM parameter file</li>
+<li>-str CHARMM stream file. Only RTF and parameter sections read</li>
+<li>-toppar CHARMM topology, parameter, and/or stream file(s). File type is detected from extension (or in the case of .inp files, the presence of &#8216;top&#8217;, &#8216;par&#8217; in the name)</li>
+<li>-psf CHARMM PSF file</li>
+<li>-crd Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)</li>
+<li>-nocmap Do not use any CMAP parameters</li>
+<li>usechamber Use the &#8216;chamber&#8217; program to write a topology file instead</li>
+<li>-box Box dimensions. If no angles are defined, they are assumed to be 90 degrees (orthorhombic box). Alternatively, you can use the word &#8216;bounding&#8217; to define a box that encloses the centers of all atoms.</li>
+<li>-radii Implicit solvent solvation radii. <tt class="docutils literal"><span class="pre">&lt;radiusset&gt;</span></tt> can be amber6, bondi, mbondi, mbondi2, mbondi3 Same effect as the <a class="reference internal" href="#changeradii">changeRadii</a> command. Default is mbondi.</li>
+<li>nocondense This prevents chamber from condensing the parameter set before applying it. This might lead to larger prmtop files, but for large parameter sets will dramatically shorten the running time of the chamber action</li>
+</ul>
+</div></blockquote>
+<p>If the PDB file has a CRYST1 record, the box information will be set from there. Any box info given on the command-line will override the box found in the crd file.</p>
+</div>
+<div class="section" id="change">
+<h3>change<a class="headerlink" href="#change" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>change &lt;property&gt; &lt;mask&gt; &lt;new_value&gt; [quiet]
+</pre></div>
+</div>
+<p>Changes the property of given atoms to a new value. <tt class="docutils literal"><span class="pre">&lt;property&gt;</span></tt> can be CHARGE, MASS, RADII, SCREEN, ATOM_NAME, AMBER_ATOM_TYPE, ATOM_TYPE_INDEX, or ATOMIC_NUMBER (note, changing elements with this command will NOT change their assignment for SHAKE!).</p>
+<p>If given, the <tt class="docutils literal"><span class="pre">[quiet]</span></tt> keyword will prevent ParmEd from printing out a <a class="reference internal" href="#summary">summary</a> with every property changed for every atom that was changed useful for suppressing overwhelming output if you are zeroing every charge, for instance)</p>
+</div>
+<div class="section" id="changelj14pair">
+<h3>changeLJ14Pair<a class="headerlink" href="#changelj14pair" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>changeLJ14Pair &lt;mask1&gt; &lt;mask2&gt; &lt;Rmin&gt; &lt;epsilon&gt;
+</pre></div>
+</div>
+<p>Changes a particular 1-4 Lennard Jones pair based on a given (pre-combined) epsilon/Rmin. Only valid for CHAMBER prmtops</p>
+</div>
+<div class="section" id="changeljpair">
+<h3>changeLJPair<a class="headerlink" href="#changeljpair" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>changeLJPair &lt;mask1&gt; &lt;mask2&gt; &lt;Rmin&gt; &lt;epsilon&gt;
+</pre></div>
+</div>
+<p>Changes a particular Lennard Jones pair based on a given (pre-combined) epsilon/Rmin</p>
+</div>
+<div class="section" id="changeljsingletype">
+<h3>changeLJSingleType<a class="headerlink" href="#changeljsingletype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>changeLJSingleType &lt;mask&gt; &lt;radius&gt; &lt;depth&gt;
+</pre></div>
+</div>
+<p>Allows you to change the radius/well depth of a single LJ type specified by <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> Note, this may change more than the atoms selected in just the mask! To find out what else will be changed, look at the output of <a class="reference internal" href="#printljtypes">printLJTypes</a>.</p>
+<p>Use <a class="reference internal" href="#addljtype">addLJType</a> to change the Lennard-Jones parameters on a set of specific atoms.</p>
+</div>
+<div class="section" id="changeprotstate">
+<h3>changeProtState<a class="headerlink" href="#changeprotstate" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>changeProtState &lt;mask&gt; &lt;state #&gt;
+</pre></div>
+</div>
+<p>Changes the protonation state of a given titratable residue that can be treated via constant pH MD in Amber. This corresponds to all residues found in <tt class="docutils literal"><span class="pre">$AMBERHOME/AmberTools/src/etc/cpin_data.py</span></tt></p>
+</div>
+<div class="section" id="changeradii">
+<h3>changeRadii<a class="headerlink" href="#changeradii" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>changeRadii &lt;radii_set&gt;
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Changes intrinsic GB radii to the specified set: Allowed values are</dt>
+<dd>amber6, bondi, mbondi, mbondi2, mbondi3</dd>
+</dl>
+</div>
+<div class="section" id="checkvalidity">
+<h3>checkValidity<a class="headerlink" href="#checkvalidity" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>checkValidity
+</pre></div>
+</div>
+<p>Basic checks for prmtop validity.</p>
+</div>
+<div class="section" id="definesolvent">
+<h3>defineSolvent<a class="headerlink" href="#definesolvent" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>defineSolvent &lt;residue list&gt;
+</pre></div>
+</div>
+<p>Allows you to change what parmed.py will consider to be &#8220;solvent&#8221;. &lt;residue list&gt; must be a comma-separated set of residue names with no spaces between them.</p>
+</div>
+<div class="section" id="deletebond">
+<h3>deleteBond<a class="headerlink" href="#deletebond" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>deleteBond &lt;mask1&gt; &lt;mask2&gt;
+</pre></div>
+</div>
+<p>This action deletes any bonds that occur between the atoms in two masks.</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&lt;mask1&gt;</span></tt> : Amber mask defining one of the atoms in a bond</li>
+<li><tt class="docutils literal"><span class="pre">&lt;mask2&gt;</span></tt> : Amber mask defining the other atom in the bond</li>
+<li><tt class="docutils literal"><span class="pre">[verbose]</span></tt> : Print out every bond that is deleted as well as the number of other valence terms that were eliminated.</li>
+</ul>
+</div></blockquote>
+<p>All bonds will be matched in which one atom comes from <tt class="docutils literal"><span class="pre">&lt;mask1&gt;</span></tt> and the other atom comes from <tt class="docutils literal"><span class="pre">&lt;mask2&gt;</span></tt> This action will also delete any other valence term (like angles and dihedrals) that would get severed by the deletion of one of the bonds.</p>
+</div>
+<div class="section" id="deletedihedral">
+<h3>deleteDihedral<a class="headerlink" href="#deletedihedral" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>deleteDihedral &lt;mask1&gt; &lt;mask2&gt; &lt;mask3&gt; &lt;mask4&gt;
+</pre></div>
+</div>
+<p>Deletes the dihedral around <tt class="docutils literal"><span class="pre">&lt;mask2&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;mask3&gt;</span></tt> in which the end-groups are <tt class="docutils literal"><span class="pre">&lt;mask1&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;mask4&gt;</span></tt> For multi-term dihedrals, it removes each term.</p>
+</div>
+<div class="section" id="deletepdb">
+<h3>deletePDB<a class="headerlink" href="#deletepdb" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>deletePDB
+</pre></div>
+</div>
+<p>This action deletes the flags added by <a class="reference internal" href="#addpdb">addPDB</a> if they are present.</p>
+</div>
+<div class="section" id="energy">
+<h3>energy<a class="headerlink" href="#energy" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>energy [cutoff &lt;cut&gt;] [[igb &lt;IGB&gt;] [saltcon &lt;conc&gt;] | [Ewald]] [nodisper] [omm] [applayer] [platform &lt;platform&gt;] [precision &lt;precision model&gt;] [decompose]
+</pre></div>
+</div>
+<p>This action will compute a single-point energy for the loaded structure (you must use &#8216;loadRestart&#8217; prior to this command to load coordinates). The following options and keywords are supported:</p>
+<p>Options</p>
+<blockquote>
+<div><ul class="simple">
+<li>cutoff <tt class="docutils literal"><span class="pre">&lt;cut&gt;</span></tt> : The size of the non-bonded cutoff, in Angstroms. Default 8 A for periodic systems or infinite for nonperiodic systems</li>
+</ul>
+</div></blockquote>
+<p>For systems with no periodic box information</p>
+<blockquote>
+<div><ul class="simple">
+<li>igb <tt class="docutils literal"><span class="pre">&lt;IGB&gt;</span></tt> : An integer corresponding to the desired GB model. May be 1, 2, 5, 7, or 8 as described by the sander and pmemd manual. Default 5.</li>
+<li>saltcon <tt class="docutils literal"><span class="pre">&lt;conc&gt;</span></tt> : The salt concentration, in mol/L, modeled by a Debye screening parameter. Default 0.0</li>
+</ul>
+</div></blockquote>
+<p>For periodic systems</p>
+<blockquote>
+<div><ul class="simple">
+<li>Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME</li>
+<li>nodisper : Do not use a long-range vdW dispersion correction</li>
+</ul>
+</div></blockquote>
+<p>OpenMM-specific options</p>
+<blockquote>
+<div><ul class="simple">
+<li>omm : If present, this keyword will instruct ParmEd to use <a class="reference internal" href="#openmm">OpenMM</a> to compute the energies (and optionally forces) using <a class="reference internal" href="#openmm">OpenMM</a> instead of sander.</li>
+<li>platform <tt class="docutils literal"><span class="pre">&lt;platform&gt;</span></tt> : <a class="reference internal" href="#openmm">OpenMM</a> compute platform to use. Options are CUDA, OpenCL, Reference, and CPU. Consult the <a class="reference internal" href="#openmm">OpenMM</a> manual for details (only used if &#8216;omm&#8217; is provided)</li>
+<li>precision &lt;precision model&gt; : Precision model to use. Options are single, double, and mixed. Reference platform is always double and CPU platform is always single. Mixed (default) uses single precision for calculations and double for accumulation (only used if &#8216;omm&#8217; is provided)</li>
+<li>decompose : Print bond, angle, dihedral, and nonbonded energies separately</li>
+<li>applayer : Use OpenMM&#8217;s class to compute the energy</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="go">
+<h3>go<a class="headerlink" href="#go" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>go
+</pre></div>
+</div>
+<p>Runs the last specified <a class="reference internal" href="#parmout">parmout</a> command and quits</p>
+</div>
+<div class="section" id="help">
+<h3>help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>help [&lt;action&gt;]
+</pre></div>
+</div>
+<p>Provides help on the requested action. If no action name is provided, a list of
+all available options is given. The character &#8216;?&#8217; can be used instead of the
+word &#8216;help&#8217; as well.</p>
+</div>
+<div class="section" id="hmassrepartition">
+<h3>HMassRepartition<a class="headerlink" href="#hmassrepartition" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>HMassRepartition [&lt;mass&gt;] [dowater]
+</pre></div>
+</div>
+<p>This action implements hydrogen mass repartitioning in the system by changing the mass of each hydrogen to the desired value (the default new hydrogen mass is 3.024 daltons) and adjusting the mass of the atom to which it is bonded by the amount required to leave the total mass unchanged. By default, water hydrogen masses are unchanged (the SETTLE algorithm for implementing constraints on water molecules is analytical). Water masses can be repartitioned as well with the &#8216;dowater&#8217; keyword.</p>
+</div>
+<div class="section" id="interpolate">
+<h3>interpolate<a class="headerlink" href="#interpolate" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>interpolate &lt;nparm&gt; [parm2 &lt;other_parm&gt;] [eleconly] [prefix &lt;prefix&gt;] [startnum &lt;num&gt;]
+</pre></div>
+</div>
+<p>Interpolates between two topology files (VDW and electrostatic terms only). If <tt class="docutils literal"><span class="pre">[eleconly]</span></tt> is present, only the charges will be interpolated. <tt class="docutils literal"><span class="pre">&lt;nparm&gt;</span></tt> is the number of &#8216;interpolated&#8217; topology files you want (in addition to the two end-points). The second prmtop must be specified if there are more than 2 in the list. startnum has no effect on the generated prmtops, but it can be used to control the names of the outputted topology files. The file names will be &lt;prefix&gt;.# where # starts at <tt class="docutils literal"><span class="pre">&lt;startnum&gt;</span></tt> and increments by 1 for each prmtop printed.</p>
+</div>
+<div class="section" id="listparms">
+<h3>listParms<a class="headerlink" href="#listparms" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>listParms
+</pre></div>
+</div>
+<p>Lists all of the loaded topology files</p>
+</div>
+<div class="section" id="lmod">
+<h3>lmod<a class="headerlink" href="#lmod" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>lmod
+</pre></div>
+</div>
+<p>Adjusts Lennard Jones parameters to work with the LMOD code in Amber (changes LJ A coefficients that are 0 to 1000).</p>
+</div>
+<div class="section" id="loadrestrt">
+<h3>loadRestrt<a class="headerlink" href="#loadrestrt" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>loadRestrt &lt;restrt_filename&gt;
+</pre></div>
+</div>
+<p>Loads a restart file so we have coordinates. Necessary for distance-based mask criteria and <a class="reference internal" href="#writeoff">writeOFF</a></p>
+</div>
+<div class="section" id="ls">
+<h3>ls<a class="headerlink" href="#ls" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>ls [Unix ls options]
+</pre></div>
+</div>
+<p>Lists directory contents. Like UNIX &#8216;ls&#8217;</p>
+</div>
+<div class="section" id="minimize">
+<h3>minimize<a class="headerlink" href="#minimize" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>minimize [cutoff &lt;cut&gt;] [[igb &lt;IGB&gt;] [saltcon &lt;conc&gt;]] [[restrain &lt;mask&gt;] [weight &lt;k&gt;]] [norun] [script &lt;script_file.py&gt;] [platform &lt;platform&gt;] [precision &lt;precision model&gt;] [tol &lt;tolerance&gt;] [maxcyc &lt;cycles&gt;]
+</pre></div>
+</div>
+<p>This action takes a structure and minimizes the <a class="reference internal" href="#energy">energy</a> using <a class="reference internal" href="#openmm">OpenMM</a>. Following this action, the coordinates stored in the topology will be the minimized structure</p>
+<p>General Options</p>
+<blockquote>
+<div><ul class="simple">
+<li>cutoff <tt class="docutils literal"><span class="pre">&lt;cutoff&gt;</span></tt> Nonbonded cutoff in Angstroms</li>
+<li>restrain <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> Selection of atoms to restrain</li>
+<li>weight <tt class="docutils literal"><span class="pre">&lt;k&gt;</span></tt> Weight of positional restraints (kcal/mol/A^2)</li>
+<li>norun Do not run the calculation</li>
+<li>script <tt class="docutils literal"><span class="pre">&lt;script&gt;</span></tt> Name of the Python script to write to run this calculation</li>
+<li>tol <tt class="docutils literal"><span class="pre">&lt;tolerance&gt;</span></tt> The largest <a class="reference internal" href="#energy">energy</a> difference between successive steps in the minimization allow the minimization to stop (Default 0.001)</li>
+<li>maxcyc <tt class="docutils literal"><span class="pre">&lt;cycles&gt;</span></tt> The maximum number of minimization cycles permitted. No limit by default (minimization stops when tolerance is satisfied)</li>
+</ul>
+</div></blockquote>
+<p>Implicit Solvent options</p>
+<blockquote>
+<div><ul class="simple">
+<li>igb <tt class="docutils literal"><span class="pre">&lt;IGB&gt;</span></tt> GB model to use (0=No GB, 1,2,5,7,8 correspond to Amber models)</li>
+<li>saltcon <tt class="docutils literal"><span class="pre">&lt;conc&gt;</span></tt> Salt concentration for GB in Molarity</li>
+</ul>
+</div></blockquote>
+<p>The implicit solvent options will be ignored for systems with periodic boundary conditions</p>
+</div>
+<div class="section" id="netcharge">
+<h3>netCharge<a class="headerlink" href="#netcharge" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>netCharge [&lt;mask&gt;]
+</pre></div>
+</div>
+<p>Prints the total charge of all of the atoms given by the mask. Defaults to all atoms</p>
+</div>
+<div class="section" id="openmm">
+<h3>OpenMM<a class="headerlink" href="#openmm" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>OpenMM -p &lt;parm&gt;|&lt;parm index&gt; [sander/pmemd options] -platform &lt;platform&gt; -precision &lt;precision model&gt; [dcd] [progress] [script &lt;script_file.py&gt;] [norun]
+</pre></div>
+</div>
+<p>This class will read a sander/pmemd input file and run an equivalent simulation using the OpenMM Python API. It uses a topology file that has been defined (and/or modified) here. The command-line flags are identical to those used for sander and pmemd (described in the Amber manual). You can additionally specify a computational platform available through OpenMM such as CUDA, OpenCL, Reference, and CPU.</p>
+<p>The default prmtop will be the &#8216;active&#8217; <a class="reference internal" href="#parm">parm</a>. The prmtop can be changed using either the &#8216;parm&#8217; keyword or the &#8216;-p&#8217; flag, but it must resolve to one of the stored topology files. Any <a class="reference internal" href="#parm">parm</a> given with the &#8216;-p&#8217; flag has precedence. If present, the &#8216;dcd&#8217; keyword triggers writting DCD-formatted trajectory files instead of NetCDF when ioutfm=1. The DCD trajectory writing offers binary trajectory support without requiring a NetCDF-Python library.</p>
+<p>The &#8216;progress&#8217; keyword triggers printing of ParmEd&#8217;s progress in setting up and starting the calculation.</p>
+<p>The &#8216;script&#8217; keyword provides a file to write an OpenMM script that performs the same calculation requested by this ParmEd command. The &#8216;norun&#8217; command will prevent anything from actually being run and can only be used when a script file is provided.</p>
+</div>
+<div class="section" id="outparm">
+<h3>outparm<a class="headerlink" href="#outparm" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>outparm &lt;prmtop_name&gt; [&lt;inpcrd_name&gt;] [netcdf]
+</pre></div>
+</div>
+<p>Prints a new prmtop like <a class="reference internal" href="#parmout">parmout</a>, but keeps its place in the action stack so several can be written out in 1 parmed session</p>
+</div>
+<div class="section" id="parm">
+<h3>parm<a class="headerlink" href="#parm" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>parm &lt;filename&gt; [&lt;filename&gt; [&lt;filename&gt; ...]] || parm copy &lt;filename&gt;|&lt;index&gt; || parm select &lt;filename&gt;|&lt;index&gt;
+</pre></div>
+</div>
+<p>Either adds a new parm to the list of available parms to edit in ParmEd, or it sets a new &#8216;active&#8217; parm to edit by default with new commands</p>
+</div>
+<div class="section" id="parmout">
+<h3>parmout<a class="headerlink" href="#parmout" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>parmout &lt;prmtop_name&gt; [&lt;inpcrd_name&gt;] [netcdf]
+</pre></div>
+</div>
+<p>Final prmtop written after all actions are complete</p>
+</div>
+<div class="section" id="printangles">
+<h3>printAngles<a class="headerlink" href="#printangles" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printAngles &lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ]
+</pre></div>
+</div>
+<p>Prints all of the angles (with their details) for the given atoms in the mask. If additional masks are given, only the angles in which the three atoms are specified in each of the given mask (with the central atom required to be in the second mask) are printed.</p>
+</div>
+<div class="section" id="printbonds">
+<h3>printBonds<a class="headerlink" href="#printbonds" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printBonds &lt;mask&gt; [&lt;mask&gt;]
+</pre></div>
+</div>
+<p>Prints all of the bonds (with their details) for the given atoms in the mask. If a second mask is given, only bonds in which one atom appears in each list will be printed.</p>
+</div>
+<div class="section" id="printdetails">
+<h3>printDetails<a class="headerlink" href="#printdetails" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printDetails &lt;mask&gt;
+</pre></div>
+</div>
+<p>Returns information about all atoms in a given mask</p>
+</div>
+<div class="section" id="printdihedrals">
+<h3>printDihedrals<a class="headerlink" href="#printdihedrals" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printDihedrals &lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ] ]
+</pre></div>
+</div>
+<p>Prints all of the dihedrals (with their details) for the given atoms in the mask. If multiple masks are given, only dihedrals that have one atom in each mask are printed. Ordering is important here, so the first atom must be in the first mask, the second atom in the second, etc. The order can be precisely reversed, but no other ordering is recognized.</p>
+</div>
+<div class="section" id="printflags">
+<h3>printFlags<a class="headerlink" href="#printflags" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printFlags
+</pre></div>
+</div>
+<p>Prints all %FLAGs found in the topology file</p>
+</div>
+<div class="section" id="printinfo">
+<h3>printInfo<a class="headerlink" href="#printinfo" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printInfo &lt;flag&gt;
+</pre></div>
+</div>
+<p>Prints all prmtop data corresponding to the given %FLAG</p>
+</div>
+<div class="section" id="printljmatrix">
+<h3>printLJMatrix<a class="headerlink" href="#printljmatrix" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printLJMatrix &lt;mask&gt;|&lt;index&gt;
+</pre></div>
+</div>
+<p>This function prints out how every atom type interacts with the atom type(s) in <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> The atom types are printed as all type names that have at least one atom with the Lennard Jones index given in square brackets at the end. Alternatively, you can request a particular atom type index</p>
+</div>
+<div class="section" id="printljtypes">
+<h3>printLJTypes<a class="headerlink" href="#printljtypes" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printLJTypes [&lt;mask&gt;|&lt;type name&gt;]
+</pre></div>
+</div>
+<p>Prints the Lennard Jones type index for the given atom mask or, if no value is given, the LJ type index for each atom.</p>
+</div>
+<div class="section" id="printpointers">
+<h3>printPointers<a class="headerlink" href="#printpointers" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>printPointers
+</pre></div>
+</div>
+<p>Prints a list of all the POINTERS and their values</p>
+</div>
+<div class="section" id="quit">
+<h3>quit<a class="headerlink" href="#quit" title="Permalink to this headline">¶</a></h3>
+<p>Quits <tt class="docutils literal"><span class="pre">parmed.py</span></tt> <em>without</em> running any final <a class="reference internal" href="#parmout">parmout</a> command.</p>
+</div>
+<div class="section" id="scale">
+<h3>scale<a class="headerlink" href="#scale" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>scale &lt;FLAG&gt; &lt;factor&gt;
+</pre></div>
+</div>
+<p>Multiplies all values in a particular section of the prmtop by a scalar factor</p>
+</div>
+<div class="section" id="scee">
+<h3>scee<a class="headerlink" href="#scee" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>scee &lt;scee_value&gt;
+</pre></div>
+</div>
+<p>Sets the 1-4 EEL scaling factor in the prmtop</p>
+</div>
+<div class="section" id="scnb">
+<h3>scnb<a class="headerlink" href="#scnb" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>scnb &lt;scnb_value&gt;
+</pre></div>
+</div>
+<p>Sets the 1-4 VDW scaling factor in the prmtop</p>
+</div>
+<div class="section" id="setangle">
+<h3>setAngle<a class="headerlink" href="#setangle" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>setAngle &lt;mask1&gt; &lt;mask2&gt; &lt;mask3&gt; &lt;k&gt; &lt;THETeq&gt;
+</pre></div>
+</div>
+<p>Changes (or adds a non-existent) angle in the topology file. Each mask must select the same number of atoms, and an angle will be placed between the atoms in mask1, mask2, and mask3 (one angle between atom1 from mask1, atom1 from mask2, and atom1 from mask3, another angle between atom2 from mask1, atom2 from mask2, and atom2 from mask3, etc.)</p>
+<p>When used through the API, the changes are not flushed to the actual data in the prmtop unless you call remake_parm() on the object (this is done for performance reasons)</p>
+</div>
+<div class="section" id="setbond">
+<h3>setBond<a class="headerlink" href="#setbond" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>setBond &lt;mask1&gt; &lt;mask2&gt; &lt;k&gt; &lt;Req&gt;
+</pre></div>
+</div>
+<p>Changes (or adds a non-existent) bond in the topology file. Each mask must select the same number of atoms, and a bond will be placed between the atoms in mask1 and mask2 (one bond between atom1 from mask1 and atom1 from mask2 and another bond between atom2 from mask1 and atom2 from mask2, etc.)</p>
+<p>When used through the API, the changes are not flushed to the actual data in the prmtop unless you call remake_parm() on the object (this is done for performance reasons)</p>
+</div>
+<div class="section" id="setmolecules">
+<h3>setMolecules<a class="headerlink" href="#setmolecules" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>setMolecules [solute_ions True|False]
+</pre></div>
+</div>
+<p>Determines the molecularity of the system based on the bonding network and correctly determines the SOLVENT_POINTERS and ATOMS_PER_MOLECULE sections of the topology file. It will consider the ions to be part of the solute if True is passed or not if False is passed. Defaults to True.</p>
+</div>
+<div class="section" id="setoverwrite">
+<h3>setOverwrite<a class="headerlink" href="#setoverwrite" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>setOverwrite [True|False]
+</pre></div>
+</div>
+<p>Necessary to overwrite original topology file name.</p>
+</div>
+<div class="section" id="source">
+<h3>source<a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>source &lt;file&gt;
+</pre></div>
+</div>
+<p>Sources a file with a list of parmed commands</p>
+</div>
+<div class="section" id="strip">
+<h3>strip<a class="headerlink" href="#strip" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>strip &lt;mask&gt;
+</pre></div>
+</div>
+<p>Deletes the atoms specified by <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> from the topology file and rebuilds the topology file according to the parameters that remain.</p>
+</div>
+<div class="section" id="summary">
+<h3>summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>summary
+</pre></div>
+</div>
+<p>Prints out a summary of prmtop contents</p>
+</div>
+<div class="section" id="timerge">
+<h3>tiMerge<a class="headerlink" href="#timerge" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>tiMerge &lt;mol1mask&gt; &lt;mol2mask&gt; &lt;scmask1&gt; &lt;scmask2&gt; [&lt;scmask1N&gt;] [&lt;scmask2N&gt;] [tol &lt;tol&gt;]
+</pre></div>
+</div>
+<p>Merges molecules removing redundant bonding terms. Input amber masks corresponding to molecules 1/2 <tt class="docutils literal"><span class="pre">&lt;mol1mask&gt;/&lt;mol2mask&gt;</span></tt> and the soft core atoms in each molecule as <tt class="docutils literal"><span class="pre">&lt;scmask1&gt;/&lt;scmask2&gt;</span></tt> The input topology can be created using leap, with the two molecules to be merged adjacent to each other in residue number. This improves the efficiency for pmemd TI when only part of a molecule is being perturbed.</p>
+<p><tt class="docutils literal"><span class="pre">&lt;scmask1/2N&gt;</span></tt> are for softcore molecules that are not going to be merged. These options will just add these atoms to the timask output, correcting for any changes in atom number.</p>
+<p>This can also be used for non-softcore simulations, where <tt class="docutils literal"><span class="pre">&lt;scmask1&gt;/&lt;scmask2&gt;</span></tt> represent the perturbed atoms. The output will give the scmask1/scmask2 flags, which can just be ignored.</p>
+<p><tt class="docutils literal"><span class="pre">&lt;tol&gt;</span></tt> is the tolerence to use when matching coordinates (default 0.01). This is used when the atoms in molecules 1/2 are not in the same order and for checking the input coordinates.</p>
+</div>
+<div class="section" id="writefrcmod">
+<h3>writeFrcmod<a class="headerlink" href="#writefrcmod" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>writeFrcmod &lt;frcmod_name&gt;
+</pre></div>
+</div>
+<p>Writes an frcmod file from all of the parameters in the topology file.</p>
+</div>
+<div class="section" id="writeoff">
+<h3>writeOFF<a class="headerlink" href="#writeoff" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>writeOFF &lt;OFF_filename&gt;
+</pre></div>
+</div>
+<p>Writes an Amber OFF Library with all of the residues found in the topology</p>
+</div>
+</div>
+<div class="section" id="atom-selection-masks">
+<h2>Atom Selection Masks<a class="headerlink" href="#atom-selection-masks" title="Permalink to this headline">¶</a></h2>
+<p>Atoms within a system are selected according to the Amber mask specification.
+The selection syntax is described in detail in the Amber user&#8217;s manual, with
+numerous examples in the <em>cpptraj</em> and <em>ambmask</em> sections.  I will include a
+brief primer here for reference.</p>
+<div class="section" id="residue-selections">
+<h3>Residue Selections<a class="headerlink" href="#residue-selections" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">:</span></tt> character is used to select specific residues by name and/or number.
+The residues you wish to select may be a comma-separated list of numbers, number
+ranges, names, or a mixed list of both.  Note that the residue number selections
+apply to a numbering scheme in which the first residue is residue 1 and the
+numbers increment sequentially from there (<em>i.e.</em>, any original numbering in
+the starting file is ignored in standard mask selections). Examples are shown
+below:</p>
+<div class="highlight-none"><div class="highlight"><pre>:1-5,10,ALA,TYR
+:101
+:ASP,GLU,HIS,LYS,TYR
+</pre></div>
+</div>
+<p>The first example selects all atoms in residues 1 through 5, residue 10, and any
+residues with the names &#8220;ALA&#8221; or &#8220;TYR&#8221; in the system. The second example selects
+<em>only</em> residue number 101. The final mask selects all residues with names ASP,
+GLU, HIS, LYS, or TYR.</p>
+</div>
+<div class="section" id="atom-selections">
+<h3>Atom selections<a class="headerlink" href="#atom-selections" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">&#64;</span></tt> character is used to select specific atoms by name and/or number. The
+atoms you wish to select may be a comma-separated list of numbers, number
+ranges, names, or a mixed list of both. Like the residue selection above, atoms
+are numbered sequentially starting from 1. Examples are shown below:</p>
+<div class="highlight-none"><div class="highlight"><pre>@1-5,10,CA,CB
+@101
+@CA,CB,HA1,HA2,HA3
+</pre></div>
+</div>
+<p>The first example selects the first five atoms, the 10th atom, and all atoms
+with the names &#8220;CA&#8221; or &#8220;CB&#8221;. The second mask selects only the 101st atom. The
+final mask selects all atoms with names CA, CB, HA1, HA2, or HA3.</p>
+<p>Many atoms also have <em>type</em> names associated with them, that are often used to
+distinguish chemical environments. These are really just force field
+implementation details, as types often change between generations of force
+fields to allow for increased parameter fitting flexibility. However, the two
+characters <tt class="docutils literal"><span class="pre">&#64;%</span></tt> allow you to select atoms based on <em>type name</em> instead of
+name (note, integer indices have no meaning for atom <em>type names</em>, so every type
+in the list following <tt class="docutils literal"><span class="pre">&#64;%</span></tt> is interpreted as a string-like name).  Examples
+include:</p>
+<div class="highlight-none"><div class="highlight"><pre>@%CT,CX
+@%N,H
+</pre></div>
+</div>
+<p>The first example selects all atom <em>types</em> with the label &#8220;CT&#8221; or &#8220;CX&#8221;, while
+the second chooses the atom types &#8220;N&#8221; or &#8220;H&#8221;.</p>
+</div>
+<div class="section" id="wild-cards">
+<h3>Wild-cards<a class="headerlink" href="#wild-cards" title="Permalink to this headline">¶</a></h3>
+<p>You can also use so-called <em>wild-cards</em> when selecting atoms. For instance,
+suppose you want to select all hydrogen atoms, which you know all start with the
+letter &#8216;H&#8217;, or all carbons which you know start with &#8216;C&#8217;. The following masks
+will do these two tasks:</p>
+<p>The &#8220;=&#8221; character works as a wild-card, as does the &#8216;*&#8217; (so the above examples
+could have been written with a &#8216;*&#8217; instead). If either &#8216;=&#8217; or &#8216;*&#8217; is part of the
+atom name, you can use the &#8220;&#8221; character to escape it and have the mask parser
+interpret it as a character literal.</p>
+</div>
+<div class="section" id="residue-atom-selections">
+<h3>Residue-Atom Selections<a class="headerlink" href="#residue-atom-selections" title="Permalink to this headline">¶</a></h3>
+<p>A frequent requirement is to select all atoms of a particular <em>name</em> from a
+given residue (or set of residues). This can be done with the <tt class="docutils literal"><span class="pre">|</span></tt> binary
+operator (see below), but it is so common that there is a shortcut for doing
+this, shown below:</p>
+<div class="highlight-none"><div class="highlight"><pre>:ALA@CA,CB
+:ASP@OD=
+</pre></div>
+</div>
+<p>The first mask selects all CA and CB atoms from all ALA residues. The second
+selects all atoms whose names start with the two letters OD (such as OD1 and
+OD2) from all ASP residues.</p>
+</div>
+<div class="section" id="distance-based-masks">
+<h3>Distance-based masks<a class="headerlink" href="#distance-based-masks" title="Permalink to this headline">¶</a></h3>
+<p>Still other times you want to select all atoms (or all residues) within a
+particular <em>distance</em> around a particular subset of atoms. This syntax can be
+confusing, so I will try to walk through it carefully.</p>
+</div>
+</div>
+<div class="section" id="limited-embedded-python-interpreter">
+<h2>Limited Embedded Python Interpreter<a class="headerlink" href="#limited-embedded-python-interpreter" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">parmed.py</span></tt> also comes equipped with a fully-fledged Python interpreter under
+the hood.  You can run individual Python commands by starting the command with a
+bang (<tt class="docutils literal"><span class="pre">!</span></tt>).  A double-bang (<tt class="docutils literal"><span class="pre">!!</span></tt>) indicates to <tt class="docutils literal"><span class="pre">parmed.py</span></tt> that a
+multi-line Python code segment follows, and to interpret everything that comes
+afterwards as Python code until another double-bang line (<tt class="docutils literal"><span class="pre">!!</span></tt>) appears. If
+you are typing at the prompt inside the interpreter, the prompt changes to
+<tt class="docutils literal"><span class="pre">py</span> <span class="pre">&gt;&gt;&gt;</span></tt> to indicate you are in the Python interpreter.</p>
+<p>Note that running Python code can be insecure if the source of that code is
+untrusted.  As a result, <tt class="docutils literal"><span class="pre">parmed.py</span></tt> will refuse to execute raw Python code
+unless you explicitly give the interpreter permission to do so with the <tt class="docutils literal"><span class="pre">-e</span></tt>
+command-line flag.</p>
+<p>A simple example is shown below (input follows the prompts <tt class="docutils literal"><span class="pre">&gt;</span></tt> and <tt class="docutils literal"><span class="pre">py</span>
+<span class="pre">&gt;&gt;&gt;</span></tt>):</p>
+<div class="highlight-none"><div class="highlight"><pre>$ parmed.py -e
+
+                                  /^^^/           /]
+                                 /   ]           / ]
+                         _______/    ]___       /  ]
+                        /                \_____/   /
+                      _/   [@]  \ \                \
+                     /..         | |                ]
+                      VVVvvv\    | |         _/\    ]
+          P A R M E D       |               /    \  ]
+                     AAA^^^^^              /       \]
+                      \_________\   \_____/
+                                \    \
+                                 \____\
+
+ParmEd: a Parameter file Editor
+
+
+Reading input from STDIN...
+&gt; !!
+py &gt;&gt;&gt; def print_hello_world():
+py &gt;&gt;&gt;     print &quot;Hello World&quot;
+py &gt;&gt;&gt;
+py &gt;&gt;&gt; print_hello_world()
+py &gt;&gt;&gt; !!
+Hello World
+&gt; !print &quot;7 + 4 = %d&quot; % (7 + 4)
+7 + 4 = 11
+</pre></div>
+</div>
+<p>Notice that immediately after the closing <tt class="docutils literal"><span class="pre">!!</span></tt> in the first Python code block,
+the Python code is executed. The interpreter takes the entire code typed between
+the <tt class="docutils literal"><span class="pre">!!</span></tt> lines and interprets it as one string, preserving indentation, then
+executes it.  On the other hand, a single <tt class="docutils literal"><span class="pre">!</span></tt> immediately runs that one line
+of Python.</p>
+<p>One &#8220;gotcha&#8221; here is that Python objects that you create in this interpreter are
+not persistent&#8212;that is, the function <tt class="docutils literal"><span class="pre">print_hello_world</span></tt> no longer exists
+after that code block closes, so you can&#8217;t use it in a later Python code block:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; !print_hello_world()
+NameError: name &#39;print_hello_world&#39; is not defined
+</pre></div>
+</div>
+<p>So the lesson here is that you either need to be able to encapsulate all Python
+activity in a single code block, use the ParmEd API directly in your own Python
+script, or make use of <a class="reference internal" href="#a-very-dirty-trick">A very dirty trick</a> that should make any Pythonista
+wince.</p>
+<p>Perhaps of the most importance, however, is that the topology file list is made
+available to you in the Python interpreter namespace as the name
+<tt class="docutils literal"><span class="pre">amber_prmtop</span></tt>, which is an instance of <a class="reference internal" href="api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList" title="ParmedTools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a>. So <tt class="docutils literal"><span class="pre">amber_prmtop.parm</span></tt> is the currently
+active parameter-topology object.</p>
+<p>Let&#8217;s have a look at how we might be able to use that:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; !print amber_prmtop.parm.bonds[0].type
+&lt;BondType; k=570.000, Req=1.229&gt;
+&gt; !!
+py &gt;&gt;&gt; amber_prmtop.parm.bonds[0].type.k = 500.0
+py &gt;&gt;&gt; print amber_prmtop.parm.bonds[0].type
+py &gt;&gt;&gt; print amber_prmtop.parm.bonds[0]
+py &gt;&gt;&gt; !!
+&lt;BondType; k=500.000, Req=1.229&gt;
+&lt;Bond &lt;Atom C [11]; In SER 0&gt;--&lt;Atom O [12]; In SER 0&gt;; type=&lt;BondType; k=500.000, Req=1.229&gt;&gt;
+&gt; printBonds @12 @13
+Atom 1               Atom 2               R eq       Frc Cnst
+     12    C (   C)      13    O (   O)     1.2290   500.0000
+</pre></div>
+</div>
+<p>Notice here how we changed our active prmtop by changing the bond force constant
+of the first bond in the system (between atoms 12 and 13 when indexing from 1)
+from 570 kcal/mol to 500 kcal/mol!</p>
+<div class="section" id="a-very-dirty-trick">
+<h3>A very dirty trick<a class="headerlink" href="#a-very-dirty-trick" title="Permalink to this headline">¶</a></h3>
+<p>There is a small trick you can play to get objects you create to persist. I only
+include this section because I find it entertaining and a possibly helpful
+pedagogical diversion. I would <em>highly</em> recommend that you use the ParmEd API in
+your own script before resorting to anything shown in this section.</p>
+<p>The three objects available to you are <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt>, <tt class="docutils literal"><span class="pre">line</span></tt>, and <tt class="docutils literal"><span class="pre">self</span></tt>.
+The <tt class="docutils literal"><span class="pre">line</span></tt> object is the currently parsed input line (not very useful), and
+<tt class="docutils literal"><span class="pre">self</span></tt> is the instance of the Python interpreter that is collecting your
+input (and will be destroyed after the interpreter is finished).</p>
+<p>So the only object that will persist past the destruction of the temporary
+Python interpreter is <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt> (and <tt class="docutils literal"><span class="pre">type(self)</span></tt>, but only in Python
+3, since it is an old-style class in Python 2 by virtue of deriving from
+<tt class="docutils literal"><span class="pre">cmd.Cmd</span></tt>).</p>
+<p>So you can attach your function to the <a class="reference internal" href="api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList" title="ParmedTools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a> object <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt> and retrieve it from
+there later.  Be careful not to clobber a critical attribute of that class,
+though!  This trick is demonstrated continuing from the interpreter session from
+above:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; !!
+py &gt;&gt;&gt; def print_hello_world():
+py &gt;&gt;&gt;     print &quot;Hello world!&quot;
+py &gt;&gt;&gt;
+py &gt;&gt;&gt; amber_prmtop.custom_func = print_hello_world
+py &gt;&gt;&gt; !!
+&gt; !amber_prmtop.custom_func()
+Hello world!
+</pre></div>
+</div>
+<p>Notice that by keeping a reference to our function in the <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt>
+namespace, we could refer back to it later.</p>
+<p>The clever Pythonista could figure out how to use other introspective commands
+to gain control of other mechanisms as well&#8212;for instance, I used to disallow
+import by blocking <tt class="docutils literal"><span class="pre">import</span> <span class="pre">foo</span></tt> or <tt class="docutils literal"><span class="pre">from</span> <span class="pre">foo</span> <span class="pre">import</span> <span class="pre">bar</span></tt>, but quickly found
+that this alternative also worked:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; !!
+py &gt;&gt;&gt; sys = __builtins__[&#39;__import__&#39;](&#39;sys&#39;)
+py &gt;&gt;&gt; print repr(sys.version_info)
+py &gt;&gt;&gt; !!
+sys.version_info(major=2, minor=7, micro=9, releaselevel=&#39;final&#39;, serial=0)
+</pre></div>
+</div>
+<p>So it seemed rather fruitless to prohibit behavior that was so easy to work
+around!</p>
+</div>
+</div>
+</div>
+<div class="section" id="using-xparmed-py">
+<h1>Using <tt class="docutils literal"><span class="pre">xparmed.py</span></tt><a class="headerlink" href="#using-xparmed-py" title="Permalink to this headline">¶</a></h1>
+<p>An alternative to running the command-line-based <tt class="docutils literal"><span class="pre">parmed.py</span></tt> program is to use
+the <em>Tkinter</em>-based GUI front-end, <tt class="docutils literal"><span class="pre">xparmed.py</span></tt>.  Note that not all actions
+have been implemented in <tt class="docutils literal"><span class="pre">xparmed.py</span></tt>&#8212;if the one you need gives a message to
+this effect, you will need to use <tt class="docutils literal"><span class="pre">parmed.py</span></tt> instead.</p>
+<p><tt class="docutils literal"><span class="pre">xparmed.py</span></tt> is significantly more limited.  It cannot be scripted, and it
+cannot process multiple topology files in the same session.  It may, however,
+help you learn ParmEd better as well as lessen the learning curve for performing
+basic tasks.</p>
+<p>You can find more extensive documentation <a class="reference external" href="http://jswails.wikidot.com/parmed#toc3">by clicking here to go to my wiki</a>.</p>
+<p>You can right-click on any of the buttons to get the same help printed above on
+that action.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt></a><ul>
+<li><a class="reference internal" href="#command-syntax">Command syntax</a></li>
+<li><a class="reference internal" href="#available-commands">Available commands</a><ul>
+<li><a class="reference internal" href="#add12-6-4">add12_6_4</a></li>
+<li><a class="reference internal" href="#addatomicnumber">addAtomicNumber</a></li>
+<li><a class="reference internal" href="#adddihedral">addDihedral</a></li>
+<li><a class="reference internal" href="#addexclusions">addExclusions</a></li>
+<li><a class="reference internal" href="#addljtype">addLJType</a></li>
+<li><a class="reference internal" href="#addpdb">addPDB</a></li>
+<li><a class="reference internal" href="#cd">cd</a></li>
+<li><a class="reference internal" href="#chamber">chamber</a></li>
+<li><a class="reference internal" href="#change">change</a></li>
+<li><a class="reference internal" href="#changelj14pair">changeLJ14Pair</a></li>
+<li><a class="reference internal" href="#changeljpair">changeLJPair</a></li>
+<li><a class="reference internal" href="#changeljsingletype">changeLJSingleType</a></li>
+<li><a class="reference internal" href="#changeprotstate">changeProtState</a></li>
+<li><a class="reference internal" href="#changeradii">changeRadii</a></li>
+<li><a class="reference internal" href="#checkvalidity">checkValidity</a></li>
+<li><a class="reference internal" href="#definesolvent">defineSolvent</a></li>
+<li><a class="reference internal" href="#deletebond">deleteBond</a></li>
+<li><a class="reference internal" href="#deletedihedral">deleteDihedral</a></li>
+<li><a class="reference internal" href="#deletepdb">deletePDB</a></li>
+<li><a class="reference internal" href="#energy">energy</a></li>
+<li><a class="reference internal" href="#go">go</a></li>
+<li><a class="reference internal" href="#help">help</a></li>
+<li><a class="reference internal" href="#hmassrepartition">HMassRepartition</a></li>
+<li><a class="reference internal" href="#interpolate">interpolate</a></li>
+<li><a class="reference internal" href="#listparms">listParms</a></li>
+<li><a class="reference internal" href="#lmod">lmod</a></li>
+<li><a class="reference internal" href="#loadrestrt">loadRestrt</a></li>
+<li><a class="reference internal" href="#ls">ls</a></li>
+<li><a class="reference internal" href="#minimize">minimize</a></li>
+<li><a class="reference internal" href="#netcharge">netCharge</a></li>
+<li><a class="reference internal" href="#openmm">OpenMM</a></li>
+<li><a class="reference internal" href="#outparm">outparm</a></li>
+<li><a class="reference internal" href="#parm">parm</a></li>
+<li><a class="reference internal" href="#parmout">parmout</a></li>
+<li><a class="reference internal" href="#printangles">printAngles</a></li>
+<li><a class="reference internal" href="#printbonds">printBonds</a></li>
+<li><a class="reference internal" href="#printdetails">printDetails</a></li>
+<li><a class="reference internal" href="#printdihedrals">printDihedrals</a></li>
+<li><a class="reference internal" href="#printflags">printFlags</a></li>
+<li><a class="reference internal" href="#printinfo">printInfo</a></li>
+<li><a class="reference internal" href="#printljmatrix">printLJMatrix</a></li>
+<li><a class="reference internal" href="#printljtypes">printLJTypes</a></li>
+<li><a class="reference internal" href="#printpointers">printPointers</a></li>
+<li><a class="reference internal" href="#quit">quit</a></li>
+<li><a class="reference internal" href="#scale">scale</a></li>
+<li><a class="reference internal" href="#scee">scee</a></li>
+<li><a class="reference internal" href="#scnb">scnb</a></li>
+<li><a class="reference internal" href="#setangle">setAngle</a></li>
+<li><a class="reference internal" href="#setbond">setBond</a></li>
+<li><a class="reference internal" href="#setmolecules">setMolecules</a></li>
+<li><a class="reference internal" href="#setoverwrite">setOverwrite</a></li>
+<li><a class="reference internal" href="#source">source</a></li>
+<li><a class="reference internal" href="#strip">strip</a></li>
+<li><a class="reference internal" href="#summary">summary</a></li>
+<li><a class="reference internal" href="#timerge">tiMerge</a></li>
+<li><a class="reference internal" href="#writefrcmod">writeFrcmod</a></li>
+<li><a class="reference internal" href="#writeoff">writeOFF</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#atom-selection-masks">Atom Selection Masks</a><ul>
+<li><a class="reference internal" href="#residue-selections">Residue Selections</a></li>
+<li><a class="reference internal" href="#atom-selections">Atom selections</a></li>
+<li><a class="reference internal" href="#wild-cards">Wild-cards</a></li>
+<li><a class="reference internal" href="#residue-atom-selections">Residue-Atom Selections</a></li>
+<li><a class="reference internal" href="#distance-based-masks">Distance-based masks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#limited-embedded-python-interpreter">Limited Embedded Python Interpreter</a><ul>
+<li><a class="reference internal" href="#a-very-dirty-trick">A very dirty trick</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-xparmed-py">Using <tt class="docutils literal"><span class="pre">xparmed.py</span></tt></a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/parmed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed_api.html" title="The ParmEd API"
+             >next</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

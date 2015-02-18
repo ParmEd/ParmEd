@@ -1,0 +1,929 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.unit.quantity &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="chemistry.unit" href="../unit.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" accesskey="U">chemistry.unit</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.unit.quantity</h1><div class="highlight"><pre>
+<span class="c">#!/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module simtk.unit.quantity</span>
+
+<span class="sd">Physical quantities with units, intended to produce similar functionality</span>
+<span class="sd">to Boost.Units package in C++ (but with a runtime cost).</span>
+<span class="sd">Uses similar API as Scientific.Physics.PhysicalQuantities</span>
+<span class="sd">but different internals to satisfy our local requirements.</span>
+<span class="sd">In particular, there is no underlying set of &#39;canonical&#39; base</span>
+<span class="sd">units, whereas in Scientific.Physics.PhysicalQuantities all</span>
+<span class="sd">units are secretly in terms of SI units.  Also, it is easier</span>
+<span class="sd">to add new fundamental dimensions to simtk.dimensions.  You</span>
+<span class="sd">might want to make new dimensions for, say, &quot;currency&quot; or</span>
+<span class="sd">&quot;information&quot;.</span>
+
+<span class="sd">Some features of this implementation:</span>
+<span class="sd">  * Quantities are a combination of a value and a unit.  The value</span>
+<span class="sd">    part can be any python type, including numbers, lists, numpy</span>
+<span class="sd">    arrays, and anything else.  The unit part must be a simtk.unit.Unit.</span>
+<span class="sd">  * Operations like adding incompatible units raises an error.</span>
+<span class="sd">  * Multiplying or dividing units/quantities creates new units.</span>
+<span class="sd">  * Users can create new Units and Dimensions, but most of the useful</span>
+<span class="sd">    ones are predefined.</span>
+<span class="sd">  * Conversion factors between units are applied transitively, so all</span>
+<span class="sd">    possible conversions are available.</span>
+<span class="sd">  * I want dimensioned Quantities that are compatible with numpy arrays,</span>
+<span class="sd">    but do not necessarily require the python numpy package. In other</span>
+<span class="sd">    words, Quantities can be based on either numpy arrays or on built in</span>
+<span class="sd">    python types.</span>
+<span class="sd">  * Units are NOT necessarily stored in terms of SI units internally.</span>
+<span class="sd">    This is very important for me, because one important application</span>
+<span class="sd">    area for us is at the molecular scale. Using SI units internally</span>
+<span class="sd">    can lead to exponent overflow in commonly used molecular force</span>
+<span class="sd">    calculations. Internally, all unit systems are equally fundamental</span>
+<span class="sd">    in SimTK.</span>
+
+<span class="sd">Two possible enhancements that have not been implemented are</span>
+<span class="sd">  1) Include uncertainties with propagation of errors</span>
+<span class="sd">  2) Incorporate offsets for celsius &lt;-&gt; kelvin conversion</span>
+
+
+
+<span class="sd">This is part of the OpenMM molecular simulation toolkit originating from</span>
+<span class="sd">Simbios, the NIH National Center for Physics-Based Simulation of</span>
+<span class="sd">Biological Structures at Stanford, funded under the NIH Roadmap for</span>
+<span class="sd">Medical Research, grant U54 GM072970. See https://simtk.org.</span>
+
+<span class="sd">Portions copyright (c) 2012 Stanford University and the Authors.</span>
+<span class="sd">Authors: Christopher M. Bruns</span>
+<span class="sd">Contributors: Peter Eastman</span>
+
+<span class="sd">Permission is hereby granted, free of charge, to any person obtaining a</span>
+<span class="sd">copy of this software and associated documentation files (the &quot;Software&quot;),</span>
+<span class="sd">to deal in the Software without restriction, including without limitation</span>
+<span class="sd">the rights to use, copy, modify, merge, publish, distribute, sublicense,</span>
+<span class="sd">and/or sell copies of the Software, and to permit persons to whom the</span>
+<span class="sd">Software is furnished to do so, subject to the following conditions:</span>
+
+<span class="sd">The above copyright notice and this permission notice shall be included in</span>
+<span class="sd">all copies or substantial portions of the Software.</span>
+
+<span class="sd">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="sd">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="sd">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</span>
+<span class="sd">THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,</span>
+<span class="sd">DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR</span>
+<span class="sd">OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE</span>
+<span class="sd">USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.5&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">unit</span> <span class="kn">import</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">is_unit</span><span class="p">,</span> <span class="n">dimensionless</span>
+
+<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Physical quantity, such as 1.3 meters per second.</span>
+
+<span class="sd">    Quantities contain both a value, such as 1.3; and a unit,</span>
+<span class="sd">    such as &#39;meters per second&#39;.</span>
+
+<span class="sd">    Supported value types include:</span>
+<span class="sd">      1 - numbers (float, int, long)</span>
+<span class="sd">      2 - lists of numbers, e.g. [1,2,3]</span>
+<span class="sd">      3 - tuples of numbers, e.g. (1,2,3)</span>
+<span class="sd">            Note - unit conversions will cause tuples to be converted to lists</span>
+<span class="sd">      4 - lists of tuples of numbers, lists of lists of ... etc. of numbers</span>
+<span class="sd">      5 - numpy.arrays</span>
+
+<span class="sd">    Create numpy.arrays with units using the Quantity constructor, not the</span>
+<span class="sd">    multiply operator.  e.g.</span>
+
+<span class="sd">      Quantity(numpy.array([1,2,3]), centimeters) # correct</span>
+
+<span class="sd">        *NOT*</span>
+
+<span class="sd">      numpy.array([1,2,3]) * centimeters # won&#39;t work</span>
+
+<span class="sd">    because numpy.arrays already overload the multiply operator for EVERYTHING.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new Quantity from a value and a unit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">         - value: (any type, usually a number) Measure of this quantity</span>
+<span class="sd">         - unit: (Unit) the physical unit, e.g. simtk.unit.meters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># When no unit is specified, bend over backwards to handle all one-argument possibilities</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># one argument version, copied from UList</span>
+            <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="c"># Unit argument creates an empty list with that unit attached</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="c"># Ulist of a Quantity is just the Quantity itself</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">unit</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">_value</span>
+            <span class="k">elif</span> <span class="n">_is_string</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Is value a container?</span>
+                <span class="n">is_container</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">is_container</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">if</span> <span class="n">is_container</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">first_item</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                        <span class="c"># Avoid infinite recursion for string, because a one-character</span>
+                        <span class="c"># string is its own first element</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">isstr</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="n">first_item</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="c"># For numpy, value == first_item returns a numpy</span>
+                            <span class="c"># array of booleans, which cannot be evaluated for</span>
+                            <span class="c"># truthiness (a ValueError is raised). So in this</span>
+                            <span class="c"># case, we don&#39;t have a string</span>
+                            <span class="n">isstr</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="k">if</span> <span class="n">isstr</span><span class="p">:</span>
+                            <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">unit</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">first_item</span><span class="p">)</span><span class="o">.</span><span class="n">unit</span>
+                     <span class="c"># Notice that tuples, lists, and numpy.arrays can all be initialized with a list</span>
+                    <span class="n">new_container</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">([],</span> <span class="n">unit</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">new_container</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Quantity</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="c"># Strips off units into list new_container._value</span>
+                    <span class="c"># __class__ trick does not work for numpy.arrays</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="kn">import</span> <span class="nn">numpy</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_container</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c"># delegate contruction to container class from list</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">new_container</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                        <span class="c"># delegate contruction to container class from list</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">new_container</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># Non-Quantity, non container</span>
+                    <span class="c"># Wrap in a dimensionless Quantity</span>
+                    <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+        <span class="c"># Accept simple scalar quantities as units</span>
+        <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">_value</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">unit</span>
+        <span class="c"># Use empty list for unspecified values</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;_value&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shallow copy produces a new Quantity with the shallow copy of value and the same unit.</span>
+<span class="sd">        Because we want copy operations to work just the same way they would on the underlying value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deep copy produces a new Quantity with a deep copy of the value, and the same unit.</span>
+<span class="sd">        Because we want copy operations to work just the same way they would on the underlying value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">memo</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delegate unrecognized attribute calls to the underlying value type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret_val</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Printable string version of this Quantity.</span>
+
+<span class="sd">        Returns a string consisting of quantity number followed by unit abbreviation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">Quantity</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&#39;(value=&#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;, unit=&#39;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">format_spec</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">())</span>
+</div>
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add two Quantities.</span>
+
+<span class="sd">        Only Quantities with the same dimensions (e.g. length)</span>
+<span class="sd">        can be added.  Raises TypeError otherwise.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">         - self: left hand member of sum</span>
+<span class="sd">         - other: right hand member of sum</span>
+
+<span class="sd">        Returns a new Quantity that is the sum of the two arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># can only add using like units</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Cannot add two quantities with incompatible units &quot;</span><span class="si">%s</span><span class="s">&quot; and &quot;</span><span class="si">%s</span><span class="s">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Subtract two Quantities.</span>
+
+<span class="sd">        Only Quantities with the same dimensions (e.g. length)</span>
+<span class="sd">        can be subtracted.  Raises TypeError otherwise.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">         - self: left hand member (a) of a - b.</span>
+<span class="sd">         - other: right hand member (b) of a - b.</span>
+
+<span class="sd">        Returns a new Quantity that is the difference of the two arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Cannot subtract two quantities with incompatible units &quot;</span><span class="si">%s</span><span class="s">&quot; and &quot;</span><span class="si">%s</span><span class="s">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compares two quantities.</span>
+
+<span class="sd">        Raises TypeError if the Quantities are of different dimension (e.g. length vs. mass)</span>
+
+<span class="sd">        Returns True if self &lt; other, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+
+    <span class="n">_reduce_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Quantity.reduce_unit"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.reduce_unit">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">guide_unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combine similar component units and scale, to form an</span>
+<span class="sd">        equal Quantity in simpler units.</span>
+
+<span class="sd">        Returns underlying value type if unit is dimensionless.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">guide_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">Quantity</span><span class="o">.</span><span class="n">_reduce_cache</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">value_factor</span><span class="p">)</span> <span class="o">=</span> <span class="n">Quantity</span><span class="o">.</span><span class="n">_reduce_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">canonical_units</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># dict of dimensionTuple: (Base/ScaledUnit, exponent)</span>
+            <span class="c"># Bias result toward guide units</span>
+            <span class="k">if</span> <span class="n">guide_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">guide_unit</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_dimension_tuple</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">canonical_units</span><span class="p">:</span>
+                        <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_dimension_tuple</span><span class="p">()</span>
+                <span class="c"># Take first unit found in a dimension as canonical</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">canonical_units</span><span class="p">:</span>
+                    <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">exponent</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value_factor</span> <span class="o">*=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="n">exponent</span><span class="p">)</span>
+                    <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">exponent</span>
+            <span class="n">new_base_units</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">canonical_units</span><span class="p">:</span>
+                <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="o">=</span> <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_base_units</span>
+                    <span class="n">new_base_units</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+            <span class="c"># Create new unit</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_base_units</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">new_base_units</span><span class="p">)</span>
+            <span class="c"># There might be a factor due to unit conversion, even though unit is dimensionless</span>
+            <span class="c"># e.g. suppose unit is meter/centimeter</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">():</span>
+                <span class="n">unit_factor</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">dimensionless</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">unit_factor</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">value_factor</span> <span class="o">*=</span> <span class="n">unit_factor</span>
+                    <span class="c"># print &quot;value_factor = %s&quot; % value_factor</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+            <span class="n">Quantity</span><span class="o">.</span><span class="n">_reduce_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">value_factor</span><span class="p">)</span>
+        <span class="c"># Create Quantity, then scale (in case value is a container)</span>
+        <span class="c"># That&#39;s why we don&#39;t just scale the value.</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value_factor</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="c"># __mul__ strips off dimensionless, if appropriate</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">value_factor</span>
+        <span class="k">if</span> <span class="n">unit</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">unit</span> <span class="ow">is</span> <span class="n">dimensionless</span> <span class="c"># should have been set earlier in this method</span>
+            <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</div>
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Multiply a quantity by another object</span>
+
+<span class="sd">        Returns a new Quantity that is the product of the self * other,</span>
+<span class="sd">        unless the resulting unit is dimensionless, in which case the</span>
+<span class="sd">        underlying value type is returned, instead of a Quantity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;quantity * unit&quot;</span>
+            <span class="c"># Many other mul/div operations delegate to here because I was debugging</span>
+            <span class="c"># a dimensionless unit conversion problem, which I ended up fixing within</span>
+            <span class="c"># the reduce_unit() method.</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">*</span> <span class="n">other</span>
+            <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">reduce_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;quantity * quantity&quot;</span>
+            <span class="c"># Situations where the units cancel can result in scale factors from the unit cancellation.</span>
+            <span class="c"># To simplify things, delegate Quantity * Quantity to (Quantity * scalar) * unit</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># print &quot;quantity * scalar&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_units_with_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">post_multiply</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="c"># value type might not be commutative for multiplication</span>
+    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Multiply a scalar by a Quantity</span>
+
+<span class="sd">        Returns a new Quantity with the same units as self, but with the value</span>
+<span class="sd">        multiplied by other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;programmer is surprised __rmul__ was called instead of __mul__&#39;</span><span class="p">)</span>
+            <span class="c"># print &quot;R unit * quantity&quot;</span>
+        <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;R quantity * quantity&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;programmer is surprised __rmul__ was called instead of __mul__&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># print &quot;scalar * quantity&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_units_with_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">post_multiply</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="c"># return Quantity(other * self._value, self.unit)</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Divide a Quantity by another object</span>
+
+<span class="sd">        Returns a new Quantity, unless the resulting unit type is dimensionless,</span>
+<span class="sd">        in which case the underlying value type is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;quantity / unit&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="c"># unit = self.unit / other</span>
+            <span class="c"># return Quantity(self._value, unit).reduce_unit(self.unit)</span>
+        <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;quantity / quantity&quot;</span>
+            <span class="c"># Delegate quantity/quantity to (quantity/scalar)/unit</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">/</span><span class="n">other</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># print &quot;quantity / scalar&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="c"># return Quantity(self._value / other, self.unit)</span>
+
+    <span class="n">__div__</span> <span class="o">=</span> <span class="n">__truediv__</span>
+
+    <span class="k">def</span> <span class="nf">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Divide a scalar by a quantity.</span>
+
+<span class="sd">        Returns a new Quantity.  The resulting units are the inverse of the self argument units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="c"># print &quot;R unit / quantity&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;programmer is surprised __rtruediv__ was called instead of __truediv__&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;programmer is surprised __rtruediv__ was called instead of __truediv__&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># print &quot;R scalar / quantity&quot;</span>
+            <span class="k">return</span> <span class="n">other</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="c"># return Quantity(other / self._value, pow(self.unit, -1.0))</span>
+
+    <span class="n">__rdiv__</span> <span class="o">=</span> <span class="n">__rtruediv__</span>
+
+    <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise a Quantity to a power.</span>
+
+<span class="sd">        Generally both the value and the unit of the Quantity are affected by this operation.</span>
+
+<span class="sd">        Returns a new Quantity equal to self**exponent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">exponent</span><span class="p">),</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Quantity.sqrt"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.sqrt">[docs]</a>    <span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns square root of a Quantity.</span>
+
+<span class="sd">        Raises ArithmeticError if component exponents are not even.</span>
+<span class="sd">        This behavior can be changed if you present a reasonable real life case to me.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># There might be a conversion factor from taking the square root of the unit</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="n">new_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+        <span class="n">unit_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">new_unit</span><span class="o">*</span><span class="n">new_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unit_factor</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">new_value</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">unit_factor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">new_value</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">new_unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.sum"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the sum of a sequence, with the result having the same unit as</span>
+<span class="sd">        the current sequence.</span>
+
+<span class="sd">        If the value is not iterable, it raises a TypeError (same behavior as if</span>
+<span class="sd">        you tried to iterate over, for instance, an integer).</span>
+
+<span class="sd">        This function can take as arguments any arguments recognized by</span>
+<span class="sd">        `numpy.sum`. If arguments are passed to a non-numpy array, a TypeError</span>
+<span class="sd">        is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># This will be much faster for numpy arrays</span>
+            <span class="n">mysum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unsupported arguments for Quantity.sum&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mysum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mysum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)):</span>
+                    <span class="n">mysum</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mysum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.mean"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the mean of a sequence, with the result having the same unit as</span>
+<span class="sd">        the current sequence.</span>
+
+<span class="sd">        If the value is not iterable, it raises a TypeError</span>
+
+<span class="sd">        This function can take as arguments any arguments recognized by</span>
+<span class="sd">        `numpy.mean`. If arguments are passed to a non-numpy array, a TypeError</span>
+<span class="sd">        is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># Faster for numpy arrays</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unsupported arguments for Quantity.mean&#39;</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">))</span><span class="o">.</span><span class="n">_value</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.std"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.std">[docs]</a>    <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the square root of the variance of a sequence, with the result</span>
+<span class="sd">        having the same unit as the current sequence.</span>
+
+<span class="sd">        If the value is not iterable, it raises a TypeError</span>
+
+<span class="sd">        This function can take as arguments any arguments recognized by</span>
+<span class="sd">        `numpy.std`. If arguments are passed to a non-numpy array, a TypeError</span>
+<span class="sd">        is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># Faster for numpy arrays</span>
+            <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unsupported arguments for Quantity.std&#39;</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">_value</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="n">val</span>
+                <span class="n">var</span> <span class="o">+=</span> <span class="n">res</span> <span class="o">*</span> <span class="n">res</span>
+            <span class="n">var</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="n">std</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.max"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the maximum value of the sequence, with the result having the</span>
+<span class="sd">        same unit as the current sequence.</span>
+
+<span class="sd">        If the value is not iterable, it raises a TypeError</span>
+
+<span class="sd">        This function can take as arguments any arguments recognized by</span>
+<span class="sd">        `numpy.max`. If arguments are passed to a non-numpy array, a TypeError</span>
+<span class="sd">        is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># Faster for numpy arrays</span>
+            <span class="n">mymax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unsupported arguments for Quantity.max&#39;</span><span class="p">)</span>
+            <span class="n">mymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mymax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.min"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the minimum value of the sequence, with the result having the</span>
+<span class="sd">        same unit as the current sequence.</span>
+
+<span class="sd">        If the value is not iterable, it raises a TypeError</span>
+
+<span class="sd">        This function can take as arguments any arguments recognized by</span>
+<span class="sd">        `numpy.min`. If arguments are passed to a non-numpy array, a TypeError</span>
+<span class="sd">        is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># Faster for numpy arrays</span>
+            <span class="n">mymin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unsupported arguments for Quantity.min&#39;</span><span class="p">)</span>
+            <span class="n">mymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mymin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.reshape"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.reshape">[docs]</a>    <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Same as numpy.ndarray.reshape, except the result is a Quantity with the</span>
+<span class="sd">        same units as the current object rather than a plain numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&#39;Only numpy array Quantity objects can be &#39;</span>
+                                 <span class="s">&#39;reshaped&#39;</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return absolute value of a Quantity.</span>
+
+<span class="sd">        The unit is unchanged.  A negative value of self will result in a positive value</span>
+<span class="sd">        in the result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a reference to self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="o">+</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Negate a Quantity.</span>
+
+<span class="sd">        Returns a new Quantity with a different sign on the value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if value underlying Quantity is zero, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__complex__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__long__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.value_in_unit"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.value_in_unit">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns underlying value, in the specified units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_units_of</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">_value</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># naked dimensionless</span>
+            <span class="k">return</span> <span class="n">val</span>
+</div>
+<div class="viewcode-block" id="Quantity.value_in_unit_system"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.value_in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the underlying value type, after conversion to a particular unit system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_unit_system</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span> <span class="c"># dimensionless</span>
+</div>
+<div class="viewcode-block" id="Quantity.in_unit_system"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new Quantity equal to this one, expressed in a particular unit system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_units</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">express_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_units_with_factor</span><span class="p">(</span><span class="n">new_units</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Quantity.in_units_of"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.in_units_of">[docs]</a>    <span class="k">def</span> <span class="nf">in_units_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an equal Quantity expressed in different units.</span>
+
+<span class="sd">        If the units are the same as those in self, a reference to self is returned.</span>
+<span class="sd">        Raises a TypeError if the new unit is not compatible with the original unit.</span>
+
+<span class="sd">        The post_multiply argument is used in case the multiplication operation is not commutative.</span>
+<span class="sd">          i.e. result = factor * value when post_multiply is False</span>
+<span class="sd">          and  result = value * factor when post_multiply is True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other_unit</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unit &quot;</span><span class="si">%s</span><span class="s">&quot; is not compatible with Unit &quot;</span><span class="si">%s</span><span class="s">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other_unit</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">other_unit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_units_with_factor</span><span class="p">(</span><span class="n">other_unit</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_change_units_with_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_unit</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">post_multiply</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="c"># numpy arrays cannot be compared with 1.0, so just &quot;try&quot;</span>
+        <span class="n">factor_is_identity</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">factor</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">):</span>
+                <span class="n">factor_is_identity</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">factor_is_identity</span><span class="p">:</span>
+            <span class="c"># No multiplication required</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="n">new_unit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># multiply operator, if it exists, is preferred</span>
+                <span class="k">if</span> <span class="n">post_multiply</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*</span> <span class="n">factor</span> <span class="c"># works for number, numpy.array, or vec3, e.g.</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="c"># works for number, numpy.array, or vec3, e.g.</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_unit</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">post_multiply</span><span class="p">),</span> <span class="n">new_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">new_unit</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_scale_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">post_multiply</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">post_multiply</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">*</span><span class="n">factor</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">factor</span><span class="o">*</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">post_multiply</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">x</span><span class="o">*</span><span class="n">factor</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                            <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">factor</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">factor</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                            <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale_sequence</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">post_multiply</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                        <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">factor</span><span class="p">,</span> <span class="n">post_multiply</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+
+
+    <span class="c">####################################</span>
+    <span class="c">### Sequence methods of Quantity ###</span>
+    <span class="c">###  in case value is a sequence ###</span>
+    <span class="c">####################################</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return size of internal value type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keep the same units on contained elements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">is_quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c"># Delegate slices to one-at-a time ___setitem___</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span> <span class="c"># slice</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">*</span><span class="n">indices</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># single index</span>
+            <span class="c"># Check unit compatibility</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span> <span class="ow">and</span> <span class="n">is_dimensionless</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="k">pass</span> <span class="c"># OK</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unit &quot;</span><span class="si">%s</span><span class="s">&quot; is not compatible with Unit &quot;</span><span class="si">%s</span><span class="s">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">is_quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.count"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.count">[docs]</a>    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Quantity.index"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Quantity.append"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">is_dimensionless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Cannot append item without units into list with units&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Quantity.extend"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.extend">[docs]</a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Quantity.insert"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span></div>
+<div class="viewcode-block" id="Quantity.remove"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Quantity.pop"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.Quantity.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+    <span class="c"># list.reverse will automatically delegate correctly</span>
+    <span class="c"># list.sort with no arguments will delegate correctly</span>
+    <span class="c"># list.sort with a comparison function cannot be done correctly</span>
+
+</div></div>
+<div class="viewcode-block" id="is_quantity"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.is_quantity">[docs]</a><span class="k">def</span> <span class="nf">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if x is a Quantity, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_dimensionless"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.quantity.html#chemistry.unit.quantity.is_dimensionless">[docs]</a><span class="k">def</span> <span class="nf">is_dimensionless</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># everything else in the universe is dimensionless</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="c"># Strings can cause trouble</span>
+<span class="c"># as can any container that has infinite levels of containment</span></div>
+<span class="k">def</span> <span class="nf">_is_string</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+     <span class="c"># step 1) String is always a container</span>
+     <span class="c"># and its contents are themselves containers.</span>
+     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+         <span class="k">return</span> <span class="bp">True</span>
+     <span class="k">try</span><span class="p">:</span>
+         <span class="n">first_item</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+         <span class="n">inner_item</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">first_item</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+         <span class="k">if</span> <span class="n">first_item</span> <span class="ow">is</span> <span class="n">inner_item</span><span class="p">:</span>
+             <span class="k">return</span> <span class="bp">True</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="k">return</span> <span class="bp">False</span>
+     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+         <span class="k">return</span> <span class="bp">False</span>
+     <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+         <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="c"># run module directly for testing</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c"># Test the examples in the docstrings</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" >chemistry.unit</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

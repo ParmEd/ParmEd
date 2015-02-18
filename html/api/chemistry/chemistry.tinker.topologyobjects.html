@@ -1,0 +1,1725 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.tinker.topologyobjects module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chemistry.tinker.topologyobjects">
+<span id="chemistry-tinker-topologyobjects-module"></span><h1>chemistry.tinker.topologyobjects module<a class="headerlink" href="#module-chemistry.tinker.topologyobjects" title="Permalink to this headline">¶</a></h1>
+<p>Contains all of the class objects for the Tinker topology</p>
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.AngleBend">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">AngleBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>k</em>, <em>theteq</em>, <em>fold</em>, <em>type_</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#AngleBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleBend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An angle-bending term</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.AngleList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">AngleList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#AngleList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.add" title="chemistry.tinker.topologyobjects.AngleList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.append" title="chemistry.tinker.topologyobjects.AngleList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.count" title="chemistry.tinker.topologyobjects.AngleList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.extend" title="chemistry.tinker.topologyobjects.AngleList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.index" title="chemistry.tinker.topologyobjects.AngleList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.insert" title="chemistry.tinker.topologyobjects.AngleList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.pop" title="chemistry.tinker.topologyobjects.AngleList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.remove" title="chemistry.tinker.topologyobjects.AngleList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.reverse" title="chemistry.tinker.topologyobjects.AngleList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.sort" title="chemistry.tinker.topologyobjects.AngleList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleList.typeclass" title="chemistry.tinker.topologyobjects.AngleList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AngleList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.AngleList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.AngleList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.AngleBend" title="chemistry.tinker.topologyobjects.AngleBend"><tt class="xref py py-class docutils literal"><span class="pre">AngleBend</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.Atom">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>symbol</em>, <em>type_</em>, <em>class_</em>, <em>atomic_number</em>, <em>mass</em>, <em>valence</em>, <em>desc</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An atom in the system</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.Atom.add_vdw" title="chemistry.tinker.topologyobjects.Atom.add_vdw"><tt class="xref py py-obj docutils literal"><span class="pre">add_vdw</span></tt></a>(radius,&nbsp;epsilon,&nbsp;radius14,&nbsp;...)</td>
+<td>Adds van der Waals terms to the atom</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.Atom.add_vdw">
+<tt class="descname">add_vdw</tt><big>(</big><em>radius</em>, <em>epsilon</em>, <em>radius14</em>, <em>epsilon14</em>, <em>reduction</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#Atom.add_vdw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.Atom.add_vdw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds van der Waals terms to the atom</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.AtomList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">AtomList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p>List for Atom instances</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.add" title="chemistry.tinker.topologyobjects.AtomList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.append" title="chemistry.tinker.topologyobjects.AtomList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.count" title="chemistry.tinker.topologyobjects.AtomList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.extend" title="chemistry.tinker.topologyobjects.AtomList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.index" title="chemistry.tinker.topologyobjects.AtomList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.insert" title="chemistry.tinker.topologyobjects.AtomList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.pop" title="chemistry.tinker.topologyobjects.AtomList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.remove" title="chemistry.tinker.topologyobjects.AtomList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.reverse" title="chemistry.tinker.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.sort" title="chemistry.tinker.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomList.typeclass" title="chemistry.tinker.topologyobjects.AtomList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.AtomList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.Atom" title="chemistry.tinker.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipole">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">AtomicMultipole</tt><big>(</big><em>atom</em>, <em>frame</em>, <em>definition</em>, <em>moments</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#AtomicMultipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Atomic multipole parameter</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">AtomicMultipoleList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#AtomicMultipoleList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.add" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.append" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.count" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.extend" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.index" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.insert" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.pop" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.remove" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.reverse" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.sort" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.typeclass" title="chemistry.tinker.topologyobjects.AtomicMultipoleList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.AtomicMultipoleList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.AtomicMultipoleList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.AtomicMultipole" title="chemistry.tinker.topologyobjects.AtomicMultipole"><tt class="xref py py-class docutils literal"><span class="pre">AtomicMultipole</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.BondList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">BondList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#BondList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.add" title="chemistry.tinker.topologyobjects.BondList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.append" title="chemistry.tinker.topologyobjects.BondList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.count" title="chemistry.tinker.topologyobjects.BondList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.extend" title="chemistry.tinker.topologyobjects.BondList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.index" title="chemistry.tinker.topologyobjects.BondList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.insert" title="chemistry.tinker.topologyobjects.BondList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.pop" title="chemistry.tinker.topologyobjects.BondList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.remove" title="chemistry.tinker.topologyobjects.BondList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.reverse" title="chemistry.tinker.topologyobjects.BondList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.sort" title="chemistry.tinker.topologyobjects.BondList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.BondList.typeclass" title="chemistry.tinker.topologyobjects.BondList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.BondList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.BondList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.BondStretch" title="chemistry.tinker.topologyobjects.BondStretch"><tt class="xref py py-class docutils literal"><span class="pre">BondStretch</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.BondStretch">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">BondStretch</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>k</em>, <em>req</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#BondStretch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.BondStretch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A bond-stretching term</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizability">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">DipolePolarizability</tt><big>(</big><em>atom</em>, <em>alpha</em>, <em>group</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#DipolePolarizability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A dipole polarizability parameter</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">DipolePolarizabilityList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#DipolePolarizabilityList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.add" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.append" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.count" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.extend" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.index" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.insert" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.pop" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.remove" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.reverse" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.sort" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.typeclass" title="chemistry.tinker.topologyobjects.DipolePolarizabilityList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.DipolePolarizabilityList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.DipolePolarizabilityList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.DipolePolarizability" title="chemistry.tinker.topologyobjects.DipolePolarizability"><tt class="xref py py-class docutils literal"><span class="pre">DipolePolarizability</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBend">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">OutOfPlaneBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>k</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#OutOfPlaneBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An out-of-plane bending term</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">OutOfPlaneBendList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#OutOfPlaneBendList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.add" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.append" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.count" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.extend" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.index" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.insert" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.pop" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.remove" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.reverse" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.sort" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.typeclass" title="chemistry.tinker.topologyobjects.OutOfPlaneBendList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneBendList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneBendList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBend" title="chemistry.tinker.topologyobjects.OutOfPlaneBend"><tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDist">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">OutOfPlaneDist</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>k</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#OutOfPlaneDist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneBend" title="chemistry.tinker.topologyobjects.OutOfPlaneBend"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects.OutOfPlaneBend</span></tt></a></p>
+<p>An out-of-plane distance (functionally equivalent to OOP Bend</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">OutOfPlaneDistList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#OutOfPlaneDistList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.add" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.append" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.count" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.extend" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.index" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.insert" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.pop" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.remove" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.reverse" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.sort" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.typeclass" title="chemistry.tinker.topologyobjects.OutOfPlaneDistList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.OutOfPlaneDistList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.OutOfPlaneDistList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.OutOfPlaneDist" title="chemistry.tinker.topologyobjects.OutOfPlaneDist"><tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneDist</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.PiTorsion">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">PiTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>amplitude</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#PiTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A Pi-Orbital Torsion parameter</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">PiTorsionList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#PiTorsionList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.add" title="chemistry.tinker.topologyobjects.PiTorsionList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.append" title="chemistry.tinker.topologyobjects.PiTorsionList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.count" title="chemistry.tinker.topologyobjects.PiTorsionList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.extend" title="chemistry.tinker.topologyobjects.PiTorsionList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.index" title="chemistry.tinker.topologyobjects.PiTorsionList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.insert" title="chemistry.tinker.topologyobjects.PiTorsionList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.pop" title="chemistry.tinker.topologyobjects.PiTorsionList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.remove" title="chemistry.tinker.topologyobjects.PiTorsionList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.reverse" title="chemistry.tinker.topologyobjects.PiTorsionList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.sort" title="chemistry.tinker.topologyobjects.PiTorsionList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsionList.typeclass" title="chemistry.tinker.topologyobjects.PiTorsionList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.PiTorsionList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.PiTorsionList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.PiTorsion" title="chemistry.tinker.topologyobjects.PiTorsion"><tt class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.StretchBend">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">StretchBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>k</em>, <em>theteq</em>, <em>r1eq</em>, <em>r2eq</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#StretchBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A stretch-bending term</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">StretchBendList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#StretchBendList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.add" title="chemistry.tinker.topologyobjects.StretchBendList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.append" title="chemistry.tinker.topologyobjects.StretchBendList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.count" title="chemistry.tinker.topologyobjects.StretchBendList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.extend" title="chemistry.tinker.topologyobjects.StretchBendList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.index" title="chemistry.tinker.topologyobjects.StretchBendList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.insert" title="chemistry.tinker.topologyobjects.StretchBendList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.pop" title="chemistry.tinker.topologyobjects.StretchBendList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.remove" title="chemistry.tinker.topologyobjects.StretchBendList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.reverse" title="chemistry.tinker.topologyobjects.StretchBendList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.sort" title="chemistry.tinker.topologyobjects.StretchBendList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBendList.typeclass" title="chemistry.tinker.topologyobjects.StretchBendList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.StretchBendList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.StretchBendList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.StretchBend" title="chemistry.tinker.topologyobjects.StretchBend"><tt class="xref py py-class docutils literal"><span class="pre">StretchBend</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngle">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">TorsionAngle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>args</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionAngle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Torsional Angle parameter</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">TorsionAngleList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionAngleList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.add" title="chemistry.tinker.topologyobjects.TorsionAngleList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.append" title="chemistry.tinker.topologyobjects.TorsionAngleList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.count" title="chemistry.tinker.topologyobjects.TorsionAngleList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.extend" title="chemistry.tinker.topologyobjects.TorsionAngleList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.index" title="chemistry.tinker.topologyobjects.TorsionAngleList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.insert" title="chemistry.tinker.topologyobjects.TorsionAngleList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.pop" title="chemistry.tinker.topologyobjects.TorsionAngleList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.remove" title="chemistry.tinker.topologyobjects.TorsionAngleList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.reverse" title="chemistry.tinker.topologyobjects.TorsionAngleList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.sort" title="chemistry.tinker.topologyobjects.TorsionAngleList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngleList.typeclass" title="chemistry.tinker.topologyobjects.TorsionAngleList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.TorsionAngleList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionAngleList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionAngle" title="chemistry.tinker.topologyobjects.TorsionAngle"><tt class="xref py py-class docutils literal"><span class="pre">TorsionAngle</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsion">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">TorsionTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>spline1</em>, <em>spline2</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A coupled-torsion parameter (like CMAP)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">TorsionTorsionGrid</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionTorsionGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt></p>
+<p>The interpolation grid of a coupled-torsion correction map. Every unique
+grid is cached and if a duplicate grid is instantiated, a reference to the
+original grid is returned. As a result, all unique TorsionTorsionGrid
+instances are singletons and should be compared for equality with &#8220;is&#8221;</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.clear" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Remove&nbsp;all&nbsp;items&nbsp;from&nbsp;od.)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.copy" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;od)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.fromkeys" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.fromkeys"><tt class="xref py py-obj docutils literal"><span class="pre">fromkeys</span></tt></a>((S[,&nbsp;...)</td>
+<td>If not specified, the value defaults to None.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.get" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>((k[,d])&nbsp;-&gt;&nbsp;D[k]&nbsp;if&nbsp;k&nbsp;in&nbsp;D,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.has_key" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.has_key"><tt class="xref py py-obj docutils literal"><span class="pre">has_key</span></tt></a>((k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.items" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.items"><tt class="xref py py-obj docutils literal"><span class="pre">items</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;(key,&nbsp;value)&nbsp;pairs&nbsp;in&nbsp;od)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.iteritems" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.iteritems"><tt class="xref py py-obj docutils literal"><span class="pre">iteritems</span></tt></a>()</td>
+<td>od.iteritems -&gt; an iterator over the (key, value) pairs in od</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.iterkeys" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.iterkeys"><tt class="xref py py-obj docutils literal"><span class="pre">iterkeys</span></tt></a>(()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;keys&nbsp;in&nbsp;od)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.itervalues" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.itervalues"><tt class="xref py py-obj docutils literal"><span class="pre">itervalues</span></tt></a>()</td>
+<td>od.itervalues -&gt; an iterator over the values in od</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.keys" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.keys"><tt class="xref py py-obj docutils literal"><span class="pre">keys</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;keys&nbsp;in&nbsp;od)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.new" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.new"><tt class="xref py py-obj docutils literal"><span class="pre">new</span></tt></a>(data)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.pop" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>((k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;...)</td>
+<td>value.  If key is not found, d is returned if given, otherwise KeyError</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.popitem" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.popitem"><tt class="xref py py-obj docutils literal"><span class="pre">popitem</span></tt></a>(()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;...)</td>
+<td>Pairs are returned in LIFO order if last is true or FIFO order if false.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.setdefault" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.setdefault"><tt class="xref py py-obj docutils literal"><span class="pre">setdefault</span></tt></a>((k[,d])&nbsp;-&gt;&nbsp;od.get(k,d),&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.update" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.update"><tt class="xref py py-obj docutils literal"><span class="pre">update</span></tt></a>(([E,&nbsp;...)</td>
+<td>If E present and has a .keys() method, does:     for k in E: D[k] = E[k]</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.values" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.values"><tt class="xref py py-obj docutils literal"><span class="pre">values</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;values&nbsp;in&nbsp;od)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewitems" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewitems"><tt class="xref py py-obj docutils literal"><span class="pre">viewitems</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewkeys" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewkeys"><tt class="xref py py-obj docutils literal"><span class="pre">viewkeys</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewvalues" title="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewvalues"><tt class="xref py py-obj docutils literal"><span class="pre">viewvalues</span></tt></a>(...)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>If not specified, the value defaults to None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.items">
+<tt class="descname">items</tt><big>(</big><big>)</big> &rarr; list of (key, value) pairs in od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.iteritems -&gt; an iterator over the (key, value) pairs in od</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big> &rarr; an iterator over the keys in od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.itervalues -&gt; an iterator over the values in od</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big> &rarr; list of keys in od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.new">
+<em class="property">classmethod </em><tt class="descname">new</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionTorsionGrid.new"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.new" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.pop">
+<tt class="descname">pop</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; v, remove specified key and return the corresponding<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>value.  If key is not found, d is returned if given, otherwise KeyError
+is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; od.get(k,d), also set od[k]=d if k not in od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.update">
+<tt class="descname">update</tt><big>(</big><span class="optional">[</span><em>E</em>, <span class="optional">]</span><em>**F</em><big>)</big> &rarr; None.  Update D from mapping/iterable E and F.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>If E present and has a .keys() method, does:     for k in E: D[k] = E[k]
+If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v
+In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.values">
+<tt class="descname">values</tt><big>(</big><big>)</big> &rarr; list of values in od<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionGrid.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">TorsionTorsionList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#TorsionTorsionList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.add" title="chemistry.tinker.topologyobjects.TorsionTorsionList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.append" title="chemistry.tinker.topologyobjects.TorsionTorsionList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.count" title="chemistry.tinker.topologyobjects.TorsionTorsionList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.extend" title="chemistry.tinker.topologyobjects.TorsionTorsionList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.index" title="chemistry.tinker.topologyobjects.TorsionTorsionList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.insert" title="chemistry.tinker.topologyobjects.TorsionTorsionList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.pop" title="chemistry.tinker.topologyobjects.TorsionTorsionList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.remove" title="chemistry.tinker.topologyobjects.TorsionTorsionList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.reverse" title="chemistry.tinker.topologyobjects.TorsionTorsionList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.sort" title="chemistry.tinker.topologyobjects.TorsionTorsionList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.typeclass" title="chemistry.tinker.topologyobjects.TorsionTorsionList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.TorsionTorsionList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.TorsionTorsionList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.TorsionTorsion" title="chemistry.tinker.topologyobjects.TorsionTorsion"><tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.UreyBradley">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">UreyBradley</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>k</em>, <em>req</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.tinker.topologyobjects.BondStretch" title="chemistry.tinker.topologyobjects.BondStretch"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects.BondStretch</span></tt></a></p>
+<p>A urey-bradley term &#8211; functionally identical to a bond-stretch</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList">
+<em class="property">class </em><tt class="descclassname">chemistry.tinker.topologyobjects.</tt><tt class="descname">UreyBradleyList</tt><a class="reference internal" href="../../_modules/chemistry/tinker/topologyobjects.html#UreyBradleyList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.tinker.topologyobjects._ParamTypeList</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.add" title="chemistry.tinker.topologyobjects.UreyBradleyList.add"><tt class="xref py py-obj docutils literal"><span class="pre">add</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.append" title="chemistry.tinker.topologyobjects.UreyBradleyList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(thing)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.count" title="chemistry.tinker.topologyobjects.UreyBradleyList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.extend" title="chemistry.tinker.topologyobjects.UreyBradleyList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(things)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.index" title="chemistry.tinker.topologyobjects.UreyBradleyList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.insert" title="chemistry.tinker.topologyobjects.UreyBradleyList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.pop" title="chemistry.tinker.topologyobjects.UreyBradleyList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.remove" title="chemistry.tinker.topologyobjects.UreyBradleyList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.reverse" title="chemistry.tinker.topologyobjects.UreyBradleyList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.sort" title="chemistry.tinker.topologyobjects.UreyBradleyList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradleyList.typeclass" title="chemistry.tinker.topologyobjects.UreyBradleyList.typeclass"><tt class="xref py py-obj docutils literal"><span class="pre">typeclass</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.add">
+<tt class="descname">add</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.append">
+<tt class="descname">append</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.extend">
+<tt class="descname">extend</tt><big>(</big><em>things</em><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.tinker.topologyobjects.UreyBradleyList.typeclass">
+<tt class="descname">typeclass</tt><a class="headerlink" href="#chemistry.tinker.topologyobjects.UreyBradleyList.typeclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.tinker.topologyobjects.UreyBradley" title="chemistry.tinker.topologyobjects.UreyBradley"><tt class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/chemistry/chemistry.tinker.topologyobjects.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

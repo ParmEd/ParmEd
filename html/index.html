@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmEd &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="#" />
+    <link rel="next" title="The topologyobjects module" href="topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="topologyobjects.html" title="The topologyobjects module"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed">
+<h1>ParmEd<a class="headerlink" href="#parmed" title="Permalink to this headline">¶</a></h1>
+<p>ParmEd is a general tool for aiding in investigations of biomolecular systems
+using popular molecular simulation packages, like Amber, CHARMM, and OpenMM
+written in Python.</p>
+<div class="section" id="what-is-it">
+<h2>What is it?<a class="headerlink" href="#what-is-it" title="Permalink to this headline">¶</a></h2>
+<p>There are two parts to ParmEd &#8211; the Python API that exposes the core classes
+used in its modeling capabilities, and two front-end Python programs
+(<tt class="docutils literal"><span class="pre">parmed.py</span></tt> and its GUI counterpart, <tt class="docutils literal"><span class="pre">xparmed.py</span></tt>) that make use of the
+ParmEd API to allow rapid prototyping and parameter-topology modifications for
+use in molecular simulations.</p>
+</div>
+<div class="section" id="why-use-it">
+<h2>Why use it?<a class="headerlink" href="#why-use-it" title="Permalink to this headline">¶</a></h2>
+<p>You can use it for a variety of modeling purposes, like manipulating system
+topologies (i.e., the <em>atoms</em>, <em>bonds</em>, and other bonded terms like valence
+angles) and translating between file formats (e.g., PDB, mmCIF/PDBx, Amber
+<em>prmtop</em>, and CHARMM <em>psf</em>).  What sets ParmEd apart from tools like OpenBabel
+is that it stores and tracks force field parameters so that the resulting files
+can be used to carry out molecular mechanics simulations with tools like Amber,
+OpenMM, NAMD, and CHARMM.</p>
+<p>ParmEd has sophisticated machinery built into its core classes that
+substantially reduces the burden of bookkeeping when manipulating chemical
+structures (for instance, adding or deleting an atom from a structure
+automatically updates the indices in each of the parameter arrays defining the
+system topology so you don&#8217;t have to worry about it).</p>
+</div>
+<div class="section" id="what-can-it-do">
+<h2>What can it do?<a class="headerlink" href="#what-can-it-do" title="Permalink to this headline">¶</a></h2>
+<p>The core <tt class="docutils literal"><span class="pre">chemistry</span></tt> package provided as part of ParmEd is intended to provide
+a powerful, but simple, API for carrying out tasks common in the field of
+biomolecular simulations.  For example, some of its features include:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Simply iterate through atoms as well as other parameters found in common
+molecular mechanical force fields</p>
+</li>
+<li><p class="first">Rapidly modify a system topology and its parameters, and write files that
+can be used with the Amber and CHARMM program suites (as well as other
+programs that support those file types, like NAMD)</p>
+</li>
+<li><p class="first">Carry out investigations using force fields, like molecular dynamics,
+directly on modern, high-performance hardware (like Graphics Processing
+Units) using the <em>OpenMM</em> library and Python application layer</p>
+</li>
+<li><p class="first">Dimensional analysis with a complete system of physical units</p>
+</li>
+<li><p class="first">Translate between a variety of file formats in common use by various
+programs including:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Amber prmtop, inpcrd, NetCDF trajectory, and NetCDF restart files</li>
+<li>CHARMM PSF, coordinate, and restart files</li>
+<li>PDB files, supporting a wide range of dialects that technically
+violate the PDB standard</li>
+<li>PDBx/mmCIF files &#8211; the new standard for the Protein Data Bank</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Extract metadata from the PDB and PDBx/mmCIF files, such as citation
+information and related database entries</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="program-and-api-reference">
+<h2>Program and API Reference<a class="headerlink" href="#program-and-api-reference" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed-py">Using <tt class="docutils literal"><span class="pre">xparmed.py</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmm.html">OpenMM Functionality</a></li>
+</ul>
+</div>
+<p>Click the &#8220;modules&#8221; link at the top of the page for a full API reference.</p>
+</div>
+<div class="section" id="search">
+<h2>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ParmEd</a><ul>
+<li><a class="reference internal" href="#what-is-it">What is it?</a></li>
+<li><a class="reference internal" href="#why-use-it">Why use it?</a></li>
+<li><a class="reference internal" href="#what-can-it-do">What can it do?</a></li>
+<li><a class="reference internal" href="#program-and-api-reference">Program and API Reference</a></li>
+<li><a class="reference internal" href="#search">Search</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="topologyobjects.html" title="The topologyobjects module"
+             >next</a> |</li>
+        <li><a href="#">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

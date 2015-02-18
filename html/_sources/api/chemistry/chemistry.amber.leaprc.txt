@@ -1,0 +1,7 @@
+chemistry.amber.leaprc module
+=============================
+
+.. automodule:: chemistry.amber.leaprc
+    :members:
+    :undoc-members:
+    :show-inheritance:

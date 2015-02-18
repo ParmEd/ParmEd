@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.arraytools module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ParmedTools.arraytools">
+<span id="parmedtools-arraytools-module"></span><h1>ParmedTools.arraytools module<a class="headerlink" href="#module-ParmedTools.arraytools" title="Permalink to this headline">¶</a></h1>
+<p>Some support classes for easy array manipulation</p>
+<dl class="class">
+<dt id="ParmedTools.arraytools.NumberArray">
+<em class="property">class </em><tt class="descclassname">ParmedTools.arraytools.</tt><tt class="descname">NumberArray</tt><big>(</big><em>stuff=None</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/arraytools.html#NumberArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.arraytools.NumberArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.append" title="ParmedTools.arraytools.NumberArray.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<td>L.append(object) &#8211; append object to end</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.count" title="ParmedTools.arraytools.NumberArray.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.extend" title="ParmedTools.arraytools.NumberArray.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.index" title="ParmedTools.arraytools.NumberArray.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.insert" title="ParmedTools.arraytools.NumberArray.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.pop" title="ParmedTools.arraytools.NumberArray.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.remove" title="ParmedTools.arraytools.NumberArray.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.reverse" title="ParmedTools.arraytools.NumberArray.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.arraytools.NumberArray.sort" title="ParmedTools.arraytools.NumberArray.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.append(object) &#8211; append object to end</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#ParmedTools.arraytools.NumberArray.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.extend">
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#ParmedTools.arraytools.NumberArray.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#ParmedTools.arraytools.NumberArray.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ParmedTools.arraytools.NumberArray.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#ParmedTools.arraytools.NumberArray.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/ParmedTools/ParmedTools.arraytools.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

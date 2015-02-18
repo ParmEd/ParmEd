@@ -1,0 +1,29 @@
+chemistry.topologyobjects.DihedralType
+======================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: DihedralType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DihedralType.__init__
+      ~DihedralType.write_info
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DihedralType.idx
+   
+   

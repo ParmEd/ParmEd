@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.amber.AmberMdcrd &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The chemistry.amber package" href="../amber.html" />
+    <link rel="prev" title="chemistry.amber.netcdffiles.use" href="chemistry.amber.netcdffiles.use.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chemistry.amber.netcdffiles.use.html" title="chemistry.amber.netcdffiles.use"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chemistry-amber-ambermdcrd">
+<h1>chemistry.amber.AmberMdcrd<a class="headerlink" href="#chemistry-amber-ambermdcrd" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.amber.AmberMdcrd">
+<em class="property">class </em><tt class="descclassname">chemistry.amber.</tt><tt class="descname">AmberMdcrd</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to parse Amber ASCII trajectory files. This is <em>much</em> slower than
+parsing NetCDF files (or the equivalent parsing done in a compiled language
+like C or C++). For large trajectories, this may be significant.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.add_box" title="chemistry.amber.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.add_coordinates" title="chemistry.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.box" title="chemistry.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>([frame])</td>
+<td>Returns the frame&#8217;th frame of the box lengths as a length-3 array</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.close" title="chemistry.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>Close the open file handler</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.coordinates" title="chemistry.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
+<td>Returns the requested coordinates</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a new Mdcrd file and either parses it (loading everything into
+memory) or sets it up for writing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>File name to open</p>
+</div></blockquote>
+<p><strong>natom</strong> : int</p>
+<blockquote>
+<div><p>Number of atoms in the system</p>
+</div></blockquote>
+<p><strong>hasbox</strong> : bool</p>
+<blockquote>
+<div><p>Does the system have PBCs?</p>
+</div></blockquote>
+<p><strong>mode</strong> : str={&#8216;r&#8217;, &#8216;w&#8217;}</p>
+<blockquote>
+<div><p>Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
+</div></blockquote>
+<p><strong>title</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This module automatically handles compressed files using either gzip or
+bzip2, and compression is determined automatically by filename extension
+(.gz for gzip and .bz2 for bzip2 files).</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.__init__" title="chemistry.amber.AmberMdcrd.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname,&nbsp;natom,&nbsp;hasbox[,&nbsp;mode,&nbsp;title])</td>
+<td>Opens a new Mdcrd file and either parses it (loading everything into memory) or sets it up for writing.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.add_box" title="chemistry.amber.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.add_coordinates" title="chemistry.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.box" title="chemistry.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>([frame])</td>
+<td>Returns the frame&#8217;th frame of the box lengths as a length-3 array</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.close" title="chemistry.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>Close the open file handler</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.coordinates" title="chemistry.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
+<td>Returns the requested coordinates</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">CRDS_PER_LINE</span></tt></td>
+<td>int(x=0) -&gt; int or long</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></tt></td>
+<td>str(object=&#8217;&#8216;) -&gt; string</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.add_box">
+<tt class="descname">add_box</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or
+np.ndarray) as the box lengths for this frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
+<blockquote>
+<div><p>This must be an iterable of length 3 with the box lengths</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
+<p><strong>currently expected to provide coordinates, a RuntimeError is raised.</strong></p>
+<p><strong>raised. If the provided box lengths are not length 3, a ValueError is</strong></p>
+<p class="last"><strong>raised.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.add_coordinates">
+<tt class="descname">add_coordinates</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an
+attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the
+open file handler. Can only be called on a &#8216;new&#8217; mdcrd, and adds these
+coordinates to the current end of the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
+<blockquote>
+<div><p>This must be an iterable of length 3*natom or a numpy array that can
+be flattened to a 3*natom-length array</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
+<p><strong>currently expected to provide unit cell dimensions, a RuntimeError is</strong></p>
+<p><strong>raised. If the provided coordinate data does not have length 3*natom, or</strong></p>
+<p><strong>cannot be ``flatten()``ed to create a 3*natom array, a ValueError is</strong></p>
+<p class="last"><strong>raised.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.box">
+<tt class="descname">box</tt><big>(</big><em>frame=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the frame&#8217;th frame of the box lengths as a length-3 array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
+<blockquote>
+<div><p>If provided, this is the frame number whose box dimensions will be
+returned. If not provided, all of the box dimensions are returned as
+a list in which each entry is a length-3 array of box lengths</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box_lengths</strong> : array or list of array</p>
+<blockquote class="last">
+<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the box lengths will be a list of length the
+number of frames in the trajectory with each item being an array
+(numpy if available) of box lengths.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the open file handler</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.AmberMdcrd.coordinates">
+<tt class="descname">coordinates</tt><big>(</big><em>frame=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the requested coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
+<blockquote>
+<div><p>If provided, this is the frame number whose coordinates will be
+returned. If not provided, all of the coordinates are returned as a
+list in which each entry is a 3*natom-length array of coordinates</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : array or list of array</p>
+<blockquote class="last">
+<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the coordinates will be a list of length the
+number of frames in the trajectory with each item being an array
+(numpy if available) of 3*natom length of coordinates.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/amberobj/chemistry.amber.AmberMdcrd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chemistry.amber.netcdffiles.use.html" title="chemistry.amber.netcdffiles.use"
+             >previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

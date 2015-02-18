@@ -1,0 +1,7 @@
+ParmedTools.coarsegrain module
+==============================
+
+.. automodule:: ParmedTools.coarsegrain
+    :members:
+    :undoc-members:
+    :show-inheritance:

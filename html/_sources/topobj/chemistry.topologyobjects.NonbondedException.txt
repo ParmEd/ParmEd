@@ -1,0 +1,22 @@
+chemistry.topologyobjects.NonbondedException
+============================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: NonbondedException
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NonbondedException.__init__
+   
+   
+
+   
+   
+   

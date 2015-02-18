@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.changeradii &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="ParmedTools" href="../ParmedTools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" accesskey="U">ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ParmedTools.changeradii</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="n">ChangeRadiiError</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<div class="viewcode-block" id="bondi"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.bondi">[docs]</a><span class="k">def</span> <span class="nf">bondi</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sets the bondi radii &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c"># Radius of C atom depends on what type it is</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C1&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">13.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C2&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">14.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C3&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">15.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.7</span>
+        <span class="c"># All other elements have fixed radii for all types/partners</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.55</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.1</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.8</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">17</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADIUS_SET&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Bondi radii (bondi)&#39;</span>
+    <span class="n">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="amber6"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.amber6">[docs]</a><span class="k">def</span> <span class="nf">amber6</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sets the amber6 radii &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c"># Radius of H atom depends on element it is bonded to</span>
+        <span class="n">bondeds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bondeds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span> <span class="c"># carbon</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.3</span>
+            <span class="k">elif</span> <span class="n">bondeds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span> <span class="c"># oxygen or sulfur</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c"># anything else</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="c"># Radius of C atom depends on what type it is</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C1&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">13.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C2&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">14.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C3&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">15.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.7</span>
+        <span class="c"># All other elements have fixed radii for all types/partners</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.55</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.1</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.8</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">17</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+   
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADIUS_SET&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;amber6 modified Bondi radii (amber6)&#39;</span>
+    <span class="n">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="mbondi"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.mbondi">[docs]</a><span class="k">def</span> <span class="nf">mbondi</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sets the mbondi radii &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c"># Radius of H atom depends on element it is bonded to</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">bondeds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bondeds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span> <span class="c"># C or N</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.3</span>
+            <span class="k">elif</span> <span class="n">bondeds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span> <span class="c"># O or S</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="c"># Radius of C atom depends on what type it is</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C1&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">13.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C2&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">14.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C3&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">15.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.7</span>
+        <span class="c"># All other elements have fixed radii for all types/partners</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.55</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>  <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>  <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.1</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.8</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">17</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADIUS_SET&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;modified Bondi radii (mbondi)&#39;</span>
+    <span class="n">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="mbondi2"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.mbondi2">[docs]</a><span class="k">def</span> <span class="nf">mbondi2</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sets the mbondi2 radii &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c"># Radius of H atom depends on element it is bonded to</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.3</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="c"># Radius of C atom depends on what type it is</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C1&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">13.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C2&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">14.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;C3&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="o">&gt;</span> <span class="mf">15.0</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.7</span>
+        <span class="c"># All other elements have fixed radii for all types/partners</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.55</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.1</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.8</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">17</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADIUS_SET&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;H(N)-modified Bondi radii (mbondi2)&#39;</span>
+    <span class="n">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="mbondi3"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.mbondi3">[docs]</a><span class="k">def</span> <span class="nf">mbondi3</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sets mbondi3 radii &quot;&quot;&quot;</span>
+    <span class="n">mbondi2</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span> <span class="c"># start from mbondi2 radii</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c"># Adjust OE (GLU), OD (ASP), and HH/HE (ARG)</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;GLU&#39;</span><span class="p">,</span> <span class="s">&#39;ASP&#39;</span><span class="p">,</span> <span class="s">&#39;GL4&#39;</span><span class="p">,</span> <span class="s">&#39;AS4&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;OE&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;OD&#39;</span><span class="p">):</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.4</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;ARG&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;HH&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;HE&#39;</span><span class="p">):</span>
+                <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.17</span>
+        <span class="c"># Adjust carboxylate O radii on C-Termini. Don&#39;t just do the end</span>
+        <span class="c"># residue, since we can have C-termini in the middle as well</span>
+        <span class="c"># (i.e., 2-chain dimers)</span>
+        <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;OXT&#39;</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.4</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADII&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.4</span>
+
+    <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;RADIUS_SET&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="s">&#39;ArgH and AspGluO modified Bondi2 radii (mbondi3)&#39;</span>
+    <span class="n">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<span class="k">def</span> <span class="nf">_screen1</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Applies the first set of screening parameters found in tleap source &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.72</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.79</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.85</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.88</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.86</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.96</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">def</span> <span class="nf">_screen2</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the second set of screening parameters found in tleap source</span>
+<span class="sd">    (unused as far as I can tell)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8461</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9615</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9343</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0088</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0000</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0000</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0700</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.1733</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">def</span> <span class="nf">_screen3</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the third and final set of screening parameters found in tleap</span>
+<span class="sd">    source (unused as far as I can tell)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8846</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9186</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8733</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8836</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0000</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0000</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9604</span>
+        <span class="k">elif</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9323</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCREEN&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="n">_call_method</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">bondi</span><span class="o">=</span><span class="n">bondi</span><span class="p">,</span> <span class="n">mbondi</span><span class="o">=</span><span class="n">mbondi</span><span class="p">,</span> <span class="n">mbondi2</span><span class="o">=</span><span class="n">mbondi2</span><span class="p">,</span>
+                    <span class="n">mbondi3</span><span class="o">=</span><span class="n">mbondi3</span><span class="p">,</span> <span class="n">amber6</span><span class="o">=</span><span class="n">amber6</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChRad"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.changeradii.html#ParmedTools.changeradii.ChRad">[docs]</a><span class="k">def</span> <span class="nf">ChRad</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">radii_set</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_call_method</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_call_method</span><span class="p">[</span><span class="n">radii_set</span><span class="p">](</span><span class="n">parm</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ChangeRadiiError</span><span class="p">(</span><span class="s">&quot;You must choose from </span><span class="si">%s</span><span class="s"> radii sets&quot;</span> <span class="o">%</span>
+                               <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_call_method</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">load_atom_info</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../ParmedTools.html" >ParmedTools</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

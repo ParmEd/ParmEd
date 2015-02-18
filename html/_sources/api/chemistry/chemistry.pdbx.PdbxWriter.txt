@@ -1,0 +1,7 @@
+chemistry.pdbx.PdbxWriter module
+================================
+
+.. automodule:: chemistry.pdbx.PdbxWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:

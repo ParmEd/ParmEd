@@ -1,0 +1,7 @@
+chemistry.amber.residue module
+==============================
+
+.. automodule:: chemistry.amber.residue
+    :members:
+    :undoc-members:
+    :show-inheritance:

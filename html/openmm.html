@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>OpenMM Functionality &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="prev" title="The ParmEd API" href="parmed_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed_api.html" title="The ParmEd API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="openmm-functionality">
+<h1>OpenMM Functionality<a class="headerlink" href="#openmm-functionality" title="Permalink to this headline">¶</a></h1>
+<p>Since ParmEd is a library for reading, converting, and modifying full molecular
+mechanical descriptions of chemical systems in a wide variety of different
+families of force fields, supporting molecular simulation directly using the
+fantastic <a class="reference external" href="http://simtk.org/home/openmm">OpenMM Python API</a> was a natural
+extension.</p>
+<p>This page is not meant as an exhaustive description of the OpenMM library and
+its usage. Instead, you should visit the <cite>OpenMM website
+&lt;http://simtk.org/home/openmm&gt;</cite> for that. However, this page <em>will</em> provide a
+brief description of OpenMM, what I consider to be its strengths that can make
+it an invaluable tool in the field of molecular mechanics. It will also present
+an introduction to using OpenMM with the tools provided by ParmEd through a
+handful of examples.</p>
+<div class="section" id="what-is-openmm">
+<h2>What is OpenMM<a class="headerlink" href="#what-is-openmm" title="Permalink to this headline">¶</a></h2>
+<p>OpenMM is not a <em>program</em> in the traditional sense. There is no <em>OpenMM</em> program
+that you can run from the terminal like you can with AMBER, CHARMM, or GROMACS,
+for example. Instead, it is a library of routines written in C++ that allow you
+to program your own molecular models in C, C++, Fortran, or, as we will
+demonstrate here, Python. Its basic features include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Basic valence-term forces, like bonds, angles, torsions, and
+coupled-torsion correction maps.</li>
+<li>Nonbonded potential terms, like the typical electrostatic and
+Lennard-Jones potentials, Generalized Born implicit solvent models, and
+more, with accurate long-range potentials.</li>
+<li>Various integrators to carry out molecular dynamics, like the Verlet
+integrator for <em>traditional</em> MD, or stochastic integrators like those
+for Langevin and Brownian dynamics.</li>
+<li>Thermostats and barostats for sampling from various statistical ensembles.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="what-makes-openmm-so-awesome">
+<h2>What makes OpenMM so awesome?<a class="headerlink" href="#what-makes-openmm-so-awesome" title="Permalink to this headline">¶</a></h2>
+<p>There are two key features that not only make <em>OpenMM</em> awesome, but make it
+unlike any other molecular dynamics software in existence.</p>
+<div class="section" id="stellar-performance-on-gpus">
+<h3>Stellar performance on GPUs<a class="headerlink" href="#stellar-performance-on-gpus" title="Permalink to this headline">¶</a></h3>
+<p>Among the primarily advertised selling-points of OpenMM is the computational
+performance that is possible by running OpenMM on NVidia and AMD/ATI graphics
+processing units (GPUs). OpenMM utilizes both CUDA and OpenCL to program
+molecular models for GPUs, and runs the entire calculation on the accelerator
+device to eliminate the GPU-to-CPU communications that can significantly limit
+performance.</p>
+<p>In general, the CUDA platform is faster than the OpenCL platform, but OpenCL
+works on a much wider array of hardware. I will not expound on the details of
+the GPU performance, as you are directed to look at the various GPU-related
+publications for such comparisons.  Suffice it to say that, currently (February,
+2015), GPU performance is ca. one, possibly up to two orders of magnitude
+<em>faster</em> than running on every core of a standard multicore server processor (8
+to 16 cores) with a multithreaded MD application.</p>
+</div>
+<div class="section" id="custom-forces">
+<h3>Custom Forces<a class="headerlink" href="#custom-forces" title="Permalink to this headline">¶</a></h3>
+<p>In my opinion, what makes OpenMM truly awesome is its custom force capabilities.
+OpenMM allows you to implement a new potential for bonds, angles, torsions, and
+even nonbonded pairwise and multi-particle interactions simply by providing an
+equation for the potential energy.</p>
+<p>OpenMM will then analytically differentiate this analytical function to get an
+analytical, closed-form expression for the gradients (forces), and build a
+modestly optimized GPU implementation of that term!</p>
+<p>For example, suppose you want to model a few bonds in your biomolecule using a
+typical Morse potential, the OpenMM Python code that will do this is shown
+below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">force</span> <span class="o">=</span> <span class="n">CustomBondForce</span><span class="p">(</span><span class="s">&quot;D*(1-exp(-alpha*(r-req)))^2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And that&#8217;s it! Once you add the bonds to that force, with their parameters,
+OpenMM will build an optimized kernel for the calculation. Not only does this
+eliminate the development cost of building and optimizing a GPU implementation
+of a new potential, it also provides a pre-tested, and pre-debugged version of
+that kernel.</p>
+</div>
+</div>
+<div class="section" id="how-does-parmed-enhance-openmm">
+<h2>How does ParmEd enhance OpenMM?<a class="headerlink" href="#how-does-parmed-enhance-openmm" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>NetCDFReporter prints a trajectory in NetCDF format</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>MdcrdReporter prints a trajectory in ASCII Amber format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Use a reporter to handle writing restarts at specified intervals.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>A class that prints out a progress report of how much MD (or minimization)</td>
+</tr>
+</tbody>
+</table>
+<p>ParmEd provides a common framework for constructing and representing fully
+parametrized force field models for various systems instantiated from a wide
+range of file formats. In particular, it supports the following file formats:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Standard Amber topology file</li>
+<li>Amber Chamber-style topology file*</li>
+<li>Amber AMOEBA-style topology file*</li>
+<li>CHARMM PSF file</li>
+</ul>
+</div></blockquote>
+<p>The <em>-marked options are *not</em> available in the OpenMM Python application layer.</p>
+<p>In addition to these file formats, ParmEd also supports several new reporter
+classes in addition to the small number provided by ParmEd:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt> &#8211; This takes an extra argument,
+<tt class="docutils literal"><span class="pre">unit_system</span></tt> that allows you to specify what unit system the output
+data is printed in (such as the AKMA unit system, which is more familiar
+to Amber and CHARMM users).</li>
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+the Amber NetCDF format.</li>
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+the Amber ASCII mdcrd format.</li>
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt></a> &#8211; This allows you to periodically write NetCDF
+or ASCII restart files during the course of the calculation</li>
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt></a> &#8211; This prints a file during the course of the
+simulation tracking the runtime speed of the calculation and predicting
+the amount of time remaining.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Right now, the two main pathways to run an OpenMM simulation starting from a
+fully parametrized molecular mechanical model (click on either option to view
+the annotated and explained example):</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="omm_amber.html">Starting from AMBER prmtop and inpcrd files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="omm_amber.html#generalized-born">Generalized Born</a></li>
+<li class="toctree-l2"><a class="reference internal" href="omm_amber.html#explicit-solvent">Explicit Solvent</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="omm_charmm.html">Starting from CHARMM PSF and coordinate files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="omm_charmm.html#generalized-born-implicit-solvent">Generalized Born Implicit Solvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="omm_charmm.html#explicit-solvent">Explicit solvent</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">OpenMM Functionality</a><ul>
+<li><a class="reference internal" href="#what-is-openmm">What is OpenMM</a></li>
+<li><a class="reference internal" href="#what-makes-openmm-so-awesome">What makes OpenMM so awesome?</a><ul>
+<li><a class="reference internal" href="#stellar-performance-on-gpus">Stellar performance on GPUs</a></li>
+<li><a class="reference internal" href="#custom-forces">Custom Forces</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-does-parmed-enhance-openmm">How does ParmEd enhance OpenMM?</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/openmm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed_api.html" title="The ParmEd API"
+             >previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

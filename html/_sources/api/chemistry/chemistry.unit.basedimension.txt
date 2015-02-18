@@ -1,0 +1,7 @@
+chemistry.unit.basedimension module
+===================================
+
+.. automodule:: chemistry.unit.basedimension
+    :members:
+    :undoc-members:
+    :show-inheritance:

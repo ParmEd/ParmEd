@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ParmedTools.coarsegrain module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ParmedTools.coarsegrain">
+<span id="parmedtools-coarsegrain-module"></span><h1>ParmedTools.coarsegrain module<a class="headerlink" href="#module-ParmedTools.coarsegrain" title="Permalink to this headline">¶</a></h1>
+<p>This module handles adding coarse graining data to topology files set up by
+Luciana Capece. It has been implemented here in parmed by Jason Swails, but all
+ideas were Luciana&#8217;s. Here is a description of what this section does to
+topology files:</p>
+<p>ANGLE_FORCE_CONSTANT has been rigged to provide an integer index to the specific
+parameter found in the given parameter file. This will be used to set up 4
+different (new) prmtop sections: ANGLE_COEF_A, ANGLE_COEF_B, ANGLE_COEF_C, and
+ANGLE_COEF_D. ANGLE_FORCE_CONSTANT now becomes useless, so I will add a comment
+to the topology file saying such.</p>
+<p>DIHEDRAL_FORCE_CONSTANT has been rigged in much the same way, creating 8 new
+sections: DIHEDRAL_AMPLITUDE_1,2,3,4 and DIHEDRAL_PHASE_1,2,3,4.
+DIHEDRAL_FORCE_CONSTANT, DIHEDRAL_PHASE, and DIHEDRAL_PERIODICITY become useless
+and are commented as such (though not removed).</p>
+<p>This module sets up ANGLE and DIHEDRAL classes to make printing them easier,
+then parses the parameter file, then sets the respective sections of the prmtop
+file.</p>
+<dl class="class">
+<dt id="ParmedTools.coarsegrain.Angle">
+<em class="property">class </em><tt class="descclassname">ParmedTools.coarsegrain.</tt><tt class="descname">Angle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>acoef</em>, <em>bcoef</em>, <em>ccoef</em>, <em>dcoef</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/coarsegrain.html#Angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.coarsegrain.Angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Angle between 3 bonded atoms</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ParmedTools.coarsegrain.Dihedral">
+<em class="property">class </em><tt class="descclassname">ParmedTools.coarsegrain.</tt><tt class="descname">Dihedral</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>ampl1</em>, <em>ampl2</em>, <em>ampl3</em>, <em>ampl4</em>, <em>phase1</em>, <em>phase2</em>, <em>phase3</em>, <em>phase4</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/coarsegrain.html#Dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.coarsegrain.Dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Dihedral between 4 bonded atoms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ParmedTools.coarsegrain.addCoarseGrain">
+<tt class="descclassname">ParmedTools.coarsegrain.</tt><tt class="descname">addCoarseGrain</tt><big>(</big><em>parm</em>, <em>param_file</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/coarsegrain.html#addCoarseGrain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.coarsegrain.addCoarseGrain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/ParmedTools/ParmedTools.coarsegrain.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

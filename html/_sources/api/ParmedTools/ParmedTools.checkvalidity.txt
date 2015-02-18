@@ -1,0 +1,7 @@
+ParmedTools.checkvalidity module
+================================
+
+.. automodule:: ParmedTools.checkvalidity
+    :members:
+    :undoc-members:
+    :show-inheritance:

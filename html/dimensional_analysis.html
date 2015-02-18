@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dimensional Analysis (working with chemistry.unit) &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="next" title="chemistry.unit.Quantity" href="unitobj/chemistry.unit.Quantity.html" />
+    <link rel="prev" title="chemistry.structure.read_CIF" href="structobj/chemistry.structure.read_CIF.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="unitobj/chemistry.unit.Quantity.html" title="chemistry.unit.Quantity"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="structobj/chemistry.structure.read_CIF.html" title="chemistry.structure.read_CIF"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dimensional-analysis-working-with-chemistry-unit">
+<h1>Dimensional Analysis (working with <a class="reference internal" href="api/chemistry/chemistry.unit.html#module-chemistry.unit" title="chemistry.unit"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.unit</span></tt></a>)<a class="headerlink" href="#dimensional-analysis-working-with-chemistry-unit" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package was originally developed by Christopher M. Bruns at
+SimTK (Stanford University) for the <tt class="docutils literal"><span class="pre">simtk</span></tt> Python package in <a class="reference external" href="http://simtk.org/home/openmm">OpenMM</a>.</p>
+<p>Different programs use different systems of units internally while performing
+calculations on quantities with specific dimensions. For instance, the <em>Amber</em>
+and <em>CHARMM</em> programs deal with energies in <em>kcal/mol</em> and lengths in
+<em>Angstroms</em>, while <em>GROMACS</em> and <em>OpenMM</em> deal with energies in <em>kJ/mol</em> and
+distances in <em>nanometers</em>. Electronic structure packages, on the other hand,
+tend to use so-called <em>atomic</em> units, with energies in Hartrees and lengths in
+Bohrs.</p>
+<p>Comparing the results between these programs requires that the results be
+converted to a common set of units beforehand. More
+importantly&#8212;interconverting these packages, or preparing common input for
+both, requires that the input for each program conform to its expected system of
+units. Not doing so can result in <a class="reference external" href="http://www.wired.com/2010/11/1110mars-climate-observer-report/">a very costly mistake</a></p>
+<p>In all of the examples below, I will assume that the <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package has
+been imported as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+</pre></div>
+</div>
+<div class="section" id="what-does-chemistry-unit-do">
+<h2>What does <a class="reference internal" href="api/chemistry/chemistry.unit.html#module-chemistry.unit" title="chemistry.unit"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.unit</span></tt></a> do?<a class="headerlink" href="#what-does-chemistry-unit-do" title="Permalink to this headline">¶</a></h2>
+<p>The main classes in the <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> module are shown below:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-obj docutils literal"><span class="pre">Quantity</span></tt></a>([value,&nbsp;unit])</td>
+<td>Physical quantity, such as 1.3 meters per second.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#chemistry.unit.is_quantity" title="chemistry.unit.is_quantity"><tt class="xref py py-obj docutils literal"><span class="pre">is_quantity</span></tt></a>(x)</td>
+<td>Returns True if x is a Quantity, False otherwise.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit" title="chemistry.unit.Unit"><tt class="xref py py-obj docutils literal"><span class="pre">Unit</span></tt></a>(base_or_scaled_units)</td>
+<td>Physical unit such as meter or ampere.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="unitobj/chemistry.unit.BaseUnit.html#chemistry.unit.BaseUnit" title="chemistry.unit.BaseUnit"><tt class="xref py py-obj docutils literal"><span class="pre">BaseUnit</span></tt></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
+<td>Physical unit expressed in exactly one BaseDimension.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-obj docutils literal"><span class="pre">UnitSystem</span></tt></a>(units)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package allows you to turn <em>numbers</em> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>,
+that has both a value and a unit.  It allows you to do basic math with units and
+it automatically performs the requisite dimensional analysis, raising an
+exception if you try to illegally combine incompatible units.  For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
+<span class="go">Quantity(value=1.1, unit=nanometer)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Find the volume of a cube with side 1 cm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">centimeters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Quantity(value=1, unit=centimeter**3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">milliliters</span>
+<span class="go">Quantity(value=1.9999999999999998, unit=centimeter**3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Now try to combine incompatible units</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span> <span class="o">+</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kelvin</span>
+<span class="go">TypeError: Cannot add two quantities with incompatible units &quot;millimeter&quot; and &quot;kelvin&quot;.</span>
+</pre></div>
+</div>
+<p>Two units can be multiplied together to form a composite unit with the
+corresponding dimensionality&#8212;in the example above, cubing 1 centimeter
+resulted in a volume, which is a cubic length dimension. This works for much
+more complex units as well:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilograms</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">seconds</span><span class="o">**</span><span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">Quantity(value=1, unit=kilogram*meter**2/(second**2))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">joule</span>
+<span class="go">Quantity(value=2, unit=kilogram*meter**2/(second**2))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-do-i-use-units">
+<h2>How do I use <tt class="docutils literal"><span class="pre">units</span></tt>?<a class="headerlink" href="#how-do-i-use-units" title="Permalink to this headline">¶</a></h2>
+<p>There are a variety of tasks you may want to do with units &#8211; the more popular
+of which is shown in the sections below.</p>
+<div class="section" id="checking-to-see-if-an-object-is-a-quantity">
+<h3>Checking to see if an object is a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a><a class="headerlink" href="#checking-to-see-if-an-object-is-a-quantity" title="Permalink to this headline">¶</a></h3>
+<p>There may be times when you want to see if a Python object is a
+<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance, or if it is just a raw number. Many functions in
+ParmEd do this when taking user input, converting to its internal AKMA unit
+system (see below). Checking that an object is a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> is done using
+the <a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#chemistry.unit.is_quantity" title="chemistry.unit.is_quantity"><tt class="xref py py-func docutils literal"><span class="pre">is_quantity()</span></tt></a> function in the <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> namespace:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-units">
+<h3>Creating units<a class="headerlink" href="#creating-units" title="Permalink to this headline">¶</a></h3>
+<p>You can create a unit in one of two ways:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Use the <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> constructor, as shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
+<span class="go">Quantity(1, nanometer)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**-</span><span class="mi">3</span><span class="p">)</span> <span class="c"># You can raise units to exponents</span>
+<span class="go">Quantity(value=1, unit=/(meter**3))</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Multiply (or divide!) by a specific unit, as shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
+<span class="go">Quantity(1, nanometer)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**</span><span class="mi">3</span> <span class="c"># You can raise units to exponents</span>
+<span class="go">Quantity(value=1, unit=/(meter**3))</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>Seems easy enough, and I usually use method 2 when turning a <tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">int</span></tt>,
+<tt class="docutils literal"><span class="pre">list</span></tt>, or <tt class="docutils literal"><span class="pre">tuple</span></tt> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. However, this does <em>not</em> work
+for numpy arrays, since numpy arrays overload all of the multiplication
+operators (<tt class="docutils literal"><span class="pre">__mul__</span></tt>, <tt class="docutils literal"><span class="pre">__imul__</span></tt>, ... etc.), which is the mechanism by which
+unit multiplication creates a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. As a result, you <em>must</em> use
+method #1 when converting a <tt class="docutils literal"><span class="pre">numpy.ndarray</span></tt> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>.</p>
+</div>
+<div class="section" id="converting-to-another-unit">
+<h3>Converting to another unit<a class="headerlink" href="#converting-to-another-unit" title="Permalink to this headline">¶</a></h3>
+<p>Aside from using units as a type-checker to make sure you are not making an
+arithmetic mistake with your transformations, the most common reason to use the
+<tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package is to handle unit conversions for you. The <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
+class defines two functions for this:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">in_units_of(unit)</span></tt>: This method returns a new <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
+instance with the specified <tt class="docutils literal"><span class="pre">unit</span></tt> (a <tt class="docutils literal"><span class="pre">TypeError</span></tt> is raised).</li>
+<li><tt class="docutils literal"><span class="pre">value_in_unit(unit)</span></tt>: This method returns a copy of the underlying
+data <em>without</em> an attached <tt class="docutils literal"><span class="pre">unit</span></tt> (i.e., it is <em>not</em> a
+<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance). This should be used when a scalar is needed
+from a quantity for use in a particular API, or if the performance hit
+from the dimensional analysis is unacceptable.</li>
+</ol>
+</div></blockquote>
+<p>The following example shows both of the above in action, demonstrating their
+differences:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">in_units_of</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoule</span><span class="p">)</span>
+<span class="go">Quantity(value=4.184, unit=kilojoule)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoule</span><span class="p">)</span>
+<span class="go">4.184</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="converting-units-in-batch-the-unitsystem">
+<h3>Converting units in batch &#8211; the <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#converting-units-in-batch-the-unitsystem" title="Permalink to this headline">¶</a></h3>
+<p>The previous section described how to convert a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> into another
+<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> in a different, but <em>compatible</em> unit. The argument to
+<tt class="docutils literal"><span class="pre">in_units_of</span></tt> and <tt class="docutils literal"><span class="pre">value_in_unit</span></tt> methods <em>must</em> be a compatible unit, which
+can be limiting if you want to write a function that changes the units of an
+argument with unknown dimensionality into a particular system of units.</p>
+<p>This is where <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> comes in. Each <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance also
+has a corresponding methods for conversion to units compatible within a
+particular <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a>:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">in_unit_system(UnitSystem)</span></tt>: This method returns a new
+<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance composed of the base units defined in that
+unit system.</li>
+<li><tt class="docutils literal"><span class="pre">value_in_unit_system(UnitSystem)</span></tt>: This method returns a scalar of the
+value in that particular unit system.</li>
+</ol>
+</div></blockquote>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
+<span class="go">Quantity(value=4.184, unit=nanometer**2*mole*dalton/(picosecond**2))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
+<span class="go">4.184</span>
+</pre></div>
+</div>
+<p>This can be useful when designing a function that needs to handle arbitrary
+units, but it comes with some drawbacks (see below), so you should avoid unit
+system conversions when you can.</p>
+</div>
+<div class="section" id="a-warning-about-unitsystem">
+<h3>A warning about <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#a-warning-about-unitsystem" title="Permalink to this headline">¶</a></h3>
+<p>Note that this method does not provide the added security of checking that the
+<em>dimensions</em> are correct &#8211; it simply converts all base dimensions to the ones
+defining the unit system. For instance, consider the two functions below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Computes the area of a rectangle</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : distance Quantity</span>
+<span class="sd">        The length of the first side</span>
+<span class="sd">    y : distance Quantity</span>
+<span class="sd">        The length of the second side</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    area : float</span>
+<span class="sd">        Area in nanometers^2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span> <span class="o">*</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">area2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span> <span class="o">*</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>As long as you provide the correct dimensions in the arguments, both functions
+yield the same result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<span class="go">100000.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">area2</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<span class="go">100000.0</span>
+</pre></div>
+</div>
+<p>Consider what happens if you make a small mistake, though:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<span class="go">9999999.999999998</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">area2</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<span class="go">TypeError: Unit &quot;/angstrom&quot; is not compatible with Unit &quot;nanometer&quot;.</span>
+</pre></div>
+</div>
+<p>Converting <tt class="docutils literal"><span class="pre">1/angstrom</span></tt> to the <tt class="docutils literal"><span class="pre">md_unit_system</span></tt> converts the value to
+<tt class="docutils literal"><span class="pre">10/nanometer</span></tt> (rather than <tt class="docutils literal"><span class="pre">1</span> <span class="pre">angstrom</span></tt> to <tt class="docutils literal"><span class="pre">0.1</span> <span class="pre">nanometer</span></tt>), leading to a
+result that is 2 orders of magnitude larger than expected! The <tt class="docutils literal"><span class="pre">area2</span></tt>
+function catches the error and raises an exception, though, thereby making the
+mistake easier to find.</p>
+</div>
+</div>
+<div class="section" id="available-unitsystem-options">
+<h2>Available <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> options<a class="headerlink" href="#available-unitsystem-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> module contains a number of <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> instances
+available in the <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> namespace. They are summarized in the table
+below, along with the units defining them (the energy unit is a composite of the
+mass unit times the square of the ratio of the length-to-time units):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="10%" />
+<col width="9%" />
+<col width="12%" />
+<col width="14%" />
+<col width="15%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a></th>
+<th class="head">Length unit</th>
+<th class="head">Mass unit</th>
+<th class="head">Time unit</th>
+<th class="head">Charge unit [1]</th>
+<th class="head">Temperature unit</th>
+<th class="head">Amount unit</th>
+<th class="head">Energy unit</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">si_unit_system</span></tt></td>
+<td>meters</td>
+<td>kilograms</td>
+<td>second</td>
+<td>Ampere</td>
+<td>kelvin</td>
+<td>mole</td>
+<td>joule</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">cgs_unit_system</span></tt></td>
+<td>centimeters</td>
+<td>gram</td>
+<td>second</td>
+<td>Ampere</td>
+<td>kelvin</td>
+<td>mole</td>
+<td>1e-7 joule</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">md_unit_system</span></tt></td>
+<td>nanometers</td>
+<td>daltons</td>
+<td>picosecond</td>
+<td>q electron</td>
+<td>kelvin</td>
+<td>mole</td>
+<td>kilojoule</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">planck_unit_system</span></tt></td>
+<td>pl. length</td>
+<td>pl. mass</td>
+<td>pl. time</td>
+<td>pl. charge</td>
+<td>pl. temperature</td>
+<td>item</td>
+<td>pl. energy</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+<td>angstroms</td>
+<td>daltons</td>
+<td>akma time [2]</td>
+<td>q electron</td>
+<td>kelvin</td>
+<td>mole</td>
+<td>kilocalorie</td>
+</tr>
+</tbody>
+</table>
+<p>[1] Some unit systems use current instead of charge as a base unit, while others
+use the charge.</p>
+<p>[2] The time in the AKMA unit system (Angstroms, Kilocalories per Mole, Atomic
+mass units) does not have an official name, and is roughly equal to 20.455
+picoseconds.</p>
+<p>Different programs tend to use different unit systems. As a general reference,
+the table below summarizes a subset of programs and the unit systems they use:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Program</th>
+<th class="head">Unit System</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>AMBER</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-odd"><td>CHARMM</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-even"><td>Tinker</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Desmond</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-even"><td>LAMMPS</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-odd"><td>NAMD</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-even"><td>AceMD</td>
+<td><tt class="docutils literal"><span class="pre">akma_unit_system</span></tt></td>
+</tr>
+<tr class="row-odd"><td>OpenMM</td>
+<td><tt class="docutils literal"><span class="pre">md_unit_system</span></tt></td>
+</tr>
+<tr class="row-even"><td>Gromacs</td>
+<td><tt class="docutils literal"><span class="pre">md_unit_system</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Gromos</td>
+<td><tt class="docutils literal"><span class="pre">md_unit_system</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a><ul>
+<li><a class="reference internal" href="#what-does-chemistry-unit-do">What does <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> do?</a></li>
+<li><a class="reference internal" href="#how-do-i-use-units">How do I use <tt class="docutils literal"><span class="pre">units</span></tt>?</a><ul>
+<li><a class="reference internal" href="#checking-to-see-if-an-object-is-a-quantity">Checking to see if an object is a <tt class="docutils literal"><span class="pre">Quantity</span></tt></a></li>
+<li><a class="reference internal" href="#creating-units">Creating units</a></li>
+<li><a class="reference internal" href="#converting-to-another-unit">Converting to another unit</a></li>
+<li><a class="reference internal" href="#converting-units-in-batch-the-unitsystem">Converting units in batch &#8211; the <tt class="docutils literal"><span class="pre">UnitSystem</span></tt></a></li>
+<li><a class="reference internal" href="#a-warning-about-unitsystem">A warning about <tt class="docutils literal"><span class="pre">UnitSystem</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#available-unitsystem-options">Available <tt class="docutils literal"><span class="pre">UnitSystem</span></tt> options</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dimensional_analysis.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="unitobj/chemistry.unit.Quantity.html" title="chemistry.unit.Quantity"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="structobj/chemistry.structure.read_CIF.html" title="chemistry.structure.read_CIF"
+             >previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

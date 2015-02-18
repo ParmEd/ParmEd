@@ -1,0 +1,18 @@
+chemistry.openmm package
+========================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.openmm.reporters
+   chemistry.openmm.utils
+
+Module contents
+---------------
+
+.. automodule:: chemistry.openmm
+    :members:
+    :undoc-members:
+    :show-inheritance:

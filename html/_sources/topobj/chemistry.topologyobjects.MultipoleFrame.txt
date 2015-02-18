@@ -1,0 +1,22 @@
+chemistry.topologyobjects.MultipoleFrame
+========================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: MultipoleFrame
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MultipoleFrame.__init__
+   
+   
+
+   
+   
+   

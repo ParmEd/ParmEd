@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.topologyobjects.OutOfPlaneBendType &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chemistry-topologyobjects-outofplanebendtype">
+<h1>chemistry.topologyobjects.OutOfPlaneBendType<a class="headerlink" href="#chemistry-topologyobjects-outofplanebendtype" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.topologyobjects.OutOfPlaneBendType">
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">OutOfPlaneBendType</tt><big>(</big><em>k</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
+<dd><p>An angle type with a set of angle parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>k</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>Force constant in kcal/mol/radians^2</p>
+</div></blockquote>
+<p><strong>list</strong> : <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.TrackedList" title="chemistry.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a></p>
+<blockquote class="last">
+<div><p>A list of <a href="#id1"><span class="problematic" id="id2">`</span></a>OutOfPlaneBendType`s in which this is a member</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Two <cite>OutOfPlaneBendType`s are equal if their `k</cite> attribute is equal</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ot2</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="ow">is</span> <span class="n">ot2</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">==</span> <span class="n">ot2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span><span class="o">.</span><span class="n">idx</span> <span class="c"># not part of any list or iterable</span>
+<span class="go">-1</span>
+</pre></div>
+</div>
+<p>As part of a list, they can be indexed</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.OutOfPlaneBendType.idx" title="chemistry.topologyobjects.OutOfPlaneBendType.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.topologyobjects.OutOfPlaneBendType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>k</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#OutOfPlaneBendType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.OutOfPlaneBendType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.OutOfPlaneBendType.__init__" title="chemistry.topologyobjects.OutOfPlaneBendType.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(k[,&nbsp;list])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.OutOfPlaneBendType.idx" title="chemistry.topologyobjects.OutOfPlaneBendType.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/chemistry.topologyobjects.OutOfPlaneBendType.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

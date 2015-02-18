@@ -1,0 +1,25 @@
+chemistry.openmm.RestartReporter
+================================
+
+.. currentmodule:: chemistry.openmm
+
+.. autoclass:: RestartReporter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RestartReporter.__init__
+      ~RestartReporter.describeNextReport
+      ~RestartReporter.finalize
+      ~RestartReporter.report
+   
+   
+
+   
+   
+   

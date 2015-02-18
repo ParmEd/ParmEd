@@ -1,0 +1,28 @@
+chemistry.topologyobjects.OutOfPlaneBendType
+============================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: OutOfPlaneBendType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OutOfPlaneBendType.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OutOfPlaneBendType.idx
+   
+   

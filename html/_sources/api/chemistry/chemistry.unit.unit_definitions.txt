@@ -1,0 +1,7 @@
+chemistry.unit.unit_definitions module
+======================================
+
+.. automodule:: chemistry.unit.unit_definitions
+    :members:
+    :undoc-members:
+    :show-inheritance:

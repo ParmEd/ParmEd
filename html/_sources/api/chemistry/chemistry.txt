@@ -1,0 +1,37 @@
+chemistry package
+=================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    chemistry.amber
+    chemistry.charmm
+    chemistry.openmm
+    chemistry.pdbx
+    chemistry.tinker
+    chemistry.unit
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.constants
+   chemistry.exceptions
+   chemistry.geometry
+   chemistry.molecule
+   chemistry.periodic_table
+   chemistry.residue
+   chemistry.structure
+   chemistry.topologyobjects
+   chemistry.utils
+
+Module contents
+---------------
+
+.. automodule:: chemistry
+    :members:
+    :undoc-members:
+    :show-inheritance:

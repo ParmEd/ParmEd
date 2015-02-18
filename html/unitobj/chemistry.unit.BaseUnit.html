@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.unit.BaseUnit &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="Dimensional Analysis (working with chemistry.unit)" href="../dimensional_analysis.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../dimensional_analysis.html" accesskey="U">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chemistry-unit-baseunit">
+<h1>chemistry.unit.BaseUnit<a class="headerlink" href="#chemistry-unit-baseunit" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.unit.BaseUnit">
+<em class="property">class </em><tt class="descclassname">chemistry.unit.</tt><tt class="descname">BaseUnit</tt><big>(</big><em>base_dim</em>, <em>name</em>, <em>symbol</em><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Physical unit expressed in exactly one BaseDimension.</p>
+<p>For example, meter_base_unit could be a BaseUnit for the length dimension.
+The BaseUnit class is used internally in the more general Unit class.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.conversion_factor_to" title="chemistry.unit.BaseUnit.conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></tt></a>(other)</td>
+<td>Returns a conversion factor from this BaseUnit to another BaseUnit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.define_conversion_factor_to" title="chemistry.unit.BaseUnit.define_conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">define_conversion_factor_to</span></tt></a>(other,&nbsp;factor)</td>
+<td>Defines a conversion factor between two BaseUnits.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.get_dimension_tuple" title="chemistry.unit.BaseUnit.get_dimension_tuple"><tt class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></tt></a>()</td>
+<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.iter_base_dimensions" title="chemistry.unit.BaseUnit.iter_base_dimensions"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></tt></a>()</td>
+<td>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></tt>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.unit.BaseUnit.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>base_dim</em>, <em>name</em>, <em>symbol</em><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new BaseUnit.</p>
+<dl class="docutils">
+<dt>Parameters</dt>
+<dd><ul class="first last">
+<li><p class="first">self: The newly created BaseUnit.</p>
+</li>
+<li><p class="first">base_dim: (BaseDimension) The dimension of the new unit, e.g. &#8216;mass&#8217;</p>
+</li>
+<li><p class="first">name: (string) Name of the unit, e.g. &#8220;kilogram&#8221;</p>
+</li>
+<li><dl class="first docutils">
+<dt>symbol: (string) Symbol for the unit, e.g. &#8216;kg&#8217;.  This symbol will appear in</dt>
+<dd><p class="first last">Quantity string descriptions.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.__init__" title="chemistry.unit.BaseUnit.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
+<td>Creates a new BaseUnit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.conversion_factor_to" title="chemistry.unit.BaseUnit.conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></tt></a>(other)</td>
+<td>Returns a conversion factor from this BaseUnit to another BaseUnit.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.define_conversion_factor_to" title="chemistry.unit.BaseUnit.define_conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">define_conversion_factor_to</span></tt></a>(other,&nbsp;factor)</td>
+<td>Defines a conversion factor between two BaseUnits.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.get_dimension_tuple" title="chemistry.unit.BaseUnit.get_dimension_tuple"><tt class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></tt></a>()</td>
+<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.BaseUnit.iter_base_dimensions" title="chemistry.unit.BaseUnit.iter_base_dimensions"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></tt></a>()</td>
+<td>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></tt>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.unit.BaseUnit.conversion_factor_to">
+<tt class="descname">conversion_factor_to</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p>
+<p>It does not matter which existing BaseUnit you define the conversion factor to.
+Conversions for all other known BaseUnits will be computed at the same time.</p>
+<p>Raises TypeError if dimension does not match.
+Raises LookupError if no conversion has been defined. (see define_conversion_factor_to).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.BaseUnit.define_conversion_factor_to">
+<tt class="descname">define_conversion_factor_to</tt><big>(</big><em>other</em>, <em>factor</em><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit.define_conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a conversion factor between two BaseUnits.</p>
+<p>self * factor = other</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>self: (BaseUnit) &#8216;From&#8217; unit in conversion.</li>
+<li>other: (BaseUnit) &#8216;To&#8217; unit in conversion.</li>
+<li>factor: (float) Conversion factor.</li>
+</ul>
+</dd>
+</dl>
+<p>After calling this method, both self and other will have stored
+conversion factors for one another, plus all other BaseUnits which
+self and other have previously defined.</p>
+<p>Both self and other must have the same dimension, otherwise a TypeError
+will be raised.</p>
+<p>Returns None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.BaseUnit.get_dimension_tuple">
+<tt class="descname">get_dimension_tuple</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.BaseUnit.iter_base_dimensions">
+<tt class="descname">iter_base_dimensions</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.unit.BaseUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/unitobj/chemistry.unit.BaseUnit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../dimensional_analysis.html" >Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

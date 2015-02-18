@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.amber.asciicrd module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chemistry.amber.asciicrd">
+<span id="chemistry-amber-asciicrd-module"></span><h1>chemistry.amber.asciicrd module<a class="headerlink" href="#module-chemistry.amber.asciicrd" title="Permalink to this headline">¶</a></h1>
+<p>This is a pure-python module for reading and writing ASCII Amber structure
+files, like trajectories and restarts.  Because it is pure-python and
+formatted-ASCII, parsing and writing these files are expected to be slow. Binary
+alternatives (like DCD and NetCDF, provided in netcdffiles.py) are strongly
+encouraged, but these are provided for more complete compatibility and for
+instances where the prequisites may not be installed.</p>
+<dl class="class">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart">
+<em class="property">class </em><tt class="descclassname">chemistry.amber.asciicrd.</tt><tt class="descname">AmberAsciiRestart</tt><big>(</big><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.asciicrd._AmberAsciiCoordinateFile</span></tt></p>
+<p>Parser for the Amber ASCII inpcrd/restart file format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote class="last">
+<div><blockquote>
+<div><p>File name to open</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>mode <span class="classifier-delimiter">:</span> <span class="classifier">str={&#8216;r&#8217;, &#8216;w&#8217;}</span></dt>
+<dd><p class="first last">Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
+</dd>
+<dt>natom <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Number of atoms in the system (necessary when mode=&#8217;w&#8217;)</p>
+</dd>
+<dt>hasbox <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">Does the system have PBCs? Necessary when mode=&#8217;w&#8217;</p>
+</dd>
+<dt>title <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
+</dd>
+<dt>time <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd><p class="first last">The time to write to the restart file in ps. Default is 0.</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.box" title="chemistry.amber.asciicrd.AmberAsciiRestart.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<td>Combined cell lengths and cell angles</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.cell_angles" title="chemistry.amber.asciicrd.AmberAsciiRestart.cell_angles"><tt class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.cell_lengths" title="chemistry.amber.asciicrd.AmberAsciiRestart.cell_lengths"><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.coordinates" title="chemistry.amber.asciicrd.AmberAsciiRestart.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.velocities" title="chemistry.amber.asciicrd.AmberAsciiRestart.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.close" title="chemistry.amber.asciicrd.AmberAsciiRestart.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>Close the open file handler</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.CRDS_PER_LINE">
+<tt class="descname">CRDS_PER_LINE</tt><em class="property"> = 6</em><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.DEFAULT_TITLE">
+<tt class="descname">DEFAULT_TITLE</tt><em class="property"> = 'restart created by ParmEd'</em><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.box">
+<tt class="descname">box</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combined cell lengths and cell angles</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.cell_angles">
+<tt class="descname">cell_angles</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.cell_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.cell_angles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.cell_lengths">
+<tt class="descname">cell_lengths</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.cell_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.cell_lengths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the open file handler</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.coordinates">
+<tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.velocities">
+<tt class="descname">velocities</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.velocities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd">
+<em class="property">class </em><tt class="descclassname">chemistry.amber.asciicrd.</tt><tt class="descname">AmberMdcrd</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.asciicrd._AmberAsciiCoordinateFile</span></tt></p>
+<p>A class to parse Amber ASCII trajectory files. This is <em>much</em> slower than
+parsing NetCDF files (or the equivalent parsing done in a compiled language
+like C or C++). For large trajectories, this may be significant.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.add_box" title="chemistry.amber.asciicrd.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.add_coordinates" title="chemistry.amber.asciicrd.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.box" title="chemistry.amber.asciicrd.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>([frame])</td>
+<td>Returns the frame&#8217;th frame of the box lengths as a length-3 array</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.close" title="chemistry.amber.asciicrd.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>Close the open file handler</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.coordinates" title="chemistry.amber.asciicrd.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
+<td>Returns the requested coordinates</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.CRDS_PER_LINE">
+<tt class="descname">CRDS_PER_LINE</tt><em class="property"> = 10</em><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.DEFAULT_TITLE">
+<tt class="descname">DEFAULT_TITLE</tt><em class="property"> = 'trajectory created by ParmEd'</em><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.add_box">
+<tt class="descname">add_box</tt><big>(</big><em>stuff</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or
+np.ndarray) as the box lengths for this frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
+<blockquote>
+<div><p>This must be an iterable of length 3 with the box lengths</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
+<p><strong>currently expected to provide coordinates, a RuntimeError is raised.</strong></p>
+<p><strong>raised. If the provided box lengths are not length 3, a ValueError is</strong></p>
+<p class="last"><strong>raised.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.add_coordinates">
+<tt class="descname">add_coordinates</tt><big>(</big><em>stuff</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd.add_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an
+attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the
+open file handler. Can only be called on a &#8216;new&#8217; mdcrd, and adds these
+coordinates to the current end of the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
+<blockquote>
+<div><p>This must be an iterable of length 3*natom or a numpy array that can
+be flattened to a 3*natom-length array</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
+<p><strong>currently expected to provide unit cell dimensions, a RuntimeError is</strong></p>
+<p><strong>raised. If the provided coordinate data does not have length 3*natom, or</strong></p>
+<p><strong>cannot be ``flatten()``ed to create a 3*natom array, a ValueError is</strong></p>
+<p class="last"><strong>raised.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.box">
+<tt class="descname">box</tt><big>(</big><em>frame=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd.box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the frame&#8217;th frame of the box lengths as a length-3 array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
+<blockquote>
+<div><p>If provided, this is the frame number whose box dimensions will be
+returned. If not provided, all of the box dimensions are returned as
+a list in which each entry is a length-3 array of box lengths</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box_lengths</strong> : array or list of array</p>
+<blockquote class="last">
+<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the box lengths will be a list of length the
+number of frames in the trajectory with each item being an array
+(numpy if available) of box lengths.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the open file handler</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.coordinates">
+<tt class="descname">coordinates</tt><big>(</big><em>frame=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the requested coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
+<blockquote>
+<div><p>If provided, this is the frame number whose coordinates will be
+returned. If not provided, all of the coordinates are returned as a
+list in which each entry is a 3*natom-length array of coordinates</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : array or list of array</p>
+<blockquote class="last">
+<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the coordinates will be a list of length the
+number of frames in the trajectory with each item being an array
+(numpy if available) of 3*natom length of coordinates.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/chemistry/chemistry.amber.asciicrd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

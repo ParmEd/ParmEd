@@ -1,0 +1,32 @@
+chemistry.amber package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    chemistry.amber.mdin
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.amber.amberformat
+   chemistry.amber.asciicrd
+   chemistry.amber.leaprc
+   chemistry.amber.mask
+   chemistry.amber.netcdffiles
+   chemistry.amber.openmmloader
+   chemistry.amber.parameters
+   chemistry.amber.readparm
+   chemistry.amber.residue
+
+Module contents
+---------------
+
+.. automodule:: chemistry.amber
+    :members:
+    :undoc-members:
+    :show-inheritance:

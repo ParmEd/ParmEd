@@ -1,0 +1,7 @@
+chemistry.charmm.psf module
+===========================
+
+.. automodule:: chemistry.charmm.psf
+    :members:
+    :undoc-members:
+    :show-inheritance:

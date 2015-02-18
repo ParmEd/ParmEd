@@ -1,0 +1,7 @@
+chemistry.amber.mdin.mdin module
+================================
+
+.. automodule:: chemistry.amber.mdin.mdin
+    :members:
+    :undoc-members:
+    :show-inheritance:

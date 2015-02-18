@@ -1,0 +1,28 @@
+chemistry.topologyobjects.StretchBendType
+=========================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: StretchBendType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StretchBendType.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~StretchBendType.idx
+   
+   

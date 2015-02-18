@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.openmm.ProgressReporter &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="OpenMM Functionality" href="../openmm.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="chemistry-openmm-progressreporter">
+<h1>chemistry.openmm.ProgressReporter<a class="headerlink" href="#chemistry-openmm-progressreporter" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.openmm.ProgressReporter">
+<em class="property">class </em><tt class="descclassname">chemistry.openmm.</tt><tt class="descname">ProgressReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class that prints out a progress report of how much MD (or minimization)
+has been done, how fast the simulation is running, and how much time is left
+(similar to the mdinfo file in Amber)</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.describeNextReport" title="chemistry.openmm.ProgressReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.finalize" title="chemistry.openmm.ProgressReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.report" title="chemistry.openmm.ProgressReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report and predict the time to completion (and</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.ProgressReporter.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.ProgressReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a StateDataReporter.
+Parameters:
+- f (str) The file name of the progress report (overwritten each time)
+- reportInterval (int) The step interval at which to write frames
+- totalSteps (int) The total number of steps that will be run in the</p>
+<blockquote>
+<div>simulation (used to estimate the completion time)</div></blockquote>
+<ul>
+<li><p class="first">potentialEnergy (boolean=False) Whether to write the potential energy</p>
+</li>
+<li><p class="first">kineticEnergy (boolean=False) Whether to write the kinetic energy</p>
+</li>
+<li><p class="first">totalEnergy (boolean=False) Whether to write the total energy</p>
+</li>
+<li><p class="first">temperature (boolean=False) Whether to write the instantaneous temp.</p>
+</li>
+<li><p class="first">volume (boolean=False) Whether to write the periodic box volume</p>
+</li>
+<li><p class="first">density (boolean=False) Whether to write the system density</p>
+</li>
+<li><dl class="first docutils">
+<dt>systemMass (mass=None) The total mass to use for the system when</dt>
+<dd><p class="first last">reporting density.  If this is None (the default), the system mass
+is computed by summing the masses of all particles.  This parameter
+is useful when the particle masses do not reflect their actual
+physical mass, such as when some particles have had their masses
+set to 0 to immobilize them.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs (keyword arguments): any other arguments accepted by</dt>
+<dd><p class="first last">AmberStateDataReporter</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.__init__" title="chemistry.openmm.ProgressReporter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create a StateDataReporter.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.describeNextReport" title="chemistry.openmm.ProgressReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.finalize" title="chemistry.openmm.ProgressReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.ProgressReporter.report" title="chemistry.openmm.ProgressReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report and predict the time to completion (and</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.ProgressReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="headerlink" href="#chemistry.openmm.ProgressReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>simulation (Simulation) The Simulation to generate a report for</li>
+</ul>
+</dd>
+<dt>Returns: A five element tuple.  The first element is the number of steps</dt>
+<dd>until the next report.  The remaining elements specify whether that
+report will require positions, velocities, forces, and energies
+respectively.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.ProgressReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.openmm.ProgressReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.ProgressReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="headerlink" href="#chemistry.openmm.ProgressReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report and predict the time to completion (and
+current/overall MD performance)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/openmmobj/chemistry.openmm.ProgressReporter.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" >OpenMM Functionality</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

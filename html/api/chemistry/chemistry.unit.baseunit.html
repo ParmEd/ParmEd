@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.unit.baseunit module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chemistry.unit.baseunit">
+<span id="chemistry-unit-baseunit-module"></span><h1>chemistry.unit.baseunit module<a class="headerlink" href="#module-chemistry.unit.baseunit" title="Permalink to this headline">¶</a></h1>
+<p>Module simtk.unit.baseunit</p>
+<p>Contains BaseUnit class, which is a component of the Unit class.</p>
+<p>This is part of the OpenMM molecular simulation toolkit originating from
+Simbios, the NIH National Center for Physics-Based Simulation of
+Biological Structures at Stanford, funded under the NIH Roadmap for
+Medical Research, grant U54 GM072970. See <a class="reference external" href="https://simtk.org">https://simtk.org</a>.</p>
+<p>Portions copyright (c) 2012 Stanford University and the Authors.
+Authors: Christopher M. Bruns
+Contributors: Peter Eastman</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the &#8220;Software&#8221;),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED &#8220;AS IS&#8221;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<dl class="class">
+<dt id="chemistry.unit.baseunit.BaseUnit">
+<em class="property">class </em><tt class="descclassname">chemistry.unit.baseunit.</tt><tt class="descname">BaseUnit</tt><big>(</big><em>base_dim</em>, <em>name</em>, <em>symbol</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Physical unit expressed in exactly one BaseDimension.</p>
+<p>For example, meter_base_unit could be a BaseUnit for the length dimension.
+The BaseUnit class is used internally in the more general Unit class.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.baseunit.BaseUnit.conversion_factor_to" title="chemistry.unit.baseunit.BaseUnit.conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></tt></a>(other)</td>
+<td>Returns a conversion factor from this BaseUnit to another BaseUnit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.baseunit.BaseUnit.define_conversion_factor_to" title="chemistry.unit.baseunit.BaseUnit.define_conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">define_conversion_factor_to</span></tt></a>(other,&nbsp;factor)</td>
+<td>Defines a conversion factor between two BaseUnits.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.baseunit.BaseUnit.get_dimension_tuple" title="chemistry.unit.baseunit.BaseUnit.get_dimension_tuple"><tt class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></tt></a>()</td>
+<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.baseunit.BaseUnit.iter_base_dimensions" title="chemistry.unit.baseunit.BaseUnit.iter_base_dimensions"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></tt></a>()</td>
+<td>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.baseunit.BaseUnit.iter_base_units" title="chemistry.unit.baseunit.BaseUnit.iter_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></tt></a>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.unit.baseunit.BaseUnit.conversion_factor_to">
+<tt class="descname">conversion_factor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p>
+<p>It does not matter which existing BaseUnit you define the conversion factor to.
+Conversions for all other known BaseUnits will be computed at the same time.</p>
+<p>Raises TypeError if dimension does not match.
+Raises LookupError if no conversion has been defined. (see define_conversion_factor_to).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.baseunit.BaseUnit.define_conversion_factor_to">
+<tt class="descname">define_conversion_factor_to</tt><big>(</big><em>other</em>, <em>factor</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit.define_conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit.define_conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a conversion factor between two BaseUnits.</p>
+<p>self * factor = other</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>self: (BaseUnit) &#8216;From&#8217; unit in conversion.</li>
+<li>other: (BaseUnit) &#8216;To&#8217; unit in conversion.</li>
+<li>factor: (float) Conversion factor.</li>
+</ul>
+</dd>
+</dl>
+<p>After calling this method, both self and other will have stored
+conversion factors for one another, plus all other BaseUnits which
+self and other have previously defined.</p>
+<p>Both self and other must have the same dimension, otherwise a TypeError
+will be raised.</p>
+<p>Returns None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.baseunit.BaseUnit.get_dimension_tuple">
+<tt class="descname">get_dimension_tuple</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.baseunit.BaseUnit.iter_base_dimensions">
+<tt class="descname">iter_base_dimensions</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.unit.baseunit.BaseUnit.iter_base_units">
+<tt class="descname">iter_base_units</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/baseunit.html#BaseUnit.iter_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.baseunit.BaseUnit.iter_base_units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/chemistry/chemistry.unit.baseunit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

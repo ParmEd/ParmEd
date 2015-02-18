@@ -1,0 +1,7 @@
+ParmedTools.parmlist module
+===========================
+
+.. automodule:: ParmedTools.parmlist
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Examples using CHARMM Files &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="up" title="OpenMM Functionality" href="openmm.html" />
+    <link rel="prev" title="Running OpenMM Simulation with AMBER Files" href="omm_amber.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples-using-charmm-files">
+<h1>Examples using CHARMM Files<a class="headerlink" href="#examples-using-charmm-files" title="Permalink to this headline">¶</a></h1>
+<p>There are popular ways to model biomolecular systems.  Because solvation effects
+are often (always?) critically important to biological function, we need some
+way to model the solvent.  The two popular approaches are to employ a continuum
+model with a dielectric constant equal to that of the bulk solvent or to model
+the solvent models directly in your system.  These two approaches are termed
+_implicit_ and _explicit_ solvation, respectively.</p>
+<p>The next 2 sections present examples using a Generalized Born implicit solvent
+model and explicit solvent based on the TIP3P water model. All of the files and
+examples here are included in the <cite>examples/charmm</cite> directory of the ParmEd
+release.</p>
+<div class="section" id="generalized-born-implicit-solvent">
+<h2>Generalized Born Implicit Solvent<a class="headerlink" href="#generalized-born-implicit-solvent" title="Permalink to this headline">¶</a></h2>
+<p>For the purposes of this example, we are using an alanine pentapeptide. You can
+find the following files that you will need for this demonstration in the
+<tt class="docutils literal"><span class="pre">examples/charmm</span></tt> directory of the ParmEd distribution:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ala5_autopsf.psf</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ala5_autopsf.pdb</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The following sample script (<tt class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></tt> in the ParmEd
+distribution) will set up and run the simulation using OpenMM:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c"># OpenMM Imports</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+
+<span class="c"># ParmEd Imports</span>
+<span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">chemistry.openmm</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="c"># Load the CHARMM files</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">(</span><span class="s">&#39;toppar/par_all36_prot.prm&#39;</span><span class="p">)</span>
+<span class="n">ala5_gas</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;ala5_autopsf.psf&#39;</span><span class="p">)</span>
+<span class="n">ala5_crds</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="s">&#39;ala5_autopsf.pdb&#39;</span><span class="p">)</span>
+
+<span class="c"># NOTE NOTE</span>
+<span class="c"># The parameter set we used here is the CHARMM 36 force field, but this is</span>
+<span class="c"># strictly an example. It is important that you use the most accurate (typically</span>
+<span class="c"># most up-to-date) force fields for your own simulation. See the CHARMM</span>
+<span class="c"># parameter web page for updates:</span>
+<span class="c"># http://mackerell.umaryland.edu/CHARMM_ff_params.html</span>
+<span class="c"># END NOTE</span>
+
+<span class="c"># Create the OpenMM system</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ala5_gas</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">,</span>
+                               <span class="n">constraints</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HCT</span><span class="p">,</span>
+                               <span class="n">implicitSolventSaltConc</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">moles</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c"># Create the integrator to do Langevin dynamics</span>
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">LangevinIntegrator</span><span class="p">(</span>
+                        <span class="mi">300</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>       <span class="c"># Temperature of heat bath</span>
+                        <span class="mf">1.0</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">,</span>  <span class="c"># Friction coefficient</span>
+                        <span class="mf">2.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">femtoseconds</span><span class="p">,</span> <span class="c"># Time step</span>
+<span class="p">)</span>
+
+<span class="c"># Define the platform to use; CUDA, OpenCL, CPU, or Reference. Or do not specify</span>
+<span class="c"># the platform to use the default (fastest) platform</span>
+<span class="n">platform</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s">&#39;CUDA&#39;</span><span class="p">)</span>
+<span class="n">prop</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">CudaPrecision</span><span class="o">=</span><span class="s">&#39;mixed&#39;</span><span class="p">)</span> <span class="c"># Use mixed single/double precision</span>
+
+<span class="c"># Create the Simulation object</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">ala5_gas</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+<span class="c"># Set the particle positions</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">ala5_crds</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+
+<span class="c"># Minimize the energy</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Minimizing energy&#39;</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="c"># Set up the reporters to report energies and coordinates every 100 steps</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                          <span class="n">volume</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">DCDReporter</span><span class="p">(</span><span class="s">&#39;ala5_gb.dcd&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c"># Run dynamics</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Running dynamics&#39;</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we&#8217;ll dissect the script to help you understand what is happening at each
+step. We will divide the script into the sections following the <tt class="docutils literal"><span class="pre">print</span></tt>
+statements that announce when each stage begins.</p>
+<div class="section" id="loading-charmm-files">
+<h3>Loading CHARMM files<a class="headerlink" href="#loading-charmm-files" title="Permalink to this headline">¶</a></h3>
+<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> with the parameters we wish to use. In
+this example we are using the CHARMM 36 force field, but be sure you check
+<a class="reference external" href="http://mackerell.umaryland.edu/CHARMM_ff_params.html">the CHARMM parameter website</a> to make sure you use
+the latest and greatest force fields for your own work.</p>
+<p>We also define the <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></a>
+object that stores all information about atom connectivity. The coordinates from
+PSF files generated by VMD are typically given in PDB format, so we use the
+OpenMM <cite>PDBFile</cite> object.</p>
+</div>
+<div class="section" id="create-the-openmm-system">
+<h3>Create the OpenMM system<a class="headerlink" href="#create-the-openmm-system" title="Permalink to this headline">¶</a></h3>
+<p>This command creates an OpenMM <tt class="docutils literal"><span class="pre">System</span></tt> object from the information stored in
+<tt class="docutils literal"><span class="pre">ala5_gas</span></tt>. It contains multiple <tt class="docutils literal"><span class="pre">Force</span></tt> instances for the bonds, angles,
+periodic torsions, improper torsions, Urey-Bradley forces, CMAP potentials, and
+nonbonded (electrostatic and van der Waals) interactions.  It is in this
+function that we define the potential parameters we want to use. In this
+example, we have chosen the default values for each parameter except the ones
+specified. In particular:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">params</span></tt> is the parameter set we defined: this is necessary to apply
+parameters to your system.</li>
+<li><tt class="docutils literal"><span class="pre">nonbondedMethod=app.NoCutoff</span></tt> indicates we do not want to use a cutoff
+for nonbonded interactions</li>
+<li><tt class="docutils literal"><span class="pre">constraints=app.HBonds</span></tt> indicates that we want to constrain all bonds
+in which at least one atom is hydrogen</li>
+<li><tt class="docutils literal"><span class="pre">implicitSolvent=app.HCT</span></tt> indicates that we want to use the Hawkins
+Cramer Truhlar GB model described in
+Hawkins et al., Chem. Phys. Lett., 1995, 51, p. 19824-19839.</li>
+<li><tt class="docutils literal"><span class="pre">implicitSolventSaltConc=0.1*u.liters/u.mole</span></tt> indicates that we want to
+model a ca. 0.1 molar solution of monovalent ions using a Debye screening
+model.</li>
+</ul>
+</div></blockquote>
+<p>See the API documentation for the <tt class="docutils literal"><span class="pre">chemistry</span></tt> package for a full listing of
+available options. If there are any other force objects you want to define, they
+can be added to the system after this step (like, for instance, positional
+restraints to a reference structure).</p>
+</div>
+<div class="section" id="create-the-integrator-to-do-langevin-dynamics">
+<h3>Create the integrator to do Langevin Dynamics<a class="headerlink" href="#create-the-integrator-to-do-langevin-dynamics" title="Permalink to this headline">¶</a></h3>
+<p>In this stage we specify an integrator. Common choices are
+<tt class="docutils literal"><span class="pre">LangevinIntegrator</span></tt> (as we&#8217;ve chosen here) to do simulations in the NVT
+ensemble and <tt class="docutils literal"><span class="pre">VerletIntegrator</span></tt> that allows us to do simulations either at
+constant energy or temperature if using the <tt class="docutils literal"><span class="pre">AndersenThermostat</span></tt>.  In this
+example, we&#8217;ve chosen the Langevin integrator with a target temperature of
+300 K, a friction coefficient of 1/ps and a time step of 2 fs.</p>
+</div>
+<div class="section" id="define-the-platform">
+<h3>Define the platform<a class="headerlink" href="#define-the-platform" title="Permalink to this headline">¶</a></h3>
+<p>In this stage, we define the platform we want to use. In this example we have
+chosen the CUDA platform, but this may not be available on every machine since
+it only runs on NVidia GPU hardware.  Other choices are OpenCL (which will run
+on a variety of GPUs including those made by AMD/ATI and CPUs), CPU (which is an
+optimized version that runs natively on CPUs), and Reference (often quite slow).</p>
+<p>The properties can be set for each platform. In this case, we specified that we
+wanted to use a mixed precision model (a good compromise between speed and
+precision).</p>
+</div>
+<div class="section" id="create-the-simulation-object">
+<h3>Create the Simulation object<a class="headerlink" href="#create-the-simulation-object" title="Permalink to this headline">¶</a></h3>
+<p>This step creates a <tt class="docutils literal"><span class="pre">Simulation</span></tt> object that will be used to run the actual
+simulations. If we wanted OpenMM to simply pick the fastest platform for us
+(rather than specify one directly), we could omit the <tt class="docutils literal"><span class="pre">platform</span></tt> and
+<tt class="docutils literal"><span class="pre">prop</span></tt> arguments.</p>
+</div>
+<div class="section" id="set-the-particle-positions">
+<h3>Set the particle positions<a class="headerlink" href="#set-the-particle-positions" title="Permalink to this headline">¶</a></h3>
+<p>This stage is very important. In this step, we set the particle positions stored
+in the <tt class="docutils literal"><span class="pre">ala5_crds</span></tt> object to our object. If you omit this step, you can get
+strange results or other errors like segmentation violations. These particle
+positions have been parsed from the PDB file, but you could use a
+<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmCrdFile.html#chemistry.charmm.CharmmCrdFile" title="chemistry.charmm.CharmmCrdFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmCrdFile</span></tt></a> or
+<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmRstFile.html#chemistry.charmm.CharmmRstFile" title="chemistry.charmm.CharmmRstFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmRstFile</span></tt></a> (restart file) instead.</p>
+</div>
+<div class="section" id="minimize-the-energy">
+<h3>Minimize the energy<a class="headerlink" href="#minimize-the-energy" title="Permalink to this headline">¶</a></h3>
+<p>This stage performs a basic energy minimization to relax particle positions.
+This particular invocation will perform at most 500 iterations.</p>
+</div>
+<div class="section" id="set-up-the-reporters">
+<h3>Set up the reporters<a class="headerlink" href="#set-up-the-reporters" title="Permalink to this headline">¶</a></h3>
+<p>This stage defines reporters that will &#8220;report&#8221; on the status of the simulation
+periodically throughout the simulation. The first is an
+<tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt> which will print out a summary of energies and
+temperatures every 100 steps.  Unlike the <tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt> in OpenMM,
+this reporter prints values in the AKMA unit system (Angstrom, Kilocalorie per
+mole, and atomic mass units). This reporter directs the printout to standard
+output (the screen), <cite>sys.stdout</cite> can be replaced with a different file-like
+object or a file name.</p>
+<p>The second reporter is a DCD trajectory reporter, which is written in the
+standard DCD trajectory format.</p>
+</div>
+<div class="section" id="running-dynamics">
+<h3>Running dynamics<a class="headerlink" href="#running-dynamics" title="Permalink to this headline">¶</a></h3>
+<p>This is the stage that actually runs the MD.  In this case, we are running
+10,000 steps of MD. The wiki page with &#8220;Common recipes&#8221; has information
+regarding running a long simulation in chunks.</p>
+</div>
+</div>
+<div class="section" id="explicit-solvent">
+<h2>Explicit solvent<a class="headerlink" href="#explicit-solvent" title="Permalink to this headline">¶</a></h2>
+<p>For the purposes of this example, we are using an alanine dipeptide. You can
+find the following files that you will need for this demonstration in the
+<tt class="docutils literal"><span class="pre">examples/charmm</span></tt> directory of the ParmEd distribution:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ala2_charmmgui.psf</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ala2_charmmgui.pdb</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The following sample script (<tt class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></tt> in the ParmEd
+distribution) will set up and run the simulation using OpenMM:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c"># OpenMM Imports</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+
+<span class="c"># ParmEd Imports</span>
+<span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">chemistry.amber.openmmreporters</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="c"># Load the CHARMM files</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">(</span><span class="s">&#39;toppar/par_all36_prot.prm&#39;</span><span class="p">,</span>
+                            <span class="s">&#39;toppar/toppar_water_ions.str&#39;</span><span class="p">)</span>
+<span class="n">ala2_solv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;ala2_charmmgui.psf&#39;</span><span class="p">)</span>
+<span class="n">ala2_crds</span> <span class="o">=</span> <span class="n">CharmmCrdFile</span><span class="p">(</span><span class="s">&#39;ala2_charmmgui.crd&#39;</span><span class="p">)</span>
+
+<span class="c"># NOTE NOTE</span>
+<span class="c"># The parameter set we used here is the CHARMM 36 force field, but this is</span>
+<span class="c"># strictly an example. It is important that you use the most accurate (typically</span>
+<span class="c"># most up-to-date) force fields for your own simulation. See the CHARMM</span>
+<span class="c"># parameter web page for updates:</span>
+<span class="c"># http://mackerell.umaryland.edu/CHARMM_ff_params.html</span>
+<span class="c"># END NOTE</span>
+
+<span class="c"># Compute the box dimensions from the coordinates and set the box lengths (only</span>
+<span class="c"># orthorhombic boxes are currently supported in OpenMM)</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">ala2_crds</span><span class="o">.</span><span class="n">positions</span>
+<span class="n">min_crds</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
+<span class="n">max_crds</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
+
+<span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">:</span>
+    <span class="n">min_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">min_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">min_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">max_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">max_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">max_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">coord</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">ala2_solv</span><span class="o">.</span><span class="n">setBox</span><span class="p">(</span><span class="n">max_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="n">max_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                 <span class="n">max_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">min_crds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c"># Create the OpenMM system</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ala2_solv</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span>
+                                <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">12.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
+                                <span class="n">constraints</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">,</span>
+                                <span class="n">switchDistance</span><span class="o">=</span><span class="mf">10.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c"># Create the integrator to do Langevin dynamics</span>
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">LangevinIntegrator</span><span class="p">(</span>
+                        <span class="mi">300</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>       <span class="c"># Temperature of heat bath</span>
+                        <span class="mf">1.0</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">,</span>  <span class="c"># Friction coefficient</span>
+                        <span class="mf">2.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">femtoseconds</span><span class="p">,</span> <span class="c"># Time step</span>
+<span class="p">)</span>
+
+<span class="c"># Define the platform to use; CUDA, OpenCL, CPU, or Reference. Or do not specify</span>
+<span class="c"># the platform to use the default (fastest) platform</span>
+<span class="n">platform</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s">&#39;CUDA&#39;</span><span class="p">)</span>
+<span class="n">prop</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">CudaPrecision</span><span class="o">=</span><span class="s">&#39;mixed&#39;</span><span class="p">)</span> <span class="c"># Use mixed single/double precision</span>
+
+<span class="c"># Create the Simulation object</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">ala2_solv</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+<span class="c"># Set the particle positions</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">ala2_crds</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+
+<span class="c"># Minimize the energy</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Minimizing energy&#39;</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="c"># Set up the reporters to report energies and coordinates every 100 steps</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                          <span class="n">volume</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">DCDReporter</span><span class="p">(</span><span class="s">&#39;ala2_solv.dcd&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c"># Run dynamics</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Running dynamics&#39;</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we&#8217;ll dissect the script to help you understand what is happening at each
+step. We will divide the script into the sections following the <tt class="docutils literal"><span class="pre">print</span></tt>
+statements that announce when each stage begins.</p>
+<div class="section" id="id1">
+<h3>Loading CHARMM files<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> with the parameters we wish to use. In
+this example we are using the CHARMM 36 force field, but be sure you check <a class="reference external" href="http://mackerell.umaryland.edu/CHARMM_ff_params.html">the
+CHARMM parameter website</a>
+to make sure you use the latest and greatest force fields for your own work.
+Note that we also need to load the stream file with the water and ion
+parameters. The file type detection (RTF, parameter, or stream) is done by
+file-name extension (or the beginning of the file name if the file names end in
+<tt class="docutils literal"><span class="pre">.inp</span></tt>).</p>
+<p>We also define the <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmPsfFile.html#chemistry.charmm.CharmmPsfFile" title="chemistry.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></a>
+object that stores all information about atom connectivity. The coordinates
+from PSF files generated by CHARMM GUI are given in the CHARMM coordinate
+format, so we use the <cite>CharmmCrdFile</cite> class to parse it.</p>
+</div>
+<div class="section" id="compute-the-box-dimensions">
+<h3>Compute the box dimensions<a class="headerlink" href="#compute-the-box-dimensions" title="Permalink to this headline">¶</a></h3>
+<p>In this step, we compute the box dimensions by calculating the extent of the
+coordinates in each of the X-, Y-, and Z-directions. Then the call to
+<tt class="docutils literal"><span class="pre">ala2_solv.setBox</span></tt> sets the periodic box vectors. You can optionally put the
+three angles between the lattice vectors (<tt class="docutils literal"><span class="pre">alpha</span></tt>, <tt class="docutils literal"><span class="pre">beta</span></tt>, and <tt class="docutils literal"><span class="pre">gamma</span></tt>)
+after the box lengths. The default angles are 90 degrees, since OpenMM only
+supports orthorhombic boxes.</p>
+</div>
+<div class="section" id="id3">
+<h3>Create the OpenMM system<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>This command creates an OpenMM <tt class="docutils literal"><span class="pre">System</span></tt> object from the information stored in
+<tt class="docutils literal"><span class="pre">ala2_solv</span></tt>. It contains multiple <tt class="docutils literal"><span class="pre">Force</span></tt> instances for the bonds, angles,
+periodic torsions, improper torsions, Urey-Bradley forces, CMAP potentials, and
+nonbonded (electrostatic and van der Waals) interactions.  It is in this
+function that we define the potential parameters we want to use. In this
+example, we have chosen the default values for each parameter except the ones
+specified. In particular:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">params</span></tt> is the parameter set we defined: this is necessary to apply
+parameters to your system.</li>
+<li><tt class="docutils literal"><span class="pre">nonbondedMethod=app.PME</span></tt> indicates we want to include the full
+electrostatic interactions using the Particle Mesh Ewald method</li>
+<li><tt class="docutils literal"><span class="pre">nonbondedCutoff=12.0*u.angstroms</span></tt> indicates we want to truncate van der
+Waals interactions and the direct-space sum in PME to 12 angstroms. (This
+is equivalent to the _ctofnb_ parameter in CHARMM)</li>
+<li><tt class="docutils literal"><span class="pre">constraints=app.HBonds</span></tt> indicates that we want to constrain all bonds
+in which at least one atom is hydrogen</li>
+<li><tt class="docutils literal"><span class="pre">switchDistance=10.0*u.angstroms</span></tt> indicates that we want to turn the
+switching function <em>on</em> at 10 Angstroms (This is equivalent to the
+<em>ctonnb</em> parameter in CHARMM)</li>
+</ul>
+</div></blockquote>
+<p>See the API documentation for the <a class="reference internal" href="api/chemistry/chemistry.html#module-chemistry" title="chemistry"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry</span></tt></a> package for a full listing
+of available options (such as using a switching function for van der Waals
+interactions with the <tt class="docutils literal"><span class="pre">switchDistance</span></tt> keyword). If there are any other force
+objects you want to define, they can be added to the system after this step
+(like, for instance, positional restraints to a reference structure).</p>
+</div>
+<div class="section" id="id4">
+<h3>Create the integrator to do Langevin Dynamics<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>In this stage we specify an integrator. Common choices are
+<tt class="docutils literal"><span class="pre">LangevinIntegrator</span></tt> (as we&#8217;ve chosen here) to do simulations in the NVT
+ensemble and <tt class="docutils literal"><span class="pre">VerletIntegrator</span></tt> that allows us to do simulations either at
+constant energy or temperature if using the <tt class="docutils literal"><span class="pre">AndersenThermostat</span></tt>. In this
+example, we&#8217;ve chosen the Langevin integrator with a target temperature of
+300 K, a friction coefficient of 1/ps and a time step of 2 fs.</p>
+</div>
+<div class="section" id="id5">
+<h3>Define the platform<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>In this stage, we define the platform we want to use. In this example we have
+chosen the CUDA platform, but this may not be available on every machine since
+it only runs on NVidia GPU hardware.  Other choices are OpenCL (which will run
+on a variety of GPUs including those made by AMD/ATI and CPUs), CPU (which is an
+optimized version that runs natively on CPUs), and Reference (often quite slow).</p>
+<p>The properties can be set for each platform. In this case, we specified that we
+wanted to use a mixed precision model (a good compromise between speed and
+precision).</p>
+</div>
+<div class="section" id="id6">
+<h3>Create the Simulation object<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>This step creates a <tt class="docutils literal"><span class="pre">Simulation</span></tt> object that will be used to run the actual
+simulations. If we wanted OpenMM to simply pick the fastest platform for us
+(rather than specify one directly), we could omit the <tt class="docutils literal"><span class="pre">platform</span></tt> and <tt class="docutils literal"><span class="pre">prop</span></tt>
+arguments.</p>
+</div>
+<div class="section" id="id7">
+<h3>Set the particle positions<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>This stage is very important. In this step, we set the particle positions stored
+in the <tt class="docutils literal"><span class="pre">ala2_crds</span></tt> object to our object. If you omit this step, you can get
+strange results or other errors like segmentation violations. These particle
+positions have been parsed from the CHARMM coordinate file, but you could use a
+<tt class="docutils literal"><span class="pre">PDBFile</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">CharmmRstFile</span></tt> (restart file) instead.</p>
+</div>
+<div class="section" id="id8">
+<h3>Minimize the energy<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>This stage performs a basic energy minimization to relax particle positions.
+This particular invocation will perform at most 500 iterations.</p>
+</div>
+<div class="section" id="id9">
+<h3>Set up the reporters<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>This stage defines reporters that will &#8220;report&#8221; on the status of the simulation
+periodically throughout the simulation. The first is an
+<tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt> which will print
+out a summary of energies and temperatures every 100 steps. Unlike the
+<tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt> in OpenMM, this
+reporter prints values in the AKMA unit system (Angstrom, Kilocalorie per mole,
+and atomic mass units). This reporter directs the printout to standard output
+(the screen), <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> can be replaced with a different file-like object
+or a file name.</p>
+<p>The second reporter is a DCD trajectory reporter, which is written in the
+standard DCD trajectory format.</p>
+</div>
+<div class="section" id="id10">
+<h3>Running dynamics<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>This is the stage that actually runs the MD. In this case, we are running 10,000
+steps of MD. The wiki page with &#8220;Common recipes&#8221; has information regarding
+running a long simulation in chunks.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Examples using CHARMM Files</a><ul>
+<li><a class="reference internal" href="#generalized-born-implicit-solvent">Generalized Born Implicit Solvent</a><ul>
+<li><a class="reference internal" href="#loading-charmm-files">Loading CHARMM files</a></li>
+<li><a class="reference internal" href="#create-the-openmm-system">Create the OpenMM system</a></li>
+<li><a class="reference internal" href="#create-the-integrator-to-do-langevin-dynamics">Create the integrator to do Langevin Dynamics</a></li>
+<li><a class="reference internal" href="#define-the-platform">Define the platform</a></li>
+<li><a class="reference internal" href="#create-the-simulation-object">Create the Simulation object</a></li>
+<li><a class="reference internal" href="#set-the-particle-positions">Set the particle positions</a></li>
+<li><a class="reference internal" href="#minimize-the-energy">Minimize the energy</a></li>
+<li><a class="reference internal" href="#set-up-the-reporters">Set up the reporters</a></li>
+<li><a class="reference internal" href="#running-dynamics">Running dynamics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#explicit-solvent">Explicit solvent</a><ul>
+<li><a class="reference internal" href="#id1">Loading CHARMM files</a></li>
+<li><a class="reference internal" href="#compute-the-box-dimensions">Compute the box dimensions</a></li>
+<li><a class="reference internal" href="#id3">Create the OpenMM system</a></li>
+<li><a class="reference internal" href="#id4">Create the integrator to do Langevin Dynamics</a></li>
+<li><a class="reference internal" href="#id5">Define the platform</a></li>
+<li><a class="reference internal" href="#id6">Create the Simulation object</a></li>
+<li><a class="reference internal" href="#id7">Set the particle positions</a></li>
+<li><a class="reference internal" href="#id8">Minimize the energy</a></li>
+<li><a class="reference internal" href="#id9">Set up the reporters</a></li>
+<li><a class="reference internal" href="#id10">Running dynamics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/omm_charmm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
+             >previous</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="openmm.html" >OpenMM Functionality</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
