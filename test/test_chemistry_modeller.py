@@ -1,12 +1,16 @@
 """
 Tests the functionality in chemistry.modeller
 """
-from chemistry import Atom
+from chemistry import Atom, read_PDB
 from chemistry.exceptions import AmberOFFWarning
 from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
                                 PROTEIN, SOLVENT)
 from chemistry.amber import AmberParm, AmberOFFLibrary
 from chemistry.exceptions import BondError
+import os
+from ParmedTools import changeRadii
+import random
+import sys
 import unittest
 import utils
 import warnings
@@ -292,6 +296,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
         for name, res in offlib.items():
+            self.assertEqual(res.name, name)
             if 'BOX' in name:
                 self.assertIsInstance(res, ResidueTemplateContainer)
                 # Make sure all residues have the same features as the first
@@ -316,10 +321,13 @@ class TestAmberOFFLibrary(unittest.TestCase):
                 self.assertIsInstance(res, ResidueTemplate)
         # Check a few solvent boxes in particular
         chcl3 = offlib['CHCL3BOX']
+        self.assertEqual(chcl3.name, 'CHCL3BOX')
         self.assertEqual(len(chcl3), 1375)
         self.assertEqual(chcl3.box[0], 56.496)
         self.assertEqual(chcl3.box[1], 56.496)
         self.assertEqual(chcl3.box[2], 56.496)
+        for res in chcl3:
+            self.assertEqual(res.name, 'CL3')
         self.assertAlmostEqual(chcl3.box[3], 90, places=4)
         self.assertAlmostEqual(chcl3.box[4], 90, places=4)
         self.assertAlmostEqual(chcl3.box[5], 90, places=4)
@@ -357,6 +365,14 @@ class TestAmberOFFLibrary(unittest.TestCase):
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
         self._check_read_written_libs(offlib, offlib2)
+
+    def testReadWriteSolventLib(self):
+        """ Tests reading/writing of Amber OFF solvent libs """
+        offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
+        outfile = StringIO.StringIO()
+        AmberOFFLibrary.write(offlib, outfile)
+        outfile.seek(0)
+        offlib2 = AmberOFFLibrary.parse(outfile)
 
     def _check_read_written_libs(self, offlib, offlib2):
         # Check that offlib and offlib2 are equivalent
@@ -399,3 +415,150 @@ class TestAmberOFFLibrary(unittest.TestCase):
             for b1, b2 in zip(r1.bonds, r2.bonds):
                 self.assertEqual(b1.atom1.name, b2.atom1.name)
                 self.assertEqual(b1.atom2.name, b2.atom2.name)
+
+class TestAmberOFFLeapCompatibility(unittest.TestCase):
+    """ Tests the AmberOFFLibrary classes written in LEaP """
+
+    def setUp(self):
+        self.tleap = utils.which('tleap')
+        self.cwd = os.getcwd()
+        try:
+            os.mkdir(get_fn('writes'))
+        except OSError:
+            pass
+        os.chdir(get_fn('writes'))
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+        os.chdir(self.cwd)
+
+    def testAmberAminoInternal(self):
+        """ Test that the internal AA OFF library writes work with LEaP """
+        # First create the parm to test against... we are in "writes" right now
+        offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
+        AmberOFFLibrary.write(offlib, 'testinternal.lib')
+        f = open('tleap_orig.in', 'w')
+        f.write("""\
+source leaprc.ff12SB
+l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
+              HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
+set default PBRadii mbondi2
+savePDB l alphabet.pdb
+saveAmberParm l alphabet.parm7 alphabet.rst7
+quit
+""")
+        f.close()
+        # Now create the leaprc for our new files
+        f = open('tleap_new.in', 'w')
+        f.write("""\
+loadAmberParams parm10.dat
+loadAmberParams frcmod.ff12SB
+loadOFF testinternal.lib
+l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
+              HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
+savePDB l alphabet2.pdb
+saveAmberParm l alphabet2.parm7 alphabet2.rst7
+quit
+""")
+        f.close()
+        os.system('tleap -f tleap_orig.in > tleap_orig.out 2>&1')
+        os.system('tleap -f tleap_new.in > tleap_new.out 2>&1')
+        # Compare the resulting files
+        pdb1 = read_PDB('alphabet.pdb')
+        pdb2 = read_PDB('alphabet2.pdb')
+        parm1 = AmberParm('alphabet.parm7', 'alphabet.rst7')
+        parm2 = AmberParm('alphabet2.parm7', 'alphabet2.rst7')
+        # Since there are some specific parts of the leaprc that affect default
+        # radii, change it here intentionally
+        changeRadii(parm1, 'mbondi2').execute()
+        changeRadii(parm2, 'mbondi2').execute()
+        self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
+
+    def testAmberAminoTermini(self):
+        """ Test that the terminal AA OFF library writes work with LEaP """
+        offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
+        offlib2 = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
+        AmberOFFLibrary.write(offlib1, 'testct.lib')
+        AmberOFFLibrary.write(offlib2, 'testnt.lib')
+        # Test all pairs a random set of 10 pairs
+        keys1 = [random.choice(offlib1.keys()) for i in range(10)]
+        keys2 = [random.choice(offlib2.keys()) for i in range(10)]
+        for key1, key2 in zip(keys1, keys2):
+            f = open('tleap_orig.in', 'w')
+            f.write("""\
+source leaprc.ff12SB
+l = sequence {%s %s}
+savePDB l alphabet.pdb
+saveAmberParm l alphabet.parm7 alphabet.rst7
+quit
+""" % (key1, key2))
+            f.close()
+            f = open('tleap_new.in', 'w')
+            f.write("""\
+loadAmberParams parm10.dat
+loadAmberParams frcmod.ff12SB
+loadOFF testct.lib
+loadOFF testnt.lib
+l = sequence {%s %s}
+savePDB l alphabet2.pdb
+saveAmberParm l alphabet2.parm7 alphabet2.rst7
+quit
+""" % (key1, key2))
+            f.close()
+            os.system('tleap -f tleap_orig.in > tleap_orig.out 2>&1')
+            os.system('tleap -f tleap_new.in > tleap_new.out 2>&1')
+            # Compare the resulting files
+            pdb1 = read_PDB('alphabet.pdb')
+            pdb2 = read_PDB('alphabet2.pdb')
+            parm1 = AmberParm('alphabet.parm7', 'alphabet.rst7')
+            parm2 = AmberParm('alphabet2.parm7', 'alphabet2.rst7')
+            # Since there are some specific parts of the leaprc that affect
+            # default radii, change it here intentionally
+            changeRadii(parm1, 'mbondi2').execute()
+            changeRadii(parm2, 'mbondi2').execute()
+            self._check_corresponding_files(pdb1, pdb2, parm1, parm2, False)
+
+    def _check_corresponding_files(self, pdb1, pdb2, parm1, parm2, tree=True):
+        self.assertEqual(len(pdb1.atoms), len(pdb2.atoms))
+        self.assertEqual(len(parm1.atoms), len(parm2.atoms))
+        self.assertEqual(len(parm1.bonds), len(parm2.bonds))
+        for a1, a2 in zip(pdb1.atoms, pdb2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+        for a1, a2 in zip(parm1.atoms, parm2.atoms):
+            # Check EVERYTHING
+            self.assertIsNot(a1, a2)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.nb_idx, a2.nb_idx)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.atom_type.rmin, a2.atom_type.rmin)
+            self.assertEqual(a1.atom_type.epsilon, a2.atom_type.epsilon)
+            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.screen, a2.screen)
+            # Ugh. OFF libs are inconsistent
+            if tree:
+                self.assertEqual(a1.tree, a2.tree)
+            self.assertEqual(len(a1.bonds), len(a2.bonds))
+            self.assertEqual(len(a1.angles), len(a2.angles))
+            self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
+            set1 = set([a.name for a in a1.bond_partners])
+            set2 = set([a.name for a in a2.bond_partners])
+            self.assertEqual(set1, set2)
+            set1 = set([a.name for a in a1.angle_partners])
+            set2 = set([a.name for a in a2.angle_partners])
+            self.assertEqual(set1, set2)
+            set1 = set([a.name for a in a1.dihedral_partners])
+            set2 = set([a.name for a in a2.dihedral_partners])
+            self.assertEqual(set1, set2)
+            # Check residue properties
+            self.assertEqual(a1.residue.name, a2.residue.name)
+
+# Only run TestAmberOFFLeapCompatibility if tleap can be found
+if utils.which('tleap') is None:
+    del TestAmberOFFLeapCompatibility

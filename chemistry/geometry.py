@@ -30,6 +30,10 @@ try:
 except ImportError:
     pass # Py3, zip is already izip
 from math import pi, cos, sin, sqrt, acos
+try:
+    import numpy as np
+except ImportError:
+    np = None
 import warnings
 
 def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
@@ -143,3 +147,28 @@ def box_vectors_to_lengths_and_angles(a, b, c):
     gamma *= RAD_TO_DEG
 
     return (la, lb, lc) * u.angstroms, (alpha, beta, gamma) * u.degrees
+
+def center_of_mass(coordinates, masses):
+    """ Compute the center of mass of a group of coordinates.
+
+    Parameters
+    ----------
+    coordinates : numpy.ndarray
+        Coordinate array
+    masses : numpy.ndarray
+        Array of masses
+
+    Returns
+    -------
+    COM
+        np.ndarray of shape (3,) identifying the cartesian center of mass
+
+    Notes
+    -----
+    This method *requires* that the parameters be passed in as numpy arrays.
+    AttributeError's will ensue if this is not the case. Also, coordinates must
+    be able to be reshaped to (len(masses), 3), or ValueError's will ensue
+    """
+    masses = masses.flatten()
+    coordinates = coordinates.reshape((masses.shape[0], 3))
+    return np.average(coordinates, weights=masses, axis=0)

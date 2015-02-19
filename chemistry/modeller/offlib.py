@@ -10,7 +10,11 @@ from chemistry.exceptions import AmberOFFWarning
 from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from collections import OrderedDict
-
+try:
+    import numpy as np
+except ImportError:
+    np = None
+from chemistry import periodic_table as pt
 import re
 import warnings
 
@@ -133,7 +137,7 @@ class AmberOFFLibrary(object):
         name : str
             The name of the residue being processed right now
         """
-        container = ResidueTemplateContainer()
+        container = ResidueTemplateContainer(name)
         nres = 1
         templ = ResidueTemplate(name)
         line = fileobj.readline()
@@ -335,6 +339,8 @@ class AmberOFFLibrary(object):
             elif typ != '?':
                 warnings.warn('Unknown residue type "%s"' % typ,
                               AmberOFFWarning)
+            if nres > 1:
+                container[i].name = resname
         # Get the residues sequence table
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec12re.match(line)
@@ -415,83 +421,123 @@ class AmberOFFLibrary(object):
         ----------
         dest : file-like
             File object to write the residue information to
-        res : :class:`ResidueTemplate`
-            The residue template to write to the file
+        res : :class:`ResidueTemplate` or :class:`ResidueTemplateContainer`
+            The residue template (or template container) to write to the file
         """
+        if isinstance(res, ResidueTemplate):
+            # Put it into a template container with the same name
+            tmp = ResidueTemplateContainer(res.name)
+            tmp.append(res)
+            res = tmp
         dest.write('!entry.%s.unit.atoms table  str name  str type  int typex  '
                    'int resx  int flags  int seq  int elmnt  dbl chg\n' %
                    res.name)
-        for atom in res:
-            dest.write(' "%s" "%s" 0 1 131072 %d %d %.6f\n' % (atom.name,
-                       atom.type, atom.idx+1, atom.atomic_number, atom.charge))
+        for i, r in enumerate(res):
+            for atom in r:
+                dest.write(' "%s" "%s" 0 %d 131072 %d %d %.6f\n' % (atom.name,
+                           atom.type, i+1, atom.idx+1, atom.atomic_number,
+                           atom.charge))
         dest.write('!entry.%s.unit.atomspertinfo table  str pname  str ptype  '
                    'int ptypex  int pelmnt  dbl pchg\n' % res.name)
-        for atom in res:
-            dest.write(' "%s" "%s" 0 -1 0.0\n' % (atom.name, atom.type))
+        for r in res:
+            for atom in r:
+                dest.write(' "%s" "%s" 0 -1 0.0\n' % (atom.name, atom.type))
         dest.write('!entry.%s.unit.boundbox array dbl\n' % res.name)
-        dest.write((' -1.000000\n' + ' 0.0\n' * 4))
-        dest.write('!entry.%s.unit.childsequence single int\n 2\n' % res.name)
+        if res.box is None:
+            dest.write((' -1.000000\n' + ' 0.0\n' * 4))
+        else:
+            dest.write(' 1.000000\n')
+            if res.box[3] == res.box[4] == res.box[5]:
+                dest.write(' %f\n' % res.box[3])
+            else:
+                raise ValueError('Cannot write boxes with different angles')
+            dest.write(' %f\n' % res.box[0])
+            dest.write(' %f\n' % res.box[1])
+            dest.write(' %f\n' % res.box[2])
+        dest.write('!entry.%s.unit.childsequence single int\n %d\n' %
+                   (res.name, len(res)+1))
         dest.write('!entry.%s.unit.connect array int\n' % res.name)
-        if res.head is not None:
-            dest.write(' %d\n' % (res.head.idx + 1))
+        if len(res) > 1:
+            dest.write(' 0\n 0\n')
         else:
-            dest.write(' 0\n')
-        if res.tail is not None:
-            dest.write(' %d\n' % (res.tail.idx + 1))
-        else:
-            dest.write(' 0\n')
+            if res[0].head is not None:
+                dest.write(' %d\n' % (res[0].head.idx + 1))
+            else:
+                dest.write(' 0\n')
+            if res[0].tail is not None:
+                dest.write(' %d\n' % (res[0].tail.idx + 1))
+            else:
+                dest.write(' 0\n')
         dest.write('!entry.%s.unit.connectivity table  int atom1x  int atom2x  '
                    'int flags\n' % res.name)
-        for bond in res.bonds:
-            dest.write(' %d %d 1\n' % (bond.atom1.idx+1, bond.atom2.idx+1))
+        for r in res:
+            for bond in r.bonds:
+                dest.write(' %d %d 1\n' % (bond.atom1.idx+1, bond.atom2.idx+1))
         dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
                    'abovex  str belowtype  int belowx\n' % res.name)
-        dest.write(' "U" 0 "R" 1\n')
-        for atom in res:
-            dest.write(' "R" 1 "A" %d\n' % (atom.idx + 1))
+        c = 1
+        for i, r in enumerate(res):
+            dest.write(' "U" 0 "R" %d\n' % (i+1))
+            for atom in r:
+                dest.write(' "R" %d "A" %d\n' % (i+1, c))
+                c += 1
         dest.write('!entry.%s.unit.name single str\n' % res.name)
         dest.write(' "%s"\n' % res.name)
         dest.write('!entry.%s.unit.positions table  dbl x  dbl y  dbl z\n' %
                    res.name)
-        for atom in res:
-            dest.write(' %g %g %g\n' % (atom.xx, atom.xy, atom.xz))
+        for r in res:
+            for atom in r:
+                dest.write(' %.6g %.6g %.6g\n' % (atom.xx, atom.xy, atom.xz))
         dest.write('!entry.%s.unit.residueconnect table  int c1x  int c2x  '
                    'int c3x  int c4x  int c5x  int c6x\n' % res.name)
-        conn = [0, 0, 0, 0, 0, 0]
-        if res.head is not None: conn[0] = res.head.idx + 1
-        if res.tail is not None: conn[1] = res.tail.idx + 1
-        for i, at in enumerate(res.connections):
-            conn[i+2] = at.idx + 1
-        dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
+        for r in res:
+            # Make the CONECT1 and 0 default to 1 so that the TREE gets set
+            # correctly by tleap. Not used for anything else...
+            conn = [1, 1, 0, 0, 0, 0]
+            if r.head is not None: conn[0] = r.head.idx + 1
+            if r.tail is not None: conn[1] = r.tail.idx + 1
+            for i, at in enumerate(r.connections):
+                conn[i+2] = at.idx + 1
+            dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
         dest.write('!entry.%s.unit.residues table  str name  int seq  int '
                    'childseq  int startatomx  str restype  int imagingx\n' %
                    res.name)
-        if res.type is PROTEIN:
-            typ = 'p'
-        elif res.type is NUCLEIC:
-            typ = 'n'
-        elif res.type is SOLVENT:
-            typ='w'
-        elif res.type is UNKNOWN:
-            typ='?'
-        else:
-            warnings.warn('Unrecognized residue type %r' % res.type,
-                          AmberOFFWarning)
-            typ = '?'
-        dest.write(' "%s" 1 %d 1 "%s" 0\n' % (res.name, len(res)+1, typ))
-        dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n 0\n' %
+        c = 1
+        for i, r in enumerate(res):
+            if r.type is PROTEIN:
+                typ = 'p'
+            elif r.type is NUCLEIC:
+                typ = 'n'
+            elif r.type is SOLVENT:
+                typ='w'
+            elif r.type is UNKNOWN:
+                typ='?'
+            else:
+                warnings.warn('Unrecognized residue type %r' % r.type,
+                              AmberOFFWarning)
+                typ = '?'
+            dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i+1, 1+len(r), c,
+                       typ, _imaging_atom(r)))
+            c += len(r)
+        dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n' %
                    res.name)
+        for i, r in enumerate(res):
+            if len(res) == 1:
+                dest.write(' 0\n')
+            else:
+                dest.write(' %d\n' % (i+1))
         dest.write('!entry.%s.unit.solventcap array dbl\n' % res.name)
         dest.write(' -1.000000\n' + ' 0.0\n' * 4)
         dest.write('!entry.%s.unit.velocities table  dbl x  dbl y  dbl z\n' %
                    res.name)
-        for atom in res:
-            try:
-                s = ' %g %g %g\n' % (atom.vx, atom.vy, atom.vz)
-            except AttributeError:
-                dest.write(' 0.0 0.0 0.0\n')
-            else:
-                dest.write(s)
+        for r in res:
+            for atom in r:
+                try:
+                    s = ' %g %g %g\n' % (atom.vx, atom.vy, atom.vz)
+                except AttributeError:
+                    dest.write(' 0.0 0.0 0.0\n')
+                else:
+                    dest.write(s)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -501,3 +547,35 @@ def _strip_enveloping_quotes(inp):
     if inp[0] == inp[-1] == '"' or inp[0] == inp[-1] == "'":
         return inp[1:-1]
     return inp
+
+def _imaging_atom(res):
+    """
+    Determines the imaging atom for the residue. If all atoms are hydrogen
+    except 1, it is the heavy atom. Otherwise, it is the atom *closest* to the
+    COM of the residue
+    """
+    from chemistry.geometry import center_of_mass
+    #TODO implement the docstring
+    found_heavy = False
+    heavy_idx = -1
+    for i, atom in enumerate(res):
+        if atom.atomic_number > 1:
+            heavy_idx = i
+            if found_heavy: break
+            found_heavy = True
+    else:
+        if heavy_idx != -1:
+            return heavy_idx
+        return 0 # No heavy atoms?? No imaging atom, then.
+    # Now pick the atom closest to COM (if numpy is available)
+    if np is None:
+        warnings.warn('numpy not available. imaging atom set to 0')
+        return 0
+    coords = res.coordinates.reshape((len(res), 3))
+    masses = np.zeros(len(res))
+    for i, atom in enumerate(res):
+        if atom.mass == 0:
+            masses[i] = pt.Mass[pt.Element[atom.atomic_number]]
+    com = center_of_mass(coords, masses)
+    diff = coords - com
+    return np.argmin((diff * diff).sum(axis=1)) + 1

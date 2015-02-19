@@ -193,6 +193,12 @@ class ResidueTemplateContainer(list):
     """
     A container of ResidueTemplate objects representing a unit with multiple
     residues
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the residue container
     """
-    def __init__(self):
+    def __init__(self, name=''):
         self.box = None
+        self.name = name
