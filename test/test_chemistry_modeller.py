@@ -2,11 +2,13 @@
 Tests the functionality in chemistry.modeller
 """
 from chemistry import Atom
-from chemistry.modeller import ResidueTemplate
+from chemistry.exceptions import AmberOFFWarning
+from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
 from chemistry.amber import AmberParm, AmberOFFLibrary
 from chemistry.exceptions import BondError
 import unittest
 import utils
+import warnings
 get_fn = utils.get_fn
 
 class TestResidueTemplate(unittest.TestCase):
@@ -271,5 +273,44 @@ class TestAmberOFFLibrary(unittest.TestCase):
 
     def testReadSolvents(self):
         """ Test reading solvent Amber OFF lib (multi-res units) """
+        # Turn off warnings... the solvents.lib file is SO broken.
+        warnings.filterwarnings('ignore', module='.', category=AmberOFFWarning)
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
+        for name, res in offlib.items():
+            if 'BOX' in name:
+                self.assertIsInstance(res, ResidueTemplateContainer)
+                # Make sure all residues have the same features as the first
+                for r in res:
+                    for a1, a2 in zip(r, res[0]):
+                        self.assertEqual(a1.name, a2.name)
+                        self.assertEqual(a1.type, a2.type)
+                        self.assertEqual(a1.charge, a2.charge)
+                        self.assertEqual(a1.atomic_number, a2.atomic_number)
+                        self.assertEqual(len(a1.bond_partners),
+                                         len(a2.bond_partners))
+                        set1 = set([x.name for x in a1.bond_partners])
+                        set2 = set([x.name for x in a2.bond_partners])
+                        self.assertEqual(set1, set2)
+                        if a1 is not a2:
+                            self.assertNotEqual(a1.xx, a2.xx)
+                            self.assertNotEqual(a1.xy, a2.xy)
+                            self.assertNotEqual(a1.xz, a2.xz)
+            else:
+                self.assertIsInstance(res, ResidueTemplate)
+        # Check a few solvent boxes in particular
+        chcl3 = offlib['CHCL3BOX']
+        self.assertEqual(len(chcl3), 1375)
+        self.assertEqual(chcl3.box[0], 56.496)
+        self.assertEqual(chcl3.box[1], 56.496)
+        self.assertEqual(chcl3.box[2], 56.496)
+        self.assertAlmostEqual(chcl3.box[3], 90, places=4)
+        self.assertAlmostEqual(chcl3.box[4], 90, places=4)
+        self.assertAlmostEqual(chcl3.box[5], 90, places=4)
+        # Check some positions (but obviously not all)
+        self.assertAlmostEqual(chcl3[0][0].xx, -22.675111)
+        self.assertAlmostEqual(chcl3[0][0].xy, -13.977137)
+        self.assertAlmostEqual(chcl3[0][0].xz, -21.470579)
+        self.assertAlmostEqual(chcl3[1][0].xx, -9.668111)
+        self.assertAlmostEqual(chcl3[1][0].xy, -15.097137)
+        self.assertAlmostEqual(chcl3[1][0].xz, -18.569579)

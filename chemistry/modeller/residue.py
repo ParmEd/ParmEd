@@ -167,3 +167,10 @@ class ResidueTemplate(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class ResidueTemplateContainer(list):
+    """
+    A container of ResidueTemplate objects representing a unit with multiple
+    residues
+    """
+    def __init__(self):
+        self.box = None

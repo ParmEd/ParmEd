@@ -5,10 +5,13 @@ ResidueTemplate objects
 import compat24
 
 from chemistry import Atom, Bond
-from chemistry.modeller.residue import ResidueTemplate
+from chemistry.constants import RAD_TO_DEG
+from chemistry.exceptions import AmberOFFWarning
+from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from collections import OrderedDict
 
 import re
+import warnings
 
 class AmberOFFLibrary(object):
     """
@@ -121,6 +124,7 @@ class AmberOFFLibrary(object):
         name : str
             The name of the residue being processed right now
         """
+        container = ResidueTemplateContainer()
         nres = 1
         templ = ResidueTemplate(name)
         line = fileobj.readline()
@@ -135,8 +139,19 @@ class AmberOFFLibrary(object):
             elmnt = int(elmnt)
             chg = float(chg)
             atom = Atom(atomic_number=elmnt, type=typ, name=nam, charge=chg)
+            if resx == nres + 1:
+                container.append(templ)
+                nres += 1
+                templ = ResidueTemplate(name)
             templ.add_atom(atom)
             line = fileobj.readline()
+        container.append(templ)
+        if nres > 1:
+            start_atoms = []
+            runsum = 0
+            for res in container:
+                start_atoms.append(runsum)
+                runsum += len(res)
         # Make sure we get the next section
         rematch = AmberOFFLibrary._sec2re.match(line)
         if not rematch:
@@ -166,6 +181,10 @@ class AmberOFFLibrary(object):
             c = float(fileobj.readline().strip())
         except ValueError:
             raise RuntimeError('Error processing boundbox table entries')
+        else:
+            if hasbox > 0:
+                angle *= RAD_TO_DEG
+                container.box = [a, b, c, angle, angle, angle]
         # Get the child sequence entry
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec4re.match(line)
@@ -175,8 +194,9 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
         n = int(fileobj.readline().strip())
-        if isinstance(templ, ResidueTemplate) and n != 2:
-            raise RuntimeError('child sequence for single residue must be 2')
+        if nres + 1 != n:
+            warnings.warn('Unexpected childsequence (%d); expected %d for '
+                          'residue %s' % (n, nres+1, name), AmberOFFWarning)
         elif not isinstance(templ, ResidueTemplate) and n != len(templ) + 1:
             raise RuntimeError('child sequence must be 1 greater than the '
                                'number of residues in the unit')
@@ -193,10 +213,17 @@ class AmberOFFLibrary(object):
             tail = int(fileobj.readline().strip())
         except ValueError:
             raise RuntimeError('Error processing connect table entries')
-        if head > 0:
+        if head > 0 and nres == 1:
             templ.head = templ[head-1]
-        if tail > 0:
+        elif head > 0 and nres > 1:
+            if head < sum([len(r) for r in container]):
+                raise RuntimeError('HEAD on multi-residue unit not supported')
+        if tail > 0 and nres == 1:
             templ.tail = templ[tail-1]
+        elif tail > 0 and nres > 1:
+            if tail < sum([len(r) for r in container]):
+                warnings.warn('TAIL on multi-residue unit not supported (%s). '
+                              'Ignored...' % name, AmberOFFWarning)
         # Get the connectivity array to set bonds
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec6re.match(line)
@@ -209,7 +236,18 @@ class AmberOFFLibrary(object):
         while line[0] != '!':
             i, j, flag = line.split()
             line = fileobj.readline()
-            templ.add_bond(int(i)-1, int(j)-1)
+            if nres > 1:
+                # Find which residue we belong in
+                i = int(i) - 1
+                j = int(j) - 1
+                for ii, idx in enumerate(start_atoms):
+                    if idx > i:
+                        ii -= 1
+                        break
+                start_idx = start_atoms[ii]
+                container[ii].add_bond(i-start_idx, j-start_idx)
+            else:
+                templ.add_bond(int(i)-1, int(j)-1)
         # Get the hierarchy table
         rematch = AmberOFFLibrary._sec7re.match(line)
         if not rematch:
@@ -238,9 +276,10 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for atom in templ:
-            x, y, z = fileobj.readline().split()
-            atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
+        for res in container:
+            for atom in res:
+                x, y, z = fileobj.readline().split()
+                atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
         line = fileobj.readline()
         # Get the residueconnect table
         rematch = AmberOFFLibrary._sec10re.match(line)
@@ -274,9 +313,10 @@ class AmberOFFLibrary(object):
             next = int(next)
             typ = _strip_enveloping_quotes(typ)
             img = int(img)
-            if next - start != len(templ):
-                raise RuntimeError('residues table predicted %d, not %d atoms' %
-                                   (next-start, len(templ)))
+            if next - start != len(container[i]):
+                warnings.warn('residue table predicted %d, not %d atoms for '
+                              'residue %s' % (next-start, len(container[i]),
+                              name), AmberOFFWarning)
         # Get the residues sequence table
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec12re.match(line)
@@ -310,10 +350,13 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for atom in templ:
-            vx, vy, vz = [float(x) for x in fileobj.readline().split()]
-            atom.vx, atom.vy, atom.vz = vx, vy, vz
+        for res in container:
+            for atom in res:
+                vx, vy, vz = [float(x) for x in fileobj.readline().split()]
+                atom.vx, atom.vy, atom.vz = vx, vy, vz
 
+        if nres > 1:
+            return container
         return templ
 
 # Helper routines
