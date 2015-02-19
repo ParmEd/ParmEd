@@ -8,6 +8,7 @@ from chemistry import Atom, Bond
 from chemistry.constants import RAD_TO_DEG
 from chemistry.exceptions import AmberOFFWarning
 from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from collections import OrderedDict
 
 import re
@@ -18,6 +19,8 @@ class AmberOFFLibrary(object):
     Class containing static methods responsible for parsing and writing OFF
     libraries
     """
+
+    #===================================================
 
     # Useful regexes
     _headerre = re.compile(r'!!index *array *str')
@@ -50,6 +53,8 @@ class AmberOFFLibrary(object):
     _sec13re = re.compile(r'!entry\.(\S*)\.unit\.solventcap *array *dbl')
     _sec14re = re.compile(r'!entry\.(\S*)\.unit\.velocities *table *dbl *x'
                           r' *dbl *y *dbl *z')
+
+    #===================================================
 
     @staticmethod
     def parse(filename):
@@ -107,8 +112,12 @@ class AmberOFFLibrary(object):
             name = rematch.groups()[0]
             residues[name] = AmberOFFLibrary._parse_residue(fileobj, name)
             line = fileobj.readline()
-        
+
+        if own_handle: fileobj.close()
+
         return residues
+
+    #===================================================
 
     @staticmethod
     def _parse_residue(fileobj, name):
@@ -317,6 +326,15 @@ class AmberOFFLibrary(object):
                 warnings.warn('residue table predicted %d, not %d atoms for '
                               'residue %s' % (next-start, len(container[i]),
                               name), AmberOFFWarning)
+            if typ == 'p':
+                container[i].type = PROTEIN
+            elif typ == 'n':
+                container[i].type = NUCLEIC
+            elif typ == 'w':
+                container[i].type = SOLVENT
+            elif typ != '?':
+                warnings.warn('Unknown residue type "%s"' % typ,
+                              AmberOFFWarning)
         # Get the residues sequence table
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec12re.match(line)
@@ -358,6 +376,124 @@ class AmberOFFLibrary(object):
         if nres > 1:
             return container
         return templ
+
+    #===================================================
+
+    @staticmethod
+    def write(lib, dest):
+        """ Writes a dictionary of ResidueTemplate units to a file in OFF format
+
+        Parameters
+        ----------
+        lib : dict {str : :class:`ResidueTemplate`}
+            Items can be either :class:`ResidueTemplate` or
+            :class:`ResidueTemplateContainer` instances
+        dest : str or file-like
+            Either a file name or a file-like object to write the file to
+        """
+        own_handle = False
+        if not hasattr(dest, 'write'):
+            dest = open(dest, 'w')
+            own_handle = True
+        # Write the residues in alphabetical order
+        names = sorted(lib.keys())
+        dest.write('!!index array str\n')
+        for name in names:
+            dest.write(' "%s"\n' % name)
+        for name in names:
+            AmberOFFLibrary._write_residue(dest, lib[name])
+
+        if own_handle: dest.close()
+
+    #===================================================
+
+    @staticmethod
+    def _write_residue(dest, res):
+        """ Writes a residue to an open file handle
+
+        Parameters
+        ----------
+        dest : file-like
+            File object to write the residue information to
+        res : :class:`ResidueTemplate`
+            The residue template to write to the file
+        """
+        dest.write('!entry.%s.unit.atoms table  str name  str type  int typex  '
+                   'int resx  int flags  int seq  int elmnt  dbl chg\n' %
+                   res.name)
+        for atom in res:
+            dest.write(' "%s" "%s" 0 1 131072 %d %d %.6f\n' % (atom.name,
+                       atom.type, atom.idx+1, atom.atomic_number, atom.charge))
+        dest.write('!entry.%s.unit.atomspertinfo table  str pname  str ptype  '
+                   'int ptypex  int pelmnt  dbl pchg\n' % res.name)
+        for atom in res:
+            dest.write(' "%s" "%s" 0 -1 0.0\n' % (atom.name, atom.type))
+        dest.write('!entry.%s.unit.boundbox array dbl\n' % res.name)
+        dest.write((' -1.000000\n' + ' 0.0\n' * 4))
+        dest.write('!entry.%s.unit.childsequence single int\n 2\n' % res.name)
+        dest.write('!entry.%s.unit.connect array int\n' % res.name)
+        if res.head is not None:
+            dest.write(' %d\n' % (res.head.idx + 1))
+        else:
+            dest.write(' 0\n')
+        if res.tail is not None:
+            dest.write(' %d\n' % (res.tail.idx + 1))
+        else:
+            dest.write(' 0\n')
+        dest.write('!entry.%s.unit.connectivity table  int atom1x  int atom2x  '
+                   'int flags\n' % res.name)
+        for bond in res.bonds:
+            dest.write(' %d %d 1\n' % (bond.atom1.idx+1, bond.atom2.idx+1))
+        dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
+                   'abovex  str belowtype  int belowx\n' % res.name)
+        dest.write(' "U" 0 "R" 1\n')
+        for atom in res:
+            dest.write(' "R" 1 "A" %d\n' % (atom.idx + 1))
+        dest.write('!entry.%s.unit.name single str\n' % res.name)
+        dest.write(' "%s"\n' % res.name)
+        dest.write('!entry.%s.unit.positions table  dbl x  dbl y  dbl z\n' %
+                   res.name)
+        for atom in res:
+            dest.write(' %g %g %g\n' % (atom.xx, atom.xy, atom.xz))
+        dest.write('!entry.%s.unit.residueconnect table  int c1x  int c2x  '
+                   'int c3x  int c4x  int c5x  int c6x\n' % res.name)
+        conn = [0, 0, 0, 0, 0, 0]
+        if res.head is not None: conn[0] = res.head.idx + 1
+        if res.tail is not None: conn[1] = res.tail.idx + 1
+        for i, at in enumerate(res.connections):
+            conn[i+2] = at.idx + 1
+        dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
+        dest.write('!entry.%s.unit.residues table  str name  int seq  int '
+                   'childseq  int startatomx  str restype  int imagingx\n' %
+                   res.name)
+        if res.type is PROTEIN:
+            typ = 'p'
+        elif res.type is NUCLEIC:
+            typ = 'n'
+        elif res.type is SOLVENT:
+            typ='w'
+        elif res.type is UNKNOWN:
+            typ='?'
+        else:
+            warnings.warn('Unrecognized residue type %r' % res.type,
+                          AmberOFFWarning)
+            typ = '?'
+        dest.write(' "%s" 1 %d 1 "%s" 0\n' % (res.name, len(res)+1, typ))
+        dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n 0\n' %
+                   res.name)
+        dest.write('!entry.%s.unit.solventcap array dbl\n' % res.name)
+        dest.write(' -1.000000\n' + ' 0.0\n' * 4)
+        dest.write('!entry.%s.unit.velocities table  dbl x  dbl y  dbl z\n' %
+                   res.name)
+        for atom in res:
+            try:
+                s = ' %g %g %g\n' % (atom.vx, atom.vy, atom.vz)
+            except AttributeError:
+                dest.write(' 0.0 0.0 0.0\n')
+            else:
+                dest.write(s)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Helper routines
 def _strip_enveloping_quotes(inp):

@@ -7,5 +7,5 @@ __author__ = 'Jason Swails'
 __date__ = '2015'
 __license__ = 'LGPL'
 
-from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from chemistry.modeller.residue import *
 from chemistry.modeller.offlib import AmberOFFLibrary

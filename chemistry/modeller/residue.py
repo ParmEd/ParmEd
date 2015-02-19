@@ -11,6 +11,27 @@ except ImportError:
     np = None
 import warnings
 
+__all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
+           'ResidueTemplateContainer']
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _ResidueType(object):
+    """ Singleton for various types of residues """
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<ResidueType %s>' % self.name
+
+    def __str__(self):
+        return self.name
+
+PROTEIN = _ResidueType('PROTEIN')
+NUCLEIC = _ResidueType('NUCLEIC')
+SOLVENT = _ResidueType('SOLVENT')
+UNKNOWN = _ResidueType('UNKNOWN')
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ResidueTemplate(object):
@@ -50,6 +71,7 @@ class ResidueTemplate(object):
         self.tail = None
         self.connections = []
         self._atomnames = set()
+        self.type = UNKNOWN
 
     def add_atom(self, atom):
         """ Adds an atom to this residue template

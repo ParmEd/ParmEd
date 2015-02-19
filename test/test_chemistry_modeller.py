@@ -3,13 +3,24 @@ Tests the functionality in chemistry.modeller
 """
 from chemistry import Atom
 from chemistry.exceptions import AmberOFFWarning
-from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
+from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
+                                PROTEIN, SOLVENT)
 from chemistry.amber import AmberParm, AmberOFFLibrary
 from chemistry.exceptions import BondError
 import unittest
 import utils
 import warnings
 get_fn = utils.get_fn
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    # Must be Python 3
+    import io as StringIO
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass # Must by py3
 
 class TestResidueTemplate(unittest.TestCase):
     """ Tests the ResidueTemplate class """
@@ -162,6 +173,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
             self.assertEqual(name, res.name)
             self.assertEqual(res.head.name, 'N')
             self.assertEqual(res.tail.name, 'C')
+            self.assertIs(res.type, PROTEIN)
         # Check two residues in particular: ALA and CYX
         ala = offlib['ALA']
         self.assertEqual(len(ala), 10)
@@ -261,6 +273,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
             self.assertEqual(name, res.name)
             self.assertIs(res.head, None)
             self.assertEqual(res.tail.name, 'C')
+            self.assertIs(res.type, PROTEIN)
 
     def testReadCTerm(self):
         """ Test reading C-terminal amino acid Amber OFF library """
@@ -270,6 +283,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head.name, 'N')
+            self.assertIs(res.type, PROTEIN)
 
     def testReadSolvents(self):
         """ Test reading solvent Amber OFF lib (multi-res units) """
@@ -282,6 +296,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
                 self.assertIsInstance(res, ResidueTemplateContainer)
                 # Make sure all residues have the same features as the first
                 for r in res:
+                    self.assertIs(r.type, SOLVENT)
                     for a1, a2 in zip(r, res[0]):
                         self.assertEqual(a1.name, a2.name)
                         self.assertEqual(a1.type, a2.type)
@@ -297,6 +312,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
                             self.assertNotEqual(a1.xy, a2.xy)
                             self.assertNotEqual(a1.xz, a2.xz)
             else:
+                self.assertIs(res.type, SOLVENT)
                 self.assertIsInstance(res, ResidueTemplate)
         # Check a few solvent boxes in particular
         chcl3 = offlib['CHCL3BOX']
@@ -314,3 +330,72 @@ class TestAmberOFFLibrary(unittest.TestCase):
         self.assertAlmostEqual(chcl3[1][0].xx, -9.668111)
         self.assertAlmostEqual(chcl3[1][0].xy, -15.097137)
         self.assertAlmostEqual(chcl3[1][0].xz, -18.569579)
+
+    def testReadWriteInternal(self):
+        """ Tests reading/writing of Amber OFF internal AA libs """
+        offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
+        outfile = StringIO.StringIO()
+        AmberOFFLibrary.write(offlib, outfile)
+        outfile.seek(0)
+        offlib2 = AmberOFFLibrary.parse(outfile)
+        self._check_read_written_libs(offlib, offlib2)
+
+    def testReadWriteCTerm(self):
+        """ Tests reading/writing of Amber OFF C-terminal AA libs """
+        offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
+        outfile = StringIO.StringIO()
+        AmberOFFLibrary.write(offlib, outfile)
+        outfile.seek(0)
+        offlib2 = AmberOFFLibrary.parse(outfile)
+        self._check_read_written_libs(offlib, offlib2)
+
+    def testReadWriteNTerm(self):
+        """ Tests reading/writing of Amber OFF N-terminal AA libs """
+        offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
+        outfile = StringIO.StringIO()
+        AmberOFFLibrary.write(offlib, outfile)
+        outfile.seek(0)
+        offlib2 = AmberOFFLibrary.parse(outfile)
+        self._check_read_written_libs(offlib, offlib2)
+
+    def _check_read_written_libs(self, offlib, offlib2):
+        # Check that offlib and offlib2 are equivalent
+        self.assertEqual(len(offlib), len(offlib2))
+        self.assertEqual(offlib.keys(), offlib2.keys())
+        for key in offlib.keys():
+            r1 = offlib[key]
+            r2 = offlib2[key]
+            # Check residues
+            self.assertEqual(len(r1), len(r2))
+            self.assertIs(r1.type, r2.type)
+            # Check head and tail
+            if r1.head is None or r2.head is None:
+                self.assertIs(r1.head, None)
+                self.assertIs(r2.head, None)
+            else:
+                self.assertEqual(r1.head.name, r2.head.name)
+                self.assertEqual(r1.head.type, r2.head.type)
+                self.assertEqual(r1.head.idx, r2.head.idx)
+            if r1.tail is None or r2.tail is None:
+                self.assertIs(r1.tail, None)
+                self.assertIs(r2.tail, None)
+            else:
+                self.assertEqual(r1.tail.name, r2.tail.name)
+                self.assertEqual(r1.tail.type, r2.tail.type)
+                self.assertEqual(r1.tail.idx, r2.tail.idx)
+            # Check atom properties
+            for a1, a2 in zip(r1, r2):
+                self.assertEqual(a1.name, a2.name)
+                self.assertEqual(a1.type, a2.type)
+                self.assertAlmostEqual(a1.charge, a2.charge)
+                self.assertAlmostEqual(a1.xx, a2.xx, places=4)
+                self.assertAlmostEqual(a1.xy, a2.xy, places=4)
+                self.assertAlmostEqual(a1.xz, a2.xz, places=4)
+                self.assertEqual(a1.vx, a2.vx)
+                self.assertEqual(a1.vy, a2.vy)
+                self.assertEqual(a1.vz, a2.vz)
+            # Check bonds
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            for b1, b2 in zip(r1.bonds, r2.bonds):
+                self.assertEqual(b1.atom1.name, b2.atom1.name)
+                self.assertEqual(b1.atom2.name, b2.atom2.name)
