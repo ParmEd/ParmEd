@@ -4,8 +4,8 @@ Tests the functionality in chemistry.modeller
 from chemistry import Atom, read_PDB
 from chemistry.exceptions import AmberOFFWarning
 from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                                PROTEIN, SOLVENT)
-from chemistry.amber import AmberParm, AmberOFFLibrary
+                                PROTEIN, SOLVENT, AmberOFFLibrary)
+from chemistry.amber import AmberParm
 from chemistry.exceptions import BondError
 import os
 from ParmedTools import changeRadii
@@ -164,6 +164,36 @@ class TestResidueTemplate(unittest.TestCase):
         if utils.has_numpy():
             self.assertIsInstance(templ.coordinates, utils.numpy.ndarray)
             self.assertEqual(templ.coordinates.shape, (len(templ)*3,))
+
+class TestResidueTemplateContainer(unittest.TestCase):
+    """ Tests the ResidueTemplateContainer class """
+
+    def testFromStructure(self):
+        """ Tests building ResidueTemplateContainer from a Structure """
+        struct = AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        cont = ResidueTemplateContainer.from_structure(struct)
+        for res, sres in zip(cont, struct.residues):
+            self.assertIsInstance(res, ResidueTemplate)
+            self.assertEqual(len(res), len(sres))
+            for a1, a2 in zip(res, sres):
+                self.assertEqual(a1.name, a2.name)
+                self.assertEqual(a1.type, a2.type)
+                self.assertEqual(a1.charge, a2.charge)
+                self.assertEqual(a1.xx, a2.xx)
+                self.assertEqual(a1.xy, a2.xy)
+                self.assertEqual(a1.xz, a2.xz)
+
+    def testToLibrary(self):
+        """ Tests converting a ResidueTemplateContainer to a library/dict """
+        lib = ResidueTemplateContainer.from_structure(
+                AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        ).to_library()
+        self.assertIsInstance(lib, dict)
+        self.assertEqual(len(lib.keys()), 23)
+        refset = set(["NSER", "ASP", "LYS", "ILE", "HID", "LEU", "THR", "SER",
+                      "PHE", "VAL", "ALA", "GLY", "ASH", "TRP", "GLU", "CYX",
+                      "PRO", "MET", "TYR", "GLN", "ASN", "ARG", "CALA"])
+        self.assertEqual(set(lib.keys()), refset)
 
 class TestAmberOFFLibrary(unittest.TestCase):
     """ Tests the AmberOFFLibrary class """
