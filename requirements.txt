@@ -1,2 +1,2 @@
 numpy
-netCDF4==1.1.3
+netCDF4

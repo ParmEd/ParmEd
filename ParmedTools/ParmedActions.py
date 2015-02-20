@@ -3,7 +3,7 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division
 
-from chemistry.amber import AmberMask, AmberFormat, ChamberParm, AmoebaParm
+from chemistry.amber import AmberMask, AmberParm, ChamberParm, AmoebaParm
 from chemistry import Bond, BondType, Angle, AngleType, Dihedral, DihedralType
 from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
@@ -152,7 +152,7 @@ class Action(lawsuit):
         # Accept both an AmberParm or ParmList instance to simplify the API
         if isinstance(input_parm, ParmList):
             self.parm_list = input_parm
-        elif isinstance(input_parm, AmberFormat):
+        elif isinstance(input_parm, AmberParm):
             self.parm_list = ParmList()
             self.parm_list.add_parm(input_parm)
         # Set active parm
