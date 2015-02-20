@@ -4,6 +4,8 @@ typically used in modelling applications
 """
 
 import copy
+from chemistry.residue import AminoAcidResidue
+from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond, AtomList, TrackedList
 try:
     import numpy as np
@@ -202,3 +204,14 @@ class ResidueTemplateContainer(list):
     def __init__(self, name=''):
         self.box = None
         self.name = name
+
+    @classmethod
+    def from_structure(self, struct, unique_only=False, term_decorate=False):
+        """
+        Instantiates a ResidueTemplateContainer from a Structure instance filled
+        with residues
+
+        Parameters
+        ----------
+        struct : :class:`Structure`
+        """

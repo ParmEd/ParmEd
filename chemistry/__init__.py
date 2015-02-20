@@ -10,4 +10,4 @@ from chemistry import exceptions, periodic_table
 from chemistry.structure import Structure, read_PDB, write_PDB, read_CIF
 from chemistry.topologyobjects import *
 from chemistry import unit
-from chemistry.residue import AminoAcidResidue
+from chemistry.residue import *

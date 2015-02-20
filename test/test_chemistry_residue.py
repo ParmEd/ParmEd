@@ -63,5 +63,70 @@ class TestChemistryResidue(unittest.TestCase):
         self.assertRaises(KeyError,
                 lambda: residue.AminoAcidResidue.get('NoResidue'))
 
+    def testHas(self):
+        """ Tests the `has` method of BiomolecularResidue """
+        self.assertTrue(residue.AminoAcidResidue.has('E'))
+        self.assertTrue(residue.AminoAcidResidue.has('GLU'))
+        self.assertTrue(residue.AminoAcidResidue.has(residue.GLU))
+        # Now test some that should be False
+        self.assertFalse(residue.AminoAcidResidue.has(residue.A))
+        self.assertFalse(residue.AminoAcidResidue.has('GUA'))
+        self.assertFalse(residue.AminoAcidResidue.has('DG'))
+
+    def testAliases(self):
+        """ Tests that the common aliases used by Amber works """
+        self.assertTrue(residue.AminoAcidResidue.has('GL4'))
+        self.assertTrue(residue.AminoAcidResidue.has('GLH'))
+        self.assertTrue(residue.AminoAcidResidue.has('ASH'))
+        self.assertIs(residue.AminoAcidResidue.get('ASH'), residue.ASP)
+        self.assertIs(residue.AminoAcidResidue.get('GL4'), residue.GLU)
+
+    def testTermini(self):
+        """ Tests that decorated termini names are properly recognized """
+        self.assertTrue(residue.AminoAcidResidue.has('CGLY'))
+        self.assertIs(residue.AminoAcidResidue.get('CHIS'), residue.HIS)
+        self.assertIs(residue.AminoAcidResidue.get('CASH'), residue.ASP)
+        self.assertIs(residue.AminoAcidResidue.get('NHIS'), residue.HIS)
+        self.assertIs(residue.AminoAcidResidue.get('NASH'), residue.ASP)
+        self.assertRaises(KeyError,
+                lambda: residue.AminoAcidResidue.get('XASH'))
+
+class TestNucleicAcidResidues(unittest.TestCase):
+
+    def testResidueMembers(self):
+        """ Tests that all of the nucleic acid residues are defined """
+        self.assertTrue(hasattr(residue, 'A'))
+        self.assertTrue(hasattr(residue, 'U'))
+        self.assertTrue(hasattr(residue, 'G'))
+        self.assertTrue(hasattr(residue, 'C'))
+        self.assertTrue(hasattr(residue, 'DA'))
+        self.assertTrue(hasattr(residue, 'DT'))
+        self.assertTrue(hasattr(residue, 'DG'))
+        self.assertTrue(hasattr(residue, 'DC'))
+
+    def testNameLookup(self):
+        """ Test that looking up DNA/RNA residues by name works """
+        self.assertIs(residue.DNAResidue.get('Guanine'), residue.DG)
+        self.assertIs(residue.DNAResidue.get('ADE'), residue.DA)
+        self.assertIs(residue.DNAResidue.get('thymine'), residue.DT)
+        self.assertIs(residue.RNAResidue.get('Uracil'), residue.U)
+        self.assertIs(residue.RNAResidue.get('G'), residue.G)
+        self.assertIs(residue.RNAResidue.get('ADE'), residue.A)
+
+    def testBadLookup(self):
+        """ Test that lookups of non-existent nucleic acid residues fails """
+        self.assertRaises(KeyError, lambda: residue.RNAResidue.get('NoResidue'))
+        self.assertRaises(KeyError, lambda: residue.DNAResidue.get('NoResidue'))
+
+    def testTermini(self):
+        """ Tests that decorated DNA/RNA termini are properly recognized """
+        self.assertTrue(residue.RNAResidue.has('G5'))
+        self.assertTrue(residue.RNAResidue.has('G3'))
+        self.assertTrue(residue.RNAResidue.has('RG5'))
+        self.assertTrue(residue.RNAResidue.has('RG3'))
+        self.assertTrue(residue.DNAResidue.has('DG5'))
+        self.assertTrue(residue.DNAResidue.has('DG3'))
+        self.assertFalse(residue.RNAResidue.has('G4'))
+
 if __name__ == '__main__':
     unittest.main()
