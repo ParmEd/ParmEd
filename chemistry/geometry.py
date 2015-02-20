@@ -97,7 +97,7 @@ def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     if abs(cy) < TINY: cv[1] = 0
     if abs(cz) < TINY: cv[2] = 0
 
-    return av*u.angstroms, bv*u.angstroms, cv*u.angstroms
+    return (av, bv, cv) * u.angstroms
 
 def box_vectors_to_lengths_and_angles(a, b, c):
     """

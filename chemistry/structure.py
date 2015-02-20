@@ -64,6 +64,7 @@ except ImportError:
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
+    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     app = mm = None
 
@@ -1203,7 +1204,9 @@ class Structure(object):
         # Set the unit cell dimensions
         if self.box is not None:
             top.setPeriodicBoxVectors(
-                    box_lengths_and_angles_to_vectors(*self.box)
+                    reducePeriodicBoxVectors(
+                        box_lengths_and_angles_to_vectors(*self.box)
+                    )
             )
         return top
 
@@ -1455,7 +1458,9 @@ class Structure(object):
         if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
         if self.box is not None:
-            system.setDefaultPeriodicBoxVectors(*self.box_vectors)
+            system.setDefaultPeriodicBoxVectors(
+                    *reducePeriodicBoxVectors(self.box_vectors)
+            )
         self.omm_set_virtual_sites(system)
         return system
 
