@@ -11,8 +11,6 @@ import utils
 import unittest
 np = utils.numpy
 
-from simtk.openmm.app.internal.unitcell import computePeriodicBoxVectors
-
 class TestChemistryGeometry(unittest.TestCase):
     """ Tests the various routines in the geometry package """
 
