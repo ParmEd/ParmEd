@@ -176,9 +176,6 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ilscivr']:
         raise SimulationError('Linearized semi-classical simulations are not '
                               'supported.')
-    if parm.ptr('ifbox') > 1:
-        raise SimulationError('OpenMM currently supports only '
-                              'orthorhombic cells')
     if parm.ptr('ifbox') > 0 and mdin.cntrl_nml['igb'] > 0:
         raise SimulationError('Cannot treat periodic system with GB')
     if mdin.cntrl_nml['nmropt']:
@@ -889,15 +886,12 @@ def energy(parm, args, output=sys.stdout):
             gbmeth = GBn
         elif igb == 8:
             gbmeth = GBn2
-    elif parm.ptr('ifbox') == 1:
+    else:
         if cutoff is None: cutoff = 8.0
         if do_ewald:
             nbmeth = ff.Ewald
         else:
             nbmeth = ff.PME
-    else:
-        raise SimulationError('Only orthorhombic boxes currently supported in '
-                              'OpenMM')
 
     parm_ = parm
     if applayer:
@@ -1092,12 +1086,9 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
             gbmeth = GBn2
         # Other choices are vacuum
         kappa = 0.73 * sqrt(saltcon * 0.10806)
-    elif parm.ptr('ifbox') == 1:
+    else:
         if cutoff is None: cutoff = 8.0
         nbmeth = ff.PME
-    else:
-        raise SimulationError('Only orthorhombic boxes currently supported in '
-                              'OpenMM')
 
     # Time to create the OpenMM system
     system = parm.createSystem(nonbondedMethod=nbmeth,

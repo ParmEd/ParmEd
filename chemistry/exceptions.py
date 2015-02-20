@@ -120,6 +120,9 @@ class AnisouWarning(ChemWarning):
 class MissingParameterWarning(ChemWarning):
     """ If a type of parameter is missing, but you don't want it to be fatal """
 
+class AmberOFFWarning(ChemWarning):
+    """ For badly formatted OFF files... ugh """
+
 class PdbxError(ChemError):
     """ Class for catching general errors with PDBx/mmCIF parsing """
 

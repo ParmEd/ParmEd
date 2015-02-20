@@ -619,7 +619,7 @@ class RestartReporter(object):
         """ No-op here """
         pass
 
-class ProgressReporter(AmberStateDataReporter):
+class ProgressReporter(StateDataReporter):
     """
     A class that prints out a progress report of how much MD (or minimization)
     has been done, how fast the simulation is running, and how much time is left
@@ -649,7 +649,7 @@ class ProgressReporter(AmberStateDataReporter):
             physical mass, such as when some particles have had their masses
             set to 0 to immobilize them.
         - **kwargs (keyword arguments): any other arguments accepted by
-            AmberStateDataReporter
+            StateDataReporter
         """
         # Make sure we got a file name rather than a file-like object.
         # Immediately close the file after opening. This erases it, which isn't
@@ -814,7 +814,7 @@ class ProgressReporter(AmberStateDataReporter):
     def __del__(self):
         """ We already closed the file. """
 
-class EnergyMinimizerReporter(AmberStateDataReporter):
+class EnergyMinimizerReporter(StateDataReporter):
     """
     This class acts as a simple energy reporter class for minimizations. This
     is not meant to be used as a reporter for OpenMM's molecular dynamics

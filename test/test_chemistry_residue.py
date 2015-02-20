@@ -2,9 +2,9 @@
 Tests the functionality in chemistry.residue
 """
 
-import utils
-import unittest
 from chemistry import residue
+import unittest
+import utils
 
 class TestChemistryResidue(unittest.TestCase):
 

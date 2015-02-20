@@ -259,3 +259,34 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
                     if abs((wx / wy) - 1) > relative_error:
                         return False
     return True
+
+def which(prog):
+    """ Like the Unix program ``which``
+
+    Parameters
+    ----------
+    prog : str
+        Name of the program to look for in PATH
+
+    Returns
+    -------
+    path
+        The full path of the program, or None if it cannot be found
+    """
+    def is_exe(filename):
+        return os.path.exists(filename) and os.access(filename, os.X_OK)
+
+    # See if full path is provided
+    fpath, fname = os.path.split(prog)
+    if fpath:
+        if is_exe(prog):
+            return prog
+        return None
+
+    # If not, see if the program exists anywhere in PATH
+    pathparts = os.environ['PATH'].split(os.path.pathsep)
+    for part in pathparts:
+        trial = os.path.join(part, prog)
+        if is_exe(trial):
+            return trial
+    return None

@@ -3,6 +3,8 @@ This module contains basic information and functionality related to individual
 residues in typical biopolymers.
 """
 
+# Informatics classes
+
 class AminoAcidResidue(object):
     """
     An individual amino acid residue.
