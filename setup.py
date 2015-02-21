@@ -10,7 +10,7 @@ packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
 packages += ['chemistry', 'chemistry.amber', 'chemistry.modeller',
              'chemistry.tinker', 'chemistry.unit', 'chemistry.amber.mdin',
              'chemistry.charmm', 'chemistry.openmm', 'chemistry.pdbx',
-             'cpinutils', 'fortranformat']
+             'fortranformat']
 
 # Modules
 modules = ['compat24', 'timer']

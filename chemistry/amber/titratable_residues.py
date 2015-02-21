@@ -7,7 +7,8 @@ titratable residue treated.
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
                        'DG', 'DT', 'AP', 'CP', 'G', 'U', 'C','A','GG','UU']
 
-from cpinutils.exceptions import *
+from chemistry.exceptions import (CpinChargeWarning, CpinRefEneWarning,
+        CpinResidueError, CpinInputError, CpinInputWarning)
 from math import log
 import warnings
 
@@ -218,7 +219,8 @@ class TitratableResidue(object):
    def cpin_pointers(self, first_atom):
       """ Sets and returns the cpin info """
       if self.first_state == -1 or self.first_charge == -1:
-         raise CpinError('Must set residue pointers before writing cpin info!')
+         raise CpinResidueError('Must set residue pointers before writing '
+                                'cpin info!')
       return {'FIRST_ATOM' : first_atom,
               'FIRST_CHARGE' : self.first_charge,
               'FIRST_STATE' : self.first_state,
@@ -430,7 +432,7 @@ refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2.solvent_energies()
 refene2 = _ReferenceEnergy(igb1=21.4298008, igb2=26.8894581, igb5=26.5980488,
                  igb7=23.4181107, igb8=26.3448911)
-refene2.solvent_energies(igb2=33.2613028, igb5=26.1881636)
+refene2.solvent_energies(igb2=33.2613028)
 refene2.dielc2_energies(igb2=12.676908, igb5=13.084913)
 refene2.dielc2.solvent_energies()
 refene2.set_pKa(4.0, deprotonated=False)
@@ -463,7 +465,7 @@ refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2.solvent_energies()
 refene2 = _ReferenceEnergy(igb1=3.89691326, igb2=8.4057785, igb5=8.0855764,
                igb7=5.305949, igb8=8.3591335)
-refene2.solvent_energies(igb2=15.20019319, igb5=7.6690995)
+refene2.solvent_energies(igb2=15.20019319)
 refene2.dielc2_energies(igb2=3.455596, igb5=3.957270)
 refene2.dielc2.solvent_energies()
 refene2.set_pKa(4.4, deprotonated=False)
