@@ -722,44 +722,6 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def writeOFF(self, off_file='off.lib'):
-        """ Writes an OFF file from all of the residues found in a prmtop """
-        from chemistry.amber.residue import ToResidue
-   
-        off_file = open(off_file, 'w')
-   
-        # keep track of all the residues we have to print to the OFF file
-        residues = []
-   
-        # First create a Molecule object from the prmtop
-        mol = self.ToMolecule()
-   
-        # Now loop through all of the residues in the Molecule object and add
-        # unique ones to the list of residues to print
-        for i in xrange(len(mol.residues)):
-            res = ToResidue(mol, i)
-            present = False
-            for compres in residues:
-                if res == compres:
-                    present = True
-   
-            if not present:
-                residues.append(res)
-      
-        # Now that we have all of the residues that we need to add, put their
-        # names in the header of the OFF file
-        off_file.write('!!index array str\n')
-        for res in residues:
-            off_file.write(' "%s"\n' % res.name)
-   
-        # Now write the OFF strings to the file
-        for res in residues:
-            off_file.write(res.OFF())
-
-        off_file.close()
-
-    #===================================================
-
     def fill_LJ(self):
         """
         Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each

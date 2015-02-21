@@ -576,6 +576,8 @@ def _imaging_atom(res):
     for i, atom in enumerate(res):
         if atom.mass == 0:
             masses[i] = pt.Mass[pt.Element[atom.atomic_number]]
+        else:
+            masses[i] = atom.mass
     com = center_of_mass(coords, masses)
     diff = coords - com
     return np.argmin((diff * diff).sum(axis=1)) + 1

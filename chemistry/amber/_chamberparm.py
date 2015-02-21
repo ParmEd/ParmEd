@@ -225,14 +225,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def writeOFF(self, off_file='off.lib'):
-        """ Writes an OFF file from all of the residues found in a prmtop """
-        warnings.warn('OFF files from chamber topologies should NOT be used '
-                      'in LEaP unless you KNOW what you are doing...')
-        return super(ChamberParm, self).writeOFF(off_file)
-
-    #===================================================
-
     def fill_LJ(self):
         """
         Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data

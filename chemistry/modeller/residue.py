@@ -4,6 +4,8 @@ typically used in modelling applications
 """
 
 import copy
+from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond, AtomList, TrackedList
 try:
     import numpy as np
@@ -202,3 +204,60 @@ class ResidueTemplateContainer(list):
     def __init__(self, name=''):
         self.box = None
         self.name = name
+
+    @classmethod
+    def from_structure(cls, struct, term_decorate=True):
+        """
+        Instantiates a ResidueTemplateContainer from a Structure instance filled
+        with residues
+
+        Parameters
+        ----------
+        struct : :class:`Structure`
+            The structure from which to generate the ResidueTemplateContainer
+            from
+        term_decorate : bool, optional
+            If True, terminal amino and nucleic acid residues will be adorned as
+            follows:
+
+                * N-prepended if it is an N-terminal amino acid
+                * C-prepended if it is a C-terminal amino acid
+                * 5-appended if it is a 5'-terminal nucleic acid
+                * 3-appended if it is a 3'-terminal nucleic acid
+
+            For example, an N-terminal GLY will become NGLY, while a 5'-terminal
+            DA will become DA5. Default is True
+        """
+        inst = cls()
+        for res in struct.residues:
+            rt = ResidueTemplate.from_residue(res)
+            # See if we need to decorate the termini names
+            if rt.head is None and rt.tail is not None and term_decorate:
+                if AminoAcidResidue.has(rt.name):
+                    rt.name = 'N%s' % rt.name
+                elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
+                    rt.name = '%s5' % rt.name
+            elif rt.tail is None and rt.head is not None and term_decorate:
+                if AminoAcidResidue.has(rt.name):
+                    rt.name = 'C%s' % rt.name
+                elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
+                    rt.name = '%s3' % rt.name
+            inst.append(rt)
+        return inst
+
+    def to_library(self):
+        """
+        Converts the ResidueTemplateContainer instance to a library of unique
+        :class:`ResidueTemplate` instances. The first of each kind of residue is
+        taken
+
+        Returns
+        -------
+        residues : dict {str : :class:`ResidueTemplate}
+            The residue library with all residues from this residue collection
+        """
+        ret = dict()
+        for res in self:
+            if res.name in ret: continue
+            ret[res.name] = res
+        return ret
