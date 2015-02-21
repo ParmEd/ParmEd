@@ -627,10 +627,6 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    delete_mask = chemistry_deprecated("delete_mask", "strip")(strip)
-
-    #===================================================
-
     def rediscover_molecules(self, solute_ions=True, fix_broken=True):
         """
         This determines the molecularity and sets the ATOMS_PER_MOLECULE and
