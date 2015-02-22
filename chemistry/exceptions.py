@@ -135,3 +135,19 @@ class PdbxSyntaxError(ChemError):
 
     def __str__(self):
         return "%%ERROR - [at line: %d] %s" % (self.lineNumber, self.text)
+
+class CpinResidueError(ChemError):
+   """ Error adding a residue to the CPIN file """
+
+class CpinChargeWarning(ChemWarning):
+   """ Bad charge definitions that are inconsistent with protonation states """
+
+class CpinRefEneWarning(ChemWarning):
+   """ If not all reference energies are properly pKa-adjusted """
+
+class CpinInputWarning(ChemWarning):
+   """ If there is a non-fatal problem with the input variables """
+
+class CpinInputError(ChemError):
+   """ If the user provides bad input """
+

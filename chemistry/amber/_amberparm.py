@@ -36,7 +36,6 @@ from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
-from chemistry.utils import chemistry_deprecated
 import copy
 try:
     from itertools import izip as zip
@@ -624,10 +623,6 @@ class AmberParm(AmberFormat, Structure):
                     self.vels.extend([atom.vx, atom.vy, atom.vz])
                 if np is not None:
                     self.vels = np.asarray(self.vels)
-
-    #===================================================
-
-    delete_mask = chemistry_deprecated("delete_mask", "strip")(strip)
 
     #===================================================
 

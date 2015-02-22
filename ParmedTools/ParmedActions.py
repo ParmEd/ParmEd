@@ -1128,7 +1128,7 @@ class changeprotstate(Action):
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
     def execute(self):
-        from cpinutils import residues
+        from chemistry.amber import titratable_residues as residues
         changeprotstate._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
