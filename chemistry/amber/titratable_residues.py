@@ -5,7 +5,7 @@ titratable residue treated.
 """
 
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
-                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'C','A','GG','UU']
+                       'DG', 'DT', 'AP', 'CP', 'G', 'U']
 
 from chemistry.exceptions import (CpinChargeWarning, CpinRefEneWarning,
         CpinResidueError, CpinInputError, CpinInputWarning)
