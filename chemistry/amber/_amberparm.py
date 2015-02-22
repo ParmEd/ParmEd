@@ -36,7 +36,6 @@ from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
-from chemistry.utils import chemistry_deprecated
 import copy
 try:
     from itertools import izip as zip
