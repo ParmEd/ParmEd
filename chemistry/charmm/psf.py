@@ -13,6 +13,8 @@ from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                        Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from chemistry.structure import needs_openmm, app, mm
 from chemistry import unit as u
 from math import sqrt
@@ -81,6 +83,28 @@ class CharmmPsfFile(Structure):
     >>> len(cs.bonds)
     32
     """
+    __metaclass__ = FileFormatType
+
+    #===================================================
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as a CHARMM PSF file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a CHARMM or Xplor-style PSF file
+        """
+        f = io.genopen(filename, 'r')
+        line = f.readline().decode()
+        f.close()
+        return line.strip().startswith('PSF')
 
     #===================================================
 

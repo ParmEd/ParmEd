@@ -17,411 +17,414 @@ warnings.filterwarnings('always', category=CpinChargeWarning)
 warnings.filterwarnings('always', category=CpinRefEneWarning)
 
 class _State(object):
-   """ A protonation state """
-   sort_by_resnum = True
+    """ A protonation state """
+    sort_by_resnum = True
 
-   def __init__(self, protcnt, charges, refene):
-      self.charges = charges
-      self.refene = refene
-      self.protcnt = protcnt
+    def __init__(self, protcnt, charges, refene):
+        self.charges = charges
+        self.refene = refene
+        self.protcnt = protcnt
 
 class _ReferenceEnergy(object):
-   """ Reference energies for various solvent models """
-   LN_TO_LOG = log(10.0)
-   KB = 0.00199
-   TEMP = 300.0
-   def __init__(self, igb1=None, igb2=None, igb5=None, igb7=None, igb8=None):
-      self.pKa_is_set = False
-      self.igb1 = igb1
-      self.igb2 = igb2
-      self.igb5 = igb5
-      self.igb7 = igb7
-      self.igb8 = igb8
+    """ Reference energies for various solvent models """
+    LN_TO_LOG = log(10.0)
+    KB = 0.00199
+    TEMP = 300.0
+    def __init__(self, igb1=None, igb2=None, igb5=None, igb7=None, igb8=None):
+        self.pKa_is_set = False
+        self.igb1 = igb1
+        self.igb2 = igb2
+        self.igb5 = igb5
+        self.igb7 = igb7
+        self.igb8 = igb8
 
-   def solvent_energies(self, igb1=None, igb2=None, igb5=None,
+    def solvent_energies(self, igb1=None, igb2=None, igb5=None,
+                         igb7=None, igb8=None):
+        """
+        Add solvent reference energies, copying the GB reference energies if
+        none are explicitly given
+        """
+        if igb1 is None: igb1 = self.igb1
+        if igb2 is None: igb2 = self.igb2
+        if igb5 is None: igb5 = self.igb5
+        if igb7 is None: igb7 = self.igb7
+        if igb8 is None: igb8 = self.igb8
+        self.solvent = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
+
+    def dielc2_energies(self, igb1=None, igb2=None, igb5=None,
                         igb7=None, igb8=None):
-      """
-      Add solvent reference energies, copying the GB reference energies if none
-      are explicitly given
-      """
-      if igb1 is None: igb1 = self.igb1
-      if igb2 is None: igb2 = self.igb2
-      if igb5 is None: igb5 = self.igb5
-      if igb7 is None: igb7 = self.igb7
-      if igb8 is None: igb8 = self.igb8
-      self.solvent = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
+        """
+        Add reference energies for a dielectric constant of 2.0. Since this has
+        no reason to be near the original reference energies, do not use those
+        in place of energies that aren't provided
+        """
+        self.dielc2 = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
 
-   def dielc2_energies(self, igb1=None, igb2=None, igb5=None,
-                       igb7=None, igb8=None):
-      """
-      Add reference energies for a dielectric constant of 2.0. Since this has no
-      reason to be near the original reference energies, do not use those in
-      place of energies that aren't provided
-      """
-      self.dielc2 = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
+    def set_pKa(self, pKa, deprotonated=False):
+        """
+        Adjusts the reference energies based on the pKa. If the reference energy
+        is given for a deprotonated state, the pKa adjustment is subtracted from
+        the reference energy. Otherwise, this state is a 'protonated' state, so
+        the pKa adjustment is added to the reference energy
+        """
+        if self.pKa_is_set: return
+        self.pKa_is_set = True
+        factor = self.KB * self.LN_TO_LOG * self.TEMP * pKa
 
-   def set_pKa(self, pKa, deprotonated=False):
-      """
-      Adjusts the reference energies based on the pKa. If the reference energy
-      is given for a deprotonated state, the pKa adjustment is subtracted from
-      the reference energy. Otherwise, this state is a 'protonated' state, so
-      the pKa adjustment is added to the reference energy
-      """
-      if self.pKa_is_set: return
-      self.pKa_is_set = True
-      factor = self.KB * self.LN_TO_LOG * self.TEMP * pKa
-
-      if deprotonated:
-         if self.igb1 is not None: self.igb1 -= factor
-         if self.igb2 is not None: self.igb2 -= factor
-         if self.igb5 is not None: self.igb5 -= factor
-         if self.igb7 is not None: self.igb7 -= factor
-         if self.igb8 is not None: self.igb8 -= factor
-      else:
-         if self.igb1 is not None: self.igb1 += factor
-         if self.igb2 is not None: self.igb2 += factor
-         if self.igb5 is not None: self.igb5 += factor
-         if self.igb7 is not None: self.igb7 += factor
-         if self.igb8 is not None: self.igb8 += factor
-      # Now apply the correction to our solvent reference energies if we have
-      # them (and dielectric-2 energies, if we have them)
-      if hasattr(self, 'solvent'):
-         self.solvent.set_pKa(pKa, deprotonated)
-      if hasattr(self, 'dielc2'):
-         self.dielc2.set_pKa(pKa, deprotonated)
+        if deprotonated:
+            if self.igb1 is not None: self.igb1 -= factor
+            if self.igb2 is not None: self.igb2 -= factor
+            if self.igb5 is not None: self.igb5 -= factor
+            if self.igb7 is not None: self.igb7 -= factor
+            if self.igb8 is not None: self.igb8 -= factor
+        else:
+            if self.igb1 is not None: self.igb1 += factor
+            if self.igb2 is not None: self.igb2 += factor
+            if self.igb5 is not None: self.igb5 += factor
+            if self.igb7 is not None: self.igb7 += factor
+            if self.igb8 is not None: self.igb8 += factor
+        # Now apply the correction to our solvent reference energies if we have
+        # them (and dielectric-2 energies, if we have them)
+        if hasattr(self, 'solvent'):
+            self.solvent.set_pKa(pKa, deprotonated)
+        if hasattr(self, 'dielc2'):
+            self.dielc2.set_pKa(pKa, deprotonated)
 
 class _LineBuffer(object):
-   """ Buffer to add lines to the cpin file """
+    """ Buffer to add lines to the cpin file """
 
-   CHARS_PER_LINE = 80
+    CHARS_PER_LINE = 80
 
-   def __init__(self, file):
-      self.file = file
-      self.linebuffer = ''
+    def __init__(self, file):
+        self.file = file
+        self.linebuffer = ''
 
-   def add_word(self, word):
-      if len(self.linebuffer) + len(word) > self.CHARS_PER_LINE:
-         self.file.write(self.linebuffer + '\n')
-         self.linebuffer = ' %s' % word
-      else:
-         self.linebuffer += word
+    def add_word(self, word):
+        if len(self.linebuffer) + len(word) > self.CHARS_PER_LINE:
+            self.file.write(self.linebuffer + '\n')
+            self.linebuffer = ' %s' % word
+        else:
+            self.linebuffer += word
 
-   def add_words(self, words, space_delimited=False):
-      """ Adds multiple words """
-      extra = ''
-      if space_delimited:
-         extra = ' '
-      for word in words:
-         self.add_word(word + extra)
-   
-   def flush(self):
-      """ Flushes this buffer to the file """
-      if len(self.linebuffer) == 0:
-         return
-      self.file.write(self.linebuffer + '\n')
-      self.linebuffer = ''
+    def add_words(self, words, space_delimited=False):
+        """ Adds multiple words """
+        extra = ''
+        if space_delimited:
+            extra = ' '
+        for word in words:
+            self.add_word(word + extra)
+
+    def flush(self):
+        """ Flushes this buffer to the file """
+        if len(self.linebuffer) == 0:
+            return
+        self.file.write(self.linebuffer + '\n')
+        self.linebuffer = ''
 
 class TitratableResidue(object):
-   """
-   A residue with different protonation states defined for Amber for use in the
-   Constant pH MD method implemented in sander
-   """
+    """
+    A residue with different protonation states defined for Amber for use in
+    the Constant pH MD method implemented in sander
+    """
 
-   def __init__(self, resname, atom_list, pka):
-      self.resname = resname
-      self.atom_list = list(atom_list) # list of atom names
-      self.states = []
-      self.first_state = -1
-      self.first_charge = -1
-      self.pKa = pka
+    def __init__(self, resname, atom_list, pka):
+        self.resname = resname
+        self.atom_list = list(atom_list) # list of atom names
+        self.states = []
+        self.first_state = -1
+        self.first_charge = -1
+        self.pKa = pka
 
-   def _str_refenes(self, solvent=False, igb=2, dielc=1.0):
-      """
-      Converts all reference energies into a formatted string with a message
-      saying if the energy is not set
-      """
-      igb = str(igb)
-      if solvent:
-         _getattr = lambda state, igb: getattr(state.solvent, 'igb%d' % igb)
-      else:
-         _getattr = lambda state, igb: getattr(state, 'igb%d' % igb)
+    def _str_refenes(self, solvent=False, igb=2, dielc=1.0):
+        """
+        Converts all reference energies into a formatted string with a message
+        saying if the energy is not set
+        """
+        igb = str(igb)
+        if solvent:
+            _getattr = lambda state, igb: getattr(state.solvent, 'igb%d' % igb)
+        else:
+            _getattr = lambda state, igb: getattr(state, 'igb%d' % igb)
 
-      ret_str = ''
-      for state in self.states:
-         if dielc == 2:
-            refene = _getattr(state.refene.dielc2, int(igb))
-         else:
-            refene = _getattr(state.refene, int(igb))
+        ret_str = ''
+        for state in self.states:
+            if dielc == 2:
+                refene = _getattr(state.refene.dielc2, int(igb))
+            else:
+                refene = _getattr(state.refene, int(igb))
 
-         if refene is None:
-            ret_str += '%12s' % 'Not Set'
-         else:
-            ret_str += '%12.5f' % refene
+            if refene is None:
+                ret_str += '%12s' % 'Not Set'
+            else:
+                ret_str += '%12.5f' % refene
 
-      return ret_str
+        return ret_str
 
-   def __str__(self):
-      ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
-                 ''.join(['%12s' % ('STATE %d' % i) for i in
-                          xrange(len(self.states))]) + '\n'
-                )
-      for i, atom in enumerate(self.atom_list):
-         ret_str += ('%8s' % atom + 
-                     ''.join(['%12.4f' % (state.charges[i]) 
-                              for state in self.states]) + '\n'
-                    )
-      ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-      ret_str += ('%8s' % 'Prot Cnt' + 
-                  ''.join(['%12d' % state.protcnt for state in self.states]) +
-                  '\n')
-      ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-      ret_str += ('Reference Energies (ES = Explicit solvent, IS = Implicit '
-                  'solvent)\n\n')
-      ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1) + '\n'
-      ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2) + '\n'
-      ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5) + '\n'
-      ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7) + '\n'
-      ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8) + '\n'
-      ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1) + '\n'
-      ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2) + '\n'
-      ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5) + '\n'
-      ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7) + '\n'
-      ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8) + '\n'
-      ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-      ret_str += 'Reference Energies for Internal Dielectric of 2.0\n\n'
-      ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1, 2) + '\n'
-      ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2, 2) + '\n'
-      ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5, 2) + '\n'
-      ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7, 2) + '\n'
-      ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8, 2) + '\n'
-      ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1, 2) + '\n'
-      ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2, 2) + '\n'
-      ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5, 2) + '\n'
-      ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7, 2) + '\n'
-      ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8, 2) + '\n'
-      return ret_str
+    def __str__(self):
+        ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
+                   ''.join(['%12s' % ('STATE %d' % i) for i in
+                           xrange(len(self.states))]) + '\n'
+        )
+        for i, atom in enumerate(self.atom_list):
+            ret_str += ('%8s' % atom +
+                        ''.join(['%12.4f' % (state.charges[i])
+                                for state in self.states]) + '\n'
+            )
+        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+        ret_str += ('%8s' % 'Prot Cnt' +
+                    ''.join(['%12d' % state.protcnt for state in self.states]) +
+                    '\n')
+        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+        ret_str += ('Reference Energies (ES = Explicit solvent, IS = Implicit '
+                    'solvent)\n\n')
+        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1) + '\n'
+        ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2) + '\n'
+        ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5) + '\n'
+        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7) + '\n'
+        ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8) + '\n'
+        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1) + '\n'
+        ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2) + '\n'
+        ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5) + '\n'
+        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7) + '\n'
+        ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8) + '\n'
+        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+        ret_str += 'Reference Energies for Internal Dielectric of 2.0\n\n'
+        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1, 2) + '\n'
+        ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2, 2) + '\n'
+        ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5, 2) + '\n'
+        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7, 2) + '\n'
+        ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8, 2) + '\n'
+        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1, 2) + '\n'
+        ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2, 2) + '\n'
+        ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5, 2) + '\n'
+        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7, 2) + '\n'
+        ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8, 2) + '\n'
+        return ret_str
 
-   def add_state(self, protcnt, charges, refene):
-      """ Add a single titratable state for this titratable residue """
-      new_state = _State(protcnt, charges, refene)
-      if len(new_state.charges) != len(self.atom_list):
-         raise CpinResidueError('Wrong number of charges for new state')
-      self.states.append(new_state)
+    def add_state(self, protcnt, charges, refene):
+        """ Add a single titratable state for this titratable residue """
+        new_state = _State(protcnt, charges, refene)
+        if len(new_state.charges) != len(self.atom_list):
+            raise CpinResidueError('Wrong number of charges for new state')
+        self.states.append(new_state)
 
-   def add_states(self, protcnts, charges, refenes):
-      """ Add multiple titratable states for this titratable residue """
-      if len(protcnts) != len(charges) and len(protcnts) != len(refenes):
-         raise CpinResidueError('Inconsistent list of parameters for '
-                                'TitratableResidue.add_states')
-      for i in xrange(len(protcnts)):
-         self.add_state(protcnts[i], charges[i], refenes[i])
+    def add_states(self, protcnts, charges, refenes):
+        """ Add multiple titratable states for this titratable residue """
+        if len(protcnts) != len(charges) and len(protcnts) != len(refenes):
+            raise CpinResidueError('Inconsistent list of parameters for '
+                                   'TitratableResidue.add_states')
+        for i in xrange(len(protcnts)):
+            self.add_state(protcnts[i], charges[i], refenes[i])
 
-   def cpin_pointers(self, first_atom):
-      """ Sets and returns the cpin info """
-      if self.first_state == -1 or self.first_charge == -1:
-         raise CpinResidueError('Must set residue pointers before writing '
-                                'cpin info!')
-      return {'FIRST_ATOM' : first_atom,
-              'FIRST_CHARGE' : self.first_charge,
-              'FIRST_STATE' : self.first_state,
-              'NUM_ATOMS' : len(self.atom_list),
-              'NUM_STATES' : len(self.states)} 
+    def cpin_pointers(self, first_atom):
+        """ Sets and returns the cpin info """
+        if self.first_state == -1 or self.first_charge == -1:
+            raise CpinResidueError('Must set residue pointers before writing '
+                                    'cpin info!')
+        return {'FIRST_ATOM' : first_atom,
+                'FIRST_CHARGE' : self.first_charge,
+                'FIRST_STATE' : self.first_state,
+                'NUM_ATOMS' : len(self.atom_list),
+                'NUM_STATES' : len(self.states)}
 
-   def set_first_state(self, index):
-      """ Sets the first state index """
-      # Has the first state already been set?
-      if self.first_state != -1:
-         return
-      self.first_state = index
+    def set_first_state(self, index):
+        """ Sets the first state index """
+        # Has the first state already been set?
+        if self.first_state != -1:
+            return
+        self.first_state = index
 
-   def set_first_charge(self, index):
-      """ Sets the first charge index """
-      # Has it already been set?
-      if self.first_charge != -1:
-         return
-      self.first_charge = index
-   
-   def reset(self):
-      """ Resets the pointers """
-      self.first_state = -1
-      self.first_charge = -1
+    def set_first_charge(self, index):
+        """ Sets the first charge index """
+        # Has it already been set?
+        if self.first_charge != -1:
+            return
+        self.first_charge = index
 
-   def check(self):
-      """ Checks that the charges are consistent with the protonation states """
-      sum_charges = [sum(state.charges) for state in self.states]
-      protcnts = [state.protcnt for state in self.states]
-      # All we have to do is make sure that the charges/proton counts are
-      # consistent between the first state and every other state
-      for i in xrange(1, len(sum_charges)):
-         charge_diff = sum_charges[i] - sum_charges[0]
-         prot_diff = protcnts[i] - protcnts[0]
-         if abs(charge_diff - prot_diff) >= 0.0001:
-            warnings.warn('Inconsistencies detected in charge definitions in %s'
-                          % self.resname, CpinChargeWarning)
-      # Check all of the reference energies to make sure that the pKa was set
-      # for all but one of them
-      notset = 0
-      for state in self.states:
-         notset += int(state.refene.pKa_is_set)
-      if notset != len(self.states) - 1:
-         warnings.warn('Not enough states are pKa-adjusted in %s' %
-                        self.resname)
+    def reset(self):
+        """ Resets the pointers """
+        self.first_state = -1
+        self.first_charge = -1
 
-   def __lt__(self, other):
-      return self.first_atom < other.first_atom
+    def check(self):
+        """ Checks that the charges are consistent w/ the protonation states """
+        sum_charges = [sum(state.charges) for state in self.states]
+        protcnts = [state.protcnt for state in self.states]
+        # All we have to do is make sure that the charges/proton counts are
+        # consistent between the first state and every other state
+        for i in xrange(1, len(sum_charges)):
+            charge_diff = sum_charges[i] - sum_charges[0]
+            prot_diff = protcnts[i] - protcnts[0]
+            if abs(charge_diff - prot_diff) >= 0.0001:
+                warnings.warn('Inconsistencies detected in charge definitions '
+                              'in %s' % self.resname, CpinChargeWarning)
+        # Check all of the reference energies to make sure that the pKa was set
+        # for all but one of them
+        notset = 0
+        for state in self.states:
+            notset += int(state.refene.pKa_is_set)
+        if notset != len(self.states) - 1:
+            warnings.warn('Not enough states are pKa-adjusted in %s' %
+                          self.resname)
 
-   def __gt__(self, other):
-      return self.first_atom > other.first_atom
+    def __lt__(self, other):
+        return self.first_atom < other.first_atom
 
-   def __eq__(self, other):
-      return self.first_atom == other.first_atom
+    def __gt__(self, other):
+        return self.first_atom > other.first_atom
 
-   def __ge__(self, other):
-      return self.first_atom >= other.first_atom
+    def __eq__(self, other):
+        return self.first_atom == other.first_atom
 
-   def __le__(self, other):
-      return self.first_atom <= other.first_atom
+    def __ge__(self, other):
+        return self.first_atom >= other.first_atom
+
+    def __le__(self, other):
+        return self.first_atom <= other.first_atom
 
 class TitratableResidueList(list):
-   """ List of all titratable residues """
-   def __init__(self, system_name='Unknown', solvated=False,
-                first_solvent=0):
-      list.__init__(self)
-      self.first_atoms = []
-      self.residue_nums = []
-      self.resstates = []
-      self.system_name = system_name
-      self.solvated = solvated
-      self.first_sol = first_solvent
+    """ List of all titratable residues """
+    def __init__(self, system_name='Unknown', solvated=False,
+                 first_solvent=0):
+        list.__init__(self)
+        self.first_atoms = []
+        self.residue_nums = []
+        self.resstates = []
+        self.system_name = system_name
+        self.solvated = solvated
+        self.first_sol = first_solvent
    
-   def add_residue(self, residue, resnum, first_atom, state=0):
-      """ Adds a residue to the list """
-      list.append(self, residue)
-      self.first_atoms.append(first_atom)
-      self.residue_nums.append(resnum)
-      if state < 0 or state >= len(residue.states):
-         raise CpinInputError('Residue %s only has states 0-%d (%d chosen)' % 
-                     (self.resname, len(residue.states)-1, state))
-      self.resstates.append(state)
+    def add_residue(self, residue, resnum, first_atom, state=0):
+        """ Adds a residue to the list """
+        list.append(self, residue)
+        self.first_atoms.append(first_atom)
+        self.residue_nums.append(resnum)
+        if state < 0 or state >= len(residue.states):
+            raise CpinInputError('Residue %s only has states 0-%d (%d chosen)' %
+                        (residue.resname, len(residue.states)-1, state))
+        self.resstates.append(state)
 
-   def set_states(self, statelist):
-      """
-      Sets the initial protonation states from a list -- make sure there are
-      enough states in the list to set every residue, or emit a warning
-      """
-      if len(statelist) != len(self):
-         warnings.warn(('Number of states (%d) does not equal number of '
-                        'residues (%d). Using default initial states.') %
-                        (len(statelist), len(self)), CpinInputWarning)
-         return
-      # Check that all states are allowable
-      for i, state in enumerate(statelist):
-         if state < 0 or state >= len(self[i].states):
-            raise CpinInputError(('Bad state choice (%d). Minimum is 0, maximum'
-                                 ' is %d') % (state, len(self[i].states)))
-      # If we got here, then we are OK
-      self.resstates = statelist
+    def set_states(self, statelist):
+        """
+        Sets the initial protonation states from a list -- make sure there are
+        enough states in the list to set every residue, or emit a warning
+        """
+        if len(statelist) != len(self):
+            warnings.warn(('Number of states (%d) does not equal number of '
+                            'residues (%d). Using default initial states.') %
+                            (len(statelist), len(self)), CpinInputWarning)
+            return
+        # Check that all states are allowable
+        for i, state in enumerate(statelist):
+            if state < 0 or state >= len(self[i].states):
+                raise CpinInputError('Bad state choice (%d). Minimum is 0, '
+                            'maximum is %d' % (state, len(self[i].states)))
+        # If we got here, then we are OK
+        self.resstates = statelist
 
-   def sort(self):
-      """ Sorts by residue number """
-      # Bubble sort
-      nswaps = 1
-      while nswaps > 0:
-         nswaps = 0
-         for i in xrange(len(self)-1):
-            if self.first_atoms[i] > self.first_atoms[i+1]:
-               nswaps += 1
-               self.first_atoms[i], self.first_atoms[i+1] = \
-                  self.first_atoms[i+1], self.first_atoms[i]
-               self[i], self[i+1] = self[i+1], self[i]
-               self.residue_nums[i], self.residue_nums[i+1] = \
-                  self.residue_nums[i+1], self.residue_nums[i]
+    def sort(self):
+        """ Sorts by residue number """
+        # Bubble sort, cuz who cares?
+        nswaps = 1
+        while nswaps > 0:
+            nswaps = 0
+            for i in xrange(len(self)-1):
+                if self.first_atoms[i] > self.first_atoms[i+1]:
+                nswaps += 1
+                self.first_atoms[i], self.first_atoms[i+1] = \
+                    self.first_atoms[i+1], self.first_atoms[i]
+                self[i], self[i+1] = self[i+1], self[i]
+                self.residue_nums[i], self.residue_nums[i+1] = \
+                    self.residue_nums[i+1], self.residue_nums[i]
 
-   def write_cpin(self, output, igb=2, intdiel=1.0, coions=False):
-      """ Writes the CPIN file based on the titrated residues """
-      # Reset all residues
-      for res in self: res.reset()
-      # Sort our residue list
-      self.sort()
-      buf = _LineBuffer(output)
-      buf.add_word('&CNSTPH')
-      buf.flush()
-      buf.add_word(' CHRGDAT=')
-      charges, energies, protcnts, pointers = [], [], [], []
-      first_charge = 0
-      first_state = 0
-      for i, res in enumerate(self):
-         if res.first_charge == -1:
-            res.set_first_charge(first_charge)
-            res.set_first_state(first_state)
+    def write_cpin(self, output, igb=2, intdiel=1.0, coions=False):
+        """ Writes the CPIN file based on the titrated residues """
+        # Reset all residues
+        for res in self: res.reset()
+        # Sort our residue list
+        self.sort()
+        buf = _LineBuffer(output)
+        buf.add_word('&CNSTPH')
+        buf.flush()
+        buf.add_word(' CHRGDAT=')
+        charges, energies, protcnts, pointers = [], [], [], []
+        first_charge = 0
+        first_state = 0
+        for i, res in enumerate(self):
+            if res.first_charge == -1:
+                res.set_first_charge(first_charge)
+                res.set_first_state(first_state)
 
-            for state in res.states:
-               # See which dielectric reference energies we want
-               if intdiel == 2:
-                  refene = state.refene.dielc2
-               else:
-                  refene = state.refene
-               # See if we want the explicit solvent refene or not
-               if self.solvated:
-                  energies.append(getattr(refene.solvent, 'igb%d' % igb))
-               else:
-                  energies.append(getattr(refene, 'igb%d' % igb))
-               # Add protonation count of this state
-               protcnts.append(state.protcnt)
+                for state in res.states:
+                    # See which dielectric reference energies we want
+                    if intdiel == 2:
+                        refene = state.refene.dielc2
+                    else:
+                        refene = state.refene
+                    # See if we want the explicit solvent refene or not
+                    if self.solvated:
+                        energies.append(getattr(refene.solvent, 'igb%d' % igb))
+                    else:
+                        energies.append(getattr(refene, 'igb%d' % igb))
+                    # Add protonation count of this state
+                    protcnts.append(state.protcnt)
 
-            first_state += len(res.states)
-            new_charges = []
-            for state in res.states:
-               new_charges.extend(state.charges)
-            charges.extend(new_charges)
-            first_charge += len(new_charges)
-         pointers.append(res.cpin_pointers(self.first_atoms[i]))
+                first_state += len(res.states)
+                new_charges = []
+                for state in res.states:
+                    new_charges.extend(state.charges)
+                charges.extend(new_charges)
+                first_charge += len(new_charges)
+            pointers.append(res.cpin_pointers(self.first_atoms[i]))
 
-      # Print the charges
-      for charge in charges:
-         buf.add_word('%s,' % charge)
-      buf.flush()
-      # Print the protcnts
-      buf.add_word(' PROTCNT=')
-      for protcnt in protcnts:
-         buf.add_word('%d,' % protcnt)
-      buf.flush()
-      # Print the residue names
-      buf.add_word(" RESNAME='System: %s'," % self.system_name)
-      for i, res in enumerate(self):
-         buf.add_word("'Residue: %s %d'," % (res.resname, self.residue_nums[i]))
-      buf.flush()
-      # Print the residue states
-      buf.add_word(" RESSTATE=")
-      for state in self.resstates:
-         buf.add_word('%d,' % state)
-      buf.flush()
-      # Print the residue pointers
-      buf.add_word(' ') # get a leading space
-      for i, p in enumerate(pointers):
-         buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i,p['FIRST_ATOM']))
-         buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " % (i,p['FIRST_CHARGE']))
-         buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " % (i,p['FIRST_STATE']))
-         buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i,p['NUM_ATOMS']))
-         buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i,p['NUM_STATES']))
-      buf.flush()
-      # Print the reference energies
-      buf.add_word(' STATENE=')
-      for i, energy in enumerate(energies):
-         if energy is None:
-            raise CpinInputError("%d'th reference energy not known for igb = %d"
-                                    % (i, igb))
-         buf.add_word('%s,' % energy)
-      buf.flush()
-      # Print the # of residues and explicit solvent info if required
-      buf.add_word(' TRESCNT=%d,' % len(self))
-      if self.solvated:
-         buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
-                      (self.first_sol, igb, intdiel))
-         buf.flush()
-         # Now scan through all of the waters
-      buf.flush()
-      buf.add_word('/'); buf.flush()
+        # Print the charges
+        for charge in charges:
+            buf.add_word('%s,' % charge)
+        buf.flush()
+        # Print the protcnts
+        buf.add_word(' PROTCNT=')
+        for protcnt in protcnts:
+            buf.add_word('%d,' % protcnt)
+        buf.flush()
+        # Print the residue names
+        buf.add_word(" RESNAME='System: %s'," % self.system_name)
+        for i, res in enumerate(self):
+            buf.add_word("'Residue: %s %d'," %
+                    (res.resname, self.residue_nums[i]))
+        buf.flush()
+        # Print the residue states
+        buf.add_word(" RESSTATE=")
+        for state in self.resstates:
+            buf.add_word('%d,' % state)
+        buf.flush()
+        # Print the residue pointers
+        buf.add_word(' ') # get a leading space
+        for i, p in enumerate(pointers):
+            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i,p['FIRST_ATOM']))
+            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, "
+                    % (i,p['FIRST_CHARGE']))
+            buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " %
+                    (i,p['FIRST_STATE']))
+            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i,p['NUM_ATOMS']))
+            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i,p['NUM_STATES']))
+        buf.flush()
+        # Print the reference energies
+        buf.add_word(' STATENE=')
+        for i, energy in enumerate(energies):
+            if energy is None:
+                raise CpinInputError("%d'th reference energy not known for "
+                                     "igb = %d" % (i, igb))
+            buf.add_word('%s,' % energy)
+        buf.flush()
+        # Print the # of residues and explicit solvent info if required
+        buf.add_word(' TRESCNT=%d,' % len(self))
+        if self.solvated:
+            buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
+                        (self.first_sol, igb, intdiel))
+            buf.flush()
+            # Now scan through all of the waters
+        buf.flush()
+        buf.add_word('/'); buf.flush()
 
 # Now define all of the titratable residues
 

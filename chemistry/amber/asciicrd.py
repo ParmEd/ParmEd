@@ -8,6 +8,8 @@ instances where the prequisites may not be installed.
 """
 from __future__ import division
 
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import ReadError
 from compat24 import property
 from math import ceil
@@ -35,6 +37,7 @@ except ImportError:
 
 class _AmberAsciiCoordinateFile(object):
     """ Abstract base class for interacting with ASCII coordinate files """
+    __metaclass__ = FileFormatType
 
     DEFAULT_TITLE = None
     CRDS_PER_LINE = None
@@ -140,7 +143,44 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         time : float, optional
             The time to write to the restart file in ps. Default is 0.
     """
-   
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as an Amber restart/inpcrd file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber restart/inpcrd file. False otherwise
+        """
+        f = io.genopen(filename, 'r')
+        lines = [f.readline().decode() for i in xrange(5)]
+        f.close()
+        # Look for natom
+        try:
+            int(lines[1].split()[0])
+        except (ValueError, IndexError):
+            return False
+        # Next 3 lines, make sure we have %12.7f format
+        try:
+            for i in xrange(3):
+                i += 2
+                for j in xrange(6):
+                    j12 = j * 12
+                    if line[j12+4] != '.': return False
+                    float(line[j12:j12+12])
+                    if line[j12+11] not in '0123456789':
+                        return False
+        except (IndexError, ValueError):
+            return False
+
+        # Must be a restart...
+        return True
+
     CRDS_PER_LINE = 6
     DEFAULT_TITLE = 'restart created by ParmEd'
 
@@ -415,6 +455,40 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
     parsing NetCDF files (or the equivalent parsing done in a compiled language
     like C or C++). For large trajectories, this may be significant.
     """
+    extra_args = ('natom', 'hasbox')
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as an Amber mdcrd file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber mdcrd file. False otherwise
+        """
+        f = io.genopen(filename, 'r')
+        lines = [f.readline().decode() for i in xrange(5)]
+        f.close()
+        # Next 4 lines, make sure we have %8.3f format
+        try:
+            for i in xrange(4):
+                i += 1
+                for j in xrange(10):
+                    j8 = j * 8
+                    if line[j8+4] != '.': return False
+                    float(line[j8:j8+8])
+                    if line[j8+7] not in '0123456789':
+                        return False
+        except (IndexError, ValueError):
+            return False
+
+        # Must be a mdcrd
+        return True
 
     CRDS_PER_LINE = 10
     DEFAULT_TITLE = 'trajectory created by ParmEd'

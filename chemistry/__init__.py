@@ -11,3 +11,6 @@ from chemistry.structure import Structure, read_PDB, write_PDB, read_CIF
 from chemistry.topologyobjects import *
 from chemistry import unit
 from chemistry.residue import *
+from chemistry import amber, charmm, tinker, openmm
+from chemistry import formats
+load_file = formats.load_file
