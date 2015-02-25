@@ -61,17 +61,16 @@ class CharmmCrdFile(object):
             True if it is a CHARMM coordinate file
         """
         f = io.genopen(filename)
-        line = crdfile.readline().decode()
+        line = f.readline().decode()
 
         try:
             while len(line.strip()) == 0:   # Skip whitespace, as a precaution
-                line = crdfile.readline().decode()
+                line = f.readline().decode()
 
             intitle = True
 
             while intitle:
-                self.title.append(line.strip())
-                line = crdfile.readline().decode()
+                line = f.readline().decode()
                 if len(line.strip()) == 0:
                     intitle = False
                 elif line.strip()[0] != '*':
@@ -80,13 +79,13 @@ class CharmmCrdFile(object):
                     intitle = True
 
             while len(line.strip()) == 0:      # Skip whitespace
-                line = crdfile.readline().decode()
+                line = f.readline().decode()
 
             try:
                 natom = int(line.strip().split()[0])
 
                 for row in xrange(min(natom, 3)):
-                    line = crdfile.readline().decode().strip().split()
+                    line = f.readline().decode().strip().split()
                     int(line[0])
                     int(line[1])
                     float(line[4])
@@ -234,7 +233,7 @@ class CharmmRstFile(object):
             True if it is a CHARMM restart file
         """
         f = io.genopen(filename)
-        line = crdfile.readline().decode()
+        line = f.readline().decode()
         f.close()
         return line.startswith('REST')
 

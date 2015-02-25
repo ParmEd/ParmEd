@@ -238,7 +238,7 @@ class NetCDFRestart(object):
         if not NETCDF_INITIALIZED:
             use()
         try:
-            f = open_netcdf(fname)
+            f = open_netcdf(filename, 'r')
         except: # Bare except... each package raises different exceptions
             return False
         f.close()
@@ -251,7 +251,7 @@ class NetCDFRestart(object):
         return True
 
     @needs_netcdf
-    def __init__(self, fname, mode=None):
+    def __init__(self, fname, mode='r'):
         """
         Opens a NetCDF File. The main constructor should never be called
         directly.  The alternative "open_old" and "open_new" constructors should
@@ -259,10 +259,7 @@ class NetCDFRestart(object):
         respectively.
         """
         self.closed = False
-        if mode is None:
-            self._ncfile = open_netcdf(fname)
-        else:
-            self._ncfile = open_netcdf(fname, mode)
+        self._ncfile = open_netcdf(fname, mode)
    
     @classmethod
     @needs_netcdf
@@ -576,7 +573,7 @@ class NetCDFTraj(object):
         if not NETCDF_INITIALIZED:
             use()
         try:
-            f = open_netcdf(fname)
+            f = open_netcdf(filename, 'r')
         except: # Bare except... each package raises different exceptions
             return False
         f.close()
@@ -589,7 +586,7 @@ class NetCDFTraj(object):
         return True
 
     @needs_netcdf
-    def __init__(self, fname, mode):
+    def __init__(self, fname, mode='r'):
         """ Opens a NetCDF File """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)

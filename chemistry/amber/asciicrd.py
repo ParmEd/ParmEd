@@ -171,9 +171,9 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 i += 2
                 for j in xrange(6):
                     j12 = j * 12
-                    if line[j12+4] != '.': return False
-                    float(line[j12:j12+12])
-                    if line[j12+11] not in '0123456789':
+                    if lines[i][j12+4] != '.': return False
+                    float(lines[i][j12:j12+12])
+                    if lines[i][j12+11] not in '0123456789':
                         return False
         except (IndexError, ValueError):
             return False
@@ -457,6 +457,9 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
     """
     extra_args = ('natom', 'hasbox')
 
+    CRDS_PER_LINE = 10
+    DEFAULT_TITLE = 'trajectory created by ParmEd'
+
     @staticmethod
     def id_format(filename):
         """ Identifies the file type as an Amber mdcrd file
@@ -480,19 +483,15 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 i += 1
                 for j in xrange(10):
                     j8 = j * 8
-                    if line[j8+4] != '.': return False
-                    float(line[j8:j8+8])
-                    if line[j8+7] not in '0123456789':
+                    if lines[i][j8+4] != '.': return False
+                    float(lines[i][j8:j8+8])
+                    if lines[i][j8+7] not in '0123456789':
                         return False
         except (IndexError, ValueError):
             return False
 
         # Must be a mdcrd
         return True
-
-    CRDS_PER_LINE = 10
-    DEFAULT_TITLE = 'trajectory created by ParmEd'
-
 
     def _parse(self):
         """

@@ -24,6 +24,7 @@ import os
 import sys
 
 PARSER_REGISTRY = dict()
+PARSER_ARGUMENTS = dict()
 
 class FileFormatType(type):
     """
@@ -47,9 +48,13 @@ class FileFormatType(type):
             raise ValueError('Duplicate name %s in parser registry' % name)
         if 'id_format' in dct:
             PARSER_REGISTRY[name] = cls
+            if 'extra_args' in dct:
+                PARSER_ARGUMENTS[name] = dct['extra_args']
+            else:
+                PARSER_ARGUMENTS[name] = ()
         super(FileFormatType, cls).__init__(name, bases, dct)
 
-def load_file(filename):
+def load_file(filename, **kwargs):
     """
     Identifies the file format of the specified file and returns its parsed
     contents.
@@ -58,6 +63,9 @@ def load_file(filename):
     ----------
     filename : str
         The name of the file to try to parse
+    **kwargs : other options
+        Some formats can only be instantiated with other options besides just a
+        file name.
 
     Returns
     -------
@@ -80,8 +88,12 @@ def load_file(filename):
 
     chemistry.exceptions.FormatNotFound
         If no suitable file format can be identified, a TypeError is raised
+
+    TypeError
+        If the identified format requires additional arguments that are not
+        provided as keyword arguments in addition to the file name
     """
-    global PARSER_REGISTRY
+    global PARSER_REGISTRY, PARSER_ARGUMENTS
 
     # Check that the file actually exists and that we can read it
     if not os.path.exists(filename):
@@ -91,13 +103,24 @@ def load_file(filename):
 
     for name, cls in PARSER_REGISTRY.iteritems():
         if not hasattr(cls, 'id_format'): continue
-        if cls.id_format(filename):
-            break
+        try:
+            if cls.id_format(filename):
+                break
+        except UnicodeDecodeError:
+            continue
     else:
         # We found no file format
         raise FormatNotFound('Could not identify file format')
 
     # We found a file format that is compatible. Parse it!
+    other_args = PARSER_ARGUMENTS[name]
+    kws = dict()
+    for arg in other_args:
+        try:
+            kws[arg] = kwargs[arg]
+        except KeyError:
+            raise TypeError('%s constructor expects %s keyword argument' %
+                            name, arg)
     if hasattr(cls, 'parse'):
-        return cls.parse(filename)
-    return cls(filename)
+        return cls.parse(filename, **kws)
+    return cls(filename, **kws)

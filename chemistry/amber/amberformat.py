@@ -334,6 +334,22 @@ class AmberFormat(object):
 
     #===================================================
 
+    @staticmethod
+    def parse(filename):
+        """
+        Meant for use with the automatic file loader, this will automatically
+        return a subclass of AmberFormat corresponding to what the information
+        in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
+        AmoebaParm, or AmberFormat)
+        """
+        from chemistry.amber import LoadParm
+        try:
+            return LoadParm(filename)
+        except IndexError:
+            return AmberFormat(filename)
+
+    #===================================================
+
     def __init__(self, fname=None):
         """ Constructor.  Read a file if given """
         self._ncopies = 0
