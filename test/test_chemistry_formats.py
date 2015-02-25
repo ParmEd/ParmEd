@@ -6,6 +6,7 @@ from chemistry import amber
 from chemistry import charmm
 from chemistry import exceptions
 from chemistry import formats
+from chemistry import Structure
 from chemistry.modeller import ResidueTemplate
 import unittest
 import utils
@@ -79,6 +80,18 @@ class TestFileLoader(unittest.TestCase):
         """ Tests automatic loading of Amber NetCDF trajectory file """
         crd = formats.load_file(get_fn('tz2.truncoct.nc'))
         self.assertIsInstance(crd, amber.NetCDFTraj)
+
+    def testLoadPDB(self):
+        """ Tests automatic loading of PDB files """
+        pdb = formats.load_file(get_fn('4lzt.pdb'))
+        self.assertIsInstance(pdb, Structure)
+        self.assertEqual(len(pdb.atoms), 1164)
+
+    def testLoadCIF(self):
+        """ Tests automatic loading of PDBx/mmCIF files """
+        cif = formats.load_file(get_fn('4LZT.cif'))
+        self.assertIsInstance(cif, Structure)
+        self.assertEqual(len(cif.atoms), 1164)
 
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """

@@ -34,7 +34,7 @@ class PSFFile(object):
         is_fmt : bool
             True if it is a CHARMM or Xplor-style PSF file
         """
-        f = io.genopen(filename, 'r')
+        f = genopen(filename, 'r')
         line = f.readline().decode()
         f.close()
         return line.strip().startswith('PSF')
