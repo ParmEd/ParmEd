@@ -766,7 +766,7 @@ class CIFFile(object):
         """
         if isinstance(filename, basestring):
             own_handle = True
-            fileobj = genopen(filename, 'r')
+            fileobj = TextToBinaryFile(genopen(filename, 'r'))
         else:
             own_handle = False
             fileobj = filename

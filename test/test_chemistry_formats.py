@@ -32,7 +32,7 @@ class TestFileLoader(unittest.TestCase):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in off.iteritems():
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def testLoadAmberParm(self):
@@ -86,13 +86,21 @@ class TestFileLoader(unittest.TestCase):
 
     def testLoadNetCDFRestart(self):
         """ Tests automatic loading of Amber NetCDF restart file """
-        crd = formats.load_file(get_fn('ncinpcrd.rst7'))
-        self.assertIsInstance(crd, amber.NetCDFRestart)
+        if amber.HAS_NETCDF:
+            crd = formats.load_file(get_fn('ncinpcrd.rst7'))
+            self.assertIsInstance(crd, amber.NetCDFRestart)
+        else:
+            self.assertRaises(exceptions.FormatNotFound, lambda:
+                    formats.load_file(get_fn('ncinpcrd.rst7')))
 
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
-        crd = formats.load_file(get_fn('tz2.truncoct.nc'))
-        self.assertIsInstance(crd, amber.NetCDFTraj)
+        if amber.HAS_NETCDF:
+            crd = formats.load_file(get_fn('tz2.truncoct.nc'))
+            self.assertIsInstance(crd, amber.NetCDFTraj)
+        else:
+            self.assertRaises(exceptions.FormatNotFound, lambda:
+                    formats.load_file(get_fn('ncinpcrd.rst7')))
 
     def testLoadPDB(self):
         """ Tests automatic loading of PDB files """
