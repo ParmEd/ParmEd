@@ -3,7 +3,6 @@ Tests chemistry.formats package
 """
 from __future__ import division
 
-from cStringIO import StringIO
 from chemistry import amber
 from chemistry import charmm
 from chemistry import exceptions
