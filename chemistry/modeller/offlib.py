@@ -4,9 +4,11 @@ ResidueTemplate objects
 """
 import compat24
 
-from chemistry import Atom, Bond
+from chemistry import Atom
 from chemistry.constants import RAD_TO_DEG
 from chemistry.exceptions import AmberOFFWarning
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from collections import OrderedDict
@@ -23,6 +25,7 @@ class AmberOFFLibrary(object):
     Class containing static methods responsible for parsing and writing OFF
     libraries
     """
+    __metaclass__ = FileFormatType
 
     #===================================================
 
@@ -57,6 +60,30 @@ class AmberOFFLibrary(object):
     _sec13re = re.compile(r'!entry\.(\S*)\.unit\.solventcap *array *dbl')
     _sec14re = re.compile(r'!entry\.(\S*)\.unit\.velocities *table *dbl *x'
                           r' *dbl *y *dbl *z')
+
+    #===================================================
+
+    @staticmethod
+    def id_format(filename):
+        """ Sees if an open file is an OFF library file.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the file to see if it is an OFF file format
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is recognized as OFF, False otherwise
+        """
+        f = io.genopen(filename, 'r')
+        try:
+            if AmberOFFLibrary._headerre.match(f.readline().decode()):
+                return True
+            return False
+        finally:
+            f.close()
 
     #===================================================
 

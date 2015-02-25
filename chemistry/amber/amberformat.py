@@ -8,6 +8,8 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from chemistry.exceptions import FlagError
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from compat24 import wraps
 from fortranformat import FortranRecordReader, FortranRecordWriter
 from copy import copy
@@ -298,7 +300,54 @@ class AmberFormat(object):
     prm_name : str
         The file name of the originally parsed file (set to the fname parameter)
     """
+    __metaclass__ = FileFormatType
    
+    #===================================================
+
+    @staticmethod
+    def id_format(filename):
+        """
+        Identifies the file type as either Amber-format file (like prmtop) or an
+        old-style topology file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber-style format, False otherwise
+        """
+        f = io.genopen(filename, 'r')
+        lines = [f.readline().decode() for i in range(5)]
+        f.close()
+
+        if lines[0].startswith('%VERSION'):
+            return True
+        # Try old-style format
+        try:
+            return AmberFormat().rdparm_old(lines, check=True)
+        except ValueError:
+            return False
+
+    #===================================================
+
+    @staticmethod
+    def parse(filename):
+        """
+        Meant for use with the automatic file loader, this will automatically
+        return a subclass of AmberFormat corresponding to what the information
+        in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
+        AmoebaParm, or AmberFormat)
+        """
+        from chemistry.amber import LoadParm
+        try:
+            return LoadParm(filename)
+        except IndexError:
+            return AmberFormat(filename)
+
     #===================================================
 
     def __init__(self, fname=None):
@@ -476,10 +525,18 @@ class AmberFormat(object):
 
     #===================================================
 
-    def rdparm_old(self, prmtop_lines):
+    def rdparm_old(self, prmtop_lines, check=False):
         """
         This reads an old-style topology file and stores the results in the
         same data structures as a new-style topology file
+
+        Parameters
+        ----------
+        prmtop_lines : list of str
+            List of all lines in the prmtop file
+        check : bool, optional
+            If True, only the first couple sections will be read to determine if
+            this is, in fact, an old-style topology file
         """
         def read_integer(line_idx, lines, num_items):
             # line_idx should be the line _before_ the first line you
@@ -563,6 +620,11 @@ class AmberFormat(object):
         nphia = self.parm_data['POINTERS'][NPHIA]
         nphb = self.parm_data['POINTERS'][NPHB]
         nphih = self.parm_data['POINTERS'][NPHIH]
+
+        # This is enough to convince me that we have an old-style prmtop if we
+        # have the number of integers I suspect we should
+        if check:
+            return len(tmp_data) == 31
 
         # Next read in the atom names
         tmp_data, line_idx = read_string(line_idx, prmtop_lines, natom)

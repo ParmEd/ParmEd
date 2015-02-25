@@ -25,8 +25,8 @@ Acknowledgements:
 
 import re
 from chemistry.exceptions import PdbxError, PdbxSyntaxError
-from chemistry.pdbx.PdbxContainers import (DataCategory, DefinitionContainer,
-                                           DataContainer)
+from chemistry.formats.pdbx.PdbxContainers import (
+        DataCategory, DefinitionContainer, DataContainer)
 
 class PdbxReader(object):
     """ PDBx reader for data files and dictionaries.

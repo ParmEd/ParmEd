@@ -6,7 +6,6 @@ from __future__ import division
 from chemistry import geometry as geo
 from chemistry import unit as u
 import math
-import random
 import utils
 import unittest
 np = utils.numpy

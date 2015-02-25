@@ -354,7 +354,7 @@ class TestCharmmParameters(unittest.TestCase):
 
     def testParamFileOnly(self):
         """ Test reading only a parameter file with no RTF (CHARMM36) """
-        p=parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
+        parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
 
     def testCollection(self):
         """ Test reading a large number of parameter files """

@@ -5,9 +5,11 @@ _charmmfile.py for reading files
 
 Author: Jason Deckman
 Contributors: Jason Swails
-Date: April 18, 2014
+Date: Feb. 24, 2015
 """
 
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import CharmmFileError
 from chemistry import unit as u
 
@@ -42,6 +44,62 @@ class CharmmCrdFile(object):
     >>> print '%d atoms; %d coords' % (chm.natom, len(chm.coords))
     1414 atoms; 4242 coords
     """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as a CHARMM coordinate file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a CHARMM coordinate file
+        """
+        f = io.genopen(filename)
+        line = f.readline().decode()
+
+        try:
+            while len(line.strip()) == 0:   # Skip whitespace, as a precaution
+                line = f.readline().decode()
+
+            intitle = True
+
+            while intitle:
+                line = f.readline().decode()
+                if len(line.strip()) == 0:
+                    intitle = False
+                elif line.strip()[0] != '*':
+                    intitle = False
+                else:
+                    intitle = True
+
+            while len(line.strip()) == 0:      # Skip whitespace
+                line = f.readline().decode()
+
+            try:
+                natom = int(line.strip().split()[0])
+
+                for row in xrange(min(natom, 3)):
+                    line = f.readline().decode().strip().split()
+                    int(line[0])
+                    int(line[1])
+                    float(line[4])
+                    float(line[5])
+                    float(line[6])
+                    int(line[8])
+                    float(line[9])
+            except (IndexError, ValueError):
+                return False
+
+            return True
+        finally:
+            f.close()
+
 
     def __init__(self, fname):
         self.atomno = []                   # Atom number
@@ -158,6 +216,26 @@ class CharmmRstFile(object):
     >>> print '%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv)
     256 atoms; 768 crds; 768 old crds; 768 vels
     """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as a CHARMM restart file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a CHARMM restart file
+        """
+        f = io.genopen(filename)
+        line = f.readline().decode()
+        f.close()
+        return line.startswith('REST')
 
     def __init__(self, fname):
         self.header = []

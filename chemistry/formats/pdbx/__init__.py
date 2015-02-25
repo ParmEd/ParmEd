@@ -10,6 +10,6 @@ __version__ = "V0.01"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __email__ = "jwest@rcsb.rutgers.edu <or> jason.swails@gmail.com"
 
-from chemistry.pdbx.PdbxReader import PdbxReader
-from chemistry.pdbx.PdbxWriter import PdbxWriter
-from chemistry.pdbx import PdbxContainers as containers
+from chemistry.formats.pdbx.PdbxReader import PdbxReader
+from chemistry.formats.pdbx.PdbxWriter import PdbxWriter
+from chemistry.formats.pdbx import PdbxContainers as containers
