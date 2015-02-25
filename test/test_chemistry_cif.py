@@ -18,8 +18,8 @@ Test cases for reading PDBx/mmCIF data files PdbxReader class -
 import sys, unittest, traceback, os
 from utils import get_fn, get_saved_fn, diff_files
 
-from chemistry.pdbx import PdbxReader, PdbxWriter
-from chemistry.pdbx.PdbxContainers import *
+from chemistry.formats.pdbx import PdbxReader, PdbxWriter
+from chemistry.formats.pdbx.PdbxContainers import *
 
 class PdbxReaderTests(unittest.TestCase):
     def setUp(self):
