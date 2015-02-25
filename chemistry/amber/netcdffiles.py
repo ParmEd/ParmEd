@@ -578,14 +578,16 @@ class NetCDFTraj(object):
             f = open_netcdf(filename, 'r')
         except: # Bare except... each package raises different exceptions
             return False
-        f.close()
         try:
-            if _coerce_to_string(f.Conventions) != 'AMBER':
+            try:
+                if _coerce_to_string(f.Conventions) != 'AMBER':
+                    return False
+            except AttributeError:
                 return False
-        except AttributeError:
-            return False
-        # Passed all our tests
-        return True
+            # Passed all our tests
+            return True
+        finally:
+            f.close()
 
     @needs_netcdf
     def __init__(self, fname, mode='r'):
