@@ -1248,3 +1248,5 @@ class CIFFile(object):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+Structure.write_pdb = PDBFile.write
+Structure.write_cif = CIFFile.write
