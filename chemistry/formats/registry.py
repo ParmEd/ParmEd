@@ -17,11 +17,7 @@ simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
 from chemistry.exceptions import FormatNotFound
-from cStringIO import StringIO
-import bz2
-import gzip
 import os
-import sys
 
 PARSER_REGISTRY = dict()
 PARSER_ARGUMENTS = dict()

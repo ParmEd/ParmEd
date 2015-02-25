@@ -58,3 +58,46 @@ def genopen(name, mode='r', buffering=None):
     if buffering is not None:
         return open(name, mode, buffering)
     return open(name, mode)
+
+class TextToBinaryFile(object):
+    """ Allows you to write text to a file open only for bytes in Python 3 """
+    def __init__(self, fileobj):
+        self._handle = fileobj
+
+    def write(self, stuff):
+        try:
+            self._handle.write(stuff.encode())
+        except AttributeError:
+            self._handle.write(stuff)
+
+    def read(self, *args, **kwargs):
+        stuff = self._handle.read(*args, **kwargs)
+        try:
+            return stuff.decode()
+        except AttributeError:
+            return stuff
+
+    def readline(self):
+        line = self._handle.readline()
+        try:
+            return line.decode()
+        except AttributeError:
+            return line
+
+    def readlines(self):
+        lines = self._handle.readlines()
+        for i, line in enumerate(lines):
+            try:
+                lines[i] = line.decode()
+            except AttributeError:
+                pass
+
+    def __iter__(self):
+        for line in self._handle:
+            try:
+                yield line.decode()
+            except AttributeError:
+                yield line
+
+    def close(self):
+        self._handle.close()

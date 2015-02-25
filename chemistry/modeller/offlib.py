@@ -4,7 +4,7 @@ ResidueTemplate objects
 """
 import compat24
 
-from chemistry import Atom, Bond
+from chemistry import Atom
 from chemistry.constants import RAD_TO_DEG
 from chemistry.exceptions import AmberOFFWarning
 from chemistry.formats import io

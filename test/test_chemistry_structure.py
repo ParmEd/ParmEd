@@ -13,6 +13,7 @@ try:
 except ImportError:
     pass # Must by py3
 
+from chemistry import read_PDB, write_PDB, read_CIF
 import chemistry.structure as structure
 from chemistry.topologyobjects import Atom
 import unittest
@@ -51,31 +52,31 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testAscii(self):
         """ Test PDB file parsing """
-        self._check4lyt(structure.read_PDB(self.pdb))
+        self._check4lyt(read_PDB(self.pdb))
         # The PDB file with multiple models
-        pdbfile = structure.read_PDB(open(self.models))
+        pdbfile = read_PDB(open(self.models))
         self.assertEqual(len(pdbfile.pdbxyz), 20)
         self.assertEqual(pdbfile.pdbxyz[0][:3], [-8.886, -5.163, 9.647])
         self.assertEqual(pdbfile.pdbxyz[19][-3:], [-12.051, 5.205, -2.146])
 
     def testGzip(self):
         """ Test Gzipped-PDB file parsing """
-        self._check4lyt(structure.read_PDB(self.pdbgz))
+        self._check4lyt(read_PDB(self.pdbgz))
 
     def testBzip(self):
         """ Test Bzipped-PDB file parsing """
-        self._check4lyt(structure.read_PDB(self.pdbbz2))
+        self._check4lyt(read_PDB(self.pdbbz2))
 
     def testVmdOverflow(self):
         """ Test PDB file where atom and residue numbers overflow """
-        pdbfile = structure.read_PDB(self.overflow)
+        pdbfile = read_PDB(self.overflow)
         self.assertEqual(len(pdbfile.atoms), 110237)
         self.assertEqual(len(pdbfile.residues), 35697)
         self.assertEqual(pdbfile.box, [0, 0, 0, 90, 90, 90])
 
     def testRegularOverflow(self):
         """ Test PDB file where atom number goes to ***** after 99999 """
-        pdbfile = structure.read_PDB(self.overflow2)
+        pdbfile = read_PDB(self.overflow2)
         self.assertEqual(len(pdbfile.atoms), 114277)
         self.assertEqual(len(pdbfile.residues), 25042)
         for i, atom in enumerate(pdbfile.atoms):
@@ -84,43 +85,43 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testPdbWriteSimple(self):
         """ Test PDB file writing on a very simple input structure """
-        pdbfile = structure.read_PDB(self.simple)
+        pdbfile = read_PDB(self.simple)
         self.assertEqual(len(pdbfile.atoms), 33)
         self.assertEqual(len(pdbfile.residues), 3)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
-        pdbfile2 = structure.read_PDB(output)
+        pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 33)
         self.assertEqual(len(pdbfile2.residues), 3)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbWriteModels(self):
         """ Test PDB file writing from NMR structure with models """
-        pdbfile = structure.read_PDB(self.models)
+        pdbfile = read_PDB(self.models)
         self.assertEqual(len(pdbfile.pdbxyz), 20)
         self.assertEqual(len(pdbfile.atoms), 451)
         output = StringIO.StringIO()
-        structure.write_PDB(pdbfile, output)
+        write_PDB(pdbfile, output)
         output.seek(0)
-        pdbfile2 = structure.read_PDB(output)
+        pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbWriteXtal(self):
         """ Test PDB file writing from a Xtal structure """
-        pdbfile = structure.read_PDB(self.pdb)
+        pdbfile = read_PDB(self.pdb)
         self._check4lyt(pdbfile)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output, renumber=False)
         output.seek(0)
-        pdbfile2 = structure.read_PDB(output)
+        pdbfile2 = read_PDB(output)
         self._check4lyt(pdbfile2, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
         output = reset_stringio(output)
-        structure.write_PDB(pdbfile, output)
+        write_PDB(pdbfile, output)
         output.seek(0)
-        pdbfile3 = structure.read_PDB(output)
+        pdbfile3 = read_PDB(output)
         self._check4lyt(pdbfile3, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile3, True)
         # Now check that renumbering is done correctly. 4lzt skips residues 130
@@ -136,26 +137,26 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testPdbWriteAltlocOptions(self):
         """ Test PDB file writing with different altloc options """
-        pdbfile = structure.read_PDB(self.pdb)
+        pdbfile = read_PDB(self.pdb)
         self._check4lyt(pdbfile)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output, renumber=False, altlocs='all')
         output.seek(0)
-        pdbfile2 = structure.read_PDB(output)
+        pdbfile2 = read_PDB(output)
         self._check4lyt(pdbfile2, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
         # Check that 'first' option works
         output = reset_stringio(output)
         pdbfile.write_pdb(output, renumber=False, altlocs='first')
         output.seek(0)
-        pdbfile3 = structure.read_PDB(output)
+        pdbfile3 = read_PDB(output)
         self._check4lyt(pdbfile3, check_meta=False, has_altloc=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile3, altloc_option='first')
         # Check that the 'occupancy' option works
         output = reset_stringio(output)
-        structure.write_PDB(pdbfile, output, renumber=False, altlocs='occupancy')
+        write_PDB(pdbfile, output, renumber=False, altlocs='occupancy')
         output.seek(0)
-        pdbfile4 = structure.read_PDB(output)
+        pdbfile4 = read_PDB(output)
         self._check4lyt(pdbfile4, check_meta=False, has_altloc=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile4, altloc_option='occupancy')
         # Double-check 'first' vs. 'occupancy'. Residue 85 (SER) has a conformer
@@ -165,7 +166,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testAnisouRead(self):
         """ Tests that read_PDB properly reads ANISOU records """
-        pdbfile = structure.read_PDB(self.pdb)
+        pdbfile = read_PDB(self.pdb)
         aniso1 = [2066, 1204, 1269, 44, 126, 191] # first atom's ANISOU record
         aniso2 = [2090, 1182, 921, 46, 64, 60]    # second atom's ANISOU record
         aniso3 = [3057, 3932, 5304, 126, -937, -661] # last atom's ANISOU
@@ -194,12 +195,12 @@ class TestChemistryPDBStructure(unittest.TestCase):
             self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
             for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
                 self.assertEqual(x/10000, y)
-        pdbfile = structure.read_PDB(self.pdb)
+        pdbfile = read_PDB(self.pdb)
         check_aniso(pdbfile)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
-        pdbfile2 = structure.read_PDB(output)
+        pdbfile2 = read_PDB(output)
         # Should have no anisou records, since by default they are not written
         for atom in pdbfile2.atoms:
             self.assertIs(atom.anisou, None)
@@ -207,7 +208,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile.write_pdb(output, renumber=False, write_anisou=True)
         output.seek(0)
         # This one should have anisou records
-        pdbfile3 = structure.read_PDB(output)
+        pdbfile3 = read_PDB(output)
         self._compareInputOutputPDBs(pdbfile, pdbfile3)
         for a1, a2 in zip(pdbfile.atoms, pdbfile3.atoms):
             if has_numpy():
@@ -229,14 +230,14 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testPDBWriteFormat(self):
         """ Test PDB atom names are properly justified per PDB standard """
-        pdbfile = structure.read_PDB(self.format_test)
+        pdbfile = read_PDB(self.format_test)
         f = get_fn('pdb_format_test.pdb', written=True)
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
     def testSegidHandling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
-        pdbfile = structure.read_PDB(self.overflow2)
+        pdbfile = read_PDB(self.overflow2)
         allsegids = set(['PROA', 'PROB', 'CARA', 'CARE', 'CARC', 'CARD', 'CARB',
                          'MEMB', 'TIP3', 'POT', 'CLA'])
         foundsegids = set()
@@ -251,11 +252,11 @@ class TestChemistryPDBStructure(unittest.TestCase):
         f = get_fn('pdb_segid_test1.pdb', written=True)
         f2 = get_fn('pdb_segid_test2.pdb', written=True)
         pdbfile.write_pdb(f)
-        pdbfile2 = structure.read_PDB(f)
+        pdbfile2 = read_PDB(f)
         for atom in pdbfile2.atoms:
             self.assertFalse(hasattr(atom, 'segid'))
         pdbfile.write_pdb(f2, charmm=True)
-        pdbfile3 = structure.read_PDB(f2)
+        pdbfile3 = read_PDB(f2)
         for atom in pdbfile3.atoms:
             self.assertTrue(hasattr(atom, 'segid'))
             self.assertEqual(atom.segid, pdbfile.atoms[atom.idx].segid)
@@ -393,10 +394,10 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
     def testWriteCIF(self):
         """ Test CIF writing capabilities """
-        cif = structure.read_CIF(self.lzt)
+        cif = read_CIF(self.lzt)
         written = get_fn('test.cif', written=True)
         cif.write_cif(written, renumber=False, write_anisou=True)
-        cif2 = structure.read_CIF(written)
+        cif2 = read_CIF(written)
         # cif and cif2 should have equivalent atom properties (basically,
         # everything should be the same except the metadata)
         self.assertEqual(len(cif.atoms), len(cif2.atoms))
@@ -434,7 +435,7 @@ class TestChemistryCIFStructure(unittest.TestCase):
         io = StringIO.StringIO()
         cif.write_cif(io)
         io.seek(0)
-        cif3 = structure.read_CIF(io)
+        cif3 = read_CIF(io)
         # cif and cif3 should have equivalent atom properties (basically,
         # everything should be the same except the metadata)
         self.assertEqual(len(cif.atoms), len(cif3.atoms))
@@ -470,8 +471,8 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
     def test4LZT(self):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
-        cif = structure.read_CIF(self.lzt)
-        pdb = structure.read_PDB(self.lztpdb)
+        cif = read_CIF(self.lzt)
+        pdb = read_PDB(self.lztpdb)
         self.assertEqual(len(cif.atoms), len(pdb.atoms))
         nextra = 0
         for a1, a2 in zip(cif.atoms, pdb.atoms):

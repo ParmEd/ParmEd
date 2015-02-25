@@ -330,12 +330,12 @@ class TitratableResidueList(list):
             nswaps = 0
             for i in xrange(len(self)-1):
                 if self.first_atoms[i] > self.first_atoms[i+1]:
-                nswaps += 1
-                self.first_atoms[i], self.first_atoms[i+1] = \
-                    self.first_atoms[i+1], self.first_atoms[i]
-                self[i], self[i+1] = self[i+1], self[i]
-                self.residue_nums[i], self.residue_nums[i+1] = \
-                    self.residue_nums[i+1], self.residue_nums[i]
+                    nswaps += 1
+                    self.first_atoms[i], self.first_atoms[i+1] = \
+                        self.first_atoms[i+1], self.first_atoms[i]
+                    self[i], self[i+1] = self[i+1], self[i]
+                    self.residue_nums[i], self.residue_nums[i+1] = \
+                        self.residue_nums[i+1], self.residue_nums[i]
 
     def write_cpin(self, output, igb=2, intdiel=1.0, coions=False):
         """ Writes the CPIN file based on the titrated residues """
