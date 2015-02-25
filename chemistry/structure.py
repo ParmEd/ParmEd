@@ -28,11 +28,10 @@ try:
 except ImportError:
     bz2 = None
 from chemistry.constants import DEG_TO_RAD
-from chemistry.exceptions import (PDBError, PDBWarning, AnisouWarning,
-        ChemError, MissingParameter, MissingParameterWarning)
+from chemistry.exceptions import (ChemError, MissingParameter,
+        MissingParameterWarning)
 from chemistry.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
-from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.residue import WATER_NAMES
 from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         AngleType, DihedralType, DihedralTypeList, BondType, ImproperType,
@@ -49,7 +48,6 @@ try:
     import gzip
 except ImportError:
     gzip = None
-import itertools
 import math
 import re
 import warnings
