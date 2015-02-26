@@ -576,6 +576,14 @@ class ScaledUnit(object):
                 + ", symbol=" + repr(self.symbol) + ")"
 
 class UnitSystem(object):
+    """
+    A complete system of units defining the *base* unit in each dimension
+
+    Parameters
+    ----------
+    units: ``list``
+        List of base units from which to construct the unit system
+    """
     def __init__(self, units):
         self.units = units
         self._unit_conversion_cache = {}
@@ -604,11 +612,7 @@ class UnitSystem(object):
                 to_base_units[m][n] = power
         try:
             self.from_base_units = ~to_base_units
-        except ArithmeticError as e:
-        # for compatibility between python 2.5 and python 3.0,
-        # try replacing line above with the following two lines:
-        # except ArithmeticError:
-        #     e=sys.exc_info[1]
+        except ArithmeticError, e:
             raise ArithmeticError("UnitSystem is not a valid basis set.  " + str(e))
 
     def __iter__(self):

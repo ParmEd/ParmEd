@@ -5,6 +5,7 @@ Tests for the chemistry/charmm subpackage
 from chemistry.charmm import charmmcrds, parameters, psf
 from chemistry import topologyobjects as to
 from chemistry import exceptions
+from compat24 import all
 import os
 import unittest
 import utils
@@ -90,7 +91,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 3)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 3)
+        self.assertEqual(len(a.segid), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 4)
@@ -167,7 +168,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 3)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 3)
+        self.assertEqual(len(a.segid), 3)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 4)
@@ -260,7 +261,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(a.name), 1)
         self.assertEqual(len(a.props), 1)
         self.assertEqual(len(a.residue), 12)
-        self.assertEqual(len(a.residue.chain), 2)
+        self.assertEqual(len(a.segid), 2)
         self.assertEqual(len(a.urey_bradleys), 0)
         # Check attributes of the psf file
         self.assertEqual(len(cpsf.acceptors), 0)
@@ -353,7 +354,7 @@ class TestCharmmParameters(unittest.TestCase):
 
     def testParamFileOnly(self):
         """ Test reading only a parameter file with no RTF (CHARMM36) """
-        p=parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
+        parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
 
     def testCollection(self):
         """ Test reading a large number of parameter files """
@@ -415,6 +416,9 @@ class TestFileWriting(unittest.TestCase):
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
+            # Skip descriptors
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities'):
+                continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
@@ -440,6 +444,8 @@ class TestFileWriting(unittest.TestCase):
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities'):
+                continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
@@ -456,3 +462,6 @@ class TestFileWriting(unittest.TestCase):
         finally:
             f.close()
         self.assertFalse(has_key)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -16,7 +16,6 @@ from chemistry.parameters import ParameterSet
 from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
 import compat24 # needs to be before collections
 from collections import OrderedDict
-import math
 import os
 import warnings
 

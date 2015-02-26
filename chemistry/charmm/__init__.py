@@ -21,7 +21,7 @@ simulation with CHARMM; specifically PSF, PAR, RTF, and STR files
             field parameter files
 """
 
-__all__ = ['psf', 'parameters', 'openmmloader', 'charmmcrds']
+__all__ = ['psf', 'parameters', 'charmmcrds']
 __authors__ = 'Jason Swails'
 __contributors__ = ''
 __license__ = 'GPL v.3'

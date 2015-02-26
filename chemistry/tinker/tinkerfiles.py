@@ -6,16 +6,16 @@ from chemistry.exceptions import TinkerKeyFileError, TinkerDynFileError
 
 class KeywordControlFile(object):
     """ Reads and processes a keyword control file for TINKER simulations """
+    _datatypes = {'PARAMETERS' : str, 'A-AXIS' : float, 'B-AXIS' : float,
+                  'C-AXIS' : float, 'ALPHA' : float, 'BETA' : float,
+                  'GAMMA' : float}
+
     def __init__(self, fname):
         # The currently recognized/parsed keywords (these are the only ones
         # necessary for running Amoeba in Amber)
         self.keywords = {'PARAMETERS' : None, 'A-AXIS' : None, 'B-AXIS' : None,
                          'C-AXIS' : None, 'ALPHA' : None, 'BETA' : None,
                          'GAMMA' : None}
-        # The data type of this particular keyword
-        self._datatypes = {'PARAMETERS' : str, 'A-AXIS' : float,
-                           'B-AXIS' : float, 'C-AXIS' : float, 'ALPHA' : float,
-                           'BETA' : float, 'GAMMA' : float}
         # Parse the file
         for line in open(fname, 'r'):
             # Skip over any blank lines
@@ -92,7 +92,8 @@ class DynFile(object):
 
     def read(self, fname):
         """ Parses the .dyn file """
-        with open(fname, 'r') as f:
+        f = open(fname, 'r')
+        try:
             if f.readline().strip() != 'Number of Atoms and Title :':
                 raise TinkerDynFileError('%s is not a recognized TINKER '
                                          '.dyn file' % fname)
@@ -150,6 +151,8 @@ class DynFile(object):
                 DynFile._read_section(f, self.old_accelerations, self.natom)
             else:
                 raise TinkerDynFileError('No velocities in %s' % fname)
+        finally:
+            f.close()
 
     @staticmethod
     def _read_section(f, container, natom):

@@ -3,7 +3,20 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division
 
-import sys
+from chemistry.amber import AmberMask, AmberParm, ChamberParm, AmoebaParm
+from chemistry import Bond, BondType, Angle, AngleType, Dihedral, DihedralType
+from chemistry.exceptions import ChemError, CharmmFileError
+from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
+from chemistry.periodic_table import Element as _Element
+from compat24 import any
+try:
+    from itertools import izip as zip
+except ImportError:
+    # Must be Python 3, zip already is izip
+    pass
+import math
+import os
+from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               ChangeStateError, ChangeLJPairError, ParmedChangeError,
               SetParamError, DeleteDihedralError, NoArgument, NonexistentParm,
@@ -14,22 +27,8 @@ from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               FileDoesNotExist, InputError, TiMergeError,
 #             CoarseGrainError,
 )
-from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.parmlist import ParmList, ChamberParm, AmoebaParm
-from chemistry.amber.mask import AmberMask
-from chemistry.amber.readparm import AmberFormat
-from chemistry.topologyobjects import (Bond, BondType, Angle, AngleType,
-                                       Dihedral, DihedralType)
-from chemistry.exceptions import ChemError, CharmmFileError
-from chemistry.periodic_table import Element as _Element
-from compat24 import any
-try:
-    from itertools import izip as zip
-except ImportError:
-    # Must be Python 3, zip already is izip
-    pass
-import math
-import os
+from ParmedTools.parmlist import ParmList
+import sys
 import warnings
 
 GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
@@ -145,9 +144,7 @@ class Action(lawsuit):
     # Do we allow any action to overwrite existing files? Static variable.
     overwrite = True
     # Set a list of which classes of topology files is supported by this action.
-    # Use class names rather than "isinstance" since ChamberParm and AmoebaParm
-    # both inherit from AmberParm
-    supported_classes = ('AmberParm', 'AmoebaParm', 'ChamberParm')
+    supported_classes = (AmberParm, AmoebaParm, ChamberParm)
     def __init__(self, input_parm, arg_list=None, *args, **kwargs):
         """ Constructor """
         # Is this action 'valid' (i.e., can we run 'execute')?
@@ -155,7 +152,7 @@ class Action(lawsuit):
         # Accept both an AmberParm or ParmList instance to simplify the API
         if isinstance(input_parm, ParmList):
             self.parm_list = input_parm
-        elif isinstance(input_parm, AmberFormat):
+        elif isinstance(input_parm, AmberParm):
             self.parm_list = ParmList()
             self.parm_list.add_parm(input_parm)
         # Set active parm
@@ -209,10 +206,7 @@ class Action(lawsuit):
                                   % parm, SeriousParmWarning)
                     return
 
-        # Make sure our topology file type is supported. OpenMM* classes should
-        # be treated the same as their non-OpenMM counterparts
-        typename = type(self.parm).__name__.replace('OpenMM', '')
-        if self.needs_parm and typename not in self.supported_classes:
+        if self.needs_parm and type(self.parm) not in self.supported_classes:
             raise ParmError('%s topologies are not supported by this action' %
                             type(self.parm).__name__)
         try:
@@ -237,7 +231,7 @@ class Action(lawsuit):
 
     def init(self, arg_list):
         """ This should be overridden if anything needs to be done """
-        raise NotImplemented('init must be overridden by Action subclass')
+        raise NotImplementedError('init must be overridden by Action subclass')
 
     def execute(self):
         """ Commands involved in executing the action """
@@ -307,7 +301,7 @@ class writefrcmod(Action):
     """
     Writes an frcmod file from all of the parameters in the topology file.
     """
-    supported_classes = ('AmberParm',)
+    supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.frcmod_name = arg_list.get_next_string(optional=True)
         if self.frcmod_name is None: self.frcmod_name = 'frcmod'
@@ -364,7 +358,7 @@ class writeoff(Action):
     """
     Writes an Amber OFF Library with all of the residues found in the topology
     """
-    supported_classes = ('AmberParm',)
+    supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.off_file = arg_list.get_next_string()
 
@@ -377,7 +371,8 @@ class writeoff(Action):
         if self.parm.coords is None:
             raise WriteOFFError('You must load a restart for WriteOFF!')
 
-        self.parm.writeOFF(self.off_file)
+        lib = ResidueTemplateContainer.from_structure(self.parm).to_library()
+        AmberOFFLibrary.write(lib, self.off_file)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -386,7 +381,7 @@ class changeradii(Action):
     Changes intrinsic GB radii to the specified set: Allowed values are
         amber6, bondi, mbondi, mbondi2, mbondi3
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.radii = arg_list.get_next_string()
 
@@ -417,7 +412,7 @@ class changeljpair(Action):
     Changes a particular Lennard Jones pair based on a given (pre-combined)
     epsilon/Rmin
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -463,7 +458,7 @@ class changelj14pair(Action):
     Changes a particular 1-4 Lennard Jones pair based on a given (pre-combined)
     epsilon/Rmin. Only valid for CHAMBER prmtops
     """
-    supported_classes = ('ChamberParm',)
+    supported_classes = (ChamberParm,)
     def init(self, arg_list):
         # Make sure this is a chamber prmtop
         if not self.parm.chamber:
@@ -518,7 +513,7 @@ class checkvalidity(Action):
     Basic checks for prmtop validity.
     """
     output = sys.stdout
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         pass
@@ -559,7 +554,8 @@ class change(Action):
         elif self.prop in ('ATOM_TYPE_INDEX', 'ATOMIC_NUMBER'):
             self.new_val = arg_list.get_next_int()
             self.new_val_str = '%4i' % self.new_val
-        elif self.prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE'):
+        elif self.prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE',
+                           'TREE_CHAIN_CLASSIFICATION'):
             self.new_val = arg_list.get_next_string()
             if len(self.new_val) > 4:
                 warnings.warn('Only 4 letters allowed for %s entries!'
@@ -571,7 +567,7 @@ class change(Action):
             raise ParmedChangeError(
                         'You may only use "change" with CHARGE, MASS, RADII, '
                         'SCREEN, ATOM_NAME, AMBER_ATOM_TYPE, ATOM_TYPE_INDEX, '
-                        'or ATOMIC_NUMBER!')
+                        'ATOMIC_NUMBER, or TREE_CHAIN_CLASSIFICATION')
         if 'AmoebaParm' in type(self.parm).__name__:
             # Catch illegal values for Amoeba topologies
             if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'ATOM_TYPE_INDEX'):
@@ -651,7 +647,7 @@ class addljtype(Action):
     Turns given mask into a new LJ atom type. It uses the radius and Rmin from
     the first atom type in <mask> if new_radius or new_epsilon aren't provided
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.new_radius_14 = arg_list.get_key_float('radius_14', None)
         self.new_epsilon_14 = arg_list.get_key_float('epsilon_14', None)
@@ -708,7 +704,7 @@ class printljtypes(Action):
     Prints the Lennard Jones type index for the given atom mask or, if no value
     is given, the LJ type index for each atom.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Compile the list of indices
         try:
@@ -769,7 +765,7 @@ class scee(Action):
     """
     Sets the 1-4 EEL scaling factor in the prmtop
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.scee_value = arg_list.get_next_float()
 
@@ -796,7 +792,7 @@ class scnb(Action):
     """
     Sets the 1-4 VDW scaling factor in the prmtop
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.scnb_value = arg_list.get_next_float()
 
@@ -821,12 +817,12 @@ class changeljsingletype(Action):
     """
     Allows you to change the radius/well depth of a single LJ type specified by
     <mask>. Note, this may change more than the atoms selected in just the mask!
-    To find out what else will be changed, look at the output of "printLJTypes".
+    To find out what else will be changed, look at the output of printLJTypes.
 
     Use addLJType to change the Lennard-Jones parameters on a set of specific
     atoms.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.radius = arg_list.get_next_float()
@@ -1032,7 +1028,7 @@ class setmolecules(Action):
             if self.parm.coords is None:
                 warnings.warn(
                         'The atoms in %s were reordered to correct molecule '
-                        'ordering. Any topology printed from now on will _not_ '
+                        'ordering. Any topology printed from now on will *not* '
                         'work with the original inpcrd or trajectory files '
                         'created with this prmtop! Consider quitting and '
                         'loading a restart prior to using setMolecules' %
@@ -1076,7 +1072,7 @@ class changeprotstate(Action):
     treated via constant pH MD in Amber. This corresponds to all residues found
     in $AMBERHOME/AmberTools/src/etc/cpin_data.py
     """
-    supported_classes = ('AmberParm',)
+    supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.state = arg_list.get_next_int()
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1132,7 +1128,7 @@ class changeprotstate(Action):
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
     def execute(self):
-        from cpinutils import residues
+        from chemistry.amber import titratable_residues as residues
         changeprotstate._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
@@ -1172,7 +1168,7 @@ class netcharge(Action):
     Prints the total charge of all of the atoms given by the mask. Defaults to
     all atoms
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     outfile = sys.stdout
     def init(self, arg_list):
         mask = arg_list.get_next_mask(optional=True)
@@ -1203,7 +1199,7 @@ class strip(Action):
                                     self.mask, self.num_atms)
 
     def execute(self):
-        self.parm.delete_mask(self.mask)
+        self.parm.strip(self.mask)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1236,7 +1232,7 @@ class addexclusions(Action):
     For PME simulations, long-range electrostatics between these atom pairs are
     still computed (in different unit cells).
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1476,7 +1472,7 @@ class setbond(Action):
     the prmtop unless you call remake_parm() on the object (this is done for
     performance reasons)
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         self.k = arg_list.get_next_float()
@@ -1552,7 +1548,7 @@ class setangle(Action):
     the prmtop unless you call remake_parm() on the object (this is done for
     performance reasons)
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         self.k = arg_list.get_next_float()
@@ -1637,7 +1633,7 @@ class adddihedral(Action):
     VDW scaling factor for this dihedral (default for AMBER is 2.0, default for
     GLYCAM is 1.0)
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         self.phi_k = arg_list.get_next_float()
@@ -1754,7 +1750,7 @@ class deletedihedral(Action):
     Deletes the dihedral around <mask2> and <mask3> in which the end-groups are
     <mask1> and <mask4>. For multi-term dihedrals, it removes each term.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1840,7 +1836,7 @@ class printljmatrix(Action):
     one atom with the Lennard Jones index given in square brackets at the end.
     Alternatively, you can request a particular atom type index
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.idx = arg_list.get_next_int(optional=True)
         self.mask = None
@@ -1908,7 +1904,7 @@ class timerge(Action):
     created using leap, with the two molecules to be merged adjacent to each
     other in residue number. This improves the efficiency for pmemd TI when only
     part of a molecule is being perturbed.
-       
+
     <scmask1/2N> are for softcore molecules that are not going to be merged.
     These options will just add these atoms to the timask output, correcting for
     any changes in atom number.
@@ -1921,7 +1917,7 @@ class timerge(Action):
     This is used when the atoms in molecules 1/2 are not in the same order and
     for checking the input coordinates.
     """
-    supported_classes = ('AmberParm',)
+    supported_classes = (AmberParm,)
 
     def init(self, arg_list):
         self.tol = arg_list.get_key_float('tol', 0.01)
@@ -2145,7 +2141,7 @@ class timerge(Action):
         self.parm.atoms.changed = True
 
         if nremove > 0:
-            self.parm.delete_mask(remove_str)
+            self.parm.strip(remove_str)
 
         new_sc_atm1 = []
         new_sc_atm2 = []
@@ -2427,7 +2423,7 @@ class interpolate(Action):
     will be <prefix>.# where # starts at <startnum> and increments by 1 for each
     prmtop printed.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
         if len(self.parm_list) < 2:
@@ -2623,7 +2619,7 @@ class lmod(Action):
     Adjusts Lennard Jones parameters to work with the LMOD code in Amber
     (changes LJ A coefficients that are 0 to 1000).
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         pass
@@ -2646,22 +2642,23 @@ class addpdb(Action):
 
     Residue Properties
     ------------------
-        RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)
-        RESIDUE_ICODE: Insertion code, if it exists
-        RESIDUE_NUMBER: Original residue number in the PDB
+        - RESIDUE_CHAINID: The chain ID of each residue (* if LEaP added it)
+        - RESIDUE_ICODE: Insertion code, if it exists
+        - RESIDUE_NUMBER: Original residue serial number in the PDB
 
     Atom Properties
     ---------------
-        ATOM_ELEMENT: Atomic element (redundant now, not printed by default)
-        ATOM_OCCUPANCY: The occupancy of each atom
-        ATOM_BFACTOR: The temperature factor of each atom
+        - ATOM_ELEMENT: Atomic element (redundant now, not printed by default)
+        - ATOM_OCCUPANCY: The occupancy of each atom
+        - ATOM_BFACTOR: The temperature factor of each atom
+        - ATOM_NUMBER: The original atom serial number in the PDB
 
     The 'strict' keyword turns residue mismatches (NOT solvent) into errors
     The 'elem' keyword will force printing of the element names.
     The 'allicodes' keyword forces insertion codes to be printed, even if every
     one will be blank (so that parsers can count on that section existing).
 
-    Residues _not_ in the PDB will be assigned a CHAINID of '*' and
+    Residues *not* in the PDB will be assigned a CHAINID of '*' and
     RESIDUE_NUMBER of 0. Any occupancy or temperature (B) factor that is not
     present in the input PDB file is assigned a number of 0
 
@@ -2681,7 +2678,10 @@ class addpdb(Action):
         self.pdbpresent = ('RESIDUE_NUMBER' in self.parm.flag_list or
                            'RESIDUE_CHAINID' in self.parm.flag_list or
                            'RESIDUE_ICODE' in self.parm.flag_list or
-                           'ATOM_ELEMENT' in self.parm.flag_list
+                           'ATOM_ELEMENT' in self.parm.flag_list or
+                           'ATOM_OCCUPANCY' in self.parm.flag_list or
+                           'ATOM_BFACTOR' in self.parm.flag_list or
+                           'ATOM_NUMBER' in self.parm.flag_list
         )
 
     def __str__(self):
@@ -2838,7 +2838,7 @@ class add12_6_4(Action):
     [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
         289-297
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
    
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
@@ -2976,7 +2976,7 @@ class openmm(Action):
     will prevent anything from actually being run and can only be used when a
     script file is provided.
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
         parm = arg_list.get_key_string('-p', default=None)
@@ -3014,39 +3014,48 @@ class energy(Action):
     must use 'loadRestart' prior to this command to load coordinates). The
     following options and keywords are supported:
 
-    The options are:
+    Options
+    -------
 
-    cutoff <cut> : The size of the non-bonded cutoff, in Angstroms. Default 8 A
-         for periodic systems or infinite for nonperiodic systems
+        - cutoff <cut> : The size of the non-bonded cutoff, in Angstroms.
+                         Default 8 A for periodic systems or infinite for
+                         nonperiodic systems
 
-    For systems with no periodic box information:
+    For systems with no periodic box information
+    --------------------------------------------
 
-    igb <IGB> : An integer corresponding to the desired GB model. May be 1, 2,
-         5, 7, or 8 as described by the sander and pmemd manual. Default 5
-    saltcon <conc> : The salt concentration, in mol/L, modeled by a Debye
-         screening parameter. Default 0.0
+        - igb <IGB> : An integer corresponding to the desired GB model. May be
+                      1, 2, 5, 7, or 8 as described by the sander and pmemd
+                      manual. Default 5.
+        - saltcon <conc> : The salt concentration, in mol/L, modeled by a Debye
+                           screening parameter. Default 0.0
 
-    For periodic systems:
+    For periodic systems
+    --------------------
 
-    Ewald : Use an Ewald sum to compute long-range electrostatics instead of PME
-    nodisper : Do not use a long-range vdW dispersion correction
+        - Ewald : Use an Ewald sum to compute long-range electrostatics instead
+                  of PME
+        - nodisper : Do not use a long-range vdW dispersion correction
 
-    OpenMM-specific options:
+    OpenMM-specific options
+    -----------------------
 
-    omm : If present, this keyword will instruct ParmEd to use OpenMM to compute
-         the energies (and optionally forces) using OpenMM instead of sander.
-    platform <platform> : OpenMM compute platform to use. Options are CUDA,
-            OpenCL, Reference, and CPU. Consult the OpenMM manual for details
-            (only used if 'omm' is provided)
-    precision <precision model> : Precision model to use. Options are single,
-         double, and mixed. Reference platform is always double and CPU platform
-         is always single. Mixed (default) uses single precision for
-         calculations and double for accumulation (only used if 'omm' is
-         provided)
-    decompose : Print bond, angle, dihedral, and nonbonded energies separately
-    applayer : Use OpenMM's class to compute the energy
+        - omm : If present, this keyword will instruct ParmEd to use OpenMM to
+                compute the energies (and optionally forces) using OpenMM
+                instead of sander.
+        - platform <platform> : OpenMM compute platform to use. Options are
+                CUDA, OpenCL, Reference, and CPU. Consult the OpenMM manual for
+                details (only used if 'omm' is provided)
+        - precision <precision model> : Precision model to use. Options are
+                single, double, and mixed. Reference platform is always double
+                and CPU platform is always single. Mixed (default) uses single
+                precision for calculations and double for accumulation (only
+                used if 'omm' is provided)
+        - decompose : Print bond, angle, dihedral, and nonbonded energies
+                      separately
+        - applayer : Use OpenMM's class to compute the energy
     """
-    supported_classes = ('AmberParm', 'ChamberParm')
+    supported_classes = (AmberParm, ChamberParm)
 
     output = sys.stdout
 
@@ -3082,18 +3091,16 @@ class deletebond(Action):
     """
     This action deletes any bonds that occur between the atoms in two masks.
 
-    <mask1> : Amber mask defining one of the atoms in a bond
-    <mask2> : Amber mask defining the other atom in the bond
-    [verbose] : Print out every bond that is deleted as well as the number of
-                other valence terms that were eliminated.
+        - <mask1> : Amber mask defining one of the atoms in a bond
+        - <mask2> : Amber mask defining the other atom in the bond
+        - [verbose] : Print out every bond that is deleted as well as the
+                      number of other valence terms that were eliminated.
 
     All bonds will be matched in which one atom comes from <mask1> and the other
     atom comes from <mask2>. This action will also delete any other valence term
     (like angles and dihedrals) that would get severed by the deletion of one of
     the bonds.
     """
-    supported_classes = ('AmberParm', 'ChamberParm', 'AmoebaParm')
-
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -3213,23 +3220,33 @@ class chamber(Action):
     the order they are specified), followed by all parameter files, and finally
     all stream files are read in.  Topology files are only necessary if the
     parameter files do not define the atom types (newer CHARMM force fields
-    define atom types directly in the parameter file.
+    define atom types directly in the parameter file. Environment variables and
+    shell wild-cards (* and ?), as well as the home shortcut character ~ are
+    properly expanded when looking for files.
 
-    Options:
-        -top        CHARMM topology, or Residue Topology File (RTF) file
-        -param      CHARMM parameter file
-        -str        CHARMM stream file. Only RTF and parameter sections are read
-        -psf        CHARMM PSF file
-        -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
-        -nocmap     Do not use any CMAP parameters
-        usechamber  Use the 'chamber' program to write a topology file instead
-        -box        Box dimensions. If no angles are defined, they are assumed
-                    to be 90 degrees (orthorhombic box). Alternatively, you can
-                    use the word 'bounding' to define a box that encloses the
-                    centers of all atoms.
-        -radii      Implicit solvent solvation radii. <radiusset> can be
-                    amber6, bondi, mbondi, mbondi2, mbondi3
-                    Same effect as the changeRadii command. Default is mbondi.
+    Options
+    -------
+        - -top        CHARMM topology, or Residue Topology File (RTF) file
+        - -param      CHARMM parameter file
+        - -str        CHARMM stream file. Only RTF and parameter sections read
+        - -toppar     CHARMM topology, parameter, and/or stream file(s). File
+                      type is detected from extension (or in the case of .inp
+                      files, the presence of 'top', 'par' in the name)
+        - -psf        CHARMM PSF file
+        - -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
+        - -nocmap     Do not use any CMAP parameters
+        - usechamber  Use the 'chamber' program to write a topology file instead
+        - -box        Box dimensions. If no angles are defined, they are assumed
+                      to be 90 degrees (orthorhombic box). Alternatively, you
+                      can use the word 'bounding' to define a box that encloses
+                      the centers of all atoms.
+        - -radii      Implicit solvent solvation radii. <radiusset> can be
+                      amber6, bondi, mbondi, mbondi2, mbondi3
+                      Same effect as the changeRadii command. Default is mbondi.
+        - nocondense  This prevents chamber from condensing the parameter set
+                      before applying it. This might lead to larger prmtop
+                      files, but for large parameter sets will dramatically
+                      shorten the running time of the chamber action
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3239,35 +3256,67 @@ class chamber(Action):
 
     def init(self, arg_list):
         from os.path import expandvars, expanduser
+        import glob
         # First get all of the topology files
         self.topfiles, self.paramfiles, self.streamfiles = [], [], []
         while arg_list.has_key('-top', mark=False):
             topfile = expanduser(arg_list.get_key_string('-top', None))
             topfile = expandvars(topfile)
-            if not os.path.exists(topfile):
+            topfiles = glob.glob(topfile)
+            if not topfiles:
                 raise FileDoesNotExist('CHARMM RTF file %s does not exist' %
                                        topfile)
-            self.topfiles.append(topfile)
+            self.topfiles.extend(topfiles)
         while arg_list.has_key('-param', mark=False):
             param = expanduser(arg_list.get_key_string('-param', None))
             param = expandvars(param)
-            if not os.path.exists(param):
+            params = glob.glob(param)
+            if not params:
                 raise FileDoesNotExist('CHARMM parameter file %s does not exist'
                                        % param)
-            self.paramfiles.append(param)
+            self.paramfiles.extend(params)
         while arg_list.has_key('-str', mark=False):
             stream = expanduser(arg_list.get_key_string('-str', None))
             stream = expandvars(stream)
-            if not os.path.exists(stream):
+            streams = glob.glob(stream)
+            if not streams:
                 raise FileDoesNotExist('CHARMM stream file %s does not exist' %
                                        stream)
-            self.streamfiles.append(stream)
+            self.streamfiles.extend(streams)
+        while arg_list.has_key('-toppar', mark=False):
+            toppar = expanduser(arg_list.get_key_string('-toppar', None))
+            toppar = expandvars(toppar)
+            toppars = glob.glob(toppar)
+            if not toppars:
+                raise FileDoesNotExist('CHARMM toppar file %s does not exist' %
+                                       toppar)
+            for fname in toppars:
+                base = os.path.split(fname)[1] # ignore the directory name
+                if base.endswith('.rtf') or base.endswith('.top'):
+                    self.topfiles.append(fname)
+                elif base.endswith('.par') or base.endswith('.prm'):
+                    self.paramfiles.append(fname)
+                elif base.endswith('.str'):
+                    self.streamfiles.append(fname)
+                elif base.endswith('.inp'):
+                    if 'par' in fname:
+                        self.paramfiles.append(fname)
+                    elif 'top' in fname:
+                        self.topfiles.append(fname)
+                    else:
+                        raise InputError('Cannot detect filetype of %s' % fname)
+                else:
+                    raise InputError('Cannot detect filetype of %s' % fname)
         crdfile = arg_list.get_key_string('-crd', None)
         if crdfile is not None:
-            self.crdfile = expanduser(expandvars(crdfile))
-            if not os.path.exists(self.crdfile):
+            crdfiles = glob.glob(expanduser(expandvars(crdfile)))
+            if not crdfiles:
                 raise FileDoesNotExist('Coordinate file %s does not exist' %
                                        self.crdfile)
+            if len(crdfiles) > 1:
+                raise InputError('Too many coordinate files selected through '
+                                 'globbing')
+            self.crdfile = crdfiles[0]
         else:
             self.crdfile = None
         self.cmap = not arg_list.has_key('-nocmap')
@@ -3275,9 +3324,12 @@ class chamber(Action):
         psf = arg_list.get_key_string('-psf', None)
         if psf is None:
             raise InputError('chamber requires a PSF file')
-        self.psf = expanduser(expandvars(psf))
-        if not os.path.exists(self.psf):
-            raise InputError('chamber PSF file %s cannot be found' % self.psf)
+        self.psf = glob.glob(expanduser(expandvars(psf)))
+        if not self.psf:
+            raise FileDoesNotExist('chamber PSF file %s cannot be found' % psf)
+        if len(self.psf) > 1:
+            raise InputError('Too many PSF files selected through globbing')
+        self.psf = self.psf[0]
         box = arg_list.get_key_string('-box', None)
 
         if box is None:
@@ -3311,6 +3363,7 @@ class chamber(Action):
                                  '(topology) and PAR (parameter) files.')
             if not self.crdfile:
                 raise InputError('The chamber program requires a CRD file.')
+        self.condense = not arg_list.has_key('nocondense')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3379,7 +3432,7 @@ class chamber(Action):
             for sfile in self.streamfiles:
                 parmset.read_stream_file(sfile)
             # All parameters are loaded, now condense the types
-            parmset.condense()
+            if self.condense: parmset.condense()
         except ChemError, e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
@@ -3411,9 +3464,19 @@ class chamber(Action):
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
                                    3*len(psf.atoms)))
+            # Set the coordinates now, since creating the parm may re-order the
+            # atoms in order to maintain contiguous molecules
+            for i, atom in enumerate(psf.atoms):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
-                psf.set_box(*crdbox[:])
+                if len(crdbox) == 3:
+                    psf.box = crdbox + [90.0, 90.0, 90.0]
+                elif len(crdbox) == 6:
+                    psf.box = crdbox[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
             elif self.box == 'bounding':
                 # Define the bounding box
                 xmin, ymin, zmin = coords[:3]
@@ -3426,17 +3489,27 @@ class chamber(Action):
                     ymax = max(ymax, coords[i3+1])
                     zmin = min(zmin, coords[i3+2])
                     zmax = max(zmax, coords[i3+2])
-                psf.set_box(xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0)
+                psf.box = [xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0]
             elif self.box is not None:
-                psf.set_box(*self.box[:])
+                if len(self.box) == 3:
+                    psf.box = self.box + [90.0, 90.0, 90.0]
+                elif len(self.box) == 6:
+                    psf.box = self.box[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
             else:
                 psf.box = None
         else:
             # Set the box information
             if self.box is None:
-                psf.set_box(None)
+                psf.box = None
             else:
-                psf.set_box(*self.box)
+                if len(self.box) == 3:
+                    psf.box = self.box + [90.0, 90.0, 90.0]
+                elif len(crdbox) == 6:
+                    psf.box = self.box[:]
+                else:
+                    raise ValueError('Unexpected box array shape')
 
         nsets = len(parmset.parametersets)
         if nsets > 0:
@@ -3455,8 +3528,6 @@ class chamber(Action):
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset).view(ChamberParm)
-        if self.crdfile is not None:
-            parm.load_coordinates(coords)
         parm.prm_name = self.psf
         changeradii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
@@ -3469,30 +3540,32 @@ class minimize(Action):
     This action takes a structure and minimizes the energy using OpenMM.
     Following this action, the coordinates stored in the topology will be the
     minimized structure
-    
-    General Options:
-        cutoff <cutoff>     Nonbonded cutoff in Angstroms
-        restrain <mask>     Selection of atoms to restrain
-        weight <k>          Weight of positional restraints (kcal/mol/A^2)
-        norun               Do not run the calculation
-        script <script>     Name of the Python script to write to run this
-                            calculation
-        tol <tolerance>     The largest energy difference between successive
-                            steps in the minimization allow the minimization to
-                            stop (Default 0.001)
-        maxcyc <cycles>     The maximum number of minimization cycles permitted.
-                            No limit by default (minimization stops when
-                            tolerance is satisfied)
 
-    Implicit Solvent options:
-        igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
-                            Amber models)
-        saltcon <conc>      Salt concentration for GB in Molarity
+    General Options
+    ---------------
+        - cutoff <cutoff>     Nonbonded cutoff in Angstroms
+        - restrain <mask>     Selection of atoms to restrain
+        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
+        - norun               Do not run the calculation
+        - script <script>     Name of the Python script to write to run this
+                              calculation
+        - tol <tolerance>     The largest energy difference between successive
+                              steps in the minimization allow the minimization
+                              to stop (Default 0.001)
+        - maxcyc <cycles>     The maximum number of minimization cycles
+                              permitted.  No limit by default (minimization
+                              stops when tolerance is satisfied)
+
+    Implicit Solvent options
+    ------------------------
+        - igb <IGB>           GB model to use (0=No GB, 1,2,5,7,8 correspond to
+                              Amber models)
+        - saltcon <conc>      Salt concentration for GB in Molarity
 
     The implicit solvent options will be ignored for systems with periodic
     boundary conditions
     """
-    supported_classes = ('ChamberParm', 'AmberParm')
+    supported_classes = (ChamberParm, AmberParm)
 
     def init(self, arg_list):
         self.cutoff = arg_list.get_key_float('cutoff', None)

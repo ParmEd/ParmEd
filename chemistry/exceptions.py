@@ -122,3 +122,43 @@ class GromacsTopologyError(ChemError):
 
 class GromacsTopologyWarning(ChemWarning):
     " If we are uncertain about something regarding the GROMACS topology file "
+
+class AnisouWarning(ChemWarning):
+    """ If there was a problem parsing an ANISOU record """
+
+class MissingParameterWarning(ChemWarning):
+    """ If a type of parameter is missing, but you don't want it to be fatal """
+
+class AmberOFFWarning(ChemWarning):
+    """ For badly formatted OFF files... ugh """
+
+class PdbxError(ChemError):
+    """ Class for catching general errors with PDBx/mmCIF parsing """
+
+class PdbxSyntaxError(ChemError):
+    """ Class for catching errors in mmCIF/PDBx syntax """
+    def __init__(self, lineNumber, text):
+        Exception.__init__(self)
+        self.lineNumber = lineNumber
+        self.text = text
+
+    def __str__(self):
+        return "%%ERROR - [at line: %d] %s" % (self.lineNumber, self.text)
+
+class CpinResidueError(ChemError):
+    """ Error adding a residue to the CPIN file """
+
+class CpinChargeWarning(ChemWarning):
+    """ Bad charge definitions that are inconsistent with protonation states """
+
+class CpinRefEneWarning(ChemWarning):
+    """ If not all reference energies are properly pKa-adjusted """
+
+class CpinInputWarning(ChemWarning):
+    """ If there is a non-fatal problem with the input variables """
+
+class CpinInputError(ChemError):
+    """ If the user provides bad input """
+
+class FormatNotFound(ChemError):
+    """ If the file format does not have a registered parser with it """

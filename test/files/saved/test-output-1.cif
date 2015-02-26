@@ -1,0 +1,16 @@
+data_myblock
+#
+#
+loop_
+_pdbx_seqtool_mapping_ref.ordinal
+_pdbx_seqtool_mapping_ref.entity_id
+_pdbx_seqtool_mapping_ref.auth_mon_id
+_pdbx_seqtool_mapping_ref.auth_mon_num
+_pdbx_seqtool_mapping_ref.pdb_chain_id
+_pdbx_seqtool_mapping_ref.ref_mon_id
+_pdbx_seqtool_mapping_ref.ref_mon_num
+1  2  3  4  5  6  7  
+1  2  3  4  5  6  7  
+1  2  3  4  5  6  7  
+1  2  3  4  5  6  7  
+##

@@ -4,15 +4,7 @@ via either the name of the topology file or by the order in which they were
 loaded.
 """
 
-from chemistry.amber.amberformat import AmberFormat
-from chemistry.amber.readparm import AmoebaParm
-try:
-    from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
-                                              OpenMMChamberParm as ChamberParm)
-    _HAS_OPENMM = True
-except ImportError:
-    from chemistry.amber.readparm import AmberParm, ChamberParm
-    _HAS_OPENMM = False
+from chemistry.amber import AmberFormat, AmberParm, AmoebaParm, ChamberParm
 from ParmedTools.exceptions import DuplicateParm, ParmIndexError
 
 class ParmList(object):
@@ -20,9 +12,6 @@ class ParmList(object):
     List of AmberParm objects index-able via either prmtop name or prmtop index
     (based on order added)
     """
-
-    openmm_enabled = _HAS_OPENMM
-
     def __init__(self):
         """ Must be instantiated by itself """
         self._parm_names = []

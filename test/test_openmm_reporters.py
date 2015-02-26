@@ -6,7 +6,7 @@ try:
     import simtk.openmm as mm
     from simtk.openmm import app
     import simtk.unit as u
-    from chemistry.amber.openmmreporters import (NetCDFReporter, MdcrdReporter,
+    from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                     ProgressReporter, RestartReporter, AmberStateDataReporter,
                     EnergyMinimizerReporter)
     from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
@@ -319,3 +319,6 @@ if not has_openmm:
     del TestStateDataReporter, TestTrajRestartReporter
 elif not HAS_NETCDF:
     del TestTrajReporter.TestNetCDFReporter
+
+if __name__ == '__main__':
+    unittest.main()

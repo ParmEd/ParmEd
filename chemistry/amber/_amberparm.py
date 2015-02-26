@@ -3,37 +3,39 @@ This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
 
-Copyright (C) 2010 - 2014  Jason Swails
+Copyright (C) 2010 - 2015  Jason Swails
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Lesser General Public License for more details.
    
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.periodic_table import AtomicNum, element_by_mass, Element
-from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
-                       BondType, AngleType, DihedralType, AtomType)
-from chemistry.structure import Structure
+from chemistry.amber.amberformat import AmberFormat
 from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
             NNB, TINY)
-from chemistry.amber.amberformat import AmberFormat
 from chemistry.exceptions import (AmberParmError, ReadError,
                                   MoleculeError, MoleculeWarning)
+from chemistry.geometry import box_lengths_and_angles_to_vectors
+from chemistry.periodic_table import AtomicNum, element_by_mass, Element
+from chemistry.structure import Structure, needs_openmm
+from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
+                       BondType, AngleType, DihedralType, AtomType, ExtraPoint)
+from chemistry import unit as u
 import copy
 try:
     from itertools import izip as zip
@@ -45,6 +47,11 @@ try:
 except ImportError:
     np = None
 from math import sqrt
+try:
+    from simtk import openmm as mm
+    from simtk.openmm import app
+except ImportError:
+    mm = app = None
 from warnings import warn
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -213,11 +220,15 @@ class AmberParm(AmberFormat, Structure):
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
 
-        Parameters:
-            - rawdata (AmberFormat): Already has a parsed file
+        Parameters
+        ----------
+        rawdata : :class:`AmberFormat`
+            An AmberFormat instance that has already been instantiated
 
-        Returns:
-            Populated AmberParm instance
+        Returns
+        -------
+        parm : :class:`AmberParm`
+            An instance of this type from the data in rawdata
         """
         inst = cls()
         inst.prm_name = rawdata.prm_name
@@ -229,10 +240,10 @@ class AmberParm(AmberFormat, Structure):
         inst.initialize_topology()
         # See if the rawdata has any kind of structural attributes, like
         # coordinates and an atom list with positions and/or velocities
-        if hasattr(rawdata, 'coords'):
-            inst.coords = copy.copy(rawdata.coords)
-        if hasattr(rawdata, 'vels'):
-            inst.vels = copy.copy(rawdata.vels)
+        if hasattr(rawdata, 'coords') and rawdata.coords is not None:
+            inst.load_coordinates(copy.copy(rawdata.coords))
+        if hasattr(rawdata, 'vels') and rawdata.vels is not None:
+            inst.load_velocities(copy.copy(rawdata.vels))
         if hasattr(rawdata, 'box'):
             inst.box = copy.copy(rawdata.box)
         if hasattr(rawdata, 'hasbox'):
@@ -251,7 +262,7 @@ class AmberParm(AmberFormat, Structure):
 
         Parameters
         ----------
-        struct : Structure
+        struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
         """
         inst = struct.copy(cls, split_dihedrals=True)
@@ -283,6 +294,14 @@ class AmberParm(AmberFormat, Structure):
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+        try:
+            coords = []
+            for atom in struct.atoms:
+                coords.extend([atom.xx, atom.xy, atom.xz])
+        except AttributeError:
+            raise
+        else:
+            inst.load_coordinates(coords)
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
@@ -406,8 +425,10 @@ class AmberParm(AmberFormat, Structure):
             screen = zeros
         try:
             atnum = self.parm_data['ATOMIC_NUMBER']
+            replace_atnum = True
         except KeyError:
             atnum = [AtomicNum[element_by_mass(m)] for m in mass]
+            replace_atnum = False
         try:
             occu = self.parm_data['ATOM_OCCUPANCY']
         except KeyError:
@@ -431,7 +452,8 @@ class AmberParm(AmberFormat, Structure):
             atom.tree = tree[i]
             atom.radii = radii[i]
             atom.screen = screen[i]
-            atom.atomic_number = atnum[i]
+            if replace_atnum or atom.atomic_number == 0:
+                atom.atomic_number = atnum[i]
             atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
@@ -498,13 +520,12 @@ class AmberParm(AmberFormat, Structure):
 
         # Check that we have a rst7 loaded, then overwrite it with a new one if
         # necessary
-        rst7 = Rst7(natom=len(self.atoms), hasvels=self.vels is not None,
-                    hasbox=self.box is not None)
+        rst7 = Rst7(natom=len(self.atoms))
 
         # Now fill in the rst7 coordinates
         rst7.coordinates = [0.0 for i in xrange(len(self.atoms)*3)]
         if self.vels is not None:
-            rst7.velocities = [0.0 for i in xrange(len(self.atoms)*3)]
+            rst7.vels = [0.0 for i in xrange(len(self.atoms)*3)]
 
         for i, at in enumerate(self.atoms):
             i3 = i * 3
@@ -512,9 +533,9 @@ class AmberParm(AmberFormat, Structure):
             rst7.coordinates[i3+1] = at.xy
             rst7.coordinates[i3+2] = at.xz
             if rst7.hasvels:
-                rst7.velocities[i3  ] = at.vx
-                rst7.velocities[i3+1] = at.vy
-                rst7.velocities[i3+2] = at.vz
+                rst7.vels[i3  ] = at.vx
+                rst7.vels[i3+1] = at.vy
+                rst7.vels[i3+2] = at.vz
 
         rst7.box = copy.copy(self.box)
         # Now write the restart file
@@ -541,8 +562,8 @@ class AmberParm(AmberFormat, Structure):
 
     def remake_parm(self):
         """
-        Re-fills the topology file arrays if we have changed the underlying
-        structure
+        Fills :attr:`parm_data` from the data in the parameter and topology
+        arrays (e.g., :attr:`atoms`, :attr:`bonds`, :attr:`bond_types`, ...)
         """
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
@@ -555,6 +576,8 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        # Load the pointers dict
+        self.load_pointers()
         # Mark atom list as unchanged
         super(AmberParm, self).unchange()
 
@@ -572,27 +595,20 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def delete_mask(self, mask):
+    def strip(self, selection):
         """
-        Deletes all of the atoms corresponding to an entire Amber mask
+        Deletes a subset of the atoms corresponding to an atom-based selection.
 
         Parameters
         ----------
-        mask : str or AmberMask
-            The Amber mask defining the selection of atoms that will be deleted
-            from this topology
+        selection : AmberMask, str, or iterable of bool
+            This is the selection of atoms that will be deleted from this
+            structure. If it is a string, it will be interpreted as an
+            AmberMask. If it is an AmberMask, it will be converted to a
+            selection of atoms. If it is an iterable, it must be the same length
+            as the `atoms` list.
         """
-        from chemistry.amber.mask import AmberMask
-        # Get the atom selection
-        if isinstance(mask, AmberMask):
-            if mask.parm is not self:
-                raise AmberParmError('Mask belongs to different prmtop!')
-            selection = reversed(list(mask.Selected()))
-        else:
-            selection = reversed(list(AmberMask(self, mask).Selected()))
-        # Delete the atoms and rebuild the topology and coordinates
-        for i in selection:
-            del self.atoms[i]
+        super(AmberParm, self).strip(selection)
         self.remake_parm()
         if self.coords is not None:
             self.coords = []
@@ -682,7 +698,8 @@ class AmberParm(AmberFormat, Structure):
                 for atom in res:
                     if molid != atom.marked:
                         warn('Residues cannot be part of 2 molecules! Molecule '
-                             'section will not be correctly set.',
+                             'section will not be correctly set. [Offending '
+                             'residue is %d: %r]' % (res.idx, res),
                              MoleculeWarning)
                         return None
             new_atoms = AtomList()
@@ -700,49 +717,14 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def writeOFF(self, off_file='off.lib'):
-        """ Writes an OFF file from all of the residues found in a prmtop """
-        from chemistry.amber.residue import ToResidue
-   
-        off_file = open(off_file, 'w')
-   
-        # keep track of all the residues we have to print to the OFF file
-        residues = []
-   
-        # First create a Molecule object from the prmtop
-        mol = self.ToMolecule()
-   
-        # Now loop through all of the residues in the Molecule object and add
-        # unique ones to the list of residues to print
-        for i in xrange(len(mol.residues)):
-            res = ToResidue(mol, i)
-            present = False
-            for compres in residues:
-                if res == compres:
-                    present = True
-   
-            if not present:
-                residues.append(res)
-      
-        # Now that we have all of the residues that we need to add, put their
-        # names in the header of the OFF file
-        off_file.write('!!index array str\n')
-        for res in residues:
-            off_file.write(' "%s"\n' % res.name)
-   
-        # Now write the OFF strings to the file
-        for res in residues:
-            off_file.write(res.OFF())
-
-        off_file.close()
-
-    #===================================================
-
     def fill_LJ(self):
         """
-        Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data
-        from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop
-        files, by undoing the canonical combining rules.
+        Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each
+        atom type by computing their values from the A and B coefficients of
+        each atom interacting with itself.
+
+        This fills the :attr:`LJ_radius`, :attr:`LJ_depth`, and :attr:`LJ_types`
+        data structures.
         """
         self.LJ_radius = []  # empty LJ_radii so it can be re-filled
         self.LJ_depth = []   # empty LJ_depths so it can be re-filled
@@ -769,41 +751,17 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def fill_14_LJ(self):
-        """
-        Fills the LJ_14_radius, LJ_14_depth arrays with data (LJ_types is
-        identical) from LENNARD_JONES_14_ACOEF and LENNARD_JONES_14_BCOEF
-        sections of the prmtop files, by undoing the canonical combining rules.
-        """
-        if not self.chamber:
-            raise TypeError('fill_14_LJ() only valid on a chamber prmtop!')
-
-        pd = self.parm_data
-        acoef = pd['LENNARD_JONES_14_ACOEF']
-        bcoef = pd['LENNARD_JONES_14_BCOEF']
-        ntypes = self.pointers['NTYPES']
-
-        self.LJ_14_radius = []  # empty LJ_radii so it can be re-filled
-        self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
-        one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
-
-        for i in xrange(ntypes):
-            lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if acoef[lj_index] < 1.0e-6:
-                self.LJ_14_radius.append(0)
-                self.LJ_14_depth.append(0)
-            else:
-                factor = 2 * acoef[lj_index] / bcoef[lj_index]
-                self.LJ_14_radius.append(pow(factor, one_sixth) * 0.5)
-                self.LJ_14_depth.append(bcoef[lj_index] / 2 / factor)
-
-    #===================================================
-
     def recalculate_LJ(self):
         """
-        Takes the values of the LJ_radius and LJ_depth arrays and recalculates
-        the LENNARD_JONES_A/BCOEF topology sections from the canonical combining
-        rules.
+        Fills the ``LENNARD_JONES_ACOEF`` and ``LENNARD_JONES_BCOEF`` arrays in
+        the :attr:`parm_data` raw data dictionary by applying the canonical
+        Lorentz-Berthelot combining rules to the values in :attr:`LJ_radius` and
+        :attr:`LJ_depth`.
+
+        Note
+        ----
+        This will undo any off-diagonal L-J modifications you may have made, so
+        call this function with care.
         """
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
@@ -817,22 +775,66 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
+    def has_NBFIX(self):
+        """
+        This routine determines whether there are any off-diagonal Lennard-Jones
+        modifications (i.e., if any two atoms have a L-J pair interaction that
+        does not match the combined L-J parameters for that pair).
+
+        Returns
+        -------
+        nbfix : bool
+            If True, off-diagonal elements in the combined Lennard-Jones matrix
+            exist. If False, they do not.
+        """
+        pd = self.parm_data
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
+                idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                rij = self.LJ_radius[i] + self.LJ_radius[j]
+                wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
+                a = pd['LENNARD_JONES_ACOEF'][idx]
+                b = pd['LENNARD_JONES_BCOEF'][idx]
+                if a == 0 or b == 0:
+                    if a != 0 or b != 0 or (wdij != 0 and rij != 0):
+                        return True
+                elif (abs((a - (wdij * rij**12)) / a) > 1e-6 or
+                        abs((b - (2 * wdij * rij**6)) / b) > 1e-6):
+                    return True
+        return False
+
+    #===================================================
+
     def load_rst7(self, rst7):
-        """ Loads coordinates into the AmberParm class """
+        """ Loads coordinates into the AmberParm class
+
+        Parameters
+        ----------
+        rst7 : str or :class:`Rst7`
+            The Amber coordinate file (either ASCII restart or NetCDF restart)
+            object or filename to assign atomic coordinates from.
+        """
         if not hasattr(rst7, 'coordinates'):
             rst7 = Rst7.open(rst7)
         self.load_coordinates(rst7.coordinates)
         self.hasvels = rst7.hasvels
-        self.hasbox = rst7.hasbox
-        if self.hasbox:
-            self.box = rst7.box[:]
+        self.box = copy.copy(rst7.box)
+        self.hasbox = self.box is not None
         if self.hasvels:
-            self.load_velocities(rst7.velocities)
+            self.load_velocities(rst7.vels)
 
     #===================================================
 
     def load_coordinates(self, coords):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        coords : list of floats
+            A 1-dimensional iterable of coordinates of shape (natom*3,) from
+            which all atomic coordinates are assigned. In Angstroms
+        """
         self.coords = coords
         for i, atom in enumerate(self.atoms):
             i3 = 3 * i
@@ -843,7 +845,14 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_velocities(self, vels):
-        """ Loads the coordinates into the atom list """
+        """ Loads the coordinates into the atom list
+
+        Parameters
+        ----------
+        vels : list of floats
+            A 1-dimensional iterable of velocities of shape (natom*3,) from
+            which all atomic velocities are assigned. In Angstroms/picosecond
+        """
         self.hasvels = True
         self.vels = vels
         for i, atom in enumerate(self.atoms):
@@ -851,6 +860,161 @@ class AmberParm(AmberFormat, Structure):
             atom.vx = vels[i3  ]
             atom.vy = vels[i3+1]
             atom.vz = vels[i3+2]
+
+    #===================================================
+
+    @needs_openmm
+    def omm_nonbonded_force(self, nonbondedMethod=None,
+                            nonbondedCutoff=8*u.angstroms,
+                            switchDistance=0*u.angstroms,
+                            ewaldErrorTolerance=0.0005,
+                            reactionFieldDielectric=78.5):
+        """
+        Creates the OpenMM NonbondedForce (and CustomNonbondedForce if
+        necessary) to define the nonbonded interatomic potential for this
+        system. A CustomNonbondedForce is used for the r^-4 part of the 12-6-4
+        Lennard-Jones potential as well as any modified off-diagonal (i.e.,
+        NBFIX) terms
+
+        Parameters
+        ----------
+        nonbondedMethod : cutoff method
+            This is the cutoff method. It can be either the NoCutoff,
+            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+            simtk.openmm.app namespace
+        nonbondedCutoff : float or distance Quantity
+            The nonbonded cutoff must be either a floating point number
+            (interpreted as nanometers) or a Quantity with attached units. This
+            is ignored if nonbondedMethod is NoCutoff.
+        switchDistance : float or distance Quantity
+            The distance at which the switching function is turned on for van
+            der Waals interactions. This is ignored when no cutoff is used, and
+            no switch is used if switchDistance is 0, negative, or greater than
+            the cutoff
+        ewaldErrorTolerance : float=0.0005
+            When using PME or Ewald, the Ewald parameters will be calculated
+            from this value
+        reactionFieldDielectric : float=78.5
+            If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+            region beyond the cutoff is treated using a reaction field method
+            with this dielectric constant. It should be set to 1 if another
+            implicit solvent model is being used (e.g., GB)
+
+        Returns
+        -------
+        NonbondedForce [, CustomNonbondedForce]
+            If a CustomNonbondedForce is necessary, the return value is a
+            2-element tuple of NonbondedForce, CustomNonbondedForce. If only a
+            NonbondedForce is necessary, that is the return value
+        """
+        if not self.atoms: return None
+        nonbfrc = super(AmberParm, self).omm_nonbonded_force(
+                nonbondedMethod, nonbondedCutoff, switchDistance,
+                ewaldErrorTolerance, reactionFieldDielectric
+        )
+        hasnbfix = self.has_NBFIX()
+        has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
+        if not hasnbfix and not has1264:
+            return nonbfrc
+
+        # We need a CustomNonbondedForce... determine what it needs to calculate
+        if hasnbfix and has1264:
+            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r4*r2;'
+                                            'r4=r2*r2; r2=r^2;'
+                                            'a=acoef(type1, type2);'
+                                            'b=bcoef(type1, type2);'
+                                            'c=ccoef(type1, type2);')
+        elif hasnbfix:
+            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2;'
+                                            'r2=r^2; a=acoef(type1, type2);'
+                                            'b=bcoef(type1, type2);')
+        elif has1264:
+            force = mm.CustomNonbondedForce('-c/r^4; c=ccoef(type1, type2);')
+
+        # Set up the force with all of the particles
+        force.addPerParticleParameter('type')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        for atom in self.atoms: force.addParticle([atom.nb_idx-1])
+
+        # Now construct the lookup tables
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        if hasnbfix:
+            ntypes = self.parm_data['POINTERS'][NTYPES]
+            acoef = [0 for i in xrange(ntypes*ntypes)]
+            parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
+            bcoef = acoef[:]
+            parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
+            if has1264:
+                ccoef = acoef[:]
+                parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+            afac = sqrt(ene_conv) * length_conv**6
+            bfac = ene_conv * length_conv**6
+            cfac = ene_conv * length_conv**4
+            nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+            for i in xrange(ntypes):
+                for j in xrange(ntypes):
+                    idx = nbidx[ntypes*i+j] - 1
+                    ii = i + ntypes * j
+                    acoef[ii] = sqrt(parm_acoef[idx]) * afac
+                    bcoef[ii] = parm_bcoef[idx] * bfac
+                    if has1264:
+                        ccoef[ii] = parm_ccoef[idx] * cfac
+            force.addTabulatedFunction('acoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, acoef))
+            force.addTabulatedFunction('bcoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+            if has1264:
+                force.addTabulatedFunction('ccoef',
+                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+            # Our CustomNonbondedForce is taking care of the LJ part of our
+            # potential, so we need to go through nonbfrc and zero-out the
+            # Lennard-Jones parameters, but keep the charge parameters in place.
+            for i in xrange(nonbfrc.getNumParticles()):
+                chg, sig, eps = nonbfrc.getParticleParameters(i)
+                nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
+            # We still let the NonbondedForce handle our nonbonded exceptions,
+            # but we may have to modify the Lennard-Jones part with
+            # off-diagonal modifications. Offload this to a private method so it
+            # can be overridden in the ChamberParm class
+            self._modify_nonb_exceptions(nonbfrc, force)
+        elif has1264:
+            # Here we have JUST the r^-4 part, since the hasnbfix block above
+            # handled the "hasnbfix and has1264" case
+            ccoef = [0 for i in xrange(ntypes*ntypes)]
+            parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+            cfac = ene_conv * length_conv**4
+            nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+            for i in xrange(ntypes):
+                for j in xrange(ntypes):
+                    idx = nbidx[ntypes*i+j] - 1
+                    ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+            force.addTabulatedFunction('ccoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+            # Copy the exclusions
+            for ii in xrange(nonbfrc.getNumExceptions()):
+                i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+                force.addExclusion(i, j)
+        # Copy the switching function information to the CustomNonbondedForce
+        if nonbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+        # Set the dispersion correction on (by default)
+        force.setUseLongRangeCorrection(True)
+        # Determine which nonbonded method we should use and transfer the
+        # nonbonded cutoff
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
+
+        return nonbfrc, force
 
     #===================================================
 
@@ -914,14 +1078,17 @@ class AmberParm(AmberFormat, Structure):
 
     @property
     def chamber(self):
+        """ Whether this instance uses the CHARMM force field """
         return False
 
     @property
     def amoeba(self):
+        """ Whether this instance uses the Amoeba force field """
         return False
 
     @property
     def has_cmap(self):
+        """ Whether this instance has correction map terms or not """
         return False
 
     #===========  PRIVATE INSTANCE METHODS  ============
@@ -1005,6 +1172,10 @@ class AmberParm(AmberFormat, Structure):
         natom = self.parm_data['POINTERS'][NATOM]
         res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom+1]
         try:
+            atnums = self.parm_data['ATOMIC_NUMBER']
+        except KeyError:
+            atnums = [1 for i in xrange(natom)]
+        try:
             res_icd = self.parm_data['RESIDUE_ICODE']
         except KeyError:
             res_icd = ['' for i in xrange(self.parm_data['POINTERS'][NRES])]
@@ -1016,9 +1187,14 @@ class AmberParm(AmberFormat, Structure):
             resstart = res_ptr[i] - 1
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
-                atom = Atom()
-                self.residues.add_atom(atom, resname, i, res_chn[i], res_icd[i])
-                self.atoms.append(atom)
+                if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
+                    atom = ExtraPoint()
+                else:
+                    if atnums[j] == 0:
+                        atom = ExtraPoint()
+                    else:
+                        atom = Atom()
+                self.add_atom(atom, resname, i, res_chn[i], res_icd[i])
 
     #===================================================
 
@@ -1127,12 +1303,12 @@ class AmberParm(AmberFormat, Structure):
             scnb = self.parm_data['SCNB_SCALE_FACTOR']
         except KeyError:
             scnb = [2.0 for i in self.parm_data['DIHEDRAL_FORCE_CONSTANT']]
-        for terms in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
-                         self.parm_data['DIHEDRAL_PERIODICITY'],
-                         self.parm_data['DIHEDRAL_PHASE'],
-                         scee, scnb):
+        for k, per, ph, e, n in zip(self.parm_data['DIHEDRAL_FORCE_CONSTANT'],
+                                    self.parm_data['DIHEDRAL_PERIODICITY'],
+                                    self.parm_data['DIHEDRAL_PHASE'],
+                                    scee, scnb):
             self.dihedral_types.append(
-                    DihedralType(*terms, list=self.dihedral_types)
+                    DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
         dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
         for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
@@ -1218,7 +1394,7 @@ class AmberParm(AmberFormat, Structure):
         nres = len(self.residues)
         data['POINTERS'][NRES] = nres
         self.pointers['NRES'] = nres
-        data['RESIDUE_LABEL'] = [res.name for res in self.residues]
+        data['RESIDUE_LABEL'] = [res.name[:4] for res in self.residues]
         data['RESIDUE_POINTER'] = [res.atoms[0].idx+1 for res in self.residues]
         if 'RESIDUE_NUMBER' in data:
             data['RESIDUE_NUMBER'] = [res.number for res in self.residues]
@@ -1383,7 +1559,7 @@ class AmberParm(AmberFormat, Structure):
         self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
         self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
         self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
-        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
+        self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=1)
         self.add_flag('LENNARD_JONES_ACOEF', '5E16.8', num_items=0)
         self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', num_items=0)
@@ -1404,7 +1580,7 @@ class AmberParm(AmberFormat, Structure):
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
-            self.add_flag('BOX_DIMENSIONS', '10I8', num_items=4)
+            self.add_flag('BOX_DIMENSIONS', '5E16.8', num_items=4)
         self.add_flag('RADIUS_SET', '1a80', num_items=0)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)
@@ -1437,6 +1613,59 @@ class AmberParm(AmberFormat, Structure):
         self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
         self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
         self.recalculate_LJ()
+
+    #===================================================
+
+    @needs_openmm
+    def _modify_nonb_exceptions(self, nonbfrc, customforce):
+        """
+        Modifies the nonbonded force exceptions and the custom nonbonded force
+        exclusions. The exceptions on the nonbonded force might need to be
+        adjusted if off-diagonal modifications on the L-J matrix are present
+        """
+        # To get into this routine, we already needed to know that nbfix is
+        # present
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        atoms = self.atoms
+        try:
+            acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
+            bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
+        except KeyError:
+            acoef = self.parm_data['LENNARD_JONES_ACOEF']
+            bcoef = self.parm_data['LENNARD_JONES_BCOEF']
+        nbidx = self.parm_data['NONBONDED_PARM_INDEX']
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        sigma_scale = 2**(-1/6) * length_conv
+        for ii in xrange(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            if qq == 0 and (ss == 0 or ee == 0):
+                # Copy this exclusion as-is... no need to modify the nonbfrc
+                # exception parameters
+                customforce.addExclusion(i, j)
+                continue
+            # Figure out what the 1-4 scaling parameters were for this pair...
+            unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
+                               self.atoms[j].epsilon_14) * ene_conv
+            try:
+                one_scnb = ee.value_in_unit(u.kilojoules_per_mole) / unscaled_ee
+            except ZeroDivisionError:
+                one_scnb = 1
+            id1 = atoms[i].nb_idx - 1
+            id2 = atoms[j].nb_idx - 1
+            idx = nbidx[ntypes*id1+id2] - 1
+            a = acoef[idx]
+            b = bcoef[idx]
+            if b == 0:
+                epsilon = 0.0
+                sigma = 0.5
+            else:
+                # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
+                rmin = (a / b * 2)**(1/6)
+                epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
+                sigma = rmin * sigma_scale
+            nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
+            customforce.addExclusion(i, j)
 
     #===================================================
 
@@ -1526,32 +1755,47 @@ class Rst7(object):
     """
     Amber input coordinate (or restart coordinate) file. Front-end for the
     readers and writers, supports both NetCDF and ASCII restarts.
+
+    Parameters
+    ----------
+    filename : str, optional
+        If a filename is provided, this file is parsed and the Rst7 data
+        populated from that file. The format (ASCII or NetCDF) is autodetected
+    natom : int, optional
+        If no filename is provided, this value is required. If a filename is
+        provided, this value is ignored (and instead set to the value of natom
+        from the coordinate file). This is the number of atoms for which we have
+        coordinates. If not provided for a new file, it *must* be set later.
+    title : str, optional
+        For a file that is to be written, this is the title that will be given
+        to that file. Default is an empty string
+    time : float, optional
+        The time to write to the restart file. This is cosmetic. Default is 0
     """
 
-    def __init__(self, filename=None, natom=None, title='', hasvels=False,
-                 hasbox=False, time=0.0):
+    def __init__(self, filename=None, natom=None, title='', time=0.0):
         """
         Optionally takes a filename to read. This is deprecated, though, as the
         alternative constructor "open" should be used instead
         """
         self.coordinates = []
-        self.velocities = []
-        self.box = []
-        self.hasvels = hasvels
-        self.hasbox = hasbox
+        self.vels = None
+        self.box = None
         self.natom = natom
         self.title = title
         self.time = 0
         if filename is not None:
             self.filename = filename
-            warn('Use Rst7.open() constructor instead of default constructor '
-                 'to parse restart files.', DeprecationWarning)
             self._read(filename)
 
     @classmethod
     def open(cls, filename):
-        """
-        Constructor that opens and parses an input coordinate file
+        """ Constructor that opens and parses an input coordinate file
+        
+        Parameters
+        ----------
+        filename : str
+            Name of the file to parse
         """
         inst = cls()
         inst.filename = filename
@@ -1581,10 +1825,8 @@ class Rst7(object):
                 raise ReadError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
-        self.hasvels = f.hasvels
-        self.hasbox = f.hasbox
         if f.hasvels:
-            self.velocities = f.velocities
+            self.vels = f.velocities
         if f.hasbox:
             self.box = f.box
         self.title = f.title
@@ -1597,13 +1839,6 @@ class Rst7(object):
              DeprecationWarning)
         return self.coordinates
    
-    @property
-    def vels(self):
-        """ Deprecated for velocities now """
-        warn('vels attribute of Rst7 is deprecated. Use velocities instead',
-             DeprecationWarning)
-        return self.velocities
-
     @classmethod
     def copy_from(cls, thing):
         """
@@ -1614,10 +1849,8 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        inst.hasvels = thing.hasvels
-        if hasattr(thing, 'velocities'): inst.velocities = thing.velocities[:]
-        inst.hasbox = thing.hasbox
-        if hasattr(thing, 'box'): inst.box = thing.box[:]
+        if hasattr(thing, 'vels'): inst.vels = copy.deepcopy(thing.vels)
+        if hasattr(thing, 'box'): inst.box = copy.deepcopy(thing.box)
         inst.time = thing.time
 
         return inst
@@ -1634,8 +1867,8 @@ class Rst7(object):
             if self.natom is None:
                 raise RuntimeError('Number of atoms must be set for NetCDF '
                                    'Restart files before write time')
-            f = NetCDFRestart.open_new(fname, self.natom, self.hasbox,
-                                       self.hasvels, self.title)
+            f = NetCDFRestart.open_new(fname, self.natom, self.box is not None,
+                                       self.vels is not None, self.title)
         else:
             f = AmberAsciiRestart(fname, 'w', natom=self.natom,
                                   title=self.title)
@@ -1643,11 +1876,57 @@ class Rst7(object):
         f.time = self.time
         # Now write the coordinates
         f.coordinates = self.coordinates
-        if self.hasvels:
-            f.velocities = self.velocities
-        if self.hasbox:
+        if self.vels is not None:
+            f.velocities = self.vels
+        if self.box is not None:
             f.box = self.box
         f.close()
+
+    @property
+    def positions(self):
+        """ Atomic coordinates with units """
+        try:
+            return u.Quantity(self.coordinates.reshape(self.natom, 3),
+                              u.angstroms)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.coordinates[i:i+3] for i in xrange(0, natom3, 3)] *
+                        u.angstroms)
+
+    @property
+    def velocities(self):
+        """ Atomic velocities with units """
+        try:
+            return u.Quantity(self.vels.reshape(self.natom, 3),
+                              u.angstroms/u.picoseconds)
+        except AttributeError:
+            natom3 = self.natom * 3
+            return ([self.vels[i:i+3] for i in xrange(0, natom3, 3)] *
+                        u.angstroms/u.picoseconds)
+
+    @property
+    def box_vectors(self):
+        """ Unit cell vectors with units """
+        if self.box is None: return None
+        return box_lengths_and_angles_to_vectors(*self.box)
+
+    @property
+    def hasbox(self):
+        """ Whether or not this Rst7 has unit cell information """
+        try:
+            return bool(self.box)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
+
+    @property
+    def hasvels(self):
+        """ Whether or not this Rst7 has velocities """
+        try:
+            return bool(self.vels)
+        except ValueError:
+            # This only occurs for numpy arrays, so it must be set...
+            return True
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

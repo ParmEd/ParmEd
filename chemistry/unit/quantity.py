@@ -713,7 +713,7 @@ class Quantity(object):
                     else:
                         for i in range(len(value)):
                             value[i] = factor*value[i]
-            except TypeError as ex:
+            except TypeError:
                 if isinstance(value, tuple):
                     value = tuple([self._scale_sequence(x, factor, post_multiply) for x in value])
                 else:

@@ -6,7 +6,7 @@ Amber parameter topology file editor
 Build Status
 ============
 
-[![Linux Build Status](https://travis-ci.org/swails/ParmEd.svg?branch=master)](https://travis-ci.org/swails/ParmEd)
+[![Linux Build Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
 
 License
 =======

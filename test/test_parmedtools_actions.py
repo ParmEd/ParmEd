@@ -6,6 +6,7 @@ from __future__ import division
 from chemistry import periodic_table
 from chemistry.amber.readparm import AmberParm, ChamberParm, AmoebaParm
 from chemistry.exceptions import MoleculeWarning, CharmmPSFWarning
+from compat24 import all
 from copy import copy
 try:
     from itertools import izip as zip
@@ -75,8 +76,25 @@ class TestNonParmActions(unittest.TestCase):
         self.assertTrue(parm.has_cmap)
         self.assertEqual(parm.ptr('ifbox'), 0)
 
+    def testChamberGlobbing(self):
+        """ Test globbing in the chamber action """
+        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+                                module='psf')
+        a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                       '-toppar', get_fn('*_all22_prot.inp'),
+                       '-crd', get_fn('ala_ala_ala.pdb'))
+        a.execute()
+        parm = a.parm
+        self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
+        self.assertTrue(parm.chamber)
+        self.assertTrue(parm.has_cmap)
+        self.assertEqual(parm.ptr('ifbox'), 0)
+
     def testChamberNbfix(self):
         """ Test the chamber action with a complex system using NBFIX """
+        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+                                module='psf')
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
                        '-param %s' % get_fn('par_all36_prot.prm'),
                        '-str %s' % get_fn('toppar_water_ions.str'),
@@ -451,6 +469,12 @@ class TestAmberParmActions(unittest.TestCase):
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(atom.screen, parm.parm_data['SCREEN'][i])
             self.assertEqual(atom.screen, 0.0)
+        PT.change(parm, 'TREE_CHAIN_CLASSIFICATION', ':1-2', 'ABC').execute()
+        for i, atom in enumerate(parm.atoms):
+            self.assertEqual(atom.tree,
+                             parm.parm_data['TREE_CHAIN_CLASSIFICATION'][i])
+            if atom.residue.idx < 2:
+                self.assertEqual(atom.tree, 'ABC')
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
@@ -2042,6 +2066,10 @@ class TestAmoebaParmActions(unittest.TestCase):
         TrackedList = type(parm.bond_types)
         objs_with_bond = []
         for attribute in dir(parm):
+            # skip descriptors
+            if attribute in ('topology', 'positions', 'box_vectors',
+                             'velocities'):
+                continue
             attr = getattr(parm, attribute)
             if not isinstance(attr, TrackedList): continue
             for obj in attr:
@@ -2149,3 +2177,6 @@ class TestAmoebaParmActions(unittest.TestCase):
                 self.assertEqual(atom.mass, 3.0)
         self.assertAlmostEqual(sum(amoebaparm.parm_data['MASS']),
                                sum(parm.parm_data['MASS']), places=6)
+
+if __name__ == '__main__':
+    unittest.main()

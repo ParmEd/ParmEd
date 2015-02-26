@@ -3,6 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
+from compat24 import all
 from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
 import os
@@ -43,7 +44,7 @@ class TestReadParm(unittest.TestCase):
         # Now check the restart file
         rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
         coords = rst.coordinates
-        vels = rst.velocities
+        vels = rst.vels
         for i, atom in enumerate(gasparm.atoms):
             i3 = i * 3
             self.assertEqual(coords[i3  ], atom.xx)
@@ -221,6 +222,7 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertFalse(restart.hasvels)
         if has_numpy():
             import numpy as np
+            self.assertIsInstance(restart.coordinates, np.ndarray)
             # Hack numpy off so we test that code path, too
             asciicrd.np = None
             asciicrd.array = array
@@ -232,7 +234,7 @@ class TestCoordinateFiles(unittest.TestCase):
         else:
             restartarray = restart
             crdsum = sum(restart.coordinates)
-        self.assertIsInstance(restart.coordinates, np.ndarray)
+        self.assertIsInstance(restartarray.coordinates, array)
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
 class TestAmberMask(unittest.TestCase):
@@ -252,23 +254,124 @@ class TestAmberMask(unittest.TestCase):
         for idx in mask_res1.Selected():
             self.assertEqual(parm.atoms[idx].residue.idx, 0)
         self.assertEqual(list(range(13)), list(mask_res1.Selected()))
+        sel = mask_res1.Selection()
+        for atom in parm.atoms:
+            if atom.residue.idx == 0:
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
             self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
+        sel = mask_resala.Selection()
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
         
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
+        sel = mask_atname.Selection()
+        for atom in parm.atoms:
+            if atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_resat.Selection()), 12)
         for idx in mask_resat.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
             self.assertEqual(parm.atoms[idx].residue.name, 'ALA')
+        sel = mask_resat.Selection()
+        for atom in parm.atoms:
+            if atom.residue.name == 'ALA' and atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
 
         self.assertEqual(sum(mask_attyp.Selection()), 341)
         for idx in mask_attyp.Selected():
             self.assertEqual(parm.atoms[idx].type, 'CT')
+        sel = mask_attyp.Selection()
+        for atom in parm.atoms:
+            if atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+    def testCompoundMask(self):
+        """ Tests compound/complex Amber selection masks """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        mask1 = mask.AmberMask(parm, ':1-6@CA,C,O,N')
+        mask2 = mask.AmberMask(parm, ':1-6,ALA,10@%CT | @O')
+        mask3 = mask.AmberMask(parm, '(:1-9,ALA,GLY@CA,H*)|@%CT')
+
+        sel = mask1.Selection()
+        for atom in parm.atoms:
+            if (atom.residue.idx < 6 and atom.name in ('CA', 'C', 'O', 'N')):
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask2.Selection()
+        for atom in parm.atoms:
+            if (atom.residue.idx < 6 or atom.residue.name == 'ALA' or
+                    atom.residue.idx == 9) and atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            elif atom.name == 'O':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask3.Selection()
+        for atom in parm.atoms:
+            res = atom.residue
+            if ((res.idx < 9 or res.name in ('ALA', 'GLY')) and
+                    (atom.name == 'CA' or atom.name.startswith('H'))):
+                self.assertEqual(sel[atom.idx], 1)
+            elif atom.type == 'CT':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+    def testDistanceBasedMask(self):
+        """ Test distance-based mask selections """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        # All atoms within 5 A of residue 8
+        mask1 = mask.AmberMask(parm, ':8<@5')
+        # All atoms more than 10 A away from residue 1
+        mask2 = mask.AmberMask(parm, ':1>:10')
+
+        sel = mask1.Selection()
+        for i, atom in enumerate(parm.atoms):
+            within = 0
+            for atom2 in parm.residues[7].atoms:
+                dx = atom2.xx - atom.xx
+                dy = atom2.xy - atom.xy
+                dz = atom2.xz - atom.xz
+                if (dx*dx + dy*dy + dz*dz) < 25:
+                    within = 1
+                    break
+            self.assertEqual(sel[i], within)
+
+        sel = mask2.Selection()
+        self.assertEqual(sum(sel), 1588)
+        for i, res in enumerate(parm.residues):
+            within = 0
+            for atom in res.atoms:
+                for atom2 in parm.residues[0].atoms:
+                    dx = atom2.xx - atom.xx
+                    dy = atom2.xy - atom.xy
+                    dz = atom2.xz - atom.xz
+                    if (dx*dx + dy*dy + dz*dz) > 100:
+                        within = 1
+                        break
+                if within: break
+            for atom in res.atoms:
+                self.assertEqual(sel[atom.idx], within)
 
 class TestWriteFiles(unittest.TestCase):
     
@@ -460,14 +563,14 @@ class TestWriteFiles(unittest.TestCase):
         self.assertFalse(rst.hasbox)
         for x1, x2 in zip(rst.coordinates, range(60)):
             self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(60))):
+        for x1, x2 in zip(rst.vels, reversed(range(60))):
             self.assertAlmostEqual(x1, x2, places=5)
         rst = readparm.Rst7.open(get_fn('testcvb.rst7', written=True))
         self.assertTrue(rst.hasvels)
         self.assertTrue(rst.hasbox)
         for x1, x2 in zip(rst.coordinates, range(45)):
             self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.velocities, reversed(range(45))):
+        for x1, x2 in zip(rst.vels, reversed(range(45))):
             self.assertAlmostEqual(x1, x2, places=5)
         for x1, x2 in zip(rst.box, box):
             self.assertEqual(x1, x2)
@@ -544,3 +647,6 @@ class TestObjectAPIs(unittest.TestCase):
 
 if not has_numpy():
     del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
+
+if __name__ == '__main__':
+    unittest.main()

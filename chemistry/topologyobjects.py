@@ -8,11 +8,12 @@ from __future__ import division
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
-from chemistry.constants import TINY
-from chemistry import unit as u
-from chemistry.periodic_table import Mass
+from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+from chemistry.periodic_table import Mass, Element as _Element
+import chemistry.unit as u
 from compat24 import all, property
 import copy
+import math
 import warnings
 try:
     from itertools import izip as zip
@@ -26,7 +27,9 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'StretchBend', 'StretchBendType', 'TorsionTorsion',
            'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
-           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley']
+           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
+           'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
+           'OutOfPlaneExtraPointFrame']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -65,7 +68,7 @@ class _ListItem(object):
 
     Attributes
     ----------
-    idx : int
+    idx : ``int``
         This is intended to be a read-only variable that determines where in the
         list this particular object is. If there is no `list` attribute for this
         object, or the item is not in the list at all, `idx` is -1
@@ -77,8 +80,8 @@ class _ListItem(object):
     indexing only needs to be done once, at most, for the entire list (until
     changes are made that could change the indexing).
 
-    The `idx` lookup in a TrackedList is therefore an O(1) operation, while it
-    is O(N^2) for standard containers.
+    The ``idx`` lookup in a TrackedList is therefore an O(1) operation, while
+    it is O(N) for standard containers (O(N^2) for looking up *all* indexes).
     """
 
     @property
@@ -117,13 +120,13 @@ class _FourAtomTerm(object):
 
     Parameters
     ----------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The first atom in the term
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The second atom in the term
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom in the term
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom in the term
 
     Notes
@@ -159,9 +162,9 @@ class _ParameterType(object):
 
     Attributes
     ----------
-    used : bool
-        If True, then this parameter type should be considered `used`. If False,
-        it is not being used and does not need to be printed.
+    used : ``bool``
+        If ``True``, then this parameter type should be considered *used*. If
+        ``False``, it is not being used and does not need to be printed.
     """
 
     def __init__(self):
@@ -174,9 +177,9 @@ def _delete_from_list(list, item):
 
     Parameters
     ----------
-    list : list
+    list : ``list``
         The list from which an item will be deleted
-    item : object
+    item : ``object``
         The object to delete from the list
     """
     list.pop(list.index(item))
@@ -196,191 +199,197 @@ def _safe_assigns(dest, source, attrs):
 class Atom(_ListItem):
     """ 
     An atom. Only use these as elements in AtomList instances, since AtomList
-    will keep track of when indexes and other stuff needs to be updated.
+    will keep track of when indexes and other stuff needs to be updated. All
+    parameters are optional.
 
     Parameters
     ----------
-    list : AtomList=None
+    atomic_number : ``int``
+        The atomic number of this atom
+    name : ``str``
+        The name of this atom
+    type : ``str``
+        The type name of this atom
+    charge : ``float``
+        The partial atomic charge of this atom in fractions of an electron
+    mass : ``float``
+        The atomic mass of this atom in daltons
+    nb_idx : ``int``
+        The nonbonded index. This is a pointer that is relevant in the context
+        of an Amber topology file and identifies its Lennard-Jones atom type
+    radii : ``float``
+        The intrinsic solvation radius of this atom.
+    screen : ``float``
+        The Generalized Born screening factor for this atom.
+    occupancy : ``float``
+        The occupancy of the atom (see PDB file)
+    bfactor : ``float``
+        The B-factor of the atom (see PDB file)
+    altloc : ``str``
+        Alternate location indicator (see PDB file)
+
+    Other Parameters
+    ----------------
+    list : :class:`AtomList`
         The AtomList that this atom belongs to. If None, this atom does not
         belong to any list. This can be any iterable, but should typically be an
         AtomList or None
-    atomic_number : int=0
-        The atomic number of this atom
-    name : str=''
-        The name of this atom
-    type : str=''
-        The type name of this atom
-    charge : float=0.0
-        The partial atomic charge of this atom in fractions of an electron
-    mass : float=0.0
-        The atomic mass of this atom in daltons
-    nb_idx : int=0
-        The nonbonded index. This is a pointer that is relevant in the context
-        of an Amber topology file and identifies its Lennard-Jones atom type
-    radii : float=0.0
-        The intrinsic solvation radius of this atom.
-    screen : float=0.0
-        The Generalized Born screening factor for this atom.
-    tree : str='BLA'
+    tree : ``str``
         The tree chain identifier assigned to this atom. Relevant in the context
         of an Amber topology file, and not used for very much.
-    join : int=0
+    join : ``int``
         The 'join` property of atoms stored in the Amber topology file. At the
         time of writing this class, `join` is unused, but still oddly required.
         Add support for future-proofing
-    irotat : int=0
+    irotat : ``int``
         The `irotat` property of atoms stored in the Amber topology file.
         Unused, but included for future-proofing.
-    occupancy : float=0.0
-        The occupancy of the atom (see PDB file)
-    bfactor : float=0.0
-        The B-factor of the atom (see PDB file)
-    altloc : str=''
-        Alternate location indicator (see PDB file)
-    number : int=-1
+    number : ``int``
         The serial number given to the atom (see PDB file)
+    rmin : ``float``
+        The Rmin/2 Lennard-Jones parameter for this atom. Default evaluates to 0
+    epsilon : ``float``
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        evaluates to 0
+    rmin14 : ``float``
+        The Rmin/2 Lennard-Jones parameter for this atom in 1-4 interactions.
+        Default evaluates to 0
+    epsilon14 : ``float``
+        The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
+        interactions. Default evaluates to 0
 
-    Attributes
-    ----------
-    atomic_number : int
-        The atomic number of this atom
-    list : AtomList (or other iterable)
-        The iterable that (possibly) contains this atom
-    element : int
+    Other Attributes
+    ----------------
+    element : ``int``
         This is an alias for atomic_number
-    name : str
-        The name of this atom
-    type : str
-        The name of the atom type assigned to this atom
-    atom_type : AtomType
+    atom_type : :class:`AtomType`
         In some cases, "type" is an ambiguous choice of an integer serial number
         or a string descriptor. In this case, atom_type is an AtomType instance
         that disambiguates this discrepancy.
-    mass : float
-        The mass, in daltons, of this atom
-    charge : float
-        The charge, in fractions of an electron, of this atom
-    nb_idx : int
-        The nonbonded Lennard-Jones index. Required when it is part of an Amber
-        topology file instance
-    tree : str
-        The tree chain classification string. Applies to the Amber topology file
-        instance, but is not used for much.
-    join : int=0
-        The 'join` property of atoms stored in the Amber topology file. At the
-        time of writing this class, `join` is unused, but still oddly required.
-        Add support for future-proofing
-    irotat : int=0
-        The `irotat` property of atoms stored in the Amber topology file.
-        Unused, but included for future-proofing.
-    occupancy : float
-        The occupancy of the atom (see PDB file)
-    bfactor : float
-        The B-factor of the atom (see PDB file)
-    altloc : str
-        The alternate location indicator (see PDB file)
-    radii : float
-        The intrinsic solvation radius of the atom
-    screen : float
-        The GB screening factor of the atom
-    idx : int
+    anisou : ``numpy.ndarray(float64) (or list of floats)``
+        Anisotropic temperature scaling factors. This is a 6-element numpy array
+        (if numpy is not available, it is a 6-element list) of floating point
+        numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),
+        U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.
+    idx : ``int``
         The index of this atom in the list. Set to -1 if this atom is not part
         of a list or the index cannot otherwise be determined (i.e., if the
         containing list does not support indexing its members)
-    residue : Residue
+    residue : :class:`Residue`
         The Residue that this atom belongs to. This is assigned when this atom
         is passed to `Residue.add_atom` -- see below for more information. Until
         it is set there, it is None
-    other_locations : dict of Atoms
+    other_locations : ``dict`` of :class:`Atom`
         A dict of Atom instances that represent alternate conformers of this
         atom. The keys are the `altloc` characters for those Atoms.
-    bonds : list of Bond instances
+    bonds : ``list`` of :class:`Bond`
         list of Bond objects in which this atom is a member. This attribute
         should not be modified.
-    angles : list of Angle instances
+    angles : ``list`` of :class:`Angle`
         list of Angle objects in which this atom is a member. This attribute
         should not be modified.
-    dihedrals : list of Dihedral instances
+    dihedrals : ``list`` of :class:`Dihedral`
         list of Dihedral objects in which this atom is a member. This attribute
         should not be modified.
-    urey_bradleys : list of UreyBradley instances
+    urey_bradleys : ``list`` of :class:`UreyBradley`
         list of UreyBradley objects in which this atom is a member (CHARMM,
         AMOEBA). This attribute should not be modified.
-    impropers : list of Improper instances
+    impropers : ``list`` of :class:`Improper`
         list of Improper objects in which the atom is a member (CHARMM). This
         attribute should not be modified.
-    cmaps : list of Cmap instances
+    cmaps : ``list`` of :class:`Cmap`
         list of Cmap objects in which the atom is a member (CHARMM, AMOEBA).
         This attribute should not be modified.
-    tortors : list of TorsionTorsion instances
+    tortors : ``list`` of :class:`TorsionTorsion`
         list of TorsionTorsion objects in which the atom is a member (AMOEBA).
         This attribute should not be modified.
-    bond_partners : list of Atom instances
+    bond_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom is bonded. Do not modify this
         attribute -- it will almost certainly not do what you think it will
-    angle_partners : list of Atom instances
+    angle_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms an angle, but not a bond. Do not
         modify this attribute -- it will almost certainly not do what you think
         it will
-    dihedral_partners : list of Atom instances
+    dihedral_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms an dihedral, but not a bond or
         angle. Do not modify this attribute -- it will almost certainly not do
         what you think it will
-    tortor_partners : list of Atom instances
+    tortor_partners : ``list`` of :class:`Atom`
         list of Atoms to which this atom forms a coupled Torsion-Torsion, but
         not a bond or angle (AMOEBA). Do not modify this attribute -- it will
         almost certainly not do what you think it will
-    exclusion_partners : list of Atom instances
+    exclusion_partners : ``list`` of :class:`Atom`
         list of Atoms with which this atom is excluded, but not bonded, angled,
         or dihedraled to. Do not modify this attribute -- it will almost
         certainly not do what you think it will
-    marked : int
+    marked : ``int``
         Mainly for internal use, it is used to indicate when certain atoms have
         been "marked" when traversing the bond network identifying topological
         features (like molecules and rings)
-    number : int
+    children : ``list`` of :class:`ExtraPoint`
+        This is the list of "child" ExtraPoint objects bonded to this atom
+    number : ``int``
         The serial number of the atom in the input structure (e.g., PDB file).
         If not present in the original structure, a default value of -1 is used
+    rmin : ``float``
+        The Rmin/2 Lennard-Jones parameter for this atom. Default value is 0.
+        If not set, it is taken from the `atom_type` attribute (if available)
+    epsilon : ``float``
+        The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+        value is 0. If not set, it is taken from the `atom_type` attribute (if
+        available)
+    rmin_14 : ``float``
+        The Rmin/2 L-J parameter for 1-4 pairs. Default value is `rmin` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
+    epsilon_14 : ``float``
+        The epsilon L-J parameter for 1-4 pairs. Default value is `epsilon` (see
+        above). If not set, it is taken from the `atom_type` attribute (if
+        available).
 
     Possible Attributes
     -------------------
-    xx : float
+    xx : ``float``
         The X-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    xy : float
+    xy : ``float``
         The Y-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    xz : float
+    xz : ``float``
         The Z-component of the position of this atom. Only present if
         coordinates have been loaded. Otherwise raises AttributeError
-    vx : float
+    vx : ``float``
         The X-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    vy : float
+    vy : ``float``
         The Y-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    vz : float
+    vz : ``float``
         The Z-component of the velocity of this atom. Only present if the
         velocities have been loaded. Otherwise raises AttributeError
-    type_idx : int
+    type_idx : ``int``
         The AMOEBA atom type index. Only present if initialized with the AMOEBA
         force field. Otherwise raises AttributeError.
-    class_idx : int
+    class_idx : ``int``
         The AMOEBA class type index Only present if initialized with the AMOEBA
         force field. Otherwise raises AttributeError.
-    multipoles : list(float)
+    multipoles : ``list(float)``
         The list of the 10 multipole moments up through quadrupoles Only present
         if initialized with the AMOEBA force field. Otherwise raises
         AttributeError.
-    polarizability : list(float)
+    polarizability : ``list(float)``
         The polarizability of the atom. Only present if initialized with the
         AMOEBA force field. Otherwise raises AttributeError.
-    vdw_parent : Atom
+    vdw_parent : :class:`Atom`
         In the AMOEBA force field, this is the parent atom for the van der Waals
         term
-    vdw_weight : float
+    vdw_weight : ``float``
         In the AMOEBA force field, this is the weight of the van der Waals
         interaction on the parent atom
+    segid : ``str``
+        In CHARMM PDB and PSF files, the SEGID behaves similarly to the residue
+        chain ID and is used to separate the total system into representative
+        parts. This will only be set if read in from the input structure.
 
     Notes
     -----
@@ -422,7 +431,8 @@ class Atom(_ListItem):
     def __init__(self, list=None, atomic_number=0, name='', type='',
                  charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
-                 bfactor=0.0, altloc='', number=-1):
+                 bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
+                 rmin14=None, epsilon14=None):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -455,24 +465,34 @@ class Atom(_ListItem):
         self.other_locations = {} # A dict of Atom instances
         self.atom_type = _UnassignedAtomType
         self.number = number
+        self.anisou = None
+        self._rmin = rmin
+        self._epsilon = epsilon
+        self._rmin14 = rmin14
+        self._epsilon14 = epsilon14
+        self.children = []
    
     #===================================================
 
-    def __copy__(self):
-        """ Returns a deep copy of this atom, but not attached to any list """
-        new = type(self)(atomic_number=self.atomic_number, name=self.name,
-                         type=self.type, charge=self.charge, mass=self.mass,
-                         nb_idx=self.nb_idx, radii=self.radii,
-                         screen=self.screen, tree=self.tree, join=self.join,
-                         irotat=self.irotat, occupancy=self.occupancy,
-                         bfactor=self.bfactor, altloc=self.altloc)
-        new.atom_type = self.atom_type
-        for key in self.other_locations:
-            new.other_locations[key] = copy.copy(self.other_locations[key])
-        _safe_assigns(new, self, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
+    @classmethod
+    def _copy(cls, item):
+        new = cls(atomic_number=item.atomic_number, name=item.name,
+                  type=item.type, charge=item.charge, mass=item.mass,
+                  nb_idx=item.nb_idx, radii=item.radii,
+                  screen=item.screen, tree=item.tree, join=item.join,
+                  irotat=item.irotat, occupancy=item.occupancy,
+                  bfactor=item.bfactor, altloc=item.altloc)
+        new.atom_type = item.atom_type
+        for key in item.other_locations:
+            new.other_locations[key] = copy.copy(item.other_locations[key])
+        _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
                       'vdw_parent', 'vdw_weight'))
         return new
+
+    def __copy__(self):
+        """ Returns a deep copy of this atom, but not attached to any list """
+        return type(self)._copy(self)
 
     #===================================================
 
@@ -507,46 +527,126 @@ class Atom(_ListItem):
     def bond_partners(self):
         """ Go through all bonded partners """
         bp = set(self._bond_partners)
+        for p in self._bond_partners:
+            for c in p.children:
+                bp.add(c)
         return sorted(list(bp))
 
     @property
     def angle_partners(self):
         """ List of all angle partners that are NOT bond partners """
         bp = set(self._bond_partners)
-        ap = set(self._angle_partners)
-        return sorted(list(ap - bp))
+        ap = set(self._angle_partners) - bp
+        for p in ap:
+            for c in p.children:
+                ap.add(c)
+        return sorted(list(ap))
 
     @property
     def dihedral_partners(self):
         " List of all dihedral partners that are NOT angle or bond partners "
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners) - ap - bp
+        for p in dp:
+            for c in p.children:
+                dp.add(c)
+        return sorted(list(dp))
 
     @property
     def tortor_partners(self):
         """
         List of all 1-5 partners that are NOT in angle or bond partners. This is
-        _only_ used in the Amoeba force field
+        *only* used in the Amoeba force field
         """
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners) - dp - ap - bp
+        for p in tp:
+            for c in p.children:
+                tp.add(c)
+        return sorted(list(tp))
 
     @property
     def exclusion_partners(self):
         """
         List of all exclusions not otherwise excluded by bonds/angles/torsions
         """
-        ep = set(self._exclusion_partners)
-        tp = set(self._tortor_partners)
-        dp = set(self._dihedral_partners)
-        ap = set(self._angle_partners)
         bp = set(self._bond_partners)
-        return sorted(list(ep - tp - dp - ap - bp))
+        ap = set(self._angle_partners)
+        dp = set(self._dihedral_partners)
+        tp = set(self._tortor_partners)
+        ep = set(self._exclusion_partners) - tp - dp - ap - bp
+        for p in ep:
+            for c in p.children:
+                ep.add(c)
+        return sorted(list(ep))
+
+    #===================================================
+
+    # Lennard-Jones parameters... can be taken from atom_type if it is set.
+    # Otherwise take it from _rmin and _epsilon attributes
+
+    @property
+    def rmin(self):
+        """ Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) """
+        if self._rmin is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin is None):
+                return 0.0
+            return self.atom_type.rmin
+        return self._rmin
+
+    @rmin.setter
+    def rmin(self, value):
+        """ Lennard-Jones Rmin/2 parameter (the Lennard-Jones radius) """
+        self._rmin = value
+
+    @property
+    def epsilon(self):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        if self._epsilon is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon is None):
+                return 0.0
+            return self.atom_type.epsilon
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
+        self._epsilon = value
+
+    @property
+    def rmin_14(self):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        if self._rmin14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin_14 is None):
+                return self.rmin
+            return self.atom_type.rmin_14
+        return self._rmin14
+
+    @rmin_14.setter
+    def rmin_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
+
+    @property
+    def epsilon_14(self):
+        """ The 1-4 Lennard-Jones epsilon parameter """
+        if self._epsilon14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.epsilon_14 is None):
+                return self.epsilon
+            return self.atom_type.epsilon_14
+        return self._epsilon14
+
+    @epsilon_14.setter
+    def epsilon_14(self, value):
+        """ The 1-4 Lennard-Jones Rmin/2 parameter """
+        self._rmin14 = value
 
     #===================================================
 
@@ -562,64 +662,55 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        only_greater : bool=True
+        only_greater : ``bool``
             If True, only atoms whose `idx` value is greater than this `Atom`s
             `idx` will be counted as an exclusion (to avoid double-counting
             exclusions). If False, all exclusions will be counted.
-        index_from : int=0
+        index_from : ``int``
             This is the index of the first atom, and is intended to be 0 (for C-
             and Python-style numbering) or 1 (for Fortran-style numbering, such
             as that used in the Amber and CHARMM topology files)
 
         Returns
         -------
-        list of int
+        ``list of int``
             The returned list will be the atom indexes of the exclusion partners
-            for this atom (indexing starts from `index_from`)
+            for this atom (indexing starts from ``index_from``)
 
         Notes
         -----
         If this instance's `idx` attribute evaluates to -1 -- meaning it is not
         in an AtomList -- a IndexError will be raised. If you have two extra
         points (i.e., those with atomic numbers of 0) bonded to each other, this
-        routine may raise a RuntimeError if the recursion depth is exceeded.
+        routine may raise a ``RuntimeError`` if the recursion depth is exceeded.
         """
         if self.idx < 0:
             raise IndexError('Cannot find exclusions of an unindexed Atom')
         if only_greater:
             baseline = self.idx
         else:
-            baseline = 0
-        if self.atomic_number > 0:
-            excl = []
-            for atm in self.bond_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.angle_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.dihedral_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.tortor_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-            for atm in self.exclusion_partners:
-                i = atm.idx + index_from
-                if i > baseline:
-                    excl.append(i)
-        else:
-            # Extra point!! Special handling required. Basically, the extra
-            # point adopts all of the exclusions of the atom it is bonded to
-            partner = self.bond_partners[0]
-            myidx = self.idx + index_from
-            excl = [a for a in partner.nonbonded_exclusions()
-                        if a != myidx]
-            excl.append(partner.idx + index_from)
+            baseline = -1
+        excl = []
+        for atm in self.bond_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.angle_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.dihedral_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.tortor_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
+        for atm in self.exclusion_partners:
+            i = atm.idx + index_from
+            if i > baseline:
+                excl.append(i)
         return sorted(excl)
 
     #===================================================
@@ -641,14 +732,18 @@ class Atom(_ListItem):
         
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `bond_partners`
 
         Notes
         -----
-        This action adds `self` to `other.bond_partners`. Raises `BondError` if
-        `other is self`
+        This action adds `self` to `other.bond_partners`. Raises
+        :class:`BondError` if `other is self`
         """
+        if isinstance(other, ExtraPoint):
+            self.children.append(other)
+        elif isinstance(self, ExtraPoint):
+            other.children.append(self)
         if self is other:
             raise BondError("Cannot bond atom to itself!")
         self._bond_partners.append(other)
@@ -662,13 +757,13 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `angle_partners`
 
         Notes
         -----
-        This action adds `self` to `other.angle_partners`. Raises `BondError` if
-        `other is self`
+        This action adds `self` to `other.angle_partners`. Raises
+        :class:`BondError` if `other is self`
         """
         if self is other:
             raise BondError("Cannot angle an atom with itself!")
@@ -683,13 +778,13 @@ class Atom(_ListItem):
         
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `dihedral_partners`
 
         Notes
         -----
-        This action adds `self` to `other.dihedral_partners`. Raises `BondError`
-        if `other is self`
+        This action adds `self` to `other.dihedral_partners`. Raises
+        :class:`BondError` if `other is self`
         """
         if self is other:
             raise BondError("Cannot dihedral an atom with itself!")
@@ -704,13 +799,13 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `tortor_partners`
 
         Notes
         -----
-        This action adds `self` to `other.tortor_partners`. Raises `BondError`
-        if `other is self`
+        This action adds `self` to `other.tortor_partners`. Raises
+        :class:`BondError` if `other is self`
         """
         if self is other:
             raise BondError('Cannot coupled-dihedral atom to itself')
@@ -725,13 +820,13 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        other : Atom
+        other : :class:`Atom`
             An atom that will be added to `exclusion_partners`.
 
         Notes
         -----
         This action adds `self` to `other.exclusion_partners`. Raises
-        `BondError` if `other is self`
+        :class:`BondError` if `other is self`
         """
         if self is other:
             raise BondError("Cannot exclude an atom from itself")
@@ -747,7 +842,7 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        keep_exclusions : bool=True
+        keep_exclusions : ``bool``
             If True, the `exclusion_partners` array is left alone. If False,
             `exclusion_partners` is emptied as well.
         """
@@ -792,9 +887,564 @@ class Atom(_ListItem):
 
     def __repr__(self):
         start = '<Atom %s [%d]' % (self.name, self.idx)
-        if self.residue is not None:
+        if self.residue is not None and hasattr(self.residue, 'idx'):
             return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
+        elif self.residue is not None:
+            return start + '; In %s>' % self.residue.name
         return start + '>'
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class ExtraPoint(Atom):
+    """
+    An extra point is a massless, virtual site that is used to extend the
+    flexibility of partial atomic charge fitting. They can be used to, for
+    instance, give atoms permanent multipoles in a fixed-charge format.
+
+    However, virtual sites are massless particles whose position is fixed with
+    respect to a particular frame of reference. As a result, they must be
+    treated specially when running dynamics. This class extends the `Atom` class
+    with extra functionality specific to these "Extra points" or "virtual
+    sites". See the documentation for the :class:`Atom` class for more
+    information.
+    """
+    def __init__(self, *args, **kwargs):
+        super(ExtraPoint, self).__init__(*args, **kwargs)
+        self._frame_type = None
+
+    #===================================================
+
+    @property
+    def parent(self):
+        """
+        The parent atom of this extra point is the atom it is bonded to (there
+        should only be 1 bond partner, but the parent is defined as its first)
+        """
+        try:
+            return self._bond_partners[0]
+        except IndexError:
+            return None
+
+    #===================================================
+
+    @property
+    def bond_partners(self):
+        """ List of all atoms bonded to this atom and its parent """
+        try:
+            return sorted([self.parent] +
+                    [x for x in self.parent.bond_partners if x is not self])
+        except AttributeError:
+            if self.parent is not None:
+                return [self.parent]
+            return []
+
+    @property
+    def angle_partners(self):
+        """ List of all atoms angled to this atom and its parent """
+        try:
+            return self.parent.angle_partners
+        except AttributeError:
+            return []
+
+    @property
+    def dihedral_partners(self):
+        try:
+            return self.parent.dihedral_partners
+        except AttributeError:
+            return []
+
+    @property
+    def tortor_partners(self):
+        try:
+            return self.parent.tortor_partners
+        except AttributeError:
+            return []
+
+    @property
+    def exclusion_partners(self):
+        try:
+            return self.parent.exclusion_partners
+        except AttributeError:
+            return []
+
+    #===================================================
+
+    @property
+    def frame_type(self):
+        """
+        The type of frame used for this extra point. Whether the EP lies
+        beyond (outside) or between (inside) the is determined from the
+        positions of each atom in the frame and the extra point. If those are
+        not set, the EP is assumed to be between the two points in the frame
+        """
+        if self._frame_type is not None:
+            return self._frame_type
+        if len(self.parent.bonds) == 2:
+            mybond = None
+            otherbond = None
+            for bond in self.parent.bonds:
+                if self in bond:
+                    mybond = bond
+                else:
+                    otherbond = bond
+            if mybond is None or otherbond is None:
+                raise RuntimeError('Strange bond pattern detected')
+            bonddist = otherbond.type.req
+            if otherbond.atom1 is self.parent:
+                otheratom = otherbond.atom2
+            else:
+                otheratom = otherbond.atom1
+            try:
+                x1, y1, z1 = self.xx, self.xy, self.xz
+                x2, y2, z2 = otheratom.xx, otheratom.xy, otheratom.xz
+            except AttributeError:
+                self._frame_type = TwoParticleExtraPointFrame(self, True)
+            else:
+                dx, dy, dz = x1-x2, y1-y2, z1-z2
+                if dx*dx + dy*dy + dz*dz > bonddist:
+                    self._frame_type = TwoParticleExtraPointFrame(self, False)
+                else:
+                    self._frame_type = TwoParticleExtraPointFrame(self, True)
+            return self._frame_type
+        elif len(self.parent.bonds) == 3:
+            # Just take 1 other atom -- an acute angle is "inside", an obtuse
+            # angle is "outside"
+            other_atom = None
+            for bond in self.parent.bonds:
+                if not self in bond:
+                    if bond.atom1 is self.parent:
+                        other_atom = bond.atom2
+                    else:
+                        other_atom = bond.atom1
+                    break
+            if other_atom is None:
+                raise RuntimeError('Strange bond pattern detected')
+            try:
+                x1, y1, z1 = other_atom.xx, other_atom.xy, other_atom.xz
+                x2, y2, z2 = self.parent.xx, self.parent.xy, self.parent.xz
+                x3, y3, z3 = self.xx, self.xy, self.xz
+            except AttributeError:
+                # See if both other atoms are hydrogens and the current atom is
+                # an oxygen. If so, this is TIP4P and we go inside. Otherwise,
+                # we go outside
+                other_atom2 = None
+                for bond in self.parent.bonds:
+                    if not self in bond and not other_atom in bond:
+                        if bond.atom1 is self.parent:
+                            other_atom2 = bond.atom2
+                        else:
+                            other_atom2 = bond.atom1
+                        break
+                if other_atom2 is None:
+                    raise RuntimeError('Strange bond pattern detected')
+                if (self.parent.element == 8 and other_atom.element == 1 and
+                        other_atom2.element == 1): # TIP4P!
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+            else:
+                vec1 = [x1-x2, y1-y2, z1-z2]
+                vec2 = [x3-x2, y3-y2, z3-z2]
+                dot11 = sum([x*y for x, y in zip(vec1, vec1)])
+                dot22 = sum([x*y for x, y in zip(vec2, vec2)])
+                dot12 = sum([x*y for x, y in zip(vec1, vec2)])
+                angle = math.acos(dot12 / (math.sqrt(dot11)*math.sqrt(dot22)))
+                if angle < math.pi / 2:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, True)
+                else:
+                    self._frame_type = ThreeParticleExtraPointFrame(self, False)
+        elif len(self.parent.bonds) == 4:
+            # Only supported option here is the OOP one (e.g., TIP5P) -- always
+            # assume tetrahedral angle
+            self._frame_type = OutOfPlaneExtraPointFrame(self)
+
+        return self._frame_type
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TwoParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 2 particles
+
+    Parameters
+    ----------
+    ep : :class:`ExtraPoint`
+        The extra point defined by this frame
+    inside : ``bool``
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside  : x1-----e--X2
+
+    Outside : x1--------X2--e
+    """
+    def __init__(self, ep, inside=False):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2 : :class:`Atom`, :class:`Atom`
+            a1 is the parent atom of the extra point. a2 is the other atom
+            bonded to the parent atom
+        """
+        try:
+            mybond, = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError("Bad bond pattern in EP frame")
+
+        if mybond.atom1 is self.ep.parent:
+            return self.ep.parent, mybond.atom2
+        else:
+            return self.ep.parent, mybond.atom1
+
+    def get_weights(self):
+        """
+        Returns the weights for the two particles
+
+        Returns
+        -------
+        w1, w2 : ``float, float``
+            w1 is the weight of particle 1 (the parent atom), whereas w2 is the
+            weight of particle 2 (the atom bonded to the parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with a 2-'
+                             'point virtual site frame')
+        b1, b2 = ep.parent.bonds
+        if ep in b1:
+            r1 = b2.type.req
+            r2 = b1.type.req
+        else:
+            r1 = b2.type.req
+            r2 = b1.type.req
+
+        if self.inside:
+            # It is closer to atom 1, but both weights are positive and add to 1
+            return ((r1 - r2) / r1), (r2 / r1)
+        else:
+            return ((r1 + r2) / r1), -(r2 / r1)
+
+class ThreeParticleExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles
+
+    Parameters
+    ----------
+    ep : :class:`ExtraPoint`
+        The extra point defined by this frame
+    inside : ``bool``
+        If True, the extra point is contained inside the curve connecting all
+        points in the frame of reference. If False, the point is outside that
+        curve. See figures below for example
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+    Inside :         X
+                    /|\
+                   / e \
+                  x     x
+    Outside :
+                     e
+                     |
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, inside=True):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.inside = inside
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : :class:`Atom`, :class:`Atom`, :class:`Atom`
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if self.ep not in bond]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom1, oatom2
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : ``float, float, float``
+            w1 is the weight of particle 1 (the parent atom), whereas w2 and w3
+            are the weights of particles 2 and 3 (the atoms bonded to the
+            parent atom)
+        """
+        ep = self.ep
+        if len(ep.parent.bonds) != 3:
+            raise ValueError('EP parent bond pattern inconsistent with a 3-'
+                             'point virtual site frame')
+        b1, b2, b3 = ep.parent.bonds
+        # There are 2 possibilities here -- there is an angle between the 3
+        # atoms in the frame OR there is a triangle of bonds (e.g., TIP4P).
+        # Compute the 'ideal' distance between the 3 frame-of-ref. atoms
+        if ep in b1:
+            b1, b3 = b3, b1
+        elif ep in b2:
+            b2, b3 = b3, b2
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b2.atom2
+            else:
+                a2 = b2.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+        req12 = b1.type.req
+        req13 = b2.type.req
+        weight = b3.type.req / math.sqrt(req12*req13 - 0.25*req23*req23)
+
+        if self.inside:
+            return 1 - weight, weight / 2, weight / 2
+        else:
+            return 1 + weight, -weight / 2, -weight / 2
+
+class OutOfPlaneExtraPointFrame(object):
+    r"""
+    This class defines a frame of reference for a given extra point with a frame
+    of reference defined by 3 particles, but with the virtual site out of the
+    plane of those 3 particles. For example, TIP5P
+
+    Parameters
+    ----------
+    ep : :class:`ExtraPoint`
+        The extra point defined by this frame
+    angle : ``float``
+        The angle out-of-plane that the extra point is. By default, it is half
+        of the angle of a tetrahedron. Given in degrees
+
+    Figures
+    -------
+    In the figures, x marks the real particles, e marks the extra point
+    (properly numbered). The numbers refer to the ordering this class expects
+    those atoms to be in. The real particle that is the parent of the extra
+    point is shown in upper-case
+
+                   e   e
+                    \ /
+                     X
+                    / \
+                   /   \
+                  x     x
+    """
+    def __init__(self, ep, angle=54.735):
+        # Don't do error-checking now, since we want to give it time for the
+        # bonds to be generated -- only error check when trying to get weights
+        self.ep = ep
+        self.angle = angle
+
+    def get_atoms(self):
+        """
+        Returns the particles involved in the frame
+
+        Returns
+        -------
+        a1, a2, a3 : :class:`Atom`, :class:`Atom`, :class:`Atom`
+            a1 is the parent atom of the extra point. a2 and a3 are the other
+            atoms that are both bonded to the parent atom but are not EPs
+        """
+        try:
+            b1, b2 = [bond for bond in self.ep.parent.bonds
+                                if (not isinstance(bond.atom1, ExtraPoint) and
+                                    not isinstance(bond.atom2, ExtraPoint))
+            ]
+        except TypeError:
+            raise RuntimeError('Unsupported bonding pattern in EP frame')
+        if b1.atom1 is self.ep.parent:
+            oatom1 = b1.atom2
+        else:
+            oatom1 = b1.atom1
+        if b2.atom1 is self.ep.parent:
+            oatom2 = b2.atom2
+        else:
+            oatom2 = b2.atom1
+        return self.ep.parent, oatom2, oatom1
+
+    def get_weights(self):
+        """
+        Returns the weights for the three particles
+
+        Returns
+        -------
+        w1, w2, w3 : ``float, float, float``
+            w1 and w2 are the weights with respect to the second two particles
+            in the frame (i.e., NOT the parent atom). w3 is the weight of the
+            cross-product
+        """
+        ep = self.ep
+        # Find the two bonds that do not involve any extra points
+        regbonds = []
+        mybond = None
+        for bond in ep.parent.bonds:
+            if (not isinstance(bond.atom1, ExtraPoint) and
+                    not isinstance(bond.atom2, ExtraPoint)):
+                regbonds.append(bond)
+            elif ep in bond:
+                if mybond is not None:
+                    raise ValueError('multiple bonds detected to extra point')
+                mybond = bond
+        #FIXME -- is this necessary?
+        if len(regbonds) != 2:
+            raise ValueError('EP parent bond pattern inconsistent with an '
+                             'out-of-plane, 3-point virtual site frame')
+        if mybond is None:
+            raise RuntimeError('No EP bond found... should not be here')
+        b1, b2 = regbonds[:2]
+        req12 = b1.type.req
+        req13 = b2.type.req
+        # See if there is an angle with both b1 and b2 in it
+        found = False
+        for angle in ep.parent.angles:
+            if b1 in angle and b2 in angle:
+                found = True
+                break
+        if found:
+            # Compute the 2-3 distance from the two bond lengths and the angles
+            # using law of cosines
+            t213 = angle.theteq
+            r1 = b1.type.req
+            r2 = b2.type.req
+            theta = angle.type.theteq * DEG_TO_RAD
+            req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
+        else:
+            # See if there is a bond between particles 2 and 3
+            if b1.atom1 is ep.parent:
+                a1 = b1.atom2
+            else:
+                a1 = b1.atom1
+            if b2.atom1 is ep.parent:
+                a2 = b2.atom2
+            else:
+                a2 = b2.atom1
+            if a1 not in a2.bond_partners:
+                raise RuntimeError('EP frame definition incomplete for 3-point '
+                                   'virtual site... cannot determine distance '
+                                   'between particles 2 and 3')
+            req23 = None
+            for bond in a1.bonds:
+                if a2 in bond:
+                    req23 = bond.type.req
+            if req23 is None:
+                raise RuntimeError('Cannot determine 2-3 particle distance in '
+                                   'three-site virtual site frame')
+            # Now calculate the angle
+            t213 = 2 * math.asin(req23 / (req12 + req13)) * RAD_TO_DEG
+        # Some necessary constants
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        req12 *= length_conv
+        req13 *= length_conv
+        req23 *= length_conv
+        sinOOP = math.sin(self.angle * DEG_TO_RAD)
+        cosOOP = math.cos(self.angle * DEG_TO_RAD)
+        sin213 = math.sin(t213 * DEG_TO_RAD)
+        # Find how big the cross product is
+        lenCross = req12 * req13 * sin213
+        # Find our weights (assume symmetric)
+        weightCross = sinOOP * mybond.type.req * length_conv / lenCross
+        weight = (cosOOP * mybond.type.req * length_conv /
+                        math.sqrt(req12*req13 - 0.25*req23*req23))
+        # Find out of the cross product weight should be positive or negative.
+        a1, a2, a3 = self.get_atoms()
+        try:
+            v12 = (a2.xx-a1.xx, a2.xy-a1.xy, a2.xz-a1.xz)
+            v13 = (a3.xx-a1.xx, a3.xy-a1.xy, a3.xz-a1.xz)
+            v1e = (self.ep.xx-a1.xx, self.ep.xy-a1.xy, self.ep.xz-a1.xz)
+        except AttributeError:
+            # No coordinates... we have to guess. The first EP will have a
+            # positive weight, the second will have a negative (this matches
+            # what happens with Amber prmtop files...)
+            for a in self.ep.parent.bond_partners:
+                if a is self.ep:
+                    break
+                if isinstance(a, ExtraPoint):
+                    weightCross = -weightCross
+                    break
+        else:
+            # Take the cross product of v12 and v13, then dot that with the EP
+            # vector. An acute angle is a positive weightCross. An obtuse one is
+            # negative
+            cross = (v12[1]*v13[2] - v12[2]*v13[1],
+                     v12[2]*v13[0] - v12[0]*v13[2],
+                     v12[0]*v13[1] - v12[1]*v13[0])
+            lencross = math.sqrt(sum([cross[i]*cross[i] for i in xrange(3)]))
+            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in xrange(3)]))
+            v1edotcross = sum([v1e[i]*cross[i] for i in xrange(3)])
+            costheta = v1edotcross / (lenv1e*lencross)
+            if costheta < 0: weightCross = -weightCross
+        return weight / 2, weight / 2, weightCross
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -802,21 +1452,22 @@ class Bond(object):
     """
     A covalent bond connecting two atoms.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom involved in the bond
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom involved in the bond
-    type : BondType=None
+    type : :class:`BondType`
         The bond type that defines the parameters for this bond
 
     Notes
     -----
-    You can test whether an Atom is contained within the bond using the `in`
-    operator. A `BondError` is raised if `atom1` and `atom2` are identical. This
-    bond instance is `append`ed to the `bonds` list for both `atom1` and `atom2`
-    and is automatically removed from those lists upon garbage collection
+    You can test whether an :class:`Atom` is contained within the bond using the
+    `in` operator. A `BondError` is raised if `atom1` and `atom2` are identical.
+    This bond instance is `append`ed to the `bonds` list for both `atom1` and
+    `atom2` and is automatically removed from those lists upon garbage
+    collection
 
     Examples
     --------
@@ -862,20 +1513,24 @@ class Bond(object):
 
         self.atom1 = self.atom2 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class BondType(_ListItem, _ParameterType):
     """
     A bond type with a set of bond parameters
 
-    Parameters (and Attributes)
-    ---------------------------
-    k : float
+    Parameters
+    ----------
+    k : ``float``
         Force constant in kcal/mol/Angstrom^2
-    req : float
+    req : ``float``
         Equilibrium bond distance in Angstroms
-    list : TrackedList=None
-        A list of `BondType`s in which this is a member
+    list : :class:`TrackedList`
+        A list of :class:`BondType`s in which this is a member
 
     Inherited Attributes
     --------------------
@@ -918,21 +1573,25 @@ class BondType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return self.k == other.k and self.req == other.req
 
+    def __repr__(self):
+        return '<%s; k=%.3f, Req=%.3f>' % (type(self).__name__,
+                self.k, self.req)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Angle(object):
     """
     A valence angle between 3 atoms separated by two covalent bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         An atom one end of the valence angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The atom in the middle of the valence angle bonded to both other atoms
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom on the other end of the valence angle to atom1
-    type : AngleType=None
+    type : :class:`AngleType`
         The AngleType object containing the parameters for this angle
 
     Notes
@@ -1002,24 +1661,28 @@ class Angle(object):
 
         self.atom1 = self.atom2 = self.atom3 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AngleType(_ListItem, _ParameterType):
     """
     An angle type with a set of angle parameters
 
-    Parameters (and Attributes)
-    ---------------------------
-    k : float
+    Parameters
+    ----------
+    k : ``float``
         Force constant in kcal/mol/radians^2
-    theteq : float
+    theteq : ``float``
         Equilibrium angle in Degrees
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `AngleType`s in which this is a member
 
     Inherited Attributes
     --------------------
-    idx : int
+    idx : ``int``
         The index of this AngleType inside its containing list
 
     Notes
@@ -1057,31 +1720,35 @@ class AngleType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return self.k == other.k and self.theteq == other.theteq
 
+    def __repr__(self):
+        return '<%s; k=%.3f, THETAeq=%.3f>' % (type(self).__name__,
+                self.k, self.theteq)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Dihedral(_FourAtomTerm):
     """
     A valence dihedral between 4 atoms separated by three covalent bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         An atom on one end of the valence dihedral bonded to atom 2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the valence dihedral bonded to atom1 and atom3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the valence dihedral bonded to atom2 and atom4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom on the other end of the valence dihedral bonded to atom 3
-    improper : bool=False
+    improper : ``bool``
         If True, this is an Amber-style improper torsion, where atom3 is the
-        "central" atom bonded to atoms 1, 2, and 4 (atoms 1, 2, and 4 are _only_
+        "central" atom bonded to atoms 1, 2, and 4 (atoms 1, 2, and 4 are *only*
         bonded to atom 3 in this instance)
-    ignore_end : bool=False
+    ignore_end : ``bool``
         If True, the end-group interactions for this torsion are ignored, either
         because it is involved in a ring where the end-group atoms are excluded
         or because it is one term in a multi-term dihedral expansion
-    type : DihedralType=None
+    type : :class:`DihedralType`
         The DihedralType object containing the parameters for this dihedral
 
     Notes
@@ -1165,17 +1832,20 @@ class Dihedral(_FourAtomTerm):
 
         Parameters
         ----------
-        thing : Dihedral or other iterable
+        thing : :class:`Dihedral` or other ``iterable``
             A Dihedral or an iterable with 4 indexes that will be used to
             identify whether this torsion has the same atoms
 
         Returns
         -------
-        bool - True if `thing` and `self` have the same atoms, False otherwise
+        is_same : ``bool``
+            True if ``thing`` and ``self`` have the same atoms. ``False``
+            otherwise
 
         Notes
         -----
-        This raises a `TypeError` if thing is not a Dihedral and is not iterable
+        This raises a ``TypeError`` if thing is not a Dihedral and is not
+        iterable
         """
         if isinstance(thing, Dihedral):
             # I'm comparing with another Dihedral here
@@ -1199,10 +1869,6 @@ class Dihedral(_FourAtomTerm):
                 self.atom2.idx == thing[2] and
                 self.atom3.idx == thing[1] and
                 self.atom4.idx == thing[0]) )
-
-    def __repr__(self):
-        return "<Dihedral %r--%r--%r--%r>" % (self.atom1, self.atom2,
-                self.atom3, self.atom4)
 
     def delete(self):
         """
@@ -1232,36 +1898,46 @@ class Dihedral(_FourAtomTerm):
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
+    def __repr__(self):
+        if self.improper:
+            name = '%s [imp]' % (type(self).__name__)
+        elif self.ignore_end:
+            name = '%s [ign]' % (type(self).__name__)
+        else:
+            name = type(self).__name__
+        return '<%s; %r--%r--%r--%r; type=%r>' % (name, self.atom1,
+                self.atom2, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralType(_ListItem, _ParameterType):
     """
     A dihedral type with a set of dihedral parameters
 
-    Parameters (and Attributes)
-    ---------------------------
-    phi_k : float
+    Parameters
+    ----------
+    phi_k : ``float``
         The force constant in kcal/mol
-    per : int
+    per : ``int``
         The dihedral periodicity
-    phase : float
+    phase : ``float``
         The dihedral phase in degrees
-    scee : float=1.0
+    scee : ``float``
         1-4 electrostatic scaling factor
-    scnb : float=1.0
+    scnb : ``float``
         1-4 Lennard-Jones scaling factor
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `DihedralType`s in which this is a member
 
     Inherited Attributes
     --------------------
-    idx : int
+    idx : ``int``
         The index of this DihedralType inside its containing list
 
     Notes
     -----
-    Two `DihedralType`s are equal if their `phi_k`, `per`, `phase`, `scee`, and
-    `scnb` attributes are equal
+    Two :class:`DihedralType`s are equal if their `phi_k`, `per`, `phase`,
+    `scee`, and `scnb` attributes are equal
 
     Examples
     --------
@@ -1306,6 +1982,11 @@ class DihedralType(_ListItem, _ParameterType):
         return (self.phi_k == other.phi_k and self.per == other.per and 
                 self.phase == other.phase and self.scee == other.scee and
                 self.scnb == other.scnb)
+
+    def __repr__(self):
+        return ('<%s; k=%.3f, periodicity=%d, phase=%.3f, '
+                'scee=%.3f, scnb=%.3f>' % (type(self).__name__, self.phi_k,
+                    self.per, self.phase, self.scee, self.scnb))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1390,11 +2071,11 @@ class DihedralTypeList(list, _ListItem):
     """
     Dihedral types are a Fourier expansion of terms. In some cases, they are
     stored in a list like this one inside another TrackedList. In other cases,
-    each term is a separate entry in the TrackedList.
+    each term is a separate entry in the :class:`TrackedList`.
 
     In cases where `DihedralType`s are stored with every term in the same
     container, this object supports list assignment and indexing like
-    `DihedralType`.
+    :class:`DihedralType`.
     """
     def __init__(self, *args, **kwargs):
         list.__init__(self, *args, **kwargs)
@@ -1409,6 +2090,9 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
+    def __repr__(self):
+        return 'DihedralTypes %s' % (super(DihedralTypeList, self).__repr__())
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class UreyBradley(object):
@@ -1417,20 +2101,21 @@ class UreyBradley(object):
     functional form as a bond, but it is defined between two atoms forming a
     valence angle separated by two bonds.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom involved in the Urey-Bradley bond
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom involved in the Urey-Bradley bond
-    type : BondType=None
+    type : :class:`BondType`
         The Urey-Bradley bond type that defines the parameters for this bond
 
     Notes
     -----
-    You can test whether an Atom is contained within the bond using the `in`
-    operator. A `BondError` is raised if `atom1` and `atom2` are identical. You
-    can also test that a `Bond` is contained in this Urey-Bradley valence angle
+    You can test whether an :class:`Atom` is contained within the bond using the
+    `in` operator. A :class:`BondError` is raised if `atom1` and `atom2` are
+    identical.  You can also test that a :class:`Bond` is contained in this
+    Urey-Bradley valence angle
 
     Examples
     --------
@@ -1507,6 +2192,10 @@ class UreyBradley(object):
 
         self.atom1 = self.atom2 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Improper(_FourAtomTerm):
@@ -1521,23 +2210,23 @@ class Improper(_FourAtomTerm):
 
     Parameters
     ----------
-    atom1 : Atom
+    atom1 : :class:`Atom`
         The central atom A1 in the schematic above
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the improper, A2 in the schematic above
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the improper, A3 in the schematic above
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the improper, A4 in the schematic above
-    type : ImproperType=None
+    type : :class:`ImproperType`
         The ImproperType object containing the parameters for this improper
         torsion
 
     Notes
     -----
     An Improper torsion can contain bonds or atoms. A bond is contained if it
-    exists between atom 1 and any other atom. Raises `BondError` if any of the
-    atoms are duplicates.
+    exists between atom 1 and any other atom. Raises :class:`BondError` if any
+    of the atoms are duplicates.
 
     Examples
     --------
@@ -1614,24 +2303,28 @@ class Improper(_FourAtomTerm):
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
 
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ImproperType(_ListItem, _ParameterType):
     """
     An improper type with a set of improper torsion parameters
 
-    Parameters (and Attributes)
-    ---------------------------
-    psi_k : float
+    Parameters
+    ----------
+    psi_k : ``float``
         Force constant in kcal/mol/radians^2
-    psi_eq : float
+    psi_eq : ``float``
         Equilibrium torsion angle in Degrees
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `ImproperType`s in which this is a member
 
     Inherited Attributes
     --------------------
-    idx : int
+    idx : ``int``
         The index of this ImproperType inside its containing list
 
     Notes
@@ -1670,6 +2363,10 @@ class ImproperType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return self.psi_k == other.psi_k and self.psi_eq == other.psi_eq
 
+    def __repr__(self):
+        return '<%s; k=%.3f, PSIeq=%.3f>' % (type(self).__name__,
+                self.psi_k, self.psi_eq)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Cmap(object):
@@ -1678,19 +2375,19 @@ class Cmap(object):
     four covalent bonds. This is a coupled-torsion potential in which the
     torsions are consecutive.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         An atom on one end of the valence coupled-torsion bonded to atom2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 1 and 3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 2 and 4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atoms 3 and 5
-    atom5 : Atom
+    atom5 : :class:`Atom`
         An atom in the middle of the CMAP bonded to atom 4
-    type : CmapType=None
+    type : :class:`CmapType`
         The CmapType object containing the parameter map for this term
 
     Notes
@@ -1745,23 +2442,23 @@ class Cmap(object):
 
         Parameters
         ----------
-        atom1 : Atom
+        atom1 : :class:`Atom`
             The first atom of the first torsion
-        atom2 : Atom
+        atom2 : :class:`Atom`
             The second atom of the first torsion
-        atom3 : Atom
+        atom3 : :class:`Atom`
             The third atom of the first torsion
-        atom4 : Atom
+        atom4 : :class:`Atom`
             The fourth atom of the first torsion
-        atom5 : Atom
+        atom5 : :class:`Atom`
             The first atom of the second torsion
-        atom6 : Atom
+        atom6 : :class:`Atom`
             The second atom of the second torsion
-        atom7 : Atom
+        atom7 : :class:`Atom`
             The third atom of the second torsion
-        atom8 : Atom
+        atom8 : :class:`Atom`
             The fourth atom of the second torsion
-        type : CmapType=None
+        type : :class:`CmapType`
             The CmapType object containing the parameter map for this term
         """
         if atom2 is not atom5 or atom3 is not atom6 or atom7 is not atom4:
@@ -1830,6 +2527,11 @@ class Cmap(object):
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = None
         self.type = None
 
+    def __repr__(self):
+        return '<%s; %r--%r--%r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
+                self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class CmapType(_ListItem, _ParameterType):
@@ -1839,28 +2541,28 @@ class CmapType(_ListItem, _ParameterType):
 
     Parameters
     ----------
-    resolution : int
+    resolution : ``int``
         The number of grid points in the correction map potential in both
         torsion dimensions
-    grid : iterable of floats
+    grid : ``iterable of floats``
         This must be a 1-dimensional list of grid values. The dimension must be
         `resolution*resolution`, and must be row-major (i.e., the second
         dimension changes the fastest) when indexed with 2 indices.
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `CmapType`s in which this is a member
 
     Attributes
     ----------
-    resolution : int
+    resolution : ``int``
         Potential grid resolution (see description in Parameters)
-    grid : _CmapGrid
+    grid : :class:`_CmapGrid`
         A _CmapGrid object defining the interpolating potential energy grid,
         with each point having the units kcal/mol
-    comments : list(str)=None
+    comments : ``list(str)``
         List of strings that represent comments about this parameter type
-    list : TrackedList=None
+    list : :class:`TrackedList`
         If not None, this is a list in which this instance _may_ be a member
-    idx : int
+    idx : ``int``
         The index of this CmapType inside its containing list
 
     Notes
@@ -1902,6 +2604,9 @@ class CmapType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return (self.resolution == other.resolution and
                 all([abs(i - j) < TINY for i, j in zip(self.grid, other.grid)]))
+
+    def __repr__(self):
+        return '<%s; res=%d>' % (type(self).__name__, self.resolution)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2050,17 +2755,17 @@ class TrigonalAngle(_FourAtomTerm):
                                 |
                           A4----A2----A3
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom involved in the trigonal angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom involved in the trigonal angle
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom involved in the trigonal angle
-    type : AngleType=None
+    type : :class:`AngleType`
         The angle type containing the parameters
 
     Notes
@@ -2084,24 +2789,28 @@ class TrigonalAngle(_FourAtomTerm):
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
 
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom2, self.atom1, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class OutOfPlaneBend(_FourAtomTerm):
     """
     Out-of-plane bending term in the AMOEBA force field. The bond pattern is the
-    same as `TrigonalAngle`
+    same as :class:`TrigonalAngle`
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom involved in the trigonal angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom involved in the trigonal angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The third atom involved in the trigonal angle
-    atom4 : Atom
+    atom4 : :class:`Atom`
         The fourth atom involved in the trigonal angle
-    type : OutOfPlaneBendType=None
+    type : :class:`OutOfPlaneBendType`
         The angle type containing the parameters
 
     Notes
@@ -2125,22 +2834,26 @@ class OutOfPlaneBend(_FourAtomTerm):
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
 
+    def __repr__(self):
+        return '<%s; %r--(%r,%r,%r); type=%r>' % (type(self).__name__,
+                self.atom2, self.atom1, self.atom3, self.atom4, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class OutOfPlaneBendType(_ListItem, _ParameterType):
     """
     An angle type with a set of angle parameters
 
-    Parameters (and Attributes)
-    ---------------------------
-    k : float
+    Parameters
+    ----------
+    k : ``float``
         Force constant in kcal/mol/radians^2
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `OutOfPlaneBendType`s in which this is a member
 
     Inherited Attributes
     --------------------
-    idx : int
+    idx : ``int``
         The index of this OutOfPlaneBendType inside its containing list
 
     Notes
@@ -2177,6 +2890,9 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     def __eq__(self, other):
         return self.k == other.k
 
+    def __repr__(self):
+        return '<%s; k=%.3f>' % (type(self).__name__, self.k)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PiTorsion(object):
@@ -2195,29 +2911,29 @@ class PiTorsion(object):
      AAA-A1           A6
 
     In the above schematic, A3 and A4 are sp2-hybridized, and atoms A2 and A6
-    are bonded _only_ to A3 and A4, respectively. Atoms A1 and A5 are each
+    are bonded *only* to A3 and A4, respectively. Atoms A1 and A5 are each
     bonded to 3 other atoms.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         atom A1 in the schematic above
-    atom2 : Atom
+    atom2 : :class:`Atom`
         atom A2 in the schematic above
-    atom3 : Atom
+    atom3 : :class:`Atom`
         atom A3 in the schematic above
-    atom4 : Atom
+    atom4 : :class:`Atom`
         atom A4 in the schematic above
-    atom5 : Atom
+    atom5 : :class:`Atom`
         atom A5 in the schematic above
-    atom6 : Atom
+    atom6 : :class:`Atom`
         atom A6 in the schematic above
-    type : DihedralType=None
+    type : :class:`DihedralType`
         The parameters for this Pi-torsion
 
     Notes
     -----
-    Both `Bond`s and `Atom`s can be contained in a pi-torsion
+    Both :class:`Bond`s and :class:`Atom`s can be contained in a pi-torsion
     """
     def __init__(self, atom1, atom2, atom3, atom4, atom5, atom6, type=None):
         self.atom1 = atom1
@@ -2251,6 +2967,11 @@ class PiTorsion(object):
         self.type = self.atom1 = self.atom2 = self.atom3 = None
         self.atom4 = self.atom5 = self.atom6 = None
 
+    def __repr__(self):
+        return '<%s; (%r,%r)--%r--%r--(%r,%r); type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
+                self.atom6, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class StretchBend(object):
@@ -2258,20 +2979,20 @@ class StretchBend(object):
     This term models the stretching and bending of a standard valence angle, and
     is used in the AMOEBA force field
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom on one end of the angle
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The central atom in the angle
-    atom3 : Atom
+    atom3 : :class:`Atom`
         The atom on the other end of the angle
-    type : StretchBendType=None
+    type : :class:`StretchBendType`
         The type containing the stretch-bend parameters
 
     Notes
     -----
-    Both `Bond`s and `Atom`s can be contained in a stretch-bend term
+    Both :class:`Bond`s and :class:`Atom`s can be contained in a stretch-bend term
     """
     def __init__(self, atom1, atom2, atom3, type=None):
         self.atom1 = atom1
@@ -2296,30 +3017,36 @@ class StretchBend(object):
         """ Sets all of the atoms and parameter type to None """
         self.atom1 = self.atom2 = self.atom3 = self.type = None
 
+    def __repr__(self):
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.type)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class StretchBendType(_ListItem, _ParameterType):
     """
     A stretch-bend type with two distances and an angle in AMOEBA
 
-    Parameters (and Attributes)
-    ---------------------------
-    k : float
-        Force constant in kcal/mol/radians^2
-    req1 : float
+    Parameters
+    ----------
+    k1 : ``float``
+        First force constant in kcal/mol/(radians*angstroms)
+    k2 : ``float``
+        Second force constant in kcal/mol/(radians*angstroms)
+    req1 : ``float``
         Equilibrium bond distance for bond between the first and second atoms in
         Angstroms
-    req2 : float
+    req2 : ``float``
         Equilibrium bond distance for bond between the second and third atoms in
         Angstroms
-    theteq : float
+    theteq : ``float``
         Equilibrium angle in degrees
-    list : TrackedList=None
+    list : :class:`TrackedList`
         A list of `StretchBendType`s in which this is a member
 
     Inherited Attributes
     --------------------
-    idx : int
+    idx : ``int``
         The index of this StretchBendType inside its containing list
 
     Notes
@@ -2329,8 +3056,8 @@ class StretchBendType(_ListItem, _ParameterType):
 
     Examples
     --------
-    >>> sbt1 = StretchBendType(10.0, 1.0, 1.0, 180.0)
-    >>> sbt2 = StretchBendType(10.0, 1.0, 1.0, 180.0)
+    >>> sbt1 = StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0)
+    >>> sbt2 = StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0)
     >>> sbt1 is sbt2
     False
     >>> sbt1 == sbt2
@@ -2341,16 +3068,17 @@ class StretchBendType(_ListItem, _ParameterType):
     As part of a list, they can be indexed
 
     >>> strbnd_list = []
-    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
-    >>> strbnd_list.append(StretchBendType(10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list.append(StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0, strbnd_list))
+    >>> strbnd_list.append(StretchBendType(10.0, 10.0, 1.0, 1.0, 180.0, strbnd_list))
     >>> strbnd_list[0].idx
     0
     >>> strbnd_list[1].idx
     1
     """
-    def __init__(self, k, req1, req2, theteq, list=None):
+    def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k)
+        self.k1 = _strip_units(k1)
+        self.k2 = _strip_units(k2)
         self.req1 = _strip_units(req1)
         self.req2 = _strip_units(req2)
         self.theteq = _strip_units(theteq)
@@ -2358,8 +3086,14 @@ class StretchBendType(_ListItem, _ParameterType):
         self.list = list
 
     def __eq__(self, other):
-        return (self.k == other.k and self.req1 == other.req1 and
-                self.req2 == other.req2 and self.theteq == other.theteq)
+        return (self.k1 == other.k1 and self.k2 == other.k2 and
+                self.req1 == other.req1 and self.req2 == other.req2 and
+                self.theteq == other.theteq)
+
+    def __repr__(self):
+        return '<%s; Req_1=%.3f, Req_2=%.3f, THETAeq=%.3f, k1=%.3f, k2=%.3f>' \
+                % (type(self).__name__, self.req1, self.req2, self.theteq,
+                   self.k1, self.k2)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2368,19 +3102,19 @@ class TorsionTorsion(Cmap):
     This is a coupled-torsion map used in the AMOEBA force field similar to the
     correction-map (CMAP) potential used by the CHARMM force field
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         An atom on one end of the valence torsion-torsion bonded to atom2
-    atom2 : Atom
+    atom2 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 1 and 3
-    atom3 : Atom
+    atom3 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 2 and 4
-    atom4 : Atom
+    atom4 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atoms 3 and 5
-    atom5 : Atom
+    atom5 : :class:`Atom`
         An atom in the middle of the torsion-torsion bonded to atom 4
-    type : TorsionTorsionType=None
+    type : :class:`TorsionTorsionType`
         The TorsionTorsionType object containing the parameter map for this term
 
     Notes
@@ -2466,13 +3200,13 @@ class _TorTorTable(object):
     Contains an interpolating potential grid for a coupled-torsion in the AMOEBA
     force field.
 
-    Parameters (and Attributes)
-    ---------------------------
-    ang1 : list of floats
+    Parameters
+    ----------
+    ang1 : ``list of floats``
         Angles in the first dimension of the interpolation table
-    ang2 : list of floats
+    ang2 : ``list of floats``
         Angles in the second dimension of the interpolation table
-    data : list of floats
+    data : ``list of floats``
         Value of the potential grid at each point (ang2 varies fastest)
 
     Notes
@@ -2547,42 +3281,42 @@ class TorsionTorsionType(_ListItem, _ParameterType):
 
     Parameters
     ----------
-    dims : tuple of 2 ints
+    dims : ``tuple of 2 ints``
         The table dimensions
-    ang1 : list of floats
+    ang1 : ``list of floats``
         The list of angles in the first dimension
-    ang2 : list of floats
+    ang2 : ``list of floats``
         The list of angles in the second dimension
-    f : list of floats
+    f : ``list of floats``
         The interpolation table for the energy
-    dfda1 : list of floats=None
+    dfda1 : ``list of floats``
         The interpolation table of the gradient w.r.t. angle 1
-    dfda2 : list of floats=None
+    dfda2 : ``list of floats``
         The interpolation table of the gradient w.r.t. angle 2
-    d2fda1da2 : list of floats=None
+    d2fda1da2 : ``list of floats``
         The interpolation table of the 2nd derivative w.r.t. both angles
-    list : TrackedList=None
+    list : :class:`TrackedList`
         The list containing this coupled torsion-torsion map
 
     Attributes
     ----------
-    dims : tuple of 2 ints
+    dims : ``tuple of 2 ints``
         The table dimensions
-    ang1 : list of floats
+    ang1 : ``list of floats``
         The list of angles in the first dimension
-    ang2 : list of floats
+    ang2 : ``list of floats``
         The list of angles in the second dimension
-    f : _TorTorTable
+    f : :class:`_TorTorTable`
         The interpolation table for the energy as a _TorTorTable
-    dfda1 : _TorTorTable
+    dfda1 : :class:`_TorTorTable`
         The interpolation table for the first gradient as a _TorTorTable
-    dfda2 : _TorTorTable
+    dfda2 : :class:`_TorTorTable`
         The interpolation table for the second gradient as a _TorTorTable
-    d2fda1da2 : _TorTorTable
+    d2fda1da2 : :class:`_TorTorTable`
         The interpolation table for the second derivative as a _TorTorTable
-    list : TrackedList
+    list : :class:`TrackedList`
         The list that may, or may not, contain this TorsionTorsionType
-    idx : int
+    idx : ``int``
         The index of this item in the list or iterable defined by `list`
     """
     def __init__(self, dims, ang1, ang2, f,
@@ -2618,6 +3352,9 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         return (self.f == other.f and self.dfda1 == other.dfda1 and
                 self.dfda2 == other.dfda2 and self.d2fda1da2 == other.d2fda1da2)
 
+    def __repr__(self):
+        return '<%s; %dx%d>' % (type(self).__name__, self.dims[0], self.dims[1])
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChiralFrame(object):
@@ -2625,13 +3362,13 @@ class ChiralFrame(object):
     A chiral frame as defined in the AMOEBA force field. It defines the frame of
     reference for a chiral center
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         The first atom defined in the chiral frame
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The second atom defined in the chiral frame
-    chirality : int
+    chirality : ``int``
         Either 1 or -1 to identify directionality. A ValueError is raised if a
         different value is provided
 
@@ -2649,6 +3386,10 @@ class ChiralFrame(object):
     def __contains__(self, thing):
         return thing is self.atom1 or thing is self.atom2
 
+    def __repr__(self):
+        return '<%s; %r--%r, direction=%d>' % (type(self).__name__, self.atom1,
+                self.atom2, self.chirality)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class MultipoleFrame(object):
@@ -2656,17 +3397,17 @@ class MultipoleFrame(object):
     This defines the frame of reference for computing multipole interactions in
     the AMOEBA force field.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom : Atom
+    Parameters
+    ----------
+    atom : :class:`Atom`
         The atom for which the frame of reference is defined
-    frame_pt_num : int
+    frame_pt_num : ``int``
         The frame point number
-    vectail : int
+    vectail : ``int``
         The vector tail index
-    vechead : int
+    vechead : ``int``
         The vector head index
-    nvec : int
+    nvec : ``int``
         The number of vectors
 
     Examples
@@ -2702,37 +3443,37 @@ class Residue(_ListItem):
 
     Parameters
     ----------
-    name : str
+    name : ``str``
         Name of the residue. Typical convention is to choose a name that is 4
         characters or shorter
-    number : int
+    number : ``int``
         Residue number assigned in the input structure
-    chain : str
+    chain : ``str``
         The 1-letter chain identifier for this residue
-    insertion_code : str
+    insertion_code : ``str``
         The insertion code (used in PDB files) for this residue
-    list : TrackedList=None
+    list : :class:`TrackedList`
         List of residues in which this residue is a member
 
     Attributes
     ----------
-    name : str
+    name : ``str``
         The name of this residue
-    number : int=-1
+    number : ``int``
         The number of this residue in the input structure
-    idx : int
+    idx : ``int``
         The index of this residue inside the container. If this residue has no
         container, or it is not present in the container, idx is -1
-    chain : str
+    chain : ``str``
         The 1-letter chain identifier for this residue
-    insertion_code : str
+    insertion_code : ``str``
         The insertion code (used in PDB files) for this residue
-    ter : bool
+    ter : ``bool``
         If True, there is a TER card directly after this residue (i.e., a
         molecule or chain ends). By default, it is False
-    list : TrackedList
+    list : :class:`TrackedList`
         The container that _may_ have this residue contained inside
-    atoms : list of Atom instances
+    atoms : ``list of`` :`class`Atom` ``instances``
         This is the list of `Atom`s that make up this residue
 
     Notes
@@ -2758,7 +3499,7 @@ class Residue(_ListItem):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to this residue
         
         Notes
@@ -2795,13 +3536,17 @@ class Residue(_ListItem):
 
         Returns
         -------
-        True if there are no atoms left. False if this residue still has atoms
+        empty: ``bool``
+            ``True`` if there are no atoms left. ``False`` otherwise.
         """
         return len(self) == 0
 
     def sort(self):
         """ Sorts the atoms in this list by atom index """
         self.atoms.sort()
+
+    def __getitem__(self, idx):
+        return self.atoms.__getitem__(idx)
 
     # Sort by atom indices
     def __lt__(self, other):
@@ -2812,6 +3557,18 @@ class Residue(_ListItem):
         return not self.atoms[0].idx > other.atoms[0].idx
     def __ge__(self, other):
         return not self.atoms[0].idx < other.atoms[0].idx
+
+    def __repr__(self):
+        if self.number == -1:
+            num = self.idx
+        else:
+            num = self.number
+        rep = '<%s %s[%d]' % (type(self).__name__, self.name, num)
+        if self.chain:
+            rep += '; chain=%s' % self.chain
+        if self.insertion_code:
+            rep += '; insertion_code=%s' % self.insertion_code
+        return rep + '>'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2829,11 +3586,11 @@ class TrackedList(list):
 
     Attributes
     ----------
-    changed : bool
+    changed : ``bool``
         Determines if something has been done to fundamentally change the
         underlying topology defined by this list such that the topology needs to
         be rebuilt
-    needs_indexing : bool
+    needs_indexing : ``bool``
         A flag to determine whether or not the items in a tracked list need to
         be indexed or not.
 
@@ -2905,6 +3662,7 @@ class TrackedList(list):
 
     append = _changes(list.append)
     extend = _changes(list.extend)
+    insert = _changes(list.insert)
     __setitem__ = _changes(list.__setitem__)
     __iadd__ = _changes(list.__iadd__)
     __imul__ = _changes(list.__imul__)
@@ -2976,15 +3734,15 @@ class ResidueList(TrackedList):
 
         Parameters
         ----------
-        atom : Atom
+        atom : :class:`Atom`
             The atom to add to this residue list
-        resname : str
+        resname : ``str``
             The name of the residue this atom belongs to
-        resnum : int
+        resnum : ``int``
             The number of the residue this atom belongs to
-        chain : str=''
+        chain : ``str``
             The chain ID character for this residue
-        inscode : str=''
+        inscode : ``str``
             The insertion code ID character for this residue (it is stripped)
 
         Notes
@@ -3082,7 +3840,7 @@ class AtomList(TrackedList):
 
         Parameters
         ----------
-        item : Atom
+        item : :class:`Atom`
             The atom to add to this list
 
         Notes
@@ -3102,7 +3860,7 @@ class AtomList(TrackedList):
 
         Parameters
         ----------
-        items : iterable of `Atom`s
+        items : iterable of :class:`Atom`s
             The iterable containing Atom instances to add to the end of this
             list
 
@@ -3116,6 +3874,22 @@ class AtomList(TrackedList):
             item.list = self
         return list.extend(self, items)
 
+    @_changes
+    def insert(self, idx, item):
+        """
+        Insert an Atom into the atom list
+
+        Parameters
+        ----------
+        idx : ``int``
+            The index in front of (i.e., before) which to insert the item
+        item : :class:`Atom`
+            The atom to insert in the desired index. This atom will be claimed
+            by the AtomList
+        """
+        item.list = self
+        return list.insert(self, idx, item)
+
     def assign_nbidx_from_types(self):
         """
         Assigns the nb_idx attribute of every atom inside here from the
@@ -3124,7 +3898,7 @@ class AtomList(TrackedList):
 
         Returns
         -------
-        list of dict
+        ``list of dict``
             Each element is a `set` of the `nb_idx` indices for which NBFIX
             alterations are defined for the type with that given that index
             (minus 1, to adjust for indexing from 0 and nb_idx starting from 1)
@@ -3184,13 +3958,13 @@ class NonbondedException(object):
     to as "adjustments" in the Amber-converted files). This class stores
     per-particle exceptions.
 
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         One of the atoms in the exclusion pair
-    atom2 : Atom
+    atom2 : :class:`Atom`
         The other atom in the exclusion pair
-    type : NonbondedExceptionType=None
+    type : :class:`NonbondedExceptionType`
         The nonbonded exception type that describes how the various nonbonded
         interactions between these two atoms should work
 
@@ -3216,34 +3990,22 @@ class NonbondedExceptionType(_ListItem):
 
     Parameters
     ----------
-    vdw_weight : float
+    vdw_weight : ``float``
         The scaling factor by which van der Waals interactions are multiplied
-    multipole_weight : float
+    multipole_weight : ``float``
         The scaling factor by which multipole interactions are multiplied
-    direct_weight : float
+    direct_weight : ``float``
         The scaling factor by which direct-space interactions are multiplied
-    polar_weight : float
+    polar_weight : ``float``
         The scaling factor by which polarization interactions are multiplied
-    mutual_weight : float
+    mutual_weight : ``float``
         The scaling factor by which mutual interactions are multiplied
-    list : float
+    list : :class:`TrackedList`
         The list containing this nonbonded exception
 
-    Attributes
-    ----------
-    vdw_weight : float
-        The scaling factor by which van der Waals interactions are multiplied
-    multipole_weight : float
-        The scaling factor by which multipole interactions are multiplied
-    direct_weight : float
-        The scaling factor by which direct-space interactions are multiplied
-    polar_weight : float
-        The scaling factor by which polarization interactions are multiplied
-    mutual_weight : float
-        The scaling factor by which mutual interactions are multiplied
-    list : float
-        The list containing this nonbonded exception
-    idx : int
+    Other Attributes
+    ----------------
+    idx : ``int``
         The index of this term in the list that contains it
     """
     def __init__(self, vdw_weight, multipole_weight, direct_weight,
@@ -3272,26 +4034,28 @@ class AtomType(object):
 
     Parameters
     ----------
-    name : str
+    name : ``str``
         The name of the atom type
-    number : int
+    number : ``int``
         The serial index of the atom type
-    mass : float
+    mass : ``float``
         The mass of the atom type
-    atomic_number : int
+    atomic_number : ``int``
         The atomic number of the element of the atom type
 
-    Attributes
-    ----------
-    name : str
-        The name of the atom type
-    number : int
-        The serial index of the atom type
-    mass : float
-        The mass of the atom type
-    atomic_number : int
-        The atomic number of the element of the atom type
-    nbfix : dict(str:tuple)
+    Other Attributes
+    ----------------
+    epsilon : ``float``
+        If set, it is the Lennard-Jones well depth of this atom type
+    rmin : ``float``
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type
+    epsilon_14 : ``float``
+        If set, it is the Lennard-Jones well depth of this atom type in 1-4
+        nonbonded interactions
+    rmin_14 : ``float``
+        If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
+        1-4 nonbonded interactions
+    nbfix : ``dict(str:tuple)``
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
         (Rmin, epsilon, Rmin14, Epsilon14)
@@ -3412,11 +4176,11 @@ class AcceptorDonor(object):
     """
     Just a holder for donors and acceptors in CHARMM speak
     
-    Parameters (and Attributes)
-    ---------------------------
-    atom1 : Atom
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
         First atom in the donor/acceptor group
-    atom2 : Atom
+    atom2 : :class:`Atom`
         Second atom in the donor/acceptor group
     """
     def __init__(self, atom1, atom2):
@@ -3438,11 +4202,11 @@ class Group(object):
 
     Parameters
     ----------
-    bs : int
+    bs : ``int``
         Not sure
-    type : int
+    type : ``int``
         The group type (??)
-    move : int
+    move : ``int``
         If the group moves (??)
 
     Disclaimer

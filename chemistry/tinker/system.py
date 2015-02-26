@@ -51,7 +51,8 @@ class TinkerAnalout(object):
                 nitors=0, ntors=0, npitors=0, nstrtor=0, ntortor=0, nion=0,
                 ndipole=0, npole=0, pair12=0, pair13=0, pair14=0, pair15=0)
         self.fname = fname
-        with open(self.fname, 'r') as f:
+        f = open(self.fname, 'r')
+        try:
             line = f.readline()
             # Look for the TINKER watermark
             while True:
@@ -107,6 +108,8 @@ class TinkerAnalout(object):
                     self._functionmap[line.strip()](self, f)
                 except KeyError:
                     break
+        finally:
+            f.close()
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

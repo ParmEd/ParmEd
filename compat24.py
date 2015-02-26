@@ -91,7 +91,7 @@ if 'OrderedDict' not in dir(_collections):
     # some basic tasks. The OrderedDict implementation in Python 2.7 is also
     # pure-python, so it has similar performance as the one implemented here.
     from UserDict import DictMixin
-    class OrderedDict(dict):
+    class OrderedDict(dict, DictMixin):
 
         def __init__(self, *args, **kwargs):
             if len(args) > 1:

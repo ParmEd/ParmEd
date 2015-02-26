@@ -361,7 +361,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(comp + comp, (6.0 + 8.0j)*u.meters)
         self.assertEqual(comp - comp, 0*u.meters)
         self.assertEqual(comp * comp, (3.0 + 4.0j)**2 * u.meters**2)
-        self.assertAlmostEqual(comp / comp, 1)
+        self.assertAlmostEqual(abs(comp / comp), 1)
         self.assertAlmostEqual(1.5*u.nanometers / u.meters, 1.5e-9, places=15)
         self.assertEqual((2.3*u.meters)**2, 2.3**2*u.meters**2)
         x = 4.3 * u.meters
@@ -613,7 +613,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(seq.mean(), 2.5*u.meters)
         self.assertEqual(seq.max(), 4*u.meters)
         self.assertEqual(seq.min(), 1*u.meters)
-        self.assertAlmostEqual(seq.std(), 1.1180339887498949*u.meters)
+        self.assertAlmostEqualQuantities(seq.std(), 1.1180339887498949*u.meters)
 
     def testString(self):
         """ Tests unit handling with strings, which should be dimensionless """
@@ -686,3 +686,6 @@ class TestNumpyUnits(QuantityTestCase):
 
 if not has_numpy():
     del TestNumpyUnits
+
+if __name__ == '__main__':
+    unittest.main()

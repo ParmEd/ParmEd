@@ -5,23 +5,19 @@ parameters defined in an input file for sander and pmemd.
 
 from __future__ import division
 
-from chemistry.amber.asciicrd import AmberMdcrd
-from chemistry.amber.mask import AmberMask
-from chemistry.amber.netcdffiles import NetCDFTraj
-from chemistry.amber.openmmloader import OpenMMRst7 as Rst7
-from chemistry.amber.openmmreporters import (AmberStateDataReporter,
-               NetCDFReporter, MdcrdReporter, RestartReporter, ProgressReporter,
-               EnergyMinimizerReporter)
-from math import sqrt
+from chemistry.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7, AmberParm
 from chemistry.amber.mdin import mdin as Mdin
-from timer import Timer
+from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
+        RestartReporter, ProgressReporter, EnergyMinimizerReporter)
+from chemistry.timer import Timer
+from chemistry import unit as u
+from math import sqrt
+import os
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
-import os
 import sys
 import warnings
 try:
-    import simtk.unit as u
     from simtk.openmm.vec3 import Vec3
     from simtk.openmm.app import (forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2,
                                   Simulation, DCDReporter, amberprmtopfile)
@@ -41,14 +37,9 @@ from simtk.openmm import *
 import simtk.unit as u
 
 # Import the Amber/OpenMM modules
-from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,
-         OpenMMRst7 as Rst7)
-from chemistry.amber.asciicrd import AmberMdcrd
-from chemistry.amber.mask import AmberMask
-from chemistry.amber.netcdffiles import NetCDFTraj
-from chemistry.amber.openmmreporters import (AmberStateDataReporter,
-               NetCDFReporter, MdcrdReporter, RestartReporter, ProgressReporter,
-               EnergyMinimizerReporter)
+from chemistry.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
+from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
+        RestartReporter, ProgressReporter, EnergyMinimizerReporter)
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')
@@ -176,9 +167,6 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ilscivr']:
         raise SimulationError('Linearized semi-classical simulations are not '
                               'supported.')
-    if parm.ptr('ifbox') > 1:
-        raise SimulationError('OpenMM currently supports only '
-                              'orthorhombic cells')
     if parm.ptr('ifbox') > 0 and mdin.cntrl_nml['igb'] > 0:
         raise SimulationError('Cannot treat periodic system with GB')
     if mdin.cntrl_nml['nmropt']:
@@ -547,7 +535,7 @@ def simulate(parm, args):
     # Add the energy reporter
     if scriptfile is not None:
         scriptfile.write('# Add the state data reporters\n')
-        scriptfile.write('rep = AmberStateDataReporter("%s", %s, volume=%s,'
+        scriptfile.write('rep = StateDataReporter("%s", %s, volume=%s,'
                 'density=%s)\n' % (outputfile, mdin.cntrl_nml['ntpr'],
                 parm.ptr('ifbox') > 0, runmd and mdin.cntrl_nml['ntp'] > 0)
         )
@@ -558,7 +546,7 @@ def simulate(parm, args):
                 runmd and mdin.cntrl_nml['ntp'] > 0)
         )
         scriptfile.write('simulation.reporters.append(rep)\n')
-    rep = AmberStateDataReporter(outputfile, mdin.cntrl_nml['ntpr'],
+    rep = StateDataReporter(outputfile, mdin.cntrl_nml['ntpr'],
                     volume=parm.ptr('ifbox') > 0,
                     density=runmd and mdin.cntrl_nml['ntp'] > 0)
     simulation.reporters.append(rep)
@@ -889,15 +877,12 @@ def energy(parm, args, output=sys.stdout):
             gbmeth = GBn
         elif igb == 8:
             gbmeth = GBn2
-    elif parm.ptr('ifbox') == 1:
+    else:
         if cutoff is None: cutoff = 8.0
         if do_ewald:
             nbmeth = ff.Ewald
         else:
             nbmeth = ff.PME
-    else:
-        raise SimulationError('Only orthorhombic boxes currently supported in '
-                              'OpenMM')
 
     parm_ = parm
     if applayer:
@@ -1092,12 +1077,9 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
             gbmeth = GBn2
         # Other choices are vacuum
         kappa = 0.73 * sqrt(saltcon * 0.10806)
-    elif parm.ptr('ifbox') == 1:
+    else:
         if cutoff is None: cutoff = 8.0
         nbmeth = ff.PME
-    else:
-        raise SimulationError('Only orthorhombic boxes currently supported in '
-                              'OpenMM')
 
     # Time to create the OpenMM system
     system = parm.createSystem(nonbondedMethod=nbmeth,

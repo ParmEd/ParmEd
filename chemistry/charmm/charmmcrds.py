@@ -5,10 +5,13 @@ _charmmfile.py for reading files
 
 Author: Jason Deckman
 Contributors: Jason Swails
-Date: April 18, 2014
+Date: Feb. 24, 2015
 """
 
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import CharmmFileError
+from chemistry import unit as u
 
 charmlen = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
@@ -19,16 +22,84 @@ class CharmmCrdFile(object):
     Reads and parses a CHARMM coordinate file (.crd) into its components,
     namely the coordinates, CHARMM atom types, resid, resname, etc.
 
-    Main attributes:
-        - natom (int) : Number of atoms in the system
-        - resname (list) : Names of all residues
-        - coords (list) : All cartesian coordinates [x1, y1, z1, x2, ...]
+    Parameters
+    ----------
+    fname : str
+        Name of the restart file to parse
+
+    Attributes
+    ----------
+    natom : int
+        Number of atoms in the system
+    resname : list of str
+        List of all residue names in the system
+    coords : list of float
+        List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    positions : natom x 3 distance Quantity
+        2-D list of all coordinates with the appropriate distance unit attached.
+        Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
 
     Example:
     >>> chm = CharmmCrdFile('testfiles/1tnm.crd')
     >>> print '%d atoms; %d coords' % (chm.natom, len(chm.coords))
     1414 atoms; 4242 coords
     """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as a CHARMM coordinate file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a CHARMM coordinate file
+        """
+        f = io.genopen(filename)
+        line = f.readline().decode()
+
+        try:
+            while len(line.strip()) == 0:   # Skip whitespace, as a precaution
+                line = f.readline().decode()
+
+            intitle = True
+
+            while intitle:
+                line = f.readline().decode()
+                if len(line.strip()) == 0:
+                    intitle = False
+                elif line.strip()[0] != '*':
+                    intitle = False
+                else:
+                    intitle = True
+
+            while len(line.strip()) == 0:      # Skip whitespace
+                line = f.readline().decode()
+
+            try:
+                natom = int(line.strip().split()[0])
+
+                for row in xrange(min(natom, 3)):
+                    line = f.readline().decode().strip().split()
+                    int(line[0])
+                    int(line[1])
+                    float(line[4])
+                    float(line[5])
+                    float(line[6])
+                    int(line[8])
+                    float(line[9])
+            except (IndexError, ValueError):
+                return False
+
+            return True
+        finally:
+            f.close()
+
 
     def __init__(self, fname):
         self.atomno = []                   # Atom number
@@ -43,6 +114,14 @@ class CharmmCrdFile(object):
 
         self.natom = 0                     # Number of atoms specified in file
         self._parse(fname)
+
+    @property
+    def positions(self):
+        """
+        Atomic coordinates with units attached to them with the shape (natom, 3)
+        """
+        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
 
     def _parse(self, fname):
 
@@ -101,12 +180,32 @@ class CharmmRstFile(object):
     Reads and parses data, velocities and coordinates from a CHARMM restart
     file (.rst) of file name 'fname' into class attributes
 
-    Main attributes:
-        - natom (int) : Number of atoms in the system
-        - resname (list) : Names of all residues
-        - coords (list) : All cartesian coordinates [x1, y1, z1, x2, ...]
-        - coordsold (list) : Old cartesian coordinates
-        - vels (list) : List of all cartesian velocities
+    Parameters
+    ----------
+    fname : str
+        Name of the restart file to parse
+
+    Attributes
+    ----------
+    natom : int
+        Number of atoms in the system
+    resname : list of str
+        Names of all residues in the system
+    coords : list of float
+        List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    coordsold : list of float
+        List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    vels : list of float
+        List of all velocities in the format [x1, y1, z1, x2, y2, z2, ...]
+    positions : natom x 3 distance Quantity
+        2-D list of all coordinates with the appropriate distance unit attached.
+        Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
+    positionsold : natom x 3 distance Quantity
+        2-D list of all old coordinates with the appropriate distance unit
+        attached.  Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
+    velocities : natom x 3 distance/time Quantity
+        2-D list of all old coordinates with the appropriate distance unit
+        attached. Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
 
     Example:
     >>> chm = CharmmRstFile('testfiles/sample-charmm.rst')
@@ -117,6 +216,26 @@ class CharmmRstFile(object):
     >>> print '%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv)
     256 atoms; 768 crds; 768 old crds; 768 vels
     """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as a CHARMM restart file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a CHARMM restart file
+        """
+        f = io.genopen(filename)
+        line = f.readline().decode()
+        f.close()
+        return line.startswith('REST')
 
     def __init__(self, fname):
         self.header = []
@@ -135,6 +254,24 @@ class CharmmRstFile(object):
         self.jhstrt = 0
 
         self._parse(fname)
+
+    @property
+    def positions(self):
+        """ Atomic positions with units """
+        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
+
+    @property
+    def positionsold(self):
+        """ Old atomic positions with units """
+        return ([self.coordsold[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms)
+
+    @property
+    def velocities(self):
+        """ Atomic velocities with units """
+        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+                        u.angstroms / u.picoseconds)
 
     def _parse(self, fname):
 
