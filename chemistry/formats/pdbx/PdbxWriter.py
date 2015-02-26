@@ -18,7 +18,8 @@ __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.01"
 
 
-from chemistry.pdbx.PdbxContainers import DefinitionContainer, DataContainer
+from chemistry.formats.pdbx.PdbxContainers import (DefinitionContainer,
+                                                   DataContainer)
 from chemistry.exceptions import PdbxError
 import sys
 

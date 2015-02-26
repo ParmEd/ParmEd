@@ -137,17 +137,19 @@ class PdbxSyntaxError(ChemError):
         return "%%ERROR - [at line: %d] %s" % (self.lineNumber, self.text)
 
 class CpinResidueError(ChemError):
-   """ Error adding a residue to the CPIN file """
+    """ Error adding a residue to the CPIN file """
 
 class CpinChargeWarning(ChemWarning):
-   """ Bad charge definitions that are inconsistent with protonation states """
+    """ Bad charge definitions that are inconsistent with protonation states """
 
 class CpinRefEneWarning(ChemWarning):
-   """ If not all reference energies are properly pKa-adjusted """
+    """ If not all reference energies are properly pKa-adjusted """
 
 class CpinInputWarning(ChemWarning):
-   """ If there is a non-fatal problem with the input variables """
+    """ If there is a non-fatal problem with the input variables """
 
 class CpinInputError(ChemError):
-   """ If the user provides bad input """
+    """ If the user provides bad input """
 
+class FormatNotFound(ChemError):
+    """ If the file format does not have a registered parser with it """

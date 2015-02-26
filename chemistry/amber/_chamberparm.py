@@ -28,7 +28,6 @@ from chemistry.exceptions import AmberParmError
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
 from math import sqrt
-import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

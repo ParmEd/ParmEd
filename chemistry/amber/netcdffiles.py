@@ -16,6 +16,7 @@ contained in this module.
 """
 from __future__ import division
 
+from chemistry.formats.registry import FileFormatType
 from chemistry import unit as u
 import warnings
 # This determines which NetCDF package we're going to use...
@@ -216,9 +217,43 @@ def needs_netcdf(fcn):
 
 class NetCDFRestart(object):
     """ Class to read or write NetCDF restart files """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as an Amber NetCDF restart file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber NetCDF restart file. False otherwise
+        """
+        if not HAS_NETCDF:
+            return False # Can't determine...
+        if not NETCDF_INITIALIZED:
+            use()
+        try:
+            f = open_netcdf(filename, 'r')
+        except: # Bare except... each package raises different exceptions
+            return False
+        try:
+            try:
+                if _coerce_to_string(f.Conventions) != 'AMBERRESTART':
+                    return False
+            except AttributeError:
+                return False
+            # Passed all our tests
+            return True
+        finally:
+            f.close()
 
     @needs_netcdf
-    def __init__(self, fname, mode):
+    def __init__(self, fname, mode='r'):
         """
         Opens a NetCDF File. The main constructor should never be called
         directly.  The alternative "open_old" and "open_new" constructors should
@@ -381,7 +416,7 @@ class NetCDFRestart(object):
             setattr(inst, dim, get_int_dimension(ncfile, dim))
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
-                        'cell_angles' in ncfile.variables)
+                       'cell_angles' in ncfile.variables)
         if inst.hasvels:
             vels = ncfile.variables['velocities']
             inst.velocity_scale = vels.scale_factor
@@ -392,6 +427,8 @@ class NetCDFRestart(object):
                 # Other packages do not have this variable
                 pass
         return inst
+
+    parse = open_old
 
     @property
     def coordinates(self):
@@ -517,9 +554,43 @@ class NetCDFTraj(object):
     You should use the open_new and open_old alternative constructors instead of
     the default constructor
     """
+    __metaclass__ = FileFormatType
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file type as an Amber NetCDF trajectory file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber NetCDF trajectory file. False otherwise
+        """
+        if not HAS_NETCDF:
+            return False # Can't determine...
+        if not NETCDF_INITIALIZED:
+            use()
+        try:
+            f = open_netcdf(filename, 'r')
+        except: # Bare except... each package raises different exceptions
+            return False
+        try:
+            try:
+                if _coerce_to_string(f.Conventions) != 'AMBER':
+                    return False
+            except AttributeError:
+                return False
+            # Passed all our tests
+            return True
+        finally:
+            f.close()
 
     @needs_netcdf
-    def __init__(self, fname, mode):
+    def __init__(self, fname, mode='r'):
         """ Opens a NetCDF File """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)
