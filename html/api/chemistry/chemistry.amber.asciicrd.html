@@ -123,6 +123,9 @@ instances where the prequisites may not be installed.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.close" title="chemistry.amber.asciicrd.AmberAsciiRestart.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Close the open file handler</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberAsciiRestart.id_format" title="chemistry.amber.asciicrd.AmberAsciiRestart.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber restart/inpcrd file</td>
+</tr>
 </tbody>
 </table>
 <dl class="attribute">
@@ -162,6 +165,30 @@ instances where the prequisites may not be installed.</p>
 <tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="staticmethod">
+<dt id="chemistry.amber.asciicrd.AmberAsciiRestart.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as an Amber restart/inpcrd file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber restart/inpcrd file. False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="chemistry.amber.asciicrd.AmberAsciiRestart.velocities">
 <tt class="descname">velocities</tt><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberAsciiRestart.velocities" title="Permalink to this definition">¶</a></dt>
@@ -197,6 +224,9 @@ like C or C++). For large trajectories, this may be significant.</p>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.coordinates" title="chemistry.amber.asciicrd.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
 <td>Returns the requested coordinates</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.asciicrd.AmberMdcrd.id_format" title="chemistry.amber.asciicrd.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber mdcrd file</td>
 </tr>
 </tbody>
 </table>
@@ -326,6 +356,35 @@ number of frames in the trajectory with each item being an array
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.extra_args">
+<tt class="descname">extra_args</tt><em class="property"> = ('natom', 'hasbox')</em><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.extra_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.amber.asciicrd.AmberMdcrd.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/asciicrd.html#AmberMdcrd.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.asciicrd.AmberMdcrd.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as an Amber mdcrd file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber mdcrd file. False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -372,7 +431,7 @@ number of frames in the trajectory with each item being an array
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

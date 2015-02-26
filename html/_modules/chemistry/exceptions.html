@@ -170,6 +170,9 @@
 <div class="viewcode-block" id="MissingParameterWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.MissingParameterWarning">[docs]</a><span class="k">class</span> <span class="nc">MissingParameterWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If a type of parameter is missing, but you don&#39;t want it to be fatal &quot;&quot;&quot;</span>
 </div>
+<div class="viewcode-block" id="AmberOFFWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmberOFFWarning">[docs]</a><span class="k">class</span> <span class="nc">AmberOFFWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For badly formatted OFF files... ugh &quot;&quot;&quot;</span>
+</div>
 <div class="viewcode-block" id="PdbxError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PdbxError">[docs]</a><span class="k">class</span> <span class="nc">PdbxError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class for catching general errors with PDBx/mmCIF parsing &quot;&quot;&quot;</span>
 </div>
@@ -181,7 +184,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">ERROR - [at line: </span><span class="si">%d</span><span class="s">] </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">ERROR - [at line: </span><span class="si">%d</span><span class="s">] </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CpinResidueError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CpinResidueError">[docs]</a><span class="k">class</span> <span class="nc">CpinResidueError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Error adding a residue to the CPIN file &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="CpinChargeWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CpinChargeWarning">[docs]</a><span class="k">class</span> <span class="nc">CpinChargeWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Bad charge definitions that are inconsistent with protonation states &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="CpinRefEneWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CpinRefEneWarning">[docs]</a><span class="k">class</span> <span class="nc">CpinRefEneWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If not all reference energies are properly pKa-adjusted &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="CpinInputWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CpinInputWarning">[docs]</a><span class="k">class</span> <span class="nc">CpinInputWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is a non-fatal problem with the input variables &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="CpinInputError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CpinInputError">[docs]</a><span class="k">class</span> <span class="nc">CpinInputError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If the user provides bad input &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="FormatNotFound"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.FormatNotFound">[docs]</a><span class="k">class</span> <span class="nc">FormatNotFound</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If the file format does not have a registered parser with it &quot;&quot;&quot;</span></div>
 </pre></div>
 
           </div>
@@ -221,7 +242,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

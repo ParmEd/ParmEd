@@ -121,10 +121,16 @@ contained in this module.</p>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.flush" title="chemistry.amber.netcdffiles.NetCDFRestart.flush"><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.open_new" title="chemistry.amber.netcdffiles.NetCDFRestart.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.id_format" title="chemistry.amber.netcdffiles.NetCDFRestart.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber NetCDF restart file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.open_new" title="chemistry.amber.netcdffiles.NetCDFRestart.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.open_old" title="chemistry.amber.netcdffiles.NetCDFRestart.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.open_old" title="chemistry.amber.netcdffiles.NetCDFRestart.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Opens the NetCDF file and sets the global attributes that the file sets</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFRestart.parse" title="chemistry.amber.netcdffiles.NetCDFRestart.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
 </tbody>
@@ -158,6 +164,30 @@ contained in this module.</p>
 <dt id="chemistry.amber.netcdffiles.NetCDFRestart.flush">
 <tt class="descname">flush</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/netcdffiles.html#NetCDFRestart.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFRestart.flush" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.amber.netcdffiles.NetCDFRestart.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/netcdffiles.html#NetCDFRestart.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFRestart.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as an Amber NetCDF restart file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber NetCDF restart file. False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.amber.netcdffiles.NetCDFRestart.open_new">
@@ -209,6 +239,24 @@ dimension (if <cite>remd</cite> above is &#8220;M[ulti-D]&#8221;)</p>
 <dl class="classmethod">
 <dt id="chemistry.amber.netcdffiles.NetCDFRestart.open_old">
 <em class="property">classmethod </em><tt class="descname">open_old</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/netcdffiles.html#NetCDFRestart.open_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFRestart.open_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the NetCDF file and sets the global attributes that the file sets</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the file to read</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.amber.netcdffiles.NetCDFRestart.parse">
+<em class="property">classmethod </em><tt class="descname">parse</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFRestart.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens the NetCDF file and sets the global attributes that the file sets</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -348,22 +396,25 @@ the default constructor</p>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.forces" title="chemistry.amber.netcdffiles.NetCDFTraj.forces"><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></a>(frame)</td>
 <td>Get the forces of a particular frame in the trajectory</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.open_new" title="chemistry.amber.netcdffiles.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.id_format" title="chemistry.amber.netcdffiles.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber NetCDF trajectory file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.open_new" title="chemistry.amber.netcdffiles.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.open_old" title="chemistry.amber.netcdffiles.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.open_old" title="chemistry.amber.netcdffiles.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.remd_indices" title="chemistry.amber.netcdffiles.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a>(frame)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.remd_indices" title="chemistry.amber.netcdffiles.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a>(frame)</td>
 <td>Returns the REMD indices for the desired frame</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.temp0" title="chemistry.amber.netcdffiles.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a>(frame)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.temp0" title="chemistry.amber.netcdffiles.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a>(frame)</td>
 <td>Returns the temperature of the current frame in kelvin</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.time" title="chemistry.amber.netcdffiles.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a>(frame)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.time" title="chemistry.amber.netcdffiles.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a>(frame)</td>
 <td>Get the time of a particular frame in the trajectory</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.velocities" title="chemistry.amber.netcdffiles.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a>(frame)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.netcdffiles.NetCDFTraj.velocities" title="chemistry.amber.netcdffiles.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a>(frame)</td>
 <td>Get the velocities of a particular frame in the trajectory</td>
 </tr>
 </tbody>
@@ -655,6 +706,30 @@ scaled to be of kcal/mol/Angstroms</p>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="chemistry.amber.netcdffiles.NetCDFTraj.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/netcdffiles.html#NetCDFTraj.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFTraj.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as an Amber NetCDF trajectory file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber NetCDF trajectory file. False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="chemistry.amber.netcdffiles.NetCDFTraj.open_new">
 <em class="property">classmethod </em><tt class="descname">open_new</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/netcdffiles.html#NetCDFTraj.open_new"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.netcdffiles.NetCDFTraj.open_new" title="Permalink to this definition">¶</a></dt>
@@ -840,21 +915,6 @@ a helpful error message</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="chemistry.amber.netcdffiles.pynget_float">
-<tt class="descclassname">chemistry.amber.netcdffiles.</tt><tt class="descname">pynget_float</tt><big>(</big><em>obj</em>, <em>name</em><big>)</big><a class="headerlink" href="#chemistry.amber.netcdffiles.pynget_float" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="chemistry.amber.netcdffiles.pynget_int_dimension">
-<tt class="descclassname">chemistry.amber.netcdffiles.</tt><tt class="descname">pynget_int_dimension</tt><big>(</big><em>obj</em>, <em>name</em><big>)</big><a class="headerlink" href="#chemistry.amber.netcdffiles.pynget_int_dimension" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="chemistry.amber.netcdffiles.pynopen_netcdf">
-<tt class="descclassname">chemistry.amber.netcdffiles.</tt><tt class="descname">pynopen_netcdf</tt><big>(</big><em>name</em>, <em>mode</em><big>)</big><a class="headerlink" href="#chemistry.amber.netcdffiles.pynopen_netcdf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="chemistry.amber.netcdffiles.sciget_float">
 <tt class="descclassname">chemistry.amber.netcdffiles.</tt><tt class="descname">sciget_float</tt><big>(</big><em>obj</em>, <em>name</em><big>)</big><a class="headerlink" href="#chemistry.amber.netcdffiles.sciget_float" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -961,7 +1021,7 @@ bugs or backwards-incompatible changes in the current or earlier versions.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

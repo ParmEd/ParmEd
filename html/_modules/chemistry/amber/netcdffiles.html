@@ -67,6 +67,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
+<span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="c"># This determines which NetCDF package we&#39;re going to use...</span>
@@ -267,9 +268,43 @@
 </div>
 <div class="viewcode-block" id="NetCDFRestart"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.netcdffiles.NetCDFRestart">[docs]</a><span class="k">class</span> <span class="nc">NetCDFRestart</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class to read or write NetCDF restart files &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="NetCDFRestart.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.netcdffiles.NetCDFRestart.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber NetCDF restart file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is an Amber NetCDF restart file. False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_NETCDF</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span> <span class="c"># Can&#39;t determine...</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">NETCDF_INITIALIZED</span><span class="p">:</span>
+            <span class="n">use</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">open_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c"># Bare except... each package raises different exceptions</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_coerce_to_string</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;AMBERRESTART&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+            <span class="c"># Passed all our tests</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
     <span class="nd">@needs_netcdf</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens a NetCDF File. The main constructor should never be called</span>
 <span class="sd">        directly.  The alternative &quot;open_old&quot; and &quot;open_new&quot; constructors should</span>
@@ -432,7 +467,7 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">get_int_dimension</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasvels</span> <span class="o">=</span> <span class="s">&#39;velocities&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;cell_lengths&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span> <span class="ow">and</span>
-                        <span class="s">&#39;cell_angles&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+                       <span class="s">&#39;cell_angles&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
             <span class="n">vels</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">]</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="n">vels</span><span class="o">.</span><span class="n">scale_factor</span>
@@ -444,6 +479,8 @@
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">inst</span>
 </div>
+    <span class="n">parse</span> <span class="o">=</span> <span class="n">open_old</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -568,9 +605,41 @@
 <span class="sd">    You should use the open_new and open_old alternative constructors instead of</span>
 <span class="sd">    the default constructor</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="NetCDFTraj.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.netcdffiles.NetCDFTraj.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber NetCDF trajectory file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is an Amber NetCDF trajectory file. False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_NETCDF</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span> <span class="c"># Can&#39;t determine...</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">NETCDF_INITIALIZED</span><span class="p">:</span>
+            <span class="n">use</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">open_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c"># Bare except... each package raises different exceptions</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_coerce_to_string</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;AMBER&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="c"># Passed all our tests</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
     <span class="nd">@needs_netcdf</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Opens a NetCDF File &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">open_netcdf</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
@@ -1078,7 +1147,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

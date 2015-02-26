@@ -1,0 +1,7 @@
+chemistry.formats.pdb module
+============================
+
+.. automodule:: chemistry.formats.pdb
+    :members:
+    :undoc-members:
+    :show-inheritance:

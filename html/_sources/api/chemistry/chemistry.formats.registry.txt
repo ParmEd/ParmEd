@@ -1,0 +1,7 @@
+chemistry.formats.registry module
+=================================
+
+.. automodule:: chemistry.formats.registry
+    :members:
+    :undoc-members:
+    :show-inheritance:

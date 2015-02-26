@@ -56,27 +56,23 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">chemistry.amber.asciicrd</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
-<span class="kn">from</span> <span class="nn">chemistry.amber.mask</span> <span class="kn">import</span> <span class="n">AmberMask</span>
-<span class="kn">from</span> <span class="nn">chemistry.amber.netcdffiles</span> <span class="kn">import</span> <span class="n">NetCDFTraj</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberMask</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">Rst7</span><span class="p">,</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.mdin</span> <span class="kn">import</span> <span class="n">mdin</span> <span class="k">as</span> <span class="n">Mdin</span>
-<span class="kn">from</span> <span class="nn">MMPBSA_mods.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">chemistry.openmm</span> <span class="kn">import</span> <span class="p">(</span><span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span><span class="p">,</span> <span class="n">MdcrdReporter</span><span class="p">,</span>
+        <span class="n">RestartReporter</span><span class="p">,</span> <span class="n">ProgressReporter</span><span class="p">,</span> <span class="n">EnergyMinimizerReporter</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">chemistry.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SimulationError</span><span class="p">,</span> <span class="n">SimulationWarning</span><span class="p">,</span>
                <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">simtk.unit</span> <span class="kn">as</span> <span class="nn">u</span>
     <span class="kn">from</span> <span class="nn">simtk.openmm.vec3</span> <span class="kn">import</span> <span class="n">Vec3</span>
     <span class="kn">from</span> <span class="nn">simtk.openmm.app</span> <span class="kn">import</span> <span class="p">(</span><span class="n">forcefield</span> <span class="k">as</span> <span class="n">ff</span><span class="p">,</span> <span class="n">OBC1</span><span class="p">,</span> <span class="n">OBC2</span><span class="p">,</span> <span class="n">GBn</span><span class="p">,</span> <span class="n">HCT</span><span class="p">,</span> <span class="n">GBn2</span><span class="p">,</span>
                                   <span class="n">Simulation</span><span class="p">,</span> <span class="n">DCDReporter</span><span class="p">,</span> <span class="n">amberprmtopfile</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
-    <span class="kn">from</span> <span class="nn">chemistry.amber.openmmloader</span> <span class="kn">import</span> <span class="n">OpenMMRst7</span> <span class="k">as</span> <span class="n">Rst7</span>
-    <span class="kn">from</span> <span class="nn">chemistry.amber.openmmreporters</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AmberStateDataReporter</span><span class="p">,</span>
-                   <span class="n">NetCDFReporter</span><span class="p">,</span> <span class="n">MdcrdReporter</span><span class="p">,</span> <span class="n">RestartReporter</span><span class="p">,</span>
-                   <span class="n">ProgressReporter</span><span class="p">,</span> <span class="n">EnergyMinimizerReporter</span><span class="p">)</span>
     <span class="n">HAS_OPENMM</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">HAS_OPENMM</span> <span class="o">=</span> <span class="bp">False</span>
@@ -92,14 +88,9 @@
 <span class="s">import simtk.unit as u</span>
 
 <span class="s"># Import the Amber/OpenMM modules</span>
-<span class="s">from chemistry.amber.openmmloader import (OpenMMAmberParm as AmberParm,</span>
-<span class="s">         OpenMMRst7 as Rst7)</span>
-<span class="s">from chemistry.amber.asciicrd import AmberMdcrd</span>
-<span class="s">from chemistry.amber.mask import AmberMask</span>
-<span class="s">from chemistry.amber.netcdffiles import NetCDFTraj</span>
-<span class="s">from chemistry.amber.openmmreporters import (AmberStateDataReporter,</span>
-<span class="s">               NetCDFReporter, MdcrdReporter, RestartReporter, ProgressReporter,</span>
-<span class="s">               EnergyMinimizerReporter)</span>
+<span class="s">from chemistry.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj</span>
+<span class="s">from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,</span>
+<span class="s">        RestartReporter, ProgressReporter, EnergyMinimizerReporter)</span>
 
 <span class="s"># Load the Amber topology file</span>
 <span class="s">parm = AmberParm(&#39;</span><span class="si">%s</span><span class="s">&#39;, &#39;</span><span class="si">%s</span><span class="s">&#39;)</span>
@@ -227,9 +218,6 @@
     <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ilscivr&#39;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Linearized semi-classical simulations are not &#39;</span>
                               <span class="s">&#39;supported.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;OpenMM currently supports only &#39;</span>
-                              <span class="s">&#39;orthorhombic cells&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;igb&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Cannot treat periodic system with GB&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;nmropt&#39;</span><span class="p">]:</span>
@@ -598,7 +586,7 @@
     <span class="c"># Add the energy reporter</span>
     <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;# Add the state data reporters</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;rep = AmberStateDataReporter(&quot;</span><span class="si">%s</span><span class="s">&quot;, </span><span class="si">%s</span><span class="s">, volume=</span><span class="si">%s</span><span class="s">,&#39;</span>
+        <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;rep = StateDataReporter(&quot;</span><span class="si">%s</span><span class="s">&quot;, </span><span class="si">%s</span><span class="s">, volume=</span><span class="si">%s</span><span class="s">,&#39;</span>
                 <span class="s">&#39;density=</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntpr&#39;</span><span class="p">],</span>
                 <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">runmd</span> <span class="ow">and</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">)</span>
@@ -609,7 +597,7 @@
                 <span class="n">runmd</span> <span class="ow">and</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;simulation.reporters.append(rep)</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-    <span class="n">rep</span> <span class="o">=</span> <span class="n">AmberStateDataReporter</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntpr&#39;</span><span class="p">],</span>
+    <span class="n">rep</span> <span class="o">=</span> <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntpr&#39;</span><span class="p">],</span>
                     <span class="n">volume</span><span class="o">=</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
                     <span class="n">density</span><span class="o">=</span><span class="n">runmd</span> <span class="ow">and</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">simulation</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rep</span><span class="p">)</span>
@@ -940,15 +928,12 @@
             <span class="n">gbmeth</span> <span class="o">=</span> <span class="n">GBn</span>
         <span class="k">elif</span> <span class="n">igb</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
             <span class="n">gbmeth</span> <span class="o">=</span> <span class="n">GBn2</span>
-    <span class="k">elif</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">8.0</span>
         <span class="k">if</span> <span class="n">do_ewald</span><span class="p">:</span>
             <span class="n">nbmeth</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">Ewald</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">nbmeth</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">PME</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Only orthorhombic boxes currently supported in &#39;</span>
-                              <span class="s">&#39;OpenMM&#39;</span><span class="p">)</span>
 
     <span class="n">parm_</span> <span class="o">=</span> <span class="n">parm</span>
     <span class="k">if</span> <span class="n">applayer</span><span class="p">:</span>
@@ -1143,12 +1128,9 @@
             <span class="n">gbmeth</span> <span class="o">=</span> <span class="n">GBn2</span>
         <span class="c"># Other choices are vacuum</span>
         <span class="n">kappa</span> <span class="o">=</span> <span class="mf">0.73</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">saltcon</span> <span class="o">*</span> <span class="mf">0.10806</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">8.0</span>
         <span class="n">nbmeth</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">PME</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Only orthorhombic boxes currently supported in &#39;</span>
-                              <span class="s">&#39;OpenMM&#39;</span><span class="p">)</span>
 
     <span class="c"># Time to create the OpenMM system</span>
     <span class="n">system</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">nbmeth</span><span class="p">,</span>
@@ -1270,7 +1252,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

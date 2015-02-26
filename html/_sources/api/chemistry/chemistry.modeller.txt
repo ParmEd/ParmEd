@@ -1,0 +1,19 @@
+chemistry.modeller package
+==========================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.modeller.mol2
+   chemistry.modeller.offlib
+   chemistry.modeller.residue
+
+Module contents
+---------------
+
+.. automodule:: chemistry.modeller
+    :members:
+    :undoc-members:
+    :show-inheritance:

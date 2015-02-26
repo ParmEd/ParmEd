@@ -1,0 +1,7 @@
+chemistry.formats.psf module
+============================
+
+.. automodule:: chemistry.formats.psf
+    :members:
+    :undoc-members:
+    :show-inheritance:

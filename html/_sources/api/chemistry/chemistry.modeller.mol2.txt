@@ -1,0 +1,7 @@
+chemistry.modeller.mol2 module
+==============================
+
+.. automodule:: chemistry.modeller.mol2
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -190,13 +190,13 @@ Date: April 20, 2014</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.update_dihedral_exclusions" title="chemistry.charmm.psf.CharmmPsfFile.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_cif" title="chemistry.charmm.psf.CharmmPsfFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_cif" title="chemistry.charmm.psf.CharmmPsfFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_pdb" title="chemistry.charmm.psf.CharmmPsfFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_pdb" title="chemistry.charmm.psf.CharmmPsfFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="chemistry.charmm.psf.CharmmPsfFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="chemistry.charmm.psf.CharmmPsfFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -930,13 +930,17 @@ atomic velocities for every atom in the system</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
@@ -987,26 +991,30 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a PDB file from the current Structure instance</p>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
-it was assigned previously</p>
+it was assigned previously. Default is True</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -1014,7 +1022,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : str, optional</p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -1031,16 +1039,16 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written</p>
+False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
-<p><strong>charmm</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>charmm</strong> : bool, optional</p>
 <blockquote class="last">
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
-atom that does not contain a SEGID identifier.</p>
+atom that does not contain a SEGID identifier. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1050,13 +1058,17 @@ atom that does not contain a SEGID identifier.</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.psf.CharmmPsfFile.write_psf">
-<tt class="descname">write_psf</tt><big>(</big><em>dest</em>, <em>vmd=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/psf.html#CharmmPsfFile.write_psf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.psf.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a PSF file from the stored molecule</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : str or file-like</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
 <blockquote>
 <div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
 attribute, it will be used to print the PSF file. Otherwise, it will
@@ -1131,7 +1143,7 @@ closed</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

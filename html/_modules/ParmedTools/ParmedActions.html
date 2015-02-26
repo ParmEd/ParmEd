@@ -54,7 +54,20 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">AmberMask</span><span class="p">,</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">AmoebaParm</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span>
+<span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ChemError</span><span class="p">,</span> <span class="n">CharmmFileError</span>
+<span class="kn">from</span> <span class="nn">chemistry.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span><span class="p">,</span> <span class="n">AmberOFFLibrary</span>
+<span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
+<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">any</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span> <span class="k">as</span> <span class="nb">zip</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c"># Must be Python 3, zip already is izip</span>
+    <span class="k">pass</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">WriteOFFError</span><span class="p">,</span> <span class="n">ParmError</span><span class="p">,</span> <span class="n">ParmWarning</span><span class="p">,</span>
               <span class="n">ChangeStateError</span><span class="p">,</span> <span class="n">ChangeLJPairError</span><span class="p">,</span> <span class="n">ParmedChangeError</span><span class="p">,</span>
               <span class="n">SetParamError</span><span class="p">,</span> <span class="n">DeleteDihedralError</span><span class="p">,</span> <span class="n">NoArgument</span><span class="p">,</span> <span class="n">NonexistentParm</span><span class="p">,</span>
@@ -65,22 +78,8 @@
               <span class="n">FileDoesNotExist</span><span class="p">,</span> <span class="n">InputError</span><span class="p">,</span> <span class="n">TiMergeError</span><span class="p">,</span>
 <span class="c">#             CoarseGrainError,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ParmedTools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
-<span class="kn">from</span> <span class="nn">ParmedTools.parmlist</span> <span class="kn">import</span> <span class="n">ParmList</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">AmoebaParm</span>
-<span class="kn">from</span> <span class="nn">chemistry.amber.mask</span> <span class="kn">import</span> <span class="n">AmberMask</span>
-<span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberFormat</span>
-<span class="kn">from</span> <span class="nn">chemistry.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span>
-                                       <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ChemError</span><span class="p">,</span> <span class="n">CharmmFileError</span>
-<span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">any</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span> <span class="k">as</span> <span class="nb">zip</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c"># Must be Python 3, zip already is izip</span>
-    <span class="k">pass</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.parmlist</span> <span class="kn">import</span> <span class="n">ParmList</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">GB_RADII</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;amber6&#39;</span><span class="p">,</span> <span class="s">&#39;bondi&#39;</span><span class="p">,</span> <span class="s">&#39;mbondi&#39;</span><span class="p">,</span> <span class="s">&#39;mbondi2&#39;</span><span class="p">,</span> <span class="s">&#39;mbondi3&#39;</span><span class="p">]</span>
@@ -196,9 +195,7 @@
     <span class="c"># Do we allow any action to overwrite existing files? Static variable.</span>
     <span class="n">overwrite</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="c"># Set a list of which classes of topology files is supported by this action.</span>
-    <span class="c"># Use class names rather than &quot;isinstance&quot; since ChamberParm and AmoebaParm</span>
-    <span class="c"># both inherit from AmberParm</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;AmoebaParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">AmoebaParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Constructor &quot;&quot;&quot;</span>
         <span class="c"># Is this action &#39;valid&#39; (i.e., can we run &#39;execute&#39;)?</span>
@@ -206,7 +203,7 @@
         <span class="c"># Accept both an AmberParm or ParmList instance to simplify the API</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_parm</span><span class="p">,</span> <span class="n">ParmList</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span> <span class="o">=</span> <span class="n">input_parm</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_parm</span><span class="p">,</span> <span class="n">AmberFormat</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_parm</span><span class="p">,</span> <span class="n">AmberParm</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span> <span class="o">=</span> <span class="n">ParmList</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="o">.</span><span class="n">add_parm</span><span class="p">(</span><span class="n">input_parm</span><span class="p">)</span>
         <span class="c"># Set active parm</span>
@@ -260,10 +257,7 @@
                                   <span class="o">%</span> <span class="n">parm</span><span class="p">,</span> <span class="n">SeriousParmWarning</span><span class="p">)</span>
                     <span class="k">return</span>
 
-        <span class="c"># Make sure our topology file type is supported. OpenMM* classes should</span>
-        <span class="c"># be treated the same as their non-OpenMM counterparts</span>
-        <span class="n">typename</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;OpenMM&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_parm</span> <span class="ow">and</span> <span class="n">typename</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_classes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_parm</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_classes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ParmError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> topologies are not supported by this action&#39;</span> <span class="o">%</span>
                             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -288,7 +282,7 @@
 
 <div class="viewcode-block" id="Action.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.Action.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; This should be overridden if anything needs to be done &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s">&#39;init must be overridden by Action subclass&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;init must be overridden by Action subclass&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Action.execute"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.Action.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Commands involved in executing the action &quot;&quot;&quot;</span>
@@ -358,7 +352,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Writes an frcmod file from all of the parameters in the topology file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
 <div class="viewcode-block" id="writefrcmod.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.writefrcmod.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_string</span><span class="p">(</span><span class="n">optional</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span> <span class="o">=</span> <span class="s">&#39;frcmod&#39;</span>
@@ -415,7 +409,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Writes an Amber OFF Library with all of the residues found in the topology</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
 <div class="viewcode-block" id="writeoff.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.writeoff.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">off_file</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_string</span><span class="p">()</span>
 </div>
@@ -428,7 +422,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coords</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">WriteOFFError</span><span class="p">(</span><span class="s">&#39;You must load a restart for WriteOFF!&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">writeOFF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">off_file</span><span class="p">)</span>
+        <span class="n">lib</span> <span class="o">=</span> <span class="n">ResidueTemplateContainer</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span><span class="o">.</span><span class="n">to_library</span><span class="p">()</span>
+        <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">off_file</span><span class="p">)</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div></div>
@@ -437,7 +432,7 @@
 <span class="sd">    Changes intrinsic GB radii to the specified set: Allowed values are</span>
 <span class="sd">        amber6, bondi, mbondi, mbondi2, mbondi3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="changeradii.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changeradii.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radii</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_string</span><span class="p">()</span>
 </div>
@@ -468,7 +463,7 @@
 <span class="sd">    Changes a particular Lennard Jones pair based on a given (pre-combined)</span>
 <span class="sd">    epsilon/Rmin</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="changeljpair.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changeljpair.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask1</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask2</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
@@ -514,7 +509,7 @@
 <span class="sd">    Changes a particular 1-4 Lennard Jones pair based on a given (pre-combined)</span>
 <span class="sd">    epsilon/Rmin. Only valid for CHAMBER prmtops</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;ChamberParm&#39;</span><span class="p">,)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ChamberParm</span><span class="p">,)</span>
 <div class="viewcode-block" id="changelj14pair.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changelj14pair.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="c"># Make sure this is a chamber prmtop</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">chamber</span><span class="p">:</span>
@@ -569,7 +564,7 @@
 <span class="sd">    Basic checks for prmtop validity.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="checkvalidity.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.checkvalidity.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -703,7 +698,7 @@
 <span class="sd">    Turns given mask into a new LJ atom type. It uses the radius and Rmin from</span>
 <span class="sd">    the first atom type in &lt;mask&gt; if new_radius or new_epsilon aren&#39;t provided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="addljtype.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.addljtype.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new_radius_14</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_float</span><span class="p">(</span><span class="s">&#39;radius_14&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new_epsilon_14</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_float</span><span class="p">(</span><span class="s">&#39;epsilon_14&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -760,7 +755,7 @@
 <span class="sd">    Prints the Lennard Jones type index for the given atom mask or, if no value</span>
 <span class="sd">    is given, the LJ type index for each atom.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="printljtypes.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.printljtypes.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="c"># Compile the list of indices</span>
         <span class="k">try</span><span class="p">:</span>
@@ -821,7 +816,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the 1-4 EEL scaling factor in the prmtop</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="scee.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.scee.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scee_value</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
 </div>
@@ -848,7 +843,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the 1-4 VDW scaling factor in the prmtop</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="scnb.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.scnb.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scnb_value</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
 </div>
@@ -878,7 +873,7 @@
 <span class="sd">    Use addLJType to change the Lennard-Jones parameters on a set of specific</span>
 <span class="sd">    atoms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="changeljsingletype.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changeljsingletype.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
@@ -1128,7 +1123,7 @@
 <span class="sd">    treated via constant pH MD in Amber. This corresponds to all residues found</span>
 <span class="sd">    in $AMBERHOME/AmberTools/src/etc/cpin_data.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
 <div class="viewcode-block" id="changeprotstate.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changeprotstate.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_int</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
@@ -1184,7 +1179,7 @@
         <span class="n">residues</span><span class="o">.</span><span class="n">titratable_residues</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&#39;ASH&#39;</span><span class="p">,</span> <span class="s">&#39;GLH&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="changeprotstate.execute"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.changeprotstate.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">cpinutils</span> <span class="kn">import</span> <span class="n">residues</span>
+        <span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">titratable_residues</span> <span class="k">as</span> <span class="n">residues</span>
         <span class="n">changeprotstate</span><span class="o">.</span><span class="n">_add_ash_glh</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
         <span class="c"># If we didn&#39;t select any residues, just return</span>
@@ -1224,7 +1219,7 @@
 <span class="sd">    Prints the total charge of all of the atoms given by the mask. Defaults to</span>
 <span class="sd">    all atoms</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
     <span class="n">outfile</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 <div class="viewcode-block" id="netcharge.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.netcharge.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">(</span><span class="n">optional</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -1288,7 +1283,7 @@
 <span class="sd">    For PME simulations, long-range electrostatics between these atom pairs are</span>
 <span class="sd">    still computed (in different unit cells).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="addexclusions.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.addexclusions.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask1</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask2</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
@@ -1528,7 +1523,7 @@
 <span class="sd">    the prmtop unless you call remake_parm() on the object (this is done for</span>
 <span class="sd">    performance reasons)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="setbond.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.setbond.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
@@ -1604,7 +1599,7 @@
 <span class="sd">    the prmtop unless you call remake_parm() on the object (this is done for</span>
 <span class="sd">    performance reasons)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="setangle.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.setangle.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
@@ -1689,7 +1684,7 @@
 <span class="sd">    VDW scaling factor for this dihedral (default for AMBER is 2.0, default for</span>
 <span class="sd">    GLYCAM is 1.0)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="adddihedral.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.adddihedral.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_float</span><span class="p">()</span>
@@ -1806,7 +1801,7 @@
 <span class="sd">    Deletes the dihedral around &lt;mask2&gt; and &lt;mask3&gt; in which the end-groups are</span>
 <span class="sd">    &lt;mask1&gt; and &lt;mask4&gt;. For multi-term dihedrals, it removes each term.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="deletedihedral.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.deletedihedral.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask1</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask2</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
@@ -1892,7 +1887,7 @@
 <span class="sd">    one atom with the Lennard Jones index given in square brackets at the end.</span>
 <span class="sd">    Alternatively, you can request a particular atom type index</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="printljmatrix.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.printljmatrix.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_int</span><span class="p">(</span><span class="n">optional</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
@@ -1973,7 +1968,7 @@
 <span class="sd">    This is used when the atoms in molecules 1/2 are not in the same order and</span>
 <span class="sd">    for checking the input coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="timerge.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.timerge.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_float</span><span class="p">(</span><span class="s">&#39;tol&#39;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -2479,7 +2474,7 @@
 <span class="sd">    will be &lt;prefix&gt;.# where # starts at &lt;startnum&gt; and increments by 1 for each</span>
 <span class="sd">    prmtop printed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 <div class="viewcode-block" id="interpolate.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.interpolate.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="c"># Make sure we have at least 2 prmtops</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -2675,7 +2670,7 @@
 <span class="sd">    Adjusts Lennard Jones parameters to work with the LMOD code in Amber</span>
 <span class="sd">    (changes LJ A coefficients that are 0 to 1000).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="lmod.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.lmod.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -2894,7 +2889,7 @@
 <span class="sd">    [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,</span>
 <span class="sd">        289-297</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
    
     <span class="n">_supported_wms</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;TIP3P&#39;</span><span class="p">,</span> <span class="s">&#39;TIP4PEW&#39;</span><span class="p">,</span> <span class="s">&#39;SPCE&#39;</span><span class="p">)</span>
 
@@ -3032,7 +3027,7 @@
 <span class="sd">    will prevent anything from actually being run and can only be used when a</span>
 <span class="sd">    script file is provided.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="openmm.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.openmm.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="n">parm</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_string</span><span class="p">(</span><span class="s">&#39;-p&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
@@ -3111,7 +3106,7 @@
 <span class="sd">                      separately</span>
 <span class="sd">        - applayer : Use OpenMM&#39;s class to compute the energy</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
 
     <span class="n">output</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
@@ -3157,8 +3152,6 @@
 <span class="sd">    (like angles and dihedrals) that would get severed by the deletion of one of</span>
 <span class="sd">    the bonds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">,</span> <span class="s">&#39;AmoebaParm&#39;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="deletebond.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.deletebond.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask1</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask2</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">())</span>
@@ -3623,7 +3616,7 @@
 <span class="sd">    The implicit solvent options will be ignored for systems with periodic</span>
 <span class="sd">    boundary conditions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;ChamberParm&#39;</span><span class="p">,</span> <span class="s">&#39;AmberParm&#39;</span><span class="p">)</span>
+    <span class="n">supported_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ChamberParm</span><span class="p">,</span> <span class="n">AmberParm</span><span class="p">)</span>
 
 <div class="viewcode-block" id="minimize.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.minimize.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_float</span><span class="p">(</span><span class="s">&#39;cutoff&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -3749,7 +3742,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

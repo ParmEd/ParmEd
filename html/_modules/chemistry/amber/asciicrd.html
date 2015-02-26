@@ -59,6 +59,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
+<span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ReadError</span>
 <span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">property</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
@@ -86,6 +88,7 @@
 
 <span class="k">class</span> <span class="nc">_AmberAsciiCoordinateFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Abstract base class for interacting with ASCII coordinate files &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">CRDS_PER_LINE</span> <span class="o">=</span> <span class="bp">None</span>
@@ -191,7 +194,44 @@
 <span class="sd">        time : float, optional</span>
 <span class="sd">            The time to write to the restart file in ps. Default is 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-   
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AmberAsciiRestart.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber restart/inpcrd file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is an Amber restart/inpcrd file. False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c"># Look for natom</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="c"># Next 3 lines, make sure we have %12.7f format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+                    <span class="n">j12</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">12</span>
+                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="p">:</span><span class="n">j12</span><span class="o">+</span><span class="mi">12</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;0123456789&#39;</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c"># Must be a restart...</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
     <span class="n">CRDS_PER_LINE</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="s">&#39;restart created by ParmEd&#39;</span>
 
@@ -466,11 +506,44 @@
 <span class="sd">    parsing NetCDF files (or the equivalent parsing done in a compiled language</span>
 <span class="sd">    like C or C++). For large trajectories, this may be significant.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">extra_args</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">,</span> <span class="s">&#39;hasbox&#39;</span><span class="p">)</span>
 
     <span class="n">CRDS_PER_LINE</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="s">&#39;trajectory created by ParmEd&#39;</span>
 
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AmberMdcrd.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber mdcrd file</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is an Amber mdcrd file. False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c"># Next 4 lines, make sure we have %8.3f format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+                    <span class="n">j8</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">8</span>
+                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j8</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j8</span><span class="p">:</span><span class="n">j8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j8</span><span class="o">+</span><span class="mi">7</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;0123456789&#39;</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c"># Must be a mdcrd</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the data out of the mdcrd file and creates self.data</span>
@@ -702,7 +775,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

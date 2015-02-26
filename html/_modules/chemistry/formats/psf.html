@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.formats.psf &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="chemistry.formats" href="../formats.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" accesskey="U">chemistry.formats</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.formats.psf</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for reading and writing CHARMM- and XPLOR-style PSF</span>
+<span class="sd">files</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span>
+<span class="c"># TODO -- move this functionality to a more centralized location</span>
+<span class="kn">from</span> <span class="nn">chemistry.charmm.psf</span> <span class="kn">import</span> <span class="n">set_molecules</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats.io</span> <span class="kn">import</span> <span class="n">genopen</span><span class="p">,</span> <span class="n">TextToBinaryFile</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
+
+<div class="viewcode-block" id="PSFFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile">[docs]</a><span class="k">class</span> <span class="nc">PSFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CHARMM- or XPLOR-style PSF file parser and writer. This class is</span>
+<span class="sd">    specifically a holder for the writing functionality and a vessel for</span>
+<span class="sd">    automatic file type detection. If you wish to instantiate a PSF file</span>
+<span class="sd">    directly, use :class:`chemistry.charmm.CharmmPsfFile` or the</span>
+<span class="sd">    :func:`chemistry.formats.load_file` function instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PSFFile.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as a CHARMM PSF file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is a CHARMM or Xplor-style PSF file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;PSF&#39;</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PSFFile.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read a CHARMM- or XPLOR-style PSF file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to parse</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        psf_file : :class:`CharmmPsfFile`</span>
+<span class="sd">            The PSF file instance with all information loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PSFFile.write"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a PSF file from the stored molecule</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`Structure`</span>
+<span class="sd">            The Structure instance from which the PSF should be written</span>
+<span class="sd">        dest : str or file-like</span>
+<span class="sd">            The place to write the output PSF file.  If it has a &quot;write&quot;</span>
+<span class="sd">            attribute, it will be used to print the PSF file. Otherwise, it will</span>
+<span class="sd">            be treated like a string and a file will be opened, printed, then</span>
+<span class="sd">            closed</span>
+<span class="sd">        vmd : bool </span>
+<span class="sd">            If True, it will write out a PSF in the format that VMD prints it in</span>
+<span class="sd">            (i.e., no NUMLP/NUMLPH or MOLNT sections)</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; cs = CharmmPsfFile(&#39;testfiles/test.psf&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; cs.write_psf(&#39;testfiles/test2.psf&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># See if this is an extended format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s">&#39;EXT&#39;</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">flags</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Index the atoms and residues</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
+
+        <span class="c"># Assign the formats we need to write with</span>
+        <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
+            <span class="n">atmfmt1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%10d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8i</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%4d</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">atmfmt2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%10d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8i</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">intfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%10d</span><span class="s">&#39;</span> <span class="c"># For pointers</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atmfmt1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4i</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%4d</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">atmfmt2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4i</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%13.4f</span><span class="s">&#39;</span> <span class="o">+</span> <span class="mi">11</span><span class="o">*</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">intfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%8d</span><span class="s">&#39;</span> <span class="c"># For pointers</span>
+
+        <span class="c"># Now print the header then the title</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;PSF &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="s">&#39;flags&#39;</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">flags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;EXT&#39;</span><span class="p">)</span> <span class="c"># EXT is always active</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NTITLE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Now time for the atoms</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NATOM</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># atmfmt1 is for CHARMM format (i.e., atom types are integers)</span>
+        <span class="c"># atmfmt is for XPLOR format (i.e., atom types are strings)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="n">atmfmt2</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">:</span> <span class="n">typ</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="n">atmfmt1</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
+                <span class="n">segid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;SYS&#39;</span>
+            <span class="n">atmstr</span> <span class="o">=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
+                            <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span>
+                            <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s">&#39;props&#39;</span><span class="p">):</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atmstr</span> <span class="o">+</span> <span class="s">&#39;   &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">props</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Bonds</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NBOND: bonds</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bond</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># Write 4 bonds per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Angles</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NTHETA: angles</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c"># Write 3 angles per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Dihedrals</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NPHI: dihedrals</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dih</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Write 2 dihedrals per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Impropers</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NIMPHI: impropers</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">imp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Write 2 dihedrals per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># See if we need to terminate</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Donor section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NDON: donors</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">don</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">donors</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">don</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">don</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># 4 donors per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Acceptor section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NACC: acceptors</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">acc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">acc</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">acc</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c"># 4 donors per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># NNB section ??</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span> <span class="o">+</span> <span class="s">&#39; !NNB</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="c"># Write 8 0&#39;s per line</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Group section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">),</span> <span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">nst2</span><span class="p">))</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; !NGRP NST2</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="n">gp</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">gp</span><span class="o">.</span><span class="n">move</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># The next two sections are never found in VMD prmtops...</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vmd</span><span class="p">:</span>
+            <span class="c"># Molecule section; first set molecularity</span>
+            <span class="n">set_molecules</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+            <span class="n">mollist</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">marked</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">max</span><span class="p">(</span><span class="n">mollist</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !MOLNT</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">marked</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="c"># NUMLP/NUMLPH section</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NUMLP NUMLPH</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># CMAP section</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; !NCRTERM: cross-terms</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="c"># Done!</span>
+        <span class="c"># If we opened our own handle, close it</span>
+        <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c">#===================================================</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" >chemistry.formats</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

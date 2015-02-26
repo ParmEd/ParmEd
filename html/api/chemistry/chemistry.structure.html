@@ -236,11 +236,14 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.structure.Structure.update_dihedral_exclusions" title="chemistry.structure.Structure.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.structure.Structure.write_psf" title="chemistry.structure.Structure.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
 </table>
@@ -992,13 +995,17 @@ atomic velocities for every atom in the system</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.write_cif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.structure.Structure.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
@@ -1049,26 +1056,30 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="chemistry.structure.Structure.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.write_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.write_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a PDB file from the current Structure instance</p>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.structure.Structure.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
-it was assigned previously</p>
+it was assigned previously. Default is True</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -1076,7 +1087,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : str, optional</p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -1093,21 +1104,56 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written</p>
+False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
-<p><strong>charmm</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>charmm</strong> : bool, optional</p>
 <blockquote class="last">
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
-atom that does not contain a SEGID identifier.</p>
+atom that does not contain a SEGID identifier. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.structure.Structure.write_psf">
+<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#chemistry.structure.Structure.write_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -1121,137 +1167,6 @@ atom that does not contain a SEGID identifier.</p>
 <dt id="chemistry.structure.needs_openmm">
 <tt class="descclassname">chemistry.structure.</tt><tt class="descname">needs_openmm</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#needs_openmm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.needs_openmm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="function">
-<dt id="chemistry.structure.read_CIF">
-<tt class="descclassname">chemistry.structure.</tt><tt class="descname">read_CIF</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#read_CIF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.read_CIF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
-<blockquote>
-<div><p>Name of PDB file to read, or a file-like object that can iterate over
-the lines of a PDB. Compressed file names can be specified and are
-determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
-<p><strong>structure#</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
-<blockquote class="last">
-<div><p>The Structure object initialized with all of the information from the
-PDBx/mmCIF file.  No bonds or other topological features are added by
-default. If multiple structures are defined in the CIF file, multiple
-Structure instances will be returned as a tuple.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The returned structure has an extra attribute, pdbxyz, that contains all of
-the coordinates for all of the frames in the PDB file as a list of NATOM*3
-lists.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="chemistry.structure.read_PDB">
-<tt class="descclassname">chemistry.structure.</tt><tt class="descname">read_PDB</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#read_PDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.read_PDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
-<blockquote>
-<div><p>Name of PDB file to read, or a file-like object that can iterate over
-the lines of a PDB. Compressed file names can be specified and are
-determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure</p>
-<p><strong>structure</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
-<blockquote class="last">
-<div><p>The Structure object initialized with all of the information from the
-PDB file.  No bonds or other topological features are added by default.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The returned structure has an extra attribute, pdbxyz, that contains all of
-the coordinates for all of the frames in the PDB file as a list of NATOM*3
-lists.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="chemistry.structure.write_PDB">
-<tt class="descclassname">chemistry.structure.</tt><tt class="descname">write_PDB</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#write_PDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.write_PDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a PDB file from a structure instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
-<blockquote>
-<div><p>A Structure instance from which to write the PDB file</p>
-</div></blockquote>
-<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
-<blockquote>
-<div><p>Either a file name or a file-like object containing a <cite>write</cite>
-method to which to write the PDB file</p>
-</div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote>
-<div><p>If True, renumber the atoms and residues sequentially as they are
-stored in the structure.  If False, use the original numbering if
-it was assigned previously</p>
-</div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
-<blockquote>
-<div><p>If provided, these coordinates will be written to the PDB file
-instead of the coordinates stored in the structure. These
-coordinates should line up with the atom order in the structure
-(not necessarily the order of the &#8220;original&#8221; PDB file if they
-differ)</p>
-</div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
-<blockquote>
-<div><p>Keyword controlling which alternate locations are printed to the
-resulting PDB file. Allowable options are:</p>
-<blockquote>
-<div><ul class="simple">
-<li>&#8216;all&#8217; : (default) print all alternate locations</li>
-<li>&#8216;first&#8217; : print only the first alternate locations</li>
-<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
-conformers have the same occupancy, the first one to occur is
-printed</li>
-</ul>
-</div></blockquote>
-<p>Input is case-insensitive, and partial strings are permitted as long
-as it is a substring of one of the above options that uniquely
-identifies the choice.</p>
-</div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote>
-<div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written</p>
-</div></blockquote>
-<p><strong>charmm</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote class="last">
-<div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file in
-the typical CHARMM-style PDB output. This will be omitted for any atom
-that does not contain a SEGID identifier.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 </div>
 
@@ -1297,7 +1212,7 @@ that does not contain a SEGID identifier.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

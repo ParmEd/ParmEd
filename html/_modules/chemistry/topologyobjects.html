@@ -453,7 +453,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Atom.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">atomic_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">atomic_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
                  <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nb_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">screen</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">tree</span><span class="o">=</span><span class="s">&#39;BLA&#39;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">irotat</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">bfactor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">altloc</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rmin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -498,7 +498,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
    
     <span class="c">#===================================================</span>
-</div>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_copy</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -912,8 +912,10 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">start</span> <span class="o">=</span> <span class="s">&#39;&lt;Atom </span><span class="si">%s</span><span class="s"> [</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="p">,</span> <span class="s">&#39;idx&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="s">&#39;; In </span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="s">&#39;; In </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="s">&#39;&gt;&#39;</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -1500,7 +1502,7 @@
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Bond.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Bond.html#chemistry.topologyobjects.Bond.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Bond constructor &quot;&quot;&quot;</span>
         <span class="c"># Make sure we&#39;re not bonding me to myself</span>
         <span class="k">if</span> <span class="n">atom1</span> <span class="ow">is</span> <span class="n">atom2</span><span class="p">:</span>
@@ -1513,7 +1515,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">atom1</span><span class="o">.</span><span class="n">bond_to</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Bond.bond_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Bond.bond_type">[docs]</a>    <span class="k">def</span> <span class="nf">bond_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;bond_type has been replaced by type&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
@@ -1586,13 +1588,13 @@
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BondType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.BondType.html#chemistry.topologyobjects.BondType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="o">=</span> <span class="n">req</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">req</span>
 
@@ -1634,7 +1636,7 @@
 <span class="sd">    False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
       
-<div class="viewcode-block" id="Angle.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Angle.html#chemistry.topologyobjects.Angle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="c"># Make sure we&#39;re not angling me to myself</span>
         <span class="k">if</span> <span class="n">atom1</span> <span class="ow">is</span> <span class="n">atom2</span> <span class="ow">or</span> <span class="n">atom1</span> <span class="ow">is</span> <span class="n">atom3</span> <span class="ow">or</span> <span class="n">atom2</span> <span class="ow">is</span> <span class="n">atom3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">BondError</span><span class="p">(</span><span class="s">&#39;Cannot angle atom to itself!&#39;</span><span class="p">)</span>
@@ -1650,7 +1652,7 @@
         <span class="n">atom1</span><span class="o">.</span><span class="n">angle_to</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
         <span class="n">atom1</span><span class="o">.</span><span class="n">angle_to</span><span class="p">(</span><span class="n">atom3</span><span class="p">)</span>
         <span class="n">atom2</span><span class="o">.</span><span class="n">angle_to</span><span class="p">(</span><span class="n">atom3</span><span class="p">)</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Angle.angle_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Angle.angle_type">[docs]</a>    <span class="k">def</span> <span class="nf">angle_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;angle_type has been replaced with type&quot;</span><span class="p">,</span>
@@ -1733,13 +1735,13 @@
 <span class="sd">    &gt;&gt;&gt; angle_list[1].idx</span>
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="AngleType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.AngleType.html#chemistry.topologyobjects.AngleType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">=</span> <span class="n">theteq</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">theteq</span>
 
@@ -1802,7 +1804,7 @@
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
       
-<div class="viewcode-block" id="Dihedral.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Dihedral.html#chemistry.topologyobjects.Dihedral.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">ignore_end</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_FourAtomTerm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
         <span class="c"># improper _implies_ ignore_end</span>
@@ -1825,7 +1827,7 @@
             <span class="n">atom2</span><span class="o">.</span><span class="n">dihedral_to</span><span class="p">(</span><span class="n">atom3</span><span class="p">)</span>
             <span class="n">atom2</span><span class="o">.</span><span class="n">dihedral_to</span><span class="p">(</span><span class="n">atom4</span><span class="p">)</span>
             <span class="n">atom3</span><span class="o">.</span><span class="n">dihedral_to</span><span class="p">(</span><span class="n">atom4</span><span class="p">)</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Dihedral.dihed_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Dihedral.dihed_type">[docs]</a>    <span class="k">def</span> <span class="nf">dihed_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;dihed_type has been replaced by type&#39;</span><span class="p">,</span>
@@ -1988,7 +1990,7 @@
 
     <span class="c">#===================================================</span>
    
-<div class="viewcode-block" id="DihedralType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.DihedralType.html#chemistry.topologyobjects.DihedralType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi_k</span><span class="p">,</span> <span class="n">per</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">scee</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scnb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi_k</span><span class="p">,</span> <span class="n">per</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">scee</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scnb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; DihedralType constructor &quot;&quot;&quot;</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">=</span> <span class="n">phi_k</span>
@@ -2000,7 +2002,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
    <span class="c">#===================================================</span>
-</div>
+
 <div class="viewcode-block" id="DihedralType.write_info"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.DihedralType.write_info">[docs]</a>    <span class="k">def</span> <span class="nf">write_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write out the dihedral parameters &quot;&quot;&quot;</span>
         <span class="c"># If our idx == -1, we&#39;re not being used, so just return</span>
@@ -2041,12 +2043,12 @@
 <span class="sd">    container, this object supports list assignment and indexing like</span>
 <span class="sd">    :class:`DihedralType`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="DihedralTypeList.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.DihedralTypeList.html#chemistry.topologyobjects.DihedralTypeList.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="bp">False</span>
         <span class="k">for</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -2093,7 +2095,7 @@
 <span class="sd">    &gt;&gt;&gt; b1 in urey and b2 in urey</span>
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="UreyBradley.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.UreyBradley.html#chemistry.topologyobjects.UreyBradley.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Bond constructor &quot;&quot;&quot;</span>
         <span class="c"># Make sure we&#39;re not bonding me to myself</span>
         <span class="k">if</span> <span class="n">atom1</span> <span class="ow">is</span> <span class="n">atom2</span><span class="p">:</span>
@@ -2106,7 +2108,7 @@
         <span class="n">atom2</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c"># Load the force constant and equilibrium distance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="UreyBradley.ub_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.UreyBradley.ub_type">[docs]</a>    <span class="k">def</span> <span class="nf">ub_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;ub_type has been replaced by type&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
@@ -2201,7 +2203,7 @@
 <span class="sd">    &gt;&gt;&gt; Bond(a2, a3) in imp</span>
 <span class="sd">    False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Improper.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Improper.html#chemistry.topologyobjects.Improper.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_FourAtomTerm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
         <span class="c"># Log these impropers in each atom</span>
         <span class="n">atom1</span><span class="o">.</span><span class="n">impropers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -2210,7 +2212,7 @@
         <span class="n">atom4</span><span class="o">.</span><span class="n">impropers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c"># Load the force constant and equilibrium angle</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Improper.improp_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Improper.improp_type">[docs]</a>    <span class="k">def</span> <span class="nf">improp_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;improp_type has been replaced by type&#39;</span><span class="p">,</span>
@@ -2317,13 +2319,13 @@
 <span class="sd">    &gt;&gt;&gt; improper_list[1].idx</span>
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ImproperType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.ImproperType.html#chemistry.topologyobjects.ImproperType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi_k</span><span class="p">,</span> <span class="n">psi_eq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi_k</span><span class="p">,</span> <span class="n">psi_eq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">psi_k</span> <span class="o">=</span> <span class="n">psi_k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">psi_eq</span> <span class="o">=</span> <span class="n">psi_eq</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">psi_k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_eq</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">psi_eq</span>
 
@@ -2369,7 +2371,7 @@
 <span class="sd">    &gt;&gt;&gt; Bond(a1, a3) in cmap</span>
 <span class="sd">    False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Cmap.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Cmap.html#chemistry.topologyobjects.Cmap.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="c"># Make sure we&#39;re not CMAPping me to myself</span>
         <span class="n">atmlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atmlist</span><span class="p">)):</span>
@@ -2390,7 +2392,7 @@
         <span class="n">atom5</span><span class="o">.</span><span class="n">cmaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c"># Load the CMAP interpolation table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Cmap.extended"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Cmap.extended">[docs]</a>    <span class="k">def</span> <span class="nf">extended</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span>
                  <span class="n">atom5</span><span class="p">,</span> <span class="n">atom6</span><span class="p">,</span> <span class="n">atom7</span><span class="p">,</span> <span class="n">atom8</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -2736,10 +2738,10 @@
 <span class="sd">    -----</span>
 <span class="sd">    Either `Atom`s or `Bond`s can be contained within this trigonal angle</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="TrigonalAngle.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.TrigonalAngle.html#chemistry.topologyobjects.TrigonalAngle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_FourAtomTerm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="TrigonalAngle.trigang_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.TrigonalAngle.trigang_type">[docs]</a>    <span class="k">def</span> <span class="nf">trigang_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;trigang_type has been replaced with type&#39;</span><span class="p">,</span>
@@ -2781,10 +2783,10 @@
 <span class="sd">    -----</span>
 <span class="sd">    Either `Atom`s or `Bond`s can be contained within this trigonal angle</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="OutOfPlaneBend.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.OutOfPlaneBend.html#chemistry.topologyobjects.OutOfPlaneBend.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_FourAtomTerm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="OutOfPlaneBend.oopbend_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.OutOfPlaneBend.oopbend_type">[docs]</a>    <span class="k">def</span> <span class="nf">oopbend_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;oopbend_type has been replaced with type&#39;</span><span class="p">,</span>
@@ -2845,12 +2847,12 @@
 <span class="sd">    &gt;&gt;&gt; oopbend_list[1].idx</span>
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="OutOfPlaneBendType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.OutOfPlaneBendType.html#chemistry.topologyobjects.OutOfPlaneBendType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k</span>
 
@@ -2899,7 +2901,7 @@
 <span class="sd">    -----</span>
 <span class="sd">    Both :class:`Bond`s and :class:`Atom`s can be contained in a pi-torsion</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="PiTorsion.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.PiTorsion.html#chemistry.topologyobjects.PiTorsion.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="n">atom6</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="n">atom6</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
@@ -2907,7 +2909,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span> <span class="o">=</span> <span class="n">atom5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom6</span> <span class="o">=</span> <span class="n">atom6</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="PiTorsion.pitor_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.PiTorsion.pitor_type">[docs]</a>    <span class="k">def</span> <span class="nf">pitor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;pitor_type has been replaced by type&quot;</span><span class="p">,</span>
@@ -2958,12 +2960,12 @@
 <span class="sd">    -----</span>
 <span class="sd">    Both :class:`Bond`s and :class:`Atom`s can be contained in a stretch-bend term</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="StretchBend.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.StretchBend.html#chemistry.topologyobjects.StretchBend.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="StretchBend.strbnd_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.StretchBend.strbnd_type">[docs]</a>    <span class="k">def</span> <span class="nf">strbnd_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;strbnd_type has been replaced by type&quot;</span><span class="p">,</span>
@@ -3039,7 +3041,7 @@
 <span class="sd">    &gt;&gt;&gt; strbnd_list[1].idx</span>
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="StretchBendType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.StretchBendType.html#chemistry.topologyobjects.StretchBendType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">req1</span><span class="p">,</span> <span class="n">req2</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">req1</span><span class="p">,</span> <span class="n">req2</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k1</span> <span class="o">=</span> <span class="n">k1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k2</span> <span class="o">=</span> <span class="n">k2</span>
@@ -3048,7 +3050,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">=</span> <span class="n">theteq</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k1</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">k2</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k2</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">req1</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">req1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">req2</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">req2</span> <span class="ow">and</span>
@@ -3096,7 +3098,7 @@
 <span class="sd">    &gt;&gt;&gt; Bond(a1, a3) in tortor</span>
 <span class="sd">    False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="TorsionTorsion.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.TorsionTorsion.html#chemistry.topologyobjects.TorsionTorsion.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">Cmap</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
         <span class="n">atom1</span><span class="o">.</span><span class="n">tortors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">atom2</span><span class="o">.</span><span class="n">tortors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3113,7 +3115,7 @@
         <span class="n">atom3</span><span class="o">.</span><span class="n">tortor_to</span><span class="p">(</span><span class="n">atom4</span><span class="p">)</span>
         <span class="n">atom3</span><span class="o">.</span><span class="n">tortor_to</span><span class="p">(</span><span class="n">atom5</span><span class="p">)</span>
         <span class="n">atom4</span><span class="o">.</span><span class="n">tortor_to</span><span class="p">(</span><span class="n">atom5</span><span class="p">)</span>
-</div>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="TorsionTorsion.tortor_type"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.TorsionTorsion.tortor_type">[docs]</a>    <span class="k">def</span> <span class="nf">tortor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;tortor_type has been replaced by type&quot;</span><span class="p">,</span>
@@ -3283,7 +3285,7 @@
 <span class="sd">    idx : ``int``</span>
 <span class="sd">        The index of this item in the list or iterable defined by `list`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="TorsionTorsionType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.TorsionTorsionType.html#chemistry.topologyobjects.TorsionTorsionType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">ang1</span><span class="p">,</span> <span class="n">ang2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">ang1</span><span class="p">,</span> <span class="n">ang2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span>
                  <span class="n">dfda1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dfda2</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d2fda1da2</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -3308,7 +3310,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">d2fda1da2</span> <span class="o">=</span> <span class="n">_TorTorTable</span><span class="p">(</span><span class="n">ang1</span><span class="p">,</span> <span class="n">ang2</span><span class="p">,</span> <span class="n">d2fda1da2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ang1</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">ang1</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
@@ -3340,13 +3342,13 @@
 <span class="sd">    -----</span>
 <span class="sd">    A chiral frame can only contain atoms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ChiralFrame.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.ChiralFrame.html#chemistry.topologyobjects.ChiralFrame.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">chirality</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">chirality</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
         <span class="k">if</span> <span class="n">chirality</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">chirality</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;chirality must be 1 or -1&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chirality</span> <span class="o">=</span> <span class="n">chirality</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">or</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span>
 
@@ -3389,13 +3391,13 @@
 <span class="sd">    &gt;&gt;&gt; mf.nvec</span>
 <span class="sd">    3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="MultipoleFrame.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.MultipoleFrame.html#chemistry.topologyobjects.MultipoleFrame.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">frame_pt_num</span><span class="p">,</span> <span class="n">vectail</span><span class="p">,</span> <span class="n">vechead</span><span class="p">,</span> <span class="n">nvec</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">frame_pt_num</span><span class="p">,</span> <span class="n">vectail</span><span class="p">,</span> <span class="n">vechead</span><span class="p">,</span> <span class="n">nvec</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_pt_num</span> <span class="o">=</span> <span class="n">frame_pt_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vectail</span> <span class="o">=</span> <span class="n">vectail</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vechead</span> <span class="o">=</span> <span class="n">vechead</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nvec</span> <span class="o">=</span> <span class="n">nvec</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="ow">is</span> <span class="n">thing</span>
 
@@ -3448,7 +3450,7 @@
 <span class="sd">    - `len()` returns the number of atoms in this residue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Residue.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Residue.html#chemistry.topologyobjects.Residue.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">insertion_code</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">insertion_code</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -3457,7 +3459,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ter</span> <span class="o">=</span> <span class="bp">False</span>
-</div>
+
 <div class="viewcode-block" id="Residue.add_atom"><a class="viewcode-back" href="../../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Residue.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an atom to this residue</span>
 
@@ -3937,11 +3939,11 @@
 <span class="sd">    NonbondedException objects &quot;contain&quot; two atoms and will return True when</span>
 <span class="sd">    used with the binary `in` operator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="NonbondedException.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.NonbondedException.html#chemistry.topologyobjects.NonbondedException.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">or</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span>
 
@@ -3972,7 +3974,7 @@
 <span class="sd">    idx : ``int``</span>
 <span class="sd">        The index of this term in the list that contains it</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="NonbondedExceptionType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.NonbondedExceptionType.html#chemistry.topologyobjects.NonbondedExceptionType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vdw_weight</span><span class="p">,</span> <span class="n">multipole_weight</span><span class="p">,</span> <span class="n">direct_weight</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vdw_weight</span><span class="p">,</span> <span class="n">multipole_weight</span><span class="p">,</span> <span class="n">direct_weight</span><span class="p">,</span>
                  <span class="n">polar_weight</span><span class="p">,</span> <span class="n">mutual_weight</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vdw_weight</span> <span class="o">=</span> <span class="n">vdw_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">multipole_weight</span> <span class="o">=</span> <span class="n">multipole_weight</span>
@@ -3981,7 +3983,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mutual_weight</span> <span class="o">=</span> <span class="n">mutual_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vdw_weight</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">vdw_weight</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">multipole_weight</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">multipole_weight</span> <span class="ow">and</span>
@@ -4041,7 +4043,7 @@
 <span class="sd">    HA: 1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AtomType.__init__"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.AtomType.html#chemistry.topologyobjects.AtomType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">atomic_number</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">atomic_number</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">number</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c"># If we were given an integer, assign it to number. Otherwise,</span>
             <span class="c"># assign it to the name</span>
@@ -4062,7 +4064,7 @@
         <span class="c"># a 2-element tuple that is rmin, epsilon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbfix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c"># needed for some internal bookkeeping</span>
-</div>
+
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compares based on available properties (name and number, just name,</span>
@@ -4246,7 +4248,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

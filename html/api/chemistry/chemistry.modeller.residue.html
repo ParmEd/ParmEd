@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.modeller.residue module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chemistry.modeller.residue">
+<span id="chemistry-modeller-residue-module"></span><h1>chemistry.modeller.residue module<a class="headerlink" href="#module-chemistry.modeller.residue" title="Permalink to this headline">¶</a></h1>
+<p>This contains the basic residue template and residue building libraries
+typically used in modelling applications</p>
+<dl class="class">
+<dt id="chemistry.modeller.residue.ResidueTemplate">
+<em class="property">class </em><tt class="descclassname">chemistry.modeller.residue.</tt><tt class="descname">ResidueTemplate</tt><big>(</big><em>name=''</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This is a residue template, which contains a listing of the atoms in the
+residue template as well as a mapping of which atoms are bonded to other
+atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>If provided, this is the name of the residue</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate.coordinates" title="chemistry.modeller.residue.ResidueTemplate.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<td>Atomic coordinates, in Angstroms, of all atoms in the template</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>atoms</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt>) List of atoms in this residue</td>
+</tr>
+<tr class="row-even"><td>bonds</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt>) List of the bonds between the atoms in this residue</td>
+</tr>
+<tr class="row-odd"><td>connections</td>
+<td>(list of <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt>) A list of all atoms that should form connections with atoms of another residue <em>besides</em> the head and tail atoms</td>
+</tr>
+<tr class="row-even"><td>head</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or None) The atom that is connected to the residue that comes before this one</td>
+</tr>
+<tr class="row-odd"><td>tail</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or None) The atom that is connected to the <em>next</em> residue after this one</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate.add_atom" title="chemistry.modeller.residue.ResidueTemplate.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom)</td>
+<td>Adds an atom to this residue template</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate.add_bond" title="chemistry.modeller.residue.ResidueTemplate.add_bond"><tt class="xref py py-obj docutils literal"><span class="pre">add_bond</span></tt></a>(atom1,&nbsp;atom2)</td>
+<td>Adds a bond between the two provided atoms in the residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate.from_residue" title="chemistry.modeller.residue.ResidueTemplate.from_residue"><tt class="xref py py-obj docutils literal"><span class="pre">from_residue</span></tt></a>(residue)</td>
+<td>This constructor creates a ResidueTemplate from a particular Residue</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplate.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplate.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplate.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an atom to this residue template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if ``atom`` has the same name as another atom in this</strong></p>
+<p class="last"><strong>residue already</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplate.add_bond">
+<tt class="descname">add_bond</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplate.add_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a bond between the two provided atoms in the residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int</p>
+<blockquote>
+<div><p>One of the atoms in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of
+this ResidueTemplate. It can also be the atom index (index from 0)
+of the atom in the bond.</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int</p>
+<blockquote>
+<div><p>The other atom in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of this
+ResidueTemplate. It can also be the atom index (index from 0) of the
+atom in the bond.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError if atom1 or atom2 are integers that are out of range of the</strong></p>
+<p><strong>number of atoms already in this template</strong></p>
+<p><strong>RuntimeError if atom1 or atom2 are :class:`Atom` instances but they are</strong></p>
+<p class="last"><strong>*not* in the atoms list of this ResidueTemplate</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If atom1 and atom2 are already bonded, this routine does nothing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.modeller.residue.ResidueTemplate.coordinates">
+<tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplate.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplate.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic coordinates, in Angstroms, of all atoms in the template</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.modeller.residue.ResidueTemplate.from_residue">
+<em class="property">classmethod </em><tt class="descname">from_residue</tt><big>(</big><em>residue</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplate.from_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplate.from_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constructor creates a ResidueTemplate from a particular Residue
+object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue from which to create a template</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer">
+<em class="property">class </em><tt class="descclassname">chemistry.modeller.residue.</tt><tt class="descname">ResidueTemplateContainer</tt><big>(</big><em>name=''</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplateContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>A container of ResidueTemplate objects representing a unit with multiple
+residues</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>The name of the residue container</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.append" title="chemistry.modeller.residue.ResidueTemplateContainer.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<td>L.append(object) &#8211; append object to end</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.count" title="chemistry.modeller.residue.ResidueTemplateContainer.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.extend" title="chemistry.modeller.residue.ResidueTemplateContainer.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.from_structure" title="chemistry.modeller.residue.ResidueTemplateContainer.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct[,&nbsp;term_decorate])</td>
+<td>Instantiates a ResidueTemplateContainer from a Structure instance filled</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.index" title="chemistry.modeller.residue.ResidueTemplateContainer.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.insert" title="chemistry.modeller.residue.ResidueTemplateContainer.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.pop" title="chemistry.modeller.residue.ResidueTemplateContainer.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.remove" title="chemistry.modeller.residue.ResidueTemplateContainer.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.reverse" title="chemistry.modeller.residue.ResidueTemplateContainer.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.sort" title="chemistry.modeller.residue.ResidueTemplateContainer.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplateContainer.to_library" title="chemistry.modeller.residue.ResidueTemplateContainer.to_library"><tt class="xref py py-obj docutils literal"><span class="pre">to_library</span></tt></a>()</td>
+<td>Converts the ResidueTemplateContainer instance to a library of unique <a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> instances.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.append(object) &#8211; append object to end</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.extend">
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em>, <em>term_decorate=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplateContainer.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a ResidueTemplateContainer from a Structure instance filled
+with residues</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to generate the ResidueTemplateContainer
+from</p>
+</div></blockquote>
+<p><strong>term_decorate</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, terminal amino and nucleic acid residues will be adorned as
+follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li>N-prepended if it is an N-terminal amino acid</li>
+<li>C-prepended if it is a C-terminal amino acid</li>
+<li>5-appended if it is a 5&#8217;-terminal nucleic acid</li>
+<li>3-appended if it is a 3&#8217;-terminal nucleic acid</li>
+</ul>
+</div></blockquote>
+<p>For example, an N-terminal GLY will become NGLY, while a 5&#8217;-terminal
+DA will become DA5. Default is True</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.ResidueTemplateContainer.to_library">
+<tt class="descname">to_library</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#ResidueTemplateContainer.to_library"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.ResidueTemplateContainer.to_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the ResidueTemplateContainer instance to a library of unique
+<a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> instances. The first of each kind of residue is
+taken</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residues</strong> : dict {str</p>
+<blockquote class="last">
+<div><p>The residue library with all residues from this residue collection</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/chemistry/chemistry.modeller.residue.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+chemistry.formats package
+=========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    chemistry.formats.pdbx
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.formats.io
+   chemistry.formats.pdb
+   chemistry.formats.psf
+   chemistry.formats.registry
+
+Module contents
+---------------
+
+.. automodule:: chemistry.formats
+    :members:
+    :undoc-members:
+    :show-inheritance:

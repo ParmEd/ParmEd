@@ -8,8 +8,8 @@
     
     <title>OpenMM Functionality &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="static/jquery.js"></script>
-    <script type="text/javascript" src="static/underscore.js"></script>
-    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="prev" title="The ParmEd API" href="parmed_api.html" /> 
@@ -134,19 +134,19 @@ that kernel.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></td>
-<td></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>This class acts as a state data reporter for OpenMM simulations, but it is a little more generalized.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt>(*args,&nbsp;**kwargs)</td>
 <td>NetCDFReporter prints a trajectory in NetCDF format</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt>(*args,&nbsp;**kwargs)</td>
 <td>MdcrdReporter prints a trajectory in ASCII Amber format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt>(*args,&nbsp;**kwargs)</td>
 <td>Use a reporter to handle writing restarts at specified intervals.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt>(*args,&nbsp;**kwargs)</td>
 <td>A class that prints out a progress report of how much MD (or minimization)</td>
 </tr>
 </tbody>
@@ -171,13 +171,13 @@ classes in addition to the small number provided by ParmEd:</p>
 <tt class="docutils literal"><span class="pre">unit_system</span></tt> that allows you to specify what unit system the output
 data is printed in (such as the AKMA unit system, which is more familiar
 to Amber and CHARMM users).</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt> &#8211; This allows you to write a trajectory file in
 the Amber NetCDF format.</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt> &#8211; This allows you to write a trajectory file in
 the Amber ASCII mdcrd format.</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt></a> &#8211; This allows you to periodically write NetCDF
+<li><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt> &#8211; This allows you to periodically write NetCDF
 or ASCII restart files during the course of the calculation</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt></a> &#8211; This prints a file during the course of the
+<li><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt> &#8211; This prints a file during the course of the
 simulation tracking the runtime speed of the calculation and predicting
 the amount of time remaining.</li>
 </ul>
@@ -228,7 +228,7 @@ the annotated and explained example):</p>
 
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="sources/openmm.txt"
+    <li><a href="_sources/openmm.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -265,7 +265,7 @@ the annotated and explained example):</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

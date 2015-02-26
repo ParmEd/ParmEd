@@ -15,13 +15,12 @@ Submodules
 
    chemistry.amber.amberformat
    chemistry.amber.asciicrd
-   chemistry.amber.leaprc
    chemistry.amber.mask
    chemistry.amber.netcdffiles
    chemistry.amber.openmmloader
    chemistry.amber.parameters
    chemistry.amber.readparm
-   chemistry.amber.residue
+   chemistry.amber.titratable_residues
 
 Module contents
 ---------------

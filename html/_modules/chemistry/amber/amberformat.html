@@ -59,6 +59,8 @@
             <span class="n">NEXT</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">NBONA</span><span class="p">,</span> <span class="n">NTHETA</span><span class="p">,</span> <span class="n">NPHIA</span><span class="p">,</span> <span class="n">NUMBND</span><span class="p">,</span> <span class="n">NUMANG</span><span class="p">,</span> <span class="n">NPTRA</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span>
             <span class="n">NPHB</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">IFCAP</span><span class="p">,</span> <span class="n">AMBER_ELECTROSTATIC</span><span class="p">,</span> <span class="n">CHARMM_ELECTROSTATIC</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">FlagError</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">fortranformat</span> <span class="kn">import</span> <span class="n">FortranRecordReader</span><span class="p">,</span> <span class="n">FortranRecordWriter</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
@@ -349,9 +351,56 @@
 <span class="sd">    prm_name : str</span>
 <span class="sd">        The file name of the originally parsed file (set to the fname parameter)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
    
     <span class="c">#===================================================</span>
 
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AmberFormat.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies the file type as either Amber-format file (like prmtop) or an</span>
+<span class="sd">        old-style topology file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is an Amber-style format, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;%VERSION&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="c"># Try old-style format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AmberFormat</span><span class="p">()</span><span class="o">.</span><span class="n">rdparm_old</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AmberFormat.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Meant for use with the automatic file loader, this will automatically</span>
+<span class="sd">        return a subclass of AmberFormat corresponding to what the information</span>
+<span class="sd">        in the prmtop file contains (i.e., either an AmberParm, ChamberParm,</span>
+<span class="sd">        AmoebaParm, or AmberFormat)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">LoadParm</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">LoadParm</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Constructor.  Read a file if given &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncopies</span> <span class="o">=</span> <span class="mi">0</span>
@@ -527,10 +576,18 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="AmberFormat.rdparm_old"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.rdparm_old">[docs]</a>    <span class="k">def</span> <span class="nf">rdparm_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prmtop_lines</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberFormat.rdparm_old"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.rdparm_old">[docs]</a>    <span class="k">def</span> <span class="nf">rdparm_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prmtop_lines</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This reads an old-style topology file and stores the results in the</span>
 <span class="sd">        same data structures as a new-style topology file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prmtop_lines : list of str</span>
+<span class="sd">            List of all lines in the prmtop file</span>
+<span class="sd">        check : bool, optional</span>
+<span class="sd">            If True, only the first couple sections will be read to determine if</span>
+<span class="sd">            this is, in fact, an old-style topology file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">read_integer</span><span class="p">(</span><span class="n">line_idx</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">num_items</span><span class="p">):</span>
             <span class="c"># line_idx should be the line _before_ the first line you</span>
@@ -614,6 +671,11 @@
         <span class="n">nphia</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NPHIA</span><span class="p">]</span>
         <span class="n">nphb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NPHB</span><span class="p">]</span>
         <span class="n">nphih</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NPHIH</span><span class="p">]</span>
+
+        <span class="c"># This is enough to convince me that we have an old-style prmtop if we</span>
+        <span class="c"># have the number of integers I suspect we should</span>
+        <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">31</span>
 
         <span class="c"># Next read in the atom names</span>
         <span class="n">tmp_data</span><span class="p">,</span> <span class="n">line_idx</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">line_idx</span><span class="p">,</span> <span class="n">prmtop_lines</span><span class="p">,</span> <span class="n">natom</span><span class="p">)</span>
@@ -947,7 +1009,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

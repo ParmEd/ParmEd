@@ -1,0 +1,7 @@
+chemistry.modeller.offlib module
+================================
+
+.. automodule:: chemistry.modeller.offlib
+    :members:
+    :undoc-members:
+    :show-inheritance:

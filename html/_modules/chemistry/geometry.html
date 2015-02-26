@@ -80,6 +80,10 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span> <span class="c"># Py3, zip is already izip</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">acos</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="box_lengths_and_angles_to_vectors"><a class="viewcode-back" href="../../api/chemistry/chemistry.geometry.html#chemistry.geometry.box_lengths_and_angles_to_vectors">[docs]</a><span class="k">def</span> <span class="nf">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
@@ -143,12 +147,7 @@
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">cv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cz</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">cv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c"># Put it in a reduced form</span>
-    <span class="n">cv</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">cv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">bv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">bv</span><span class="p">)]</span>
-    <span class="n">cv</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">cv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">av</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">av</span><span class="p">)]</span>
-    <span class="n">bv</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">bv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">av</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">av</span><span class="p">)]</span>
-
-    <span class="k">return</span> <span class="n">av</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="n">bv</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="n">cv</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">bv</span><span class="p">,</span> <span class="n">cv</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
 </div>
 <div class="viewcode-block" id="box_vectors_to_lengths_and_angles"><a class="viewcode-back" href="../../api/chemistry/chemistry.geometry.html#chemistry.geometry.box_vectors_to_lengths_and_angles">[docs]</a><span class="k">def</span> <span class="nf">box_vectors_to_lengths_and_angles</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -192,7 +191,32 @@
     <span class="n">beta</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
     <span class="n">gamma</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">la</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">lc</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">la</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">lc</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span>
+</div>
+<div class="viewcode-block" id="center_of_mass"><a class="viewcode-back" href="../../api/chemistry/chemistry.geometry.html#chemistry.geometry.center_of_mass">[docs]</a><span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">masses</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compute the center of mass of a group of coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coordinates : numpy.ndarray</span>
+<span class="sd">        Coordinate array</span>
+<span class="sd">    masses : numpy.ndarray</span>
+<span class="sd">        Array of masses</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    COM</span>
+<span class="sd">        np.ndarray of shape (3,) identifying the cartesian center of mass</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This method *requires* that the parameters be passed in as numpy arrays.</span>
+<span class="sd">    AttributeError&#39;s will ensue if this is not the case. Also, coordinates must</span>
+<span class="sd">    be able to be reshaped to (len(masses), 3), or ValueError&#39;s will ensue</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">masses</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -232,7 +256,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

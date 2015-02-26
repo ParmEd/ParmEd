@@ -78,10 +78,11 @@
 <span class="n">VELUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">picosecond</span>
 <span class="n">FRCUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie_per_mole</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
 
-<div class="viewcode-block" id="AmberStateDataReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.AmberStateDataReporter">[docs]</a><span class="k">class</span> <span class="nc">AmberStateDataReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter">[docs]</a><span class="k">class</span> <span class="nc">StateDataReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class acts as a state data reporter for OpenMM simulations, but it is a</span>
 <span class="sd">    little more generalized. Notable differences are:</span>
+
 <span class="sd">      -  It allows the units of the output to be specified, with defaults being</span>
 <span class="sd">         those used in Amber (e.g., kcal/mol, angstroms^3, etc.)</span>
 <span class="sd">      -  It will write to any object containing a &#39;write&#39; method; not just</span>
@@ -97,50 +98,40 @@
 <span class="sd">        Destination to write the state data (file name or file object)</span>
 <span class="sd">    reportInterval : int</span>
 <span class="sd">        Number of steps between state data reports</span>
-<span class="sd">    step : bool=True</span>
-<span class="sd">        Print out the step number</span>
-<span class="sd">    time : bool=True</span>
-<span class="sd">        Print out the simulation time</span>
-<span class="sd">    potentialEnergy : bool=True</span>
-<span class="sd">        Print out the potential energy of the structure</span>
-<span class="sd">    kineticEnergy : bool=True</span>
-<span class="sd">        Print out the kinetic energy of the structure</span>
-<span class="sd">    totalEnergy : bool=True</span>
-<span class="sd">        Print out the total energy of the system</span>
-<span class="sd">    temperature : bool=True</span>
-<span class="sd">        Print out the temperature of the system</span>
-<span class="sd">    volume : bool=False</span>
+<span class="sd">    step : bool, optional</span>
+<span class="sd">        Print out the step number (Default True)</span>
+<span class="sd">    time : bool, optional</span>
+<span class="sd">        Print out the simulation time (Defaults True)</span>
+<span class="sd">    potentialEnergy : bool, optional</span>
+<span class="sd">        Print out the potential energy of the structure (Default True)</span>
+<span class="sd">    kineticEnergy : bool, optional</span>
+<span class="sd">        Print out the kinetic energy of the structure (Default True)</span>
+<span class="sd">    totalEnergy : bool, optional</span>
+<span class="sd">        Print out the total energy of the system (Default True)</span>
+<span class="sd">    temperature : bool, optional</span>
+<span class="sd">        Print out the temperature of the system (Default True)</span>
+<span class="sd">    volume : bool, optional</span>
 <span class="sd">        Print out the volume of the unit cell. If the system is not periodic,</span>
-<span class="sd">        the value is meaningless</span>
-<span class="sd">    density : bool=False</span>
+<span class="sd">        the value is meaningless (Default False)</span>
+<span class="sd">    density : bool, optional</span>
 <span class="sd">        Print out the density of the unit cell. If the system is not periodic,</span>
-<span class="sd">        the value is meaningless</span>
-<span class="sd">    separator : str=&#39;,&#39;</span>
-<span class="sd">        The string to separate data fields</span>
-<span class="sd">    systemMass : float=None</span>
+<span class="sd">        the value is meaningless (Default False)</span>
+<span class="sd">    separator : str, optional</span>
+<span class="sd">        The string to separate data fields (Default &#39;,&#39;)</span>
+<span class="sd">    systemMass : float, optional</span>
 <span class="sd">        If not None, the density will be computed from this mass, since setting</span>
-<span class="sd">        a mass to 0 is used to constrain the position of that particle</span>
-<span class="sd">    energyUnit : unit=kilocalories_per_mole</span>
-<span class="sd">        The unit to print energies in</span>
-<span class="sd">    temperatureUnit : unit=kelvin</span>
-<span class="sd">        The unit to print temperature in</span>
-<span class="sd">    volumeUnit : unit=angstrom**3</span>
-<span class="sd">        The unit to print volumes in</span>
-<span class="sd">    densityUnit : unit=grams/item/milliliter</span>
-<span class="sd">        The unit to print densities in</span>
-<span class="sd">    timeUnit : unit=picosecond</span>
-<span class="sd">        The unit to print times in</span>
+<span class="sd">        a mass to 0 is used to constrain the position of that particle. (Default</span>
+<span class="sd">        None)</span>
+<span class="sd">    unit_system : :class:`UnitSystem`, optional</span>
+<span class="sd">        The unit system to which to convert all of the resulting quantities to.</span>
+<span class="sd">        Default is ``akma_unit_system``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                  <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                  <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span>
-                 <span class="n">systemMass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">energyUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">,</span>
-                 <span class="n">temperatureUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
-                 <span class="n">volumeUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
-                 <span class="n">densityUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">grams</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">item</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">milliliter</span><span class="p">,</span>
-                 <span class="n">timeUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">):</span>
+                 <span class="n">systemMass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unit_system</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">akma_unit_system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create a StateDataReporter.  &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">=</span> <span class="n">reportInterval</span>
@@ -165,13 +156,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_needsForces</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span> <span class="o">=</span> <span class="p">(</span><span class="n">potentialEnergy</span> <span class="ow">or</span> <span class="n">kineticEnergy</span> <span class="ow">or</span>
                             <span class="n">totalEnergy</span> <span class="ow">or</span> <span class="n">temperature</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temperatureUnit</span> <span class="o">=</span> <span class="n">temperatureUnit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">volumeUnit</span> <span class="o">=</span> <span class="n">volumeUnit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">densityUnit</span> <span class="o">=</span> <span class="n">densityUnit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">timeUnit</span> <span class="o">=</span> <span class="n">timeUnit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span> <span class="o">=</span> <span class="n">unit_system</span>
 
-<div class="viewcode-block" id="AmberStateDataReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.AmberStateDataReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -188,7 +175,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needsPositions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needsVelocities</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_needsForces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="AmberStateDataReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.AmberStateDataReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a report.</span>
 
 <span class="sd">        Parameters:</span>
@@ -240,19 +227,22 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">:</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeUnit</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span> <span class="ow">is</span> <span class="n">u</span><span class="o">.</span><span class="n">akma_unit_system</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potentialEnergy</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pe</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pe</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kineticEnergy</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ke</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ke</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_totalEnergy</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pe</span> <span class="o">+</span> <span class="n">ke</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energyUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pe</span> <span class="o">+</span> <span class="n">ke</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperatureUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volumeUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">:</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">density</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">densityUnit</span><span class="p">))</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">density</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">densityUnit</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="k">def</span> <span class="nf">_initializeConstants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
@@ -260,7 +250,9 @@
 <span class="sd">        Initialize a set of constants required for the reports</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">            - simulation (Simulation) The simulation to generate a report for</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation : Simulation</span>
+<span class="sd">            The simulation to generate a report for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">system</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">system</span>
         <span class="n">frclist</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">()</span>
@@ -329,7 +321,7 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_openedFile&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="AmberStateDataReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.AmberStateDataReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
@@ -678,7 +670,7 @@
         <span class="sd">&quot;&quot;&quot; No-op here &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </div></div>
-<div class="viewcode-block" id="ProgressReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.ProgressReporter">[docs]</a><span class="k">class</span> <span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">AmberStateDataReporter</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgressReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.ProgressReporter">[docs]</a><span class="k">class</span> <span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">StateDataReporter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that prints out a progress report of how much MD (or minimization)</span>
 <span class="sd">    has been done, how fast the simulation is running, and how much time is left</span>
@@ -708,7 +700,7 @@
 <span class="sd">            physical mass, such as when some particles have had their masses</span>
 <span class="sd">            set to 0 to immobilize them.</span>
 <span class="sd">        - **kwargs (keyword arguments): any other arguments accepted by</span>
-<span class="sd">            AmberStateDataReporter</span>
+<span class="sd">            StateDataReporter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Make sure we got a file name rather than a file-like object.</span>
         <span class="c"># Immediately close the file after opening. This erases it, which isn&#39;t</span>
@@ -873,7 +865,7 @@
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; We already closed the file. &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="EnergyMinimizerReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.EnergyMinimizerReporter">[docs]</a><span class="k">class</span> <span class="nc">EnergyMinimizerReporter</span><span class="p">(</span><span class="n">AmberStateDataReporter</span><span class="p">):</span>
+<div class="viewcode-block" id="EnergyMinimizerReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.EnergyMinimizerReporter">[docs]</a><span class="k">class</span> <span class="nc">EnergyMinimizerReporter</span><span class="p">(</span><span class="n">StateDataReporter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class acts as a simple energy reporter class for minimizations. This</span>
 <span class="sd">    is not meant to be used as a reporter for OpenMM&#39;s molecular dynamics</span>
@@ -972,7 +964,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

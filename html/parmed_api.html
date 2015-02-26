@@ -8,8 +8,8 @@
     
     <title>The ParmEd API &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="static/jquery.js"></script>
-    <script type="text/javascript" src="static/underscore.js"></script>
-    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="next" title="OpenMM Functionality" href="openmm.html" />
@@ -75,9 +75,9 @@ in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> page
 <p>Each of the actions described on the previous page can be invoked either on a
 parm list (a few, like <tt class="xref doc docutils literal"><span class="pre">interpolate</span></tt>, actually <em>require</em> a parm list with
 multiple topologies), or a raw <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt>
-object. Note that some actions do not support all <a class="reference internal" href="amberobj/chemistry.amber.AmberParm.html#chemistry.amber.AmberParm" title="chemistry.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> subclasses (like those for the CHARMM or Amoeba
+object. Note that some actions do not support all <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt> subclasses (like those for the CHARMM or Amoeba
 force fields).</p>
-<p>The first step is to instantiate the action with the <a class="reference internal" href="amberobj/chemistry.amber.AmberParm.html#chemistry.amber.AmberParm" title="chemistry.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> instance as the first argument. The arguments that
+<p>The first step is to instantiate the action with the <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt> instance as the first argument. The arguments that
 each action requires in the ParmEd interpreter can then be given as separate
 arguments to the constructor or all as a single string in the second argument.
 Keyword arguments can optionally be given as keyword arguments to the action
@@ -132,7 +132,7 @@ the action to a string:</p>
 
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="sources/parmed_api.txt"
+    <li><a href="_sources/parmed_api.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -172,7 +172,7 @@ the action to a string:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

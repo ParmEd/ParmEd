@@ -149,6 +149,38 @@ between the unit cell vectors as angle-dimension Quantity objects</p>
 given.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="chemistry.geometry.center_of_mass">
+<tt class="descclassname">chemistry.geometry.</tt><tt class="descname">center_of_mass</tt><big>(</big><em>coordinates</em>, <em>masses</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/geometry.html#center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.geometry.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the center of mass of a group of coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Coordinate array</p>
+</div></blockquote>
+<p><strong>masses</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Array of masses</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">COM</p>
+<blockquote class="last">
+<div><p>np.ndarray of shape (3,) identifying the cartesian center of mass</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method <em>requires</em> that the parameters be passed in as numpy arrays.
+AttributeError&#8217;s will ensue if this is not the case. Also, coordinates must
+be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
+</dd></dl>
+
 </div>
 
 
@@ -193,7 +225,7 @@ given.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -8,8 +8,9 @@ Subpackages
 
     chemistry.amber
     chemistry.charmm
+    chemistry.formats
+    chemistry.modeller
     chemistry.openmm
-    chemistry.pdbx
     chemistry.tinker
     chemistry.unit
 
@@ -25,8 +26,8 @@ Submodules
    chemistry.periodic_table
    chemistry.residue
    chemistry.structure
+   chemistry.timer
    chemistry.topologyobjects
-   chemistry.utils
 
 Module contents
 ---------------

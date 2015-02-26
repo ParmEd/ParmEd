@@ -1,0 +1,7 @@
+chemistry.modeller.residue module
+=================================
+
+.. automodule:: chemistry.modeller.residue
+    :members:
+    :undoc-members:
+    :show-inheritance:

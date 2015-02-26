@@ -168,6 +168,9 @@ meter/centimeter</p>
 <span class="gr">ArithmeticError</span>: <span class="n">Exponents in Unit.sqrt() must be even.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">((</span><span class="n">meter</span><span class="o">*</span><span class="n">meter</span><span class="o">/</span><span class="n">second</span><span class="o">/</span><span class="n">second</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">())</span>
 <span class="go">meter/second</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">ArithmeticError</span>: <span class="n">Exponents in Unit.sqrt() must be even.</span>
 </pre></div>
 </div>
 <p>Mixture of BaseUnits and ScaledUnits should cause no trouble:
@@ -600,6 +603,9 @@ Traceback (most recent call last):</p>
 <span class="gr">ArithmeticError</span>: <span class="n">Exponents in Unit.sqrt() must be even.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="mf">9.0</span><span class="o">*</span><span class="n">meter</span><span class="o">*</span><span class="n">meter</span><span class="o">/</span><span class="n">second</span><span class="o">/</span><span class="n">second</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
 <span class="go">Quantity(value=3.0, unit=meter/second)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">ArithmeticError</span>: <span class="n">Exponents in Unit.sqrt() must be even.</span>
 </pre></div>
 </div>
 <p>Mixture of BaseUnits and ScaledUnits should cause no trouble:
@@ -705,6 +711,9 @@ Quantity(value=2.0454828280872954, unit=kilogram*meter/second)</p>
 <span class="gr">TypeError</span>: <span class="n">Unit &quot;second&quot; is not compatible with Unit &quot;angstrom&quot;.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Quantity</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="go">Quantity(value=5, unit=dimensionless)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">Unit &quot;second&quot; is not compatible with Unit &quot;angstrom&quot;.</span>
 </pre></div>
 </div>
 <p>Passing a unit to the constructor yields a Quantity with an empty list value.
@@ -732,6 +741,9 @@ Quantity(value=500.0, unit=meter)</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">in_units_of</span><span class="p">(</span><span class="n">centimeters</span><span class="p">))</span>
 <span class="go">230.0 cm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">in_units_of</span><span class="p">(</span><span class="n">seconds</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+   <span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">Unit &quot;meter&quot; is not compatible with Unit &quot;second&quot;.</span>
 <span class="gt">Traceback (most recent call last):</span>
    <span class="c">...</span>
 <span class="gr">TypeError</span>: <span class="n">Unit &quot;meter&quot; is not compatible with Unit &quot;second&quot;.</span>
@@ -935,7 +947,7 @@ Quantity(value=5.439999999, unit=picosecond)
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
