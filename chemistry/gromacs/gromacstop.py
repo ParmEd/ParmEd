@@ -3,7 +3,10 @@ This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
+from chemistry.formats.io import genopen, TextToBinaryFile
+from chemistry.formats.registry import FileFormatType
 from chemistry.gromacs._gromacsfile import GromacsFile
+from chemistry.gromacs import _cpp as cpp
 from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, TrackedList,
             NonbondedException)
@@ -27,30 +30,61 @@ class GromacsTopologyFile(Structure):
     parameterset : ParameterSet
         The set of parameters defining a force field
     """
+    __metaclass__ = FileFormatType
+
+    #===================================================
+
+    @staticmethod
+    def id_format(filename):
+        """ Identifies the file as a GROMACS topology file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check if it is a gromacs topology file
+
+        Returns
+        -------
+        is_fmt : bool
+            If it is identified as a gromacs topology, return True. False
+            otherwise
+        """
+        f = TextToBinaryFile(genopen(filename))
+        try:
+            for line in f:
+                if line.startswith(';'): continue
+                if line.startswith('#'):
+                    if line.startswith('#if'): continue
+                    if line.startswith('#define'): continue
+                    if line.startswith('#include'): continue
+                    if line.startswith('#undef'): continue
+                    return False
+                if line.strip() == '[ moleculetype ]': return True
+                return False
+            return False
+        finally:
+            f.close()
+
+    #===================================================
 
     def __init__(self, fname=None, defines=None):
         super(GromacsTopologyFile, self).__init__()
         self.name = fname
         self.parameterset = ParameterSet()
-        if defines is None:
-            self.defines = []
-        else:
-            self.defines = defines
         # This protects us against using topologies defining a functional form
         # that I have no idea how to deal with
         self.unknown_functional = False
         if fname is not None:
-            self.rdparm(self, fname, defines)
+            self.rdparm(fname, defines)
 
-    @staticmethod
-    def rdparm(inst, fname, defines=None):
+    #===================================================
+
+    def rdparm(self, fname, defines=None):
         """
         Reads the GROMACS topology file
 
         Parameters
         ----------
-        inst : GromacsTopologyFile
-            The GromacsTopologyFile instance to apply this 
         fname : str
             The name of the file to read
         defines : list of str=None
