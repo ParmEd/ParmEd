@@ -3863,6 +3863,31 @@ class AtomList(TrackedList):
 
         return nbfix_list
 
+    def find_original_index(self, idx):
+        """
+        Finds an atom with the given original index. Cannot assume that the
+        original indexes are in order, since reordering may have been necessary.
+        As a result, the complexity of this algorithm is O(N)
+
+        Parameters
+        ----------
+        idx : int
+            The integer corresponding to the original index
+
+        Returns
+        -------
+        atom : :class:`Atom`
+            The atom with the original index ``idx``
+
+        Raises
+        ------
+        IndexError
+            If no atom has the original index ``idx``
+        """
+        for atom in self:
+            if atom.number == idx: return atom
+        raise IndexError('No atom found with index %d' % idx)
+
     def __iadd__(self, other):
         return NotImplemented
 
