@@ -696,3 +696,21 @@ class TestMol2File(unittest.TestCase):
                 self.assertEqual(len(res), 33)
         # This should have the total number of bonds, 686
         self.assertEqual(len(struct.bonds), 686)
+
+    def testMol3File(self):
+        """ Tests parsing a Mol3 file into a ResidueTemplate """
+        mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        self.assertIsInstance(mol3, ResidueTemplate)
+        self.assertEqual(mol3.name, 'GPN')
+        self.assertEqual(len(mol3), 34)
+        self.assertEqual(len(mol3.bonds), 35)
+        self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
+        self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
+
+    def testMol3Structure(self):
+        """ Tests parsing a Mol3 file with 1 residue into a Structure """
+        mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        self.assertIsInstance(mol3, Structure)
+        self.assertEqual(mol3.residues[0].name, 'GPN')
+        self.assertEqual(len(mol3.atoms), 34)
+        self.assertEqual(len(mol3.bonds), 35)
