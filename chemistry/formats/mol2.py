@@ -30,7 +30,7 @@ class Mol2File(object):
         is_fmt : bool
             True if it is a mol2 (or mol3) file, False otherwise
         """
-        f = TextFileToBinary(genopen(filename, 'r'))
+        f = TextToBinaryFile(genopen(filename, 'r'))
         try:
             for line in f:
                 if line.startswith('#'): continue
