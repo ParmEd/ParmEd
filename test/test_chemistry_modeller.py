@@ -516,8 +516,8 @@ quit
         AmberOFFLibrary.write(offlib1, 'testct.lib')
         AmberOFFLibrary.write(offlib2, 'testnt.lib')
         # Test all pairs a random set of 10 pairs
-        keys1 = [random.choice(offlib1.keys()) for i in range(10)]
-        keys2 = [random.choice(offlib2.keys()) for i in range(10)]
+        keys1 = [random.choice(list(offlib1.keys())) for i in range(10)]
+        keys2 = [random.choice(list(offlib2.keys())) for i in range(10)]
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\

@@ -7,6 +7,7 @@ __all__ = ['load_file', 'io', 'PDBFile', 'CIFFile']
 
 from chemistry.formats.registry import load_file
 from chemistry.formats import io
+from chemistry.formats.mol2 import Mol2File
 from chemistry.formats.pdb import PDBFile, CIFFile
 from chemistry.formats.psf import PSFFile
 

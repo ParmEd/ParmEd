@@ -67,7 +67,7 @@ class TextToBinaryFile(object):
     def write(self, stuff):
         try:
             self._handle.write(stuff.encode())
-        except AttributeError:
+        except (AttributeError, TypeError):
             self._handle.write(stuff)
 
     def read(self, *args, **kwargs):
@@ -101,3 +101,6 @@ class TextToBinaryFile(object):
 
     def close(self):
         self._handle.close()
+
+    def flush(self):
+        self._handle.flush()

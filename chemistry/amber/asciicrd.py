@@ -10,7 +10,7 @@ from __future__ import division
 
 from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
-from chemistry.exceptions import ReadError
+from chemistry.exceptions import ParsingError
 from compat24 import property
 from math import ceil
 import warnings as _warnings
@@ -518,7 +518,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             while rawline:
                 if np is not None:
                     frame = np.zeros(self.natom*3)
-                    if not rawline: raise ReadError()
+                    if not rawline: raise ParsingError()
                     cell = np.zeros(3)
                 else:
                     frame = array('f', [0 for i in natom3iter])
@@ -527,7 +527,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 rawline = self._file.readline()
                 if not rawline: raise StopIteration()
                 for i in xrange(self._full_lines_per_frame):
-                    if not rawline: raise ReadError()
+                    if not rawline: raise ParsingError()
                     frame[idx:idx+10] = converter([float(rawline[j:j+8]) 
                                                    for j in mainiter])
                     idx += 10
@@ -540,7 +540,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
                 if self.hasbox:
                     rawline = self._file.readline()
-                    if not rawline: raise ReadError()
+                    if not rawline: raise ParsingError()
                     cell[0] = float(rawline[:8])
                     cell[1] = float(rawline[8:16])
                     cell[2] = float(rawline[16:24])
@@ -549,7 +549,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 self.cell_lengths.append(cell)
                 self.frame += 1
 
-        except ReadError:
+        except ParsingError:
             _warnings.warn('Unexpected EOF in parsing mdcrd. natom and/or '
                            'hasbox are likely wrong', RuntimeWarning)
         except StopIteration:

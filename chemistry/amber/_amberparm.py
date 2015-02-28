@@ -28,7 +28,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
             NNB, TINY)
-from chemistry.exceptions import (AmberParmError, ReadError,
+from chemistry.exceptions import (AmberParmError, ParsingError,
                                   MoleculeError, MoleculeWarning)
 from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass, Element
@@ -1817,12 +1817,12 @@ class Rst7(object):
                 f = NetCDFRestart.open_old(filename)
                 self.natom = f.atom
             except ImportError:
-                raise ReadError('Could not parse %s as an ASCII restart and '
-                                'could not find any NetCDF-Python packages to '
-                                'attempt to parse as a NetCDF Restart.'
-                                % filename)
+                raise ParsingError('Could not parse %s as an ASCII restart and '
+                                   'could not find any NetCDF-Python packages '
+                                   'to attempt to parse as a NetCDF Restart.'
+                                   % filename)
             except RuntimeError:
-                raise ReadError('Could not parse restart file %s' % filename)
+                raise ParsingError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
         if f.hasvels:
