@@ -625,6 +625,20 @@ class TestChemistryCIFStructure(unittest.TestCase):
 class TestMol2File(unittest.TestCase):
     """ Tests the correct parsing and processing of mol2 files """
 
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
     def testMultiMol2(self):
         """ Tests the parsing of a mol2 file with multiple residues """
         cont = formats.Mol2File.parse(get_fn('test_multi.mol2'))
@@ -714,3 +728,67 @@ class TestMol2File(unittest.TestCase):
         self.assertEqual(mol3.residues[0].name, 'GPN')
         self.assertEqual(len(mol3.atoms), 34)
         self.assertEqual(len(mol3.bonds), 35)
+
+    def testMol2MultiWrite(self):
+        """
+        Tests writing mol2 file of multi residues from ResidueTemplateContainer
+        """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
+        formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('test_multi.mol2', written=True),
+                                   get_saved_fn('test_multi.mol2')))
+
+    def testMol2MultiWriteFromStructure(self):
+        """ Tests writing mol2 file of multi residues from Structure """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('test_multistruct.mol2', written=True),
+                                   get_saved_fn('test_multistruct.mol2')))
+
+    def testMol3MultiWrite(self):
+        """
+        Tests writing mol3 file of multi residues from ResidueTemplateContainer
+        """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
+        formats.Mol2File.write(mol2, get_fn('test_multi.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('test_multi.mol3', written=True),
+                                   get_saved_fn('test_multi.mol3')))
+
+    def testMol3MultiWriteFromStructure(self):
+        """ Tests writing mol3 file of multi residues from Structure """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('test_multistruct.mol3', written=True),
+                                   get_saved_fn('test_multistruct.mol3')))
+
+    def testMol2SingleWrite(self):
+        """ Tests writing mol2 file of single ResidueTemplate """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        formats.Mol2File.write(mol2, get_fn('tripos9.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('tripos9.mol2', written=True),
+                                   get_saved_fn('tripos9.mol2')))
+
+    def testMol2SingleWriteStruct(self):
+        """ Tests writing mol2 file of single-residue Structure """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('tripos9struct.mol2', written=True),
+                                   get_saved_fn('tripos9struct.mol2')))
+
+    def testMol3SingleWrite(self):
+        """ Tests writing mol3 file of single ResidueTemplate """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        formats.Mol2File.write(mol2, get_fn('tripos9.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('tripos9.mol3', written=True),
+                                   get_saved_fn('tripos9.mol3')))
+
+    def testMol3SingleWriteStruct(self):
+        """ Tests writing mol3 file of single-residue Structure """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
+                                   get_saved_fn('tripos9struct.mol3')))

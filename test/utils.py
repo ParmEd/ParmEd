@@ -192,7 +192,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
         i = 1
         same = True
         if ignore_whitespace:
-            while l1 and l2:
+            while l1 or l2:
                 if l1.strip() != l2.strip():
                     if l1.startswith('%VERSION') and l2.startswith('%VERSION'):
                         l1 = f1.readline()

@@ -6,8 +6,10 @@ from chemistry.exceptions import Mol2Error
 from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
+from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond
+from compat24 import any
 import copy
 
 class Mol2File(object):
@@ -259,9 +261,10 @@ class Mol2File(object):
                                 headtail = 'head'
                             break
                     else:
-                        # Did not find the atom
-                        raise Mol2Error('Could not find %s atom %s in residue '
-                                        '%d' % (headtail, atname, residx))
+                        if headtail == 'head':
+                            headtail = 'tail'
+                        else:
+                            headtail = 'head'
                     continue
                 if section == 'RESIDUECONNECT':
                     words = line.split()
@@ -297,7 +300,7 @@ class Mol2File(object):
     #===================================================
 
     @staticmethod
-    def write(struct, filename, mol3=False):
+    def write(struct, dest, mol3=False):
         """ Writes a mol2 file from a structure or residue template
 
         Parameters
@@ -305,10 +308,170 @@ class Mol2File(object):
         struct : :class:`Structure` or :class:`ResidueTemplate` or
                  :class:`ResidueTemplateContainer`
             The input structure to write the mol2 file from
-        filename : str or file-like obj
-            Name of the file to write
+        dest : str or file-like obj
+            Name of the file to write or open file handle to write to
         mol3 : bool, optional
             If True and ``struct`` is a ResidueTemplate or container, write
             HEAD/TAIL sections. Default is False
         """
-        raise NotImplementedError('Not implemented yet')
+        own_handle = False
+        if not hasattr(dest, 'write'):
+            own_handle = True
+            dest = TextToBinaryFile(genopen(dest, 'w'))
+        try:
+            if isinstance(struct, ResidueTemplateContainer):
+                natom = sum([len(c) for c in struct])
+                # To find the number of bonds, we need to total number of bonds
+                # + the number of bonds that would be formed by "stitching"
+                # together residues via their head and tail
+                bonds = []
+                charges = []
+                bases = [1 for res in struct]
+                for i, res in enumerate(struct):
+                    if i < len(struct) - 1:
+                        bases[i+1] = bases[i] + len(res)
+                for i, res in enumerate(struct):
+                    for bond in res.bonds:
+                        bonds.append((bond.atom1.idx+bases[i],
+                                      bond.atom2.idx+bases[i]))
+                    if i < len(struct)-1 and (res.tail is not None and
+                            struct[i+1].head is not None):
+                        bonds.append((res.tail.idx+bases[i],
+                                      struct[i+1].head.idx+bases[i+1]))
+                    charges.extend([a.charge for a in res])
+                residues = struct
+            else:
+                natom = len(struct.atoms)
+                bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
+                if isinstance(struct, ResidueTemplate):
+                    residues = [struct]
+                else:
+                    residues = struct.residues
+                charges = [a.charge for a in struct.atoms]
+            dest.write('@<TRIPOS>MOLECULE\n')
+            dest.write('\n')
+            dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
+            if len(residues) == 1:
+                dest.write('SMALL\n')
+            else:
+                for residue in residues:
+                    if AminoAcidResidue.has(residue.name):
+                        dest.write('PROTEIN\n')
+                        break
+                    if (RNAResidue.has(residue.name) or
+                            DNAResidue.has(residue.name)):
+                        dest.write('NUCLEIC\n')
+                        break
+                else:
+                    dest.write('BIOPOLYMER\n')
+            if not any(charges):
+                dest.write('NO_CHARGES\n')
+                printchg = False
+            else:
+                dest.write('USER_CHARGES\n')
+                printchg = True
+            # Now do ATOM section
+            dest.write('@<TRIPOS>ATOM\n')
+            j = 1
+            for i, res in enumerate(residues):
+                for atom in res:
+                    try:
+                        x = atom.xx
+                    except AttributeError:
+                        x = 0
+                    try:
+                        y = atom.xy
+                    except AttributeError:
+                        y = 0
+                    try:
+                        z = atom.xz
+                    except AttributeError:
+                        z = 0
+                    dest.write('%d %s %.4f %.4f %.4f %s %d %s' % (j, atom.name,
+                               x, y, z, atom.type, i+1, res.name))
+                    if printchg:
+                        dest.write(' %.4f\n' % atom.charge)
+                    else:
+                        dest.write('\n')
+                    j += 1
+            dest.write('@<TRIPOS>BOND\n')
+            for i, bond in enumerate(bonds):
+                dest.write('%d %d %d 1\n' % (i+1, bond[0], bond[1]))
+            dest.write('@<TRIPOS>SUBSTRUCTURE\n')
+            first_atom = 0
+            for i, res in enumerate(residues):
+                if not hasattr(res, 'chain') or not res.chain:
+                    chain = '****'
+                else:
+                    chain = res.chain
+                intresbonds = 0
+                if isinstance(res, ResidueTemplate):
+                    if i != len(residues)-1 and (res.tail is not None and
+                            residues[i+1].head is not None):
+                        intresbonds += 1
+                    if i != 0 and (res.head is not None and residues[i-1].tail
+                            is not None):
+                        intresbonds += 1
+                else:
+                    for atom in res:
+                        for a2 in atom.bond_partners:
+                            if a2.residue is not res:
+                                intresbonds += 1
+                dest.write('%d %s %d RESIDUE %d %s ROOT %d\n' % (i+1, res.name,
+                           first_atom+1, 0, chain[:4], intresbonds))
+                first_atom += len(res)
+            if mol3:
+                dest.write('@<TRIPOS>HEADTAIL\n')
+                for i, res in enumerate(residues):
+                    if isinstance(res, ResidueTemplate):
+                        if res.head is not None:
+                            dest.write('%s %d\n' % (res.head.name, i+1))
+                        else:
+                            dest.write('0 0\n')
+                        if res.tail is not None:
+                            dest.write('%s %d\n' % (res.tail.name, i+1))
+                        else:
+                            dest.write('0 0\n')
+                    else:
+                        head = tail = None
+                        for atom in res:
+                            for a2 in atom.bond_partners:
+                                if a2.residue.idx == res.idx - 1:
+                                    head = atom
+                                if a2.residue.idx == res.idx + 1:
+                                    tail = atom
+                        if head is not None:
+                            dest.write('%s %d\n' % (head.name, i+1))
+                        else:
+                            dest.write('0 0\n')
+                        if tail is not None:
+                            dest.write('%s %d\n' % (tail.name, i+1))
+                        else:
+                            dest.write('0 0\n')
+                dest.write('@<TRIPOS>RESIDUECONNECT\n')
+                for i, res in enumerate(residues):
+                    if isinstance(res, ResidueTemplate):
+                        con = [res.head, res.tail, None, None, None, None]
+                        for i, a in enumerate(res.connections):
+                            con[i+2] = a
+                    else:
+                        con = [None, None, None, None, None, None]
+                        ncon = 2
+                        for atom in res:
+                            for a2 in atom.bond_partners:
+                                if a2.residue.idx == res.idx - 1:
+                                    con[0] = atom
+                                elif a2.residue.idx == res.idx + 1:
+                                    con[1] = atom
+                                elif a2.residue.idx != res.idx:
+                                    con[ncon] = atom
+                                    ncon += 1
+                    dest.write('%d' % (i+1))
+                    for a in con:
+                        if a is not None:
+                            dest.write(' %s' % a.name)
+                        else:
+                            dest.write(' 0')
+                    dest.write('\n')
+        finally:
+            if own_handle: dest.close()
