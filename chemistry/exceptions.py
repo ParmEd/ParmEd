@@ -15,14 +15,17 @@ class APIError(Exception):
 class ChemWarning(Warning):
     """ Base warning class """
 
-class PDBError(ChemError):
+class ParsingError(ChemError):
+    """ If there was a problem parsing any kind of file """
+
+class PDBError(ParsingError):
     """ If there was a problem parsing a PDB file """
+
+class Mol2Error(ParsingError):
+    """ If there was a problem parsing a Mol2 file """
 
 class PDBWarning(ChemWarning):
     """ A non-fatal error to indicate a problematic PDB file """
-
-class ReadError(ChemError):
-    """ Error when files cannot be properly read """
 
 class MoleculeError(ChemError):
     """ Error when molecule is illegally defined """
@@ -45,7 +48,7 @@ class AmberParmWarning(ChemWarning):
 class AmberFormatWarning(ChemWarning):
     """ If there is something that is non-fatal """
 
-class AmberParmError(ChemError):
+class AmberParmError(ParsingError):
     """ This is a generic AmberParmError """
 
 class AmberParameterError(ChemError):
@@ -60,22 +63,22 @@ class MoleculeWarning(ChemWarning):
 class DihedralError(ChemError):
     " This happens when we try to do disallowed things in the _Dihedral class "
 
-class AmoebaParamFileError(ChemError):
+class AmoebaParamFileError(ParsingError):
     """ When a parameter file is incorrect """
 
 class AmoebaParamFileWarning(ChemWarning):
     """ When a parameter file is incorrect """
 
-class TinkerFileError(ChemError):
+class TinkerFileError(ParsingError):
     """ Raised when one of the TINKER parsing routines hits a bad file """
 
-class TinkerAnaloutError(TinkerFileError):
+class TinkerAnaloutError(ParsingError):
     """ When the analout file is not a valid format """
 
-class TinkerKeyFileError(TinkerFileError):
+class TinkerKeyFileError(ParsingError):
     """ When a keyword control file is invalid """
 
-class TinkerDynFileError(TinkerFileError):
+class TinkerDynFileError(ParsingError):
     """ When a .dyn file is corrupt or badly formatted """
 
 class CmapError(ChemError):
@@ -93,7 +96,7 @@ class AmoebaError(ChemError):
 class CreateInputError(ChemError):
     """ If there's a problem making a mdin input file """
 
-class CharmmPSFError(ChemError):
+class CharmmPSFError(ParsingError):
     """ If there is a problem parsing CHARMM PSF files """
 
 class SplitResidueWarning(ChemWarning):
@@ -105,7 +108,7 @@ class ResidueError(ChemError):
 class CharmmPSFWarning(ChemWarning):
     """ For non-fatal PSF parsing issues """
 
-class CharmmFileError(ChemError):
+class CharmmFileError(ParsingError):
     """ If there is a problem parsing CHARMM files """
 
 class CharmmPsfEOF(ChemError):

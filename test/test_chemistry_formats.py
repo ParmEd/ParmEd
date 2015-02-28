@@ -8,7 +8,7 @@ from chemistry import charmm
 from chemistry import exceptions
 from chemistry import formats
 from chemistry import Structure, read_PDB, write_PDB, read_CIF
-from chemistry.modeller import ResidueTemplate
+from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
 try:
     import cStringIO as StringIO
     from itertools import izip as zip
@@ -113,6 +113,13 @@ class TestFileLoader(unittest.TestCase):
         cif = formats.load_file(get_fn('4LZT.cif'))
         self.assertIsInstance(cif, Structure)
         self.assertEqual(len(cif.atoms), 1164)
+
+    def testLoadMol2(self):
+        """ Tests automatic loading of mol2 and mol3 files """
+        mol2 = formats.load_file(get_fn('test_multi.mol2'))
+        self.assertIsInstance(mol2, ResidueTemplateContainer)
+        mol3 = formats.load_file(get_fn('tripos9.mol2'))
+        self.assertIsInstance(mol3, ResidueTemplate)
 
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
@@ -615,3 +622,173 @@ class TestChemistryCIFStructure(unittest.TestCase):
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
 
+class TestMol2File(unittest.TestCase):
+    """ Tests the correct parsing and processing of mol2 files """
+
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testMultiMol2(self):
+        """ Tests the parsing of a mol2 file with multiple residues """
+        cont = formats.Mol2File.parse(get_fn('test_multi.mol2'))
+        self.assertIsInstance(cont, ResidueTemplateContainer)
+        self.assertEqual(len(cont), 20)
+        for i, res in enumerate(cont):
+            if i == 0:
+                self.assertEqual(res.name, 'DA5')
+                self.assertIs(res.head, None)
+                self.assertIs(res.tail, [a for a in res if a.name == "O3'"][0])
+                self.assertEqual(len(res), 30)
+            elif i < 9:
+                self.assertEqual(res.name, 'DA')
+                self.assertIs(res.head, [a for a in res if a.name == "P"][0])
+                self.assertIs(res.tail, [a for a in res if a.name == "O3'"][0])
+                self.assertEqual(len(res), 32)
+            elif i == 9:
+                self.assertEqual(res.name, 'DA3')
+                self.assertIs(res.head, [a for a in res if a.name == "P"][0])
+                self.assertIs(res.tail, None)
+                self.assertEqual(len(res), 33)
+            elif i == 10:
+                self.assertEqual(res.name, 'DT5')
+                self.assertIs(res.head, None)
+                self.assertIs(res.tail, [a for a in res if a.name == "O3'"][0])
+                self.assertEqual(len(res), 30)
+            elif i < 19:
+                self.assertEqual(res.name, 'DT')
+                self.assertIs(res.head, [a for a in res if a.name == "P"][0])
+                self.assertIs(res.tail, [a for a in res if a.name == "O3'"][0])
+                self.assertEqual(len(res), 32)
+            elif i == 19:
+                self.assertEqual(res.name, 'DT3')
+                self.assertIs(res.head, [a for a in res if a.name == "P"][0])
+                self.assertIs(res.tail, None)
+                self.assertEqual(len(res), 33)
+        # There are 686 total bonds defined in the mol2 file. However, there are
+        # 20 residues, of which only 2 of the termini are *not* bonded to the
+        # next residue. Ergo, 18 of those 686 bonds are intra-residue, and so
+        # are not added to any of the ResidueTemplate instances. As a result, we
+        # should have 686 - 18 = 668 total bonds if we add up the lengths of the
+        # bond arrays for every residue
+        self.assertEqual(sum([len(x.bonds) for x in cont]), 668)
+
+    def testMultiMol2Structure(self):
+        """ Tests parsing a multi-residue mol2 into a Structure """
+        struct = formats.Mol2File.parse(get_fn('test_multi.mol2'),
+                                        structure=True)
+        self.assertIsInstance(struct, Structure)
+        self.assertEqual(len(struct.residues), 20)
+        for i, res in enumerate(struct.residues):
+            if i == 0:
+                self.assertEqual(res.name, 'DA5')
+                self.assertEqual(len(res), 30)
+            elif i < 9:
+                self.assertEqual(res.name, 'DA')
+                self.assertEqual(len(res), 32)
+            elif i == 9:
+                self.assertEqual(res.name, 'DA3')
+                self.assertEqual(len(res), 33)
+            elif i == 10:
+                self.assertEqual(res.name, 'DT5')
+                self.assertEqual(len(res), 30)
+            elif i < 19:
+                self.assertEqual(res.name, 'DT')
+                self.assertEqual(len(res), 32)
+            elif i == 19:
+                self.assertEqual(res.name, 'DT3')
+                self.assertEqual(len(res), 33)
+        # This should have the total number of bonds, 686
+        self.assertEqual(len(struct.bonds), 686)
+
+    def testMol3File(self):
+        """ Tests parsing a Mol3 file into a ResidueTemplate """
+        mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        self.assertIsInstance(mol3, ResidueTemplate)
+        self.assertEqual(mol3.name, 'GPN')
+        self.assertEqual(len(mol3), 34)
+        self.assertEqual(len(mol3.bonds), 35)
+        self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
+        self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
+
+    def testMol3Structure(self):
+        """ Tests parsing a Mol3 file with 1 residue into a Structure """
+        mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        self.assertIsInstance(mol3, Structure)
+        self.assertEqual(mol3.residues[0].name, 'GPN')
+        self.assertEqual(len(mol3.atoms), 34)
+        self.assertEqual(len(mol3.bonds), 35)
+
+    def testMol2MultiWrite(self):
+        """
+        Tests writing mol2 file of multi residues from ResidueTemplateContainer
+        """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
+        formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('test_multi.mol2', written=True),
+                                   get_saved_fn('test_multi.mol2')))
+
+    def testMol2MultiWriteFromStructure(self):
+        """ Tests writing mol2 file of multi residues from Structure """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('test_multistruct.mol2', written=True),
+                                   get_saved_fn('test_multistruct.mol2')))
+
+    def testMol3MultiWrite(self):
+        """
+        Tests writing mol3 file of multi residues from ResidueTemplateContainer
+        """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
+        formats.Mol2File.write(mol2, get_fn('test_multi.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('test_multi.mol3', written=True),
+                                   get_saved_fn('test_multi.mol3')))
+
+    def testMol3MultiWriteFromStructure(self):
+        """ Tests writing mol3 file of multi residues from Structure """
+        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('test_multistruct.mol3', written=True),
+                                   get_saved_fn('test_multistruct.mol3')))
+
+    def testMol2SingleWrite(self):
+        """ Tests writing mol2 file of single ResidueTemplate """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        formats.Mol2File.write(mol2, get_fn('tripos9.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('tripos9.mol2', written=True),
+                                   get_saved_fn('tripos9.mol2')))
+
+    def testMol2SingleWriteStruct(self):
+        """ Tests writing mol2 file of single-residue Structure """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol2', written=True))
+        self.assertTrue(diff_files(get_fn('tripos9struct.mol2', written=True),
+                                   get_saved_fn('tripos9struct.mol2')))
+
+    def testMol3SingleWrite(self):
+        """ Tests writing mol3 file of single ResidueTemplate """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        formats.Mol2File.write(mol2, get_fn('tripos9.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('tripos9.mol3', written=True),
+                                   get_saved_fn('tripos9.mol3')))
+
+    def testMol3SingleWriteStruct(self):
+        """ Tests writing mol3 file of single-residue Structure """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol3', written=True),
+                               mol3=True)
+        self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
+                                   get_saved_fn('tripos9struct.mol3')))

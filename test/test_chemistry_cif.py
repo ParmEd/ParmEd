@@ -183,6 +183,7 @@ class PdbxWriterTests(unittest.TestCase):
         myBlock.printIt(dest)
         myCat=myBlock.getObj('pdbx_seqtool_mapping_ref')
         myCat.printIt(dest)
+        dest.close()
         for iRow in range(0,myCat.getRowCount()):
             myCat.setValue('some value', 'ref_mon_id',iRow)
             myCat.setValue(100, 'ref_mon_num',iRow)
