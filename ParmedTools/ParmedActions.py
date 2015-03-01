@@ -4,7 +4,8 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 from __future__ import division
 
 from chemistry.amber import AmberMask, AmberParm, ChamberParm, AmoebaParm
-from chemistry import Bond, BondType, Angle, AngleType, Dihedral, DihedralType
+from chemistry import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
+        Structure)
 from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
@@ -32,7 +33,15 @@ import sys
 import warnings
 
 GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
+__all__ = []
+COMMANDMAP = dict()
 
+def ActionType(type):
+    """
+    Metaclass for defining Action types, to add it to the list of available
+    actions and provide a hash lookup to the interpreter to support
+    case-insensitive command access
+    """
 # Add a help dictionary entry for each additional Action added to this class!
 # Each help entry should be a list with 2 elements: [Usage, description]
 Usages = {
@@ -51,7 +60,7 @@ Usages = {
                 'cd' : 'cd <directory>',
            'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
                        '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
-                       '[-nocmap] [usechamber] [box a,b,c[,alpha,beta,gamma]]'
+                       '[-nocmap] [box a,b,c[,alpha,beta,gamma]] '
                        '[-radii <radiusset>]',
             'change' : 'change <property> <mask> <new_value> [quiet]',
     'changelj14pair' : 'changeLJ14Pair <mask1> <mask2> <Rmin> <epsilon>',
@@ -3235,7 +3244,6 @@ class chamber(Action):
         - -psf        CHARMM PSF file
         - -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
         - -nocmap     Do not use any CMAP parameters
-        - usechamber  Use the 'chamber' program to write a topology file instead
         - -box        Box dimensions. If no angles are defined, they are assumed
                       to be 90 degrees (orthorhombic box). Alternatively, you
                       can use the word 'bounding' to define a box that encloses
@@ -3320,7 +3328,6 @@ class chamber(Action):
         else:
             self.crdfile = None
         self.cmap = not arg_list.has_key('-nocmap')
-        self.usechamber = arg_list.has_key('usechamber')
         psf = arg_list.get_key_string('-psf', None)
         if psf is None:
             raise InputError('chamber requires a PSF file')
@@ -3345,8 +3352,6 @@ class chamber(Action):
                 raise InputError('Box must be 3 lengths or 3 lengths and 3 '
                                  'angles!')
         else:
-            if self.usechamber:
-                raise InputError('Bounding box not supported with usechamber.')
             self.box = 'bounding'
         self.radii = arg_list.get_key_string('-radii', 'mbondi')
 
@@ -3356,13 +3361,6 @@ class chamber(Action):
         if not self.radii in GB_RADII:
             raise InputError('Illegal radius set %s -- must be one of '
                              '%s' % (self.radii, ', '.join(GB_RADII)))
-        if self.usechamber:
-            # We need a topfile, paramfile, and crd file for chamber
-            if not self.topfiles or not self.paramfiles:
-                raise InputError('The chamber program requires both RTF '
-                                 '(topology) and PAR (parameter) files.')
-            if not self.crdfile:
-                raise InputError('The chamber program requires a CRD file.')
         self.condense = not arg_list.has_key('nocondense')
 
     def __str__(self):
@@ -3388,40 +3386,12 @@ class chamber(Action):
         elif self.box is not None:
             retstr += ' Box info %s.' % (self.box)
         retstr += ' GB Radius set %s.' % self.radii
-        if self.usechamber:
-            retstr += ' Using chamber program.'
         return retstr
 
     def execute(self):
         from chemistry.amber._chamberparm import ConvertFromPSF
-        from chemistry.charmm.parameters import CharmmParameterSet
-        from chemistry.charmm.psf import CharmmPsfFile
-        from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
-        from chemistry import read_PDB
-        from subprocess import Popen
-        import tempfile
-        if self.usechamber:
-            tmpprm = tempfile.mktemp(suffix='.parm7')
-            tmpcrd = tempfile.mktemp(suffix='.rst7')
-            args = ['chamber', '-top', self.topfiles[0], '-param',
-                    self.paramfiles[0], '-psf', self.psf, '-crd', self.crdfile,
-                    '-str']
-            args += self.topfiles[1:] + self.paramfiles[1:]
-            args += self.streamfiles[:]
-            args += ['-p', tmpprm, '-inpcrd', tmpcrd]
-            if self.cmap:
-                args.append('-cmap')
-            else:
-                args.append('-nocmap')
-            if self.box is not None:
-                args += ['-box'] + [str(x) for x in self.box[:3]]
-            process = Popen(args)
-            if process.wait() != 0:
-                raise ChamberError('chamber failed with command\n\t' +
-                                   ' '.join(args))
-            # Now we have created a topology file
-            self.parm_list.add_parm(tmpprm, tmpcrd)
-            return
+        from chemistry.charmm import CharmmPsfFile, CharmmParameterSet
+        from chemistry import load_file
         # We're not using chamber, do the conversion in-house
         try:
             parmset = CharmmParameterSet()
@@ -3447,19 +3417,30 @@ class chamber(Action):
             crdbox = None # Really only ever available in a VMD-created PDB
             # Automatic format determination
             try:
-                crd = CharmmCrdFile(self.crdfile)
-                coords = crd.coords
-            except CharmmFileError:
+                crd = load_file(self.crdfile)
+            except FormatNotFound:
+                raise ChamberError('Could not determine file type format for '
+                                   'coordinate file %s' % self.crdfile)
+            if isinstance(crd, Structure):
+                # PDB or CIF?
                 try:
-                    crd = CharmmRstFile(self.crdfile)
-                    coords = crd.coords
-                except CharmmFileError:
-                    crd = read_PDB(self.crdfile)
-                    if len(crd.atoms) == 0:
-                        raise ChamberError('Could not determine coordinate'
-                                           'file type')
-                    crdbox = crd.box
-                    coords = crd.pdbxyz[0]
+                    coords = []
+                    for a in crd.atoms:
+                        coords.extend([a.xx, a.xy, a.xz])
+                except AttributeError:
+                    raise ChamberError('Coordinate file %s is not a coordinate '
+                                       'file format' % self.crdfile)
+            else:
+                try:
+                    coords = crd.coordinates
+                except AttributeError:
+                    raise ChamberError('Coordinate file %s is not a coordinate '
+                                       'file format' % self.crdfile)
+            if callable(coords):
+                # Must be a trajectory; take the first frame
+                coords = coords(0)
+            if hasattr(crd, 'box') and crd.box is not None:
+                crdbox = crd.box
             if len(coords) != len(psf.atoms) * 3:
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
@@ -3527,7 +3508,7 @@ class chamber(Action):
             psf.load_parameters(parmset)
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
-        parm = ConvertFromPSF(psf, parmset).view(ChamberParm)
+        parm = ConvertFromPSF(psf, parmset)
         parm.prm_name = self.psf
         changeradii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)

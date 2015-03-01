@@ -3,7 +3,6 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 """
 
 # Load some system modules that may be useful for various users in shell mode
-import math
 from chemistry.amber.readparm import AmberParm
 import cmd
 from glob import glob
@@ -209,7 +208,6 @@ class ParmedCmd(cmd.Cmd):
         return True
 
     def default(self, line):
-        """ Default behavior """
         mycmd = line.split()[0].lower()
         if (mycmd in ('lawsuit', 'math', 'warnings') or not
                 hasattr(ParmedActions, mycmd)):
