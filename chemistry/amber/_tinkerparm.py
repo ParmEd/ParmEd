@@ -66,7 +66,7 @@ class AmoebaParm(AmberParm):
         `flag_list` is a key to those 3 dicts and no other keys exist
     version : str
         The VERSION string from the Amber file
-    prm_name : str
+    name : str
         The file name of the originally parsed file (set to the fname parameter)
     atoms : AtomList(Atom)
         List of all atoms in the system

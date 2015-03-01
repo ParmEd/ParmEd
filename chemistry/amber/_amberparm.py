@@ -93,7 +93,7 @@ class AmberParm(AmberFormat, Structure):
         ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
     version : str
         The VERSION string from the Amber file
-    prm_name : str
+    name : str
         The file name of the originally parsed file (set to the fname parameter)
     LJ_types : dict {str : int}
         A mapping whose keys are atom types paired with the nonbonded index of
@@ -231,7 +231,7 @@ class AmberParm(AmberFormat, Structure):
             An instance of this type from the data in rawdata
         """
         inst = cls()
-        inst.prm_name = rawdata.prm_name
+        inst.name = rawdata.name
         inst.version = rawdata.version
         inst.formats = rawdata.formats
         inst.parm_data = rawdata.parm_data
@@ -466,14 +466,6 @@ class AmberParm(AmberFormat, Structure):
             except AttributeError:
                 depth14 = radius14 = None
             atom.atom_type.set_lj_params(depth, radius, depth14, radius14)
-
-    #===================================================
-
-    def __str__(self):
-        " Returns the name of the topology file as its string representation "
-        if self.prm_name is not None:
-            return self.prm_name
-        return repr(self)
 
     #===================================================
 

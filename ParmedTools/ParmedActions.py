@@ -35,108 +35,36 @@ import warnings
 GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
 __all__ = []
 COMMANDMAP = dict()
+Usages = dict(go='go', quit='quit', help='help [<action>]')
 
-def ActionType(type):
+class ActionType(type):
     """
     Metaclass for defining Action types, to add it to the list of available
     actions and provide a hash lookup to the interpreter to support
     case-insensitive command access
-    """
-# Add a help dictionary entry for each additional Action added to this class!
-# Each help entry should be a list with 2 elements: [Usage, description]
-Usages = {
-         'add12_6_4' : 'add12_6_4 [<divalent ion mask>] '
-                       '[c4file <C4 Param. File> | watermodel <water model>] '
-                       '[polfile <Pol. Param File>] [tunfactor <tunfactor>]',
-   'addatomicnumber' : 'addAtomicNumber',
-     'addexclusions' : 'addExclusions <mask1> <mask2>',
-       'adddihedral' : 'addDihedral <mask1> <mask2> <mask3> <mask4> <phi_k> '
-                       '<per> <phase> [<scee>] [<scnb>] [type <type>]',
-#   'addcoarsegrain' : 'addCoarseGrain <parameter_file>',
-         'addljtype' : 'addLJType <mask> [radius <new_radius>] '
-                       '[epsilon <new_epsilon>] [radius_14 <new_radius14>] '
-                       '[epsilon_14 <new_epsilon14>]',
-            'addpdb' : 'addPDB <filename> [elem] [strict] [allicodes]',
-                'cd' : 'cd <directory>',
-           'chamber' : 'chamber -top <CHARMM.top> -param <CHARMM.par> [-str '
-                       '<CHARMM.str>] -psf <CHARMM.psf> [-crd <CHARMM.pdb>] '
-                       '[-nocmap] [box a,b,c[,alpha,beta,gamma]] '
-                       '[-radii <radiusset>]',
-            'change' : 'change <property> <mask> <new_value> [quiet]',
-    'changelj14pair' : 'changeLJ14Pair <mask1> <mask2> <Rmin> <epsilon>',
-      'changeljpair' : 'changeLJPair <mask1> <mask2> <Rmin> <epsilon>',
-'changeljsingletype' : 'changeLJSingleType <mask> <radius> <depth>',
-   'changeprotstate' : 'changeProtState <mask> <state #>',
-       'changeradii' : 'changeRadii <radii_set>',
-     'checkvalidity' : 'checkValidity',
-     'definesolvent' : 'defineSolvent <residue list>',
-        'deletebond' : 'deleteBond <mask1> <mask2>',
-    'deletedihedral' : 'deleteDihedral <mask1> <mask2> <mask3> <mask4>',
-         'deletepdb' : 'deletePDB',
-            'energy' : 'energy [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-                       '[Ewald]] [nodisper] [omm] [applayer] [platform '
-                       '<platform>] [precision <precision model>] [decompose]',
-                'go' : 'go',
-  'hmassrepartition' : 'HMassRepartition [<mass>] [dowater]',
-       'interpolate' : 'interpolate <nparm> [parm2 <other_parm>] [eleconly]'
-                       ' [prefix <prefix>] [startnum <num>]',
-              'help' : 'help [<action>]',
-         'listparms' : 'listParms',
-              'lmod' : 'lmod',
-        'loadrestrt' : 'loadRestrt <restrt_filename>',
-                'ls' : 'ls [Unix ls options]',
-          'minimize' : 'minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
-                       '[[restrain <mask>] [weight <k>]] [norun] '
-                       '[script <script_file.py>] [platform <platform>] '
-                       '[precision <precision model>] [tol <tolerance>] '
-                       '[maxcyc <cycles>]',
-         'netcharge' : 'netCharge [<mask>]',
-            'openmm' : 'OpenMM -p <parm>|<parm index> [sander/pmemd options] '
-                       '-platform <platform> -precision <precision model> '
-                       '[dcd] [progress] [script <script_file.py>] [norun]',
-           'outparm' : 'outparm <prmtop_name> [<inpcrd_name>] [netcdf]',
-              'parm' : 'parm <filename> [<filename> [<filename> ...]] || '
-                       'parm copy <filename>|<index> || parm select '
-                       '<filename>|<index>',
-           'parmout' : 'parmout <prmtop_name> [<inpcrd_name>] [netcdf]',
-       'printangles' : 'printAngles <mask> [<mask> [<mask>] ]',
-        'printbonds' : 'printBonds <mask> [<mask>]',
-      'printdetails' : 'printDetails <mask>',
-    'printdihedrals' : 'printDihedrals <mask> [<mask> [<mask> [<mask>] ] ]',
-        'printflags' : 'printFlags',
-     'printpointers' : 'printPointers',
-         'printinfo' : 'printInfo <flag>',
-     'printljmatrix' : 'printLJMatrix <mask>|<index>',
-      'printljtypes' : 'printLJTypes [<mask>|<type name>]',
-              'quit' : 'quit',
-             'scale' : 'scale <FLAG> <factor>',
-              'scee' : 'scee <scee_value>',
-              'scnb' : 'scnb <scnb_value>',
-           'setbond' : 'setBond <mask1> <mask2> <k> <Req>',
-          'setangle' : 'setAngle <mask1> <mask2> <mask3> <k> <THETeq>',
-      'setmolecules' : 'setMolecules [solute_ions True|False]',
-      'setoverwrite' : 'setOverwrite [True|False]', 
-            'source' : 'source <file>',
-           'summary' : 'summary',
-             'strip' : 'strip <mask>',
-           'timerge' : 'tiMerge <mol1mask> <mol2mask> <scmask1> <scmask2>'
-                            ' [<scmask1N>] [<scmask2N>] [tol <tol>]',
-       'writefrcmod' : 'writeFrcmod <frcmod_name>',
-          'writeoff' : 'writeOFF <OFF_filename>',
-#             'heat' : 'heat [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] '
-#                      '[[restrain <mask>] [weight <k>]] [langevin | '
-#                      'anderson] [nvt | npt] [anisotropic] [norun] [script '
-#                      '<script_file.py>] [platform <platform>] '
-#                      '[precision <precision model>]',
-#               'md' : 'MD [cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | '
-#                      '[Ewald]] [[restrain <mask>] [weight <k>]] [npt | nve | '
-#                      'nvt] [langevin | anderson] [anisotropic] [norun] '
-#                      '[script <script_file.py>] [platform <platform>] '
-#                      '[precision <precision model>]',
-}
 
-# Add help and go as a class here to basically hold docstrings for the help
-# function
+    Parameters
+    ----------
+    cls : class type
+        The class that is being generated by this metaclass
+    name : str
+        The name of the class being created
+    bases : tuple of types
+        Tuple of all base class types for this class
+    dct: dict
+        The list of options and attributes currently present in this class
+    """
+    def __init__(cls, name, bases, dct):
+        global COMMANDMAP, __all__, Usages
+        __all__.append(name)
+        if name != 'Action':
+            COMMANDMAP[name.lower()] = cls
+        if 'usage' in dct:
+            Usages[name.lower()] = '%s %s' % (name, dct['usage'])
+        elif name != 'Action': # Skip base action class
+            Usages[name.lower()] = name
+#       print('Adding %s' % name)
+        super(ActionType, cls).__init__(name, bases, dct)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -145,7 +73,7 @@ lawsuit = object
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class Action(lawsuit):
-    """ Base action class """
+    __metaclass__ = ActionType
     stderr = sys.stderr
     # Does this action need a populated parm_list? If yes, bail out if it's
     # unpopulated
@@ -221,12 +149,11 @@ class Action(lawsuit):
         try:
             self.init(arg_list)
         except NoArgument:
+            cmdname = type(self).__name__
             try:
-                usage = Usages[type(self).__name__]
-                cmdname = usage.split()[0]
-            except KeyError:
-                usage = ''
-                cmdname = type(self).__name__
+                usage = '%s %s' % (cmdname, self.usage)
+            except AttributeError:
+                usage = cmdname
             Action.stderr.write("Bad command %s:\n\t%s\n" % (cmdname, usage))
             self.__str__ = Action.__str__
             self.execute = Action.execute
@@ -255,6 +182,8 @@ class parmout(Action):
     """
     Final prmtop written after all actions are complete
     """
+    usage = '<prmtop_name> [<inpcrd_name>] [netcdf]'
+
     def init(self, arg_list):
         self.filename = arg_list.get_next_string()
         self.rst_name = arg_list.get_next_string(optional=True)
@@ -281,10 +210,11 @@ class parmout(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class setoverwrite(Action):
+class setOverwrite(Action):
     """
     Necessary to overwrite original topology file name.
     """
+    usage = '[True|False]'
     needs_parm = False
     def init(self, arg_list):
         # see if we got an argument
@@ -306,10 +236,11 @@ class setoverwrite(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class writefrcmod(Action):
+class writeFrcmod(Action):
     """
     Writes an frcmod file from all of the parameters in the topology file.
     """
+    usage = '<frcmod_name>'
     supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.frcmod_name = arg_list.get_next_string(optional=True)
@@ -347,11 +278,12 @@ class writefrcmod(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class loadrestrt(Action):
+class loadRestrt(Action):
     """
     Loads a restart file so we have coordinates. Necessary for distance-based
     mask criteria and writeOFF
     """
+    usage = '<restrt_filename>'
     def init(self, arg_list):
         self.rst_name = arg_list.get_next_string()
 
@@ -363,10 +295,11 @@ class loadrestrt(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class writeoff(Action):
+class writeOFF(Action):
     """
     Writes an Amber OFF Library with all of the residues found in the topology
     """
+    usage = '<OFF_filename>'
     supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.off_file = arg_list.get_next_string()
@@ -385,11 +318,12 @@ class writeoff(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changeradii(Action):
+class changeRadii(Action):
     """
     Changes intrinsic GB radii to the specified set: Allowed values are
         amber6, bondi, mbondi, mbondi2, mbondi3
     """
+    usage = '<radii_set>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.radii = arg_list.get_next_string()
@@ -416,11 +350,12 @@ class changeradii(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changeljpair(Action):
+class changeLJPair(Action):
     """
     Changes a particular Lennard Jones pair based on a given (pre-combined)
     epsilon/Rmin
     """
+    usage = '<mask1> <mask2> <Rmin> <epsilon>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -434,7 +369,6 @@ class changeljpair(Action):
                 self.rmin, self.eps)
 
     def execute(self):
-        from ParmedTools.changeljpair import ChLJPair
         selection1 = self.mask1.Selection()
         selection2 = self.mask2.Selection()
         if sum(selection1) == 0 or sum(selection2) == 0:
@@ -458,15 +392,16 @@ class changeljpair(Action):
                     if attype2 != atom.nb_idx:
                         raise ChangeLJPairError(
                                      'Second mask matches multiple atom types!')
-        ChLJPair(self.parm, attype1, attype2, self.rmin, self.eps)
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changelj14pair(Action):
+class changeLJ14Pair(Action):
     """
     Changes a particular 1-4 Lennard Jones pair based on a given (pre-combined)
     epsilon/Rmin. Only valid for CHAMBER prmtops
     """
+    usage = '<mask1> <mask2> <Rmin> <epsilon>'
     supported_classes = (ChamberParm,)
     def init(self, arg_list):
         # Make sure this is a chamber prmtop
@@ -487,7 +422,6 @@ class changelj14pair(Action):
         return 'Not a chamber topology. Nothing to do.'
 
     def execute(self):
-        from ParmedTools.changeljpair import ChLJPair
         selection1 = self.mask1.Selection()
         selection2 = self.mask2.Selection()
         if sum(selection1) == 0 or sum(selection2) == 0:
@@ -513,11 +447,11 @@ class changelj14pair(Action):
                                      'Second mask matches multiple atom types!')
 
         # Adjust 1-4 non-bonded terms as well if we're using a chamber-prmtop
-        ChLJPair(self.parm, attype1, attype2, self.rmin, self.eps, True)
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, True)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class checkvalidity(Action):
+class checkValidity(Action):
     """
     Basic checks for prmtop validity.
     """
@@ -553,6 +487,7 @@ class change(Action):
     useful for suppressing overwhelming output if you are zeroing every
     charge, for instance)
     """
+    usage = '<property> <mask> <new_value> [quiet]'
     def init(self, arg_list):
         self.quiet = arg_list.has_key('quiet')
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
@@ -621,10 +556,11 @@ class change(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printinfo(Action):
+class printInfo(Action):
     """
     Prints all prmtop data corresponding to the given %FLAG
     """
+    usage = '<flag>'
     outfile = sys.stdout
     def init(self, arg_list):
         self.flag = arg_list.get_next_string().upper()
@@ -651,11 +587,13 @@ class printinfo(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class addljtype(Action):
+class addLJType(Action):
     """
     Turns given mask into a new LJ atom type. It uses the radius and Rmin from
     the first atom type in <mask> if new_radius or new_epsilon aren't provided
     """
+    usage = ('<mask> [radius <new_radius>] [epsilon <new_epsilon>] '
+             '[radius_14 <new_radius14>] [epsilon_14 <new_epsilon14>]')
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.new_radius_14 = arg_list.get_key_float('radius_14', None)
@@ -705,14 +643,16 @@ class outparm(parmout):
     Prints a new prmtop like parmout, but keeps its place in the action stack so
     several can be written out in 1 parmed session
     """
+    usage = '<prmtop_name> [<inpcrd_name>] [netcdf]'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printljtypes(Action):
+class printLJTypes(Action):
     """
     Prints the Lennard Jones type index for the given atom mask or, if no value
     is given, the LJ type index for each atom.
     """
+    usage = '[<mask>|<type name>]'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Compile the list of indices
@@ -774,6 +714,7 @@ class scee(Action):
     """
     Sets the 1-4 EEL scaling factor in the prmtop
     """
+    usage = '<scee_value>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.scee_value = arg_list.get_next_float()
@@ -801,6 +742,7 @@ class scnb(Action):
     """
     Sets the 1-4 VDW scaling factor in the prmtop
     """
+    usage = '<scnb_value>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.scnb_value = arg_list.get_next_float()
@@ -822,7 +764,7 @@ class scnb(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changeljsingletype(Action):
+class changeLJSingleType(Action):
     """
     Allows you to change the radius/well depth of a single LJ type specified by
     <mask>. Note, this may change more than the atoms selected in just the mask!
@@ -830,7 +772,13 @@ class changeljsingletype(Action):
 
     Use addLJType to change the Lennard-Jones parameters on a set of specific
     atoms.
+
+        - <mask> : The selection of atoms to change the LJ type for. All atoms
+                   selected must have the same LJ type
+        - <radius> : Rmin/2 (van der Waals radius of the new type)
+        - <depth> : Well-depth (a.k.a., epsilon)
     """
+    usage = '<mask> <radius> <depth>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
@@ -887,10 +835,11 @@ class changeljsingletype(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printdetails(Action):
+class printDetails(Action):
     """
     Returns information about all atoms in a given mask
     """
+    usage = '<mask>'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
 
@@ -927,7 +876,7 @@ class printdetails(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printflags(Action):
+class printFlags(Action):
     """
     Prints all %FLAGs found in the topology file
     """
@@ -942,7 +891,7 @@ class printflags(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printpointers(Action):
+class printPointers(Action):
     """
     Prints a list of all the POINTERS and their values
     """
@@ -1003,13 +952,14 @@ NSPSOL (The first solvent "molecule")............= %d
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class setmolecules(Action):
+class setMolecules(Action):
     """
     Determines the molecularity of the system based on the bonding network and
     correctly determines the SOLVENT_POINTERS and ATOMS_PER_MOLECULE sections of
     the topology file. It will consider the ions to be part of the solute if
     True is passed or not if False is passed. Defaults to True.
     """
+    usage = '[solute_ions True|False]'
     def init(self, arg_list):
         # Allow solute_ions to be a keyword argument or the only argument.
         # Default is True
@@ -1049,11 +999,12 @@ class setmolecules(Action):
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #
-#class addcoarsegrain(Action):
+#class addCoarseGrain(Action):
 #    """
 #    Adds coarse graining information to the Amber topology file according to
 #    a given coarse graining parameter file
 #    """
+#    usage = '<parameter_file>
 #    def init(self, arg_list):
 #        self.cg_param_file = arg_list.get_next_string()
 #        if not os.path.exists(self.cg_param_file):
@@ -1075,12 +1026,12 @@ class setmolecules(Action):
 #
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changeprotstate(Action):
+class changeProtState(Action):
     """
     Changes the protonation state of a given titratable residue that can be
-    treated via constant pH MD in Amber. This corresponds to all residues found
-    in $AMBERHOME/AmberTools/src/etc/cpin_data.py
+    treated via constant pH MD in Amber.
     """
+    usage = '<mask> <state #>'
     supported_classes = (AmberParm,)
     def init(self, arg_list):
         self.state = arg_list.get_next_int()
@@ -1138,7 +1089,7 @@ class changeprotstate(Action):
 
     def execute(self):
         from chemistry.amber import titratable_residues as residues
-        changeprotstate._add_ash_glh(residues)
+        changeProtState._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
         if sum(sel) == 0: return
@@ -1172,11 +1123,12 @@ class changeprotstate(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class netcharge(Action):
+class netCharge(Action):
     """
     Prints the total charge of all of the atoms given by the mask. Defaults to
     all atoms
     """
+    usage = '[<mask>]'
     supported_classes = (AmberParm, ChamberParm)
     outfile = sys.stdout
     def init(self, arg_list):
@@ -1199,6 +1151,7 @@ class strip(Action):
     Deletes the atoms specified by <mask> from the topology file and rebuilds
     the topology file according to the parameters that remain.
     """
+    usage = '<mask>'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.num_atms = sum(self.mask.Selection())
@@ -1212,12 +1165,13 @@ class strip(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class definesolvent(Action):
+class defineSolvent(Action):
     """
     Allows you to change what parmed.py will consider to be "solvent". 
     <residue list> must be a comma-separated set of residue names with no
     spaces between them.
     """
+    usage = '<residue_list>'
     def init(self, arg_list):
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
@@ -1232,7 +1186,7 @@ class definesolvent(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class addexclusions(Action):
+class addExclusions(Action):
     """ 
     Allows you to add arbitrary exclusions to the exclusion list. Every atom in
     <mask2> is added to the exclusion list for each atom in <mask1> so that
@@ -1241,6 +1195,7 @@ class addexclusions(Action):
     For PME simulations, long-range electrostatics between these atom pairs are
     still computed (in different unit cells).
     """
+    usage = '<mask1> <mask2>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1265,12 +1220,13 @@ class addexclusions(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printbonds(Action):
+class printBonds(Action):
     """
     Prints all of the bonds (with their details) for the given atoms in the
     mask. If a second mask is given, only bonds in which one atom appears in
-    each list will be printed.
+    *each* list will be printed.
     """
+    usage = '<mask> [<mask>]'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm,
@@ -1297,13 +1253,15 @@ class printbonds(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printangles(Action):
+class printAngles(Action):
     """
     Prints all of the angles (with their details) for the given atoms in the
-    mask. If additional masks are given, only the angles in which the three
-    atoms are specified in each of the given mask (with the central atom
-    required to be in the second mask) are printed.
+    mask. If a second mask is given, only atoms whose central atom is in the
+    second mask and another atom is in the first mask is printed. If a third
+    mask is given, the central atom must be in the second mask and the other two
+    atoms must appear in the first *and* third masks (in any order)
     """
+    usage = '<mask> [<mask> [<mask>] ]'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         arg2 = arg_list.get_next_mask(optional=True)
@@ -1358,7 +1316,7 @@ class printangles(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printdihedrals(Action):
+class printDihedrals(Action):
     """
     Prints all of the dihedrals (with their details) for the given atoms in the
     mask. If multiple masks are given, only dihedrals that have one atom in each
@@ -1366,6 +1324,7 @@ class printdihedrals(Action):
     the first mask, the second atom in the second, etc. The order can be
     precisely reversed, but no other ordering is recognized.
     """
+    usage = '<mask> [<mask> [<mask> [<mask>] ] ]'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         arg2 = arg_list.get_next_mask(optional=True)
@@ -1469,7 +1428,7 @@ class printdihedrals(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class setbond(Action):
+class setBond(Action):
     """
     Changes (or adds a non-existent) bond in the topology file. Each mask must
     select the same number of atoms, and a bond will be placed between the
@@ -1477,10 +1436,12 @@ class setbond(Action):
     from mask2 and another bond between atom2 from mask1 and atom2 from mask2,
     etc.)
 
-    When used through the API, the changes are not flushed to the actual data in
-    the prmtop unless you call remake_parm() on the object (this is done for
-    performance reasons)
+        - <mask1> : Selection of first atoms in each bond
+        - <mask2> : Selection of second atoms in each bond
+        - <k> : Force constant (kcal/mol/A^2) in energy expression k(R-Req)^2
+        - <Req> : Equilibrium distance (A)
     """
+    usage = '<mask1> <mask2> <k> <Req>'
     supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
@@ -1545,7 +1506,7 @@ class setbond(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class setangle(Action):
+class setAngle(Action):
     """
     Changes (or adds a non-existent) angle in the topology file. Each mask must
     select the same number of atoms, and an angle will be placed between the
@@ -1553,10 +1514,14 @@ class setangle(Action):
     from mask2, and atom1 from mask3, another angle between atom2 from mask1,
     atom2 from mask2, and atom2 from mask3, etc.)
 
-    When used through the API, the changes are not flushed to the actual data in
-    the prmtop unless you call remake_parm() on the object (this is done for
-    performance reasons)
+        - <mask1> : The selection of one of the end-atoms in each angle
+        - <mask2> : The selection of central atoms in each angle
+        - <mask3> : The selection of other end-atoms in each angle
+        - <k> : Force constant in kcal/mol/radians^2 in energy expression
+                k(THET - THETeq)^2
+        - <THETeq> : Equilibrium angle (in *degrees*)
     """
+    usage = '<mask1> <mask2> <mask3> <k> <THETeq>'
     supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
@@ -1627,7 +1592,7 @@ class setangle(Action):
    
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class adddihedral(Action):
+class addDihedral(Action):
     """
     Adds a dihedral between mask1, mask2, mask3, and mask4. Each mask must
     specify the same number of atoms, and the dihedral is defined around the
@@ -1635,13 +1600,24 @@ class adddihedral(Action):
     instance, a dihedral will be placed around atom1 in mask 1, atom1 in mask 2,
     atom1 in mask 3, and atom1 in mask 4.  A second dihedral will be placed
     around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in
-    mask4. dihed_type can either be "normal" or "improper". <phi_k> is the
-    barrier height of the dihedral term, <per> is the periodicity, <phase> is
-    the phase offset, <scee> is the 1-4 EEL scaling factor for this dihedral
-    (default for AMBER is 1.2, default for GLYCAM is 1.0), and <scnb> is the 1-4
-    VDW scaling factor for this dihedral (default for AMBER is 2.0, default for
-    GLYCAM is 1.0)
+    mask4.
+    
+        - <mask1> : Selection of one of the end-atoms for each dihedral
+        - <mask2> : Selection of the middle atom bonded to <mask1> and
+                    <mask3> in each dihedral
+        - <mask3> : Selection of the other middle atom bonded to <mask2>
+                    and <mask4>
+        - <mask4> : Selection of the other end-atom in each dihedral
+        - <phi_k> : Force constant in kcal/mol
+        - <per> : Periodicity
+        - <phase> : Torsion phase shift
+        - <scnb> : 1-4 Lennard-Jones scaling constant (default 2.0)
+        - <scee> : 1-4 electrostatic scaling constant (default 1.2)
+        - <type> : Type of dihedral, either "improper" or "normal".
+                   Default is "normal"
     """
+    usage = ('<mask1> <mask2> <mask3> <mask4> <phi_k> <per> <phase> [<scee>] '
+             '[<scnb>] [type <type>]')
     supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
@@ -1728,7 +1704,7 @@ class adddihedral(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class addatomicnumber(Action):
+class addAtomicNumber(Action):
     """
     Adds the atomic number of each atom to a new section titled "ATOMIC_NUMBER"
     in the topology file. Elements are identified by the atomic mass found in
@@ -1754,11 +1730,12 @@ class addatomicnumber(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class deletedihedral(Action):
+class deleteDihedral(Action):
     """
     Deletes the dihedral around <mask2> and <mask3> in which the end-groups are
     <mask1> and <mask4>. For multi-term dihedrals, it removes each term.
     """
+    usage = '<mask1> <mask2> <mask3> <mask4>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1838,13 +1815,14 @@ class deletedihedral(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class printljmatrix(Action):
+class printLJMatrix(Action):
     """ 
     This function prints out how every atom type interacts with the atom type(s)
     in <mask>. The atom types are printed as all type names that have at least
     one atom with the Lennard Jones index given in square brackets at the end.
     Alternatively, you can request a particular atom type index
     """
+    usage = '<mask>|<index>'
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.idx = arg_list.get_next_int(optional=True)
@@ -1905,7 +1883,7 @@ class printljmatrix(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class timerge(Action):
+class tiMerge(Action):
     """
     Merges molecules removing redundant bonding terms.  Input amber masks
     corresponding to molecules 1/2 <mol1mask>/<mol2mask>, and the soft core
@@ -1926,6 +1904,8 @@ class timerge(Action):
     This is used when the atoms in molecules 1/2 are not in the same order and
     for checking the input coordinates.
     """
+    usage = ('<mol1mask> <mol2mask> <scmask1> <scmask2> [<scmask1N>] '
+             '[<scmask2N>] [tol <tol>]')
     supported_classes = (AmberParm,)
 
     def init(self, arg_list):
@@ -2216,6 +2196,7 @@ class source(Action):
     """
     Sources a file with a list of parmed commands
     """
+    usage = '<file>'
     needs_parm = False
     def init(self, arg_list):
         self.filename = arg_list.get_next_string()
@@ -2237,6 +2218,8 @@ class parm(Action):
     Either adds a new parm to the list of available parms to edit in ParmEd, or
     it sets a new 'active' parm to edit by default with new commands
     """
+    usage = ('<filename> [<filename> [<filename> ...]] || parm copy <filename>|'
+             '<index> || parm select <filename>|<index>')
     needs_parm = False # We don't need a parm for this action
     def init(self, arg_list):
         from glob import glob
@@ -2333,6 +2316,7 @@ class ls(Action):
     """
     Lists directory contents. Like UNIX 'ls'
     """
+    usage = '[Unix ls options]'
     needs_parm = False
     def init(self, arg_list):
         from glob import glob
@@ -2366,6 +2350,7 @@ class cd(Action):
     """
     Changes to a new directory like UNIX 'cd'
     """
+    usage = '<directory>'
     needs_parm = False
     def init(self, arg_list):
         from glob import glob
@@ -2398,7 +2383,7 @@ class cd(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class listparms(Action):
+class listParms(Action):
     """
     Lists all of the loaded topology files
     """
@@ -2426,12 +2411,21 @@ class interpolate(Action):
     Interpolates between two topology files (VDW and electrostatic terms only).
     If [eleconly] is present, only the charges will be interpolated. <nparm> is
     the number of 'interpolated' topology files you want (in addition to the two
-    end-points). The second prmtop must be specified if there are more than 2 in
-    the list. startnum has no effect on the generated prmtops, but it can be
-    used to control the names of the outputted topology files. The file names
-    will be <prefix>.# where # starts at <startnum> and increments by 1 for each
-    prmtop printed.
+    end-points). The second prmtop must be specified if there are more than 2
+    parms currently loaded in the ParmEd parm list. startnum has no effect on
+    the generated prmtops, but it can be used to control the names of the
+    outputted topology files.
+
+        - <nparm> : Number of topology files that will be generated
+        - <other_parm> : The other parm object used in interpolation if more
+                         than 2 parms are present (first parm is active one)
+        - eleconly : Only do charge interpolation
+        - <prefix> : Generated parm objects will be written as <prefix>.#, where
+                     # starts from <num> and increases by 1
+        - <num> : Starting number for file names (see <prefix> above)
     """
+    usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] '
+             '[startnum <num>')
     supported_classes = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
@@ -2599,10 +2593,10 @@ class summary(Action):
 
 class scale(Action):
     """
-    Multiplies all values in a particular section of the prmtop by a scalar
+    Multiplies all values in a particular section of an Amber prmtop by a scalar
     factor
     """
-
+    usage = '<FLAG> <factor>'
     def init(self, arg_list):
         self.flag = arg_list.get_next_string().upper()
         self.factor = arg_list.get_next_float()
@@ -2643,11 +2637,11 @@ class lmod(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class addpdb(Action):
+class addPDB(Action):
     """
-    Adds PDB information to new flags in the topology file to enable analyses
-    based on the original residue information in the PDB file, <filename>. It
-    adds the flags:
+    Adds PDB information to new flags in an Amber topology file to enable
+    analyses based on the original residue information in the PDB file,
+    <filename>. It adds the flags:
 
     Residue Properties
     ------------------
@@ -2675,7 +2669,7 @@ class addpdb(Action):
         This action is based on, and reproduces the key results of, the
         historical 'add_pdb' program. It is a bit more flexible, though.
     """
-
+    usage = '<filename> [elem] [strict] [allicodes]'
     def init(self, arg_list):
         self.pdbfile = arg_list.get_next_string()
         self.elements = arg_list.has_key('elem')
@@ -2798,11 +2792,10 @@ class addpdb(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class deletepdb(Action):
+class deletePDB(Action):
     """
     This action deletes the flags added by addPDB if they are present.
     """
-
     def init(self, arg_list):
         self.pdbpresent = ('RESIDUE_NUMBER' in self.parm.flag_list or
                            'RESIDUE_CHAINID' in self.parm.flag_list or
@@ -2847,6 +2840,8 @@ class add12_6_4(Action):
     [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
         289-297
     """
+    usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
+            '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')
     supported_classes = (AmberParm, ChamberParm)
    
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
@@ -2900,7 +2895,7 @@ class add12_6_4(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class hmassrepartition(Action):
+class HMassRepartition(Action):
     """
     This action implements hydrogen mass repartitioning in the system by
     changing the mass of each hydrogen to the desired value (the default new
@@ -2910,7 +2905,7 @@ class hmassrepartition(Action):
     implementing constraints on water molecules is analytical). Water masses can
     be repartitioned as well with the 'dowater' keyword.
     """
-
+    usage = '[<mass>] [dowater]'
     def init(self, arg_list):
         self.changewater = arg_list.has_key('dowater')
         self.new_h_mass = arg_list.get_next_float(optional=True, default=3.024)
@@ -2961,7 +2956,7 @@ class hmassrepartition(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class openmm(Action):
+class OpenMM(Action):
     """
     This class will read a sander/pmemd input file and run an equivalent
     simulation using the OpenMM Python API. It uses a topology file that has
@@ -2985,6 +2980,9 @@ class openmm(Action):
     will prevent anything from actually being run and can only be used when a
     script file is provided.
     """
+    usage = ('[-p <parm>|<parm index>] [sander/pmemd options] [-platform '
+            '<platform>] [-precision <precision model>] [dcd] [progress] '
+            '[script <script_file.py>] [norun]')
     supported_classes = (AmberParm, ChamberParm)
 
     def init(self, arg_list):
@@ -3064,6 +3062,9 @@ class energy(Action):
                       separately
         - applayer : Use OpenMM's class to compute the energy
     """
+    usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | [Ewald]] '
+             '[nodisper] [omm] [applayer] [platform <platform>] [precision '
+             '<precision model>] [decompose]')
     supported_classes = (AmberParm, ChamberParm)
 
     output = sys.stdout
@@ -3096,7 +3097,7 @@ class energy(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class deletebond(Action):
+class deleteBond(Action):
     """
     This action deletes any bonds that occur between the atoms in two masks.
 
@@ -3110,6 +3111,7 @@ class deletebond(Action):
     (like angles and dihedrals) that would get severed by the deletion of one of
     the bonds.
     """
+    usage = '<mask1> <mask2>'
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -3242,7 +3244,7 @@ class chamber(Action):
                       type is detected from extension (or in the case of .inp
                       files, the presence of 'top', 'par' in the name)
         - -psf        CHARMM PSF file
-        - -crd        Input coordinate file (PDB, CHARMM CRD, or CHARMM restart)
+        - -crd        Coordinate file (PDB, CHARMM CRD, Amber restart, etc.)
         - -nocmap     Do not use any CMAP parameters
         - -box        Box dimensions. If no angles are defined, they are assumed
                       to be 90 degrees (orthorhombic box). Alternatively, you
@@ -3260,6 +3262,9 @@ class chamber(Action):
     there. Any box info given on the command-line will override the box found in
     the crd file.
     """
+    usage = ('-top <RTF> -param <PAR> [-str <STR>] -psf <PSF> [-crd <CRD>] '
+             '[-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii '
+             '<radiusset>]')
     needs_parm = False
 
     def init(self, arg_list):
@@ -3509,8 +3514,8 @@ class chamber(Action):
         except ChemError, e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset)
-        parm.prm_name = self.psf
-        changeradii(parm, self.radii).execute()
+        parm.name = self.psf
+        changeRadii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
         self.parm = parm
 
@@ -3546,6 +3551,10 @@ class minimize(Action):
     The implicit solvent options will be ignored for systems with periodic
     boundary conditions
     """
+    usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] [[restrain <mask>] '
+             '[weight <k>]] [norun] [script <script_file.py>] [platform '
+             '<platform>] [precision <precision model>] [tol <tolerance>] '
+             '[maxcyc <cycles>]')
     supported_classes = (ChamberParm, AmberParm)
 
     def init(self, arg_list):
@@ -3630,5 +3639,27 @@ class minimize(Action):
         minimize(self.parm, self.igb, self.saltcon, self.cutoff,
                  self.restrain, self.weight, self.script, self.platform,
                  self.precision, self.norun, self.tol, self.maxcyc)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+# Private helper methods
+
+def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
+   
+    if one_4:
+        key = 'LENNARD_JONES_14'
+    else:
+        key = 'LENNARD_JONES'
+
+    # Make sure that atom type 1 comes first
+    a1, a2 = sorted([atom_1, atom_2])
+    ntypes = parm.pointers['NTYPES']
+   
+    # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
+    term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
+   
+    # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
+    parm.parm_data['%s_ACOEF' % key][term_idx] = eps * rmin**12
+    parm.parm_data['%s_BCOEF' % key][term_idx] = 2 * eps * rmin**6
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

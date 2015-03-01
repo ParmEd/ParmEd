@@ -17,7 +17,6 @@ class ParmList(object):
         self._parm_names = []
         self._parm_instances = []
         self.parm = None # The active parm instance
-        self.prev = None
         self.current_index = 0
 
     def set_new_active(self, idx):
@@ -25,7 +24,7 @@ class ParmList(object):
         self.current_index = self.index(idx)
         self.parm = self[self.current_index]
 
-    def add_parm(self, parm, rst7=None):
+    def add_parm(self, parm):
         """ Add a parm to the list """
         # Make sure this parm is not part of the list already
         if isinstance(parm, basestring):
@@ -47,14 +46,12 @@ class ParmList(object):
         # A newly added topology file is the currently active parm
         self.current_index = len(self._parm_instances) - 1
         self.parm = parm
-        # If we have a restart file, load it
-        if rst7 is not None:
-            parm.load_rst7(rst7)
 
     def index(self, idx):
         """ See what the index of the requested parm is (can be int or str) """
         if isinstance(idx, int):
-            if idx < 0 or idx >= len(self._parm_instances):
+            if (idx <= -len(self._parm_instances) or
+                    idx >= len(self._parm_instances)):
                 raise ParmIndexError('index out of range for ParmList')
             return idx
         else:

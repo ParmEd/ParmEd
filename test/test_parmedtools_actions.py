@@ -858,7 +858,7 @@ class TestAmberParmActions(unittest.TestCase):
         self._empty_writes()
         parm = AmberParm(get_fn('ash.parm7'))
         origparm = copy(parm)
-        origparm.prm_name = origparm.prm_name + '_copy1'
+        origparm.name = origparm.name + '_copy1'
         PT.changeProtState(parm, ':ASH', 0).execute()
         self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
         self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
@@ -1647,7 +1647,7 @@ class TestChamberParmActions(unittest.TestCase):
         self._empty_writes()
         parm = copy(gascham)
         origparm = copy(gascham)
-        origparm.prm_name = origparm.prm_name + '_copy1'
+        origparm.name = origparm.name + '_copy1'
         PT.change(parm, 'CHARGE', ':1', 0).execute()
         self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
         self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)

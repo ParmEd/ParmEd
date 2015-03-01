@@ -297,7 +297,7 @@ class AmberFormat(object):
         ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
     version : str
         The VERSION string from the Amber file
-    prm_name : str
+    name : str
         The file name of the originally parsed file (set to the fname parameter)
     """
     __metaclass__ = FileFormatType
@@ -359,7 +359,7 @@ class AmberFormat(object):
         self.flag_list = []
         self.version = None
         self.charge_flag = 'CHARGE'
-        self.prm_name = fname
+        self.name = fname
 
         if fname is not None:
             self.rdparm(fname)
@@ -372,10 +372,10 @@ class AmberFormat(object):
         other = type(self)()
         other.flag_list = self.flag_list[:]
         other.version = self.version
-        if self.prm_name is not None:
-            other.prm_name = self.prm_name + '_copy%d' % self._ncopies
+        if self.name is not None:
+            other.name = self.name + '_copy%d' % self._ncopies
         else:
-            other.prm_name = None
+            other.name = None
         other.charge_flag = self.charge_flag
         other.parm_data = {}
         other.parm_comments = {}
@@ -416,7 +416,7 @@ class AmberFormat(object):
         """ Parses the Amber format file """
         # See if we have the optimized parser available
 
-        self.prm_name = fname
+        self.name = fname
         self.version = None # reset all top info each time rdparm is called
         self.formats = {}
         self.parm_data = {}
@@ -478,7 +478,7 @@ class AmberFormat(object):
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
 
         # Open up the file and read the data into memory
-        prm = open(self.prm_name, 'r')
+        prm = open(self.name, 'r')
 
         for line in prm:
             if line[0] == '%':
@@ -519,7 +519,7 @@ class AmberFormat(object):
 
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            self.rdparm_old(open(self.prm_name, 'r').readlines())
+            self.rdparm_old(open(self.name, 'r').readlines())
 
         return
 
