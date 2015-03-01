@@ -139,7 +139,22 @@ class MaskEntry(Frame):
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
 class ActionWindow(BaseParmedWindow):
-    """ A window with a bunch of user-entry fields """
+    """ A window with a bunch of user-entry fields
+    
+    Parameters
+    ----------
+    title : str
+        Title that should be placed on the top bar of the window
+    amber_prmtop : :class:`ParmList`
+        List of topology files being modified
+    widget_list : list of (str, str)
+        Widget class names, descriptions of widgets
+    var_list : list of XyzVar
+        List of Var classes (StringVar, IntVar, FloatVar) corresponding to the
+        entries in the widget_list
+    description : str
+        Description of the action being performed
+    """
     def __init__(self, title, amber_prmtop, widget_list, var_list, description):
         self.cancelled = False
         self.var_list = var_list
