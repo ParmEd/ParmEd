@@ -35,7 +35,7 @@ import warnings
 GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
 __all__ = []
 COMMANDMAP = dict()
-Usages = dict(go='go', quit='quit', help='help [<action>]')
+Usages = dict(go='go', quit='quit', help='help [<action>]', history='history')
 
 class ActionType(type):
     """
