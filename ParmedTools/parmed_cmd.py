@@ -15,6 +15,10 @@ def log_commands(func):
     def new_func(self, line, *args, **kwargs):
         if self._logfile is not None and line != 'EOF':
             self._logfile.write('%s\n' % line)
+            try:
+                self._logfile.flush()
+            except AttributeError:
+                pass
         return func(self, line, *args, **kwargs)
 
     return new_func
@@ -308,11 +312,6 @@ class ParmedCmd(cmd.Cmd):
             self.print_topics(self.doc_header,   cmds_doc,   15,80)
             self.print_topics(self.misc_header,  help.keys(),15,80)
             self.print_topics(self.undoc_header, cmds_undoc, 15,80)
-
-    def __del__(self):
-        """ Destructor -- make sure the log file is closed if it has one """
-        if self._logfile is not None: 
-            self._logfile.close()
 
 class PythonCmd(cmd.Cmd):
     """ Command interpreter for limited Python interpreter """
