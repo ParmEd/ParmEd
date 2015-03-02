@@ -6,15 +6,25 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 from chemistry.amber.readparm import AmberParm
 import cmd
 from glob import glob
+import os
 from ParmedTools.ParmedActions import COMMANDMAP, Usages
 from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.exceptions import InterpreterError, ParmError
+try:
+    import readline
+except ImportError:
+    readline = None
+
+_COMMANDLOGS = []
 
 def log_commands(func):
     """ Decorator to write the line to a file """
+    global _COMMANDLOGS
     def new_func(self, line, *args, **kwargs):
         if self._logfile is not None and line != 'EOF':
             self._logfile.write('%s\n' % line)
+            if readline is None:
+                _COMMANDLOGS.append(line)
             try:
                 self._logfile.flush()
             except AttributeError:
@@ -206,6 +216,16 @@ class ParmedCmd(cmd.Cmd):
         command that had been issued
         """
         return True
+
+    def do_history(self, line):
+        """ Print the readline history """
+        global _COMMANDLOGS
+        if readline is None:
+            for line in _COMMANDLOGS:
+                self.stdout.write('%s\n' % line)
+        else:
+            for i in xrange(readline.get_current_history_length()):
+                self.stdout.write('%s\n' % readline.get_history_item(i+1))
 
     def default(self, line):
         words = line.split()
