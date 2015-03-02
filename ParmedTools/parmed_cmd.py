@@ -10,10 +10,6 @@ from ParmedTools.ParmedActions import COMMANDMAP, Usages
 from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.exceptions import InterpreterError, ParmError
 
-# For Python 2.4 support
-if not 'BaseException' in dir(__builtins__):
-    BaseException = Exception
-
 def log_commands(func):
     """ Decorator to write the line to a file """
     def new_func(self, line, *args, **kwargs):
@@ -228,11 +224,15 @@ class ParmedCmd(cmd.Cmd):
         else:
             try:
                 exec(line.strip())
-            except BaseException, err:
+            except Exception, err:
                 self.stdout.write("%s: %s\n" % (type(err).__name__, err))
 
     def completedefault(self, text, line, begidx, endidx):
-        return glob(text + '*')
+        partial = line[:endidx]
+        idx = max(partial.rfind(' '), partial.rfind('\t')) + 1
+        full_token = partial[idx:]
+        beg_token = partial[idx:begidx]
+        return [s.replace(beg_token, '', 1) for s in glob(partial[idx:] + '*')]
 
     def _python_shell(self):
         """ Drop into a limited interpreter and read until we see !! """
@@ -245,7 +245,7 @@ class ParmedCmd(cmd.Cmd):
         try:
             amber_prmtop = self.parm
             exec(python_interpreter.command_string)
-        except BaseException, err:
+        except Exception, err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
     def do_help(self, arg):
