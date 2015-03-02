@@ -218,7 +218,9 @@ class ParmedCmd(cmd.Cmd):
         return True
 
     def do_history(self, line):
-        """ Print the readline history """
+        """
+        Print the command history
+        """
         global _COMMANDLOGS
         if readline is None:
             for line in _COMMANDLOGS:
