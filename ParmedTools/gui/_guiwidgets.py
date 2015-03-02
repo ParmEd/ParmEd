@@ -122,7 +122,7 @@ class MaskEntry(Frame):
 
     def evaluate_me(self):
         """ Evaluates the mask and dumps the contents into a Text box """
-        from ParmedTools.ParmedActions import printdetails
+        from ParmedTools.ParmedActions import printDetails
         from chemistry.exceptions import MaskError
         mask = self.var.get().strip()
         if not mask: return
@@ -130,7 +130,7 @@ class MaskEntry(Frame):
         self.window.deiconify()
         self.text.clear()
         try: 
-            maskstr = printdetails(self.amber_prmtop, ArgumentList(mask))
+            maskstr = printDetails(self.amber_prmtop, ArgumentList(mask))
             self.text.write(str(maskstr))
         except MaskError:
             self.text.write('Bad mask string [%s]' % mask)

@@ -1907,6 +1907,7 @@ class tiMerge(Action):
     usage = ('<mol1mask> <mol2mask> <scmask1> <scmask2> [<scmask1N>] '
              '[<scmask2N>] [tol <tol>]')
     supported_classes = (AmberParm,)
+    output = sys.stdout
 
     def init(self, arg_list):
         self.tol = arg_list.get_key_float('tol', 0.01)
@@ -2188,7 +2189,7 @@ class tiMerge(Action):
                    % (self.sc_mask1, self.sc_mask2))
         ret_str3 = ("\nscmask1=\'%s\',\nscmask2=\'%s\',"
                    % (self.sc_mask1, self.sc_mask2))
-        print ret_str + ret_str2 + ret_str3
+        self.output.write('%s%s%s\n' % (ret_str, ret_str2, ret_str3))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

@@ -104,9 +104,9 @@ def changeljpair(root, amber_prmtop, messages):
 def outparm(root, amber_prmtop, messages):
     """ Output a final topology file """
     fname = [save_file_chooser('prmtop', '.prmtop')]
-    if hasattr(amber_prmtop, 'rst7') and fname:
+    if amber_prmtop.parm.coords is not None and fname:
         fname.append(save_file_chooser('inpcrd', '.inpcrd'))
-    if fname: 
+    if fname:
         action = ParmedActions.outparm(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
@@ -802,7 +802,7 @@ def adddihedral(root, amber_prmtop, messages):
             ('Entry', 'Phase (Degrees)'),
             ('Entry', 'EEL scaling factor'),
             ('Entry', 'VDW scaling factor'),
-            ('Spinbox', 'Dihedral type', 'normal', 'multiterm', 'improper')
+            ('Spinbox', 'Dihedral type', 'normal', 'improper')
     ]
     # We need 10 variables
     var_list = [StringVar() for i in xrange(10)]
@@ -842,7 +842,7 @@ def addatomicnumber(root, amber_prmtop, messages):
                         'Do you want to add the ATOMIC_NUMBER section to %s?' % 
                         amber_prmtop.parm)
     if response:
-        action = ParmedActions.addatomicnumber(amber_prmtop, ArgumentList(''))
+        action = ParmedActions.addAtomicNumber(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -919,7 +919,7 @@ def printljmatrix(root, amber_prmtop, messages):
 def timerge(root, amber_prmtop, messages):
     """ Merges a topology file with 2 molecules into a single prmtop for TI """
     # We need coordinates, so check for that
-    if not hasattr(amber_prmtop, 'coords'):
+    if amber_prmtop.parm.coords is None:
         showerror(root, 'tiMerge requires you to load coordinates first!')
         return
     # We need 2 masks, a force constant, and an equilibrium distance
@@ -946,6 +946,7 @@ def timerge(root, amber_prmtop, messages):
     if not var_list[6].strip():
         var_list[6] = '0.0001'
     var_list.insert(6, 'tol')
+    ParmedActions.tiMerge.output = messages
     try:
         action = ParmedActions.tiMerge(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
