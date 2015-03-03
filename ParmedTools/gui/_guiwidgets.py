@@ -7,6 +7,7 @@ use
 from ParmedTools.argumentlist import ArgumentList
 from Tkinter import *
 from tkMessageBox import showerror, showinfo
+from ParmedTools.gui.guifiletools import file_chooser
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
@@ -122,7 +123,7 @@ class MaskEntry(Frame):
 
     def evaluate_me(self):
         """ Evaluates the mask and dumps the contents into a Text box """
-        from ParmedTools.ParmedActions import printdetails
+        from ParmedTools.ParmedActions import printDetails
         from chemistry.exceptions import MaskError
         mask = self.var.get().strip()
         if not mask: return
@@ -130,7 +131,7 @@ class MaskEntry(Frame):
         self.window.deiconify()
         self.text.clear()
         try: 
-            maskstr = printdetails(self.amber_prmtop, ArgumentList(mask))
+            maskstr = printDetails(self.amber_prmtop, ArgumentList(mask))
             self.text.write(str(maskstr))
         except MaskError:
             self.text.write('Bad mask string [%s]' % mask)
@@ -139,7 +140,22 @@ class MaskEntry(Frame):
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
 class ActionWindow(BaseParmedWindow):
-    """ A window with a bunch of user-entry fields """
+    """ A window with a bunch of user-entry fields
+    
+    Parameters
+    ----------
+    title : str
+        Title that should be placed on the top bar of the window
+    amber_prmtop : :class:`ParmList`
+        List of topology files being modified
+    widget_list : list of (str, str)
+        Widget class names, descriptions of widgets
+    var_list : list of XyzVar
+        List of Var classes (StringVar, IntVar, FloatVar) corresponding to the
+        entries in the widget_list
+    description : str
+        Description of the action being performed
+    """
     def __init__(self, title, amber_prmtop, widget_list, var_list, description):
         self.cancelled = False
         self.var_list = var_list
@@ -178,6 +194,15 @@ class ActionWindow(BaseParmedWindow):
                 mywidget = Checkbutton(local_frame, text=wdesc, variable=var,
                                     onvalue='yes', offvalue='no')
                 mywidget.grid(row=0, column=0, sticky=N+S+E+W)
+            elif wname == 'FileSelector':
+                def callback():
+                    file_chooser('C4 Parameter File',
+                            extensions=[('All files', '*')], set_var=var)
+                mywidget = Button(local_frame, textvariable=var,
+                                  command=callback)
+                wlab = Label(local_frame, text=wdesc)
+                wlab.grid(row=0, column=0, sticky=N+S+E+W)
+                mywidget.grid(row=1, column=0, sticky=N+S+E+W)
             else:
                 showerror('Error!', '%s not implemented yet!' % wname)
                 self.destroy()

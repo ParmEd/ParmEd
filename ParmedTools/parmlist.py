@@ -3,13 +3,13 @@ List of topology file objects that can be edited in ParmEd. They can be indexed
 via either the name of the topology file or by the order in which they were
 loaded.
 """
-
-from chemistry.amber import AmberFormat, AmberParm, AmoebaParm, ChamberParm
-from ParmedTools.exceptions import DuplicateParm, ParmIndexError
+from chemistry import load_file, Structure
+from chemistry.exceptions import FormatNotFound
+from ParmedTools.exceptions import DuplicateParm, ParmIndexError, ParmError
 
 class ParmList(object):
     """
-    List of AmberParm objects index-able via either prmtop name or prmtop index
+    List of Structure objects index-able via either file name or file index
     (based on order added)
     """
     def __init__(self):
@@ -17,7 +17,6 @@ class ParmList(object):
         self._parm_names = []
         self._parm_instances = []
         self.parm = None # The active parm instance
-        self.prev = None
         self.current_index = 0
 
     def set_new_active(self, idx):
@@ -25,37 +24,34 @@ class ParmList(object):
         self.current_index = self.index(idx)
         self.parm = self[self.current_index]
 
-    def add_parm(self, parm, rst7=None):
+    def add_parm(self, parm):
         """ Add a parm to the list """
         # Make sure this parm is not part of the list already
-        if str(parm) in self._parm_names:
-            raise DuplicateParm('%s already in ParmList' % parm)
-        # Convert a string to an AmberParm or add an AmberParm directly
-        if not isinstance(parm, AmberFormat):
-            parm = AmberFormat(parm)
-            # From the parm data, we should be able to tell whether it was a
-            # chamber topology or regular topology. Take the proper view and
-            # add it to the list
-            if 'CTITLE' in parm.flag_list:
-                parm = parm.view(ChamberParm)
-            elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
-                parm = parm.view(AmoebaParm)
-            else:
-                parm = parm.view(AmberParm)
+        if isinstance(parm, basestring):
+            if parm in self._parm_names:
+                raise DuplicateParm('%s already in ParmList' % parm)
+            try:
+                parm = load_file(parm)
+            except FormatNotFound:
+                raise ParmError('Could not determine file type of %s' % parm)
+            if not isinstance(parm, Structure):
+                raise ParmError('Added parm must be Structure or a subclass')
+        elif not isinstance(parm, Structure):
+            raise ParmError('Added parm must be Structure or a subclass')
+            if str(parm) in self._parm_names:
+                raise DuplicateParm('%s already in ParmList' % parm)
         # Otherwise, add in the new parm's name
         self._parm_names.append(str(parm))
         self._parm_instances.append(parm)
         # A newly added topology file is the currently active parm
         self.current_index = len(self._parm_instances) - 1
         self.parm = parm
-        # If we have a restart file, load it
-        if rst7 is not None:
-            parm.load_rst7(rst7)
 
     def index(self, idx):
         """ See what the index of the requested parm is (can be int or str) """
         if isinstance(idx, int):
-            if idx < 0 or idx >= len(self._parm_instances):
+            if (idx <= -len(self._parm_instances) or
+                    idx >= len(self._parm_instances)):
                 raise ParmIndexError('index out of range for ParmList')
             return idx
         else:
@@ -83,4 +79,5 @@ class ParmList(object):
         return len(self._parm_instances)
 
     def empty(self):
+        """ Returns True if the list is empty; False otherwise """
         return len(self._parm_instances) == 0

@@ -2,7 +2,12 @@
 
 # Load system modules.
 from argparse import ArgumentParser
+import datetime
 import os
+try:
+    import readline
+except ImportError:
+    readline = None
 import signal
 import sys
 import warnings
@@ -149,21 +154,39 @@ if len(opt.script) > 0:
             sys.exit(1)
 
 else:
+    close_log_file = False
     parmed_commands = ParmedCmd(amber_prmtop)
     parmed_commands.intro = "Reading input from STDIN..."
     parmed_commands.interpreter = opt.interpreter
     parmed_commands.prompt = opt.prompt.strip() + ' '
     # Set the log file and logging, but only if interactive
     if os.isatty(sys.stdin.fileno()):
-        parmed_commands.setlog(open(opt.logfile, 'w'))
+        if os.path.exists(opt.logfile) and readline is not None:
+            # Load the logfile as a history, and get rid of any timestamps from
+            # the history
+            f = open(opt.logfile, 'r')
+            for line in f:
+                if line.startswith('# Log started on'): continue
+                readline.add_history(line.rstrip())
+        logfile = open(opt.logfile, 'a')
+        now = datetime.datetime.now()
+        logfile.write('# Log started on %02d/%02d/%d [mm/dd/yyyy] at '
+                      '%02d:%02d:%02d\n' % (now.month, now.day, now.year,
+                                            now.hour, now.minute, now.second))
+        parmed_commands.setlog(logfile)
+        close_log_file = True
     # Loop through all of the commands
     try:
-        parmed_commands.cmdloop()
-    except InterpreterError, err:
-        sys.exit('%s: %s' % (type(err).__name__, err))
-    except ParmError:
-        # This has already been caught and printed. If it was re-raised, then
-        # that means we wanted to exit
-        sys.exit(1)
+        try:
+            parmed_commands.cmdloop()
+        except InterpreterError, err:
+            sys.exit('%s: %s' % (type(err).__name__, err))
+        except ParmError:
+            # This has already been caught and printed. If it was re-raised,
+            # then that means we wanted to exit
+            sys.exit(1)
+    finally:
+        if close_log_file:
+            logfile.close()
 
 print('Done!')

@@ -123,6 +123,10 @@ class CharmmCrdFile(object):
         return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
                         u.angstroms)
 
+    @property
+    def coordinates(self):
+        return self.coords
+
     def _parse(self, fname):
 
         crdfile = open(fname, 'r')
@@ -254,6 +258,10 @@ class CharmmRstFile(object):
         self.jhstrt = 0
 
         self._parse(fname)
+
+    @property
+    def coordinates(self):
+        return self.coords
 
     @property
     def positions(self):

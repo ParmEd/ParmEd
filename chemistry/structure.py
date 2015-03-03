@@ -2059,6 +2059,13 @@ class Structure(object):
 
     #===================================================
 
+    def __str__(self):
+        if hasattr(self, 'name') and self.name:
+            return self.name
+        return repr(self)
+
+    #===================================================
+
     @staticmethod
     def _add_force_to_system(system, force):
         """ Adds an OpenMM force to a system IFF the force is not None """

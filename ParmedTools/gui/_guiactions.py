@@ -23,7 +23,7 @@ def writefrcmod(root, amber_prmtop, messages):
     """ Dumps an frcmod file to a given filename """
     fname = save_file_chooser('frcmod', '.frcmod')
     if fname: 
-        action = ParmedActions.writefrcmod(amber_prmtop, fname)
+        action = ParmedActions.writeFrcmod(amber_prmtop, fname)
         action.execute()
         messages.write('%s\n' % action)
 
@@ -36,7 +36,7 @@ def loadrestrt(root, amber_prmtop, messages):
                  ('All Files', '*')]
     fname = file_chooser('Amber Coordinate File', type_list)
     if fname: 
-        action = ParmedActions.loadrestrt(amber_prmtop, ArgumentList(fname))
+        action = ParmedActions.loadRestrt(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -46,7 +46,7 @@ def writeoff(root, amber_prmtop, messages):
     """ Dumps an OFF library to a given filename """
     fname = save_file_chooser('OFF library', '.lib')
     if fname: 
-        action = ParmedActions.writeoff(amber_prmtop, ArgumentList(fname))
+        action = ParmedActions.writeOFF(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -67,7 +67,7 @@ def changeradii(root, amber_prmtop, messages):
     cmd_window.wait_window()
     sel = str(radius_selection.get())
     if sel:
-        action = ParmedActions.changeradii(amber_prmtop, ArgumentList(sel))
+        action = ParmedActions.changeRadii(amber_prmtop, ArgumentList(sel))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -83,7 +83,7 @@ def changeljpair(root, amber_prmtop, messages):
     # Variable list -- we need 2 masks and 2 floats
     var_list = [StringVar(), StringVar(), StringVar(), StringVar()]
     # description
-    description = ' '.join(ParmedActions.changeljpair.__doc__.split())
+    description = ' '.join(ParmedActions.changeLJPair.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('changeLJPair', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -93,7 +93,7 @@ def changeljpair(root, amber_prmtop, messages):
     # Now that we did something, do it
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.changeljpair(amber_prmtop,ArgumentList(var_list))
+        action = ParmedActions.changeLJPair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -104,9 +104,9 @@ def changeljpair(root, amber_prmtop, messages):
 def outparm(root, amber_prmtop, messages):
     """ Output a final topology file """
     fname = [save_file_chooser('prmtop', '.prmtop')]
-    if hasattr(amber_prmtop, 'rst7') and fname:
+    if amber_prmtop.parm.coords is not None and fname[0]:
         fname.append(save_file_chooser('inpcrd', '.inpcrd'))
-    if fname: 
+    if fname[0]:
         action = ParmedActions.outparm(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
@@ -117,11 +117,11 @@ def printflags(root, amber_prmtop, messages):
     """ Prints all of the flags in the topology file """
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('%%FLAG list in %s' % amber_prmtop)
+    window.title('%%FLAG list in %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=80, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printflags(amber_prmtop, ArgumentList(''))
+    action = ParmedActions.printFlags(amber_prmtop, ArgumentList(''))
     text.write(action)
     window.wait_window()
 
@@ -131,11 +131,11 @@ def printpointers(root, amber_prmtop, messages):
     """ Prints all of the flags in the topology file """
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('POINTER list in %s' % amber_prmtop)
+    window.title('POINTER list in %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=80, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printpointers(amber_prmtop, ArgumentList(''))
+    action = ParmedActions.printPointers(amber_prmtop, ArgumentList(''))
     text.write(action)
     window.wait_window()
 
@@ -156,7 +156,7 @@ def changelj14pair(root, amber_prmtop, messages):
     # Variable list -- we need 2 masks and 2 floats
     var_list = [StringVar(), StringVar(), StringVar(), StringVar()]
     # description
-    description = ' '.join(ParmedActions.changeljpair.__doc__.split())
+    description = ' '.join(ParmedActions.changeLJ14Pair.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('changeLJ14Pair', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -166,7 +166,7 @@ def changelj14pair(root, amber_prmtop, messages):
     # Now that we did something, do it
     var_list = [v.get() for v in var_list]
     try:
-        action=ParmedActions.changelj14pair(amber_prmtop,ArgumentList(var_list))
+        action=ParmedActions.changeLJ14Pair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -179,14 +179,14 @@ def checkvalidity(root, amber_prmtop, messages):
     # Create our Info window
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('Problems with %s' % amber_prmtop)
+    window.title('Problems with %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=2, padx=5,
                                          pady=5, width=81, height=30)
     text.pack(fill=BOTH, expand=1)
     # Set this text to catch the output of our action
     ParmedActions.checkvalidity.output = text
     # Initialize our action
-    action = ParmedActions.checkvalidity(amber_prmtop, ArgumentList(''))
+    action = ParmedActions.checkValidity(amber_prmtop, ArgumentList(''))
     messages.write('%s\n' % action)
     action.execute()
     text.write(action)
@@ -234,7 +234,7 @@ def printinfo(root, amber_prmtop, messages):
     # Variable list -- we need a single string
     var_list = [StringVar()]
     # description
-    description = ' '.join(ParmedActions.printinfo.__doc__.split())
+    description = ' '.join(ParmedActions.printInfo.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('printInfo', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -242,7 +242,7 @@ def printinfo(root, amber_prmtop, messages):
     var = var_list[0].get()
     if not var: return
     # Now that we did something, do it
-    action = ParmedActions.printinfo(amber_prmtop, ArgumentList(var))
+    action = ParmedActions.printInfo(amber_prmtop, ArgumentList(var))
     if not action.found:
         showerror('Not Found!', '%%FLAG %s not found!' % var.upper())
         return
@@ -293,7 +293,7 @@ def addljtype(root, amber_prmtop, messages):
     if amber_prmtop.parm.chamber and var_list[4]:
         kw_var_list.extend(['epsilon_14', var_list[4]])
     try:
-        action = ParmedActions.addljtype(amber_prmtop,ArgumentList(kw_var_list))
+        action = ParmedActions.addLJType(amber_prmtop,ArgumentList(kw_var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -322,7 +322,7 @@ def setmolecules(root, amber_prmtop, messages):
         sel = 'True'
     else:
         sel = 'False'
-    action = ParmedActions.setmolecules(amber_prmtop, 
+    action = ParmedActions.setMolecules(amber_prmtop, 
                                         ArgumentList('solute_ions '+sel))
     messages.write('%s\n' % action)
     action.execute()
@@ -350,7 +350,7 @@ def printdetails(root, amber_prmtop, messages):
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=100, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printdetails(amber_prmtop, mask.get())
+    action = ParmedActions.printDetails(amber_prmtop, mask.get())
     text.write(action)
     messages.write('Printed Amber Mask details on [%s]\n' % mask.get())
     window.wait_window()
@@ -369,7 +369,7 @@ def netcharge(root, amber_prmtop, messages):
     button.grid(row=1, column=0, sticky=N+E+S+W)
     cmd_window.wait_window()
     if not mask.get(): return
-    action = ParmedActions.netcharge(amber_prmtop, ArgumentList(mask.get()))
+    action = ParmedActions.netCharge(amber_prmtop, ArgumentList(mask.get()))
     chg = action.execute()
     showinfo('Net Charge', 'The net charge of [%s] is %.4f' % (mask.get(), chg))
 
@@ -387,7 +387,7 @@ def strip(root, amber_prmtop, messages):
                  'remaining atoms and parameters remain unchanged. Any\n'
                  'parameters associated with stripped atoms are removed.')
     # Create the window, open it, then wait for it to close
-    cmd_window = _guiwidgets.ActionWindow('addLJType', amber_prmtop,
+    cmd_window = _guiwidgets.ActionWindow('strip', amber_prmtop,
                                         widget_list, var_list, description)
     cmd_window.wait_window()
     # See if we got any variables back
@@ -424,7 +424,7 @@ def addexclusions(root, amber_prmtop, messages):
    
     var_list = [v.get() for v in var_list]
     try:
-        act = ParmedActions.addexclusions(amber_prmtop, ArgumentList(var_list))
+        act = ParmedActions.addExclusions(amber_prmtop, ArgumentList(var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -439,9 +439,7 @@ def changeprotstate(root, amber_prmtop, messages):
                    ('Entry', 'Protonation state to change to')]
     var_list = [StringVar(), StringVar()]
     description=('Changes the protonation state of a titratable residue that\n'
-                 'can be treated with constant pH MD in Amber. The residue '
-                 'must be\ndefined in $AMBERHOME/AmberTools/src/etc/'
-                 'cpin_data.py')
+                 'can be treated with constant pH MD in Amber.')
     cmd_window = _guiwidgets.ActionWindow('changeProtState', amber_prmtop,
                         widget_list, var_list, description)
     cmd_window.wait_window()
@@ -451,7 +449,7 @@ def changeprotstate(root, amber_prmtop, messages):
    
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.changeprotstate(amber_prmtop, 
+        action = ParmedActions.changeProtState(amber_prmtop, 
                                                ArgumentList(var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
@@ -530,7 +528,7 @@ def printljtypes(root, amber_prmtop, messages):
    
     # Instantiate our action
     try:
-        action = ParmedActions.printljtypes(amber_prmtop, ArgumentList(var))
+        action = ParmedActions.printLJTypes(amber_prmtop, ArgumentList(var))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -568,36 +566,13 @@ def changeljsingletype(root, amber_prmtop, messages):
         if not v: var_list[i] = None
     # If we did, store them and pass it to the class
     try:
-        action = ParmedActions.changeljsingletype(amber_prmtop,
+        action = ParmedActions.changeLJSingleType(amber_prmtop,
                                                   ArgumentList(var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('%s\n' % action)
     action.execute()
-
-#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
-
-def combinemolecules(root, amber_prmtop, messages):
-    """ Combines 2 molecules into a single molecule """
-    # We need a molecule #
-    widget_list = [('Entry', 'Molecule Number')]
-    var_list = [StringVar()]
-    description = 'Combine the given molecule number with the next molecule'
-    cmd_window = _guiwidgets.ActionWindow('combineMolecules', amber_prmtop,
-                                          widget_list, var_list, description)
-    cmd_window.wait_window()
-    # See if we got any variables back
-    var = var_list[0].get()
-    if not var: return
-    # addljtype expects any _non_specified variables to be None
-    try:
-        action = ParmedActions.combinemolecules(amber_prmtop, ArgumentList(var))
-        messages.write('%s\n' % action)
-        action.execute()
-    except Exception, err:
-        showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
-        return
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
@@ -616,7 +591,7 @@ def addcoarsegrain(root, amber_prmtop, messages):
     if not fname: return
 
     try:
-        action = ParmedActions.addcoarsegrain(amber_prmtop, ArgumentList(fname))
+        action = ParmedActions.addCoarseGrain(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -641,7 +616,7 @@ def definesolvent(root, amber_prmtop, messages):
     if not var: return
     # addljtype expects any _non_specified variables to be None
     try:
-        action = ParmedActions.definesolvent(amber_prmtop, ArgumentList(var))
+        action = ParmedActions.defineSolvent(amber_prmtop, ArgumentList(var))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -652,30 +627,28 @@ def definesolvent(root, amber_prmtop, messages):
 
 def printbonds(root, amber_prmtop, messages):
     """ Prints bonds containing atoms from a given mask """
-    # We need a mask, new radius, new epsilon, and for chamber topologies,
-    # a new radius-1-4 and epsilon-1-4. Don't add the latter ones until we
-    # know if we have a chamber prmtop or not.
-    widget_list = [('MaskEntry', 'Atoms to analyze for bonds')]
+    widget_list = [('MaskEntry', 'Atoms 1 or Atoms to analyze for bonds'),
+                   ('MaskEntry', 'Atoms 2 (optional)')]
     # We need 5 string variables, then get the description. 
-    var_list = [StringVar()]
+    var_list = [StringVar(), StringVar()]
     description='Prints all bonds containing at least 1 atom in the given mask'
     # Create the window, open it, then wait for it to close
     cmd_window = _guiwidgets.ActionWindow('printBonds', amber_prmtop,
                                           widget_list, var_list, description)
     cmd_window.wait_window()
     # See if we got any variables back
-    var = var_list[0]
-    if not var.get(): return
+    var = ' '.join([x.get() for x in var_list]).strip()
+    if not var: return
     try:
-        action = ParmedActions.printbonds(amber_prmtop, ArgumentList(var.get()))
+        action = ParmedActions.printBonds(amber_prmtop, ArgumentList(var))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
-    messages.write('Printed BONDs for %s\n' % var.get())
+    messages.write('Printed BONDs for %s\n' % var)
     # Now make the text window
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('BOND list in %s' % amber_prmtop)
+    window.title('BOND list in %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=65, height=20)
     text.pack(fill=BOTH, expand=1)
@@ -686,30 +659,28 @@ def printbonds(root, amber_prmtop, messages):
 
 def printangles(root, amber_prmtop, messages):
     """ Prints angles containing atoms from a given mask """
-    # We need a mask, new radius, new epsilon, and for chamber topologies,
-    # a new radius-1-4 and epsilon-1-4. Don't add the latter ones until we
-    # know if we have a chamber prmtop or not.
-    widget_list = [('MaskEntry', 'Atoms to analyze for angles')]
-    # We need 5 string variables, then get the description. 
-    var_list = [StringVar()]
+    widget_list = [('MaskEntry', 'Atoms 1 or Atoms to analyze for angles'),
+                   ('MaskEntry', 'Atoms 2 (optional)'),
+                   ('MaskEntry', 'Atoms 3 (optional)')]
+    var_list = [StringVar(), StringVar(), StringVar()]
     description='Prints all angles containing at least 1 atom in the given mask'
     # Create the window, open it, then wait for it to close
     cmd_window = _guiwidgets.ActionWindow('printAngles', amber_prmtop,
                                         widget_list, var_list, description)
     cmd_window.wait_window()
     # See if we got any variables back
-    var = var_list[0]
-    if not var.get(): return
+    var = ' '.join([x.get() for x in var_list]).strip()
+    if not var: return
     try:
-        action = ParmedActions.printangles(amber_prmtop,ArgumentList(var.get()))
+        action = ParmedActions.printAngles(amber_prmtop, ArgumentList(var))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
-    messages.write('Printed ANGLEs for %s\n' % var.get())
+    messages.write('Printed ANGLEs for %s\n' % var)
     # Now make the text window
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('ANGLE list in %s' % amber_prmtop)
+    window.title('ANGLE list in %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                           pady=5, width=90, height=20)
     text.pack(fill=BOTH, expand=1)
@@ -720,22 +691,21 @@ def printangles(root, amber_prmtop, messages):
 
 def printdihedrals(root, amber_prmtop, messages):
     """ Prints dihedrals containing atoms from a given mask """
-    # We need a mask, new radius, new epsilon, and for chamber topologies,
-    # a new radius-1-4 and epsilon-1-4. Don't add the latter ones until we
-    # know if we have a chamber prmtop or not.
-    widget_list = [('MaskEntry', 'Atoms to analyze for dihedrals')]
-    # We need 5 string variables, then get the description. 
-    var_list = [StringVar()]
+    widget_list = [('MaskEntry', 'Atoms 1 or Atoms to analyze for dihedrals'),
+                   ('MaskEntry', 'Atoms 2 (optional)'),
+                   ('MaskEntry', 'Atoms 3 (optional)'),
+                   ('MaskEntry', 'Atoms 4 (optional)')]
+    var_list = [StringVar(), StringVar(), StringVar(), StringVar()]
     desc = 'Prints all dihedrals containing at least 1 atom in the given mask'
     # Create the window, open it, then wait for it to close
     cmd_window = _guiwidgets.ActionWindow('printDihedrals', amber_prmtop,
                                           widget_list, var_list, desc)
     cmd_window.wait_window()
     # See if we got any variables back
-    var = var_list[0].get()
+    var = ' '.join([x.get() for x in var_list]).strip()
     if not var: return
     try:
-        action = ParmedActions.printdihedrals(amber_prmtop, ArgumentList(var))
+        action = ParmedActions.printDihedrals(amber_prmtop, ArgumentList(var))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -743,7 +713,7 @@ def printdihedrals(root, amber_prmtop, messages):
     # Now make the text window
     window = Toplevel(root)
     window.resizable(True, True)
-    window.title('DIHEDRAL list in %s' % amber_prmtop)
+    window.title('DIHEDRAL list in %s' % amber_prmtop.parm)
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=140, height=20)
     text.pack(fill=BOTH, expand=1)
@@ -776,7 +746,7 @@ def setbond(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.setbond(amber_prmtop, ArgumentList(var_list))
+        action = ParmedActions.setBond(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -810,7 +780,7 @@ def setangle(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.setangle(amber_prmtop, ArgumentList(var_list))
+        action = ParmedActions.setAngle(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -832,7 +802,7 @@ def adddihedral(root, amber_prmtop, messages):
             ('Entry', 'Phase (Degrees)'),
             ('Entry', 'EEL scaling factor'),
             ('Entry', 'VDW scaling factor'),
-            ('Spinbox', 'Dihedral type', 'normal', 'multiterm', 'improper')
+            ('Spinbox', 'Dihedral type', 'normal', 'improper')
     ]
     # We need 10 variables
     var_list = [StringVar() for i in xrange(10)]
@@ -857,7 +827,7 @@ def adddihedral(root, amber_prmtop, messages):
     # The last argument is a keyword, so append that, then swap the last 2 args
     var_list.insert(9, 'type')
     try:
-        action = ParmedActions.adddihedral(amber_prmtop, ArgumentList(var_list))
+        action = ParmedActions.addDihedral(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -872,7 +842,7 @@ def addatomicnumber(root, amber_prmtop, messages):
                         'Do you want to add the ATOMIC_NUMBER section to %s?' % 
                         amber_prmtop.parm)
     if response:
-        action = ParmedActions.addatomicnumber(amber_prmtop, ArgumentList(''))
+        action = ParmedActions.addAtomicNumber(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -902,7 +872,7 @@ def deletedihedral(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.deletedihedral(amber_prmtop,
+        action = ParmedActions.deleteDihedral(amber_prmtop,
                                               ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
@@ -928,7 +898,7 @@ def printljmatrix(root, amber_prmtop, messages):
     var = var_list[0].get()
     if not var: return
     try:
-        action = ParmedActions.printljmatrix(amber_prmtop, ArgumentList(var))
+        action = ParmedActions.printLJMatrix(amber_prmtop, ArgumentList(var))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -949,7 +919,7 @@ def printljmatrix(root, amber_prmtop, messages):
 def timerge(root, amber_prmtop, messages):
     """ Merges a topology file with 2 molecules into a single prmtop for TI """
     # We need coordinates, so check for that
-    if not hasattr(amber_prmtop, 'coords'):
+    if amber_prmtop.parm.coords is None:
         showerror(root, 'tiMerge requires you to load coordinates first!')
         return
     # We need 2 masks, a force constant, and an equilibrium distance
@@ -976,8 +946,9 @@ def timerge(root, amber_prmtop, messages):
     if not var_list[6].strip():
         var_list[6] = '0.0001'
     var_list.insert(6, 'tol')
+    ParmedActions.tiMerge.output = messages
     try:
-        action = ParmedActions.timerge(amber_prmtop, ArgumentList(var_list))
+        action = ParmedActions.tiMerge(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -1015,7 +986,7 @@ def addpdb(root, amber_prmtop, messages):
     if var_list[1] == 'yes': newvars.append('elem')
     if var_list[1] == 'yes': newvars.append('allicodes')
     try:
-        action = ParmedActions.addpdb(amber_prmtop, ArgumentList(newvars))
+        action = ParmedActions.addPDB(amber_prmtop, ArgumentList(newvars))
         messages.write('%s\n' % action)
         action.execute()
     except Exception, err:
@@ -1030,7 +1001,7 @@ def deletepdb(root, amber_prmtop, messages):
                         'Do you want to delete the addPDB flags from %s?' %
                         amber_prmtop.parm)
     if response:
-        action = ParmedActions.deletepdb(amber_prmtop, ArgumentList(''))
+        action = ParmedActions.deletePDB(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -1114,10 +1085,57 @@ def hmassrepartition(root, amber_prmtop, messages):
     else:
         var_list[1] = ''
     try:
-        action = ParmedActions.hmassrepartition(amber_prmtop,
+        action = ParmedActions.HMassRepartition(amber_prmtop,
                                                 ArgumentList(var_list))
     except Exception, err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
     messages.write('%s\n' % action)
+
+#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
+
+def add12_6_4(root, amber_prmtop, messages):
+    """
+    Adds 12-6-4 potential energy terms
+    """
+    # The variables we need for changeljpair
+    widget_list = [('MaskEntry', 'Divalent ion mask'),
+                   ('FileSelector', 'C4 Parameter File'),
+                   ('Entry', 'Water model (instead of C4 Params)'),
+                   ('FileSelector', 'Pol. Param File'),
+                   ('Entry', 'tunfactor')]
+    # Variable list -- we need 2 masks and 2 floats
+    var_list = [StringVar(), StringVar(), StringVar(), StringVar(), StringVar()]
+    var_list[1].set('Pick C4 File')
+    var_list[3].set('Pick Pol. File')
+    # description
+    description = ('Add the r^-4 Lennard-Jones parameter for the 12-6-4 term\n'
+                   'used typically for multi-valent ion parameters')
+    cmd_window = _guiwidgets.ActionWindow('add12_6_4', amber_prmtop,
+                                          widget_list, var_list, description)
+    cmd_window.wait_window()
+    # Make sure we didn't cancel (or just press OK with no input), or just leave
+    vars_exist = [bool(v.get()) for v in var_list]
+    if var_list[1].get() == 'Pick C4 File': vars_exist[1] = False
+    if var_list[3].get() == 'Pick Pol. File': vars_exist[3] = False
+    if vars_exist[1] and vars_exist[2]:
+        showerror('Cannot select both C4 parameter file AND water model')
+        return
+    vars_exist = True in vars_exist
+    if not vars_exist: return
+    # Now that we did something, do it
+    var_list = [v.get() for v in var_list]
+    if var_list[1] == 'Pick C4 File': var_list[1] = ''
+    if var_list[3] == 'Pick Pol. File': var_list[3] = ''
+    args = [var_list[0]]
+    if var_list[1]: args.extend(['c4file', var_list[1]])
+    if var_list[2]: args.extend(['watermodel', var_list[2]])
+    if var_list[3]: args.extend(['polfile', var_list[3]])
+    if var_list[4]: args.extend(['tunfactor', var_list[4]])
+    try:
+        action = ParmedActions.add12_6_4(amber_prmtop, ArgumentList(args))
+        messages.write('%s\n' % action)
+        action.execute()
+    except Exception, err:
+        showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
