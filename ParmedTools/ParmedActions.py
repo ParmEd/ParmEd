@@ -3643,6 +3643,78 @@ class minimize(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+class outPDB(Action):
+    """
+    Write a PDB file from the currently active system to <file>
+
+        - <file>: The PDB file to write
+        - [norenumber]: Use the original atom and residue numbering if available
+        - [charmm]: Put the SEGID, if available, in columns 72 to 76
+        - [anisou]: Write anisotropic B-factors if available
+    """
+    usage = "<file> [norenumber] [charmm] [anisou]"
+
+    def init(self, arg_list):
+        self.renumber = not arg_list.has_key('norenumber')
+        self.charmm = arg_list.has_key('charmm')
+        self.anisou = arg_list.has_key('anisou')
+        self.filename = arg_list.get_next_string()
+        if self.parm.coords is None:
+            raise InputError('Parm %s does not have loaded coordinates' %
+                             self.parm)
+
+    def __str__(self):
+        retstr = 'Writing PDB file %s' % self.filename
+        if self.renumber:
+            retstr += ' renumbering atoms and residues'
+        else:
+            retstr += ' not renumbering atoms and residues'
+        if self.charmm:
+            retstr += ' and adding CHARMM SEGIDs'
+        if self.anisou:
+            retstr += ' and adding anisotropic B-factors'
+        return retstr
+
+    def execute(self):
+        self.parm.write_pdb(self.filename, renumber=self.renumber,
+                            charmm=self.charmm, write_anisou=self.anisou)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class outCIF(Action):
+    """
+    Write a PDBx/mmCIF file from the currently active system to <file>
+
+        - <file>: The PDBx/mmCIF file to write
+        - [norenumber]: Use the original atom and residue numbering if available
+        - [anisou]: Write anisotropic B-factors if available
+    """
+    usage = "<file> [norenumber] [charmm] [anisou]"
+
+    def init(self, arg_list):
+        self.renumber = not arg_list.has_key('norenumber')
+        self.anisou = arg_list.has_key('anisou')
+        self.filename = arg_list.get_next_string()
+        if self.parm.coords is None:
+            raise InputError('Parm %s does not have loaded coordinates' %
+                             self.parm)
+
+    def __str__(self):
+        retstr = 'Writing PDB file %s' % self.filename
+        if self.renumber:
+            retstr += ' renumbering atoms and residues'
+        else:
+            retstr += ' not renumbering atoms and residues'
+        if self.anisou:
+            retstr += ' and adding anisotropic B-factors'
+        return retstr
+
+    def execute(self):
+        self.parm.write_cif(self.filename, renumber=self.renumber,
+                            write_anisou=self.anisou)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 # Private helper methods
 
 def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
