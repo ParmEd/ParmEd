@@ -104,9 +104,9 @@ def changeljpair(root, amber_prmtop, messages):
 def outparm(root, amber_prmtop, messages):
     """ Output a final topology file """
     fname = [save_file_chooser('prmtop', '.prmtop')]
-    if amber_prmtop.parm.coords is not None and fname:
+    if amber_prmtop.parm.coords is not None and fname[0]:
         fname.append(save_file_chooser('inpcrd', '.inpcrd'))
-    if fname:
+    if fname[0]:
         action = ParmedActions.outparm(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
@@ -1092,3 +1092,50 @@ def hmassrepartition(root, amber_prmtop, messages):
         return
     action.execute()
     messages.write('%s\n' % action)
+
+#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
+
+def add12_6_4(root, amber_prmtop, messages):
+    """
+    Adds 12-6-4 potential energy terms
+    """
+    # The variables we need for changeljpair
+    widget_list = [('MaskEntry', 'Divalent ion mask'),
+                   ('FileSelector', 'C4 Parameter File'),
+                   ('Entry', 'Water model (instead of C4 Params)'),
+                   ('FileSelector', 'Pol. Param File'),
+                   ('Entry', 'tunfactor')]
+    # Variable list -- we need 2 masks and 2 floats
+    var_list = [StringVar(), StringVar(), StringVar(), StringVar(), StringVar()]
+    var_list[1].set('Pick C4 File')
+    var_list[3].set('Pick Pol. File')
+    # description
+    description = ('Add the r^-4 Lennard-Jones parameter for the 12-6-4 term\n'
+                   'used typically for multi-valent ion parameters')
+    cmd_window = _guiwidgets.ActionWindow('add12_6_4', amber_prmtop,
+                                          widget_list, var_list, description)
+    cmd_window.wait_window()
+    # Make sure we didn't cancel (or just press OK with no input), or just leave
+    vars_exist = [bool(v.get()) for v in var_list]
+    if var_list[1].get() == 'Pick C4 File': vars_exist[1] = False
+    if var_list[3].get() == 'Pick Pol. File': vars_exist[3] = False
+    if vars_exist[1] and vars_exist[2]:
+        showerror('Cannot select both C4 parameter file AND water model')
+        return
+    vars_exist = True in vars_exist
+    if not vars_exist: return
+    # Now that we did something, do it
+    var_list = [v.get() for v in var_list]
+    if var_list[1] == 'Pick C4 File': var_list[1] = ''
+    if var_list[3] == 'Pick Pol. File': var_list[3] = ''
+    args = [var_list[0]]
+    if var_list[1]: args.extend(['c4file', var_list[1]])
+    if var_list[2]: args.extend(['watermodel', var_list[2]])
+    if var_list[3]: args.extend(['polfile', var_list[3]])
+    if var_list[4]: args.extend(['tunfactor', var_list[4]])
+    try:
+        action = ParmedActions.add12_6_4(amber_prmtop, ArgumentList(args))
+        messages.write('%s\n' % action)
+        action.execute()
+    except Exception, err:
+        showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))

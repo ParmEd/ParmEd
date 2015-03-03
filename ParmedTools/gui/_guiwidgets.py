@@ -7,6 +7,7 @@ use
 from ParmedTools.argumentlist import ArgumentList
 from Tkinter import *
 from tkMessageBox import showerror, showinfo
+from ParmedTools.gui.guifiletools import file_chooser
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
@@ -193,6 +194,15 @@ class ActionWindow(BaseParmedWindow):
                 mywidget = Checkbutton(local_frame, text=wdesc, variable=var,
                                     onvalue='yes', offvalue='no')
                 mywidget.grid(row=0, column=0, sticky=N+S+E+W)
+            elif wname == 'FileSelector':
+                def callback():
+                    file_chooser('C4 Parameter File',
+                            extensions=[('All files', '*')], set_var=var)
+                mywidget = Button(local_frame, textvariable=var,
+                                  command=callback)
+                wlab = Label(local_frame, text=wdesc)
+                wlab.grid(row=0, column=0, sticky=N+S+E+W)
+                mywidget.grid(row=1, column=0, sticky=N+S+E+W)
             else:
                 showerror('Error!', '%s not implemented yet!' % wname)
                 self.destroy()
