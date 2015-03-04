@@ -1,0 +1,189 @@
+HETATM    1  CAB BF0 A   0     -27.656 -12.441  -8.864  0.00  0.00      A    C  
+HETATM    2  CAC BF0 A   0     -28.181 -11.619  -7.974  0.00  0.00      A    C  
+HETATM    3  CAE BF0 A   0     -29.107 -10.618  -8.263  0.00  0.00      A    C  
+HETATM    4  CAF BF0 A   0     -29.238 -10.140  -9.555  0.00  0.00      A    C  
+HETATM    5  CAG BF0 A   0     -28.429 -10.775 -10.475  0.00  0.00      A    C  
+HETATM    6  CAH BF0 A   0     -28.499 -10.494 -11.860  0.00  0.00      A    C  
+HETATM    7  CAI BF0 A   0     -27.259 -10.996 -12.682  0.00  0.00      A    C  
+HETATM    8  CAK BF0 A   0     -25.510 -10.460 -11.222  0.00  0.00      A    C  
+HETATM    9  CAL BF0 A   0     -25.414 -11.906 -10.780  0.00  0.00      A    C  
+HETATM   10  CAM BF0 A   0     -26.812 -12.526 -10.960  0.00  0.00      A    C  
+HETATM   11  CAN BF0 A   0     -26.844 -13.782 -10.383  0.00  0.00      A    C  
+HETATM   12  CAO BF0 A   0     -28.226 -14.446 -10.537  0.00  0.00      A    C  
+HETATM   13  CAP BF0 A   0     -28.674 -14.519 -12.044  0.00  0.00      A    C  
+HETATM   14  CAQ BF0 A   0     -28.656 -13.091 -12.522  0.00  0.00      A    C  
+HETATM   15  CAR BF0 A   0     -27.260 -12.476 -12.410  0.00  0.00      A    C  
+HETATM   16  CAU BF0 A   0     -29.302 -16.538  -9.812  0.00  0.00      A    C  
+HETATM   17  CAW BF0 A   0     -29.118 -17.898  -9.138  0.00  0.00      A    C  
+HETATM   18  CAX BF0 A   0     -30.172 -18.853  -9.723  0.00  0.00      A    C  
+HETATM   19  CAY BF0 A   0     -30.053 -19.003 -11.252  0.00  0.00      A    C  
+HETATM   20  NAJ BF0 A   0     -25.934 -10.308 -12.595  0.00  0.00      A    N1+
+HETATM   21  NAT BF0 A   0     -28.194 -15.779  -9.909  0.00  0.00      A    N  
+HETATM   22  OAA BF0 A   0     -26.608 -13.297  -9.000  0.00  0.00      A    O  
+HETATM   23  OAD BF0 A   0     -28.156 -12.113  -6.708  0.00  0.00      A    O  
+HETATM   24  OAS BF0 A   0     -26.332 -13.147 -13.263  0.00  0.00      A    O  
+HETATM   25  OAV BF0 A   0     -30.419 -16.187 -10.190  0.00  0.00      A    O  
+HETATM   26  OAZ BF0 A   0     -31.056 -19.220 -11.934  0.00  0.00      A    O  
+HETATM   27  CBB BF0 A   0     -28.860 -19.034 -13.196  0.00  0.00      A    C  
+HETATM   28  CBC BF0 A   0     -27.699 -11.843 -10.090  0.00  0.00      A    C  
+HETATM   29  CBD BF0 A   0     -25.984  -8.851 -12.878  0.00  0.00      A    C  
+HETATM   30  CBE BF0 A   0     -26.336  -8.407 -14.330  0.00  0.00      A    C  
+HETATM   31  CBF BF0 A   0     -27.674  -8.743 -15.007  0.00  0.00      A    C  
+HETATM   32  CBG BF0 A   0     -27.434  -7.353 -14.448  0.00  0.00      A    C  
+HETATM   33  OBA BF0 A   0     -28.801 -18.878 -11.772  0.00  0.00      A    O  
+HETATM   34 HNAJ BF0 A   0     -25.272 -10.756 -13.212  0.00  0.00      A    H  
+HETATM   35 HNAT BF0 A   0     -27.315 -16.120  -9.547  0.00  0.00      A    H  
+HETATM   36  HAE BF0 A   0     -29.726 -10.212  -7.477  0.00  0.00      A    H  
+HETATM   37  HAF BF0 A   0     -29.929  -9.338  -9.766  0.00  0.00      A    H  
+HETATM   38 HAH1 BF0 A   0     -28.618  -9.420 -12.005  0.00  0.00      A    H  
+HETATM   39 HAH2 BF0 A   0     -29.407 -10.933 -12.272  0.00  0.00      A    H  
+HETATM   40  HAI BF0 A   0     -27.557 -10.902 -13.726  0.00  0.00      A    H  
+HETATM   41 HAK1 BF0 A   0     -26.201  -9.927 -10.569  0.00  0.00      A    H  
+HETATM   42 HAK2 BF0 A   0     -24.543  -9.975 -11.086  0.00  0.00      A    H  
+HETATM   43 HAL1 BF0 A   0     -25.133 -11.946  -9.728  0.00  0.00      A    H  
+HETATM   44 HAL2 BF0 A   0     -24.700 -12.432 -11.413  0.00  0.00      A    H  
+HETATM   45  HAN BF0 A   0     -26.037 -14.421 -10.740  0.00  0.00      A    H  
+HETATM   46  HAO BF0 A   0     -28.953 -13.838  -9.999  0.00  0.00      A    H  
+HETATM   47 HAP1 BF0 A   0     -27.945 -15.099 -12.610  0.00  0.00      A    H  
+HETATM   48 HAP2 BF0 A   0     -29.691 -14.906 -12.100  0.00  0.00      A    H  
+HETATM   49 HAQ1 BF0 A   0     -28.987 -13.052 -13.560  0.00  0.00      A    H  
+HETATM   50 HAQ2 BF0 A   0     -29.360 -12.503 -11.933  0.00  0.00      A    H  
+HETATM   51  HAW BF0 A   0     -28.108 -18.282  -9.284  0.00  0.00      A    H  
+HETATM   52  HAX BF0 A   0     -30.888 -19.332  -9.071  0.00  0.00      A    H  
+HETATM   53 HBB1 BF0 A   0     -27.859 -18.934 -13.615  0.00  0.00      A    H  
+HETATM   54 HBB2 BF0 A   0     -29.258 -20.020 -13.438  0.00  0.00      A    H  
+HETATM   55 HBB3 BF0 A   0     -29.508 -18.267 -13.620  0.00  0.00      A    H  
+HETATM   56 HBD1 BF0 A   0     -26.674  -8.375 -12.181  0.00  0.00      A    H  
+HETATM   57 HBD2 BF0 A   0     -25.037  -8.397 -12.585  0.00  0.00      A    H  
+HETATM   58  HBE BF0 A   0     -25.487  -8.280 -15.002  0.00  0.00      A    H  
+HETATM   59 HBF1 BF0 A   0     -27.392  -8.562 -16.044  0.00  0.00      A    H  
+HETATM   60 HBF2 BF0 A   0     -28.192  -9.184 -14.155  0.00  0.00      A    H  
+HETATM   61 HBG1 BF0 A   0     -27.900  -7.473 -13.470  0.00  0.00      A    H  
+HETATM   62 HBG2 BF0 A   0     -27.101  -6.852 -15.357  0.00  0.00      A    H  
+HETATM   63 HOAD BF0 A   0     -28.549 -11.475  -6.107  0.00  0.00      A    H  
+HETATM   64 HOAS BF0 A   0     -26.640 -13.100 -14.171  0.00  0.00      A    H  
+CONECT    1    2
+CONECT    1    2
+CONECT    1    2
+CONECT    1    2
+CONECT    1   22
+CONECT    1   28
+CONECT    1   28
+CONECT    1   28
+CONECT    1   28
+CONECT    2    1
+CONECT    2    1
+CONECT    2    1
+CONECT    2    1
+CONECT    2    3
+CONECT    2    3
+CONECT    2    3
+CONECT    2    3
+CONECT    2   23
+CONECT    3    2
+CONECT    3    2
+CONECT    3    2
+CONECT    3    2
+CONECT    3    4
+CONECT    3    4
+CONECT    3    4
+CONECT    3    4
+CONECT    3   36
+CONECT    4    3
+CONECT    4    3
+CONECT    4    3
+CONECT    4    3
+CONECT    4    5
+CONECT    4    5
+CONECT    4    5
+CONECT    4    5
+CONECT    4   37
+CONECT    5    4
+CONECT    5    4
+CONECT    5    4
+CONECT    5    4
+CONECT    5    6
+CONECT    5   28
+CONECT    5   28
+CONECT    5   28
+CONECT    5   28
+CONECT    6    5    7   38   39
+CONECT    7    6   15   20   40
+CONECT    8    9   20   41   42
+CONECT    9    8   10   43   44
+CONECT   10    9   11   15   28
+CONECT   11   10   12   22   45
+CONECT   12   11   13   21   46
+CONECT   13   12   14   47   48
+CONECT   14   13   15   49   50
+CONECT   15    7   10   14   24
+CONECT   16   17   21
+CONECT   16   25
+CONECT   16   25
+CONECT   17   16
+CONECT   17   18
+CONECT   17   18
+CONECT   17   51
+CONECT   18   17
+CONECT   18   17
+CONECT   18   19   52
+CONECT   19   18
+CONECT   19   26
+CONECT   19   26
+CONECT   19   33
+CONECT   20    7    8   29   34
+CONECT   21   12   16   35
+CONECT   22    1   11
+CONECT   23    2   63
+CONECT   24   15   64
+CONECT   25   16
+CONECT   25   16
+CONECT   26   19
+CONECT   26   19
+CONECT   27   33   53   54   55
+CONECT   28    1
+CONECT   28    1
+CONECT   28    1
+CONECT   28    1
+CONECT   28    5
+CONECT   28    5
+CONECT   28    5
+CONECT   28    5
+CONECT   28   10
+CONECT   29   20   30   56   57
+CONECT   30   29   31   32   58
+CONECT   31   30   32   59   60
+CONECT   32   30   31   61   62
+CONECT   33   19   27
+CONECT   34   20
+CONECT   35   21
+CONECT   36    3
+CONECT   37    4
+CONECT   38    6
+CONECT   39    6
+CONECT   40    7
+CONECT   41    8
+CONECT   42    8
+CONECT   43    9
+CONECT   44    9
+CONECT   45   11
+CONECT   46   12
+CONECT   47   13
+CONECT   48   13
+CONECT   49   14
+CONECT   50   14
+CONECT   51   17
+CONECT   52   18
+CONECT   53   27
+CONECT   54   27
+CONECT   55   27
+CONECT   56   29
+CONECT   57   29
+CONECT   58   30
+CONECT   59   31
+CONECT   60   31
+CONECT   61   32
+CONECT   62   32
+CONECT   63   23
+CONECT   64   24
+END
