@@ -118,7 +118,8 @@ Action.overwrite = opt.overwrite
 amber_prmtop = ParmList()
 for i, parm in enumerate(opt.prmtop):
     if i < len(opt.inpcrd):
-        amber_prmtop.add_parm(parm, opt.inpcrd[i])
+        amber_prmtop.add_parm(parm)
+        amber_prmtop.parm.load_rst7(opt.inpcrd[i])
         print('Loaded Amber topology file %s with coordinates from %s\n' %
               (parm, opt.inpcrd[i]))
     else:
