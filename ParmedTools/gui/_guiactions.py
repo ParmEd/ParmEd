@@ -184,7 +184,7 @@ def checkvalidity(root, amber_prmtop, messages):
                                          pady=5, width=81, height=30)
     text.pack(fill=BOTH, expand=1)
     # Set this text to catch the output of our action
-    ParmedActions.checkvalidity.output = text
+    ParmedActions.checkValidity.output = text
     # Initialize our action
     action = ParmedActions.checkValidity(amber_prmtop, ArgumentList(''))
     messages.write('%s\n' % action)
