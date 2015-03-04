@@ -13,7 +13,7 @@ packages += ['chemistry', 'chemistry.amber', 'chemistry.modeller',
              'chemistry.formats', 'fortranformat']
 
 # Modules
-modules = ['compat24', 'timer']
+modules = ['compat24']
 
 # Scripts
 scripts = ['parmed.py', 'xparmed.py']
