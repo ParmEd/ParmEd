@@ -646,9 +646,9 @@ class AmberParm(AmberFormat, Structure):
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
             self.pointers['IFBOX'] = 0
-            del self.pointers['IPTRES']
-            del self.pointers['NSPM']
-            del self.pointers['NSPSOL']
+            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
+            if 'NSPM' in self.pointers: del self.pointers['NSPM']
+            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
             self.delete_flag('SOLVENT_POINTERS')
             self.delete_flag('ATOMS_PER_MOLECULE')
             self.delete_flag('BOX_DIMENSIONS')
