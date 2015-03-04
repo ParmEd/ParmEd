@@ -6,6 +6,7 @@ from __future__ import division
 from chemistry import periodic_table
 from chemistry.amber.readparm import AmberParm, ChamberParm, AmoebaParm
 from chemistry.exceptions import MoleculeWarning, CharmmPSFWarning
+from chemistry.formats import PDBFile, CIFFile
 from compat24 import all
 from copy import copy
 try:
@@ -14,9 +15,8 @@ except ImportError:
     pass
 import os
 from ParmedTools import exceptions as exc
-from ParmedTools import ParmedActions as PA
+from ParmedTools import ParmedActions as PT
 from ParmedTools import parmlist
-import ParmedTools as PT
 import saved_outputs as saved
 import sys
 import unittest
@@ -40,15 +40,15 @@ class TestNonParmActions(unittest.TestCase):
 
     def testOverwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
-        self.assertTrue(PA.Action.overwrite)
+        self.assertTrue(PT.Action.overwrite)
         a = PT.setOverwrite(self.parm, False)
-        self.assertTrue(PA.Action.overwrite)
+        self.assertTrue(PT.Action.overwrite)
         a.execute()
-        self.assertFalse(PA.Action.overwrite)
+        self.assertFalse(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are NOT overwritable')
         a = PT.setOverwrite(self.parm, True)
         a.execute()
-        self.assertTrue(PA.Action.overwrite)
+        self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
     
     def testListParms(self):
@@ -956,6 +956,40 @@ class TestAmberParmActions(unittest.TestCase):
         self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
                                sum(parm.parm_data['MASS']))
 
+    def testOutPDB(self):
+        """ Test the outPDB action on AmberParm """
+        parm = copy(gasparm)
+        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
+        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+    def testOutCIF(self):
+        """ Test the outCIF action on AmberParm """
+        parm = copy(gasparm)
+        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
+        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
 class TestChamberParmActions(unittest.TestCase):
     """ Tests actions on Amber prmtop files """
     
@@ -1756,6 +1790,40 @@ class TestChamberParmActions(unittest.TestCase):
         self.assertAlmostEqual(sum(solvchamber.parm_data['MASS']),
                                sum(parm.parm_data['MASS']), places=6)
 
+    def testOutPDB(self):
+        """ Test the outPDB action on ChamberParm """
+        parm = copy(gascham)
+        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+    def testOutCIF(self):
+        """ Test the outCIF action on ChamberParm """
+        parm = copy(gascham)
+        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
 class TestAmoebaParmActions(unittest.TestCase):
     """ Tests actions on Amber prmtop files """
     
@@ -2177,6 +2245,40 @@ class TestAmoebaParmActions(unittest.TestCase):
                 self.assertEqual(atom.mass, 3.0)
         self.assertAlmostEqual(sum(amoebaparm.parm_data['MASS']),
                                sum(parm.parm_data['MASS']), places=6)
+
+    def testOutPDB(self):
+        """ Test the outPDB action on AmoebaParm """
+        parm = copy(amoebaparm)
+        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+    def testOutCIF(self):
+        """ Test the outCIF action on AmoebaParm """
+        parm = copy(amoebaparm)
+        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        self.assertEqual(len(f.atoms), len(parm.atoms))
+        self.assertEqual(len(f.residues), len(parm.residues))
+        for a1, a2 in zip(f.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertAlmostEqual(a1.xx, a2.xx, delta=2e-3)
+            self.assertAlmostEqual(a1.xy, a2.xy, delta=2e-3)
+            self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
 
 if __name__ == '__main__':
     unittest.main()
