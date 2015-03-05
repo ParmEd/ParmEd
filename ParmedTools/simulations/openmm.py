@@ -890,7 +890,7 @@ def energy(parm, args, output=sys.stdout):
         # delete that file
         tmp = tempfile.mktemp(suffix='.parm7')
         try:
-            parm.writeParm(tmp)
+            parm.write_parm(tmp)
             parm_ = amberprmtopfile.AmberPrmtopFile(tmp)
             os.unlink(tmp)
         except IOError:

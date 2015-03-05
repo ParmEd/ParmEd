@@ -31,6 +31,7 @@ if has_openmm:
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
     tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
+    amber1264 = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -510,6 +511,23 @@ class TestAmberParm(unittest.TestCase):
         self.assertAlmostEqual(energies['angle'], 0.9616, 4)
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
         self.assertAlmostEqual(energies['nonbond'], 1256.3579, 3)
+
+    def test1264(self):
+        """ Testing the 12-6-4 LJ potential in OpenMM """
+        parm = amber1264
+        system = parm.createSystem(nonbondedMethod=app.NoCutoff)
+        for force in system.getForces():
+            if isinstance(force, mm.CustomNonbondedForce):
+                self.assertTrue(force.getUseLongRangeCorrection())
+                force.setUseLongRangeCorrection(False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 26.3947079, places=4)
+        self.assertAlmostEqual(energies['angle'], 122.8243431, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=4)
+        self.assertAlmostEqual(energies['nonbond'], -2133.6170786, places=3)
 
     def testInterfacePBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (periodic) """
