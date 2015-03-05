@@ -912,7 +912,7 @@ class AmberParm(AmberFormat, Structure):
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
             force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r4*r2;'
-                                            'r4=r2*r2; r2=r^2;'
+                                            'r4=r2^2; r2=r^2;'
                                             'a=acoef(type1, type2);'
                                             'b=bcoef(type1, type2);'
                                             'c=ccoef(type1, type2);')
@@ -931,8 +931,8 @@ class AmberParm(AmberFormat, Structure):
         # Now construct the lookup tables
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ntypes = self.parm_data['POINTERS'][NTYPES]
         if hasnbfix:
-            ntypes = self.parm_data['POINTERS'][NTYPES]
             acoef = [0 for i in xrange(ntypes*ntypes)]
             parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
             bcoef = acoef[:]
