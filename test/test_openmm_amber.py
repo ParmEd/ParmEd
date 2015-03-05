@@ -523,7 +523,7 @@ class TestAmberParm(unittest.TestCase):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
         sim.context.setPositions(parm.positions)
-        energies = decmoposed_energy(sim.context, parm)
+        energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 26.3947079, places=4)
         self.assertAlmostEqual(energies['angle'], 122.8243431, places=4)
         self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=4)
