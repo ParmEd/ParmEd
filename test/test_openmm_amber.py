@@ -186,7 +186,7 @@ class TestAmberParm(unittest.TestCase):
                 if abs(x1) > 1 or abs(x2) > 1:
                     self.assertRelativeEqual(x1, x2, places=3)
                 else:
-                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+                    self.assertAlmostEqual(x1, x2, delta=5e-3)
             i += 1
 
     def testGasEnergy(self):
@@ -524,9 +524,9 @@ class TestAmberParm(unittest.TestCase):
         sim = app.Simulation(parm.topology, system, integrator)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
-        self.assertAlmostEqual(energies['bond'], 26.3947079, places=4)
-        self.assertAlmostEqual(energies['angle'], 122.8243431, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=4)
+        self.assertAlmostEqual(energies['bond'], 26.3947079, places=3)
+        self.assertAlmostEqual(energies['angle'], 122.8243431, places=3)
+        self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=3)
         self.assertAlmostEqual(energies['nonbond'], -2133.6170786, places=3)
 
     def testInterfacePBC(self):
