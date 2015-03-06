@@ -312,23 +312,15 @@ class AmberParm(AmberFormat, Structure):
     def __copy__(self):
         """ Needs to copy a few additional data structures """
         other = super(AmberParm, self).__copy__()
-        other.pointers = {}
-        other.LJ_types = {}
-        other.LJ_radius = self.LJ_radius[:]
-        other.LJ_depth = self.LJ_depth[:]
-        other.hasvels = self.hasvels
-        other.hasbox = self.hasbox
+        other.initialize_topology()
         other.coords = copy.copy(self.coords)
         other.vels = copy.copy(other.vels)
         other.box = copy.copy(self.box)
-
-        # Now fill the LJ and other data structures
-        for p in self.pointers: other.pointers[p] = self.pointers[p]
-        for typ in self.LJ_types: other.LJ_types[typ] = self.LJ_types[typ]
-        try:
-            other.load_structure()
-        except (KeyError, IndexError, AttributeError):
-            raise AmberParmError('Could not set up topology for parm copy')
+        # Fill in the coordinates if applicable
+        if other.coords is not None:
+            for i, atom in enumerate(other.atoms):
+                i3 = i * 3
+                atom.xx, atom.xy, atom.xz = other.coords[i3:i3+3]
         # Now we should have a full copy
         return other
 
