@@ -97,15 +97,6 @@ class ChamberParm(AmberParm):
       
     #===================================================
 
-    def __copy__(self):
-        """ Needs to copy a few additional data structures """
-        other = AmberParm.__copy__(self)
-        other.LJ_14_radius = self.LJ_14_radius[:]
-        other.LJ_14_depth = self.LJ_14_depth[:]
-        return other
-
-    #===================================================
-   
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each

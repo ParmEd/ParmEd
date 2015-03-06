@@ -140,7 +140,7 @@ class TestNonParmActions(unittest.TestCase):
         self.assertEqual(parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
         self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.type for a in parm.atoms],
+        self.assertEqual([a.type[:4] for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
     
     def _extensive_checks(self, parm):
@@ -2086,8 +2086,13 @@ class TestAmoebaParmActions(unittest.TestCase):
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
-        """ Check that netCharge fails for AmoebaParm """
-        self.assertRaises(exc.ParmError, lambda: PT.netCharge(amoebaparm))
+        """ Test netCharge for AmoebaParm (charge is the monopole) """
+        act = PT.netCharge(amoebaparm)
+        chg = act.execute() # check this part of the API
+        self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
+        self.assertAlmostEqual(chg, 0.0)
+        chg = PT.netCharge(amoebaparm, ':WAT').execute()
+        self.assertAlmostEqual(chg, 0)
 
     def testStrip(self):
         """ Test strip action for AmoebaParm """
