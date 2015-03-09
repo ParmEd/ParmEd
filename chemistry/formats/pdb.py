@@ -533,11 +533,20 @@ class PDBFile(object):
         if not hasattr(dest, 'write'):
             dest = TextToBinaryFile(genopen(dest, 'w'))
             own_handle = True
-        atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
-                   '%6.2f      %-4s%2s%-2s\n')
-        anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                     '      %2s%-2s\n')
-        terrec = ('TER   %5d      %-3s %1s%4d\n')
+        if charmm:
+            atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                       '%6.2f      %-4s%2s%-2s\n')
+            anisourec = ('ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                         '      %2s%-2s\n')
+            terrec = ('TER   %5d      %-4s%1s%4d\n')
+            reslen = 4
+        else:
+            atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                       '%6.2f      %-4s%2s%-2s\n')
+            anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                         '      %2s%-2s\n')
+            terrec = ('TER   %5d      %-3s %1s%4d\n')
+            reslen = 3
         if struct.box is not None:
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
@@ -616,14 +625,14 @@ class PDBFile(object):
                 else:
                     segid = ''
                 dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name[:3], res.chain[:1], rnum,
+                           res.name[:reslen], res.chain[:1], rnum,
                            res.insertion_code[:1], x, y, z, pa.occupancy,
                            pa.bfactor, segid,
                            Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
                     anisou = [int(ani*1e4) for ani in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name[:3], res.chain[:1], rnum,
+                               res.name[:reslen], res.chain[:1], rnum,
                                res.insertion_code[:1], anisou[0], anisou[1],
                                anisou[2], anisou[3], anisou[4], anisou[5],
                                Element[pa.atomic_number].upper(), ''))
@@ -646,19 +655,20 @@ class PDBFile(object):
                         segid = oatom.segid[:4]
                     else:
                         segid = ''
-                    dest.write(atomrec % (anum, aname, key, res.name,
+                    dest.write(atomrec % (anum, aname, key, res.name[:reslen],
                                res.chain[:1], rnum, res.insertion_code[:1],
                                x, y, z, oatom.occupancy, oatom.bfactor, segid,
                                Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
                         anisou = [int(ani*1e4) for ani in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
-                            oatom.altloc[:1], res.name[:3], res.chain[:1], rnum,
-                            res.insertion_code[:1], anisou[0], anisou[1],
+                            oatom.altloc[:1], res.name[:reslen], res.chain[:1],
+                            rnum, res.insertion_code[:1], anisou[0], anisou[1],
                             anisou[2], anisou[3], anisou[4], anisou[5],
                             Element[oatom.atomic_number].upper(), ''))
             if res.ter:
-                dest.write(terrec % (anum+1, res.name, res.chain, rnum))
+                dest.write(terrec % (anum+1, res.name[:reslen],
+                                     res.chain, rnum))
                 if renumber:
                     nmore += 1
                 else:
