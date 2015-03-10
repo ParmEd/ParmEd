@@ -189,7 +189,7 @@ class PDBFile(object):
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
                     atnum, atname, altloc = line[6:11], line[12:16], line[16]
-                    resname, chain = line[17:20], line[21]
+                    resname, chain = line[17:21], line[21]
                     resid, inscode = line[22:resend], line[26]
                     x, y, z = line[30:38], line[38:46], line[47:54]
                     occupancy, bfactor = line[54:60], line[60:66]
@@ -348,7 +348,7 @@ class PDBFile(object):
                         continue # Skip the rest of this record
                     aname = line[12:16].strip()
                     altloc = line[16].strip()
-                    rname = line[17:20].strip()
+                    rname = line[17:21].strip()
                     chain = line[21].strip()
                     try:
                         resid = int(line[22:26])
