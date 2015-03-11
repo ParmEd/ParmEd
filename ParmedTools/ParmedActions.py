@@ -3148,10 +3148,14 @@ class add12_6_4(Action):
     Parameters are expected in a file with 2 columns:
         <atom type>   <parameter>
 
-    All defaults come from Ref. [1]
+    All defaults come from Ref. [1], [2] and [3]
 
     [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
         289-297
+    [2] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
+        119, 883-895
+    [3] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
+        Accepted.
     """
     usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
             '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')
@@ -3173,15 +3177,18 @@ class add12_6_4(Action):
         if self.c4file is None:
             if self.watermodel is None:
                 self.watermodel = 'TIP3P'
-        else:
-            self.watermodel = self.watermodel.upper()
-            if not self.watermodel in self._supported_wms:
-                raise LJ12_6_4Error('Defaults exist for water models ' +
-                                    ', '.join(self._supported_wms))
             else:
-                if self.watermodel is not None:
-                    raise LJ12_6_4Error('c4file and watermodel are mutually '
-                                        'exclusive')
+                self.watermodel = self.watermodel.upper()
+                if not self.watermodel in self._supported_wms:
+                    raise LJ12_6_4Error('Unrecognized water model %s; pick one '
+                                        'of the following: %s' %
+                                        (self.watermodel,
+                                        ', '.join(self._supported_wms))
+                    )
+        else:
+            if self.watermodel is not None:
+                raise LJ12_6_4Error('c4file and watermodel are mutually '
+                                    'exclusive')
 
     def __str__(self):
         retstr = ('Adding Lennard-Jones C-coefficient for 12-6-4 potential. '
