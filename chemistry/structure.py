@@ -682,7 +682,7 @@ class Structure(object):
         ret['name'] = [atom.name for atom in self.atoms]
         ret['type'] = [atom.type for atom in self.atoms]
         ret['atomic_number'] = [atom.atomic_number for atom in self.atoms]
-        ret['charge'] = [atom.type for atom in self.atoms]
+        ret['charge'] = [atom.charge for atom in self.atoms]
         ret['mass'] = [atom.mass for atom in self.atoms]
         ret['nb_idx'] = [atom.nb_idx for atom in self.atoms]
         ret['radii'] = [atom.radii for atom in self.atoms]
@@ -748,7 +748,7 @@ class Structure(object):
             ret = ret.join(multipoles)
         # AMOEBA polarizabilities
         try:
-            ret['polariability'] = [atom.polarizability for atom in self.atoms]
+            ret['polarizability'] = [atom.polarizability for atom in self.atoms]
         except AttributeError:
             pass
         # AMOEBA vdw parent atom
@@ -764,6 +764,9 @@ class Structure(object):
         # anisotropic b-factors
         none6 = [None] * 6
         anisos = [atom.anisou for atom in self.atoms]
+        for i, aniso in enumerate(anisos):
+            if hasattr(aniso, 'tolist'):
+                anisos[i] = aniso.tolist()
         all_nones = True
         for i, aniso in enumerate(anisos):
             if aniso is None:
