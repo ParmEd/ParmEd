@@ -364,11 +364,11 @@ def _process_docstring(doc, currcmd):
             lines.append(' '.join(addlinkfmt(combined_words)))
     return '\n'.join(lines)
 
-keylist = sorted(act.Usages.keys())
+keylist = sorted(act.COMMANDMAP.keys())
 # Construct the docs from ParmedActions
 for action in keylist:
     usage = act.Usages[action.lower()]
-    actname = usage.split()[0]
+    actname = act.COMMANDMAP[action].__name__
     # Some actions are part of the interpreter, NOT members of ParmedTools.
     # Special-case those here
     if action == 'help':
@@ -414,7 +414,7 @@ Quits ``parmed.py`` *without* running any final parmout_ command.
         continue
     # Except for the special-cases, pull the remaining documentation from the
     # docstrings
-    actionobj = getattr(act, action)
+    actionobj = act.COMMANDMAP[action]
     h = '%s\n%s\n\n.. code-block:: none\n\n    %s\n\n%s\n\n' % (actname,
             '~'*len(actname), usage,
             _process_docstring(actionobj.__doc__, actname))
