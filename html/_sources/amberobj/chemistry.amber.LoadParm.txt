@@ -1,0 +1,6 @@
+chemistry.amber.LoadParm
+========================
+
+.. currentmodule:: chemistry.amber
+
+.. autofunction:: LoadParm

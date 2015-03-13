@@ -19,7 +19,6 @@ Submodules
    ParmedTools.addljtype
    ParmedTools.argumentlist
    ParmedTools.arraytools
-   ParmedTools.changeljpair
    ParmedTools.changeradii
    ParmedTools.checkvalidity
    ParmedTools.coarsegrain

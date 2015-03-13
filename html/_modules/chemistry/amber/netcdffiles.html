@@ -629,14 +629,16 @@
             <span class="n">f</span> <span class="o">=</span> <span class="n">open_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span> <span class="c"># Bare except... each package raises different exceptions</span>
             <span class="k">return</span> <span class="bp">False</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_coerce_to_string</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;AMBER&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_coerce_to_string</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;AMBER&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        <span class="c"># Passed all our tests</span>
-        <span class="k">return</span> <span class="bp">True</span>
+            <span class="c"># Passed all our tests</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>
     <span class="nd">@needs_netcdf</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
@@ -1147,7 +1149,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

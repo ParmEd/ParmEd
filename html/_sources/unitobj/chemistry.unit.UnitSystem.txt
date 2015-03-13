@@ -1,0 +1,23 @@
+chemistry.unit.UnitSystem
+=========================
+
+.. currentmodule:: chemistry.unit
+
+.. autoclass:: UnitSystem
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UnitSystem.__init__
+      ~UnitSystem.express_unit
+   
+   
+
+   
+   
+   

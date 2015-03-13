@@ -65,14 +65,17 @@
 <div class="viewcode-block" id="ChemWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.ChemWarning">[docs]</a><span class="k">class</span> <span class="nc">ChemWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base warning class &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="PDBError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PDBError">[docs]</a><span class="k">class</span> <span class="nc">PDBError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="ParsingError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.ParsingError">[docs]</a><span class="k">class</span> <span class="nc">ParsingError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there was a problem parsing any kind of file &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="PDBError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PDBError">[docs]</a><span class="k">class</span> <span class="nc">PDBError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there was a problem parsing a PDB file &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="Mol2Error"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.Mol2Error">[docs]</a><span class="k">class</span> <span class="nc">Mol2Error</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there was a problem parsing a Mol2 file &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="PDBWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PDBWarning">[docs]</a><span class="k">class</span> <span class="nc">PDBWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A non-fatal error to indicate a problematic PDB file &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="ReadError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.ReadError">[docs]</a><span class="k">class</span> <span class="nc">ReadError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Error when files cannot be properly read &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="MoleculeError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.MoleculeError">[docs]</a><span class="k">class</span> <span class="nc">MoleculeError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Error when molecule is illegally defined &quot;&quot;&quot;</span>
@@ -95,7 +98,7 @@
 <div class="viewcode-block" id="AmberFormatWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmberFormatWarning">[docs]</a><span class="k">class</span> <span class="nc">AmberFormatWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there is something that is non-fatal &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="AmberParmError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmberParmError">[docs]</a><span class="k">class</span> <span class="nc">AmberParmError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParmError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmberParmError">[docs]</a><span class="k">class</span> <span class="nc">AmberParmError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This is a generic AmberParmError &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="AmberParameterError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmberParameterError">[docs]</a><span class="k">class</span> <span class="nc">AmberParameterError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
@@ -110,22 +113,22 @@
 <div class="viewcode-block" id="DihedralError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.DihedralError">[docs]</a><span class="k">class</span> <span class="nc">DihedralError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
     <span class="s">&quot; This happens when we try to do disallowed things in the _Dihedral class &quot;</span>
 </div>
-<div class="viewcode-block" id="AmoebaParamFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmoebaParamFileError">[docs]</a><span class="k">class</span> <span class="nc">AmoebaParamFileError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="AmoebaParamFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmoebaParamFileError">[docs]</a><span class="k">class</span> <span class="nc">AmoebaParamFileError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; When a parameter file is incorrect &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="AmoebaParamFileWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AmoebaParamFileWarning">[docs]</a><span class="k">class</span> <span class="nc">AmoebaParamFileWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; When a parameter file is incorrect &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="TinkerFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerFileError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="TinkerFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerFileError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Raised when one of the TINKER parsing routines hits a bad file &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="TinkerAnaloutError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerAnaloutError">[docs]</a><span class="k">class</span> <span class="nc">TinkerAnaloutError</span><span class="p">(</span><span class="n">TinkerFileError</span><span class="p">):</span>
+<div class="viewcode-block" id="TinkerAnaloutError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerAnaloutError">[docs]</a><span class="k">class</span> <span class="nc">TinkerAnaloutError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; When the analout file is not a valid format &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="TinkerKeyFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerKeyFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerKeyFileError</span><span class="p">(</span><span class="n">TinkerFileError</span><span class="p">):</span>
+<div class="viewcode-block" id="TinkerKeyFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerKeyFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerKeyFileError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; When a keyword control file is invalid &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="TinkerDynFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerDynFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerDynFileError</span><span class="p">(</span><span class="n">TinkerFileError</span><span class="p">):</span>
+<div class="viewcode-block" id="TinkerDynFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.TinkerDynFileError">[docs]</a><span class="k">class</span> <span class="nc">TinkerDynFileError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; When a .dyn file is corrupt or badly formatted &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="CmapError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CmapError">[docs]</a><span class="k">class</span> <span class="nc">CmapError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
@@ -143,7 +146,7 @@
 <div class="viewcode-block" id="CreateInputError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CreateInputError">[docs]</a><span class="k">class</span> <span class="nc">CreateInputError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there&#39;s a problem making a mdin input file &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="CharmmPSFError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmPSFError">[docs]</a><span class="k">class</span> <span class="nc">CharmmPSFError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmPSFError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmPSFError">[docs]</a><span class="k">class</span> <span class="nc">CharmmPSFError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there is a problem parsing CHARMM PSF files &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="SplitResidueWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.SplitResidueWarning">[docs]</a><span class="k">class</span> <span class="nc">SplitResidueWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
@@ -155,7 +158,7 @@
 <div class="viewcode-block" id="CharmmPSFWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmPSFWarning">[docs]</a><span class="k">class</span> <span class="nc">CharmmPSFWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; For non-fatal PSF parsing issues &quot;&quot;&quot;</span>
 </div>
-<div class="viewcode-block" id="CharmmFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmFileError">[docs]</a><span class="k">class</span> <span class="nc">CharmmFileError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmFileError">[docs]</a><span class="k">class</span> <span class="nc">CharmmFileError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there is a problem parsing CHARMM files &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="CharmmPsfEOF"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.CharmmPsfEOF">[docs]</a><span class="k">class</span> <span class="nc">CharmmPsfEOF</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
@@ -242,7 +245,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

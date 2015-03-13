@@ -8,8 +8,8 @@
     
     <title>chemistry.amber.NetCDFRestart &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The chemistry.amber package" href="../amber.html" /> 
@@ -105,10 +105,16 @@
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.open_new" title="chemistry.amber.NetCDFRestart.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.id_format" title="chemistry.amber.NetCDFRestart.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber NetCDF restart file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.open_new" title="chemistry.amber.NetCDFRestart.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.open_old" title="chemistry.amber.NetCDFRestart.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.open_old" title="chemistry.amber.NetCDFRestart.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Opens the NetCDF file and sets the global attributes that the file sets</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.NetCDFRestart.parse" title="chemistry.amber.NetCDFRestart.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
 </tbody>
@@ -185,6 +191,30 @@ respectively.</p>
 </tr>
 </tbody>
 </table>
+<dl class="staticmethod">
+<dt id="chemistry.amber.NetCDFRestart.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.NetCDFRestart.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as an Amber NetCDF restart file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber NetCDF restart file. False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="chemistry.amber.NetCDFRestart.open_new">
 <em class="property">classmethod </em><tt class="descname">open_new</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.NetCDFRestart.open_new" title="Permalink to this definition">¶</a></dt>
@@ -250,6 +280,24 @@ dimension (if <cite>remd</cite> above is &#8220;M[ulti-D]&#8221;)</p>
 </table>
 </dd></dl>
 
+<dl class="classmethod">
+<dt id="chemistry.amber.NetCDFRestart.parse">
+<em class="property">classmethod </em><tt class="descname">parse</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.NetCDFRestart.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the NetCDF file and sets the global attributes that the file sets</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the file to read</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -262,7 +310,7 @@ dimension (if <cite>remd</cite> above is &#8220;M[ulti-D]&#8221;)</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/amberobj/chemistry.amber.NetCDFRestart.txt"
+    <li><a href="../_sources/amberobj/chemistry.amber.NetCDFRestart.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

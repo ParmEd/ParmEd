@@ -54,23 +54,32 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c"># Load some system modules that may be useful for various users in shell mode</span>
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 <span class="kn">import</span> <span class="nn">cmd</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
-<span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">ParmedActions</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">ParmedTools.ParmedActions</span> <span class="kn">import</span> <span class="n">COMMANDMAP</span><span class="p">,</span> <span class="n">Usages</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="n">InterpreterError</span><span class="p">,</span> <span class="n">ParmError</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">readline</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">readline</span> <span class="o">=</span> <span class="bp">None</span>
 
-<span class="c"># For Python 2.4 support</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;BaseException&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">__builtins__</span><span class="p">):</span>
-    <span class="ne">BaseException</span> <span class="o">=</span> <span class="ne">Exception</span>
+<span class="n">_COMMANDLOGS</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="log_commands"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.log_commands">[docs]</a><span class="k">def</span> <span class="nf">log_commands</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Decorator to write the line to a file &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_COMMANDLOGS</span>
     <span class="k">def</span> <span class="nf">new_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">line</span> <span class="o">!=</span> <span class="s">&#39;EOF&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">readline</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">_COMMANDLOGS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">new_func</span>
@@ -175,7 +184,7 @@
 <div class="viewcode-block" id="ParmedCmd.do_parmout"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.do_parmout">[docs]</a>    <span class="k">def</span> <span class="nf">do_parmout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="c"># Store this action for later use. This action is unique</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parmout</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">parmout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parmout</span> <span class="o">=</span> <span class="n">COMMANDMAP</span><span class="p">[</span><span class="s">&#39;parmout&#39;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">ParmError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Action parmout failed.</span><span class="se">\n\t</span><span class="s">&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
@@ -184,7 +193,7 @@
    </div>
     <span class="k">def</span> <span class="nf">_normaldo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ActionClass</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The standard action command does this stuff &quot;&quot;&quot;</span>
-        <span class="n">actionname</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">[</span><span class="n">ActionClass</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">actionname</span> <span class="o">=</span> <span class="n">ActionClass</span><span class="o">.</span><span class="n">__name__</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">action</span> <span class="o">=</span> <span class="n">ActionClass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
@@ -203,16 +212,16 @@
 <span class="sd">        auto-complete. This eliminates the need to modify the ParmedCmd class</span>
 <span class="sd">        when a new command is added</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">_cmd</span> <span class="ow">in</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_cmd</span><span class="p">,</span> <span class="n">cmdclass</span> <span class="ow">in</span> <span class="n">COMMANDMAP</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">_cmd</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;source&#39;</span><span class="p">,</span> <span class="s">&#39;go&#39;</span><span class="p">,</span> <span class="s">&#39;EOF&#39;</span><span class="p">,</span> <span class="s">&#39;quit&#39;</span><span class="p">,</span> <span class="s">&#39;help&#39;</span><span class="p">,</span> <span class="s">&#39;parmout&#39;</span><span class="p">):</span>
                 <span class="k">continue</span>
-            <span class="n">cmdname</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">[</span><span class="n">_cmd</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">cmdname</span> <span class="o">=</span> <span class="n">cmdclass</span><span class="o">.</span><span class="n">__name__</span>
             <span class="k">exec</span><span class="p">(</span><span class="s">&#39;cls.do_</span><span class="si">%s</span><span class="s"> = lambda self, line: &#39;</span>
-                 <span class="s">&#39;self._normaldo(ParmedActions.</span><span class="si">%s</span><span class="s">, line)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmdname</span><span class="p">,</span> <span class="n">_cmd</span><span class="p">))</span>
+                 <span class="s">&#39;self._normaldo(COMMANDMAP[&quot;</span><span class="si">%s</span><span class="s">&quot;], line)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmdname</span><span class="p">,</span> <span class="n">_cmd</span><span class="p">))</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">_populated</span> <span class="o">=</span> <span class="bp">True</span>
 </div>
 <div class="viewcode-block" id="ParmedCmd.do_source"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.do_source">[docs]</a>    <span class="k">def</span> <span class="nf">do_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="n">action</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">COMMANDMAP</span><span class="p">[</span><span class="s">&#39;source&#39;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
         <span class="n">_cmd</span> <span class="o">=</span> <span class="n">ParmedCmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">),</span>
                          <span class="n">stdout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
@@ -259,15 +268,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">True</span>
 </div>
+<div class="viewcode-block" id="ParmedCmd.do_history"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.do_history">[docs]</a>    <span class="k">def</span> <span class="nf">do_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the command history</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">_COMMANDLOGS</span>
+        <span class="k">if</span> <span class="n">readline</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">_COMMANDLOGS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">readline</span><span class="o">.</span><span class="n">get_current_history_length</span><span class="p">()):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">readline</span><span class="o">.</span><span class="n">get_history_item</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</div>
 <div class="viewcode-block" id="ParmedCmd.default"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Default behavior &quot;&quot;&quot;</span>
-        <span class="n">mycmd</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">mycmd</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;lawsuit&#39;</span><span class="p">,</span> <span class="s">&#39;math&#39;</span><span class="p">,</span> <span class="s">&#39;warnings&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span>
-                <span class="nb">hasattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">mycmd</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> command not recognized</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">mycmd</span><span class="p">):</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_normaldo</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">mycmd</span><span class="p">),</span> <span class="n">args</span><span class="p">)</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">mycmd</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mycmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COMMANDMAP</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> command not recognized</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normaldo</span><span class="p">(</span><span class="n">COMMANDMAP</span><span class="p">[</span><span class="n">mycmd</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="ParmedCmd.do_shell"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.do_shell">[docs]</a>    <span class="k">def</span> <span class="nf">do_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Support the limited interpreter &quot;&quot;&quot;</span>
@@ -281,11 +301,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">exec</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="ParmedCmd.completedefault"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.completedefault">[docs]</a>    <span class="k">def</span> <span class="nf">completedefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">begidx</span><span class="p">,</span> <span class="n">endidx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">glob</span><span class="p">(</span><span class="n">text</span> <span class="o">+</span> <span class="s">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">partial</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="n">endidx</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">partial</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">),</span> <span class="n">partial</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">full_token</span> <span class="o">=</span> <span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
+        <span class="n">beg_token</span> <span class="o">=</span> <span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">begidx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">beg_token</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span> <span class="o">+</span> <span class="s">&#39;*&#39;</span><span class="p">)]</span>
 </div>
     <span class="k">def</span> <span class="nf">_python_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Drop into a limited interpreter and read until we see !! &quot;&quot;&quot;</span>
@@ -298,7 +322,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">amber_prmtop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span>
             <span class="k">exec</span><span class="p">(</span><span class="n">python_interpreter</span><span class="o">.</span><span class="n">command_string</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
       
 <div class="viewcode-block" id="ParmedCmd.do_help"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.ParmedCmd.do_help">[docs]</a>    <span class="k">def</span> <span class="nf">do_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
@@ -316,13 +340,13 @@
                 <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
                     <span class="k">pass</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">_action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                    <span class="n">_action</span> <span class="o">=</span> <span class="n">COMMANDMAP</span><span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
                     <span class="k">if</span> <span class="n">_action</span><span class="o">.</span><span class="n">needs_parm</span><span class="p">:</span>
                         <span class="n">doc</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> [parm &lt;idx&gt;|&lt;name&gt;]</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">doc</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span>
-                    <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span> <span class="o">%</span> <span class="p">(</span><span class="n">_fmt_usage</span><span class="p">(</span><span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">()]),</span>
-                                <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span> <span class="o">%</span> <span class="p">(</span><span class="n">_fmt_usage</span><span class="p">(</span><span class="n">Usages</span><span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">()]),</span>
+                                 <span class="n">_action</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">doc</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
                         <span class="k">return</span>
@@ -353,8 +377,7 @@
                         <span class="k">del</span> <span class="n">help</span><span class="p">[</span><span class="n">cmd</span><span class="p">]</span>
                     <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">__doc__</span><span class="p">:</span>
                         <span class="n">cmds_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-                    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="ow">and</span> \
-                            <span class="n">cmd</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">elif</span> <span class="n">cmd</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">COMMANDMAP</span> <span class="ow">and</span> <span class="n">cmd</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">Usages</span><span class="p">:</span>
                         <span class="n">cmds_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">cmds_undoc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
@@ -362,12 +385,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_header</span><span class="p">,</span>   <span class="n">cmds_doc</span><span class="p">,</span>   <span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">misc_header</span><span class="p">,</span>  <span class="n">help</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">undoc_header</span><span class="p">,</span> <span class="n">cmds_undoc</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
-</div>
-    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Destructor -- make sure the log file is closed if it has one &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</div>
+</div></div>
 <div class="viewcode-block" id="PythonCmd"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmed_cmd.html#ParmedTools.parmed_cmd.PythonCmd">[docs]</a><span class="k">class</span> <span class="nc">PythonCmd</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Command interpreter for limited Python interpreter &quot;&quot;&quot;</span>
     <span class="n">prompt</span> <span class="o">=</span> <span class="s">&quot;py &gt;&gt;&gt; &quot;</span>
@@ -517,7 +535,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

@@ -8,8 +8,8 @@
     
     <title>chemistry.topologyobjects.AtomList &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
@@ -51,7 +51,7 @@
 <h1>chemistry.topologyobjects.AtomList<a class="headerlink" href="#chemistry-topologyobjects-atomlist" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.AtomList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomList</tt><big>(</big><em>arg=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Array of Atoms</p>
 <p class="rubric">Notes</p>
 <p>Deleting an atom from the AtomList also deletes that atom from the residue
@@ -78,31 +78,34 @@ it belongs to.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.AtomList.extend" title="chemistry.topologyobjects.AtomList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.index" title="chemistry.topologyobjects.AtomList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.find_original_index" title="chemistry.topologyobjects.AtomList.find_original_index"><tt class="xref py py-obj docutils literal"><span class="pre">find_original_index</span></tt></a>(idx)</td>
+<td>Finds an atom with the given original index.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.index" title="chemistry.topologyobjects.AtomList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.index_members" title="chemistry.topologyobjects.AtomList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.index_members" title="chemistry.topologyobjects.AtomList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.AtomList.insert" title="chemistry.topologyobjects.AtomList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.AtomList.insert" title="chemistry.topologyobjects.AtomList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.AtomList.pop" title="chemistry.topologyobjects.AtomList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.AtomList.pop" title="chemistry.topologyobjects.AtomList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.prune_unused" title="chemistry.topologyobjects.AtomList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.prune_unused" title="chemistry.topologyobjects.AtomList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.remove" title="chemistry.topologyobjects.AtomList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.remove" title="chemistry.topologyobjects.AtomList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.reverse" title="chemistry.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.reverse" title="chemistry.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.sort" title="chemistry.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.sort" title="chemistry.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.unmark" title="chemistry.topologyobjects.AtomList.unmark"><tt class="xref py py-obj docutils literal"><span class="pre">unmark</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomList.unmark" title="chemistry.topologyobjects.AtomList.unmark"><tt class="xref py py-obj docutils literal"><span class="pre">unmark</span></tt></a>()</td>
 <td>Unmark all atoms in this list</td>
 </tr>
 </tbody>
@@ -168,7 +171,7 @@ it belongs to.</p>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.assign_nbidx_from_types">
-<tt class="descname">assign_nbidx_from_types</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#AtomList.assign_nbidx_from_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.assign_nbidx_from_types" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_nbidx_from_types</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomList.assign_nbidx_from_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.assign_nbidx_from_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns the nb_idx attribute of every atom inside here from the
 atom_type definition. If the atom_type is not assigned, RuntimeError is
 raised.</p>
@@ -199,6 +202,38 @@ subsequently indexes all of its items.</p>
 <dt id="chemistry.topologyobjects.AtomList.count">
 <tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.topologyobjects.AtomList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="chemistry.topologyobjects.AtomList.find_original_index">
+<tt class="descname">find_original_index</tt><big>(</big><em>idx</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomList.find_original_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.find_original_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds an atom with the given original index. Cannot assume that the
+original indexes are in order, since reordering may have been necessary.
+As a result, the complexity of this algorithm is O(N)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>idx</strong> : int</p>
+<blockquote>
+<div><p>The integer corresponding to the original index</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>atom</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The atom with the original index <tt class="docutils literal"><span class="pre">idx</span></tt></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError</strong></p>
+<blockquote class="last">
+<div><p>If no atom has the original index <tt class="docutils literal"><span class="pre">idx</span></tt></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.index">
@@ -242,7 +277,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomList.unmark">
-<tt class="descname">unmark</tt><big>(</big><big>)</big><a class="reference internal" href="../modules/chemistry/topologyobjects.html#AtomList.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.unmark" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">unmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomList.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomList.unmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unmark all atoms in this list</p>
 </dd></dl>
 
@@ -258,7 +293,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/topobj/chemistry.topologyobjects.AtomList.txt"
+    <li><a href="../_sources/topobj/chemistry.topologyobjects.AtomList.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

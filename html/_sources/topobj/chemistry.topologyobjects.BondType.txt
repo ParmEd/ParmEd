@@ -1,0 +1,28 @@
+chemistry.topologyobjects.BondType
+==================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: BondType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BondType.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BondType.idx
+   
+   

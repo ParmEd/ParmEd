@@ -1,0 +1,27 @@
+chemistry.charmm.CharmmParameterSet
+===================================
+
+.. currentmodule:: chemistry.charmm
+
+.. autoclass:: CharmmParameterSet
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CharmmParameterSet.__init__
+      ~CharmmParameterSet.condense
+      ~CharmmParameterSet.load_set
+      ~CharmmParameterSet.read_parameter_file
+      ~CharmmParameterSet.read_stream_file
+      ~CharmmParameterSet.read_topology_file
+   
+   
+
+   
+   
+   

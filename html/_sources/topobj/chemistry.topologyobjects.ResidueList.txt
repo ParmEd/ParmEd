@@ -1,0 +1,36 @@
+chemistry.topologyobjects.ResidueList
+=====================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: ResidueList
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ResidueList.__init__
+      ~ResidueList.add_atom
+      ~ResidueList.append
+      ~ResidueList.claim
+      ~ResidueList.count
+      ~ResidueList.extend
+      ~ResidueList.index
+      ~ResidueList.index_members
+      ~ResidueList.insert
+      ~ResidueList.pop
+      ~ResidueList.prune
+      ~ResidueList.prune_unused
+      ~ResidueList.remove
+      ~ResidueList.reverse
+      ~ResidueList.sort
+   
+   
+
+   
+   
+   

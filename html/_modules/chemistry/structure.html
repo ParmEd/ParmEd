@@ -231,7 +231,7 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A chemical structure composed of atoms, bonds, angles, torsions, and other</span>
 <span class="sd">    topological features</span>
@@ -315,7 +315,7 @@
 
     <span class="c">#===================================================</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.__init__"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c"># Topological object lists</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
@@ -358,8 +358,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">space_group</span> <span class="o">=</span> <span class="s">&quot;P 1&quot;</span>
 
     <span class="c">#===================================================</span>
-
-<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure, adding a new residue to `residues` if</span>
 <span class="sd">        it has a different name or number as the last residue added and adding</span>
@@ -388,7 +388,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure at the end if the given residue</span>
 
@@ -426,7 +426,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a copy of the current structure as an instance of a specified</span>
 <span class="sd">        subclass</span>
@@ -647,7 +647,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if any of the topology has changed for this structure &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
@@ -670,7 +670,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Toggles all lists so that they do not indicate any changes &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
@@ -708,7 +708,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Looks through all of the topological lists and gets rid of terms</span>
 <span class="sd">        in which at least one of the atoms is None or has an `idx` attribute set</span>
@@ -731,7 +731,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonbonded exclusions and exceptions have the following priority:</span>
 
@@ -759,7 +759,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes a subset of the atoms corresponding to an atom-based selection.</span>
 
@@ -795,7 +795,7 @@
 </div>
     <span class="nd">@property</span>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.topology"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.topology">[docs]</a>    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.topology"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.topology">[docs]</a>    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The OpenMM Topology object. Cached when possible, but any changes to the</span>
 <span class="sd">        Structure instance results in the topology being deleted and rebuilt</span>
@@ -857,7 +857,7 @@
         <span class="k">return</span> <span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
 
     <span class="nd">@positions.setter</span>
-<div class="viewcode-block" id="Structure.positions"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.positions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic positions for every atom in the system. If set with unitless</span>
@@ -888,7 +888,7 @@
         <span class="k">return</span> <span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">vz</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span>
 
     <span class="nd">@velocities.setter</span>
-<div class="viewcode-block" id="Structure.velocities"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.velocities"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic velocities for every atom in the system</span>
@@ -919,7 +919,7 @@
         <span class="k">return</span> <span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
 
     <span class="nd">@box_vectors.setter</span>
-<div class="viewcode-block" id="Structure.box_vectors"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.box_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.box_vectors"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.box_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3, 3-element tuple of unit cell vectors that are Quantity objects of</span>
 <span class="sd">        dimension length</span>
@@ -936,7 +936,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                      <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">switchDistance</span><span class="o">=</span><span class="mf">0.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -1102,7 +1102,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds constraints to a given system</span>
 
 <span class="sd">        Parameters</span>
@@ -1158,7 +1158,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the virtual sites in a given OpenMM `System` object from the extra</span>
 <span class="sd">        points defined in this system</span>
@@ -1201,7 +1201,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                        <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</span>
@@ -1258,7 +1258,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</span>
 <span class="sd">        angles are for an Amoeba-parametrized system)</span>
@@ -1309,7 +1309,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM PeriodicTorsionForce modeling dihedrals</span>
 
 <span class="sd">        Returns</span>
@@ -1339,7 +1339,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM Urey-Bradley force</span>
 
 <span class="sd">        Returns</span>
@@ -1364,7 +1364,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM improper torsion force (quadratic bias)</span>
 
 <span class="sd">        Returns</span>
@@ -1390,7 +1390,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM CMAP torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -1429,7 +1429,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                             <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">switchDistance</span><span class="o">=</span><span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">ewaldErrorTolerance</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
@@ -1599,7 +1599,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
                        <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">30.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                        <span class="n">soluteDielectric</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -1716,7 +1716,7 @@
     <span class="c"># Amoeba-specific forces below</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba trigonal-angle force</span>
 
 <span class="sd">        Returns</span>
@@ -1748,7 +1748,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba out-of-plane bend force</span>
 
 <span class="sd">        Returns</span>
@@ -1779,7 +1779,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba pi-torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -1802,7 +1802,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba stretch-bend force for this system</span>
 
 <span class="sd">        Returns</span>
@@ -1827,7 +1827,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba coupled-torsion (CMAP) force</span>
 
 <span class="sd">        Returns</span>
@@ -2109,6 +2109,13 @@
 
     <span class="c">#===================================================</span>
 
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_add_force_to_system</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an OpenMM force to a system IFF the force is not None &quot;&quot;&quot;</span>
@@ -2160,7 +2167,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

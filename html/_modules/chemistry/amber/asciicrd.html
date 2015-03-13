@@ -61,7 +61,7 @@
 
 <span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ReadError</span>
+<span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ParsingError</span>
 <span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">property</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
 <span class="kn">import</span> <span class="nn">warnings</span> <span class="kn">as</span> <span class="nn">_warnings</span>
@@ -569,7 +569,7 @@
             <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ReadError</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">()</span>
                     <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">frame</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">natom3iter</span><span class="p">])</span>
@@ -578,7 +578,7 @@
                 <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ReadError</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">()</span>
                     <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> 
                                                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">mainiter</span><span class="p">])</span>
                     <span class="n">idx</span> <span class="o">+=</span> <span class="mi">10</span>
@@ -591,7 +591,7 @@
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
                     <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ReadError</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">()</span>
                     <span class="n">cell</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span>
                     <span class="n">cell</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>
                     <span class="n">cell</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
@@ -600,7 +600,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="k">except</span> <span class="n">ReadError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">ParsingError</span><span class="p">:</span>
             <span class="n">_warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unexpected EOF in parsing mdcrd. natom and/or &#39;</span>
                            <span class="s">&#39;hasbox are likely wrong&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
@@ -775,7 +775,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

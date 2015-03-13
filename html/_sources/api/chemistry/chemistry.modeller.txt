@@ -6,7 +6,6 @@ Submodules
 
 .. toctree::
 
-   chemistry.modeller.mol2
    chemistry.modeller.offlib
    chemistry.modeller.residue
 

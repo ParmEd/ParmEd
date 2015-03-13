@@ -69,22 +69,20 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">amber_prmtop</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Instantiates the window &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">math</span>
-        <span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">ParmedActions</span>
+        <span class="kn">from</span> <span class="nn">ParmedTools.ParmedActions</span> <span class="kn">import</span> <span class="n">COMMANDMAP</span>
         <span class="k">global</span> <span class="n">BPR</span>
         <span class="n">Frame</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="n">amber_prmtop</span>
         <span class="n">actions</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">action_name</span> <span class="o">=</span> <span class="n">ParmedActions</span><span class="o">.</span><span class="n">Usages</span><span class="p">[</span><span class="n">action</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">actioncls</span> <span class="ow">in</span> <span class="n">COMMANDMAP</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">action_name</span> <span class="o">=</span> <span class="n">actioncls</span><span class="o">.</span><span class="n">__name__</span>
             <span class="c"># Skip actions that don&#39;t get buttons</span>
             <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_actions</span><span class="p">:</span> <span class="k">continue</span>
             <span class="c"># Save outparm for later</span>
             <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;outparm&#39;</span><span class="p">:</span>
-                <span class="n">outparm_action</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span>
-                                    <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+                <span class="n">outparm_action</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span> <span class="n">actioncls</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">actions</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span>
-                                    <span class="nb">getattr</span><span class="p">(</span><span class="n">ParmedActions</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+            <span class="n">actions</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Description</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span> <span class="n">actioncls</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message_frame</span> <span class="o">=</span> <span class="n">MessageWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c"># Now make the action button frame and put a title on it</span>
         <span class="n">action_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -199,7 +197,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

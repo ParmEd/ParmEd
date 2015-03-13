@@ -8,8 +8,8 @@
     
     <title>chemistry.charmm.CharmmRstFile &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The chemistry.charmm package" href="../charmm.html" /> 
@@ -153,10 +153,13 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt>(crds)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.id_format" title="chemistry.charmm.CharmmRstFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a CHARMM restart file</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt>(crds)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt>(handle,&nbsp;str[,&nbsp;r])</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt>(handle,&nbsp;str[,&nbsp;r])</td>
 <td></td>
 </tr>
 </tbody>
@@ -202,6 +205,30 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 </tr>
 </tbody>
 </table>
+<dl class="staticmethod">
+<dt id="chemistry.charmm.CharmmRstFile.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmRstFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as a CHARMM restart file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CHARMM restart file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="chemistry.charmm.CharmmRstFile.positions">
 <tt class="descname">positions</tt><a class="headerlink" href="#chemistry.charmm.CharmmRstFile.positions" title="Permalink to this definition">¶</a></dt>
@@ -232,7 +259,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/charmmobj/chemistry.charmm.CharmmRstFile.txt"
+    <li><a href="../_sources/charmmobj/chemistry.charmm.CharmmRstFile.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

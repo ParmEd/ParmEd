@@ -137,7 +137,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.AmberParmError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">AmberParmError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#AmberParmError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.AmberParmError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>This is a generic AmberParmError</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.AmberParmError.args">
@@ -188,7 +188,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.AmoebaParamFileError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">AmoebaParamFileError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#AmoebaParamFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.AmoebaParamFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>When a parameter file is incorrect</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.AmoebaParamFileError.args">
@@ -256,7 +256,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.CharmmFileError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">CharmmFileError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#CharmmFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.CharmmFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>If there is a problem parsing CHARMM files</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.CharmmFileError.args">
@@ -273,7 +273,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.CharmmPSFError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">CharmmPSFError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#CharmmPSFError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.CharmmPSFError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>If there is a problem parsing CHARMM PSF files</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.CharmmPSFError.args">
@@ -610,6 +610,23 @@ package</p>
 </dd></dl>
 
 <dl class="exception">
+<dt id="chemistry.exceptions.Mol2Error">
+<em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">Mol2Error</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#Mol2Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.Mol2Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
+<p>If there was a problem parsing a Mol2 file</p>
+<dl class="attribute">
+<dt id="chemistry.exceptions.Mol2Error.args">
+<tt class="descname">args</tt><a class="headerlink" href="#chemistry.exceptions.Mol2Error.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.exceptions.Mol2Error.message">
+<tt class="descname">message</tt><a class="headerlink" href="#chemistry.exceptions.Mol2Error.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
 <dt id="chemistry.exceptions.MoleculeError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">MoleculeError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#MoleculeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.MoleculeError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
@@ -663,7 +680,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.PDBError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">PDBError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#PDBError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.PDBError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>If there was a problem parsing a PDB file</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.PDBError.args">
@@ -690,6 +707,23 @@ package</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.PDBWarning.message">
 <tt class="descname">message</tt><a class="headerlink" href="#chemistry.exceptions.PDBWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="chemistry.exceptions.ParsingError">
+<em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">ParsingError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#ParsingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.ParsingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<p>If there was a problem parsing any kind of file</p>
+<dl class="attribute">
+<dt id="chemistry.exceptions.ParsingError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#chemistry.exceptions.ParsingError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.exceptions.ParsingError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#chemistry.exceptions.ParsingError.message" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -724,23 +758,6 @@ package</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.PdbxSyntaxError.message">
 <tt class="descname">message</tt><a class="headerlink" href="#chemistry.exceptions.PdbxSyntaxError.message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="chemistry.exceptions.ReadError">
-<em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">ReadError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#ReadError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.ReadError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
-<p>Error when files cannot be properly read</p>
-<dl class="attribute">
-<dt id="chemistry.exceptions.ReadError.args">
-<tt class="descname">args</tt><a class="headerlink" href="#chemistry.exceptions.ReadError.args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="chemistry.exceptions.ReadError.message">
-<tt class="descname">message</tt><a class="headerlink" href="#chemistry.exceptions.ReadError.message" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -782,7 +799,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.TinkerAnaloutError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">TinkerAnaloutError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#TinkerAnaloutError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.TinkerAnaloutError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.TinkerFileError" title="chemistry.exceptions.TinkerFileError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.TinkerFileError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>When the analout file is not a valid format</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.TinkerAnaloutError.args">
@@ -799,7 +816,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.TinkerDynFileError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">TinkerDynFileError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#TinkerDynFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.TinkerDynFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.TinkerFileError" title="chemistry.exceptions.TinkerFileError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.TinkerFileError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>When a .dyn file is corrupt or badly formatted</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.TinkerDynFileError.args">
@@ -816,7 +833,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.TinkerFileError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">TinkerFileError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#TinkerFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.TinkerFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ChemError" title="chemistry.exceptions.ChemError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ChemError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>Raised when one of the TINKER parsing routines hits a bad file</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.TinkerFileError.args">
@@ -833,7 +850,7 @@ package</p>
 <dl class="exception">
 <dt id="chemistry.exceptions.TinkerKeyFileError">
 <em class="property">exception </em><tt class="descclassname">chemistry.exceptions.</tt><tt class="descname">TinkerKeyFileError</tt><big>(</big><em>msg='Error'</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/exceptions.html#TinkerKeyFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.exceptions.TinkerKeyFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.TinkerFileError" title="chemistry.exceptions.TinkerFileError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.TinkerFileError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.exceptions.ParsingError" title="chemistry.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.exceptions.ParsingError</span></tt></a></p>
 <p>When a keyword control file is invalid</p>
 <dl class="attribute">
 <dt id="chemistry.exceptions.TinkerKeyFileError.args">
@@ -891,7 +908,7 @@ package</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

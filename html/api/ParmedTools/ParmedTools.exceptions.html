@@ -275,16 +275,34 @@
 <dl class="exception">
 <dt id="ParmedTools.exceptions.FileDoesNotExist">
 <em class="property">exception </em><tt class="descclassname">ParmedTools.exceptions.</tt><tt class="descname">FileDoesNotExist</tt><big>(</big><em>msg='parmed error'</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/exceptions.html#FileDoesNotExist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ParmedTools.exceptions.ParmError" title="ParmedTools.exceptions.ParmError"><tt class="xref py py-class docutils literal"><span class="pre">ParmedTools.exceptions.ParmError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#ParmedTools.exceptions.ParmError" title="ParmedTools.exceptions.ParmError"><tt class="xref py py-class docutils literal"><span class="pre">ParmedTools.exceptions.ParmError</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">exceptions.IOError</span></tt></p>
 <dl class="attribute">
 <dt id="ParmedTools.exceptions.FileDoesNotExist.args">
 <tt class="descname">args</tt><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist.args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="ParmedTools.exceptions.FileDoesNotExist.errno">
+<tt class="descname">errno</tt><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist.errno" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception errno</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ParmedTools.exceptions.FileDoesNotExist.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception filename</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="ParmedTools.exceptions.FileDoesNotExist.message">
 <tt class="descname">message</tt><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist.message" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ParmedTools.exceptions.FileDoesNotExist.strerror">
+<tt class="descname">strerror</tt><a class="headerlink" href="#ParmedTools.exceptions.FileDoesNotExist.strerror" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception strerror</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -548,7 +566,7 @@
 <dl class="exception">
 <dt id="ParmedTools.exceptions.ParmIndexError">
 <em class="property">exception </em><tt class="descclassname">ParmedTools.exceptions.</tt><tt class="descname">ParmIndexError</tt><big>(</big><em>msg='parmed error'</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/exceptions.html#ParmIndexError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.exceptions.ParmIndexError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ParmedTools.exceptions.ParmError" title="ParmedTools.exceptions.ParmError"><tt class="xref py py-class docutils literal"><span class="pre">ParmedTools.exceptions.ParmError</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#ParmedTools.exceptions.ParmError" title="ParmedTools.exceptions.ParmError"><tt class="xref py py-class docutils literal"><span class="pre">ParmedTools.exceptions.ParmError</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">exceptions.IndexError</span></tt></p>
 <dl class="attribute">
 <dt id="ParmedTools.exceptions.ParmIndexError.args">
 <tt class="descname">args</tt><a class="headerlink" href="#ParmedTools.exceptions.ParmIndexError.args" title="Permalink to this definition">¶</a></dt>
@@ -798,7 +816,7 @@
 
 <dl class="method">
 <dt id="ParmedTools.exceptions.WarningList.dump">
-<tt class="descname">dump</tt><big>(</big><em>dest=&lt;open file '&lt;stderr&gt;'</em>, <em>mode 'w' at 0x10c7d71e0&gt;</em>, <em>ncols=80</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/exceptions.html#WarningList.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.exceptions.WarningList.dump" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dump</tt><big>(</big><em>dest=&lt;open file '&lt;stderr&gt;'</em>, <em>mode 'w' at 0x7f12976701e0&gt;</em>, <em>ncols=80</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/exceptions.html#WarningList.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.exceptions.WarningList.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump a list of all warnings to the destination</p>
 </dd></dl>
 
@@ -913,7 +931,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

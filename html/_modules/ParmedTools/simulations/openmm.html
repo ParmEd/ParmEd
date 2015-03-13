@@ -941,7 +941,7 @@
         <span class="c"># delete that file</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mktemp</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s">&#39;.parm7&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">parm</span><span class="o">.</span><span class="n">writeParm</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">write_parm</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
             <span class="n">parm_</span> <span class="o">=</span> <span class="n">amberprmtopfile</span><span class="o">.</span><span class="n">AmberPrmtopFile</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
@@ -1252,7 +1252,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

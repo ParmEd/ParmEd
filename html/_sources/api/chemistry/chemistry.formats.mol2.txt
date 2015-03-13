@@ -1,0 +1,7 @@
+chemistry.formats.mol2 module
+=============================
+
+.. automodule:: chemistry.formats.mol2
+    :members:
+    :undoc-members:
+    :show-inheritance:

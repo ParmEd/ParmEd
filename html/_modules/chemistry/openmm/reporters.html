@@ -633,8 +633,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)</span>
             <span class="c"># First time written</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="n">hasvels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">write_velocities</span><span class="p">,</span>
-                             <span class="n">hasbox</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span>
                              <span class="n">title</span><span class="o">=</span><span class="s">&#39;Restart file written by ParmEd with OpenMM&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getTime</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">)</span>
         <span class="n">flatcrd</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
@@ -964,7 +963,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

@@ -177,13 +177,13 @@
 <div class="viewcode-block" id="InputError"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.InputError">[docs]</a><span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="ParmIndexError"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.ParmIndexError">[docs]</a><span class="k">class</span> <span class="nc">ParmIndexError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
+<div class="viewcode-block" id="ParmIndexError"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.ParmIndexError">[docs]</a><span class="k">class</span> <span class="nc">ParmIndexError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="FileExists"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.FileExists">[docs]</a><span class="k">class</span> <span class="nc">FileExists</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="FileDoesNotExist"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.FileDoesNotExist">[docs]</a><span class="k">class</span> <span class="nc">FileDoesNotExist</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
+<div class="viewcode-block" id="FileDoesNotExist"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.FileDoesNotExist">[docs]</a><span class="k">class</span> <span class="nc">FileDoesNotExist</span><span class="p">(</span><span class="n">ParmError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="ChamberError"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.exceptions.html#ParmedTools.exceptions.ChamberError">[docs]</a><span class="k">class</span> <span class="nc">ChamberError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
@@ -271,7 +271,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

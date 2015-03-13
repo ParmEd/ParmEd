@@ -8,8 +8,8 @@
     
     <title>chemistry.structure.read_PDB &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,13 +20,11 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="The structure module" href="../structure.html" />
-    <link rel="next" title="chemistry.structure.read_CIF" href="chemistry.structure.read_CIF.html" /> 
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,11 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="chemistry.structure.read_CIF.html" title="chemistry.structure.read_CIF"
-             accesskey="N">next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../structure.html" accesskey="U">The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,38 +47,6 @@
             
   <div class="section" id="chemistry-structure-read-pdb">
 <h1>chemistry.structure.read_PDB<a class="headerlink" href="#chemistry-structure-read-pdb" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="chemistry.structure.read_PDB">
-<tt class="descclassname">chemistry.structure.</tt><tt class="descname">read_PDB</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../modules/chemistry/structure.html#read_PDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.read_PDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
-<blockquote>
-<div><p>Name of PDB file to read, or a file-like object that can iterate over
-the lines of a PDB. Compressed file names can be specified and are
-determined by file-name extension (e.g., file.pdb.gz, file.pdb.bz2)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure</p>
-<p><strong>structure</strong> : <a class="reference internal" href="chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
-<blockquote class="last">
-<div><p>The Structure object initialized with all of the information from the
-PDB file.  No bonds or other topological features are added by default.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The returned structure has an extra attribute, pdbxyz, that contains all of
-the coordinates for all of the frames in the PDB file as a list of NATOM*3
-lists.</p>
-</dd></dl>
-
 </div>
 
 
@@ -95,7 +57,7 @@ lists.</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/structobj/chemistry.structure.read_PDB.txt"
+    <li><a href="../_sources/structobj/chemistry.structure.read_PDB.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -124,11 +86,7 @@ lists.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="chemistry.structure.read_CIF.html" title="chemistry.structure.read_CIF"
-             >next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../structure.html" >The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

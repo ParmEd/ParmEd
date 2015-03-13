@@ -8,8 +8,8 @@
     
     <title>chemistry.amber.ChamberParm &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The chemistry.amber package" href="../amber.html" /> 
@@ -157,14 +157,14 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.delete_flag" title="chemistry.amber.ChamberParm.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.delete_mask" title="chemistry.amber.ChamberParm.delete_mask"><tt class="xref py py-obj docutils literal"><span class="pre">delete_mask</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.fill_LJ" title="chemistry.amber.ChamberParm.fill_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.fill_LJ" title="chemistry.amber.ChamberParm.fill_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></tt></a>()</td>
 <td>Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop files, by undoing the canonical combining rules.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.has_NBFIX" title="chemistry.amber.ChamberParm.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.has_NBFIX" title="chemistry.amber.ChamberParm.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
 <td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.id_format" title="chemistry.amber.ChamberParm.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.initialize_topology" title="chemistry.amber.ChamberParm.initialize_topology"><tt class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></tt></a>([rst7_name])</td>
 <td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
@@ -241,61 +241,64 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.omm_urey_bradley_force" title="chemistry.amber.ChamberParm.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.prune_empty_terms" title="chemistry.amber.ChamberParm.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.parse" title="chemistry.amber.ChamberParm.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<td>Meant for use with the automatic file loader, this will automatically</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.prune_empty_terms" title="chemistry.amber.ChamberParm.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.ptr" title="chemistry.amber.ChamberParm.ptr"><tt class="xref py py-obj docutils literal"><span class="pre">ptr</span></tt></a>(pointer)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.ptr" title="chemistry.amber.ChamberParm.ptr"><tt class="xref py py-obj docutils literal"><span class="pre">ptr</span></tt></a>(pointer)</td>
 <td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm" title="chemistry.amber.ChamberParm.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm" title="chemistry.amber.ChamberParm.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_old" title="chemistry.amber.ChamberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_old" title="chemistry.amber.ChamberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
 <td>This reads an old-style topology file and stores the results in the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_slow" title="chemistry.amber.ChamberParm.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_slow" title="chemistry.amber.ChamberParm.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
 <td>Parses the Amber format file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.recalculate_LJ" title="chemistry.amber.ChamberParm.recalculate_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.recalculate_LJ" title="chemistry.amber.ChamberParm.recalculate_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></tt></a>()</td>
 <td>Takes the values of the LJ_radius and LJ_depth arrays and recalculates the LENNARD_JONES_A/BCOEF topology sections from the canonical combining rules.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rediscover_molecules" title="chemistry.amber.ChamberParm.rediscover_molecules"><tt class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></tt></a>([solute_ions,&nbsp;fix_broken])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rediscover_molecules" title="chemistry.amber.ChamberParm.rediscover_molecules"><tt class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></tt></a>([solute_ions,&nbsp;fix_broken])</td>
 <td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.remake_parm" title="chemistry.amber.ChamberParm.remake_parm"><tt class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.remake_parm" title="chemistry.amber.ChamberParm.remake_parm"><tt class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></tt></a>()</td>
 <td>Fills <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> from the data in the parameter and topology</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.set_version" title="chemistry.amber.ChamberParm.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.set_version" title="chemistry.amber.ChamberParm.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
 <td>Sets the version string</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.strip" title="chemistry.amber.ChamberParm.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.strip" title="chemistry.amber.ChamberParm.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.unchange" title="chemistry.amber.ChamberParm.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.unchange" title="chemistry.amber.ChamberParm.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.update_dihedral_exclusions" title="chemistry.amber.ChamberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.update_dihedral_exclusions" title="chemistry.amber.ChamberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.view" title="chemistry.amber.ChamberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.view" title="chemistry.amber.ChamberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.writeOFF" title="chemistry.amber.ChamberParm.writeOFF"><tt class="xref py py-obj docutils literal"><span class="pre">writeOFF</span></tt></a>([off_file])</td>
-<td>Writes an OFF file from all of the residues found in a prmtop</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_cif" title="chemistry.amber.ChamberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_cif" title="chemistry.amber.ChamberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_parm" title="chemistry.amber.ChamberParm.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_pdb" title="chemistry.amber.ChamberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_pdb" title="chemistry.amber.ChamberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_rst7" title="chemistry.amber.ChamberParm.write_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></tt></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_psf" title="chemistry.amber.ChamberParm.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_rst7" title="chemistry.amber.ChamberParm.write_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></tt></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -346,8 +349,8 @@ correctly dispatch the object to the &#8216;correct&#8217; flavor of AmberParm</
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.delete_flag" title="chemistry.amber.ChamberParm.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.delete_mask" title="chemistry.amber.ChamberParm.delete_mask"><tt class="xref py py-obj docutils literal"><span class="pre">delete_mask</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ChamberParm.delete_mask</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.fill_LJ" title="chemistry.amber.ChamberParm.fill_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></tt></a>()</td>
 <td>Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop files, by undoing the canonical combining rules.</td>
@@ -439,7 +442,7 @@ correctly dispatch the object to the &#8216;correct&#8217; flavor of AmberParm</
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm" title="chemistry.amber.ChamberParm.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_old" title="chemistry.amber.ChamberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_old" title="chemistry.amber.ChamberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
 <td>This reads an old-style topology file and stores the results in the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.rdparm_slow" title="chemistry.amber.ChamberParm.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
@@ -469,20 +472,20 @@ correctly dispatch the object to the &#8216;correct&#8217; flavor of AmberParm</
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.view" title="chemistry.amber.ChamberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.writeOFF" title="chemistry.amber.ChamberParm.writeOFF"><tt class="xref py py-obj docutils literal"><span class="pre">writeOFF</span></tt></a>([off_file])</td>
-<td>Writes an OFF file from all of the residues found in a prmtop</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">ChamberParm.writeOFF</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_cif" title="chemistry.amber.ChamberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_cif" title="chemistry.amber.ChamberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_parm" title="chemistry.amber.ChamberParm.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_pdb" title="chemistry.amber.ChamberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_pdb" title="chemistry.amber.ChamberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.ChamberParm.write_rst7" title="chemistry.amber.ChamberParm.write_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></tt></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
@@ -918,28 +921,6 @@ of freedom will <em>still</em> be constrained).</p>
 <dd><p>Removes a flag from the topology file</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="chemistry.amber.ChamberParm.delete_mask">
-<tt class="descname">delete_mask</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.delete_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : AmberMask, str, or iterable of bool</p>
-<blockquote class="last">
-<div><p>This is the selection of atoms that will be deleted from this
-structure. If it is a string, it will be interpreted as an
-AmberMask. If it is an AmberMask, it will be converted to a
-selection of atoms. If it is an iterable, it must be the same length
-as the <cite>atoms</cite> list.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="chemistry.amber.ChamberParm.dihedrals_inc_h">
 <tt class="descname">dihedrals_inc_h</tt><a class="headerlink" href="#chemistry.amber.ChamberParm.dihedrals_inc_h" title="Permalink to this definition">¶</a></dt>
@@ -974,6 +955,31 @@ does not match the combined L-J parameters for that pair).</p>
 <blockquote class="last">
 <div><p>If True, off-diagonal elements in the combined Lennard-Jones matrix
 exist. If False, they do not.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.amber.ChamberParm.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as either Amber-format file (like prmtop) or an
+old-style topology file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber-style format, False otherwise</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1512,6 +1518,15 @@ for this system</p>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="chemistry.amber.ChamberParm.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meant for use with the automatic file loader, this will automatically
+return a subclass of AmberFormat corresponding to what the information
+in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
+AmoebaParm, or AmberFormat)</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="chemistry.amber.ChamberParm.positions">
 <tt class="descname">positions</tt><a class="headerlink" href="#chemistry.amber.ChamberParm.positions" title="Permalink to this definition">¶</a></dt>
@@ -1561,9 +1576,26 @@ it&#8217;s case-insensitive. A non-existent pointer meets with a KeyError</p>
 
 <dl class="method">
 <dt id="chemistry.amber.ChamberParm.rdparm_old">
-<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.rdparm_old" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.rdparm_old" title="Permalink to this definition">¶</a></dt>
 <dd><p>This reads an old-style topology file and stores the results in the
 same data structures as a new-style topology file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prmtop_lines</strong> : list of str</p>
+<blockquote>
+<div><p>List of all lines in the prmtop file</p>
+</div></blockquote>
+<p><strong>check</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, only the first couple sections will be read to determine if
+this is, in fact, an old-style topology file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1690,20 +1722,18 @@ be converted into</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="chemistry.amber.ChamberParm.writeOFF">
-<tt class="descname">writeOFF</tt><big>(</big><em>off_file='off.lib'</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.writeOFF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes an OFF file from all of the residues found in a prmtop</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="chemistry.amber.ChamberParm.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
@@ -1773,26 +1803,30 @@ given name.</p>
 
 <dl class="method">
 <dt id="chemistry.amber.ChamberParm.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.write_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a PDB file from the current Structure instance</p>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
-it was assigned previously</p>
+it was assigned previously. Default is True</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -1800,7 +1834,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : str, optional</p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -1817,21 +1851,56 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : bool, optional</p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written</p>
+False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
-<p><strong>charmm</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>charmm</strong> : bool, optional</p>
 <blockquote class="last">
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
-atom that does not contain a SEGID identifier.</p>
+atom that does not contain a SEGID identifier. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.amber.ChamberParm.write_psf">
+<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.ChamberParm.write_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1874,7 +1943,7 @@ explicit value for <cite>netcdf</cite> will override any filename extensions.</p
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/amberobj/chemistry.amber.ChamberParm.txt"
+    <li><a href="../_sources/amberobj/chemistry.amber.ChamberParm.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

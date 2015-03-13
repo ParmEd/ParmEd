@@ -1,0 +1,36 @@
+chemistry.topologyobjects.AtomList
+==================================
+
+.. currentmodule:: chemistry.topologyobjects
+
+.. autoclass:: AtomList
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AtomList.__init__
+      ~AtomList.append
+      ~AtomList.assign_nbidx_from_types
+      ~AtomList.claim
+      ~AtomList.count
+      ~AtomList.extend
+      ~AtomList.index
+      ~AtomList.index_members
+      ~AtomList.insert
+      ~AtomList.pop
+      ~AtomList.prune_unused
+      ~AtomList.remove
+      ~AtomList.reverse
+      ~AtomList.sort
+      ~AtomList.unmark
+   
+   
+
+   
+   
+   

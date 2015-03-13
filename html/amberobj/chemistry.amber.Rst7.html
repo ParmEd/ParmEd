@@ -8,8 +8,8 @@
     
     <title>chemistry.amber.Rst7 &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The chemistry.amber package" href="../amber.html" /> 
@@ -51,7 +51,7 @@
 <h1>chemistry.amber.Rst7<a class="headerlink" href="#chemistry-amber-rst7" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.amber.Rst7">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.</tt><tt class="descname">Rst7</tt><big>(</big><em>filename=None</em>, <em>natom=None</em>, <em>title=''</em>, <em>hasvels=False</em>, <em>hasbox=False</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.Rst7" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.amber.</tt><tt class="descname">Rst7</tt><big>(</big><em>filename=None</em>, <em>natom=None</em>, <em>title=''</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.Rst7" title="Permalink to this definition">¶</a></dt>
 <dd><p>Amber input coordinate (or restart coordinate) file. Front-end for the
 readers and writers, supports both NetCDF and ASCII restarts.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -74,15 +74,6 @@ coordinates. If not provided for a new file, it <em>must</em> be set later.</p>
 <blockquote>
 <div><p>For a file that is to be written, this is the title that will be given
 to that file. Default is an empty string</p>
-</div></blockquote>
-<p><strong>hasvels</strong> : bool, deprecated</p>
-<blockquote>
-<div><p>This variable has no effect. The presence of vels is detected by whether
-or not velocities have been set</p>
-</div></blockquote>
-<p><strong>hasbox</strong> : bool, deprecated</p>
-<blockquote>
-<div><p>This variable has no effect (see the reason for hasvels, above)</p>
 </div></blockquote>
 <p><strong>time</strong> : float, optional</p>
 <blockquote class="last">
@@ -139,7 +130,7 @@ or not velocities have been set</p>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.Rst7.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>filename=None</em>, <em>natom=None</em>, <em>title=''</em>, <em>hasvels=False</em>, <em>hasbox=False</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.Rst7.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>filename=None</em>, <em>natom=None</em>, <em>title=''</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.Rst7.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optionally takes a filename to read. This is deprecated, though, as the
 alternative constructor &#8220;open&#8221; should be used instead</p>
 </dd></dl>
@@ -151,7 +142,7 @@ alternative constructor &#8220;open&#8221; should be used instead</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.Rst7.__init__" title="chemistry.amber.Rst7.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([filename,&nbsp;natom,&nbsp;title,&nbsp;hasvels,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.Rst7.__init__" title="chemistry.amber.Rst7.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([filename,&nbsp;natom,&nbsp;title,&nbsp;time])</td>
 <td>Optionally takes a filename to read.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.Rst7.copy_from" title="chemistry.amber.Rst7.copy_from"><tt class="xref py py-obj docutils literal"><span class="pre">copy_from</span></tt></a>(thing)</td>
@@ -271,7 +262,7 @@ instance</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../sources/amberobj/chemistry.amber.Rst7.txt"
+    <li><a href="../_sources/amberobj/chemistry.amber.Rst7.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
