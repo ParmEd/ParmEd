@@ -314,7 +314,7 @@ The :class:`Cmap` class
 -----------------------
 
 The :class:`Cmap` class is a correction map defined between adjacent torsions
-(i.e., 5 atoms separated by 4 bonds). Like the other valence terms deNatali Di Russo <natalidirusso@gmail.com>scribed
+(i.e., 5 atoms separated by 4 bonds). Like the other valence terms described
 above, it contains 5 :class:`Atom` instances and may contain 4 :class:`Bond`
 instances (as tested via the ``in`` operator). See the API documentation for
 :class:`Cmap` for more details.
