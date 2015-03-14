@@ -3,6 +3,7 @@ language: python
 install:
       # conda stuff
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+    - bash Miniconda-latest-Linux-x86_64.sh -b
     - export PATH=$HOME/miniconda/bin:$PATH
     - conda config --add channels http://conda.binstar.org/colli_r
     - conda config --add channels http://conda.binstar.org/rmcgibbo
