@@ -171,7 +171,7 @@ class TestNonParmActions(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
-class TestAmberParmActions(unittest.TestCase):
+class TestAmberParmActions(utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
     def setUp(self):
@@ -187,14 +187,6 @@ class TestAmberParmActions(unittest.TestCase):
             os.rmdir(get_fn('writes'))
         except OSError:
             pass
-
-    def assertRelativeEqual(self, val1, val2, places=7):
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
 
     def _empty_writes(self):
         """ Empty the "writes" directory """
@@ -1013,7 +1005,7 @@ class TestAmberParmActions(unittest.TestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestChamberParmActions(unittest.TestCase):
+class TestChamberParmActions(utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
     def setUp(self):
@@ -1029,14 +1021,6 @@ class TestChamberParmActions(unittest.TestCase):
             os.rmdir(get_fn('writes'))
         except OSError:
             pass
-
-    def assertRelativeEqual(self, val1, val2, places=7):
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
 
     def _empty_writes(self):
         """ Empty the "writes" directory """
@@ -1847,7 +1831,7 @@ class TestChamberParmActions(unittest.TestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestAmoebaParmActions(unittest.TestCase):
+class TestAmoebaParmActions(utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
     def setUp(self):
@@ -1863,14 +1847,6 @@ class TestAmoebaParmActions(unittest.TestCase):
             os.rmdir(get_fn('writes'))
         except OSError:
             pass
-
-    def assertRelativeEqual(self, val1, val2, places=7):
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
 
     def _empty_writes(self):
         """ Empty the "writes" directory """
