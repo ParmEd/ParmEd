@@ -170,7 +170,7 @@ class TestAmberParm(utils.TestCaseRelative):
             for x1, x2 in zip(p, s):
                 # Compare large forces relatively and small ones absolutely
                 if abs(x1) > 1 or abs(x2) > 1:
-                    self.assertRelativeEqual(x1, x2, places=3)
+                    self.assertRelativeEqual(x1, x2, delta=5e-3)
                 else:
                     self.assertAlmostEqual(x1, x2, delta=5e-3)
             i += 1
@@ -513,7 +513,7 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 26.3947079, places=3)
         self.assertAlmostEqual(energies['angle'], 122.8243431, places=3)
         self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=3)
-        self.assertAlmostEqual(energies['nonbond'], -2133.6170786, places=3)
+        self.assertAlmostEqual(energies['nonbond'], -2133.6170786, delta=2e-3)
 
     def test1012(self):
         """ Testing the 10-12 LJ H-bond potential in OpenMM """

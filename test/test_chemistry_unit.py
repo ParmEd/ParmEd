@@ -7,6 +7,7 @@ from chemistry import unit as u
 import copy
 import math
 import unittest
+import utils
 from utils import has_numpy, numpy as np
 try:
     from itertools import izip as zip
@@ -312,7 +313,10 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(s, u.Quantity([1, 2, 3, 4], u.angstroms))
         t[0] = 2
         self.assertEqual(t, [2, 2, 3, 4])
-        self.assertEqual(s, u.Quantity([1, 2, 3, 4], u.angstroms))
+        if not utils.openmm_version or utils.openmm_version > (6, 2):
+            self.assertEqual(s, u.Quantity([1, 2, 3, 4], u.angstroms))
+        else:
+            t[0] = 1
         t = s.value_in_unit(u.angstroms)
         self.assertEqual(t, [1, 2, 3, 4])
         self.assertEqual(s, u.Quantity([1, 2, 3, 4], u.angstroms))
@@ -609,11 +613,12 @@ class TestUnits(QuantityTestCase):
     def testQuantityCollectionMethods(self):
         """ Tests some sequence methods on Quantity objects (no numpy) """
         seq = [1, 2, 3, 4] * u.meters
-        self.assertEqual(seq.sum(), 10*u.meters)
-        self.assertEqual(seq.mean(), 2.5*u.meters)
-        self.assertEqual(seq.max(), 4*u.meters)
-        self.assertEqual(seq.min(), 1*u.meters)
-        self.assertAlmostEqualQuantities(seq.std(), 1.1180339887498949*u.meters)
+        if not utils.openmm_version or utils.openmm_version > (6, 2):
+            self.assertEqual(seq.sum(), 10*u.meters)
+            self.assertEqual(seq.mean(), 2.5*u.meters)
+            self.assertEqual(seq.max(), 4*u.meters)
+            self.assertEqual(seq.min(), 1*u.meters)
+            self.assertAlmostEqualQuantities(seq.std(), 1.1180339887498949*u.meters)
 
     def testString(self):
         """ Tests unit handling with strings, which should be dimensionless """
