@@ -143,6 +143,7 @@ class TestReadParm(unittest.TestCase):
                          parm.parm_data['ATOM_NAME'])
         self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
+        self.assertFalse(parm.has_1012())
 
     def _solv_pointer_tests(self, parm):
         self.assertEqual(parm.ptr('nspm'),

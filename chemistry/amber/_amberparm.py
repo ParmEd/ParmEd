@@ -725,7 +725,7 @@ class AmberParm(AmberFormat, Structure):
          
         for i in xrange(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
+            if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
                 self.LJ_radius.append(0)
                 self.LJ_depth.append(0)
             else:
@@ -752,6 +752,10 @@ class AmberParm(AmberFormat, Structure):
         for i in xrange(ntypes):
             for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                if index < 0:
+                    pd['LENNARD_JONES_ACOEF'][-index] = 0.0
+                    pd['LENNARD_JONES_BCOEF'][-index] = 0.0
+                    continue
                 rij = self.LJ_radius[i] + self.LJ_radius[j]
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
@@ -776,6 +780,7 @@ class AmberParm(AmberFormat, Structure):
         for i in xrange(ntypes):
             for j in xrange(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                if idx < 0: continue
                 rij = self.LJ_radius[i] + self.LJ_radius[j]
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
@@ -786,6 +791,40 @@ class AmberParm(AmberFormat, Structure):
                 elif (abs((a - (wdij * rij**12)) / a) > 1e-6 or
                         abs((b - (2 * wdij * rij**6)) / b) > 1e-6):
                     return True
+        return False
+
+    #===================================================
+
+    def has_1012(self):
+        """
+        This routine determines whether there are any defined 10-12
+        Lennard-Jones interactions that are non-zero
+
+        Returns
+        -------
+        has_10_12 : bool
+            If True, 10-12 interactions *are* defined for this particular system
+        """
+        indices_with_1012 = []
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
+                idx = self.parm_data['NONBONDED_PARM_INDEX'][i*ntypes+j] - 1
+                if idx >= 0: continue
+                # It was negative, so we should have ADDED 1 to adjust for
+                # indexing from 0
+                idx = -idx - 2
+                a = self.parm_data['HBOND_ACOEF'][idx]
+                b = self.parm_data['HBOND_BCOEF'][idx]
+                if a == 0 and b == 0: continue
+                indices_with_1012.append((i, j))
+        if not indices_with_1012: return False
+        # Now make sure that some of the atoms *have* those indices
+        active_indices = set()
+        for atom in self.atoms: active_indices.add(atom.nb_idx-1)
+        for i, j in indices_with_1012:
+            if i in active_indices and j in active_indices:
+                return True
         return False
 
     #===================================================
@@ -897,6 +936,7 @@ class AmberParm(AmberFormat, Structure):
                 ewaldErrorTolerance, reactionFieldDielectric
         )
         hasnbfix = self.has_NBFIX()
+        has1012 = self.has_1012()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
         if not hasnbfix and not has1264:
             return nonbfrc
@@ -939,6 +979,7 @@ class AmberParm(AmberFormat, Structure):
             for i in xrange(ntypes):
                 for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
+                    if idx < 0: continue
                     ii = i + ntypes * j
                     acoef[ii] = sqrt(parm_acoef[idx]) * afac
                     bcoef[ii] = parm_bcoef[idx] * bfac
@@ -972,6 +1013,7 @@ class AmberParm(AmberFormat, Structure):
             for i in xrange(ntypes):
                 for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
+                    if idx < 0: continue
                     ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
             force.addTabulatedFunction('ccoef',
                     mm.Discrete2DFunction(ntypes, ntypes, ccoef))
@@ -1638,12 +1680,15 @@ class AmberParm(AmberFormat, Structure):
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
-            a = acoef[idx]
-            b = bcoef[idx]
+            if idx >= 0:
+                a = acoef[idx]
+                b = bcoef[idx]
+            else:
+                a = b = 0
             if b == 0:
                 epsilon = 0.0
                 sigma = 0.5
-            else:
+            elif idx >= 0:
                 # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
                 rmin = (a / b * 2)**(1/6)
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
