@@ -1,3 +1,0 @@
-numpy
-netCDF4
-pandas
