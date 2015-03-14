@@ -11,6 +11,7 @@ install:
     - conda install -y pandas
     - conda install -y openmm
     - conda install -y netcdf4
+    - conda install -y nose
       # install our package
     - python setup.py install
 
