@@ -1,13 +1,16 @@
 language: python
 
+python:
+    - "2.7"
+    - "3.4"
+
 install:
     - sudo apt-get install -y g++ gcc gfortran
       # conda stuff
-    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
-    - bash Miniconda-latest-Linux-x86_64.sh -b
+    - cv=`python -c "import sys; print(sys.version_info[0] if sys.version_info[0] > 2 else '')"`
+    - wget http://repo.continuum.io/miniconda/Miniconda${cv}-latest-Linux-x86_64.sh
+    - bash Miniconda${cv}-latest-Linux-x86_64.sh -b
     - export PATH=$HOME/miniconda/bin:$PATH
-    - conda config --add channels http://conda.binstar.org/colli_r
-    - conda config --add channels http://conda.binstar.org/rmcgibbo
     - conda config --add channels http://conda.binstar.org/omnia
     - conda install -y pandas
     - conda install -y openmm
@@ -16,12 +19,6 @@ install:
       # install our package
     - python setup.py install
 
-env:
-    matrix:
-        - python=2.6  CONDA_PY=26  CONDA_NPY=16
-        - python=2.7  CONDA_PY=27  CONDA_NPY=18
-        - python=3.3  CONDA_PY=33  CONDA_NPY=17
-        - python=3.4  CONDA_PY=34  CONDA_NPY=19
 script:
     - cd test
     - nosetests -vs .
