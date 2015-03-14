@@ -938,7 +938,7 @@ class AmberParm(AmberFormat, Structure):
         hasnbfix = self.has_NBFIX()
         has1012 = self.has_1012()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
-        if not hasnbfix and not has1264:
+        if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
 
         # We need a CustomNonbondedForce... determine what it needs to calculate
@@ -975,14 +975,14 @@ class AmberParm(AmberFormat, Structure):
                                                 'b=bcoef(type1, type2);')
         elif has1264:
             if has1012:
-                force = mm.CustomNonbondedForce('-c/r^4+ah/r^12-bh/r^6;'
+                force = mm.CustomNonbondedForce('-c/r^4+ah/r^12-bh/r^10;'
                                                 'c=ccoef(type1, type2);'
                                                 'ah=ahcoef(type1, type2);'
                                                 'bh=bhcoef(type1, type2);')
             else:
                 force = mm.CustomNonbondedForce('-c/r^4;c=ccoef(type1, type2);')
         elif has1012:
-            force = mm.CustomNonbondedForce('a/r^12-b/r^6;'
+            force = mm.CustomNonbondedForce('a/r^12-b/r^10;'
                                             'a=ahcoef(type1, type2);'
                                             'b=bhcoef(type1, type2);')
 
@@ -1022,16 +1022,13 @@ class AmberParm(AmberFormat, Structure):
                         idx = -idx - 2 # Fix adjust for 0 since it was negative
                         ahcoef[ii] = parm_ahcoef[idx] * ahfac
                         bhcoef[ii] = parm_bhcoef[idx] * bhfac
-                        acoef[ii] = bcoef[ii] = 0.0
-                        if has_1264:
+                        if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
                     elif idx >= 0:
                         acoef[ii] = sqrt(parm_acoef[idx]) * afac
                         bcoef[ii] = parm_bcoef[idx] * bfac
                         if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
-                        if has1012:
-                            ahcoef[ii] = bhcoef[ii] = 0.0
             force.addTabulatedFunction('acoef',
                     mm.Discrete2DFunction(ntypes, ntypes, acoef))
             force.addTabulatedFunction('bcoef',
@@ -1062,23 +1059,24 @@ class AmberParm(AmberFormat, Structure):
                 parm_ahcoef = self.parm_data['HBOND_ACOEF']
                 parm_bhcoef = self.parm_data['HBOND_BCOEF']
             cfac = ene_conv * length_conv**4
+            ahfac = ene_conv * length_conv**12
+            bhfac = ene_conv * length_conv**10
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in xrange(ntypes):
                 for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
-                    if idx < 0 and has_1012:
+                    if idx < 0 and has1012:
                         idx = -idx - 2 # Fix adjust for 0 since it was negative
                         ahcoef[i+ntypes*j] = parm_ahcoef[idx] * ahfac
                         bhcoef[i+ntypes*j] = parm_bhcoef[idx] * bhfac
-                        if has_1264:
+                        if has1264:
                             ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
                     elif idx > 0:
                         if has1264:
                             ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
-                        if has1012:
-                            ahcoef[i+ntypes*j] = bhcoef[i+ntypes*j] = 0.0
-            force.addTabulatedFunction('ccoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+            if has1264:
+                force.addTabulatedFunction('ccoef',
+                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Copy the exclusions
             for ii in xrange(nonbfrc.getNumExceptions()):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)

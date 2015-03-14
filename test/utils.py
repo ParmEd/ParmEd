@@ -64,6 +64,30 @@ if not hasattr(unittest.TestCase, 'assertIsInstance'):
 
     unittest.TestCase = TestCase
 
+class TestCaseRelative(unittest.TestCase):
+
+    def assertRelativeEqual(self, val1, val2, places=7, delta=None):
+        if val1 == val2: return
+        try:
+            ratio = val1 / val2
+        except ZeroDivisionError:
+            return self.assertAlmostEqual(val1, val2, places=places)
+        else:
+            if delta is None:
+                if abs(round(ratio - 1, places)) == 0:
+                    return
+                raise self.failureException(
+                            '%s != %s with relative tolerance %g (%f)' %
+                            (val1, val2, 10**-places, ratio)
+                )
+            else:
+                if abs(ratio - 1) < delta:
+                    return
+                raise self.failureException(
+                            '%s != %s with relative tolerance %g (%f)' %
+                            (val1, val2, delta, ratio))
+
+
 def get_fn(filename, written=False):
     """
     Gets the full path of the file name for a particular test file

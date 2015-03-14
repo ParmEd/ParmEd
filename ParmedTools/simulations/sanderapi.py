@@ -92,6 +92,8 @@ def energy(parm, args, output=sys.stdout):
                       e.vdw_14, e.elec_14, e.vdw, e.elec))
         if igb != 0 and inp.ntb == 0:
             output.write('     Egb      = %20.7f' % e.gb)
+        elif e.hbond != 0:
+            output.write('     EHbond   = %20.7f' % e.hbond)
         output.write('\nTOTAL    = %20.7f\n' % e.tot)
 
     sander.cleanup()
