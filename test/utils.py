@@ -12,7 +12,7 @@ except ImportError:
 
 try:
     from simtk import openmm
-    openmm_version = tuple([int(x) for x in openmm.__version__.split(',')])
+    openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
 except ImportError:
     openmm_version = None
 
