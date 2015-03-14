@@ -10,6 +10,12 @@ try:
 except ImportError:
     numpy = None
 
+try:
+    from simtk import openmm
+    openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
+except ImportError:
+    openmm_version = None
+
 # Patches for older Pythons.
 
 if not hasattr(unittest.TestCase, 'assertIsInstance'):
