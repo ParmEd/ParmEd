@@ -3,23 +3,32 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 """
 
 # Load some system modules that may be useful for various users in shell mode
-import math
 from chemistry.amber.readparm import AmberParm
 import cmd
 from glob import glob
-from ParmedTools import ParmedActions
+import os
+from ParmedTools.ParmedActions import COMMANDMAP, Usages
 from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.exceptions import InterpreterError, ParmError
+try:
+    import readline
+except ImportError:
+    readline = None
 
-# For Python 2.4 support
-if not 'BaseException' in dir(__builtins__):
-    BaseException = Exception
+_COMMANDLOGS = []
 
 def log_commands(func):
     """ Decorator to write the line to a file """
+    global _COMMANDLOGS
     def new_func(self, line, *args, **kwargs):
         if self._logfile is not None and line != 'EOF':
             self._logfile.write('%s\n' % line)
+            if readline is None:
+                _COMMANDLOGS.append(line)
+            try:
+                self._logfile.flush()
+            except AttributeError:
+                pass
         return func(self, line, *args, **kwargs)
 
     return new_func
@@ -124,7 +133,7 @@ class ParmedCmd(cmd.Cmd):
     def do_parmout(self, line):
         # Store this action for later use. This action is unique
         try:
-            self.parmout = ParmedActions.parmout(self.parm, line)
+            self.parmout = COMMANDMAP['parmout'](self.parm, line)
         except ParmError, err:
             self.stdout.write('Action parmout failed.\n\t')
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
@@ -133,7 +142,7 @@ class ParmedCmd(cmd.Cmd):
    
     def _normaldo(self, ActionClass, line):
         """ The standard action command does this stuff """
-        actionname = ParmedActions.Usages[ActionClass.__name__].split()[0]
+        actionname = ActionClass.__name__
         try:
             action = ActionClass(self.parm, line)
             if action.valid:
@@ -152,16 +161,16 @@ class ParmedCmd(cmd.Cmd):
         auto-complete. This eliminates the need to modify the ParmedCmd class
         when a new command is added
         """
-        for _cmd in ParmedActions.Usages:
+        for _cmd, cmdclass in COMMANDMAP.iteritems():
             if _cmd in ('source', 'go', 'EOF', 'quit', 'help', 'parmout'):
                 continue
-            cmdname = ParmedActions.Usages[_cmd].split()[0]
+            cmdname = cmdclass.__name__
             exec('cls.do_%s = lambda self, line: '
-                 'self._normaldo(ParmedActions.%s, line)' % (cmdname, _cmd))
+                 'self._normaldo(COMMANDMAP["%s"], line)' % (cmdname, _cmd))
         cls._populated = True
 
     def do_source(self, line):
-        action = ParmedActions.source(self.parm, line)
+        action = COMMANDMAP['source'](self.parm, line)
         self.stdout.write('%s\n' % action)
         _cmd = ParmedCmd(self.parm, stdin=open(action.filename, 'r'),
                          stdout=self.stdout)
@@ -208,15 +217,26 @@ class ParmedCmd(cmd.Cmd):
         """
         return True
 
+    def do_history(self, line):
+        """
+        Print the command history
+        """
+        global _COMMANDLOGS
+        if readline is None:
+            for line in _COMMANDLOGS:
+                self.stdout.write('%s\n' % line)
+        else:
+            for i in xrange(readline.get_current_history_length()):
+                self.stdout.write('%s\n' % readline.get_history_item(i+1))
+
     def default(self, line):
-        """ Default behavior """
-        mycmd = line.split()[0].lower()
-        if (mycmd in ('lawsuit', 'math', 'warnings') or not
-                hasattr(ParmedActions, mycmd)):
-            self.stdout.write("%s command not recognized\n" % line.split()[0])
-        if hasattr(ParmedActions, mycmd):
-            args = ArgumentList(line.split()[1:])
-            self._normaldo(getattr(ParmedActions, mycmd), args)
+        words = line.split()
+        mycmd = words[0].lower()
+        if mycmd not in COMMANDMAP:
+            self.stdout.write("%s command not recognized\n" % words[0])
+        else:
+            args = ArgumentList(words[1:])
+            self._normaldo(COMMANDMAP[mycmd], args)
 
     def do_shell(self, line):
         """ Support the limited interpreter """
@@ -230,11 +250,15 @@ class ParmedCmd(cmd.Cmd):
         else:
             try:
                 exec(line.strip())
-            except BaseException, err:
+            except Exception, err:
                 self.stdout.write("%s: %s\n" % (type(err).__name__, err))
 
     def completedefault(self, text, line, begidx, endidx):
-        return glob(text + '*')
+        partial = line[:endidx]
+        idx = max(partial.rfind(' '), partial.rfind('\t')) + 1
+        full_token = partial[idx:]
+        beg_token = partial[idx:begidx]
+        return [s.replace(beg_token, '', 1) for s in glob(partial[idx:] + '*')]
 
     def _python_shell(self):
         """ Drop into a limited interpreter and read until we see !! """
@@ -247,7 +271,7 @@ class ParmedCmd(cmd.Cmd):
         try:
             amber_prmtop = self.parm
             exec(python_interpreter.command_string)
-        except BaseException, err:
+        except Exception, err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
     def do_help(self, arg):
@@ -265,13 +289,13 @@ class ParmedCmd(cmd.Cmd):
                 except (AttributeError, TypeError):
                     pass
                 try:
-                    _action = getattr(ParmedActions, arg.lower())
+                    _action = COMMANDMAP[arg.lower()]
                     if _action.needs_parm:
                         doc = '%s [parm <idx>|<name>]\n%s'
                     else:
                         doc = '%s\n%s'
-                    doc = doc % (_fmt_usage(ParmedActions.Usages[arg.lower()]),
-                                getattr(ParmedActions, arg.lower()).__doc__)
+                    doc = doc % (_fmt_usage(Usages[arg.lower()]),
+                                 _action.__doc__)
                     if doc:
                         self.stdout.write("%s\n"%str(doc))
                         return
@@ -302,8 +326,7 @@ class ParmedCmd(cmd.Cmd):
                         del help[cmd]
                     elif getattr(self, name).__doc__:
                         cmds_doc.append(cmd)
-                    elif hasattr(ParmedActions, cmd.lower()) and \
-                            cmd.lower() in ParmedActions.Usages.keys():
+                    elif cmd.lower() in COMMANDMAP and cmd.lower() in Usages:
                         cmds_doc.append(cmd)
                     else:
                         cmds_undoc.append(cmd)
@@ -311,11 +334,6 @@ class ParmedCmd(cmd.Cmd):
             self.print_topics(self.doc_header,   cmds_doc,   15,80)
             self.print_topics(self.misc_header,  help.keys(),15,80)
             self.print_topics(self.undoc_header, cmds_undoc, 15,80)
-
-    def __del__(self):
-        """ Destructor -- make sure the log file is closed if it has one """
-        if self._logfile is not None: 
-            self._logfile.close()
 
 class PythonCmd(cmd.Cmd):
     """ Command interpreter for limited Python interpreter """

@@ -31,6 +31,8 @@ if has_openmm:
     amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
     tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
     tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
+    amber1264 = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
+    amber1012 = AmberParm(get_fn('ff91.parm7'), get_fn('ff91.rst7'))
 
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
@@ -85,22 +87,7 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
         energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
 
-class TestAmberParm(unittest.TestCase):
-
-    def assertRelativeEqual(self, val1, val2, places=7):
-        if val1 == val2: return
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            if abs(round(ratio - 1, places)) == 0:
-                return
-            raise self.failureException(
-                        '%s != %s with relative tolerance %g (%f)' %
-                        (val1, val2, 10**-places, ratio)
-            )
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
+class TestAmberParm(utils.TestCaseRelative):
 
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
@@ -183,9 +170,9 @@ class TestAmberParm(unittest.TestCase):
             for x1, x2 in zip(p, s):
                 # Compare large forces relatively and small ones absolutely
                 if abs(x1) > 1 or abs(x2) > 1:
-                    self.assertRelativeEqual(x1, x2, places=3)
+                    self.assertRelativeEqual(x1, x2, delta=5e-3)
                 else:
-                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+                    self.assertAlmostEqual(x1, x2, delta=5e-3)
             i += 1
 
     def testGasEnergy(self):
@@ -511,6 +498,40 @@ class TestAmberParm(unittest.TestCase):
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
         self.assertAlmostEqual(energies['nonbond'], 1256.3579, 3)
 
+    def test1264(self):
+        """ Testing the 12-6-4 LJ potential in OpenMM """
+        parm = amber1264
+        system = parm.createSystem(nonbondedMethod=app.NoCutoff)
+        for force in system.getForces():
+            if isinstance(force, mm.CustomNonbondedForce):
+                self.assertTrue(force.getUseLongRangeCorrection())
+                force.setUseLongRangeCorrection(False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 26.3947079, places=3)
+        self.assertAlmostEqual(energies['angle'], 122.8243431, places=3)
+        self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=3)
+        self.assertAlmostEqual(energies['nonbond'], -2133.6170786, delta=2e-3)
+
+    def test1012(self):
+        """ Testing the 10-12 LJ H-bond potential in OpenMM """
+        parm = amber1012
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms)
+        for force in system.getForces():
+            if isinstance(force, mm.CustomNonbondedForce):
+                self.assertTrue(force.getUseLongRangeCorrection())
+        integrator = mm.VerletIntegrator(1*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
+        self.assertAlmostEqual(energies['angle'], 82.5853211, places=3)
+        self.assertAlmostEqual(energies['dihedral'], 1.2476012, places=3)
+        self.assertRelativeEqual(energies['nonbond'], -11191.2563220, delta=2e-5)
+
     def testInterfacePBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (periodic) """
         parm = amber_solv_system
@@ -714,23 +735,8 @@ class TestAmberParm(unittest.TestCase):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
 
-class TestChamberParm(unittest.TestCase):
+class TestChamberParm(utils.TestCaseRelative):
     
-    def assertRelativeEqual(self, val1, val2, places=7):
-        if val1 == val2: return
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            if abs(round(ratio - 1, places)) == 0:
-                return
-            raise self.failureException(
-                        '%s != %s with relative tolerance %g (%f)' %
-                        (val1, val2, 10**-places, ratio)
-            )
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
-
     def testGasEnergy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
         parm = chamber_gas_system

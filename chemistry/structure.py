@@ -57,11 +57,20 @@ try:
 except ImportError:
     create_array = lambda x: [float(v) for v in x]
 
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
-    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    try:
+        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    except ImportError:
+        # OpenMM version is too old... only orthorhombic cells supported
+        reducePeriodicBoxVectors = None
 except ImportError:
     app = mm = None
 
@@ -608,6 +617,186 @@ class Structure(object):
 
     #===================================================
 
+    def to_dataframe(self):
+        """ Creates a pandas.DataFrame object from the current Structure
+
+        Returns
+        -------
+        dataframe : :class:`pandas.DataFrame`
+
+        Notes
+        -----
+        The DataFrame will be over all atoms. The columns will be the attributes
+        of the atom (as well as its containing residue). Some columns will
+        *always* exist. Others will only exist if those attributes have been set
+        on the Atom instances (see the :class:`Atom` docs for possible
+        attributes and their meaning). The columns that will always be present
+        are:
+
+            - number : int
+            - name : str
+            - type : str
+            - atomic_number : int
+            - charge : float
+            - mass : float
+            - nb_idx : int
+            - radii : float
+            - screen : float
+            - occupancy : float
+            - bfactor : float
+            - altloc : str
+            - tree : str
+            - join : int
+            - irotat : int
+            - rmin : float
+            - epsilon : float
+            - rmin_14 : float
+            - epsilon_14 : float
+            - resname : str (name of the containing residue)
+            - resid : int (Sequential index of the containing residue)
+            - resnum : int (original residue number in the input structure)
+            - chain : str (chain ID that the containing residue belongs to)
+
+        The following attributes are optionally present if they were present in
+        the original file defining the structure:
+
+            - xx : float (x-coordinate position)
+            - xy : float (y-coordinate position)
+            - xz : float (z-coordinate position)
+            - vx : float (x-coordinate velocity)
+            - vy : float (y-coordinate velocity)
+            - vz : float (z-coordinate velocity)
+            - type_idx : int (integer type index for AMOEBA)
+            - class_idx : int (integer class type index for AMOEBA)
+            - multipole_111 : float (Monopole)
+            - multipole_211 : float (1,1 Dipole component)
+            - multipole_212 : float (1,2 Dipole component)
+            - multipole_222 : float (2,2 Dipole component)
+            - multipole_411 : float (1,1 Quadrupole component)
+            - multipole_412 : float (1,2 Quadrupole component)
+            - multipole_422 : float (2,2 Quadrupole component)
+            - multipole_413 : float (1,3 Quadrupole component)
+            - multipole_423 : float (2,3 Quadrupole component)
+            - multipole_433 : float (3,3 Quadrupole component)
+            - polarizability : float (dipole polarizability)
+            - vdw_parent : int (index of the vdW parent atom of this atom)
+            - segid : segment ID (similar to chain, but for CHARMM)
+            - U11 : float (U[1][1] of anisotropic b-factor tensor)
+            - U22 : float (U[2][2] of anisotropic b-factor tensor)
+            - U33 : float (U[3][3] of anisotropic b-factor tensor)
+            - U12 : float (U[1][2] of anisotropic b-factor tensor)
+            - U13 : float (U[1][3] of anisotropic b-factor tensor)
+            - U23 : float (U[2][3] of anisotropic b-factor tensor)
+        """
+        if pd is None:
+            raise ImportError('pandas is not available; cannot create a pandas '
+                              'DataFrame from this Structure')
+        ret = pd.DataFrame()
+
+        ret['number'] = [atom.number for atom in self.atoms]
+        ret['name'] = [atom.name for atom in self.atoms]
+        ret['type'] = [atom.type for atom in self.atoms]
+        ret['atomic_number'] = [atom.atomic_number for atom in self.atoms]
+        ret['charge'] = [atom.charge for atom in self.atoms]
+        ret['mass'] = [atom.mass for atom in self.atoms]
+        ret['nb_idx'] = [atom.nb_idx for atom in self.atoms]
+        ret['radii'] = [atom.radii for atom in self.atoms]
+        ret['screen'] = [atom.screen for atom in self.atoms]
+        ret['occupancy'] = [atom.occupancy for atom in self.atoms]
+        ret['bfactor'] = [atom.bfactor for atom in self.atoms]
+        ret['altloc'] = [atom.altloc for atom in self.atoms]
+        ret['tree'] = [atom.tree for atom in self.atoms]
+        ret['join'] = [atom.join for atom in self.atoms]
+        ret['irotat'] = [atom.irotat for atom in self.atoms]
+        ret['rmin'] = [atom.rmin for atom in self.atoms]
+        ret['epsilon'] = [atom.epsilon for atom in self.atoms]
+        ret['rmin_14'] = [atom.rmin_14 for atom in self.atoms]
+        ret['epsilon_14'] = [atom.epsilon_14 for atom in self.atoms]
+        ret['resname'] = [atom.residue.name for atom in self.atoms]
+        ret['resid'] = [atom.residue.idx for atom in self.atoms]
+        ret['resnum'] = [atom.residue.number for atom in self.atoms]
+        ret['chain'] = [atom.residue.chain for atom in self.atoms]
+
+        # Now for optional attributes
+        # Coordinates
+        try:
+            coords = pd.DataFrame(
+                    [[atom.xx, atom.xy, atom.xz] for atom in self.atoms],
+                    columns=['xx', 'xy', 'xz']
+            )
+        except AttributeError:
+            pass
+        else:
+            ret = ret.join(coords)
+        # Velocities
+        try:
+            vels = pd.DataFrame(
+                    [[atom.vx, atom.vy, atom.vz] for atom in self.atoms],
+                    columns=['vx', 'vy', 'vz']
+            )
+        except AttributeError:
+            pass
+        else:
+            ret = ret.join(vels)
+        # AMOEBA LJ type
+        try:
+            ret['type_idx'] = [atom.type_idx for atom in self.atoms]
+        except AttributeError:
+            pass
+        # AMOEBA class type
+        try:
+            ret['class_idx'] = [atom.class_idx for atom in self.atoms]
+        except AttributeError:
+            pass
+        # AMOEBA multipoles
+        try:
+            multipoles = pd.DataFrame(
+                    [atom.multipoles for atom in self.atoms],
+                    columns=['multipole_111', 'multipole_211', 'multipole_212',
+                             'multipole_222', 'multipole_411', 'multipole_412',
+                             'multipole_422', 'multipole_413', 'multipole_423',
+                             'multipole_433']
+            )
+        except AttributeError:
+            pass
+        else:
+            ret = ret.join(multipoles)
+        # AMOEBA polarizabilities
+        try:
+            ret['polarizability'] = [atom.polarizability for atom in self.atoms]
+        except AttributeError:
+            pass
+        # AMOEBA vdw parent atom
+        try:
+            ret['vdw_parent'] = [atom.vdw_parent.idx for atom in self.atoms]
+        except AttributeError:
+            pass
+        # SEGID (CHARMM)
+        try:
+            ret['segid'] = [atom.segid for atom in self.atoms]
+        except AttributeError:
+            pass
+        # anisotropic b-factors
+        none6 = [None] * 6
+        anisos = [atom.anisou for atom in self.atoms]
+        for i, aniso in enumerate(anisos):
+            if hasattr(aniso, 'tolist'):
+                anisos[i] = aniso.tolist()
+        all_nones = True
+        for i, aniso in enumerate(anisos):
+            if aniso is None:
+                anisos[i] = none6
+            elif all_nones:
+                all_nones = False
+        if not all_nones:
+            ret = ret.join(
+                    pd.DataFrame(anisos,
+                        columns=['U11', 'U22', 'U33', 'U12', 'U13', 'U23'])
+            )
+        return ret
+
+    #===================================================
+
     def is_changed(self):
         """ Determines if any of the topology has changed for this structure """
         return (self.atoms.changed or self.residues.changed or
@@ -799,11 +988,14 @@ class Structure(object):
             top.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
         # Set the unit cell dimensions
         if self.box is not None:
-            top.setPeriodicBoxVectors(
-                    reducePeriodicBoxVectors(
-                        box_lengths_and_angles_to_vectors(*self.box)
-                    )
-            )
+            if reducePeriodicBoxVectors is None:
+                top.setUnitCellDimensions(self.box[:3]*u.angstroms)
+            else:
+                top.setPeriodicBoxVectors(
+                        reducePeriodicBoxVectors(
+                            box_lengths_and_angles_to_vectors(*self.box)
+                        )
+                )
         return top
 
     #===================================================
@@ -1054,9 +1246,16 @@ class Structure(object):
         if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
         if self.box is not None:
-            system.setDefaultPeriodicBoxVectors(
-                    *reducePeriodicBoxVectors(self.box_vectors)
-            )
+            if reducePeriodicBoxVectors is None:
+                # This version of OpenMM does *not* support triclinics
+                if self.box[3] != 90 or self.box[4] != 90 or self.box[5] != 90:
+                    raise ValueError('OpenMM version %s only supports '
+                                     'orthorhombic unit cells' % mm.__version__)
+                system.setDefaultPeriodicBoxVectors(*self.box_vectors)
+            else:
+                system.setDefaultPeriodicBoxVectors(
+                        *reducePeriodicBoxVectors(self.box_vectors)
+                )
         self.omm_set_virtual_sites(system)
         return system
 
@@ -2067,6 +2266,13 @@ class Structure(object):
         if implicitSolvent is app.GBn2:
             return zip(radii, screen, alpha, beta, gamma)
         return zip(radii, screen)
+
+    #===================================================
+
+    def __str__(self):
+        if hasattr(self, 'name') and self.name:
+            return self.name
+        return repr(self)
 
     #===================================================
 
