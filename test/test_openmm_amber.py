@@ -89,6 +89,11 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
 
 class TestAmberParm(utils.TestCaseRelative):
 
+    def tearDown(self):
+        import gc
+        # Try to force garbage collection
+        gc.collect()
+
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
         parm = tip4p_system
@@ -737,6 +742,11 @@ class TestAmberParm(utils.TestCaseRelative):
 
 class TestChamberParm(utils.TestCaseRelative):
     
+    def tearDown(self):
+        import gc
+        # Try to force garbage collection
+        gc.collect()
+
     def testGasEnergy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
         parm = chamber_gas_system

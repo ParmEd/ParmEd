@@ -69,6 +69,11 @@ if has_openmm:
 
 class TestCharmmFiles(utils.TestCaseRelative):
 
+    def tearDown(self):
+        import gc
+        # Try to force garbage collection
+        gc.collect()
+
     def setUp(self):
         if charmm_solv.box is None:
             charmm_solv.box = [95.387, 80.381, 80.225, 90, 90, 90]
