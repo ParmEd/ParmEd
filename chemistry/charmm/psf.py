@@ -174,6 +174,7 @@ class CharmmPsfFile(Structure):
             raise IOError('Could not find PSF file %s' % psf_name)
         # Open the PSF and read the first line. It must start with "PSF"
         psf = open(psf_name, 'r')
+        self.name = psf_name
         line = psf.readline()
         if not line.startswith('PSF'):
             raise CharmmPSFError('Unrecognized PSF file. First line is %s' %
@@ -330,6 +331,10 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
+    def __str__(self):
+        return self.name
+
+    #===================================================
 
     @needs_openmm
     def createSystem(self, params=None, *args, **kwargs):

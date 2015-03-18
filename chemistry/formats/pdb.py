@@ -189,7 +189,7 @@ class PDBFile(object):
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
                     atnum, atname, altloc = line[6:11], line[12:16], line[16]
-                    resname, chain = line[17:20], line[21]
+                    resname, chain = line[17:21], line[21]
                     resid, inscode = line[22:resend], line[26]
                     x, y, z = line[30:38], line[38:46], line[47:54]
                     occupancy, bfactor = line[54:60], line[60:66]
@@ -304,7 +304,7 @@ class PDBFile(object):
                     try:
                         chg = float(chg)
                     except ValueError:
-                        chg = 0
+                        chg = 0.0
                     if atname in ('EP', 'LP'): # lone pair
                         atom = ExtraPoint(atomic_number=atomic_number,
                                 name=atname, charge=chg, mass=mass,
@@ -348,7 +348,7 @@ class PDBFile(object):
                         continue # Skip the rest of this record
                     aname = line[12:16].strip()
                     altloc = line[16].strip()
-                    rname = line[17:20].strip()
+                    rname = line[17:21].strip()
                     chain = line[21].strip()
                     try:
                         resid = int(line[22:26])
@@ -533,11 +533,20 @@ class PDBFile(object):
         if not hasattr(dest, 'write'):
             dest = TextToBinaryFile(genopen(dest, 'w'))
             own_handle = True
-        atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
-                   '%6.2f      %-4s%2s%-2s\n')
-        anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                     '      %2s%-2s\n')
-        terrec = ('TER   %5d      %-3s %1s%4d\n')
+        if charmm:
+            atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                       '%6.2f      %-4s%2s%-2s\n')
+            anisourec = ('ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                         '      %2s%-2s\n')
+            terrec = ('TER   %5d      %-4s%1s%4d\n')
+            reslen = 4
+        else:
+            atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
+                       '%6.2f      %-4s%2s%-2s\n')
+            anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
+                         '      %2s%-2s\n')
+            terrec = ('TER   %5d      %-3s %1s%4d\n')
+            reslen = 3
         if struct.box is not None:
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
@@ -616,14 +625,14 @@ class PDBFile(object):
                 else:
                     segid = ''
                 dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name[:3], res.chain[:1], rnum,
+                           res.name[:reslen], res.chain[:1], rnum,
                            res.insertion_code[:1], x, y, z, pa.occupancy,
                            pa.bfactor, segid,
                            Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
                     anisou = [int(ani*1e4) for ani in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name[:3], res.chain[:1], rnum,
+                               res.name[:reslen], res.chain[:1], rnum,
                                res.insertion_code[:1], anisou[0], anisou[1],
                                anisou[2], anisou[3], anisou[4], anisou[5],
                                Element[pa.atomic_number].upper(), ''))
@@ -646,19 +655,20 @@ class PDBFile(object):
                         segid = oatom.segid[:4]
                     else:
                         segid = ''
-                    dest.write(atomrec % (anum, aname, key, res.name,
+                    dest.write(atomrec % (anum, aname, key, res.name[:reslen],
                                res.chain[:1], rnum, res.insertion_code[:1],
                                x, y, z, oatom.occupancy, oatom.bfactor, segid,
                                Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
                         anisou = [int(ani*1e4) for ani in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
-                            oatom.altloc[:1], res.name[:3], res.chain[:1], rnum,
-                            res.insertion_code[:1], anisou[0], anisou[1],
+                            oatom.altloc[:1], res.name[:reslen], res.chain[:1],
+                            rnum, res.insertion_code[:1], anisou[0], anisou[1],
                             anisou[2], anisou[3], anisou[4], anisou[5],
                             Element[oatom.atomic_number].upper(), ''))
             if res.ter:
-                dest.write(terrec % (anum+1, res.name, res.chain, rnum))
+                dest.write(terrec % (anum+1, res.name[:reslen],
+                                     res.chain, rnum))
                 if renumber:
                     nmore += 1
                 else:
@@ -898,6 +908,13 @@ class CIFFile(object):
                 except ValueError:
                     bfactor = 0.0
                 charge = row[chargeid]
+                if not charge.strip() or charge.strip() in ('.', '?'):
+                    charge = 0
+                else:
+                    try:
+                        charge = float(charge)
+                    except TypeError:
+                        charge = 0.0
                 # Try to figure out the element
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '

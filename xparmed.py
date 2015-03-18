@@ -9,20 +9,20 @@ All it really does is give users a point-and-click, guided tour through
 everything parmed can do
 """
 
-import sys
-from os.path import exists, split
+from chemistry import load_file
 from optparse import OptionParser
+from os.path import exists, split
 from ParmedTools.exceptions import ParmError
-from chemistry.amber.readparm import AmberParm, ChamberParm, AmberFormat
 from ParmedTools import ParmedActions
 from ParmedTools import __version__
-import Tkinter as tk
 from ParmedTools.gui.guitools import ParmedApp
 from ParmedTools.gui.guifiletools import file_chooser
-from tkMessageBox import showerror
 from ParmedTools.logos import Logo
 from ParmedTools.ParmedActions import Action
 from ParmedTools.parmlist import ParmList
+import Tkinter as tk
+from tkMessageBox import showerror
+import sys
 
 debug = False
 
@@ -60,7 +60,7 @@ def main():
     elif len(args) == 1:
         prmtop_name = args[0]
     else:
-        print >> sys.stderr, 'Unknown command-line options. Ignoring'
+        sys.stderr.write('Unknown command-line options. Ignoring\n')
         prmtop_name = file_chooser('Topology')
 
     # If we chose no prmtop file, 
@@ -68,11 +68,7 @@ def main():
 
     # Load the amber prmtop and check for errors
     amber_prmtop = ParmList()
-    parm = AmberFormat(prmtop_name)
-    if 'CTITLE' in parm.flag_list:
-        parm = parm.view(ChamberParm)
-    else:
-        parm = parm.view(AmberParm)
+    parm = load_file(prmtop_name)
     amber_prmtop.add_parm(parm)
 
     # Make this overwritable -- the all of the file save boxes will ask the user
@@ -88,6 +84,6 @@ def main():
     app.pack(fill=tk.BOTH, expand=1)
     root.mainloop()
 
-    print 'Thank you for using xParmEd!\n%s' % Logo()
+    print('Thank you for using xParmEd!\n%s' % Logo())
 
 if __name__ == '__main__': main()

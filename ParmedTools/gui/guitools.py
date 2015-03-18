@@ -18,22 +18,20 @@ class ParmedApp(Frame):
     def __init__(self, master, amber_prmtop):
         """ Instantiates the window """
         import math
-        from ParmedTools import ParmedActions
+        from ParmedTools.ParmedActions import COMMANDMAP
         global BPR
         Frame.__init__(self, master)
         self.parm = amber_prmtop
         actions = {}
-        for action in ParmedActions.Usages.keys():
-            action_name = ParmedActions.Usages[action].split()[0]
+        for action, actioncls in COMMANDMAP.iteritems():
+            action_name = actioncls.__name__
             # Skip actions that don't get buttons
             if action in self.skipped_actions: continue
             # Save outparm for later
             elif action == 'outparm':
-                outparm_action = _Description(action_name,
-                                    getattr(ParmedActions, action).__doc__)
+                outparm_action = _Description(action_name, actioncls.__doc__)
                 continue
-            actions[action] = _Description(action_name,
-                                    getattr(ParmedActions, action).__doc__)
+            actions[action] = _Description(action_name, actioncls.__doc__)
         self.message_frame = MessageWindow(self)
         # Now make the action button frame and put a title on it
         action_frame = Frame(self)

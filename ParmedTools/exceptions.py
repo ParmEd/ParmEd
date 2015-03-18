@@ -126,13 +126,13 @@ class UnhandledArgumentWarning(SeriousParmWarning):
 class InputError(ParmError):
     pass
 
-class ParmIndexError(ParmError):
+class ParmIndexError(ParmError, IndexError):
     pass
 
 class FileExists(ParmError):
     pass
 
-class FileDoesNotExist(ParmError):
+class FileDoesNotExist(ParmError, IOError):
     pass
 
 class ChamberError(ParmError):

@@ -582,8 +582,7 @@ class RestartReporter(object):
             self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
             self.atom = len(crds)
             # First time written
-            self.rst7 = Rst7(natom=self.atom, hasvels=self.write_velocities,
-                             hasbox=self.uses_pbc,
+            self.rst7 = Rst7(natom=self.atom,
                              title='Restart file written by ParmEd with OpenMM')
         self.rst7.time = state.getTime().value_in_unit(u.picosecond)
         flatcrd = [0.0 for i in xrange(self.atom*3)]
