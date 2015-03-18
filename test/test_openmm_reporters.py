@@ -34,8 +34,6 @@ class TestStateDataReporter(unittest.TestCase):
             os.makedirs(get_fn('writes'))
 
     def tearDown(self):
-        import gc
-        gc.collect()
         for f in os.listdir(get_fn('writes')):
             os.unlink(get_fn(f, written=True))
 
@@ -182,8 +180,6 @@ class TestTrajRestartReporter(unittest.TestCase):
             os.makedirs(get_fn('writes'))
 
     def tearDown(self):
-        import gc
-        gc.collect()
         for f in os.listdir(get_fn('writes')):
             os.unlink(get_fn(f, written=True))
 
