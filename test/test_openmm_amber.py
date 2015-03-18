@@ -22,18 +22,6 @@ import utils
 get_fn = utils.get_fn
 
 if has_openmm:
-    amber_simple_gas_system = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
-    amber_solv_system = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
-    chamber_gas_system = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                                     get_fn('ala_ala_ala.rst7'))
-    chamber_solv_system = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                                      get_fn('dhfr_cmap_pbc.rst7'))
-    amber_ff14ipq = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
-    tip4p_system = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
-    tip5p_system = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
-    amber1264 = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
-    amber1012 = AmberParm(get_fn('ff91.parm7'), get_fn('ff91.rst7'))
-
     # Make sure all precisions are double
     for i in range(mm.Platform.getNumPlatforms()):
         plat = mm.Platform.getPlatform(i)
@@ -89,14 +77,9 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
 
 class TestAmberParm(utils.TestCaseRelative):
 
-    def tearDown(self):
-        import gc
-        # Try to force garbage collection
-        gc.collect()
-
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
-        parm = tip4p_system
+        parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    constraints=app.HBonds,
@@ -139,7 +122,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testEPEnergy2(self):
         """ Tests AmberParm handling of extra points in TIP5P water """
-        parm = tip5p_system
+        parm = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    constraints=app.HBonds,
@@ -182,7 +165,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -201,7 +184,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGB1Energy(self): # HCT (igb=1)
         """ Compare Amber and OpenMM GB (igb=1) energies (w/ and w/out salt) """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -234,7 +217,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGB2Energy(self): # OBC1 (igb=2)
         """ Compare Amber and OpenMM GB (igb=2) energies (w/ and w/out salt) """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -267,7 +250,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGB5Energy(self): # OBC2 (igb=5)
         """ Compare Amber and OpenMM GB (igb=5) energies (w/ and w/out salt) """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -300,7 +283,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGB7Energy(self): # GBn (igb=7)
         """ Compare Amber and OpenMM GB (igb=7) energies (w/ and w/out salt) """
-        parm = copy(amber_simple_gas_system)
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn)
@@ -335,7 +318,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testGB8Energy(self): # GBn2 (igb=8)
         """ Compare Amber and OpenMM GB (igb=8) energies (w/ and w/out salt) """
-        parm = copy(amber_simple_gas_system)
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn2)
@@ -370,7 +353,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testRst7(self):
         """ Test loading coordinates via the OpenMMRst7 class """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -389,7 +372,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testEwald(self):
         """ Compare Amber and OpenMM Ewald energies """
-        parm = amber_solv_system
+        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.Ewald,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -410,7 +393,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testPME(self):
         """ Compare Amber and OpenMM PME energies """
-        parm = amber_solv_system
+        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -431,7 +414,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testDispersionCorrection(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
-        parm = amber_solv_system
+        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -455,7 +438,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testSHAKE(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
-        parm = amber_solv_system
+        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5,
@@ -474,7 +457,7 @@ class TestAmberParm(utils.TestCaseRelative):
     def testNBFIX(self):
         """ Compare Amber and OpenMM PME energies with NBFIX modifications """
         # For now, long-range correction is not available
-        parm = copy(amber_ff14ipq)
+        parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
         PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
@@ -489,7 +472,7 @@ class TestAmberParm(utils.TestCaseRelative):
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
-        sim.context.setPositions(amber_ff14ipq.positions)
+        sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
 #Etot   =     -7042.2475  EKtot   =         0.0000  EPtot      =     -7042.2475
@@ -505,7 +488,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def test1264(self):
         """ Testing the 12-6-4 LJ potential in OpenMM """
-        parm = amber1264
+        parm = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
         system = parm.createSystem(nonbondedMethod=app.NoCutoff)
         for force in system.getForces():
             if isinstance(force, mm.CustomNonbondedForce):
@@ -522,7 +505,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def test1012(self):
         """ Testing the 10-12 LJ H-bond potential in OpenMM """
-        parm = amber1012
+        parm = AmberParm(get_fn('ff91.parm7'), get_fn('ff91.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
         for force in system.getForces():
@@ -539,7 +522,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testInterfacePBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (periodic) """
-        parm = amber_solv_system
+        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=None, rigidWater=False,
@@ -641,7 +624,7 @@ class TestAmberParm(utils.TestCaseRelative):
 
     def testInterfaceNoPBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (non-periodic) """
-        parm = amber_simple_gas_system
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
                                    implicitSolvent=app.HCT,
@@ -742,14 +725,10 @@ class TestAmberParm(utils.TestCaseRelative):
 
 class TestChamberParm(utils.TestCaseRelative):
     
-    def tearDown(self):
-        import gc
-        # Try to force garbage collection
-        gc.collect()
-
     def testGasEnergy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -772,7 +751,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testGB1Energy(self): # HCT (igb=1)
         """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -813,7 +793,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testGB2Energy(self): # OBC1 (igb=2)
         """Compare OpenMM and CHAMBER GB (igb=2) energies (w/ and w/out salt)"""
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -854,7 +835,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testGB5Energy(self): # OBC2 (igb=5)
         """Compare OpenMM and CHAMBER GB (igb=5) energies (w/ and w/out salt)"""
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -895,7 +877,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testGB7Energy(self): # GBn (igb=7)
         """Compare OpenMM and CHAMBER GB (igb=7) energies (w/ and w/out salt)"""
-        parm = copy(chamber_gas_system)
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         system = parm.createSystem(implicitSolvent=app.GBn)
@@ -938,7 +921,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testGB8Energy(self): # GBn2 (igb=8)
         """Compare OpenMM and CHAMBER GB (igb=8) energies (w/ and w/out salt)"""
-        parm = copy(chamber_gas_system)
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         system = parm.createSystem(implicitSolvent=app.GBn2)
@@ -981,7 +965,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testRst7(self):
         """ Test using OpenMMRst7 to provide coordinates (CHAMBER) """
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator)
@@ -1009,7 +994,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testPME(self):
         """ Compare OpenMM and CHAMBER PME energies """
-        parm = chamber_solv_system
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                           get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -1034,7 +1020,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testDispersionCorrection(self):
         """ Compare OpenMM and CHAMBER energies without vdW correction """
-        parm = chamber_solv_system
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                           get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -1062,7 +1049,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testSHAKE(self):
         """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
-        parm = chamber_solv_system
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                           get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5,
@@ -1080,7 +1068,8 @@ class TestChamberParm(utils.TestCaseRelative):
         
     def testInterfacePBC(self):
         """ Testing all OpenMMChamberParm.createSystem options (periodic) """
-        parm = chamber_solv_system
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                           get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=None, rigidWater=False,
@@ -1199,7 +1188,8 @@ class TestChamberParm(utils.TestCaseRelative):
 
     def testInterfaceNoPBC(self):
         """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
-        parm = chamber_gas_system
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
+                           get_fn('ala_ala_ala.rst7'))
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
                                    implicitSolvent=app.HCT,
