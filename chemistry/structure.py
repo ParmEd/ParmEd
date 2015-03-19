@@ -1288,9 +1288,8 @@ class Structure(object):
                                      bond.type.req*length_conv)
         if constraints is app.HAngles:
             for angle in self.angles:
-                num_h = ((angle.atom1.element == 1) + (angle.atom2.element == 1)
-                         + (angle.atom3.element == 1))
-                if num_h >= 2 or (num_h == 1 and angle.atom2.element == 8):
+                num_h = (angle.atom1.element == 1) + (angle.atom3.element == 1)
+                if num_h == 2 or (num_h == 1 and angle.atom2.element == 8):
                     # Constrain this angle
                     l1 = l2 = None
                     for bond in angle.atom2.bonds:
@@ -1442,9 +1441,8 @@ class Structure(object):
             force = mm.HarmonicAngleForce()
         force.setForceGroup(self.ANGLE_FORCE_GROUP)
         for angle in self.angles:
-            num_h = ((angle.atom1.element == 1) + (angle.atom2.element == 1) +
-                     (angle.atom3.element == 1))
-            if constraints is app.HAngles and (num_h >= 2 or (num_h == 1 and
+            num_h = (angle.atom1.element == 1) + (angle.atom3.element == 1)
+            if constraints is app.HAngles and (num_h == 2 or (num_h == 1 and
                     angle.atom2.element == 8) and not flexibleConstraints):
                 continue
             if angle.type is None:
