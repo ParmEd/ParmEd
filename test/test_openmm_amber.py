@@ -520,6 +520,44 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 1.2476012, places=3)
         self.assertRelativeEqual(energies['nonbond'], -11191.2563220, delta=3e-5)
 
+    def testHangleConstraints(self):
+        """ Tests that HAngle constraints get applied correctly """
+        # This used to be a bug
+        # Constrain just bonds. Make sure 1000 angles remain, and we have 2000
+        # constraints
+        parm = AmberParm(get_fn('gaffwat.parm7'))
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=10.0*u.angstroms,
+                                   constraints=app.HBonds, rigidWater=False,
+                                   flexibleConstraints=False)
+        nbonds = 0
+        for force in system.getForces():
+            if isinstance(force, mm.HarmonicBondForce):
+                nbonds += force.getNumBonds()
+        self.assertEqual(nbonds, 0)
+        nangles = 0
+        for force in system.getForces():
+            if isinstance(force, mm.HarmonicAngleForce):
+                nangles += force.getNumAngles()
+        self.assertEqual(nangles, 1000)
+        self.assertEqual(system.getNumConstraints(), 2000)
+        # Constrain H-angles now, too
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=10.0*u.angstroms,
+                                   constraints=app.HAngles, rigidWater=False,
+                                   flexibleConstraints=False)
+        nbonds = 0
+        for force in system.getForces():
+            if isinstance(force, mm.HarmonicBondForce):
+                nbonds += force.getNumBonds()
+        self.assertEqual(nbonds, 0)
+        nangles = 0
+        for force in system.getForces():
+            if isinstance(force, mm.HarmonicAngleForce):
+                nangles += force.getNumAngles()
+        self.assertEqual(nangles, 0)
+        self.assertEqual(system.getNumConstraints(), 3000)
+
     def testInterfacePBC(self):
         """ Testing all OpenMMAmberParm.createSystem options (periodic) """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))

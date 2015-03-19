@@ -1288,8 +1288,8 @@ class Structure(object):
                                      bond.type.req*length_conv)
         if constraints is app.HAngles:
             for angle in self.angles:
-                num_h = (angle.atom1.element == 1 + angle.atom2.element == 1 +
-                         angle.atom3.element == 1)
+                num_h = ((angle.atom1.element == 1) + (angle.atom2.element == 1)
+                         + (angle.atom3.element == 1))
                 if num_h >= 2 or (num_h == 1 and angle.atom2.element == 8):
                     # Constrain this angle
                     l1 = l2 = None
@@ -1302,7 +1302,7 @@ class Structure(object):
                     if l1 is None or l2 is None: continue # no bonds found...
                     cost = math.cos(angle.type.theteq*DEG_TO_RAD)
                     length = math.sqrt(l1*l1 + l2*l2 - 2*l1*l2*cost)*length_conv
-                    system.addConstraint(angle.atom1, angle.atom3, length)
+                    system.addConstraint(angle.atom1.idx,angle.atom3.idx,length)
 
     #===================================================
 
@@ -1442,8 +1442,8 @@ class Structure(object):
             force = mm.HarmonicAngleForce()
         force.setForceGroup(self.ANGLE_FORCE_GROUP)
         for angle in self.angles:
-            num_h = (angle.atom1.element == 1 + angle.atom2.element == 1 +
-                     angle.atom3.element == 1)
+            num_h = ((angle.atom1.element == 1) + (angle.atom2.element == 1) +
+                     (angle.atom3.element == 1))
             if constraints is app.HAngles and (num_h >= 2 or (num_h == 1 and
                     angle.atom2.element == 8) and not flexibleConstraints):
                 continue
