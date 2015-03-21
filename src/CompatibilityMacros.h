@@ -16,6 +16,7 @@ int PyObject_IS_STRING(PyObject *chk) {
 
 // PyInt -> PyLong
 #   define PyInt_FromLong PyLong_FromLong
+#   define PyInt_AsLong PyLong_AsLong
 
 #else /* Python 2 */
 
@@ -23,4 +24,3 @@ int PyObject_IS_STRING(PyObject *chk) {
 #   define PY_DESTROY_TYPE self->ob_type->tp_free((PyObject *)self)
 
 #endif
-
