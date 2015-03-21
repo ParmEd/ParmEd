@@ -13,6 +13,10 @@ from utils import get_fn, has_numpy
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
     
+    def testOptimizedReader(self):
+        """ Check that the optimized reader imports correctly """
+        from chemistry.amber import _rdparm
+
     def testLoadParm(self):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
