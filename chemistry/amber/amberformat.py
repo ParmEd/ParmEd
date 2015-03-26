@@ -792,8 +792,6 @@ class AmberFormat(object):
         Converts the flags and internal format fields to a VMD-compatible
         format.
         """
-   #     self.add_flag('TITLE', format, data, num_items, comments, after)
-        print("Converting to vmd compat\n")
         if 'TITLE' not in self.flag_list:
             self.add_flag('TITLE', '20a4', num_items=0, after='CTITLE')
         self.formats['CHARGE'] = FortranFormat('5E16.8')

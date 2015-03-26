@@ -242,7 +242,6 @@ class parmout(Action):
     supported_subclasses = (AmberParm,)
     
     def init(self, arg_list):
-        print("INITING\n")
         self.filename = arg_list.get_next_string()
         self.rst_name = arg_list.get_next_string(optional=True)
         if arg_list.has_key('netcdf'):
@@ -250,7 +249,6 @@ class parmout(Action):
         else:
             self.netcdf = None
         if arg_list.has_key('vmd'):
-            print("Found vmd key\n")
             self.vmd = True
         else:
             self.vmd = None
@@ -268,7 +266,6 @@ class parmout(Action):
             if not Action.overwrite and os.path.exists(self.rst_name):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         if self.vmd is not None:
-            print("CONVERTING TO VMD COMPAT\n")
             self.parm.convert_to_vmd_compat()
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
