@@ -800,6 +800,10 @@ class AmberFormat(object):
         self.formats['LENNARD_JONES_BCOEF'] = FortranFormat('5E16.8')
         self.formats['LENNARD_JONES_14_ACOEF'] = FortranFormat('5E16.8')
         self.formats['LENNARD_JONES_14_bCOEF'] = FortranFormat('5E16.8')
+        self.formats['CHARMM_CMAP_PARAMETER_01'] = FortranFormat('8F9.5')
+        self.formats['CHARMM_CMAP_PARAMETER_02'] = FortranFormat('8F9.5')
+        self.formats['CHARMM_CMAP_PARAMETER_03'] = FortranFormat('8F9.5')
+        self.formats['FORCE_FIELD_TYPE'] = FortranFormat('20a4')
         self.vmd_compat = True
     
     #===================================================
