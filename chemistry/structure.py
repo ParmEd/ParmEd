@@ -938,6 +938,11 @@ class Structure(object):
         """
         The OpenMM Topology object. Cached when possible, but any changes to the
         Structure instance results in the topology being deleted and rebuilt
+
+        Notes
+        -----
+        This function calls ``prune_empty_terms`` if any topology lists have
+        changed.
         """
         if not self.is_changed():
             try:
@@ -946,6 +951,7 @@ class Structure(object):
                 pass
         else:
             self.prune_empty_terms()
+            self.unchange()
 
         self._topology = top = app.Topology()
         chain = top.addChain()
@@ -1157,6 +1163,10 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
+
+        Notes
+        -----
+        This function calls prune_empty_terms if any Topology lists have changed
         """
         # Establish defaults
         if nonbondedMethod is None:
@@ -1185,6 +1195,10 @@ class Structure(object):
                         masses[heavy_atom.idx] -= hydrogenMass - atom.mass
         for mass in masses: system.addParticle(mass)
         self.omm_add_constraints(system, constraints, rigidWater)
+        # Prune empty terms if we have changed
+        if self.is_changed():
+            self.prune_empty_terms()
+            self.unchange()
         # Add the various types of forces
         if verbose: print('Adding bonds...')
         self._add_force_to_system(system,
