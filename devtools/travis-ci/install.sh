@@ -15,17 +15,19 @@ export PATH=$HOME/miniconda/bin:$PATH
 conda install --yes conda-build jinja2 binstar pip
 conda config --add channels http://conda.binstar.org/omnia
 
-# Python 2.6 does not have argparse, but parmed.py uses it
+# Python 2.6 does not have argparse or an OpenMM conda package
+openmm="openmm"
 if [ "$PYTHON_VERSION" = "2.6" ]; then
     argparse="argparse"
+    openmm=""
 fi
 
 if [ -z "$NO_NUMPY" ]; then
     conda create -y -n myenv python=$PYTHON_VERSION $argparse \
-        numpy scipy netcdf4 pandas nose openmm
+        numpy scipy netcdf4 pandas nose $openmm
 else
     # Do not install the full numpy/scipy stack
-    conda create -y -n myenv python=$PYTHON_VERSION $argparse
+    conda create -y -n myenv python=$PYTHON_VERSION $argparse nose
 fi
 
 source activate myenv
