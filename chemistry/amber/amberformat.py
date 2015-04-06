@@ -359,6 +359,7 @@ class AmberFormat(object):
         self.version = None
         self.charge_flag = 'CHARGE'
         self.name = fname
+        self.vmd_compat = None
 
         if fname is not None:
             self.rdparm(fname)
@@ -794,6 +795,7 @@ class AmberFormat(object):
         """
         if 'TITLE' not in self.flag_list:
             self.add_flag('TITLE', '20a4', num_items=0, after='CTITLE')
+        self.delete_flag('CTITLE')
         self.formats['CHARGE'] = FortranFormat('5E16.8')
         self.formats['ANGLE_EQUIL_VALUE'] = FortranFormat('5E16.8')
         self.formats['LENNARD_JONES_ACOEF'] = FortranFormat('5E16.8')
@@ -834,15 +836,15 @@ class AmberFormat(object):
             for i in xrange(len(self.parm_data[self.charge_flag])):
                 self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
 
-        if self.vmd_compat is not None:
-            self.delete_flag('CTITLE')
-
         # write version to top of prmtop file
         new_prm.write('%s\n' % self.version)
 
         # then write pointers
         self.flag_list.remove('POINTERS')
-        self.flag_list.insert(self.flag_list.index('TITLE')+1, 'POINTERS')
+        if 'TITLE' in self.flag_list:
+          self.flag_list.insert(self.flag_list.index('TITLE')+1, 'POINTERS')
+        else:
+          self.flag_list.insert(self.flag_list.index('CTITLE')+1, 'POINTERS')
 
         # write data to prmtop file, inserting blank line if it's an empty field
         for flag in self.flag_list:
