@@ -244,7 +244,7 @@ class TestAmberParmActions(utils.TestCaseRelative):
         parm = copy(gasparm)
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
         PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
-        if has_numpy:
+        if utils.has_numpy():
             self.assertTrue(utils.diff_files(get_saved_fn('test.off'),
                                              get_fn('test.off', written=True),
                                              absolute_error=0.0001))
