@@ -318,6 +318,28 @@ class Structure(object):
 
     #===================================================
 
+    def __repr__(self):
+        natom = len(self.atoms)
+        nres = len(self.residues)
+        nextra = sum([isinstance(a, ExtraPoint) for a in self.atoms])
+        retstr = ['<%s %d atoms' % (type(self).__name__, natom)]
+        if nextra > 0:
+            retstr.append(' [%d EPs]' % nextra)
+        retstr.append('; %d residues' % nres)
+        nbond = len(self.bonds)
+        retstr.append('; %d bonds' % nbond)
+        if self.box is not None:
+            retstr.append('; PBC')
+        # Just assume that if the first bond has a defined type, so does
+        # everything else... we don't want __repr__ to be super expensive
+        if len(self.bonds) > 0 and self.bonds[0].type is not None:
+            retstr.append('; parametrized>')
+        else:
+            retstr.append('; NOT parametrized>')
+        return ''.join(retstr)
+
+    #===================================================
+
     def add_atom(self, atom, resname, resnum, chain='', inscode=''):
         """
         Adds a new atom to the Structure, adding a new residue to `residues` if
