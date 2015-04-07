@@ -2,13 +2,9 @@ language: python
 
 env:
     matrix:
-        - PYTHON_VERSION=2.6 NO_NUMPY=yes
-        - PYTHON_VERSION=2.6 
-        - PYTHON_VERSION=2.7 NO_NUMPY=yes
         - PYTHON_VERSION=2.7 
-        - PYTHON_VERSION=3.3 NO_NUMPY=yes
+        - PYTHON_VERSION=2.7 NO_NUMPY=yes
         - PYTHON_VERSION=3.3 
-        - PYTHON_VERSION=3.4 NO_NUMPY=yes
         - PYTHON_VERSION=3.4 
 
 install:
