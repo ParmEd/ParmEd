@@ -318,6 +318,28 @@ class Structure(object):
 
     #===================================================
 
+    def __repr__(self):
+        natom = len(self.atoms)
+        nres = len(self.residues)
+        nextra = sum([isinstance(a, ExtraPoint) for a in self.atoms])
+        retstr = ['<%s %d atoms' % (type(self).__name__, natom)]
+        if nextra > 0:
+            retstr.append(' [%d EPs]' % nextra)
+        retstr.append('; %d residues' % nres)
+        nbond = len(self.bonds)
+        retstr.append('; %d bonds' % nbond)
+        if self.box is not None:
+            retstr.append('; PBC')
+        # Just assume that if the first bond has a defined type, so does
+        # everything else... we don't want __repr__ to be super expensive
+        if len(self.bonds) > 0 and self.bonds[0].type is not None:
+            retstr.append('; parametrized>')
+        else:
+            retstr.append('; NOT parametrized>')
+        return ''.join(retstr)
+
+    #===================================================
+
     def add_atom(self, atom, resname, resnum, chain='', inscode=''):
         """
         Adds a new atom to the Structure, adding a new residue to `residues` if
@@ -938,6 +960,11 @@ class Structure(object):
         """
         The OpenMM Topology object. Cached when possible, but any changes to the
         Structure instance results in the topology being deleted and rebuilt
+
+        Notes
+        -----
+        This function calls ``prune_empty_terms`` if any topology lists have
+        changed.
         """
         if not self.is_changed():
             try:
@@ -946,6 +973,7 @@ class Structure(object):
                 pass
         else:
             self.prune_empty_terms()
+            self.unchange()
 
         self._topology = top = app.Topology()
         chain = top.addChain()
@@ -1157,6 +1185,10 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
+
+        Notes
+        -----
+        This function calls prune_empty_terms if any Topology lists have changed
         """
         # Establish defaults
         if nonbondedMethod is None:
@@ -1185,6 +1217,10 @@ class Structure(object):
                         masses[heavy_atom.idx] -= hydrogenMass - atom.mass
         for mass in masses: system.addParticle(mass)
         self.omm_add_constraints(system, constraints, rigidWater)
+        # Prune empty terms if we have changed
+        if self.is_changed():
+            self.prune_empty_terms()
+            self.unchange()
         # Add the various types of forces
         if verbose: print('Adding bonds...')
         self._add_force_to_system(system,

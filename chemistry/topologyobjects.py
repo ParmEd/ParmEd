@@ -1549,7 +1549,7 @@ class BondType(_ListItem, _ParameterType):
         return self.k == other.k and self.req == other.req
 
     def __repr__(self):
-        return '<%s; k=%.3f, Req=%.3f>' % (type(self).__name__,
+        return '<%s; k=%.3f, req=%.3f>' % (type(self).__name__,
                 self.k, self.req)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1696,7 +1696,7 @@ class AngleType(_ListItem, _ParameterType):
         return self.k == other.k and self.theteq == other.theteq
 
     def __repr__(self):
-        return '<%s; k=%.3f, THETAeq=%.3f>' % (type(self).__name__,
+        return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__,
                 self.k, self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1953,33 +1953,15 @@ class DihedralType(_ListItem, _ParameterType):
 
    #===================================================
 
-    def write_info(self, parm):
-        """ Write out the dihedral parameters """
-        # If our idx == -1, we're not being used, so just return
-        if self.idx == -1: return
-        parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][self.idx] = self.phi_k
-        parm.parm_data['DIHEDRAL_PERIODICITY'][self.idx] = self.per
-        parm.parm_data['DIHEDRAL_PHASE'][self.idx] = self.phase
-        try:
-            parm.parm_data['SCEE_SCALE_FACTOR'][self.idx] = self.scee
-        except KeyError:
-            pass
-        try:
-            parm.parm_data['SCNB_SCALE_FACTOR'][self.idx] = self.scnb
-        except KeyError:
-            pass
-   
-    #===================================================
-
     def __eq__(self, other):
         return (self.phi_k == other.phi_k and self.per == other.per and 
                 self.phase == other.phase and self.scee == other.scee and
                 self.scnb == other.scnb)
 
     def __repr__(self):
-        return ('<%s; k=%.3f, periodicity=%d, phase=%.3f, '
-                'scee=%.3f, scnb=%.3f>' % (type(self).__name__, self.phi_k,
-                    self.per, self.phase, self.scee, self.scnb))
+        return ('<%s; phi_k=%.3f, per=%d, phase=%.3f, scee=%.3f, scnb=%.3f>' %
+                (type(self).__name__, self.phi_k, self.per, self.phase,
+                 self.scee, self.scnb))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2007,7 +1989,7 @@ class DihedralTypeList(list, _ListItem):
         return True
 
     def __repr__(self):
-        return 'DihedralTypes %s' % (super(DihedralTypeList, self).__repr__())
+        return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2280,7 +2262,7 @@ class ImproperType(_ListItem, _ParameterType):
         return self.psi_k == other.psi_k and self.psi_eq == other.psi_eq
 
     def __repr__(self):
-        return '<%s; k=%.3f, PSIeq=%.3f>' % (type(self).__name__,
+        return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__,
                 self.psi_k, self.psi_eq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2522,7 +2504,7 @@ class CmapType(_ListItem, _ParameterType):
                 all([abs(i - j) < TINY for i, j in zip(self.grid, other.grid)]))
 
     def __repr__(self):
-        return '<%s; res=%d>' % (type(self).__name__, self.resolution)
+        return '<%s; resolution=%d>' % (type(self).__name__, self.resolution)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3007,7 +2989,7 @@ class StretchBendType(_ListItem, _ParameterType):
                 self.theteq == other.theteq)
 
     def __repr__(self):
-        return '<%s; Req_1=%.3f, Req_2=%.3f, THETAeq=%.3f, k1=%.3f, k2=%.3f>' \
+        return '<%s; req1=%.3f, req2=%.3f, theteq=%.3f, k1=%.3f, k2=%.3f>' \
                 % (type(self).__name__, self.req1, self.req2, self.theteq,
                    self.k1, self.k2)
 
