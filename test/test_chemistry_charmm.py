@@ -296,6 +296,18 @@ class TestCharmmPsf(unittest.TestCase):
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
 
+    def testInscodePSF(self):
+        """ Test PSF with insertion code as part of residue number """
+        cpsf = psf.CharmmPsfFile(get_fn('4TVP-dmj_wat-ion.psf'))
+        self.assertEqual(len(cpsf.atoms), 66264)
+        self.assertEqual(len(cpsf.residues), 20169)
+        self.assertEqual(len(cpsf.bonds), 46634)
+        self.assertEqual(len(cpsf.angles), 32739)
+        self.assertEqual(len(cpsf.dihedrals), 19104)
+        self.assertEqual(len(cpsf.impropers), 1257)
+        self.assertEqual(len(cpsf.cmaps), 447)
+        self.assertEqual(cpsf.residues[281].insertion_code, 'A')
+
 class TestCharmmParameters(unittest.TestCase):
     """ Test CHARMM Parameter file parsing """
     
