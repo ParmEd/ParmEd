@@ -334,7 +334,7 @@ class ChamberParm(AmberParm):
         for i, j, k, l, m, n in zip(it, it, it, it, it, it):
             self.cmaps.append(
                     Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
-                         self.atoms[k-1], self.atoms[m-1], self.cmap_types[n-1])
+                         self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
             )
 
     #===================================================
