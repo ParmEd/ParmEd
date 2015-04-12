@@ -518,7 +518,7 @@ class AmoebaParm(AmberParm):
             self.dihedral_types.append(
                     DihedralType(k, per, phase, list=self.dihedral_types)
             )
-        it = zip(data['AMOEBA_TORSION_LIST'])
+        it = iter(data['AMOEBA_TORSION_LIST'])
         for i, j, k, l, m in zip(it, it, it, it, it):
             self.dihedrals.append(
                     Dihedral(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
