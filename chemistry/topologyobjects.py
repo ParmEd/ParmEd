@@ -581,6 +581,10 @@ class Atom(_ListItem):
     @property
     def sigma(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
+        if self._rmin is None:
+            if self.atom_type is not None:
+                return self.atom_type.sigma
+            return None
         return self._rmin * 2**(-1/6)
 
     @sigma.setter
