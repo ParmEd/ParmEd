@@ -579,6 +579,15 @@ class Atom(_ListItem):
         self._rmin = value
 
     @property
+    def sigma(self):
+        """ Lennard-Jones sigma parameter -- directly related to Rmin """
+        return self._rmin * 2**(-1/6)
+
+    @sigma.setter
+    def sigma(self, value):
+        self._rmin = value * 2**(1/6)
+
+    @property
     def epsilon(self):
         """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
         if self._epsilon is None:
@@ -607,6 +616,15 @@ class Atom(_ListItem):
     def rmin_14(self, value):
         """ The 1-4 Lennard-Jones Rmin/2 parameter """
         self._rmin14 = value
+
+    @property
+    def sigma_14(self):
+        """ Lennard-Jones sigma parameter -- directly related to Rmin """
+        return self._rmin14 * 2**(-1/6)
+
+    @sigma_14.setter
+    def sigma_14(self, value):
+        self._rmin14 = value * 2**(1/6)
 
     @property
     def epsilon_14(self):
@@ -4063,6 +4081,24 @@ class AtomType(object):
         if rmin14 is None: rmin14 = rmin
         if epsilon14 is None: epsilon14 = epsilon
         self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)
+
+    @property
+    def sigma(self):
+        """ Sigma is Rmin / 2^(1/6) """
+        return self.rmin * 2**(-1/6)
+
+    @sigma.setter
+    def sigma(self, value):
+        self.rmin = value * 2**(1/6)
+
+    @property
+    def sigma_14(self):
+        """ Sigma is Rmin / 2^(1/6) """
+        return self.rmin_14 * 2**(-1/6)
+
+    @sigma.setter
+    def sigma_14(self, value):
+        self.rmin_14 = value * 2**(1/6)
 
     def __str__(self):
         return self.name
