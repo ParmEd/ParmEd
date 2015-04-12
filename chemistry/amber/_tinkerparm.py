@@ -623,8 +623,7 @@ class AmoebaParm(AmberParm):
             it = iter(data['AMOEBA_CHIRAL_FRAME_LIST'])
             for i, j, k in zip(it, it, it):
                 self.chiral_frames.append(
-                        ChiralFrame(self.atoms[i-1], self.atoms[j-1],
-                                    framelist[k-1])
+                        ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
                 )
         except KeyError:
             pass
