@@ -13,6 +13,10 @@ from utils import get_fn, has_numpy
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
     
+    def testOptimizedReader(self):
+        """ Check that the optimized reader imports correctly """
+        from chemistry.amber import _rdparm
+
     def testLoadParm(self):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
@@ -129,8 +133,13 @@ class TestReadParm(unittest.TestCase):
         self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
 
+    def test1012(self):
+        """ Test that 10-12 prmtop files are recognized properly """
+        parm = readparm.AmberParm(get_fn('ff91.parm7'))
+        self._standard_parm_tests(parm, has1012=True)
+
     # Tests for individual prmtops
-    def _standard_parm_tests(self, parm):
+    def _standard_parm_tests(self, parm, has1012=False):
         self.assertEqual(parm.ptr('natom'), len(parm.atoms))
         self.assertEqual(parm.ptr('nres'), len(parm.residues))
         self.assertEqual(parm.ptr('nbonh'), len(list(parm.bonds_inc_h)))
@@ -143,6 +152,10 @@ class TestReadParm(unittest.TestCase):
                          parm.parm_data['ATOM_NAME'])
         self.assertEqual([a.type for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
+        if has1012:
+            self.assertTrue(parm.has_1012())
+        else:
+            self.assertFalse(parm.has_1012())
 
     def _solv_pointer_tests(self, parm):
         self.assertEqual(parm.ptr('nspm'),

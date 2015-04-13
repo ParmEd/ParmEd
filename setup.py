@@ -52,6 +52,13 @@ if __name__ == '__main__':
                     if not 'has_key' in x and not 'itertools_imports' in x]
         Mixin2to3.fixer_names = fixers
 
+    # See if we have the Python development headers.  If not, don't build the
+    # optimized prmtop parser extension
+    from distutils import sysconfig
+    if not os.path.exists(os.path.join(sysconfig.get_config_vars()['INCLUDEPY'],
+                                       'Python.h')):
+        extensions = []
+
     setup(name='ParmEd',
           version='15.0b',
           description='Amber parameter file editor',

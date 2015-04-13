@@ -67,7 +67,7 @@ if has_openmm:
         if plat.getName() == 'OpenCL':
             plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
 
-class TestCharmmFiles(unittest.TestCase):
+class TestCharmmFiles(utils.TestCaseRelative):
 
     def setUp(self):
         if charmm_solv.box is None:
@@ -75,21 +75,6 @@ class TestCharmmFiles(unittest.TestCase):
         if charmm_nbfix.box is None:
             charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
-    def assertRelativeEqual(self, val1, val2, places=7):
-        if val1 == val2: return
-        try:
-            ratio = val1 / val2
-        except ZeroDivisionError:
-            return self.assertAlmostEqual(val1, val2, places=places)
-        else:
-            if abs(round(ratio - 1, places)) == 0:
-                return
-            raise self.failureException(
-                        '%s != %s with relative tolerance %g (%f)' %
-                        (val1, val2, 10**-places, ratio)
-            )
-            return self.assertAlmostEqual(ratio, 1.0, places=places)
-    
     def testGasEnergy(self):
         """ Compare OpenMM and CHARMM gas phase energies """
         parm = charmm_gas

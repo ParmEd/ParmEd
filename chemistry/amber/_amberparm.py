@@ -725,7 +725,7 @@ class AmberParm(AmberFormat, Structure):
          
         for i in xrange(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
+            if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
                 self.LJ_radius.append(0)
                 self.LJ_depth.append(0)
             else:
@@ -752,6 +752,10 @@ class AmberParm(AmberFormat, Structure):
         for i in xrange(ntypes):
             for j in xrange(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                if index < 0:
+                    pd['LENNARD_JONES_ACOEF'][-index] = 0.0
+                    pd['LENNARD_JONES_BCOEF'][-index] = 0.0
+                    continue
                 rij = self.LJ_radius[i] + self.LJ_radius[j]
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
@@ -776,6 +780,7 @@ class AmberParm(AmberFormat, Structure):
         for i in xrange(ntypes):
             for j in xrange(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                if idx < 0: continue
                 rij = self.LJ_radius[i] + self.LJ_radius[j]
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
@@ -786,6 +791,40 @@ class AmberParm(AmberFormat, Structure):
                 elif (abs((a - (wdij * rij**12)) / a) > 1e-6 or
                         abs((b - (2 * wdij * rij**6)) / b) > 1e-6):
                     return True
+        return False
+
+    #===================================================
+
+    def has_1012(self):
+        """
+        This routine determines whether there are any defined 10-12
+        Lennard-Jones interactions that are non-zero
+
+        Returns
+        -------
+        has_10_12 : bool
+            If True, 10-12 interactions *are* defined for this particular system
+        """
+        indices_with_1012 = []
+        ntypes = self.parm_data['POINTERS'][NTYPES]
+        for i in xrange(ntypes):
+            for j in xrange(ntypes):
+                idx = self.parm_data['NONBONDED_PARM_INDEX'][i*ntypes+j] - 1
+                if idx >= 0: continue
+                # It was negative, so we should have ADDED 1 to adjust for
+                # indexing from 0
+                idx = -idx - 2
+                a = self.parm_data['HBOND_ACOEF'][idx]
+                b = self.parm_data['HBOND_BCOEF'][idx]
+                if a == 0 and b == 0: continue
+                indices_with_1012.append((i, j))
+        if not indices_with_1012: return False
+        # Now make sure that some of the atoms *have* those indices
+        active_indices = set()
+        for atom in self.atoms: active_indices.add(atom.nb_idx-1)
+        for i, j in indices_with_1012:
+            if i in active_indices and j in active_indices:
+                return True
         return False
 
     #===================================================
@@ -897,23 +936,55 @@ class AmberParm(AmberFormat, Structure):
                 ewaldErrorTolerance, reactionFieldDielectric
         )
         hasnbfix = self.has_NBFIX()
+        has1012 = self.has_1012()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
-        if not hasnbfix and not has1264:
+        if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
 
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
-            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r4*r2;'
-                                            'r4=r2^2; r2=r^2;'
-                                            'a=acoef(type1, type2);'
-                                            'b=bcoef(type1, type2);'
-                                            'c=ccoef(type1, type2);')
+            if has1012:
+                force = mm.CustomNonbondedForce(
+                        '(a/r6)^2-b/r6-c/r4+ah/(r6*r6)-bh/(r6*r4); r6=r4*r2;'
+                                                'r4=r2^2; r2=r^2;'
+                                                'a=acoef(type1, type2);'
+                                                'b=bcoef(type1, type2);'
+                                                'c=ccoef(type1, type2);'
+                                                'ah=ahcoef(type1, type2);'
+                                                'bh=bhcoef(type1, type2);'
+                )
+            else:
+                force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r4*r2;'
+                                                'r4=r2^2; r2=r^2;'
+                                                'a=acoef(type1, type2);'
+                                                'b=bcoef(type1, type2);'
+                                                'c=ccoef(type1, type2);')
         elif hasnbfix:
-            force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2;'
-                                            'r2=r^2; a=acoef(type1, type2);'
-                                            'b=bcoef(type1, type2);')
+            if has1012:
+                force = mm.CustomNonbondedForce(
+                        '(a/r6)^2-b/r6+ah/(r6*r6)-bh/(r6*r4);'
+                        'r6=r2*r2*r2;r2=r^2;'
+                        'a=acoef(type1, type2);'
+                        'b=bcoef(type1, type2);'
+                        'ah=ahcoef(type1, type2);'
+                        'bh=bhcoef(type1, type2);'
+                )
+            else:
+                force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2;'
+                                                'r2=r^2; a=acoef(type1, type2);'
+                                                'b=bcoef(type1, type2);')
         elif has1264:
-            force = mm.CustomNonbondedForce('-c/r^4; c=ccoef(type1, type2);')
+            if has1012:
+                force = mm.CustomNonbondedForce('-c/r^4+ah/r^12-bh/r^10;'
+                                                'c=ccoef(type1, type2);'
+                                                'ah=ahcoef(type1, type2);'
+                                                'bh=bhcoef(type1, type2);')
+            else:
+                force = mm.CustomNonbondedForce('-c/r^4;c=ccoef(type1, type2);')
+        elif has1012:
+            force = mm.CustomNonbondedForce('a/r^12-b/r^10;'
+                                            'a=ahcoef(type1, type2);'
+                                            'b=bhcoef(type1, type2);')
 
         # Set up the force with all of the particles
         force.addPerParticleParameter('type')
@@ -932,18 +1003,32 @@ class AmberParm(AmberFormat, Structure):
             if has1264:
                 ccoef = acoef[:]
                 parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+            if has1012:
+                ahcoef = acoef[:]
+                bhcoef = acoef[:]
+                parm_ahcoef = self.parm_data['HBOND_ACOEF']
+                parm_bhcoef = self.parm_data['HBOND_BCOEF']
             afac = sqrt(ene_conv) * length_conv**6
             bfac = ene_conv * length_conv**6
             cfac = ene_conv * length_conv**4
+            ahfac = ene_conv * length_conv**12
+            bhfac = ene_conv * length_conv**10
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in xrange(ntypes):
                 for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
                     ii = i + ntypes * j
-                    acoef[ii] = sqrt(parm_acoef[idx]) * afac
-                    bcoef[ii] = parm_bcoef[idx] * bfac
-                    if has1264:
-                        ccoef[ii] = parm_ccoef[idx] * cfac
+                    if idx < 0 and has1012:
+                        idx = -idx - 2 # Fix adjust for 0 since it was negative
+                        ahcoef[ii] = parm_ahcoef[idx] * ahfac
+                        bhcoef[ii] = parm_bhcoef[idx] * bhfac
+                        if has1264:
+                            ccoef[ii] = parm_ccoef[idx] * cfac
+                    elif idx >= 0:
+                        acoef[ii] = sqrt(parm_acoef[idx]) * afac
+                        bcoef[ii] = parm_bcoef[idx] * bfac
+                        if has1264:
+                            ccoef[ii] = parm_ccoef[idx] * cfac
             force.addTabulatedFunction('acoef',
                     mm.Discrete2DFunction(ntypes, ntypes, acoef))
             force.addTabulatedFunction('bcoef',
@@ -962,23 +1047,45 @@ class AmberParm(AmberFormat, Structure):
             # off-diagonal modifications. Offload this to a private method so it
             # can be overridden in the ChamberParm class
             self._modify_nonb_exceptions(nonbfrc, force)
-        elif has1264:
-            # Here we have JUST the r^-4 part, since the hasnbfix block above
-            # handled the "hasnbfix and has1264" case
-            ccoef = [0 for i in xrange(ntypes*ntypes)]
-            parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+        elif has1264 or has1012:
+            # Here we have JUST the r^-4 or r^-10/r^-12 parts, since the
+            # hasnbfix block above handled the "hasnbfix and has1264" case
+            if has1264:
+                ccoef = [0 for i in xrange(ntypes*ntypes)]
+                parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
+            if has1012:
+                ahcoef = [0 for i in xrange(ntypes*ntypes)]
+                bhcoef = ahcoef[:]
+                parm_ahcoef = self.parm_data['HBOND_ACOEF']
+                parm_bhcoef = self.parm_data['HBOND_BCOEF']
             cfac = ene_conv * length_conv**4
+            ahfac = ene_conv * length_conv**12
+            bhfac = ene_conv * length_conv**10
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in xrange(ntypes):
                 for j in xrange(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
-                    ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
-            force.addTabulatedFunction('ccoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                    if idx < 0 and has1012:
+                        idx = -idx - 2 # Fix adjust for 0 since it was negative
+                        ahcoef[i+ntypes*j] = parm_ahcoef[idx] * ahfac
+                        bhcoef[i+ntypes*j] = parm_bhcoef[idx] * bhfac
+                        if has1264:
+                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+                    elif idx > 0:
+                        if has1264:
+                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+            if has1264:
+                force.addTabulatedFunction('ccoef',
+                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Copy the exclusions
             for ii in xrange(nonbfrc.getNumExceptions()):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
                 force.addExclusion(i, j)
+        if has1012:
+            force.addTabulatedFunction('ahcoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, ahcoef))
+            force.addTabulatedFunction('bhcoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, bhcoef))
         # Copy the switching function information to the CustomNonbondedForce
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -1234,17 +1341,17 @@ class AmberParm(AmberFormat, Structure):
         for k, req in zip(self.parm_data['BOND_FORCE_CONSTANT'],
                           self.parm_data['BOND_EQUIL_VALUE']):
             self.bond_types.append(BondType(k, req, self.bond_types))
-        blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][MBONA], 3):
+        it = iter(self.parm_data['BONDS_WITHOUT_HYDROGEN'])
+        for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                            self.bond_types[blist[i+2]-1])
+                    Bond(self.atoms[i//3], self.atoms[j//3],
+                         self.bond_types[k-1])
             )
-        blist = self.parm_data['BONDS_INC_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
+        it = iter(self.parm_data['BONDS_INC_HYDROGEN'])
+        for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                         self.bond_types[blist[i+2]-1])
+                    Bond(self.atoms[i//3], self.atoms[j//3],
+                         self.bond_types[k-1])
             )
 
     #===================================================
@@ -1256,21 +1363,17 @@ class AmberParm(AmberFormat, Structure):
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
-        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][MTHETA], 4):
+        it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
+        for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
+                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
+                          self.angle_types[l-1])
             )
-        alist = self.parm_data['ANGLES_INC_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][NTHETH], 4):
+        it = iter(self.parm_data['ANGLES_INC_HYDROGEN'])
+        for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
+                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
+                          self.angle_types[l-1])
             )
 
     #===================================================
@@ -1294,29 +1397,25 @@ class AmberParm(AmberFormat, Structure):
             self.dihedral_types.append(
                     DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
-        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
+        it = iter(self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
+            ignore_end = k < 0
+            improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[abs(dlist[i+2])//3],
-                             self.atoms[abs(dlist[i+3])//3],
+                    Dihedral(self.atoms[i//3], self.atoms[j//3],
+                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
                              improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[dlist[i+4]-1])
+                             type=self.dihedral_types[m-1])
             )
-        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
+        it = iter(self.parm_data['DIHEDRALS_INC_HYDROGEN'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
+            ignore_end = k < 0
+            improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[abs(dlist[i+2])//3],
-                             self.atoms[abs(dlist[i+3])//3],
+                    Dihedral(self.atoms[i//3], self.atoms[j//3],
+                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
                              improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[dlist[i+4]-1])
+                             type=self.dihedral_types[m-1])
             )
 
     #===================================================
@@ -1638,12 +1737,15 @@ class AmberParm(AmberFormat, Structure):
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
             idx = nbidx[ntypes*id1+id2] - 1
-            a = acoef[idx]
-            b = bcoef[idx]
+            if idx >= 0:
+                a = acoef[idx]
+                b = bcoef[idx]
+            else:
+                a = b = 0
             if b == 0:
                 epsilon = 0.0
                 sigma = 0.5
-            else:
+            elif idx >= 0:
                 # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
                 rmin = (a / b * 2)**(1/6)
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb

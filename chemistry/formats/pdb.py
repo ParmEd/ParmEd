@@ -304,7 +304,7 @@ class PDBFile(object):
                     try:
                         chg = float(chg)
                     except ValueError:
-                        chg = 0
+                        chg = 0.0
                     if atname in ('EP', 'LP'): # lone pair
                         atom = ExtraPoint(atomic_number=atomic_number,
                                 name=atname, charge=chg, mass=mass,
@@ -908,6 +908,13 @@ class CIFFile(object):
                 except ValueError:
                     bfactor = 0.0
                 charge = row[chargeid]
+                if not charge.strip() or charge.strip() in ('.', '?'):
+                    charge = 0
+                else:
+                    try:
+                        charge = float(charge)
+                    except TypeError:
+                        charge = 0.0
                 # Try to figure out the element
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '
