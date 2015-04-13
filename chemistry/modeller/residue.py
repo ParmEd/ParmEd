@@ -327,7 +327,7 @@ class ResidueTemplateContainer(list):
             # Behave like a dict here... albeit a slow one
             for res in self:
                 if res.name == value: return res
-        return list.__getitem__(value)
+        return list.__getitem__(self, value)
 
     def to_library(self):
         """
