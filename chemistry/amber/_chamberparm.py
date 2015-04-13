@@ -21,6 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 from __future__ import division
+try:
+    from itertools import izip as zip
+except ImportError:
+    # This only happens in Python 3, where zip is equivalent to izip
+    pass
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
@@ -286,12 +291,11 @@ class ChamberParm(AmberParm):
             self.urey_bradley_types.append(
                     BondType(k, req, self.urey_bradley_types)
             )
-        ulist = self.parm_data['CHARMM_UREY_BRADLEY']
-        for i in xrange(0, 3*self.pointers['NUB'], 3):
+        it = iter(self.parm_data['CHARMM_UREY_BRADLEY'])
+        for i, j, k in zip(it, it, it):
             self.urey_bradleys.append(
-                    UreyBradley(self.atoms[ulist[i  ]-1],
-                                self.atoms[ulist[i+1]-1],
-                                self.urey_bradley_types[ulist[i+2]-1])
+                    UreyBradley(self.atoms[i-1], self.atoms[j-1],
+                                self.urey_bradley_types[k-1])
             )
 
     #===================================================
@@ -305,14 +309,11 @@ class ChamberParm(AmberParm):
             self.improper_types.append(
                     ImproperType(k, eq, self.improper_types)
             )
-        ilist = self.parm_data['CHARMM_IMPROPERS']
-        for i in xrange(0, 5*self.pointers['NIMPHI'], 5):
+        it = iter(self.parm_data['CHARMM_IMPROPERS'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
             self.impropers.append(
-                    Improper(self.atoms[ilist[i  ]-1],
-                             self.atoms[ilist[i+1]-1],
-                             self.atoms[ilist[i+2]-1],
-                             self.atoms[ilist[i+3]-1],
-                             self.improper_types[ilist[i+4]-1])
+                    Improper(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                             self.atoms[l-1], self.improper_types[m-1])
             )
 
     #===================================================
@@ -329,13 +330,11 @@ class ChamberParm(AmberParm):
             self.cmap_types.append(
                     CmapType(resolution, grid, cmts, list=self.cmap_types)
             )
-        clist = self.parm_data['CHARMM_CMAP_INDEX']
-        for i in xrange(0, 6*self.pointers['CMAP'], 6):
+        it = iter(self.parm_data['CHARMM_CMAP_INDEX'])
+        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
             self.cmaps.append(
-                    Cmap(self.atoms[clist[i  ]-1], self.atoms[clist[i+1]-1],
-                         self.atoms[clist[i+2]-1], self.atoms[clist[i+3]-1],
-                         self.atoms[clist[i+4]-1],
-                         self.cmap_types[clist[i+5]-1])
+                    Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                         self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
             )
 
     #===================================================
