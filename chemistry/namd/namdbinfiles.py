@@ -52,7 +52,7 @@ class NamdBinFile(object):
         """Delete entries corresponding to the given atom indices."""
         del_indices = np.atleast_1d(np.asarray(indices,np.int32))
         mask = np.ones(self.natom,np.bool)
-        mask[del_indices] *= 0
+        mask[del_indices] = False
         newvalues = np.zeros(3*(self.natom - del_indices.size),np.float64)
         newvalues += self.values.reshape((self.natom,3))[mask].flatten()
         self.values = newvalues
