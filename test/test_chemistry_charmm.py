@@ -337,6 +337,28 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(len(params.nbfix_types), 0)
         self.assertEqual(len(params.parametersets), 1)
         self.assertEqual(len(params.urey_bradley_types), 685)
+        # Look at the parsed residue templates and make sure they line up
+        self.assertEqual(len(params.residues), 32)
+        self.assertEqual(set(params.residues.keys()),
+                set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
+                     'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
+                     'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
+                     'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
+        )
+        self.assertEqual(len(params.patches), 22)
+        for resname, res in params.residues.items():
+            if resname in ('TIP3', 'TP3M', 'SOD', 'MG', 'CLA', 'POT', 'CES',
+                    'CAL', 'ZN2', 'ALAD'):
+                self.assertIs(res.first_patch, None)
+                self.assertIs(res.last_patch, None)
+                continue
+            self.assertIs(res.last_patch, params.patches['CTER'])
+            if resname == 'GLY':
+                self.assertIs(res.first_patch, params.patches['GLYP'])
+            elif resname == 'PRO':
+                self.assertIs(res.first_patch, params.patches['PROP'])
+            else:
+                self.assertIs(res.first_patch, params.patches['NTER'])
         # Look at the number of unique terms
         def uniques(stuff):
             myset = set()
