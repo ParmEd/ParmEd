@@ -71,7 +71,10 @@ class NamdBinFile(object):
                                     values,
                                     self.values[hinge:]))
         self.values = newvalues
-       
+
+    def copyatoms(self, start_index, natoms):
+        values = self.values[3*start_index:3*(start_index+natoms)]       
+        self.insertatoms(start_index,natoms,values)
 
 class NamdBinCoor(NamdBinFile):
     """Class to read or write NAMD "bincoordinates" files."""
