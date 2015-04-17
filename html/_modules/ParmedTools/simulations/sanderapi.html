@@ -143,6 +143,8 @@
                       <span class="n">e</span><span class="o">.</span><span class="n">vdw_14</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">elec_14</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">vdw</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">elec</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">igb</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">inp</span><span class="o">.</span><span class="n">ntb</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     Egb      = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">gb</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     EHbond   = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span><span class="p">)</span>
         <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span>
 
     <span class="n">sander</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
@@ -186,7 +188,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

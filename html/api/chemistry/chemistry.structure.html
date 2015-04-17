@@ -230,19 +230,22 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.strip" title="chemistry.structure.Structure.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange" title="chemistry.structure.Structure.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe" title="chemistry.structure.Structure.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Creates a pandas.DataFrame object from the current Structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange" title="chemistry.structure.Structure.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions" title="chemistry.structure.Structure.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions" title="chemistry.structure.Structure.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_psf" title="chemistry.structure.Structure.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_psf" title="chemistry.structure.Structure.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -515,6 +518,8 @@ of freedom will <em>still</em> be constrained).</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>This function calls prune_empty_terms if any Topology lists have changed</p>
 </dd></dl>
 
 <dl class="method">
@@ -953,11 +958,95 @@ as the <cite>atoms</cite> list.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="chemistry.structure.Structure.to_dataframe">
+<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.to_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pandas.DataFrame object from the current Structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The DataFrame will be over all atoms. The columns will be the attributes
+of the atom (as well as its containing residue). Some columns will
+<em>always</em> exist. Others will only exist if those attributes have been set
+on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+attributes and their meaning). The columns that will always be present
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+<li>resname : str (name of the containing residue)</li>
+<li>resid : int (Sequential index of the containing residue)</li>
+<li>resnum : int (original residue number in the input structure)</li>
+<li>chain : str (chain ID that the containing residue belongs to)</li>
+</ul>
+</div></blockquote>
+<p>The following attributes are optionally present if they were present in
+the original file defining the structure:</p>
+<blockquote>
+<div><ul class="simple">
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+<li>type_idx : int (integer type index for AMOEBA)</li>
+<li>class_idx : int (integer class type index for AMOEBA)</li>
+<li>multipole_111 : float (Monopole)</li>
+<li>multipole_211 : float (1,1 Dipole component)</li>
+<li>multipole_212 : float (1,2 Dipole component)</li>
+<li>multipole_222 : float (2,2 Dipole component)</li>
+<li>multipole_411 : float (1,1 Quadrupole component)</li>
+<li>multipole_412 : float (1,2 Quadrupole component)</li>
+<li>multipole_422 : float (2,2 Quadrupole component)</li>
+<li>multipole_413 : float (1,3 Quadrupole component)</li>
+<li>multipole_423 : float (2,3 Quadrupole component)</li>
+<li>multipole_433 : float (3,3 Quadrupole component)</li>
+<li>polarizability : float (dipole polarizability)</li>
+<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
+<li>segid : segment ID (similar to chain, but for CHARMM)</li>
+<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
+<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
+<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
+<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
+<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
+<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.topology">
 <tt class="descname">topology</tt><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
 Structure instance results in the topology being deleted and rebuilt</p>
+<p class="rubric">Notes</p>
+<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+changed.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1212,7 +1301,7 @@ closed</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

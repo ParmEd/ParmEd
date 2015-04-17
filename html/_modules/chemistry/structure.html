@@ -107,11 +107,20 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">create_array</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">pd</span> <span class="o">=</span> <span class="bp">None</span>
+
 <span class="c"># Try to import the OpenMM modules</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
     <span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
-    <span class="kn">from</span> <span class="nn">simtk.openmm.app.internal.unitcell</span> <span class="kn">import</span> <span class="n">reducePeriodicBoxVectors</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">simtk.openmm.app.internal.unitcell</span> <span class="kn">import</span> <span class="n">reducePeriodicBoxVectors</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="c"># OpenMM version is too old... only orthorhombic cells supported</span>
+        <span class="n">reducePeriodicBoxVectors</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">mm</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -359,6 +368,28 @@
 
     <span class="c">#===================================================</span>
 </div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">natom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">nres</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+        <span class="n">nextra</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s"> atoms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">natom</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">nextra</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; [</span><span class="si">%d</span><span class="s"> EPs]&#39;</span> <span class="o">%</span> <span class="n">nextra</span><span class="p">)</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; </span><span class="si">%d</span><span class="s"> residues&#39;</span> <span class="o">%</span> <span class="n">nres</span><span class="p">)</span>
+        <span class="n">nbond</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; </span><span class="si">%d</span><span class="s"> bonds&#39;</span> <span class="o">%</span> <span class="n">nbond</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; PBC&#39;</span><span class="p">)</span>
+        <span class="c"># Just assume that if the first bond has a defined type, so does</span>
+        <span class="c"># everything else... we don&#39;t want __repr__ to be super expensive</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; parametrized&gt;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; NOT parametrized&gt;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">retstr</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+
 <div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure, adding a new residue to `residues` if</span>
@@ -647,6 +678,186 @@
 
     <span class="c">#===================================================</span>
 </div>
+<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a pandas.DataFrame object from the current Structure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dataframe : :class:`pandas.DataFrame`</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The DataFrame will be over all atoms. The columns will be the attributes</span>
+<span class="sd">        of the atom (as well as its containing residue). Some columns will</span>
+<span class="sd">        *always* exist. Others will only exist if those attributes have been set</span>
+<span class="sd">        on the Atom instances (see the :class:`Atom` docs for possible</span>
+<span class="sd">        attributes and their meaning). The columns that will always be present</span>
+<span class="sd">        are:</span>
+
+<span class="sd">            - number : int</span>
+<span class="sd">            - name : str</span>
+<span class="sd">            - type : str</span>
+<span class="sd">            - atomic_number : int</span>
+<span class="sd">            - charge : float</span>
+<span class="sd">            - mass : float</span>
+<span class="sd">            - nb_idx : int</span>
+<span class="sd">            - radii : float</span>
+<span class="sd">            - screen : float</span>
+<span class="sd">            - occupancy : float</span>
+<span class="sd">            - bfactor : float</span>
+<span class="sd">            - altloc : str</span>
+<span class="sd">            - tree : str</span>
+<span class="sd">            - join : int</span>
+<span class="sd">            - irotat : int</span>
+<span class="sd">            - rmin : float</span>
+<span class="sd">            - epsilon : float</span>
+<span class="sd">            - rmin_14 : float</span>
+<span class="sd">            - epsilon_14 : float</span>
+<span class="sd">            - resname : str (name of the containing residue)</span>
+<span class="sd">            - resid : int (Sequential index of the containing residue)</span>
+<span class="sd">            - resnum : int (original residue number in the input structure)</span>
+<span class="sd">            - chain : str (chain ID that the containing residue belongs to)</span>
+
+<span class="sd">        The following attributes are optionally present if they were present in</span>
+<span class="sd">        the original file defining the structure:</span>
+
+<span class="sd">            - xx : float (x-coordinate position)</span>
+<span class="sd">            - xy : float (y-coordinate position)</span>
+<span class="sd">            - xz : float (z-coordinate position)</span>
+<span class="sd">            - vx : float (x-coordinate velocity)</span>
+<span class="sd">            - vy : float (y-coordinate velocity)</span>
+<span class="sd">            - vz : float (z-coordinate velocity)</span>
+<span class="sd">            - type_idx : int (integer type index for AMOEBA)</span>
+<span class="sd">            - class_idx : int (integer class type index for AMOEBA)</span>
+<span class="sd">            - multipole_111 : float (Monopole)</span>
+<span class="sd">            - multipole_211 : float (1,1 Dipole component)</span>
+<span class="sd">            - multipole_212 : float (1,2 Dipole component)</span>
+<span class="sd">            - multipole_222 : float (2,2 Dipole component)</span>
+<span class="sd">            - multipole_411 : float (1,1 Quadrupole component)</span>
+<span class="sd">            - multipole_412 : float (1,2 Quadrupole component)</span>
+<span class="sd">            - multipole_422 : float (2,2 Quadrupole component)</span>
+<span class="sd">            - multipole_413 : float (1,3 Quadrupole component)</span>
+<span class="sd">            - multipole_423 : float (2,3 Quadrupole component)</span>
+<span class="sd">            - multipole_433 : float (3,3 Quadrupole component)</span>
+<span class="sd">            - polarizability : float (dipole polarizability)</span>
+<span class="sd">            - vdw_parent : int (index of the vdW parent atom of this atom)</span>
+<span class="sd">            - segid : segment ID (similar to chain, but for CHARMM)</span>
+<span class="sd">            - U11 : float (U[1][1] of anisotropic b-factor tensor)</span>
+<span class="sd">            - U22 : float (U[2][2] of anisotropic b-factor tensor)</span>
+<span class="sd">            - U33 : float (U[3][3] of anisotropic b-factor tensor)</span>
+<span class="sd">            - U12 : float (U[1][2] of anisotropic b-factor tensor)</span>
+<span class="sd">            - U13 : float (U[1][3] of anisotropic b-factor tensor)</span>
+<span class="sd">            - U23 : float (U[2][3] of anisotropic b-factor tensor)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pd</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;pandas is not available; cannot create a pandas &#39;</span>
+                              <span class="s">&#39;DataFrame from this Structure&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;atomic_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;nb_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;radii&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">radii</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;screen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">screen</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;bfactor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;altloc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">altloc</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;tree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">tree</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">join</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;irotat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">irotat</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+
+        <span class="c"># Now for optional attributes</span>
+        <span class="c"># Coordinates</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">,</span> <span class="s">&#39;xy&#39;</span><span class="p">,</span> <span class="s">&#39;xz&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+        <span class="c"># Velocities</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;vx&#39;</span><span class="p">,</span> <span class="s">&#39;vy&#39;</span><span class="p">,</span> <span class="s">&#39;vz&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
+        <span class="c"># AMOEBA LJ type</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># AMOEBA class type</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;class_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">class_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># AMOEBA multipoles</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">multipoles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">multipoles</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;multipole_111&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_211&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_212&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;multipole_222&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_411&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_412&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;multipole_422&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_413&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_423&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;multipole_433&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multipoles</span><span class="p">)</span>
+        <span class="c"># AMOEBA polarizabilities</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;polarizability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">polarizability</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># AMOEBA vdw parent atom</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;vdw_parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># SEGID (CHARMM)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># anisotropic b-factors</span>
+        <span class="n">none6</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
+        <span class="n">anisos</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aniso</span><span class="p">,</span> <span class="s">&#39;tolist&#39;</span><span class="p">):</span>
+                <span class="n">anisos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aniso</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">all_nones</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">aniso</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">anisos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">none6</span>
+            <span class="k">elif</span> <span class="n">all_nones</span><span class="p">:</span>
+                <span class="n">all_nones</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_nones</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">anisos</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;U11&#39;</span><span class="p">,</span> <span class="s">&#39;U22&#39;</span><span class="p">,</span> <span class="s">&#39;U33&#39;</span><span class="p">,</span> <span class="s">&#39;U12&#39;</span><span class="p">,</span> <span class="s">&#39;U13&#39;</span><span class="p">,</span> <span class="s">&#39;U23&#39;</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="c">#===================================================</span>
+</div>
 <div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if any of the topology has changed for this structure &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
@@ -799,6 +1010,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The OpenMM Topology object. Cached when possible, but any changes to the</span>
 <span class="sd">        Structure instance results in the topology being deleted and rebuilt</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function calls ``prune_empty_terms`` if any topology lists have</span>
+<span class="sd">        changed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_changed</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
@@ -807,6 +1023,7 @@
                 <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prune_empty_terms</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_topology</span> <span class="o">=</span> <span class="n">top</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Topology</span><span class="p">()</span>
         <span class="n">chain</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">addChain</span><span class="p">()</span>
@@ -838,11 +1055,14 @@
             <span class="n">top</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span> <span class="n">atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">])</span>
         <span class="c"># Set the unit cell dimensions</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">top</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span>
-                    <span class="n">reducePeriodicBoxVectors</span><span class="p">(</span>
-                        <span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
-                    <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">reducePeriodicBoxVectors</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">top</span><span class="o">.</span><span class="n">setUnitCellDimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">top</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span>
+                        <span class="n">reducePeriodicBoxVectors</span><span class="p">(</span>
+                            <span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
+                        <span class="p">)</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">top</span>
 
     <span class="c">#===================================================</span>
@@ -1015,6 +1235,10 @@
 <span class="sd">            of freedom will *still* be constrained).</span>
 <span class="sd">        verbose : bool=False</span>
 <span class="sd">            If True, the progress of this subroutine will be printed to stdout</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function calls prune_empty_terms if any Topology lists have changed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Establish defaults</span>
         <span class="k">if</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -1043,6 +1267,10 @@
                         <span class="n">masses</span><span class="p">[</span><span class="n">heavy_atom</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">-=</span> <span class="n">hydrogenMass</span> <span class="o">-</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
         <span class="k">for</span> <span class="n">mass</span> <span class="ow">in</span> <span class="n">masses</span><span class="p">:</span> <span class="n">system</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">omm_add_constraints</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">)</span>
+        <span class="c"># Prune empty terms if we have changed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_changed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune_empty_terms</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
         <span class="c"># Add the various types of forces</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;Adding bonds...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_force_to_system</span><span class="p">(</span><span class="n">system</span><span class="p">,</span>
@@ -1093,9 +1321,16 @@
         <span class="k">if</span> <span class="n">removeCMMotion</span><span class="p">:</span>
             <span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CMMotionRemover</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">system</span><span class="o">.</span><span class="n">setDefaultPeriodicBoxVectors</span><span class="p">(</span>
-                    <span class="o">*</span><span class="n">reducePeriodicBoxVectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">reducePeriodicBoxVectors</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c"># This version of OpenMM does *not* support triclinics</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">90</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">90</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">90</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;OpenMM version </span><span class="si">%s</span><span class="s"> only supports &#39;</span>
+                                     <span class="s">&#39;orthorhombic unit cells&#39;</span> <span class="o">%</span> <span class="n">mm</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+                <span class="n">system</span><span class="o">.</span><span class="n">setDefaultPeriodicBoxVectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">system</span><span class="o">.</span><span class="n">setDefaultPeriodicBoxVectors</span><span class="p">(</span>
+                        <span class="o">*</span><span class="n">reducePeriodicBoxVectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">omm_set_virtual_sites</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">system</span>
 
@@ -1139,9 +1374,8 @@
                                      <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">req</span><span class="o">*</span><span class="n">length_conv</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">HAngles</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
-                <span class="n">num_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">+</span>
-                         <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">num_h</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">8</span><span class="p">):</span>
+                <span class="n">num_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">num_h</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">8</span><span class="p">):</span>
                     <span class="c"># Constrain this angle</span>
                     <span class="n">l1</span> <span class="o">=</span> <span class="n">l2</span> <span class="o">=</span> <span class="bp">None</span>
                     <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
@@ -1153,7 +1387,7 @@
                     <span class="k">if</span> <span class="n">l1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">l2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span> <span class="c"># no bonds found...</span>
                     <span class="n">cost</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">theteq</span><span class="o">*</span><span class="n">DEG_TO_RAD</span><span class="p">)</span>
                     <span class="n">length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">l1</span><span class="o">*</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span><span class="o">*</span><span class="n">l2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">*</span><span class="n">l2</span><span class="o">*</span><span class="n">cost</span><span class="p">)</span><span class="o">*</span><span class="n">length_conv</span>
-                    <span class="n">system</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+                    <span class="n">system</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span><span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span><span class="n">length</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -1293,9 +1527,8 @@
             <span class="n">force</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">HarmonicAngleForce</span><span class="p">()</span>
         <span class="n">force</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ANGLE_FORCE_GROUP</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
-            <span class="n">num_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">+</span>
-                     <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">HAngles</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
+            <span class="n">num_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">HAngles</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="p">(</span><span class="n">num_h</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
                     <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">flexibleConstraints</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">angle</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -2167,7 +2400,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

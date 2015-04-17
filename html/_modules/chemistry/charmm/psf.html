@@ -68,6 +68,7 @@
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="k">def</span> <span class="nf">_catchindexerror</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
@@ -109,6 +110,8 @@
             <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[]</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="n">_resre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(\d+)([a-zA-Z]*)&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CharmmPsfFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.psf.html#chemistry.charmm.psf.CharmmPsfFile">[docs]</a><span class="k">class</span> <span class="nc">CharmmPsfFile</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -218,6 +221,7 @@
 <span class="sd">        Opens and parses a PSF file, then instantiates a CharmmPsfFile</span>
 <span class="sd">        instance from the data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">_resre</span>
         <span class="n">Structure</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_convert</span>
         <span class="c"># Make sure the file exists</span>
@@ -253,7 +257,12 @@
             <span class="k">if</span> <span class="n">atid</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">CharmmPSFError</span><span class="p">(</span><span class="s">&#39;Nonsequential atoms detected!&#39;</span><span class="p">)</span>
             <span class="n">segid</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">resid</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;residue number&#39;</span><span class="p">)</span>
+            <span class="n">rematch</span> <span class="o">=</span> <span class="n">_resre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Could not interpret residue number </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                   <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">resid</span><span class="p">,</span> <span class="n">inscode</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="n">resid</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;residue number&#39;</span><span class="p">)</span>
             <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
             <span class="n">attype</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
@@ -268,7 +277,7 @@
             <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">attype</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="n">props</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="n">segid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="n">segid</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="n">inscode</span><span class="p">)</span>
         <span class="c"># Now get the number of bonds</span>
         <span class="n">nbond</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NBOND&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;number of bonds&#39;</span><span class="p">)</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">psfsections</span><span class="p">[</span><span class="s">&#39;NBOND&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -847,7 +856,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

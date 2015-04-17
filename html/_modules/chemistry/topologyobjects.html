@@ -629,6 +629,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">=</span> <span class="n">value</span>
 </div>
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Lennard-Jones sigma parameter -- directly related to Rmin &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">sigma</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="nd">@sigma.setter</span>
+<div class="viewcode-block" id="Atom.sigma"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones epsilon parameter (the Lennard-Jones well depth) &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -657,6 +670,15 @@
 <div class="viewcode-block" id="Atom.rmin_14"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom.rmin_14">[docs]</a>    <span class="k">def</span> <span class="nf">rmin_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The 1-4 Lennard-Jones Rmin/2 parameter &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Lennard-Jones sigma parameter -- directly related to Rmin &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="nd">@sigma_14.setter</span>
+<div class="viewcode-block" id="Atom.sigma_14"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">epsilon_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1599,7 +1621,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">req</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, Req=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, req=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -1746,7 +1768,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">theteq</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, THETAeq=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, theteq=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -2003,33 +2025,15 @@
 
    <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="DihedralType.write_info"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.DihedralType.html#chemistry.topologyobjects.DihedralType.write_info">[docs]</a>    <span class="k">def</span> <span class="nf">write_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write out the dihedral parameters &quot;&quot;&quot;</span>
-        <span class="c"># If our idx == -1, we&#39;re not being used, so just return</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span>
-        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;DIHEDRAL_FORCE_CONSTANT&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span>
-        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;DIHEDRAL_PERIODICITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span>
-        <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;DIHEDRAL_PHASE&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCEE_SCALE_FACTOR&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCNB_SCALE_FACTOR&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
-   
-    <span class="c">#===================================================</span>
-</div>
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">phi_k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">per</span> <span class="ow">and</span> 
                 <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">phase</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">scee</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, periodicity=</span><span class="si">%d</span><span class="s">, phase=</span><span class="si">%.3f</span><span class="s">, &#39;</span>
-                <span class="s">&#39;scee=</span><span class="si">%.3f</span><span class="s">, scnb=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; phi_k=</span><span class="si">%.3f</span><span class="s">, per=</span><span class="si">%d</span><span class="s">, phase=</span><span class="si">%.3f</span><span class="s">, scee=</span><span class="si">%.3f</span><span class="s">, scnb=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -2057,7 +2061,7 @@
         <span class="k">return</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;DihedralTypes </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">DihedralTypeList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;DihedralTypes </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">DihedralTypeList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -2330,7 +2334,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_k</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">psi_k</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_eq</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">psi_eq</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; k=</span><span class="si">%.3f</span><span class="s">, PSIeq=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; psi_k=</span><span class="si">%.3f</span><span class="s">, psi_eq=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">psi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_eq</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -2572,7 +2576,7 @@
                 <span class="nb">all</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">grid</span><span class="p">)]))</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; res=</span><span class="si">%d</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; resolution=</span><span class="si">%d</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -3057,7 +3061,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">theteq</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; Req_1=</span><span class="si">%.3f</span><span class="s">, Req_2=</span><span class="si">%.3f</span><span class="s">, THETAeq=</span><span class="si">%.3f</span><span class="s">, k1=</span><span class="si">%.3f</span><span class="s">, k2=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> \
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; req1=</span><span class="si">%.3f</span><span class="s">, req2=</span><span class="si">%.3f</span><span class="s">, theteq=</span><span class="si">%.3f</span><span class="s">, k1=</span><span class="si">%.3f</span><span class="s">, k2=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> \
                 <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">k1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k2</span><span class="p">)</span>
 
@@ -4132,6 +4136,24 @@
         <span class="k">if</span> <span class="n">epsilon14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">epsilon14</span> <span class="o">=</span> <span class="n">epsilon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbfix</span><span class="p">[</span><span class="n">typename</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">rmin14</span><span class="p">,</span> <span class="n">epsilon14</span><span class="p">)</span>
 </div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sigma is Rmin / 2^(1/6) &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="nd">@sigma.setter</span>
+<div class="viewcode-block" id="AtomType.sigma"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.AtomType.html#chemistry.topologyobjects.AtomType.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sigma is Rmin / 2^(1/6) &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin_14</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="nd">@sigma.setter</span>
+<div class="viewcode-block" id="AtomType.sigma_14"><a class="viewcode-back" href="../../topobj/chemistry.topologyobjects.AtomType.html#chemistry.topologyobjects.AtomType.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmin_14</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+</div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
@@ -4273,7 +4295,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -64,7 +64,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;PROTEIN&#39;</span><span class="p">,</span> <span class="s">&#39;NUCLEIC&#39;</span><span class="p">,</span> <span class="s">&#39;SOLVENT&#39;</span><span class="p">,</span> <span class="s">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s">&#39;ResidueTemplate&#39;</span><span class="p">,</span>
-           <span class="s">&#39;ResidueTemplateContainer&#39;</span><span class="p">]</span>
+           <span class="s">&#39;ResidueTemplateContainer&#39;</span><span class="p">,</span> <span class="s">&#39;PatchTemplate&#39;</span><span class="p">]</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -113,6 +113,14 @@
 <span class="sd">        The atom that is connected to the residue that comes before this one</span>
 <span class="sd">    tail : :class:`Atom` or None</span>
 <span class="sd">        The atom that is connected to the *next* residue after this one</span>
+<span class="sd">    first_patch : :class:`ResidueTemplate` or None</span>
+<span class="sd">        If it is not None, this is the patch whose tail is added to the head</span>
+<span class="sd">        atom of this residue when this residue is the first in a chain</span>
+<span class="sd">    last_patch : :class:`ResidueTemplate` or None</span>
+<span class="sd">        If it is not None, this is the patch whose head is added to the tail</span>
+<span class="sd">        atom of this residue when this residue is the last in a chain</span>
+<span class="sd">    groups : list of list(:class:`Atom`)</span>
+<span class="sd">        If set, each group is a list of Atom instances making up each group</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
@@ -124,6 +132,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">UNKNOWN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="s">&#39;None&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="s">&#39;None&#39;</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">: </span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> bonds; head=</span><span class="si">%s</span><span class="s">; tail=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">),</span> <span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ResidueTemplate.add_atom"><a class="viewcode-back" href="../../../api/chemistry/chemistry.modeller.residue.html#chemistry.modeller.residue.ResidueTemplate.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an atom to this residue template</span>
@@ -149,11 +174,11 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom1 : :class:`Atom` or int</span>
+<span class="sd">        atom1 : :class:`Atom` or int or str</span>
 <span class="sd">            One of the atoms in the bond. It must be in the ``atoms`` list of</span>
 <span class="sd">            this ResidueTemplate. It can also be the atom index (index from 0)</span>
 <span class="sd">            of the atom in the bond.</span>
-<span class="sd">        atom2 : :class:`Atom` or int</span>
+<span class="sd">        atom2 : :class:`Atom` or int or str</span>
 <span class="sd">            The other atom in the bond. It must be in the ``atoms`` list of this</span>
 <span class="sd">            ResidueTemplate. It can also be the atom index (index from 0) of the</span>
 <span class="sd">            atom in the bond.</span>
@@ -168,12 +193,14 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        If atom1 and atom2 are already bonded, this routine does nothing</span>
+<span class="sd">        If atom1 and atom2 are already bonded, this routine does nothing. If</span>
+<span class="sd">        atom1 or atom2 are strings, then they will match the first instance of</span>
+<span class="sd">        the atom name that is the same as the atom name passed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom2</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">atom1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom2</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">atom2</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="ow">or</span> <span class="n">atom2</span><span class="o">.</span><span class="n">list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Both atoms must belong to template.atoms&#39;</span><span class="p">)</span>
         <span class="c"># Do not add the same bond twice</span>
@@ -233,11 +260,61 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span>
 
-    <span class="c"># Make ResidueTemplate look like a container of atoms</span></div>
+    <span class="c"># Make ResidueTemplate look like a container of atoms, also indexable by the</span>
+    <span class="c"># atom name</span></div>
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">atom</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">atom</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%s</span><span class="s"> not found in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="PatchTemplate"><a class="viewcode-back" href="../../../api/chemistry/chemistry.modeller.residue.html#chemistry.modeller.residue.PatchTemplate">[docs]</a><span class="k">class</span> <span class="nc">PatchTemplate</span><span class="p">(</span><span class="n">ResidueTemplate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A residue patch (typically used for CHARMM) that is used to modify existing</span>
+<span class="sd">    residues in some way (e.g., terminal patches, disulfide bridges, etc.)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        If provided, this is the name of the residue</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    delete : list of str</span>
+<span class="sd">        List of atoms that need to be deleted in applying the patch</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`ResidueTemplate`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This class basically just provides an additional list of atoms that need to</span>
+<span class="sd">    be deleted when applying this patch -- something that does not apply to</span>
+<span class="sd">    standard Residues</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PatchTemplate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -295,6 +372,13 @@
             <span class="n">inst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span>
 </div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c"># Behave like a dict here... albeit a slow one</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span> <span class="k">return</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ResidueTemplateContainer.to_library"><a class="viewcode-back" href="../../../api/chemistry/chemistry.modeller.residue.html#chemistry.modeller.residue.ResidueTemplateContainer.to_library">[docs]</a>    <span class="k">def</span> <span class="nf">to_library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the ResidueTemplateContainer instance to a library of unique</span>
@@ -350,7 +434,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
