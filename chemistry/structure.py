@@ -62,6 +62,11 @@ try:
 except ImportError:
     pd = None
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -946,11 +951,169 @@ class Structure(object):
             except TypeError:
                 raise TypeError('Selection not a supported type [%s]' %
                                 type(selection))
-            if len(sel) != self.atoms:
+            if len(sel) != len(self.atoms):
                 raise ValueError('Selection iterable wrong length')
         atomlist = sorted([i for i, s in enumerate(sel) if s])
         for i in reversed(atomlist):
             del self.atoms[i]
+        self.prune_empty_terms()
+        self.residues.prune()
+        self.unchange()
+
+    #===================================================
+
+    def __getitem__(self, selection):
+        """
+        Allows extracting a single atom from the structure or a slice of atoms
+        as a new Structure instance. The following syntaxes are allowed:
+
+            - struct[str] : str is interpreted as an Amber selection mask
+            - struct[[sel,[sel,]],sel] : sel can be a list of indices (or
+                            strings for chain selection) an integer, or a slice
+
+        Parameters
+        ----------
+        selection : str, or slice|iter|str, slice|iter|int, slice|iter|int
+            Which atoms to select for the new structure
+
+        Returns
+        -------
+        struct : :class:`Structure`
+            If more than one atom is selected, the resulting return value is a
+            new structure containing all selected atoms and all valence terms
+            (and types) in which all involved atoms are present
+
+        or
+
+        atom : :class:`Atom`
+            If only a single atom is selected
+
+        or
+
+        None
+            If no atoms are selected
+
+        Notes
+        -----
+        When selecting more than 1 atom, this is a costly operation. It is
+        currently implemented by making a full copy of the object and then
+        stripping the unused atoms.
+
+        Raises
+        ------
+        ``TypeError`` : if selection (or any part of the selection) is not an
+                        allowed type
+
+        ``ValueError`` : if the selection is a boolean-like list and its length
+                         is not the same as the number of atoms in the system
+        """
+        from copy import copy
+        from chemistry.amber import AmberMask
+        if isinstance(selection, int):
+            return self.atoms[selection]
+
+        # Now we select a subset of atoms. Convert "selection" into a natom list
+        # with 0s and 1s, depending on what the input selection is
+        if isinstance(selection, basestring):
+            mask = AmberMask(self, selection)
+            selection = mask.Selection()
+        elif isinstance(selection, slice):
+            sel = [0 for a in self.atoms]
+            for idx in range(len(self.atoms))[selection]:
+                sel[idx] = 1
+            selection = sel
+        elif isinstance(selection, tuple) and len(selection) in (2, 3):
+            # This is a selection of chains, and/or residues, and/or atoms
+            if len(selection) == 2:
+                # Select just residues and atoms
+                ressel, atomsel = selection
+                has_chain = False
+            elif len(selection) == 3:
+                chainsel, ressel, atomsel = selection
+                chainmap = dict() # First residue in each chain
+                for r in self.residues:
+                    if r.chain not in chainmap:
+                        chainmap[r.chain] = r.idx
+                if isinstance(chainsel, basestring):
+                    if chainsel in chainmap:
+                        chainset = set([chainsel])
+                    else:
+                        # The selected chain is not in the system. Cannot
+                        # possibly select *any* atoms. Bail now for speed
+                        return None
+                elif isinstance(chainsel, slice):
+                    # Build an ordered set of chains
+                    chains = [self.residues[0].chain]
+                    for res in self.residues:
+                        if res.chain != chains[-1]:
+                            chains.append(res.chain)
+                    chainset = set(chains[chainsel])
+                else:
+                    chainset = set(chainsel)
+                for chain in chainset:
+                    if chain in chainmap:
+                        break
+                else:
+                    # No requested chain is present. Bail now for speed
+                    return None
+                has_chain = True
+            # Residue selection can either be by name or index
+            if isinstance(ressel, slice):
+                resset = set(range(len(self.residues))[ressel])
+            elif isinstance(ressel, basestring) or isinstance(ressel, int):
+                resset = set([ressel])
+            else:
+                resset = set(ressel)
+            if isinstance(atomsel, slice):
+                atomset = set(range(len(self.atoms))[atomsel])
+            elif isinstance(atomsel, basestring) or isinstance(atomsel, int):
+                atomset = set([atomsel])
+            else:
+                atomset = set(atomsel)
+            if has_chain:
+                selection = [
+                        (a.residue.chain in chainset) and
+                        (a.residue.name in resset or
+                         a.residue.idx-chainmap[a.residue.chain] in resset) and
+                        (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                            for a in self.atoms
+                ]
+            else:
+                selection = [
+                    (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                    and (a.residue.name in resset or a.residue.idx in resset)
+                            for a in self.atoms
+                ]
+        else:
+            # Assume it is an iterable. If it is the same length as the atoms,
+            # it is a boolean mask array. Otherwise, it is a list of atom
+            # indices to select
+            sel = [0 for atom in self.atoms]
+            selection = list(selection)
+            if len(selection) == len(self.atoms):
+                for i, val in enumerate(selection):
+                    if val: sel[i] = 1
+            elif len(selection) > len(self.atoms):
+                raise ValueError('Selection iterable is too long')
+            else:
+                try:
+                    for val in selection:
+                        sel[val] = 1
+                except IndexError:
+                    raise ValueError('Selected atom out of range')
+            selection = sel
+        # Now our selection array is a "boolean" array for each atom. Strip the
+        # unselected atoms from a copy of this structure
+        sumsel = sum(selection)
+        if sumsel == 0:
+            # No atoms selected. Return None
+            return None
+        if sumsel == 1:
+            # 1 atom selected; return that atom
+            return self.atoms[selection.index(1)]
+        other = copy(self)
+        other.strip([not i for i in selection])
+        return other
 
     #===================================================
 

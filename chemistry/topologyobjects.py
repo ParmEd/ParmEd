@@ -4100,7 +4100,7 @@ class AtomType(object):
         """ Sigma is Rmin / 2^(1/6) """
         return self.rmin_14 * 2**(-1/6)
 
-    @sigma.setter
+    @sigma_14.setter
     def sigma_14(self, value):
         self.rmin_14 = value * 2**(1/6)
 

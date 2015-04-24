@@ -25,10 +25,6 @@ from __future__ import division
 
 from chemistry import unit as u
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Py3, zip is already izip
 from math import pi, cos, sin, sqrt, acos
 try:
     import numpy as np
