@@ -1,7 +1,7 @@
 from chemistry import read_PDB, load_rosetta
 from utils import get_fn
 import unittest
-from unittest import skipIf, skipTest
+from unittest import skipIf
 
 try:
     from simtk.openmm.app import PDBFile
@@ -19,7 +19,7 @@ def _unpackLen(obj):
     return len(list(obj))
 
 
-@skipTest(not init, "Cannot test load_rosetta module without PyRosetta.")
+@skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):
     """ Tests loading of a Rosetta pose object """
 
