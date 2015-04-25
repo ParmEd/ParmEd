@@ -159,6 +159,3 @@ class FormatNotFound(ChemError):
 
 class RosettaError(ChemError):
     """ If there is a problem loading a Rosetta pose object """
-
-class RosettaWarning(ChemWarning):
-    """ If there is a non-fatal error manipulating a Rosetta pose object """
