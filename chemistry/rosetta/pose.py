@@ -34,41 +34,43 @@ class RosettaPose(object):
         struct.year = None
         struct.related_entries = []
 
-        # try:
-        atnum = 1
-        conf = pose.conformation()
-        for resid in xrange(1, pose.total_residue()+1):
-            res = pose.residue(resid)
-            resname = res.name3().strip()
-            chain = chr(res.chain()+ord('A')-1)
-            for atno, at in enumerate(res.atoms(), start=1):
-                try:
-                    atname = res.atom_name(atno).strip()
-                    atsym = res.atom_type(atno).element()
-                    rmin = res.atom_type(atno).lj_radius()
-                    epsilon = res.atom_type(atno).lj_wdepth()
-                    atomic_number = AtomicNum[atsym]
-                    mass = Mass[atsym]
-                except KeyError:
-                    raise RosettaError('')
+        try:
+            atnum = 1
+            conf = pose.conformation()
+            for resid in xrange(1, pose.total_residue()+1):
+                res = pose.residue(resid)
+                resname = res.name3().strip()
+                chain = chr(res.chain()+ord('A')-1)
+                for atno, at in enumerate(res.atoms(), start=1):
+                    try:
+                        atname = res.atom_name(atno).strip()
+                        atsym = res.atom_type(atno).element()
+                        rmin = res.atom_type(atno).lj_radius()
+                        epsilon = res.atom_type(atno).lj_wdepth()
+                        atomic_number = AtomicNum[atsym]
+                        mass = Mass[atsym]
+                    except KeyError:
+                        raise RosettaError('')
 
-                atom = Atom(atomic_number=atomic_number, name=atname,
-                            charge=0.0, mass=mass, occupancy=0.0,
-                            bfactor=0.0, altloc='', number=atnum,
-                            rmin=rmin, epsilon=epsilon)
-                atom.xx, atom.xy, atom.xz = tuple(at.xyz())
-                struct.add_atom(atom, resname, resid, chain, '')
-                for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
-                                                               resid)):
-                    if nbr.rsd() <= resid and nbr.atomno() < atno:
-                        Bond(struct.atoms[sum([pose.residue(i).natoms()
-                                          for i in xrange(1, nbr.rsd())])
-                                          + nbr.atomno() - 1],
-                             atom)
-                atnum += 1
+                    atom = Atom(atomic_number=atomic_number, name=atname,
+                                charge=0.0, mass=mass, occupancy=0.0,
+                                bfactor=0.0, altloc='', number=atnum,
+                                rmin=rmin, epsilon=epsilon)
+                    atom.xx, atom.xy, atom.xz = tuple(at.xyz())
+                    struct.add_atom(atom, resname, resid, chain, '')
+                    for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
+                                                                   resid)):
+                        if nbr.rsd() <= resid and nbr.atomno() < atno:
+                            struct.bonds.append(
+                                Bond(struct.atoms[sum(
+                                    [pose.residue(i).natoms()
+                                     for i in xrange(1, nbr.rsd())])
+                                    + nbr.atomno() - 1],
+                                    atom))
+                    atnum += 1
 
-        # except:
-            # raise RosettaError('')
+        except:
+            raise RosettaError('')
 
         struct.unchange()
         return struct
