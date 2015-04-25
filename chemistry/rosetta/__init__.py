@@ -4,7 +4,7 @@ A package dealing with PyRosetta integration.
 
 __all__ = ['RosettaPose']
 
-from chemistry.rosetta import RosettaPose
+from chemistry.rosetta.pose import RosettaPose
 
 # Now let's modify structure.Structure and add our write methods from our
 # various formats
