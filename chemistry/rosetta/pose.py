@@ -50,7 +50,7 @@ class RosettaPose(object):
                         atomic_number = AtomicNum[atsym]
                         mass = Mass[atsym]
                     except KeyError:
-                        raise RosettaError('')
+                        raise RosettaError('Atom not recognized.')
 
                     atom = Atom(atomic_number=atomic_number, name=atname,
                                 charge=0.0, mass=mass, occupancy=0.0,
@@ -58,19 +58,22 @@ class RosettaPose(object):
                                 rmin=rmin, epsilon=epsilon)
                     atom.xx, atom.xy, atom.xz = tuple(at.xyz())
                     struct.add_atom(atom, resname, resid, chain, '')
-                    for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
-                                                                   resid)):
-                        if nbr.rsd() <= resid and nbr.atomno() < atno:
-                            struct.bonds.append(
-                                Bond(struct.atoms[sum(
-                                    [pose.residue(i).natoms()
-                                     for i in xrange(1, nbr.rsd())])
-                                    + nbr.atomno() - 1],
-                                    atom))
-                    atnum += 1
+                    try:
+                        for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
+                                                                       resid)):
+                            if nbr.rsd() <= resid and nbr.atomno() < atno:
+                                struct.bonds.append(
+                                    Bond(struct.atoms[sum(
+                                        [pose.residue(i).natoms()
+                                         for i in xrange(1, nbr.rsd())])
+                                        + nbr.atomno() - 1],
+                                        atom))
+                        atnum += 1
+                    except:
+                        raise RosettaError('Could not add bonds.')
 
         except:
-            raise RosettaError('')
+            raise RosettaError('Could not load structure.')
 
         struct.unchange()
         return struct
