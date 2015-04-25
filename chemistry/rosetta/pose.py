@@ -18,10 +18,10 @@ except ImportError:
 
 
 def _n_prior(pose, nbr):
-    prior = 0
+    prior = -1
     for i in xrange(1, nbr.rsd()):
         prior += pose.residue(i).natoms()
-    return prior + nbr.atomno() - 1
+    return prior + nbr.atomno()
 
 
 class RosettaPose(object):
