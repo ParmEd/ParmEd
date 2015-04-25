@@ -17,10 +17,17 @@ except ImportError:
     pass
 
 
+def _n_prior(pose, nbr):
+    prior = 0
+    for i in xrange(1, nbr.rsd()):
+        prior += pose.residue(i).natoms()
+    return prior + nbr.atomno() - 1
+
+
 class RosettaPose(object):
 
     @staticmethod
-    def load(self, pose):
+    def load(pose):
         """ Load a Pose object and return a populated `Structure` class
         """
         if not Pose or not AtomID:
@@ -28,7 +35,6 @@ class RosettaPose(object):
         if not isinstance(pose, Pose):
             raise TypeError('Object is not a PyRosetta Pose object.')
 
-        self.pose = pose
         struct = Structure()
 
         try:
@@ -71,7 +77,7 @@ class RosettaPose(object):
                                                                        resid)):
                             if nbr.rsd() <= resid and nbr.atomno() < atno:
                                 struct.bonds.append(
-                                    Bond(struct.atoms[self._n_prior_(nbr)],
+                                    Bond(struct.atoms[_n_prior(pose, nbr)],
                                          atom))
                         atnum += 1
                     except:
@@ -82,9 +88,3 @@ class RosettaPose(object):
 
         struct.unchange()
         return struct
-
-        def _n_prior_(self, nbr):
-            prior = 0
-            for i in xrange(1, nbr.rsd()):
-                prior += self.pose.residue(i).natoms()
-            return prior + nbr.atomno() - 1
