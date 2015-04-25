@@ -10,7 +10,7 @@ except:
 try:
     from rosetta import init, pose_from_sequence
 except ImportError:
-    init, pose_from_sequence = None
+    init = pose_from_sequence = None
     pass
 
 
