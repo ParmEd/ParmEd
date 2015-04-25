@@ -71,14 +71,15 @@ class RosettaPose(object):
                                 rmin=rmin, epsilon=epsilon)
                 atom.xx, atom.xy, atom.xz = tuple(at.xyz())
                 struct.add_atom(atom, resname, resid, chain, '')
+                atnum += 1
                 try:
                     for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
                                                                    resid)):
-                        if nbr.rsd() <= resid and nbr.atomno() < atno:
+                        if nbr.rsd() < resid or (nbr.rsd() == resid
+                                                 and nbr.atomno() < atno):
                             struct.bonds.append(
                                 Bond(struct.atoms[_n_prior(pose, nbr)],
                                      atom))
-                    atnum += 1
                 except:
                     raise RosettaError('Could not add bonds.')
 
