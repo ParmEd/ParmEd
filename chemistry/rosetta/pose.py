@@ -13,7 +13,7 @@ from chemistry.topologyobjects import Atom, Bond
 try:
     from rosetta import Pose, AtomID
 except ImportError:
-    raise RosettaWarning('Cannot find the PyRosetta module.')
+    RosettaWarning('Cannot find the PyRosetta module.')
 
 
 class RosettaPose(object):
