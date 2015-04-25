@@ -40,7 +40,7 @@ class RosettaPose(object):
         for resid in xrange(1, pose.total_residue()+1):
             res = pose.residue(resid)
             resname = res.name3().strip()
-            chain = res.chain()
+            chain = chr(res.chain()+ord('A')-1)
             for atno, at in enumerate(res.atoms(), start=1):
                 try:
                     atname = res.atom_name(atno).strip()
