@@ -5,7 +5,7 @@ Pose objects.
 
 from __future__ import print_function
 
-from chemistry.exceptions import RosettaError
+from chemistry.exceptions import RosettaError, RosettaWarning
 from chemistry.periodic_table import AtomicNum, Mass
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond
@@ -13,7 +13,7 @@ from chemistry.topologyobjects import Atom, Bond
 try:
     from rosetta import Pose, AtomID
 except ImportError:
-    raise RosettaError('Cannot find the PyRosetta module.')
+    raise RosettaWarning('Cannot find the PyRosetta module.')
 
 
 class RosettaPose(object):
