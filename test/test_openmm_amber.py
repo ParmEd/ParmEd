@@ -18,6 +18,7 @@ from math import sqrt
 import ParmedTools as PT
 import unittest
 import utils
+skipIf = utils.skipIf
     
 get_fn = utils.get_fn
 
@@ -559,7 +560,7 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertEqual(system.getNumConstraints(), 3000)
 
     def testInterfacePBC(self):
-        """ Testing all OpenMMAmberParm.createSystem options (periodic) """
+        """ Testing all AmberParm.createSystem options (periodic) """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -661,7 +662,7 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
     def testInterfaceNoPBC(self):
-        """ Testing all OpenMMAmberParm.createSystem options (non-periodic) """
+        """ Testing all AmberParm.createSystem options (non-periodic) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
@@ -1026,12 +1027,84 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
-# Ewald is WAYYY to slow for a ~60K atom system. So just do PME and assume the
-# testInterfacePBC method below makes sure that Ewald is appropriately set when
-# requested
-
     def testPME(self):
         """ Compare OpenMM and CHAMBER PME energies """
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+#Bond         =            1.1324222     Angle        =            1.0688008
+#Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
+#Improper     =            0.0000000     CMAP         =            0.1267899
+#Nonbond      =         6514.4460318
+#TOTAL        =         6524.6468990
+        self.assertAlmostEqual(energies['bond'], 1.1324, delta=5e-3)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.8114, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+
+    def testDispersionCorrection(self):
+        """ Compare OpenMM and CHAMBER energies without vdW correction """
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5)
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce):
+                force.setUseDispersionCorrection(False)
+            elif isinstance(force, mm.CustomNonbondedForce):
+                force.setUseLongRangeCorrection(False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+#Bond         =            1.1324222     Angle        =            1.0688008
+#Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
+#Improper     =            0.0000000     CMAP         =            0.1267899
+#Nonbond      =         6584.1603528
+#TOTAL        =         6594.3612201
+        self.assertAlmostEqual(energies['bond'], 1.13242, delta=5e-5)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6584.1604, places=4)
+
+    def testSHAKE(self):
+        """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5,
+                                   flexibleConstraints=False,
+                                   constraints=app.HBonds)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator)
+        sim.context.setPositions(parm.positions)
+        # The only thing that changes here compared to the other periodic tests
+        # is the bond energy, which should be slightly smaller than before
+        state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
+                                     groups=2**parm.BOND_FORCE_GROUP)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 1.13236, delta=5e-5)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+
+    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigPME(self):
+        """ Compare OpenMM and CHAMBER PME energies on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                            get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
@@ -1056,8 +1129,9 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
-    def testDispersionCorrection(self):
-        """ Compare OpenMM and CHAMBER energies without vdW correction """
+    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigDispersionCorrection(self):
+        """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                            get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
@@ -1085,8 +1159,9 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
-    def testSHAKE(self):
-        """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
+    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigSHAKE(self):
+        """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                            get_fn('dhfr_cmap_pbc.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
@@ -1103,11 +1178,11 @@ class TestChamberParm(utils.TestCaseRelative):
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
         self.assertAlmostEqual(bond, 139.2453, delta=5e-4)
-        
+
     def testInterfacePBC(self):
         """ Testing all OpenMMChamberParm.createSystem options (periodic) """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('ala3_solv.parm7'),
+                           get_fn('ala3_solv.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=None, rigidWater=False,
