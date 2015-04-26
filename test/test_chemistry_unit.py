@@ -8,7 +8,7 @@ import copy
 import math
 import unittest
 import utils
-from utils import has_numpy, numpy as np
+from utils import has_numpy, numpy as np, skipIf
 try:
     from itertools import izip as zip
 except ImportError:
@@ -641,6 +641,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
+@skipIf(not has_numpy(), "Cannot test without numpy")
 class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyQuantity(self):
@@ -688,9 +689,6 @@ class TestNumpyUnits(QuantityTestCase):
         self.assertAlmostEqualQuantities(a.std(), 2.8722813232690143*u.seconds)
         b = a.reshape((5, 2))
         self.assertTrue(u.is_quantity(b))
-
-if not has_numpy():
-    del TestNumpyUnits
 
 if __name__ == '__main__':
     unittest.main()

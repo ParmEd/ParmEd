@@ -23,10 +23,12 @@ import utils
 import unittest
 
 get_fn = utils.get_fn
+skipIf = utils.skipIf
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
+@skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(unittest.TestCase):
 
     def setUp(self):
@@ -173,6 +175,7 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
+@skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
 class TestTrajRestartReporter(unittest.TestCase):
 
     def setUp(self):
@@ -314,11 +317,6 @@ class TestTrajRestartReporter(unittest.TestCase):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)
-
-if not has_openmm:
-    del TestStateDataReporter, TestTrajRestartReporter
-elif not HAS_NETCDF:
-    del TestTrajReporter.TestNetCDFReporter
 
 if __name__ == '__main__':
     unittest.main()

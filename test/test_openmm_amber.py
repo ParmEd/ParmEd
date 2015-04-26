@@ -1076,7 +1076,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
-        self.assertRelativeEqual(energies['nonbond'], 6584.1604, places=4)
+        self.assertRelativeEqual(energies['nonbond'], 6584.1604, delta=5e-4)
 
     def testSHAKE(self):
         """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """

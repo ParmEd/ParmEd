@@ -9,6 +9,7 @@ import math
 import utils
 import unittest
 np = utils.numpy
+skipIf = utils.skipIf
 
 class TestChemistryGeometry(unittest.TestCase):
     """ Tests the various routines in the geometry package """
@@ -34,6 +35,7 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertEqualVectors(leng, (50, 50, 50))
         self.assertEqualVectors(ang, (rad, rad, rad))
 
+    @skipIf(not has_numpy(), "Cannot test without numpy")
     def testCenterOfMass(self):
         """ Tests the center-of-mass calculator """
         almost_equal = np.testing.assert_array_almost_equal
@@ -50,5 +52,5 @@ def strip_units(x):
         return x.value_in_unit_system(u.akma_unit_system)
     return x
 
-if not utils.has_numpy():
-    del TestChemistryGeometry.testCenterOfMass
+if __name__ == '__main__':
+    unittest.main()
