@@ -289,11 +289,11 @@ class AmberParm(AmberFormat, Structure):
                 or abs(struct.box[5] - 90) > TINY):
             inst.parm_data['POINTERS'][IFBOX] = 2
             inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         else:
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
-            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
         try:
             coords = []
             for atom in struct.atoms:
