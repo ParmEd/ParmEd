@@ -35,7 +35,7 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertEqualVectors(leng, (50, 50, 50))
         self.assertEqualVectors(ang, (rad, rad, rad))
 
-    @skipIf(not has_numpy(), "Cannot test without numpy")
+    @skipIf(not utils.has_numpy(), "Cannot test without numpy")
     def testCenterOfMass(self):
         """ Tests the center-of-mass calculator """
         almost_equal = np.testing.assert_array_almost_equal
