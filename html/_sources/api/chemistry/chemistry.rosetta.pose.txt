@@ -1,0 +1,7 @@
+chemistry.rosetta.pose module
+=============================
+
+.. automodule:: chemistry.rosetta.pose
+    :members:
+    :undoc-members:
+    :show-inheritance:

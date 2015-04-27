@@ -1,0 +1,17 @@
+chemistry.rosetta package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.rosetta.pose
+
+Module contents
+---------------
+
+.. automodule:: chemistry.rosetta
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -11,6 +11,7 @@ Subpackages
     chemistry.formats
     chemistry.modeller
     chemistry.openmm
+    chemistry.rosetta
     chemistry.tinker
     chemistry.unit
 

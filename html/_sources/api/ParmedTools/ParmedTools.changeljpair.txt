@@ -1,7 +1,0 @@
-ParmedTools.changeljpair module
-===============================
-
-.. automodule:: ParmedTools.changeljpair
-    :members:
-    :undoc-members:
-    :show-inheritance:

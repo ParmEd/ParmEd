@@ -23,12 +23,11 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="The chemistry.amber package" href="../amber.html" /> 
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +36,20 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-amber-amberasciirestart">
 <h1>chemistry.amber.AmberAsciiRestart<a class="headerlink" href="#chemistry-amber-amberasciirestart" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.amber.AmberAsciiRestart">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.</tt><tt class="descname">AmberAsciiRestart</tt><big>(</big><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.amber.</code><code class="descname">AmberAsciiRestart</code><span class="sig-paren">(</span><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parser for the Amber ASCII inpcrd/restart file format</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -91,19 +89,19 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.box" title="chemistry.amber.AmberAsciiRestart.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.box" title="chemistry.amber.AmberAsciiRestart.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
 <td>Combined cell lengths and cell angles</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></td>
 <td></td>
 </tr>
 </tbody>
@@ -115,17 +113,11 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.close" title="chemistry.amber.AmberAsciiRestart.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
-<td>Close the open file handler</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.id_format" title="chemistry.amber.AmberAsciiRestart.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
-<td>Identifies the file type as an Amber restart/inpcrd file</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.AmberAsciiRestart.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>For restart files, natom and hasbox are determined automatically for
 mode=&#8217;r&#8217;, and can be determined at write-time when the coordinates are
 set.</p>
@@ -138,12 +130,6 @@ set.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.__init__" title="chemistry.amber.AmberAsciiRestart.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname[,&nbsp;mode,&nbsp;natom,&nbsp;hasbox,&nbsp;...])</td>
-<td>For restart files, natom and hasbox are determined automatically for mode=&#8217;r&#8217;, and can be determined at write-time when the coordinates are set.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.close" title="chemistry.amber.AmberAsciiRestart.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
-<td>Close the open file handler</td>
-</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
@@ -153,44 +139,44 @@ set.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">CRDS_PER_LINE</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">CRDS_PER_LINE</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.box" title="chemistry.amber.AmberAsciiRestart.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberAsciiRestart.box" title="chemistry.amber.AmberAsciiRestart.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
 <td>Combined cell lengths and cell angles</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.amber.AmberAsciiRestart.box">
-<tt class="descname">box</tt><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.box" title="Permalink to this definition">¶</a></dt>
+<code class="descname">box</code><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combined cell lengths and cell angles</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberAsciiRestart.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.close" title="Permalink to this definition">¶</a></dt>
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the open file handler</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="chemistry.amber.AmberAsciiRestart.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/asciicrd.html#AmberAsciiRestart.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberAsciiRestart.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an Amber restart/inpcrd file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -220,14 +206,16 @@ set.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/amberobj/chemistry.amber.AmberAsciiRestart.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/amberobj/chemistry.amber.AmberAsciiRestart.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -244,7 +232,7 @@ set.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -253,13 +241,12 @@ set.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

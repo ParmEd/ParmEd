@@ -1,7 +1,0 @@
-chemistry.unit.unit_math module
-===============================
-
-.. automodule:: chemistry.unit.unit_math
-    :members:
-    :undoc-members:
-    :show-inheritance:

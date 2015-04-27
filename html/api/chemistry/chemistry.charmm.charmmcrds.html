@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chemistry.charmm.charmmcrds">
 <span id="chemistry-charmm-charmmcrds-module"></span><h1>chemistry.charmm.charmmcrds module<a class="headerlink" href="#module-chemistry.charmm.charmmcrds" title="Permalink to this headline">¶</a></h1>
@@ -55,8 +55,8 @@ Contributors: Jason Swails
 Date: Feb. 24, 2015</p>
 <dl class="class">
 <dt id="chemistry.charmm.charmmcrds.CharmmCrdFile">
-<em class="property">class </em><tt class="descclassname">chemistry.charmm.charmmcrds.</tt><tt class="descname">CharmmCrdFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.charmm.charmmcrds.</code><code class="descname">CharmmCrdFile</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Reads and parses a CHARMM coordinate file (.crd) into its components,
 namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -78,7 +78,7 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.positions" title="chemistry.charmm.charmmcrds.CharmmCrdFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.positions" title="chemistry.charmm.charmmcrds.CharmmCrdFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>Atomic coordinates with units attached to them with the shape (natom, 3)</td>
 </tr>
 </tbody>
@@ -125,19 +125,19 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.id_format" title="chemistry.charmm.charmmcrds.CharmmCrdFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.id_format" title="chemistry.charmm.charmmcrds.CharmmCrdFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a CHARMM coordinate file</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmCrdFile.coordinates">
-<tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">coordinates</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
 <dt id="chemistry.charmm.charmmcrds.CharmmCrdFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a CHARMM coordinate file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -161,7 +161,7 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmCrdFile.positions">
-<tt class="descname">positions</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmCrdFile.positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.positions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positions</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmCrdFile.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomic coordinates with units attached to them with the shape (natom, 3)</p>
 </dd></dl>
 
@@ -169,8 +169,8 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 
 <dl class="class">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile">
-<em class="property">class </em><tt class="descclassname">chemistry.charmm.charmmcrds.</tt><tt class="descname">CharmmRstFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.charmm.charmmcrds.</code><code class="descname">CharmmRstFile</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Reads and parses data, velocities and coordinates from a CHARMM restart
 file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -192,13 +192,13 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positions" title="chemistry.charmm.charmmcrds.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positions" title="chemistry.charmm.charmmcrds.CharmmRstFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>Atomic positions with units</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positionsold" title="chemistry.charmm.charmmcrds.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positionsold" title="chemistry.charmm.charmmcrds.CharmmRstFile.positionsold"><code class="xref py py-obj docutils literal"><span class="pre">positionsold</span></code></a></td>
 <td>Old atomic positions with units</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.velocities" title="chemistry.charmm.charmmcrds.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.velocities" title="chemistry.charmm.charmmcrds.CharmmRstFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td>Atomic velocities with units</td>
 </tr>
 </tbody>
@@ -272,25 +272,25 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.id_format" title="chemistry.charmm.charmmcrds.CharmmRstFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.id_format" title="chemistry.charmm.charmmcrds.CharmmRstFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a CHARMM restart file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.printcoords" title="chemistry.charmm.charmmcrds.CharmmRstFile.printcoords"><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt></a>(crds)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.printcoords" title="chemistry.charmm.charmmcrds.CharmmRstFile.printcoords"><code class="xref py py-obj docutils literal"><span class="pre">printcoords</span></code></a>(crds)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.scan" title="chemistry.charmm.charmmcrds.CharmmRstFile.scan"><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt></a>(handle,&nbsp;str[,&nbsp;r])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.charmmcrds.CharmmRstFile.scan" title="chemistry.charmm.charmmcrds.CharmmRstFile.scan"><code class="xref py py-obj docutils literal"><span class="pre">scan</span></code></a>(handle,&nbsp;str[,&nbsp;r])</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.coordinates">
-<tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">coordinates</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a CHARMM restart file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -314,29 +314,29 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.positions">
-<tt class="descname">positions</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positions</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomic positions with units</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.positionsold">
-<tt class="descname">positionsold</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.positionsold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positionsold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positionsold</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.positionsold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Old atomic positions with units</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.printcoords">
-<tt class="descname">printcoords</tt><big>(</big><em>crds</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.printcoords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.printcoords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">printcoords</code><span class="sig-paren">(</span><em>crds</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.printcoords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.printcoords" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.scan">
-<tt class="descname">scan</tt><big>(</big><em>handle</em>, <em>str</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.scan" title="Permalink to this definition">¶</a></dt>
+<code class="descname">scan</code><span class="sig-paren">(</span><em>handle</em>, <em>str</em>, <em>r=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.scan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.charmmcrds.CharmmRstFile.velocities">
-<tt class="descname">velocities</tt><a class="reference internal" href="../../_modules/chemistry/charmm/charmmcrds.html#CharmmRstFile.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.velocities" title="Permalink to this definition">¶</a></dt>
+<code class="descname">velocities</code><a class="headerlink" href="#chemistry.charmm.charmmcrds.CharmmRstFile.velocities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomic velocities with units</p>
 </dd></dl>
 
@@ -348,14 +348,16 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.charmm.charmmcrds.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.charmm.charmmcrds.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -372,7 +374,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -381,12 +383,12 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

@@ -109,10 +109,10 @@ The *-marked options are *not* available in the OpenMM Python application layer.
 In addition to these file formats, ParmEd also supports several new reporter
 classes in addition to the small number provided by ParmEd:
 
-    * :class:`StateDataReporter` -- This takes an extra argument,
-      ``unit_system`` that allows you to specify what unit system the output
-      data is printed in (such as the AKMA unit system, which is more familiar
-      to Amber and CHARMM users).
+    * :class:`StateDataReporter` -- This takes extra arguments specifying the
+      units of each of the types of data (like the energy, volume, and time
+      units). The defaults correspond to the AKMA unit system, which is more
+      familiar to Amber and CHARMM users.
     * :class:`NetCDFReporter` -- This allows you to write a trajectory file in
       the Amber NetCDF format.
     * :class:`MdcrdReporter` -- This allows you to write a trajectory file in

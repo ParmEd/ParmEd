@@ -23,14 +23,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" />
     <link rel="next" title="chemistry.topologyobjects.MultipoleFrame" href="chemistry.topologyobjects.MultipoleFrame.html" />
     <link rel="prev" title="chemistry.topologyobjects.TorsionTorsionType" href="chemistry.topologyobjects.TorsionTorsionType.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,36 +45,36 @@
         <li class="right" >
           <a href="chemistry.topologyobjects.TorsionTorsionType.html" title="chemistry.topologyobjects.TorsionTorsionType"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-topologyobjects-chiralframe">
 <h1>chemistry.topologyobjects.ChiralFrame<a class="headerlink" href="#chemistry-topologyobjects-chiralframe" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.ChiralFrame">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">ChiralFrame</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>chirality</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#ChiralFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.topologyobjects.</code><code class="descname">ChiralFrame</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>chirality</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#ChiralFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>A chiral frame as defined in the AMOEBA force field. It defines the frame of
 reference for a chiral center</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The first atom defined in the chiral frame</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The second atom defined in the chiral frame</p>
 </div></blockquote>
-<p><strong>chirality</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>chirality</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote class="last">
 <div><p>Either 1 or -1 to identify directionality. A ValueError is raised if a
 different value is provided</p>
@@ -87,7 +87,7 @@ different value is provided</p>
 <p>A chiral frame can only contain atoms.</p>
 <dl class="method">
 <dt id="chemistry.topologyobjects.ChiralFrame.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>chirality</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#ChiralFrame.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>chirality</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#ChiralFrame.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.ChiralFrame.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -97,7 +97,7 @@ different value is provided</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.ChiralFrame.__init__" title="chemistry.topologyobjects.ChiralFrame.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2,&nbsp;chirality)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.ChiralFrame.__init__" title="chemistry.topologyobjects.ChiralFrame.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2,&nbsp;chirality)</td>
 <td></td>
 </tr>
 </tbody>
@@ -110,14 +110,16 @@ different value is provided</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/chemistry.topologyobjects.ChiralFrame.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/chemistry.topologyobjects.ChiralFrame.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -134,7 +136,7 @@ different value is provided</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -149,13 +151,13 @@ different value is provided</p>
         <li class="right" >
           <a href="chemistry.topologyobjects.TorsionTorsionType.html" title="chemistry.topologyobjects.TorsionTorsionType"
              >previous</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

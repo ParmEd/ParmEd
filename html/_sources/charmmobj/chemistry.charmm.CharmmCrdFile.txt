@@ -14,6 +14,7 @@ chemistry.charmm.CharmmCrdFile
    .. autosummary::
    
       ~CharmmCrdFile.__init__
+      ~CharmmCrdFile.id_format
    
    
 
@@ -23,6 +24,7 @@ chemistry.charmm.CharmmCrdFile
 
    .. autosummary::
    
+      ~CharmmCrdFile.coordinates
       ~CharmmCrdFile.positions
    
    

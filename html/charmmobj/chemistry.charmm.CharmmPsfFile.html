@@ -23,12 +23,11 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="The chemistry.charmm package" href="../charmm.html" /> 
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,22 +36,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../charmm.html" accesskey="U">The <tt class="docutils literal"><span class="pre">chemistry.charmm</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-charmm-charmmpsffile">
 <h1>chemistry.charmm.CharmmPsfFile<a class="headerlink" href="#chemistry-charmm-charmmpsffile" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.charmm.CharmmPsfFile">
-<em class="property">class </em><tt class="descclassname">chemistry.charmm.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</p>
+<em class="property">class </em><code class="descclassname">chemistry.charmm.</code><code class="descname">CharmmPsfFile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>A chemical <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instantiated from CHARMM files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -63,7 +61,7 @@
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong> : If file <tt class="docutils literal"><span class="pre">psf_name</span></tt> does not exist</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong> : If file <code class="docutils literal"><span class="pre">psf_name</span></code> does not exist</p>
 <p class="last"><strong>CharmmPsfError</strong> : If any parsing errors are encountered</p>
 </td>
 </tr>
@@ -84,16 +82,16 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="chemistry.charmm.CharmmPsfFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="chemistry.charmm.CharmmPsfFile.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
 <td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.positions" title="chemistry.charmm.CharmmPsfFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.positions" title="chemistry.charmm.CharmmPsfFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.topology" title="chemistry.charmm.CharmmPsfFile.topology"><tt class="xref py py-obj docutils literal"><span class="pre">topology</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.topology" title="chemistry.charmm.CharmmPsfFile.topology"><code class="xref py py-obj docutils literal"><span class="pre">topology</span></code></a></td>
 <td>The OpenMM Topology object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.velocities" title="chemistry.charmm.CharmmPsfFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.velocities" title="chemistry.charmm.CharmmPsfFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td>A list of 3-element Quantity tuples of dimension length representing the</td>
 </tr>
 </tbody>
@@ -105,104 +103,11 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.add_atom" title="chemistry.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
-<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.add_atom_to_residue" title="chemistry.charmm.CharmmPsfFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
-<td>Adds a new atom to the Structure at the end if the given residue</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.clear_cmap" title="chemistry.charmm.CharmmPsfFile.clear_cmap"><tt class="xref py py-obj docutils literal"><span class="pre">clear_cmap</span></tt></a>()</td>
-<td>Clear the cmap list to prevent any CMAP parameters from being used</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.copy" title="chemistry.charmm.CharmmPsfFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
-<td>Makes a copy of the current structure as an instance of a specified</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.createSystem" title="chemistry.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM System object from the CHARMM PSF file.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.has_NBFIX" title="chemistry.charmm.CharmmPsfFile.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
-<td>Returns whether or not any pairs of atom types have their LJ</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.is_changed" title="chemistry.charmm.CharmmPsfFile.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
-<td>Determines if any of the topology has changed for this structure</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.load_parameters" title="chemistry.charmm.CharmmPsfFile.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(parmset)</td>
-<td>Loads parameters from a parameter set that was loaded via CHARMM RTF, PAR, and STR files.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_add_constraints" title="chemistry.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Adds constraints to a given system</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_angle_force" title="chemistry.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_bond_force" title="chemistry.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_cmap_force" title="chemistry.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM CMAP torsion force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_dihedral_force" title="chemistry.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_gbsa_force" title="chemistry.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates a Generalized Born force for running implicit solvent</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_improper_force" title="chemistry.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_nonbonded_force" title="chemistry.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM NonbondedForce instance</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba out-of-plane bend force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force" title="chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba pi-torsion force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites" title="chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force" title="chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba trigonal-angle force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force" title="chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM Urey-Bradley force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.prune_empty_terms" title="chemistry.charmm.CharmmPsfFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
-<td>Looks through all of the topological lists and gets rid of terms</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.strip" title="chemistry.charmm.CharmmPsfFile.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
-<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.to_dataframe" title="chemistry.charmm.CharmmPsfFile.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
-<td>Creates a pandas.DataFrame object from the current Structure</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.unchange" title="chemistry.charmm.CharmmPsfFile.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
-<td>Toggles all lists so that they do not indicate any changes</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions" title="chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
-<td>Nonbonded exclusions and exceptions have the following priority:</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_cif" title="chemistry.charmm.CharmmPsfFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_pdb" title="chemistry.charmm.CharmmPsfFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
-<td>Write a PDB file from a Structure instance</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_psf" title="chemistry.charmm.CharmmPsfFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
-<td>Writes a PSF file from the stored molecule</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens and parses a PSF file, then instantiates a CharmmPsfFile
 instance from the data.</p>
 </dd></dl>
@@ -214,99 +119,6 @@ instance from the data.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.__init__" title="chemistry.charmm.CharmmPsfFile.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Opens and parses a PSF file, then instantiates a CharmmPsfFile instance from the data.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.add_atom" title="chemistry.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
-<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.add_atom_to_residue" title="chemistry.charmm.CharmmPsfFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
-<td>Adds a new atom to the Structure at the end if the given residue</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.clear_cmap" title="chemistry.charmm.CharmmPsfFile.clear_cmap"><tt class="xref py py-obj docutils literal"><span class="pre">clear_cmap</span></tt></a>()</td>
-<td>Clear the cmap list to prevent any CMAP parameters from being used</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.copy" title="chemistry.charmm.CharmmPsfFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
-<td>Makes a copy of the current structure as an instance of a specified</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.createSystem" title="chemistry.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM System object from the CHARMM PSF file.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.has_NBFIX" title="chemistry.charmm.CharmmPsfFile.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
-<td>Returns whether or not any pairs of atom types have their LJ</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.is_changed" title="chemistry.charmm.CharmmPsfFile.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
-<td>Determines if any of the topology has changed for this structure</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.load_parameters" title="chemistry.charmm.CharmmPsfFile.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(parmset)</td>
-<td>Loads parameters from a parameter set that was loaded via CHARMM RTF, PAR, and STR files.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_add_constraints" title="chemistry.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Adds constraints to a given system</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_angle_force" title="chemistry.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_bond_force" title="chemistry.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_cmap_force" title="chemistry.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM CMAP torsion force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_dihedral_force" title="chemistry.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_gbsa_force" title="chemistry.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates a Generalized Born force for running implicit solvent</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_improper_force" title="chemistry.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_nonbonded_force" title="chemistry.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM NonbondedForce instance</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba out-of-plane bend force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force" title="chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba pi-torsion force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites" title="chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force" title="chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the Amoeba trigonal-angle force</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force" title="chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Creates the OpenMM Urey-Bradley force</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.prune_empty_terms" title="chemistry.charmm.CharmmPsfFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
-<td>Looks through all of the topological lists and gets rid of terms</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.strip" title="chemistry.charmm.CharmmPsfFile.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
-<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.unchange" title="chemistry.charmm.CharmmPsfFile.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
-<td>Toggles all lists so that they do not indicate any changes</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions" title="chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
-<td>Nonbonded exclusions and exceptions have the following priority:</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_cif" title="chemistry.charmm.CharmmPsfFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_pdb" title="chemistry.charmm.CharmmPsfFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
-<td>Write a PDB file from a Structure instance</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.write_psf" title="chemistry.charmm.CharmmPsfFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
-<td>Writes a PSF file from the stored molecule</td>
-</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
@@ -316,59 +128,59 @@ instance from the data.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ANGLE_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">ANGLE_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">BOND_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">BOND_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">CMAP_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">CMAP_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DIHEDRAL_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DIHEDRAL_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">IMPROPER_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">IMPROPER_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">NONBONDED_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">NONBONDED_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">OUT_OF_PLANE_BEND_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">OUT_OF_PLANE_BEND_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">PI_TORSION_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">PI_TORSION_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">STRETCH_BEND_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">STRETCH_BEND_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">TORSION_TORSION_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">TORSION_TORSION_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">TRIGONAL_ANGLE_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">TRIGONAL_ANGLE_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">UREY_BRADLEY_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">UREY_BRADLEY_FORCE_GROUP</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="chemistry.charmm.CharmmPsfFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="chemistry.charmm.CharmmPsfFile.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
 <td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.positions" title="chemistry.charmm.CharmmPsfFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.positions" title="chemistry.charmm.CharmmPsfFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.topology" title="chemistry.charmm.CharmmPsfFile.topology"><tt class="xref py py-obj docutils literal"><span class="pre">topology</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.topology" title="chemistry.charmm.CharmmPsfFile.topology"><code class="xref py py-obj docutils literal"><span class="pre">topology</span></code></a></td>
 <td>The OpenMM Topology object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.velocities" title="chemistry.charmm.CharmmPsfFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmPsfFile.velocities" title="chemistry.charmm.CharmmPsfFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td>A list of 3-element Quantity tuples of dimension length representing the</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.add_atom" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_atom</code><span class="sig-paren">(</span><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
 it has a different name or number as the last residue added and adding
 it to the <cite>atoms</cite> list.</p>
@@ -376,23 +188,23 @@ it to the <cite>atoms</cite> list.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
 <blockquote>
 <div><p>The atom to add to this residue list</p>
 </div></blockquote>
-<p><strong>resname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>resname</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The name of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>resnum</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>resnum</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote>
 <div><p>The number of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>chain</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The chain ID character for this residue</p>
 </div></blockquote>
-<p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>inscode</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote class="last">
 <div><p>The insertion code ID character for this residue (it is stripped)</p>
 </div></blockquote>
@@ -407,17 +219,17 @@ list, a new residue is added and the atom is added to that residue</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.add_atom_to_residue">
-<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_atom_to_residue</code><span class="sig-paren">(</span><em>atom</em>, <em>residue</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure at the end if the given residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
 <blockquote>
 <div><p>The atom to add to the system</p>
 </div></blockquote>
-<p><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<p><strong>residue</strong> : <code class="xref py py-class docutils literal"><span class="pre">Residue</span></code></p>
 <blockquote class="last">
 <div><p>The residue to which to add this atom. It MUST be part of this
 Structure instance already or a ValueError is raised</p>
@@ -435,20 +247,20 @@ relatively expensive operation</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.CharmmPsfFile.box_vectors">
-<tt class="descname">box_vectors</tt><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">box_vectors</code><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.box_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
 dimension length</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.clear_cmap">
-<tt class="descname">clear_cmap</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.clear_cmap" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clear_cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.clear_cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.clear_cmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the cmap list to prevent any CMAP parameters from being used</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.copy">
-<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.copy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">copy</code><span class="sig-paren">(</span><em>cls</em>, <em>split_dihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a copy of the current structure as an instance of a specified
 subclass</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -459,7 +271,7 @@ subclass</p>
 <blockquote>
 <div><p>The returned object is a copy of this structure as a <cite>cls</cite> instance</p>
 </div></blockquote>
-<p><strong>split_dihedrals</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>split_dihedrals</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, then the Dihedral entries will be split up so that each one
 is paired with a single DihedralType (rather than a
@@ -480,7 +292,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.createSystem">
-<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.createSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM System object from the CHARMM PSF file. This is a
 shortcut for calling <cite>load_parameters</cite> followed by
 Structure.createSystem. If params is not None, <cite>load_parameters</cite> will be
@@ -501,15 +313,15 @@ with the remaining args and kwargs</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dt>
-<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></tt></a></dd>
+<dt><a class="reference internal" href="../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><code class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></code></a></dt>
+<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><code class="xref py py-meth docutils literal"><span class="pre">chemistry.structure.Structure.createSystem()</span></code></a></dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.has_NBFIX">
-<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has_NBFIX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.has_NBFIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether or not any pairs of atom types have their LJ
 interactions modified by an NBFIX definition</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -528,20 +340,20 @@ interactions modified by an NBFIX definition</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.is_changed">
-<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.is_changed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.is_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if any of the topology has changed for this structure</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.load_parameters">
-<tt class="descname">load_parameters</tt><big>(</big><em>parmset</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.load_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_parameters</code><span class="sig-paren">(</span><em>parmset</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.load_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.load_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads parameters from a parameter set that was loaded via CHARMM RTF,
 PAR, and STR files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parmset</strong> : <a class="reference internal" href="chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parmset</strong> : <a class="reference internal" href="chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></code></a></p>
 <blockquote class="last">
 <div><p>List of all parameters</p>
 </div></blockquote>
@@ -565,7 +377,7 @@ expansion</li>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_add_constraints">
-<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -592,7 +404,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_angle_force">
-<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -625,7 +437,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_bond_force">
-<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -662,7 +474,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_cmap_force">
-<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -680,7 +492,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_dihedral_force">
-<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -698,7 +510,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_gbsa_force">
-<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -753,7 +565,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_improper_force">
-<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -771,7 +583,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_nonbonded_force">
-<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/charmm/psf.html#CharmmPsfFile.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -827,7 +639,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force">
-<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -845,7 +657,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force">
-<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -863,7 +675,7 @@ should override this method to implement what is needed</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites">
-<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -884,7 +696,7 @@ method</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force">
-<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -902,7 +714,7 @@ method</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force">
-<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -921,7 +733,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force">
-<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -939,7 +751,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force">
-<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -957,7 +769,7 @@ for this system</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.CharmmPsfFile.positions">
-<tt class="descname">positions</tt><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.positions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positions</code><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic positions for every atom in the system. If set with unitless
 numbers, those numbers are assumed to be in angstroms</p>
@@ -965,7 +777,7 @@ numbers, those numbers are assumed to be in angstroms</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.prune_empty_terms">
-<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prune_empty_terms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Looks through all of the topological lists and gets rid of terms
 in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
 to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
@@ -973,13 +785,13 @@ to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.strip">
-<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.strip" title="Permalink to this definition">¶</a></dt>
+<code class="descname">strip</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.strip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt>, <tt class="docutils literal"><span class="pre">str</span></tt>, or <tt class="docutils literal"><span class="pre">iterable</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <code class="xref py py-class docutils literal"><span class="pre">AmberMask</span></code>, <code class="docutils literal"><span class="pre">str</span></code>, or <code class="docutils literal"><span class="pre">iterable</span></code></p>
 <blockquote class="last">
 <div><p>This is the selection of atoms that will be deleted from this
 structure. If it is a string, it will be interpreted as an
@@ -995,13 +807,13 @@ as the <cite>atoms</cite> list.</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.to_dataframe">
-<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a pandas.DataFrame object from the current Structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -1009,7 +821,7 @@ as the <cite>atoms</cite> list.</p>
 <p>The DataFrame will be over all atoms. The columns will be the attributes
 of the atom (as well as its containing residue). Some columns will
 <em>always</em> exist. Others will only exist if those attributes have been set
-on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+on the Atom instances (see the <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code> docs for possible
 attributes and their meaning). The columns that will always be present
 are:</p>
 <blockquote>
@@ -1076,23 +888,23 @@ the original file defining the structure:</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.CharmmPsfFile.topology">
-<tt class="descname">topology</tt><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.topology" title="Permalink to this definition">¶</a></dt>
+<code class="descname">topology</code><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
 Structure instance results in the topology being deleted and rebuilt</p>
 <p class="rubric">Notes</p>
-<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+<p>This function calls <code class="docutils literal"><span class="pre">prune_empty_terms</span></code> if any topology lists have
 changed.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.unchange">
-<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.unchange" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.unchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggles all lists so that they do not indicate any changes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions">
-<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_dihedral_exclusions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
 <p>bond -&gt; angle -&gt; dihedral</p>
 <p>Since bonds and angles are completely excluded, any ring systems in
@@ -1112,37 +924,37 @@ partners arrays</p>
 
 <dl class="attribute">
 <dt id="chemistry.charmm.CharmmPsfFile.velocities">
-<tt class="descname">velocities</tt><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.velocities" title="Permalink to this definition">¶</a></dt>
+<code class="descname">velocities</code><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.velocities" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic velocities for every atom in the system</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDBx/mmCIF file</p>
 </div></blockquote>
-<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -1150,7 +962,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -1167,7 +979,7 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote class="last">
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
@@ -1180,13 +992,13 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_pdb</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -1247,13 +1059,13 @@ atom that does not contain a SEGID identifier. Default is False</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.CharmmPsfFile.write_psf">
-<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_psf</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>vmd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.charmm.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a PSF file from the stored molecule</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The Structure instance from which the PSF should be written</p>
 </div></blockquote>
@@ -1288,14 +1100,16 @@ closed</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/charmmobj/chemistry.charmm.CharmmPsfFile.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/charmmobj/chemistry.charmm.CharmmPsfFile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -1312,7 +1126,7 @@ closed</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1321,13 +1135,12 @@ closed</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../charmm.html" >The <tt class="docutils literal"><span class="pre">chemistry.charmm</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

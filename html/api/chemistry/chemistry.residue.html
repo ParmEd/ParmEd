@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chemistry.residue">
 <span id="chemistry-residue-module"></span><h1>chemistry.residue module<a class="headerlink" href="#module-chemistry.residue" title="Permalink to this headline">¶</a></h1>
@@ -51,8 +51,8 @@
 residues in typical biopolymers.</p>
 <dl class="class">
 <dt id="chemistry.residue.AminoAcidResidue">
-<em class="property">class </em><tt class="descclassname">chemistry.residue.</tt><tt class="descname">AminoAcidResidue</tt><big>(</big><em>name</em>, <em>abbr</em>, <em>symbol</em>, <em>aliases=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#AminoAcidResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.AminoAcidResidue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.residue.BiomolecularResidue</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.residue.</code><code class="descname">AminoAcidResidue</code><span class="sig-paren">(</span><em>name</em>, <em>abbr</em>, <em>symbol</em>, <em>aliases=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#AminoAcidResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.AminoAcidResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">chemistry.residue.BiomolecularResidue</span></code></p>
 <p>An individual amino acid residue.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -91,22 +91,22 @@ residues in typical biopolymers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.AminoAcidResidue.get" title="chemistry.residue.AminoAcidResidue.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.AminoAcidResidue.get" title="chemistry.residue.AminoAcidResidue.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key)</td>
 <td>Gets the amino acid corresponding to either the residue name, 3-letter abbreviation or 1-letter symbol.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.AminoAcidResidue.has" title="chemistry.residue.AminoAcidResidue.has"><tt class="xref py py-obj docutils literal"><span class="pre">has</span></tt></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.AminoAcidResidue.has" title="chemistry.residue.AminoAcidResidue.has"><code class="xref py py-obj docutils literal"><span class="pre">has</span></code></a>(thing)</td>
 <td>Determines if a particular BiomolecularResidue or residue name is</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.residue.AminoAcidResidue.all_residues">
-<tt class="descname">all_residues</tt><em class="property"> = [&lt;Amino Acid Residue Alanine: ALA [A]&gt;, &lt;Amino Acid Residue Arginine: ARG [R]&gt;, &lt;Amino Acid Residue Asparagine: ASN [N]&gt;, &lt;Amino Acid Residue Aspartate: ASP [D]&gt;, &lt;Amino Acid Residue Cysteine: CYS [C]&gt;, &lt;Amino Acid Residue Glutamate: GLU [E]&gt;, &lt;Amino Acid Residue Glutamine: GLN [Q]&gt;, &lt;Amino Acid Residue Glycine: GLY [G]&gt;, &lt;Amino Acid Residue Histidine: HIS [H]&gt;, &lt;Amino Acid Residue Isoleucine: ILE [I]&gt;, &lt;Amino Acid Residue Leucine: LEU [L]&gt;, &lt;Amino Acid Residue Lysine: LYS [K]&gt;, &lt;Amino Acid Residue Methionine: MET [M]&gt;, &lt;Amino Acid Residue Phenylalanine: PHE [F]&gt;, &lt;Amino Acid Residue Proline: PRO [P]&gt;, &lt;Amino Acid Residue Serine: SER [S]&gt;, &lt;Amino Acid Residue Threonine: THR [T]&gt;, &lt;Amino Acid Residue Tryptophan: TRP [W]&gt;, &lt;Amino Acid Residue Tyrosine: TYR [Y]&gt;, &lt;Amino Acid Residue Valine: VAL [V]&gt;]</em><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.all_residues" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_residues</code><em class="property"> = [&lt;Amino Acid Residue Alanine: ALA [A]&gt;, &lt;Amino Acid Residue Arginine: ARG [R]&gt;, &lt;Amino Acid Residue Asparagine: ASN [N]&gt;, &lt;Amino Acid Residue Aspartate: ASP [D]&gt;, &lt;Amino Acid Residue Cysteine: CYS [C]&gt;, &lt;Amino Acid Residue Glutamate: GLU [E]&gt;, &lt;Amino Acid Residue Glutamine: GLN [Q]&gt;, &lt;Amino Acid Residue Glycine: GLY [G]&gt;, &lt;Amino Acid Residue Histidine: HIS [H]&gt;, &lt;Amino Acid Residue Isoleucine: ILE [I]&gt;, &lt;Amino Acid Residue Leucine: LEU [L]&gt;, &lt;Amino Acid Residue Lysine: LYS [K]&gt;, &lt;Amino Acid Residue Methionine: MET [M]&gt;, &lt;Amino Acid Residue Phenylalanine: PHE [F]&gt;, &lt;Amino Acid Residue Proline: PRO [P]&gt;, &lt;Amino Acid Residue Serine: SER [S]&gt;, &lt;Amino Acid Residue Threonine: THR [T]&gt;, &lt;Amino Acid Residue Tryptophan: TRP [W]&gt;, &lt;Amino Acid Residue Tyrosine: TYR [Y]&gt;, &lt;Amino Acid Residue Valine: VAL [V]&gt;]</em><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.all_residues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.residue.AminoAcidResidue.get">
-<em class="property">classmethod </em><tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#AminoAcidResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.get" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#AminoAcidResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the amino acid corresponding to either the residue name, 3-letter
 abbreviation or 1-letter symbol. It is case-insensitive.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -119,7 +119,7 @@ abbreviation or 1-letter symbol. It is case-insensitive.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.AminoAcidResidue" title="chemistry.residue.AminoAcidResidue"><tt class="xref py py-class docutils literal"><span class="pre">AminoAcidResidue</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.AminoAcidResidue" title="chemistry.residue.AminoAcidResidue"><code class="xref py py-class docutils literal"><span class="pre">AminoAcidResidue</span></code></a></p>
 <blockquote class="last">
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
@@ -131,16 +131,16 @@ abbreviation or 1-letter symbol. It is case-insensitive.</p>
 <p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="chemistry.residue.AminoAcidResidue.has">
-<em class="property">classmethod </em><tt class="descname">has</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.has" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.residue.AminoAcidResidue.has" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if a particular BiomolecularResidue or residue name is
 present in this classification of biomolecular residues</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <tt class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <code class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></code></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>contains</strong> : bool</p>
@@ -158,8 +158,8 @@ False.</p>
 
 <dl class="class">
 <dt id="chemistry.residue.RNAResidue">
-<em class="property">class </em><tt class="descclassname">chemistry.residue.</tt><tt class="descname">RNAResidue</tt><big>(</big><em>name</em>, <em>abbr</em>, <em>aliases=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#RNAResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.RNAResidue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.residue.DNAResidue" title="chemistry.residue.DNAResidue"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.residue.DNAResidue</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.residue.</code><code class="descname">RNAResidue</code><span class="sig-paren">(</span><em>name</em>, <em>abbr</em>, <em>aliases=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#RNAResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.RNAResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.residue.DNAResidue" title="chemistry.residue.DNAResidue"><code class="xref py py-class docutils literal"><span class="pre">chemistry.residue.DNAResidue</span></code></a></p>
 <p>An individual RNA residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -188,22 +188,22 @@ False.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.RNAResidue.get" title="chemistry.residue.RNAResidue.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.RNAResidue.get" title="chemistry.residue.RNAResidue.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key)</td>
 <td>Gets the nucleic acid corresponding to either the residue name or abbreviation.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.RNAResidue.has" title="chemistry.residue.RNAResidue.has"><tt class="xref py py-obj docutils literal"><span class="pre">has</span></tt></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.RNAResidue.has" title="chemistry.residue.RNAResidue.has"><code class="xref py py-obj docutils literal"><span class="pre">has</span></code></a>(thing)</td>
 <td>Determines if a particular BiomolecularResidue or residue name is</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.residue.RNAResidue.all_residues">
-<tt class="descname">all_residues</tt><em class="property"> = [&lt;RNA Residue Guanine: G&gt;, &lt;RNA Residue Cytosine: C&gt;, &lt;RNA Residue Adenine: A&gt;, &lt;RNA Residue Uracil: U&gt;]</em><a class="headerlink" href="#chemistry.residue.RNAResidue.all_residues" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_residues</code><em class="property"> = [&lt;RNA Residue Guanine: G&gt;, &lt;RNA Residue Cytosine: C&gt;, &lt;RNA Residue Adenine: A&gt;, &lt;RNA Residue Uracil: U&gt;]</em><a class="headerlink" href="#chemistry.residue.RNAResidue.all_residues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.residue.RNAResidue.get">
-<em class="property">classmethod </em><tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#RNAResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.RNAResidue.get" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#RNAResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.RNAResidue.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the nucleic acid corresponding to either the residue name or
 abbreviation. It is case-insensitive.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -216,7 +216,7 @@ abbreviation. It is case-insensitive.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.RNAResidue" title="chemistry.residue.RNAResidue"><tt class="xref py py-class docutils literal"><span class="pre">RNAResidue</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.RNAResidue" title="chemistry.residue.RNAResidue"><code class="xref py py-class docutils literal"><span class="pre">RNAResidue</span></code></a></p>
 <blockquote class="last">
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
@@ -228,16 +228,16 @@ abbreviation. It is case-insensitive.</p>
 <p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="chemistry.residue.RNAResidue.has">
-<em class="property">classmethod </em><tt class="descname">has</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.residue.RNAResidue.has" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.residue.RNAResidue.has" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if a particular BiomolecularResidue or residue name is
 present in this classification of biomolecular residues</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <tt class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <code class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></code></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>contains</strong> : bool</p>
@@ -255,8 +255,8 @@ False.</p>
 
 <dl class="class">
 <dt id="chemistry.residue.DNAResidue">
-<em class="property">class </em><tt class="descclassname">chemistry.residue.</tt><tt class="descname">DNAResidue</tt><big>(</big><em>name</em>, <em>abbr</em>, <em>aliases=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#DNAResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.DNAResidue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">chemistry.residue.BiomolecularResidue</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.residue.</code><code class="descname">DNAResidue</code><span class="sig-paren">(</span><em>name</em>, <em>abbr</em>, <em>aliases=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#DNAResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.DNAResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">chemistry.residue.BiomolecularResidue</span></code></p>
 <p>An individual DNA residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -285,22 +285,22 @@ False.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.DNAResidue.get" title="chemistry.residue.DNAResidue.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.residue.DNAResidue.get" title="chemistry.residue.DNAResidue.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key)</td>
 <td>Gets the nucleic acid corresponding to either the residue name or abbreviation.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.DNAResidue.has" title="chemistry.residue.DNAResidue.has"><tt class="xref py py-obj docutils literal"><span class="pre">has</span></tt></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.residue.DNAResidue.has" title="chemistry.residue.DNAResidue.has"><code class="xref py py-obj docutils literal"><span class="pre">has</span></code></a>(thing)</td>
 <td>Determines if a particular BiomolecularResidue or residue name is</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="chemistry.residue.DNAResidue.all_residues">
-<tt class="descname">all_residues</tt><em class="property"> = [&lt;DNA Residue Guanine: DG&gt;, &lt;DNA Residue Cytosine: DC&gt;, &lt;DNA Residue Adenine: DA&gt;, &lt;DNA Residue Thymine: DT&gt;]</em><a class="headerlink" href="#chemistry.residue.DNAResidue.all_residues" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_residues</code><em class="property"> = [&lt;DNA Residue Guanine: DG&gt;, &lt;DNA Residue Cytosine: DC&gt;, &lt;DNA Residue Adenine: DA&gt;, &lt;DNA Residue Thymine: DT&gt;]</em><a class="headerlink" href="#chemistry.residue.DNAResidue.all_residues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.residue.DNAResidue.get">
-<em class="property">classmethod </em><tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/residue.html#DNAResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.DNAResidue.get" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/residue.html#DNAResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.residue.DNAResidue.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the nucleic acid corresponding to either the residue name or
 abbreviation. It is case-insensitive.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -313,7 +313,7 @@ abbreviation. It is case-insensitive.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.DNAResidue" title="chemistry.residue.DNAResidue"><tt class="xref py py-class docutils literal"><span class="pre">DNAResidue</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#chemistry.residue.DNAResidue" title="chemistry.residue.DNAResidue"><code class="xref py py-class docutils literal"><span class="pre">DNAResidue</span></code></a></p>
 <blockquote class="last">
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
@@ -325,16 +325,16 @@ abbreviation. It is case-insensitive.</p>
 <p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="chemistry.residue.DNAResidue.has">
-<em class="property">classmethod </em><tt class="descname">has</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#chemistry.residue.DNAResidue.has" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.residue.DNAResidue.has" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if a particular BiomolecularResidue or residue name is
 present in this classification of biomolecular residues</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <tt class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : str or <code class="xref py py-class docutils literal"><span class="pre">BiomolecularResidue</span></code></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>contains</strong> : bool</p>
@@ -356,14 +356,16 @@ False.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.residue.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.residue.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -380,7 +382,7 @@ False.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -389,12 +391,12 @@ False.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

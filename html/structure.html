@@ -23,12 +23,12 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="next" title="chemistry.structure.Structure" href="structobj/chemistry.structure.Structure.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -40,54 +40,54 @@
         <li class="right" >
           <a href="structobj/chemistry.structure.Structure.html" title="chemistry.structure.Structure"
              accesskey="N">next</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="the-structure-module">
-<h1>The <tt class="xref py py-mod docutils literal"><span class="pre">structure</span></tt> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">structure</span></tt> module contains the core class defining systems of
-particles &#8211; the <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> class. The API documentation makes this
-class look intimidating, but its core features are the <tt class="docutils literal"><span class="pre">atoms</span></tt> attribute
-(which is an <tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt>) and its <tt class="docutils literal"><span class="pre">residues</span></tt> attribute (which is a
-<tt class="xref py py-class docutils literal"><span class="pre">ResidueList</span></tt>). These two attributes are enough to write numerous files
+<h1>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module contains the core class defining systems of
+particles &#8211; the <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class. The API documentation makes this
+class look intimidating, but its core features are the <code class="docutils literal"><span class="pre">atoms</span></code> attribute
+(which is an <code class="xref py py-class docutils literal"><span class="pre">AtomList</span></code>) and its <code class="docutils literal"><span class="pre">residues</span></code> attribute (which is a
+<code class="xref py py-class docutils literal"><span class="pre">ResidueList</span></code>). These two attributes are enough to write numerous files
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.</p>
 <div class="section" id="structure-class">
-<h2><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
+<h2><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-obj docutils literal"><span class="pre">Structure</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-obj docutils literal"><span class="pre">Structure</span></code></a>()</td>
 <td>A chemical structure composed of atoms, bonds, angles, torsions, and other</td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class may be instantiated directly, but is more often
-created by one of the parsers (see below for <tt class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></tt> and
-<tt class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></tt> which both return a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance) or extended to
+<p>The <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class may be instantiated directly, but is more often
+created by one of the parsers (see below for <code class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></code> and
+<code class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></code> which both return a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance) or extended to
 support the structure files of various computational chemistry programs.</p>
 </div>
 <div class="section" id="read-pdb-and-read-cif-functions">
-<h2><tt class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></tt> and <tt class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></tt> functions<a class="headerlink" href="#read-pdb-and-read-cif-functions" title="Permalink to this headline">¶</a></h2>
+<h2><code class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></code> and <code class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></code> functions<a class="headerlink" href="#read-pdb-and-read-cif-functions" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_PDB</span></tt></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">read_PDB</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_CIF</span></tt></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">read_CIF</span></code></td>
 <td></td>
 </tr>
 </tbody>
@@ -100,7 +100,7 @@ entries (such as BMRB entries for NMR-solved structures). This information is
 extracted from both PDB and PDBx/mmCIF files when available, along with
 anisotropic B-factors.</p>
 <p>The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+file to a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance.</p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -176,8 +176,8 @@ suite, so you can get the files from there, or <a class="reference external" hre
 <hr class="docutils" />
 <div class="section" id="converting-pdbx-mmcif-files-to-pdb-files">
 <h2>Converting PDBx/mmCIF files to PDB files<a class="headerlink" href="#converting-pdbx-mmcif-files-to-pdb-files" title="Permalink to this headline">¶</a></h2>
-<p>If you noticed the <tt class="docutils literal"><span class="pre">write_cif</span></tt> and <tt class="docutils literal"><span class="pre">write_pdb</span></tt> methods attached to the
-<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class, you may have deduced that you can very simply convert
+<p>If you noticed the <code class="docutils literal"><span class="pre">write_cif</span></code> and <code class="docutils literal"><span class="pre">write_pdb</span></code> methods attached to the
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class, you may have deduced that you can very simply convert
 a PDBx/mmCIF file to a PDB file.</p>
 <p>This is likely to be increasingly popular, since the PDB is moving to the mmCIF
 format, but many programs in the field of computational chemistry and physics
@@ -188,10 +188,10 @@ has decades worth of legacy code built around PDB files. Not to worry!  A quick
                                <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this case, the metadata is <em>not</em> copied (i.e., the <tt class="docutils literal"><span class="pre">EXPTL</span></tt>, <tt class="docutils literal"><span class="pre">JRNL</span></tt>,
-and <tt class="docutils literal"><span class="pre">AUTHOR</span></tt> records, to name a few). Only the coordinates, unit cell
-(<tt class="docutils literal"><span class="pre">CYRST1</span></tt> record), and optionally anisotropic B-factor lines are translated.</p>
-<p>The <tt class="docutils literal"><span class="pre">renumber</span></tt> argument tells <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> to use the original PDB
+<p>In this case, the metadata is <em>not</em> copied (i.e., the <code class="docutils literal"><span class="pre">EXPTL</span></code>, <code class="docutils literal"><span class="pre">JRNL</span></code>,
+and <code class="docutils literal"><span class="pre">AUTHOR</span></code> records, to name a few). Only the coordinates, unit cell
+(<code class="docutils literal"><span class="pre">CYRST1</span></code> record), and optionally anisotropic B-factor lines are translated.</p>
+<p>The <code class="docutils literal"><span class="pre">renumber</span></code> argument tells <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> to use the original PDB
 numbers, rather than its internal number scheme that numbers sequentially from 1
 to N, where N is the number of residues.</p>
 <p>If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
@@ -204,25 +204,27 @@ the numbering starts again.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a><ul>
-<li><a class="reference internal" href="#structure-class"><tt class="docutils literal"><span class="pre">Structure</span></tt> class</a></li>
-<li><a class="reference internal" href="#read-pdb-and-read-cif-functions"><tt class="docutils literal"><span class="pre">read_PDB()</span></tt> and <tt class="docutils literal"><span class="pre">read_CIF()</span></tt> functions</a></li>
+<li><a class="reference internal" href="#">The <code class="docutils literal"><span class="pre">structure</span></code> module</a><ul>
+<li><a class="reference internal" href="#structure-class"><code class="docutils literal"><span class="pre">Structure</span></code> class</a></li>
+<li><a class="reference internal" href="#read-pdb-and-read-cif-functions"><code class="docutils literal"><span class="pre">read_PDB()</span></code> and <code class="docutils literal"><span class="pre">read_CIF()</span></code> functions</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 <li><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
 </ul>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/structure.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/structure.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -239,7 +241,7 @@ the numbering starts again.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -251,12 +253,12 @@ the numbering starts again.</p>
         <li class="right" >
           <a href="structobj/chemistry.structure.Structure.html" title="chemistry.structure.Structure"
              >next</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

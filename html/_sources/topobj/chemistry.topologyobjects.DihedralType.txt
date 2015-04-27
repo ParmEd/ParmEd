@@ -14,7 +14,6 @@ chemistry.topologyobjects.DihedralType
    .. autosummary::
    
       ~DihedralType.__init__
-      ~DihedralType.write_info
    
    
 

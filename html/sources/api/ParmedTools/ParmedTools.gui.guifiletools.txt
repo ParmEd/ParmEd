@@ -1,7 +1,0 @@
-ParmedTools.gui.guifiletools module
-===================================
-
-.. automodule:: ParmedTools.gui.guifiletools
-    :members:
-    :undoc-members:
-    :show-inheritance:

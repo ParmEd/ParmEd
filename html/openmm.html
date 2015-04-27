@@ -23,13 +23,13 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="chemistry.openmm.StateDataReporter" href="openmmobj/chemistry.openmm.StateDataReporter.html" />
+    <link rel="next" title="Running OpenMM Simulation with AMBER Files" href="omm_amber.html" />
     <link rel="prev" title="The ParmEd API" href="parmed_api.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -39,19 +39,19 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="openmmobj/chemistry.openmm.StateDataReporter.html" title="chemistry.openmm.StateDataReporter"
+          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="parmed_api.html" title="The ParmEd API"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="openmm-functionality">
 <h1>OpenMM Functionality<a class="headerlink" href="#openmm-functionality" title="Permalink to this headline">¶</a></h1>
@@ -138,21 +138,6 @@ that kernel.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.StateDataReporter" title="chemistry.openmm.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>This class acts as a state data reporter for OpenMM simulations, but it is a little more generalized.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>NetCDFReporter prints a trajectory in NetCDF format</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>MdcrdReporter prints a trajectory in ASCII Amber format.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Use a reporter to handle writing restarts at specified intervals.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>A class that prints out a progress report of how much MD (or minimization)</td>
-</tr>
 </tbody>
 </table>
 <p>ParmEd provides a common framework for constructing and representing fully
@@ -171,17 +156,17 @@ range of file formats. In particular, it supports the following file formats:</p
 classes in addition to the small number provided by ParmEd:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.StateDataReporter" title="chemistry.openmm.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt></a> &#8211; This takes an extra argument,
-<tt class="docutils literal"><span class="pre">unit_system</span></tt> that allows you to specify what unit system the output
-data is printed in (such as the AKMA unit system, which is more familiar
-to Amber and CHARMM users).</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.StateDataReporter" title="chemistry.openmm.StateDataReporter"><code class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></code></a> &#8211; This takes extra arguments specifying the
+units of each of the types of data (like the energy, volume, and time
+units). The defaults correspond to the AKMA unit system, which is more
+familiar to Amber and CHARMM users.</li>
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.NetCDFReporter" title="chemistry.openmm.NetCDFReporter"><code class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></code></a> &#8211; This allows you to write a trajectory file in
 the Amber NetCDF format.</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.MdcrdReporter" title="chemistry.openmm.MdcrdReporter"><code class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></code></a> &#8211; This allows you to write a trajectory file in
 the Amber ASCII mdcrd format.</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt></a> &#8211; This allows you to periodically write NetCDF
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.RestartReporter" title="chemistry.openmm.RestartReporter"><code class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></code></a> &#8211; This allows you to periodically write NetCDF
 or ASCII restart files during the course of the calculation</li>
-<li><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt></a> &#8211; This prints a file during the course of the
+<li><a class="reference internal" href="openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.ProgressReporter" title="chemistry.openmm.ProgressReporter"><code class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></code></a> &#8211; This prints a file during the course of the
 simulation tracking the runtime speed of the calculation and predicting
 the amount of time remaining.</li>
 </ul>
@@ -213,7 +198,7 @@ the annotated and explained example):</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -230,12 +215,14 @@ the annotated and explained example):</p>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/openmm.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/openmm.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -252,7 +239,7 @@ the annotated and explained example):</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -262,17 +249,17 @@ the annotated and explained example):</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="openmmobj/chemistry.openmm.StateDataReporter.html" title="chemistry.openmm.StateDataReporter"
+          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
              >next</a> |</li>
         <li class="right" >
           <a href="parmed_api.html" title="The ParmEd API"
              >previous</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

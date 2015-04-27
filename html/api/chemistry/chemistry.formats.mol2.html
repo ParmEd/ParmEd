@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chemistry.formats.mol2">
 <span id="chemistry-formats-mol2-module"></span><h1>chemistry.formats.mol2 module<a class="headerlink" href="#module-chemistry.formats.mol2" title="Permalink to this headline">¶</a></h1>
@@ -51,8 +51,8 @@
 extension described at <a class="reference external" href="http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php">http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php</a></p>
 <dl class="class">
 <dt id="chemistry.formats.mol2.Mol2File">
-<em class="property">class </em><tt class="descclassname">chemistry.formats.mol2.</tt><tt class="descname">Mol2File</tt><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.formats.mol2.</code><code class="descname">Mol2File</code><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Class to read and write TRIPOS Mol2 files</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -61,20 +61,20 @@ extension described at <a class="reference external" href="http://q4md-forcefiel
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.id_format" title="chemistry.formats.mol2.Mol2File.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.id_format" title="chemistry.formats.mol2.Mol2File.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identify the file as a Mol2 (or Mol3) file format or not</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.parse" title="chemistry.formats.mol2.Mol2File.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename[,&nbsp;structure])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.parse" title="chemistry.formats.mol2.Mol2File.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
 <td>Parses a mol2 file (or mol3) file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.write" title="chemistry.formats.mol2.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.mol2.Mol2File.write" title="chemistry.formats.mol2.Mol2File.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;mol3])</td>
 <td>Writes a mol2 file from a structure or residue template</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="chemistry.formats.mol2.Mol2File.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identify the file as a Mol2 (or Mol3) file format or not</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -98,7 +98,7 @@ extension described at <a class="reference external" href="http://q4md-forcefiel
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.mol2.Mol2File.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>structure=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a mol2 file (or mol3) file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -110,18 +110,18 @@ extension described at <a class="reference external" href="http://q4md-forcefiel
 </div></blockquote>
 <p><strong>structure</strong> : bool, optional</p>
 <blockquote>
-<div><p>If True, the return value is a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance. If
-False, it is either a <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or
-<tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainter</span></tt> instance, depending on whether
+<div><p>If True, the return value is a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance. If
+False, it is either a <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code> or
+<code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainter</span></code> instance, depending on whether
 there is one or more than one residue defined in it. Default is
 False</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>molecule</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt>, or</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>molecule</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>, <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code>, or</p>
 <blockquote>
 <div><blockquote>
-<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+<div><p><code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></code></p>
 </div></blockquote>
 <p>The molecule defined by this mol2 file</p>
 </div></blockquote>
@@ -140,16 +140,16 @@ present where integers or floating point numbers are expected</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.mol2.Mol2File.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>mol3=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.mol2.Mol2File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a mol2 file from a structure or residue template</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> or <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code> or</p>
 <blockquote>
 <div><blockquote>
-<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+<div><p><code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></code></p>
 </div></blockquote>
 <p>The input structure to write the mol2 file from</p>
 </div></blockquote>
@@ -159,7 +159,7 @@ present where integers or floating point numbers are expected</p>
 </div></blockquote>
 <p><strong>mol3</strong> : bool, optional</p>
 <blockquote class="last">
-<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplate or container, write
+<div><p>If True and <code class="docutils literal"><span class="pre">struct</span></code> is a ResidueTemplate or container, write
 HEAD/TAIL sections. Default is False</p>
 </div></blockquote>
 </td>
@@ -176,14 +176,16 @@ HEAD/TAIL sections. Default is False</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.formats.mol2.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.formats.mol2.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -200,7 +202,7 @@ HEAD/TAIL sections. Default is False</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -209,12 +211,12 @@ HEAD/TAIL sections. Default is False</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

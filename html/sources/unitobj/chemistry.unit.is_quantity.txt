@@ -1,6 +1,0 @@
-chemistry.unit.is_quantity
-==========================
-
-.. currentmodule:: chemistry.unit
-
-.. autofunction:: is_quantity

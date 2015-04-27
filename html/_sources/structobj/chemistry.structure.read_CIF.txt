@@ -1,6 +1,0 @@
-chemistry.structure.read_CIF
-============================
-
-.. currentmodule:: chemistry.structure
-
-.. autofunction:: read_CIF

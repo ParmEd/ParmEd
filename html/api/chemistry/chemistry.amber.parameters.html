@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,28 +36,28 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chemistry.amber.parameters">
 <span id="chemistry-amber-parameters-module"></span><h1>chemistry.amber.parameters module<a class="headerlink" href="#module-chemistry.amber.parameters" title="Permalink to this headline">¶</a></h1>
 <p>Classes helpful for reading/storing Amber parameters</p>
 <dl class="class">
 <dt id="chemistry.amber.parameters.AngleParam">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">AngleParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>thetk=None</em>, <em>theteq=None</em>, <em>angletype=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AngleParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AngleParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">AngleParam</code><span class="sig-paren">(</span><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>thetk=None</em>, <em>theteq=None</em>, <em>angletype=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AngleParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AngleParam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.AngleParamList">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">AngleParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AngleParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">AngleParamList</code><span class="sig-paren">(</span><em>unique_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AngleParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><code class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></code></a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -65,113 +65,113 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.add_param" title="chemistry.amber.parameters.AngleParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.add_param" title="chemistry.amber.parameters.AngleParamList.add_param"><code class="xref py py-obj docutils literal"><span class="pre">add_param</span></code></a>(param)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.append" title="chemistry.amber.parameters.AngleParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.append" title="chemistry.amber.parameters.AngleParamList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.count" title="chemistry.amber.parameters.AngleParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.count" title="chemistry.amber.parameters.AngleParamList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.extend" title="chemistry.amber.parameters.AngleParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.extend" title="chemistry.amber.parameters.AngleParamList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.index" title="chemistry.amber.parameters.AngleParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.index" title="chemistry.amber.parameters.AngleParamList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.insert" title="chemistry.amber.parameters.AngleParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.insert" title="chemistry.amber.parameters.AngleParamList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.pop" title="chemistry.amber.parameters.AngleParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.pop" title="chemistry.amber.parameters.AngleParamList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.remove" title="chemistry.amber.parameters.AngleParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.remove" title="chemistry.amber.parameters.AngleParamList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.reverse" title="chemistry.amber.parameters.AngleParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.reverse" title="chemistry.amber.parameters.AngleParamList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.sort" title="chemistry.amber.parameters.AngleParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.sort" title="chemistry.amber.parameters.AngleParamList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.type" title="chemistry.amber.parameters.AngleParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.AngleParam" title="chemistry.amber.parameters.AngleParam"><tt class="xref py py-class docutils literal"><span class="pre">AngleParam</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AngleParamList.type" title="chemistry.amber.parameters.AngleParamList.type"><code class="xref py py-obj docutils literal"><span class="pre">type</span></code></a></td>
+<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.AngleParam" title="chemistry.amber.parameters.AngleParam"><code class="xref py py-class docutils literal"><span class="pre">AngleParam</span></code></a></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.add_param" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.add_param" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AngleParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.parameters.AngleParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.AngleParam" title="chemistry.amber.parameters.AngleParam"><tt class="xref py py-class docutils literal"><span class="pre">AngleParam</span></tt></a></p>
+<code class="descname">type</code><a class="headerlink" href="#chemistry.amber.parameters.AngleParamList.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.AngleParam" title="chemistry.amber.parameters.AngleParam"><code class="xref py py-class docutils literal"><span class="pre">AngleParam</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.AtomType">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">AtomType</tt><big>(</big><em>atype</em>, <em>mass</em>, <em>rmin</em>, <em>epsilon</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">AtomType</code><span class="sig-paren">(</span><em>atype</em>, <em>mass</em>, <em>rmin</em>, <em>epsilon</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -179,22 +179,22 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomType.lennard_jones" title="chemistry.amber.parameters.AtomType.lennard_jones"><tt class="xref py py-obj docutils literal"><span class="pre">lennard_jones</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomType.lennard_jones" title="chemistry.amber.parameters.AtomType.lennard_jones"><code class="xref py py-obj docutils literal"><span class="pre">lennard_jones</span></code></a>()</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomType.lennard_jones">
-<tt class="descname">lennard_jones</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomType.lennard_jones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomType.lennard_jones" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lennard_jones</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomType.lennard_jones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomType.lennard_jones" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.AtomTypeList">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">AtomTypeList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">AtomTypeList</code><span class="sig-paren">(</span><em>unique_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#AtomTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><code class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></code></a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -202,119 +202,119 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.add_param" title="chemistry.amber.parameters.AtomTypeList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.add_param" title="chemistry.amber.parameters.AtomTypeList.add_param"><code class="xref py py-obj docutils literal"><span class="pre">add_param</span></code></a>(param)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.append" title="chemistry.amber.parameters.AtomTypeList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.append" title="chemistry.amber.parameters.AtomTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.count" title="chemistry.amber.parameters.AtomTypeList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.count" title="chemistry.amber.parameters.AtomTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.extend" title="chemistry.amber.parameters.AtomTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.extend" title="chemistry.amber.parameters.AtomTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.index" title="chemistry.amber.parameters.AtomTypeList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.index" title="chemistry.amber.parameters.AtomTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.insert" title="chemistry.amber.parameters.AtomTypeList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.insert" title="chemistry.amber.parameters.AtomTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.pop" title="chemistry.amber.parameters.AtomTypeList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.pop" title="chemistry.amber.parameters.AtomTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.remove" title="chemistry.amber.parameters.AtomTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.remove" title="chemistry.amber.parameters.AtomTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.reverse" title="chemistry.amber.parameters.AtomTypeList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.reverse" title="chemistry.amber.parameters.AtomTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.sort" title="chemistry.amber.parameters.AtomTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.sort" title="chemistry.amber.parameters.AtomTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.type" title="chemistry.amber.parameters.AtomTypeList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.AtomType" title="chemistry.amber.parameters.AtomType"><tt class="xref py py-class docutils literal"><span class="pre">AtomType</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.AtomTypeList.type" title="chemistry.amber.parameters.AtomTypeList.type"><code class="xref py py-obj docutils literal"><span class="pre">type</span></code></a></td>
+<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.AtomType" title="chemistry.amber.parameters.AtomType"><code class="xref py py-class docutils literal"><span class="pre">AtomType</span></code></a></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.add_param" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.add_param" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.AtomTypeList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.parameters.AtomTypeList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.AtomType" title="chemistry.amber.parameters.AtomType"><tt class="xref py py-class docutils literal"><span class="pre">AtomType</span></tt></a></p>
+<code class="descname">type</code><a class="headerlink" href="#chemistry.amber.parameters.AtomTypeList.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.AtomType" title="chemistry.amber.parameters.AtomType"><code class="xref py py-class docutils literal"><span class="pre">AtomType</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.BondParam">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">BondParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>rk=None</em>, <em>req=None</em>, <em>bondtype=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#BondParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.BondParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">BondParam</code><span class="sig-paren">(</span><em>atype1</em>, <em>atype2</em>, <em>rk=None</em>, <em>req=None</em>, <em>bondtype=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#BondParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.BondParam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.BondParamList">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">BondParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#BondParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.BondParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">BondParamList</code><span class="sig-paren">(</span><em>unique_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#BondParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.BondParamList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><code class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></code></a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -322,113 +322,113 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.add_param" title="chemistry.amber.parameters.BondParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.add_param" title="chemistry.amber.parameters.BondParamList.add_param"><code class="xref py py-obj docutils literal"><span class="pre">add_param</span></code></a>(param)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.append" title="chemistry.amber.parameters.BondParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.append" title="chemistry.amber.parameters.BondParamList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.count" title="chemistry.amber.parameters.BondParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.count" title="chemistry.amber.parameters.BondParamList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.extend" title="chemistry.amber.parameters.BondParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.extend" title="chemistry.amber.parameters.BondParamList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.index" title="chemistry.amber.parameters.BondParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.index" title="chemistry.amber.parameters.BondParamList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.insert" title="chemistry.amber.parameters.BondParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.insert" title="chemistry.amber.parameters.BondParamList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.pop" title="chemistry.amber.parameters.BondParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.pop" title="chemistry.amber.parameters.BondParamList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.remove" title="chemistry.amber.parameters.BondParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.remove" title="chemistry.amber.parameters.BondParamList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.reverse" title="chemistry.amber.parameters.BondParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.reverse" title="chemistry.amber.parameters.BondParamList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.sort" title="chemistry.amber.parameters.BondParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.sort" title="chemistry.amber.parameters.BondParamList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.type" title="chemistry.amber.parameters.BondParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.BondParam" title="chemistry.amber.parameters.BondParam"><tt class="xref py py-class docutils literal"><span class="pre">BondParam</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.BondParamList.type" title="chemistry.amber.parameters.BondParamList.type"><code class="xref py py-obj docutils literal"><span class="pre">type</span></code></a></td>
+<td>alias of <a class="reference internal" href="#chemistry.amber.parameters.BondParam" title="chemistry.amber.parameters.BondParam"><code class="xref py py-class docutils literal"><span class="pre">BondParam</span></code></a></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.add_param" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.add_param" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.BondParamList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.BondParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.parameters.BondParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.BondParam" title="chemistry.amber.parameters.BondParam"><tt class="xref py py-class docutils literal"><span class="pre">BondParam</span></tt></a></p>
+<code class="descname">type</code><a class="headerlink" href="#chemistry.amber.parameters.BondParamList.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#chemistry.amber.parameters.BondParam" title="chemistry.amber.parameters.BondParam"><code class="xref py py-class docutils literal"><span class="pre">BondParam</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.DihedralParam">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">DihedralParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">DihedralParam</code><span class="sig-paren">(</span><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -436,107 +436,107 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.add_term" title="chemistry.amber.parameters.DihedralParam.add_term"><tt class="xref py py-obj docutils literal"><span class="pre">add_term</span></tt></a>(term)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.add_term" title="chemistry.amber.parameters.DihedralParam.add_term"><code class="xref py py-obj docutils literal"><span class="pre">add_term</span></code></a>(term)</td>
 <td>Add this to the current dihedral IFF it is not already there</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.add_term_from_args" title="chemistry.amber.parameters.DihedralParam.add_term_from_args"><tt class="xref py py-obj docutils literal"><span class="pre">add_term_from_args</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.add_term_from_args" title="chemistry.amber.parameters.DihedralParam.add_term_from_args"><code class="xref py py-obj docutils literal"><span class="pre">add_term_from_args</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Convert the args to a _DihedralTerm first</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.append" title="chemistry.amber.parameters.DihedralParam.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.append" title="chemistry.amber.parameters.DihedralParam.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.count" title="chemistry.amber.parameters.DihedralParam.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.count" title="chemistry.amber.parameters.DihedralParam.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.extend" title="chemistry.amber.parameters.DihedralParam.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.extend" title="chemistry.amber.parameters.DihedralParam.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.index" title="chemistry.amber.parameters.DihedralParam.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.index" title="chemistry.amber.parameters.DihedralParam.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.insert" title="chemistry.amber.parameters.DihedralParam.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.insert" title="chemistry.amber.parameters.DihedralParam.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.pop" title="chemistry.amber.parameters.DihedralParam.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.pop" title="chemistry.amber.parameters.DihedralParam.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.remove" title="chemistry.amber.parameters.DihedralParam.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.remove" title="chemistry.amber.parameters.DihedralParam.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.reverse" title="chemistry.amber.parameters.DihedralParam.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.reverse" title="chemistry.amber.parameters.DihedralParam.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.same_atoms" title="chemistry.amber.parameters.DihedralParam.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(atomlist)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.same_atoms" title="chemistry.amber.parameters.DihedralParam.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(atomlist)</td>
 <td>Determine if two dihedrals are assigned to the same sets of atom types</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.sort" title="chemistry.amber.parameters.DihedralParam.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParam.sort" title="chemistry.amber.parameters.DihedralParam.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.add_term">
-<tt class="descname">add_term</tt><big>(</big><em>term</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.add_term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.add_term" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_term</code><span class="sig-paren">(</span><em>term</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.add_term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.add_term" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add this to the current dihedral IFF it is not already there</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.add_term_from_args">
-<tt class="descname">add_term_from_args</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.add_term_from_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.add_term_from_args" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_term_from_args</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.add_term_from_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.add_term_from_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the args to a _DihedralTerm first</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>atomlist</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.same_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">same_atoms</code><span class="sig-paren">(</span><em>atomlist</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParam.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if two dihedrals are assigned to the same sets of atom types</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -566,7 +566,7 @@ directions, only.</p>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParam.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParam.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
@@ -575,8 +575,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.DihedralParamList">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">DihedralParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">DihedralParamList</code><span class="sig-paren">(</span><em>unique_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.amber.parameters.ParamList" title="chemistry.amber.parameters.ParamList"><code class="xref py py-class docutils literal"><span class="pre">chemistry.amber.parameters.ParamList</span></code></a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -584,44 +584,44 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.add_param" title="chemistry.amber.parameters.DihedralParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(atype1,&nbsp;atype2,&nbsp;atype3,&nbsp;atype4,&nbsp;param)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.add_param" title="chemistry.amber.parameters.DihedralParamList.add_param"><code class="xref py py-obj docutils literal"><span class="pre">add_param</span></code></a>(atype1,&nbsp;atype2,&nbsp;atype3,&nbsp;atype4,&nbsp;param)</td>
 <td>Override this since dihedral parameters are actually lists of dihedral</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.append" title="chemistry.amber.parameters.DihedralParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.append" title="chemistry.amber.parameters.DihedralParamList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.count" title="chemistry.amber.parameters.DihedralParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.count" title="chemistry.amber.parameters.DihedralParamList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.extend" title="chemistry.amber.parameters.DihedralParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.extend" title="chemistry.amber.parameters.DihedralParamList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.index" title="chemistry.amber.parameters.DihedralParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.index" title="chemistry.amber.parameters.DihedralParamList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.insert" title="chemistry.amber.parameters.DihedralParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.insert" title="chemistry.amber.parameters.DihedralParamList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.pop" title="chemistry.amber.parameters.DihedralParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.pop" title="chemistry.amber.parameters.DihedralParamList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.remove" title="chemistry.amber.parameters.DihedralParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.remove" title="chemistry.amber.parameters.DihedralParamList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.reverse" title="chemistry.amber.parameters.DihedralParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.reverse" title="chemistry.amber.parameters.DihedralParamList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.sort" title="chemistry.amber.parameters.DihedralParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.sort" title="chemistry.amber.parameters.DihedralParamList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.type" title="chemistry.amber.parameters.DihedralParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <tt class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.DihedralParamList.type" title="chemistry.amber.parameters.DihedralParamList.type"><code class="xref py py-obj docutils literal"><span class="pre">type</span></code></a></td>
+<td>alias of <code class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></code></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em>, <em>param</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.add_param" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em>, <em>param</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#DihedralParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.add_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override this since dihedral parameters are actually lists of dihedral
 terms, so adding a DihedralParam to a DihedralParamList is different
 than the other parameter lists</p>
@@ -629,71 +629,71 @@ than the other parameter lists</p>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.DihedralParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.parameters.DihedralParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></tt></p>
+<code class="descname">type</code><a class="headerlink" href="#chemistry.amber.parameters.DihedralParamList.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></code></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.ParamList">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">ParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">ParamList</code><span class="sig-paren">(</span><em>unique_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParamList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -713,109 +713,109 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.add_param" title="chemistry.amber.parameters.ParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.add_param" title="chemistry.amber.parameters.ParamList.add_param"><code class="xref py py-obj docutils literal"><span class="pre">add_param</span></code></a>(param)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.append" title="chemistry.amber.parameters.ParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.append" title="chemistry.amber.parameters.ParamList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.count" title="chemistry.amber.parameters.ParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.count" title="chemistry.amber.parameters.ParamList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.extend" title="chemistry.amber.parameters.ParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.extend" title="chemistry.amber.parameters.ParamList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.index" title="chemistry.amber.parameters.ParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.index" title="chemistry.amber.parameters.ParamList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.insert" title="chemistry.amber.parameters.ParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.insert" title="chemistry.amber.parameters.ParamList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.pop" title="chemistry.amber.parameters.ParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.pop" title="chemistry.amber.parameters.ParamList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.remove" title="chemistry.amber.parameters.ParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.remove" title="chemistry.amber.parameters.ParamList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.reverse" title="chemistry.amber.parameters.ParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.reverse" title="chemistry.amber.parameters.ParamList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.sort" title="chemistry.amber.parameters.ParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParamList.sort" title="chemistry.amber.parameters.ParamList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParamList.add_param" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParamList.add_param" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.ParamList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.parameters.ParamList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.ParamList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.parameters.ParamList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.ParamList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.parameters.ParamList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.parameters.ParamList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.parameters.ParamList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.parameters.ParamList.type">
-<tt class="descname">type</tt><em class="property"> = None</em><a class="headerlink" href="#chemistry.amber.parameters.ParamList.type" title="Permalink to this definition">¶</a></dt>
+<code class="descname">type</code><em class="property"> = None</em><a class="headerlink" href="#chemistry.amber.parameters.ParamList.type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.amber.parameters.ParameterSet">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.parameters.</tt><tt class="descname">ParameterSet</tt><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.amber.parameters.</code><code class="descname">ParameterSet</code><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -823,22 +823,22 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParameterSet.load_from_parm" title="chemistry.amber.parameters.ParameterSet.load_from_parm"><tt class="xref py py-obj docutils literal"><span class="pre">load_from_parm</span></tt></a>(parm)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.parameters.ParameterSet.load_from_parm" title="chemistry.amber.parameters.ParameterSet.load_from_parm"><code class="xref py py-obj docutils literal"><span class="pre">load_from_parm</span></code></a>(parm)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParameterSet.write" title="chemistry.amber.parameters.ParameterSet.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(dest)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.parameters.ParameterSet.write" title="chemistry.amber.parameters.ParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest)</td>
 <td>Writes a parm.dat file with the current parameters</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParameterSet.load_from_parm">
-<tt class="descname">load_from_parm</tt><big>(</big><em>parm</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet.load_from_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet.load_from_parm" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_from_parm</code><span class="sig-paren">(</span><em>parm</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet.load_from_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet.load_from_parm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.parameters.ParameterSet.write">
-<tt class="descname">write</tt><big>(</big><em>dest</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>dest</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/parameters.html#ParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.parameters.ParameterSet.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a parm.dat file with the current parameters</p>
 </dd></dl>
 
@@ -850,14 +850,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.amber.parameters.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.amber.parameters.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -874,7 +876,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -883,12 +885,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

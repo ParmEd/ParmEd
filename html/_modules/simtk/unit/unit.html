@@ -1,0 +1,777 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simtk.unit.unit &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for simtk.unit.unit</h1><div class="highlight"><pre>
+<span class="c">#!/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module simtk.unit</span>
+
+<span class="sd">Contains classes Unit and ScaledUnit.</span>
+
+<span class="sd">This is part of the OpenMM molecular simulation toolkit originating from</span>
+<span class="sd">Simbios, the NIH National Center for Physics-Based Simulation of</span>
+<span class="sd">Biological Structures at Stanford, funded under the NIH Roadmap for</span>
+<span class="sd">Medical Research, grant U54 GM072970. See https://simtk.org.</span>
+
+<span class="sd">Portions copyright (c) 2012 Stanford University and the Authors.</span>
+<span class="sd">Authors: Christopher M. Bruns</span>
+<span class="sd">Contributors: Peter Eastman</span>
+
+<span class="sd">Permission is hereby granted, free of charge, to any person obtaining a</span>
+<span class="sd">copy of this software and associated documentation files (the &quot;Software&quot;),</span>
+<span class="sd">to deal in the Software without restriction, including without limitation</span>
+<span class="sd">the rights to use, copy, modify, merge, publish, distribute, sublicense,</span>
+<span class="sd">and/or sell copies of the Software, and to permit persons to whom the</span>
+<span class="sd">Software is furnished to do so, subject to the following conditions:</span>
+
+<span class="sd">The above copyright notice and this permission notice shall be included in</span>
+<span class="sd">all copies or substantial portions of the Software.</span>
+
+<span class="sd">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="sd">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="sd">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</span>
+<span class="sd">THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,</span>
+<span class="sd">DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR</span>
+<span class="sd">OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE</span>
+<span class="sd">USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.5&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">mymatrix</span> <span class="kn">import</span> <span class="n">MyMatrix</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span> <span class="nn">basedimension</span> <span class="kn">import</span> <span class="n">BaseDimension</span>
+<span class="kn">from</span> <span class="nn">baseunit</span> <span class="kn">import</span> <span class="n">BaseUnit</span>
+<span class="kn">from</span> <span class="nn">standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Unit"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit">[docs]</a><span class="k">class</span> <span class="nc">Unit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Physical unit such as meter or ampere.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Unit.__init__"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_or_scaled_units</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new Unit.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">         - self (Unit) The newly created Unit.</span>
+<span class="sd">         - base_or_scaled_units (dict) Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Unit contents are of two types: BaseUnits and ScaledUnits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">base_or_scaled_unit</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span> <span class="ow">in</span> <span class="n">base_or_scaled_units</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_or_scaled_unit</span><span class="p">,</span> <span class="n">BaseUnit</span><span class="p">):</span>
+                <span class="n">bu</span> <span class="o">=</span> <span class="n">base_or_scaled_unit</span>
+                <span class="n">dim</span> <span class="o">=</span> <span class="n">bu</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="n">bu</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">bu</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">bu</span><span class="p">]</span> <span class="o">+=</span> <span class="n">power</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">base_or_scaled_unit</span><span class="p">,</span> <span class="n">power</span><span class="p">))</span>
+        <span class="c"># Populate self._all_base_units</span>
+        <span class="c"># first, deep copy of self._top_base_units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">d</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="n">u</span><span class="p">]</span>
+        <span class="c"># second, BaseUnits from self._scaled_units</span>
+        <span class="k">for</span> <span class="n">scaled_unit</span><span class="p">,</span> <span class="n">exponent1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent2</span> <span class="ow">in</span> <span class="n">scaled_unit</span><span class="o">.</span><span class="n">iter_base_units</span><span class="p">():</span>
+                <span class="n">dim</span> <span class="o">=</span> <span class="n">base_unit</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="n">base_unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span> <span class="o">+=</span> <span class="n">exponent1</span> <span class="o">*</span> <span class="n">exponent2</span>
+        <span class="c"># What about heterogenous units that cancel? --&gt; leave them</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Unit.create_unit"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.create_unit">[docs]</a>    <span class="k">def</span> <span class="nf">create_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convenience method for creating a new simple unit from another simple unit.</span>
+<span class="sd">        Both units must consist of a single BaseUnit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO - also handle non-simple units, i.e. units with multiple BaseUnits/ScaledUnits</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">base_unit_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_unit_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">parent_base_unit</span> <span class="o">=</span> <span class="n">base_unit_dict</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">parent_exponent</span> <span class="o">=</span> <span class="n">base_unit_dict</span><span class="p">[</span><span class="n">parent_base_unit</span><span class="p">]</span>
+        <span class="n">new_base_unit</span> <span class="o">=</span> <span class="n">BaseUnit</span><span class="p">(</span><span class="n">parent_base_unit</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
+        <span class="c"># BaseUnit scale might be different depending on exponent</span>
+        <span class="n">true_scale</span> <span class="o">=</span> <span class="n">scale</span>
+        <span class="k">if</span> <span class="n">parent_exponent</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">true_scale</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">parent_exponent</span><span class="p">)</span>
+        <span class="n">new_base_unit</span><span class="o">.</span><span class="n">define_conversion_factor_to</span><span class="p">(</span><span class="n">parent_base_unit</span><span class="p">,</span> <span class="n">true_scale</span><span class="p">)</span>
+        <span class="n">new_unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">({</span><span class="n">new_base_unit</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">new_unit</span>
+</div>
+<div class="viewcode-block" id="Unit.iter_base_dimensions"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.iter_base_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">iter_base_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields (BaseDimension, exponent) tuples comprising this unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># There might be two units with the same dimension? No.</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="n">exponent</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+                <span class="n">exponent</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Unit.iter_all_base_units"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.iter_all_base_units">[docs]</a>    <span class="k">def</span> <span class="nf">iter_all_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits</span>
+<span class="sd">        found within ScaledUnits.</span>
+
+<span class="sd">        There might be multiple BaseUnits with the same dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+                <span class="n">exponent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Unit.iter_top_base_units"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.iter_top_base_units">[docs]</a>    <span class="k">def</span> <span class="nf">iter_top_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+                <span class="n">exponent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">iter_scaled_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">iter_base_or_scaled_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_top_base_units</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">item</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_scaled_units</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">item</span>
+
+<div class="viewcode-block" id="Unit.get_conversion_factor_to_base_units"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.get_conversion_factor_to_base_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_conversion_factor_to_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        There may be ScaleUnit components to this Unit.</span>
+<span class="sd">        Returns conversion factor to the set of BaseUnits returned by iter_all_base_units().</span>
+
+<span class="sd">        Units comprised of only BaseUnits return 1.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">scaled_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="p">:</span>
+            <span class="c"># print scaled_unit.factor</span>
+            <span class="n">factor</span> <span class="o">*=</span> <span class="n">scaled_unit</span><span class="o">.</span><span class="n">factor</span> <span class="o">**</span> <span class="n">exponent</span>
+        <span class="k">return</span> <span class="n">factor</span>
+</div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two Units.</span>
+
+<span class="sd">        Raises a TypeError if the units have different dimensions.</span>
+
+<span class="sd">        Returns True if self &lt; other, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Unit &quot;</span><span class="si">%s</span><span class="s">&quot; is not compatible with Unit &quot;</span><span class="si">%s</span><span class="s">&quot;.&#39;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute a hash code for this object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span>
+
+    <span class="c"># def __mul__(self, other):</span>
+    <span class="c"># See unit_operators.py for Unit.__mul__ operator</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Divide a Unit by another object.</span>
+
+<span class="sd">        Returns a composite Unit if other is another Unit.</span>
+
+<span class="sd">        Returns a Quantity otherwise.  UNLESS other is a Quantity AND</span>
+<span class="sd">        the resulting unit type is dimensionless, in which case the underlying</span>
+<span class="sd">        value type of the Quantity is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">__div__</span> <span class="o">=</span> <span class="n">__truediv__</span>
+
+    <span class="c"># def __rtruediv__(self, other):</span>
+    <span class="c"># Because rtruediv returns a Quantity, look in quantity.py for definition of Unit.__rtruediv__</span>
+
+    <span class="n">_pow_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise a Unit to a power.</span>
+
+<span class="sd">        Returns a new Unit with different exponents on the BaseUnits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_pow_cache</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_pow_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_pow_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">exponent</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Unit</span><span class="o">.</span><span class="n">_pow_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># dictionary of unit: exponent</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">exponent2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent2</span> <span class="o">*</span> <span class="n">exponent</span>
+        <span class="n">new_unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">Unit</span><span class="o">.</span><span class="n">_pow_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">exponent</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_unit</span>
+        <span class="k">return</span> <span class="n">new_unit</span>
+
+<div class="viewcode-block" id="Unit.sqrt"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.sqrt">[docs]</a>    <span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns square root of a unit.</span>
+
+<span class="sd">        Raises ArithmeticError if component exponents are not even.</span>
+<span class="sd">        This behavior can be changed if you present a reasonable real life case to me.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># There might be odd exponents in base and scaled units that</span>
+        <span class="c"># boil down to even exponents in base dimensions.</span>
+        <span class="c"># But if ScaledUnits and BaseUnits have even exponents, we should use them.</span>
+        <span class="n">nice_and_even</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">exponent</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># This isn&#39;t going to work, we need to bust apart the ScaledUnits</span>
+                <span class="n">nice_and_even</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">break</span>
+            <span class="n">new_units</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nice_and_even</span><span class="p">:</span>
+            <span class="c"># Create a new unit formed from inner BaseUnits</span>
+            <span class="n">new_units</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">base_units_by_dimension</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c"># Choose the first BaseUnit for each dimension</span>
+            <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_all_base_units</span><span class="p">():</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">base_unit</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_units_by_dimension</span><span class="p">:</span>
+                    <span class="n">base_units_by_dimension</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_unit</span>
+                    <span class="n">new_units</span><span class="p">[</span><span class="n">base_unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># Already assigned a BaseUnit to this dimension, just update exponent</span>
+                    <span class="n">bu</span> <span class="o">=</span> <span class="n">base_units_by_dimension</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+                    <span class="n">new_units</span><span class="p">[</span><span class="n">bu</span><span class="p">]</span> <span class="o">+=</span> <span class="n">exponent</span>
+            <span class="c"># If exponents are not even by now, they never will be even</span>
+            <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">new_units</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">exponent</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&#39;Exponents in Unit.sqrt() must be even.&#39;</span><span class="p">)</span>
+                <span class="n">new_units</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">return</span> <span class="n">Unit</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the human-readable name of this unit&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a unit name (string) for this Unit, composed of its various</span>
+<span class="sd">        BaseUnit symbols.  e.g. &#39;kilogram meter**2 second**-1&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="n">units</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">power</span>
+        <span class="k">return</span> <span class="s">&#39;Unit(</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c"># Performance</span>
+    <span class="n">_is_compatible_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Unit.is_compatible"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.is_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if two Units share the same dimension.</span>
+<span class="sd">        Returns False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">other</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">():</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">self_dims</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
+            <span class="n">self_dims</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+        <span class="n">other_dims</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
+            <span class="n">other_dims</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_dims</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">self_dims</span> <span class="o">==</span> <span class="n">other_dims</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">:</span>
+            <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">other</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+</div>
+    <span class="n">_is_dimensionless_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Unit.is_dimensionless"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.is_dimensionless">[docs]</a>    <span class="k">def</span> <span class="nf">is_dimensionless</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if this Unit has no dimensions.</span>
+<span class="sd">        Returns False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="c"># Performance</span></div>
+    <span class="n">_conversion_factor_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Unit.conversion_factor_to"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.conversion_factor_to">[docs]</a>    <span class="k">def</span> <span class="nf">conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns conversion factor for computing all of the common dimensions</span>
+<span class="sd">        between self and other from self base units to other base units.</span>
+
+<span class="sd">        The two units need not share all of the same dimensions.  In case they</span>
+<span class="sd">        do not, the conversion factor applies only to the BaseUnits of self</span>
+<span class="sd">        that correspond to different BaseUnits in other.</span>
+
+<span class="sd">        This method requires strict compatibility between the two units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">factor</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">other</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">factor</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_conversion_factor_to_base_units</span><span class="p">()</span>
+        <span class="n">factor</span> <span class="o">/=</span> <span class="n">other</span><span class="o">.</span><span class="n">get_conversion_factor_to_base_units</span><span class="p">()</span>
+        <span class="c"># Organize both units&#39; base units by dimension</span>
+
+        <span class="n">canonical_units</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># dimension: BaseUnit</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_all_base_units</span><span class="p">():</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">dimension</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">canonical_units</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">unit</span> <span class="o">!=</span> <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]:</span>
+                    <span class="n">factor</span> <span class="o">*=</span> <span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">])</span><span class="o">**</span><span class="n">power</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">iter_all_base_units</span><span class="p">():</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">dimension</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">canonical_units</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">unit</span> <span class="o">!=</span> <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]:</span>
+                    <span class="n">factor</span> <span class="o">/=</span> <span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">])</span><span class="o">**</span><span class="n">power</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">canonical_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">:</span>
+            <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Unit</span><span class="o">.</span><span class="n">_conversion_factor_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">other</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span>
+        <span class="k">return</span> <span class="n">factor</span>
+</div>
+<div class="viewcode-block" id="Unit.in_unit_system"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</span>
+
+<span class="sd">        Strips off any ScaledUnits in the Unit, leaving only BaseUnits.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">         - system: a dictionary of (BaseDimension, BaseUnit) pairs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">system</span><span class="o">.</span><span class="n">express_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Unit.get_symbol"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.get_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">get_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a unit symbol (string) for this Unit, composed of its various</span>
+<span class="sd">        BaseUnit symbols.  e.g. &#39;kg m**2 s**-1&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="c"># emit positive exponents first</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">pos_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">pos_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">pos_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">pos</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">symbol</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">+=</span> <span class="s">&quot;**</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">power</span>
+        <span class="c"># emit negative exponents second</span>
+        <span class="n">neg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">neg_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">neg_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">neg_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">neg</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+                <span class="n">neg</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">symbol</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">neg</span> <span class="o">+=</span> <span class="s">&quot;**</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="o">-</span><span class="n">power</span>
+                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Format of denominator depends on number of terms</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">elif</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">neg_count</span> <span class="ow">and</span> <span class="n">simple_denominator</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">neg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;/(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">neg</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">pos_count</span><span class="p">:</span>
+            <span class="n">pos_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pos_string</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">pos_count</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="s">&quot;dimensionless&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pos_string</span><span class="p">,</span> <span class="n">neg_string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">symbol</span>
+</div>
+<div class="viewcode-block" id="Unit.get_name"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a unit name (string) for this Unit, composed of its various</span>
+<span class="sd">        BaseUnit symbols.  e.g. &#39;kilogram meter**2 secon**-1&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># emit positive exponents first</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">pos_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">pos_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">pos_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">pos</span> <span class="o">+=</span> <span class="s">&quot;*&quot;</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">+=</span> <span class="s">&quot;**</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">power</span>
+        <span class="c"># emit negative exponents second</span>
+        <span class="n">neg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">neg_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">neg_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">neg_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">neg</span> <span class="o">+=</span> <span class="s">&quot;*&quot;</span>
+                <span class="n">neg</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">neg</span> <span class="o">+=</span> <span class="s">&quot;**</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="o">-</span><span class="n">power</span>
+                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># Format of denominator depends on number of terms</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">elif</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">neg_count</span> <span class="ow">and</span> <span class="n">simple_denominator</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">neg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">neg_string</span> <span class="o">=</span> <span class="s">&quot;/(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">neg</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">pos_count</span><span class="p">:</span>
+            <span class="n">pos_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pos_string</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">pos_count</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;dimensionless&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pos_string</span><span class="p">,</span> <span class="n">neg_string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="n">name</span>
+
+</div></div>
+<span class="k">class</span> <span class="nc">ScaledUnit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ScaledUnit is like a BaseUnit, but it is based on another Unit.</span>
+
+<span class="sd">    ScaledUnit and BaseUnit are both used in the internals of Unit.  They</span>
+<span class="sd">    should only be used during the construction of Units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
+        <span class="c"># Convert to one base_unit per dimension</span>
+        <span class="n">base_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">bu</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">master</span><span class="o">.</span><span class="n">iter_all_base_units</span><span class="p">():</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="n">bu</span><span class="o">.</span><span class="n">dimension</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_units</span><span class="p">:</span>
+                <span class="n">base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">bu</span><span class="p">,</span> <span class="n">exponent</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">exponent</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*=</span> <span class="n">base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">bu</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sbu</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">master</span><span class="o">.</span><span class="n">iter_scaled_units</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*=</span> <span class="n">sbu</span><span class="o">.</span><span class="n">factor</span><span class="o">**</span><span class="n">exponent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_units</span> <span class="o">=</span> <span class="n">base_units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">master</span> <span class="o">=</span> <span class="n">master</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">iter_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">yield</span><span class="p">(</span><span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">iter_base_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a sorted tuple of (BaseDimension, exponent) pairs, describing the dimension of this unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">base_unit</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_dimension_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">())</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_conversion_factor_to_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span>
+
+    <span class="k">def</span> <span class="nf">conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c"># Create fake unit based on base units</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_units</span><span class="p">():</span>
+            <span class="n">u</span><span class="p">[</span><span class="n">base_unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Unit</span><span class="p">):</span>
+            <span class="n">other_u</span> <span class="o">=</span> <span class="n">other</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">other_u</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">({</span><span class="n">other</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">Unit</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">other_u</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two ScaledUnits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">hash</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a string with the name of this ScaledUnit</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_units</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_units</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_units</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">base_units</span> <span class="o">+=</span> <span class="s">&quot;, &quot;</span>
+            <span class="n">base_units</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">base_unit</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;ScaledUnit(factor=&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">)</span> <span class="o">+</span> \
+                <span class="s">&quot;, master=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">master</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;, name=&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>\
+                <span class="o">+</span> <span class="s">&quot;, symbol=&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
+
+<div class="viewcode-block" id="UnitSystem"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem">[docs]</a><span class="k">class</span> <span class="nc">UnitSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="UnitSystem.__init__"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit_conversion_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># Create a set of base units to be used for dimension conversion</span>
+        <span class="n">base_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">unit</span><span class="o">.</span><span class="n">iter_base_units</span><span class="p">():</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">base_unit</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_units</span><span class="p">:</span>
+                    <span class="n">base_units</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_units</span> <span class="o">=</span> <span class="n">base_units</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&quot;UnitSystem must have same number of units as base dimensions&quot;</span><span class="p">)</span>
+        <span class="c"># self.dimensions is a dict of {BaseDimension: index}</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="n">base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">dimensions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dimensions</span><span class="p">[</span><span class="n">d</span><span class="p">]]</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="c"># Create units-&gt;base units exponent matrix</span>
+        <span class="n">to_base_units</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">)):</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="n">unit</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+                <span class="n">to_base_units</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">power</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_base_units</span> <span class="o">=</span> <span class="o">~</span><span class="n">to_base_units</span>
+        <span class="k">except</span> <span class="ne">ArithmeticError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c"># for compatibility between python 2.5 and python 3.0,</span>
+        <span class="c"># try replacing line above with the following two lines:</span>
+        <span class="c"># except ArithmeticError:</span>
+        <span class="c">#     e=sys.exc_info[1]</span>
+            <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&quot;UnitSystem is not a valid basis set.  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">unit</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s">&quot;UnitSystem([&quot;</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">sep</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="s">&quot;])&quot;</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="UnitSystem.express_unit"><a class="viewcode-back" href="../../../unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem.express_unit">[docs]</a>    <span class="k">def</span> <span class="nf">express_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">old_unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_conversion_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_conversion_cache</span><span class="p">[</span><span class="n">old_unit</span><span class="p">]</span>
+        <span class="c"># First express unit in terms of base dimensions found in this unit system</span>
+        <span class="c"># (plus other dimensions not found)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">base_dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span>
+        <span class="n">other_dims</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">old_unit</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
+                <span class="n">base_dims</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dim</span><span class="p">]]</span> <span class="o">=</span> <span class="n">exponent</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">other_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
+        <span class="c"># Multiply by self.from_base_units to convert to unit system units</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">MyMatrix</span><span class="p">([</span><span class="n">base_dims</span><span class="p">,])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_base_units</span>
+        <span class="n">new_unit</span> <span class="o">=</span> <span class="n">dimensionless</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="n">exponent</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_unit</span> <span class="o">*=</span> <span class="n">Unit</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">exponent</span><span class="p">})</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c"># Find one base unit for each dimension</span>
+            <span class="n">found_dims</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">base_unit</span><span class="p">,</span> <span class="n">useless_exponent</span> <span class="ow">in</span> <span class="n">old_unit</span><span class="o">.</span><span class="n">iter_all_base_units</span><span class="p">():</span>
+                <span class="n">dim</span> <span class="o">=</span> <span class="n">base_unit</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other_dims</span><span class="p">:</span>
+                    <span class="k">continue</span> <span class="c"># this dimension is in the unit system</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">found_dims</span><span class="p">:</span>
+                    <span class="k">continue</span> <span class="c"># already got a BaseUnit for this dimension</span>
+                <span class="n">found_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_unit</span>
+                <span class="n">exponent</span> <span class="o">=</span> <span class="n">other_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+                <span class="n">new_unit</span> <span class="o">*=</span> <span class="n">Unit</span><span class="p">({</span><span class="n">base_unit</span><span class="p">:</span> <span class="n">exponent</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit_conversion_cache</span><span class="p">[</span><span class="n">old_unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_unit</span>
+        <span class="k">return</span> <span class="n">new_unit</span>
+</div></div>
+<span class="k">def</span> <span class="nf">is_unit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if x is a Unit, False otherwise.</span>
+
+<span class="sd">    Examples</span>
+
+<span class="sd">    &gt;&gt;&gt; is_unit(16)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Unit</span><span class="p">)</span>
+
+<span class="n">dimensionless</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">({})</span>
+
+<span class="c"># run module directly for testing</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c"># Test the examples in the docstrings</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -1,7 +1,0 @@
-chemistry.openmm.utils module
-=============================
-
-.. automodule:: chemistry.openmm.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:

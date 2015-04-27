@@ -1,7 +1,0 @@
-ParmedTools.ParmedActions module
-================================
-
-.. automodule:: ParmedTools.ParmedActions
-    :members:
-    :undoc-members:
-    :show-inheritance:

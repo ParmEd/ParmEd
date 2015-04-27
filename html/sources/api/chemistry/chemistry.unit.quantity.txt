@@ -1,7 +1,0 @@
-chemistry.unit.quantity module
-==============================
-
-.. automodule:: chemistry.unit.quantity
-    :members:
-    :undoc-members:
-    :show-inheritance:

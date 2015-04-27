@@ -1,7 +1,0 @@
-chemistry.amber.amberformat module
-==================================
-
-.. automodule:: chemistry.amber.amberformat
-    :members:
-    :undoc-members:
-    :show-inheritance:

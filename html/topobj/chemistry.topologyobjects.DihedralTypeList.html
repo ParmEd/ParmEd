@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,24 +37,24 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-topologyobjects-dihedraltypelist">
 <h1>chemistry.topologyobjects.DihedralTypeList<a class="headerlink" href="#chemistry-topologyobjects-dihedraltypelist" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.DihedralTypeList">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">DihedralTypeList</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.topologyobjects.</code><code class="descname">DihedralTypeList</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dihedral types are a Fourier expansion of terms. In some cases, they are
 stored in a list like this one inside another TrackedList. In other cases,
-each term is a separate entry in the <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.TrackedList" title="chemistry.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a>.</p>
+each term is a separate entry in the <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.TrackedList" title="chemistry.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a>.</p>
 <p>In cases where <cite>DihedralType`s are stored with every term in the same
 container, this object supports list assignment and indexing like
 :class:`DihedralType</cite>.</p>
@@ -65,7 +65,7 @@ container, this object supports list assignment and indexing like
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.DihedralTypeList.idx" title="chemistry.topologyobjects.DihedralTypeList.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.DihedralTypeList.idx" title="chemistry.topologyobjects.DihedralTypeList.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -77,38 +77,38 @@ container, this object supports list assignment and indexing like
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.append" title="chemistry.topologyobjects.DihedralTypeList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.append" title="chemistry.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.count" title="chemistry.topologyobjects.DihedralTypeList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.count" title="chemistry.topologyobjects.DihedralTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="chemistry.topologyobjects.DihedralTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="chemistry.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.index" title="chemistry.topologyobjects.DihedralTypeList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.index" title="chemistry.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="chemistry.topologyobjects.DihedralTypeList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="chemistry.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="chemistry.topologyobjects.DihedralTypeList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="chemistry.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="chemistry.topologyobjects.DihedralTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="chemistry.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="chemistry.topologyobjects.DihedralTypeList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="chemistry.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="chemistry.topologyobjects.DihedralTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="chemistry.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#DihedralTypeList.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#DihedralTypeList.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -118,34 +118,34 @@ container, this object supports list assignment and indexing like
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.__init__" title="chemistry.topologyobjects.DihedralTypeList.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.__init__" title="chemistry.topologyobjects.DihedralTypeList.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.append" title="chemistry.topologyobjects.DihedralTypeList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.append" title="chemistry.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.count" title="chemistry.topologyobjects.DihedralTypeList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.count" title="chemistry.topologyobjects.DihedralTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="chemistry.topologyobjects.DihedralTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="chemistry.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.index" title="chemistry.topologyobjects.DihedralTypeList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.index" title="chemistry.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="chemistry.topologyobjects.DihedralTypeList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="chemistry.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="chemistry.topologyobjects.DihedralTypeList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="chemistry.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="chemistry.topologyobjects.DihedralTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="chemistry.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="chemistry.topologyobjects.DihedralTypeList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="chemistry.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="chemistry.topologyobjects.DihedralTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="chemistry.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
@@ -157,62 +157,62 @@ container, this object supports list assignment and indexing like
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.DihedralTypeList.idx" title="chemistry.topologyobjects.DihedralTypeList.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.DihedralTypeList.idx" title="chemistry.topologyobjects.DihedralTypeList.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.DihedralTypeList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
@@ -225,14 +225,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/chemistry.topologyobjects.DihedralTypeList.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/chemistry.topologyobjects.DihedralTypeList.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -249,7 +251,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -258,13 +260,13 @@ cmp(x, y) -&gt; -1, 0, 1</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

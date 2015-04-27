@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="chemistry.amber" href="../amber.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,16 +37,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">chemistry.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for chemistry.amber.asciicrd</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -175,7 +174,7 @@
 
 <span class="c">#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="AmberAsciiRestart"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart">[docs]</a><span class="k">class</span> <span class="nc">AmberAsciiRestart</span><span class="p">(</span><span class="n">_AmberAsciiCoordinateFile</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberAsciiRestart"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberAsciiRestart">[docs]</a><span class="k">class</span> <span class="nc">AmberAsciiRestart</span><span class="p">(</span><span class="n">_AmberAsciiCoordinateFile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parser for the Amber ASCII inpcrd/restart file format</span>
 
@@ -195,7 +194,7 @@
 <span class="sd">            The time to write to the restart file in ps. Default is 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AmberAsciiRestart.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberAsciiRestart.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberAsciiRestart.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber restart/inpcrd file</span>
 
 <span class="sd">        Parameters</span>
@@ -235,7 +234,7 @@
     <span class="n">CRDS_PER_LINE</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="s">&#39;restart created by ParmEd&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AmberAsciiRestart.__init__"><a class="viewcode-back" href="../../../amberobj/chemistry.amber.AmberAsciiRestart.html#chemistry.amber.AmberAsciiRestart.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For restart files, natom and hasbox are determined automatically for</span>
@@ -249,7 +248,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AmberAsciiRestart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">natom</span><span class="p">,</span> <span class="n">hasbox</span><span class="p">,</span>
                                                 <span class="n">mode</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
-
+</div>
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the data out of the ASCII restart file and creates</span>
@@ -357,7 +356,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span>
 
     <span class="nd">@coordinates.setter</span>
-<div class="viewcode-block" id="AmberAsciiRestart.coordinates"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set coordinates on an old restart&#39;</span><span class="p">)</span>
         <span class="c"># Try to flatten the array if we got a 3-D numpy array. Don&#39;t worry if</span>
@@ -388,7 +387,7 @@
             <span class="k">if</span> <span class="n">numwrit</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords_written</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;new&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_velocities&#39;</span><span class="p">):</span>
@@ -398,7 +397,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span>
 
     <span class="nd">@velocities.setter</span>
-<div class="viewcode-block" id="AmberAsciiRestart.velocities"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set velocities on an old restart&#39;</span><span class="p">)</span>
         <span class="c"># Try to flatten the array if we got a 3-D numpy array</span>
@@ -428,7 +427,7 @@
             <span class="k">if</span> <span class="n">numwrit</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vels_written</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cell_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;new&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_cell_lengths&#39;</span><span class="p">):</span>
@@ -463,7 +462,7 @@
         <span class="k">return</span> <span class="n">box</span>
 
     <span class="nd">@cell_lengths.setter</span>
-<div class="viewcode-block" id="AmberAsciiRestart.cell_lengths"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.cell_lengths">[docs]</a>    <span class="k">def</span> <span class="nf">cell_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">cell_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set cell lengths on old restart&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords_written</span><span class="p">:</span>
@@ -475,9 +474,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">stuff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths_written</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
+
     <span class="nd">@cell_angles.setter</span>
-<div class="viewcode-block" id="AmberAsciiRestart.cell_angles"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.cell_angles">[docs]</a>    <span class="k">def</span> <span class="nf">cell_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">cell_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set cell angles on old restart&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords_written</span><span class="p">:</span>
@@ -491,16 +490,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">stuff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">stuff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">stuff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles_written</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
+
     <span class="nd">@box.setter</span>
-<div class="viewcode-block" id="AmberAsciiRestart.box"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberAsciiRestart.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes both the cell lengths and cell angles &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="n">stuff</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_angles</span> <span class="o">=</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
 
 <span class="c">#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
-</div></div>
-<div class="viewcode-block" id="AmberMdcrd"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd">[docs]</a><span class="k">class</span> <span class="nc">AmberMdcrd</span><span class="p">(</span><span class="n">_AmberAsciiCoordinateFile</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="AmberMdcrd"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd">[docs]</a><span class="k">class</span> <span class="nc">AmberMdcrd</span><span class="p">(</span><span class="n">_AmberAsciiCoordinateFile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to parse Amber ASCII trajectory files. This is *much* slower than</span>
 <span class="sd">    parsing NetCDF files (or the equivalent parsing done in a compiled language</span>
@@ -512,7 +511,7 @@
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="s">&#39;trajectory created by ParmEd&#39;</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AmberMdcrd.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMdcrd.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identifies the file type as an Amber mdcrd file</span>
 
 <span class="sd">        Parameters</span>
@@ -608,7 +607,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="AmberMdcrd.coordinates"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMdcrd.coordinates"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the requested coordinates</span>
 
@@ -632,7 +631,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
    </div>
-<div class="viewcode-block" id="AmberMdcrd.box"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMdcrd.box"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the frame&#39;th frame of the box lengths as a length-3 array</span>
 
@@ -656,7 +655,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span>
 </div>
-<div class="viewcode-block" id="AmberMdcrd.add_coordinates"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.add_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">add_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMdcrd.add_coordinates"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd.add_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">add_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints &#39;stuff&#39; (which must be either an iterable of 3*natom or have an</span>
 <span class="sd">        attribute &#39;flatten&#39; that converts it into an iterable of 3*natom) to the</span>
@@ -705,7 +704,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_writebox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="AmberMdcrd.add_box"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.asciicrd.AmberMdcrd.add_box">[docs]</a>    <span class="k">def</span> <span class="nf">add_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMdcrd.add_box"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.asciicrd.html#chemistry.amber.AmberMdcrd.add_box">[docs]</a>    <span class="k">def</span> <span class="nf">add_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints &#39;stuff&#39; (which must be a 3-element list, array.array, tuple, or</span>
 <span class="sd">        np.ndarray) as the box lengths for this frame</span>
@@ -740,9 +739,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -759,7 +758,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -768,14 +767,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../amber.html" >chemistry.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

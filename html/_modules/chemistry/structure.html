@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,15 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for chemistry.structure</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -112,6 +112,11 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">pd</span> <span class="o">=</span> <span class="bp">None</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="nb">basestring</span> <span class="o">=</span> <span class="nb">str</span>
+
 <span class="c"># Try to import the OpenMM modules</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
@@ -124,7 +129,7 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">mm</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="needs_openmm"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.structure.needs_openmm">[docs]</a><span class="k">def</span> <span class="nf">needs_openmm</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="needs_openmm"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.needs_openmm">[docs]</a><span class="k">def</span> <span class="nf">needs_openmm</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">app</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">mm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -240,7 +245,7 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A chemical structure composed of atoms, bonds, angles, torsions, and other</span>
 <span class="sd">    topological features</span>
@@ -324,7 +329,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.__init__"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.__init__"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c"># Topological object lists</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
@@ -390,7 +395,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure, adding a new residue to `residues` if</span>
 <span class="sd">        it has a different name or number as the last residue added and adding</span>
@@ -419,7 +424,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure at the end if the given residue</span>
 
@@ -457,7 +462,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a copy of the current structure as an instance of a specified</span>
 <span class="sd">        subclass</span>
@@ -678,7 +683,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates a pandas.DataFrame object from the current Structure</span>
 
 <span class="sd">        Returns</span>
@@ -858,7 +863,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if any of the topology has changed for this structure &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
@@ -881,7 +886,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Toggles all lists so that they do not indicate any changes &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
@@ -919,7 +924,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Looks through all of the topological lists and gets rid of terms</span>
 <span class="sd">        in which at least one of the atoms is None or has an `idx` attribute set</span>
@@ -942,7 +947,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonbonded exclusions and exceptions have the following priority:</span>
 
@@ -970,7 +975,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes a subset of the atoms corresponding to an atom-based selection.</span>
 
@@ -996,17 +1001,175 @@
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Selection not a supported type [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>
                                 <span class="nb">type</span><span class="p">(</span><span class="n">selection</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selection iterable wrong length&#39;</span><span class="p">)</span>
         <span class="n">atomlist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">atomlist</span><span class="p">):</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prune_empty_terms</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
 
     <span class="c">#===================================================</span>
 </div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows extracting a single atom from the structure or a slice of atoms</span>
+<span class="sd">        as a new Structure instance. The following syntaxes are allowed:</span>
+
+<span class="sd">            - struct[str] : str is interpreted as an Amber selection mask</span>
+<span class="sd">            - struct[[sel,[sel,]],sel] : sel can be a list of indices (or</span>
+<span class="sd">                            strings for chain selection) an integer, or a slice</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selection : str, or slice|iter|str, slice|iter|int, slice|iter|int</span>
+<span class="sd">            Which atoms to select for the new structure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        struct : :class:`Structure`</span>
+<span class="sd">            If more than one atom is selected, the resulting return value is a</span>
+<span class="sd">            new structure containing all selected atoms and all valence terms</span>
+<span class="sd">            (and types) in which all involved atoms are present</span>
+
+<span class="sd">        or</span>
+
+<span class="sd">        atom : :class:`Atom`</span>
+<span class="sd">            If only a single atom is selected</span>
+
+<span class="sd">        or</span>
+
+<span class="sd">        None</span>
+<span class="sd">            If no atoms are selected</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        When selecting more than 1 atom, this is a costly operation. It is</span>
+<span class="sd">        currently implemented by making a full copy of the object and then</span>
+<span class="sd">        stripping the unused atoms.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ``TypeError`` : if selection (or any part of the selection) is not an</span>
+<span class="sd">                        allowed type</span>
+
+<span class="sd">        ``ValueError`` : if the selection is a boolean-like list and its length</span>
+<span class="sd">                         is not the same as the number of atoms in the system</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+        <span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">AmberMask</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
+
+        <span class="c"># Now we select a subset of atoms. Convert &quot;selection&quot; into a natom list</span>
+        <span class="c"># with 0s and 1s, depending on what the input selection is</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))[</span><span class="n">selection</span><span class="p">]:</span>
+                <span class="n">sel</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="c"># This is a selection of chains, and/or residues, and/or atoms</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c"># Select just residues and atoms</span>
+                <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
+                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">chainsel</span><span class="p">,</span> <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
+                <span class="n">chainmap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="c"># First residue in each chain</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">chain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
+                        <span class="n">chainmap</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">idx</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">chainsel</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
+                        <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">chainsel</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># The selected chain is not in the system. Cannot</span>
+                        <span class="c"># possibly select *any* atoms. Bail now for speed</span>
+                        <span class="k">return</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                    <span class="c"># Build an ordered set of chains</span>
+                    <span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="n">chainsel</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chainsel</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># No requested chain is present. Bail now for speed</span>
+                    <span class="k">return</span> <span class="bp">None</span>
+                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="c"># Residue selection can either be by name or index</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">))[</span><span class="n">ressel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">ressel</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ressel</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))[</span><span class="n">atomsel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atomsel</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atomsel</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">has_chain</span><span class="p">:</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span>
+                         <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">chainmap</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+                <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Assume it is an iterable. If it is the same length as the atoms,</span>
+            <span class="c"># it is a boolean mask array. Otherwise, it is a list of atom</span>
+            <span class="c"># indices to select</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">val</span><span class="p">:</span> <span class="n">sel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selection iterable is too long&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
+                        <span class="n">sel</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selected atom out of range&#39;</span><span class="p">)</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
+        <span class="c"># Now our selection array is a &quot;boolean&quot; array for each atom. Strip the</span>
+        <span class="c"># unselected atoms from a copy of this structure</span>
+        <span class="n">sumsel</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sumsel</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c"># No atoms selected. Return None</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">sumsel</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c"># 1 atom selected; return that atom</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">strip</span><span class="p">([</span><span class="ow">not</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="c">#===================================================</span>
+
     <span class="nd">@property</span>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.topology"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.topology">[docs]</a>    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The OpenMM Topology object. Cached when possible, but any changes to the</span>
 <span class="sd">        Structure instance results in the topology being deleted and rebuilt</span>
@@ -1066,7 +1229,7 @@
         <span class="k">return</span> <span class="n">top</span>
 
     <span class="c">#===================================================</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1077,7 +1240,7 @@
         <span class="k">return</span> <span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
 
     <span class="nd">@positions.setter</span>
-<div class="viewcode-block" id="Structure.positions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic positions for every atom in the system. If set with unitless</span>
@@ -1098,7 +1261,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Wrong shape for position array&#39;</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1108,7 +1271,7 @@
         <span class="k">return</span> <span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">vz</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span>
 
     <span class="nd">@velocities.setter</span>
-<div class="viewcode-block" id="Structure.velocities"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic velocities for every atom in the system</span>
@@ -1128,7 +1291,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Wrong shape for velocities array&#39;</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1139,7 +1302,7 @@
         <span class="k">return</span> <span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
 
     <span class="nd">@box_vectors.setter</span>
-<div class="viewcode-block" id="Structure.box_vectors"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.box_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3, 3-element tuple of unit cell vectors that are Quantity objects of</span>
 <span class="sd">        dimension length</span>
@@ -1154,9 +1317,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">create_array</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">G</span><span class="p">])</span>
 
     <span class="c">#===================================================</span>
-</div>
+
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                      <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">switchDistance</span><span class="o">=</span><span class="mf">0.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -1337,7 +1500,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds constraints to a given system</span>
 
 <span class="sd">        Parameters</span>
@@ -1392,7 +1555,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the virtual sites in a given OpenMM `System` object from the extra</span>
 <span class="sd">        points defined in this system</span>
@@ -1435,7 +1598,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                        <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</span>
@@ -1492,7 +1655,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</span>
 <span class="sd">        angles are for an Amoeba-parametrized system)</span>
@@ -1542,7 +1705,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM PeriodicTorsionForce modeling dihedrals</span>
 
 <span class="sd">        Returns</span>
@@ -1572,7 +1735,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM Urey-Bradley force</span>
 
 <span class="sd">        Returns</span>
@@ -1597,7 +1760,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM improper torsion force (quadratic bias)</span>
 
 <span class="sd">        Returns</span>
@@ -1623,7 +1786,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM CMAP torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -1662,7 +1825,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                             <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">switchDistance</span><span class="o">=</span><span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">ewaldErrorTolerance</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
@@ -1832,7 +1995,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
                        <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">30.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                        <span class="n">soluteDielectric</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -1949,7 +2112,7 @@
     <span class="c"># Amoeba-specific forces below</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba trigonal-angle force</span>
 
 <span class="sd">        Returns</span>
@@ -1981,7 +2144,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba out-of-plane bend force</span>
 
 <span class="sd">        Returns</span>
@@ -2012,7 +2175,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba pi-torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -2035,7 +2198,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba stretch-bend force for this system</span>
 
 <span class="sd">        Returns</span>
@@ -2060,7 +2223,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba coupled-torsion (CMAP) force</span>
 
 <span class="sd">        Returns</span>
@@ -2366,9 +2529,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -2385,7 +2548,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -2394,13 +2557,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

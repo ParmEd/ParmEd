@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,40 +37,40 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-topologyobjects-atomtype">
 <h1>chemistry.topologyobjects.AtomType<a class="headerlink" href="#chemistry-topologyobjects-atomtype" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.AtomType">
-<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">AtomType</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.topologyobjects.</code><code class="descname">AtomType</code><span class="sig-paren">(</span><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atom types can either be compared by indexes or names. Can be assigned with
 a string, integer, (string is not automatically cast) or with both.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The name of the atom type</p>
 </div></blockquote>
-<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>number</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote>
 <div><p>The serial index of the atom type</p>
 </div></blockquote>
-<p><strong>mass</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<p><strong>mass</strong> : <code class="docutils literal"><span class="pre">float</span></code></p>
 <blockquote>
 <div><p>The mass of the atom type</p>
 </div></blockquote>
-<p><strong>atomic_number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>atomic_number</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote class="last">
 <div><p>The atomic number of the element of the atom type</p>
 </div></blockquote>
@@ -99,10 +99,10 @@ files</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma" title="chemistry.topologyobjects.AtomType.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma" title="chemistry.topologyobjects.AtomType.sigma"><code class="xref py py-obj docutils literal"><span class="pre">sigma</span></code></a></td>
 <td>Sigma is Rmin / 2^(1/6)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma_14" title="chemistry.topologyobjects.AtomType.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma_14" title="chemistry.topologyobjects.AtomType.sigma_14"><code class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></code></a></td>
 <td>Sigma is Rmin / 2^(1/6)</td>
 </tr>
 </tbody>
@@ -114,17 +114,17 @@ files</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="chemistry.topologyobjects.AtomType.add_nbfix"><tt class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></tt></a>(typename,&nbsp;rmin,&nbsp;epsilon,&nbsp;rmin14,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="chemistry.topologyobjects.AtomType.add_nbfix"><code class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></code></a>(typename,&nbsp;rmin,&nbsp;epsilon,&nbsp;rmin14,&nbsp;...)</td>
 <td>Adds a new NBFIX exclusion for this atom</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="chemistry.topologyobjects.AtomType.set_lj_params"><tt class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></tt></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="chemistry.topologyobjects.AtomType.set_lj_params"><code class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></code></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
 <td>Sets Lennard-Jones parameters on this atom type</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomType.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -134,38 +134,53 @@ files</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.__init__" title="chemistry.topologyobjects.AtomType.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(name,&nbsp;number,&nbsp;mass,&nbsp;atomic_number)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.__init__" title="chemistry.topologyobjects.AtomType.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(name,&nbsp;number,&nbsp;mass,&nbsp;atomic_number)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="chemistry.topologyobjects.AtomType.add_nbfix"><tt class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></tt></a>(typename,&nbsp;rmin,&nbsp;epsilon,&nbsp;rmin14,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="chemistry.topologyobjects.AtomType.add_nbfix"><code class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></code></a>(typename,&nbsp;rmin,&nbsp;epsilon,&nbsp;rmin14,&nbsp;...)</td>
 <td>Adds a new NBFIX exclusion for this atom</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="chemistry.topologyobjects.AtomType.set_lj_params"><tt class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></tt></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="chemistry.topologyobjects.AtomType.set_lj_params"><code class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></code></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
 <td>Sets Lennard-Jones parameters on this atom type</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma" title="chemistry.topologyobjects.AtomType.sigma"><code class="xref py py-obj docutils literal"><span class="pre">sigma</span></code></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.AtomType.sigma_14" title="chemistry.topologyobjects.AtomType.sigma_14"><code class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></code></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomType.add_nbfix">
-<tt class="descname">add_nbfix</tt><big>(</big><em>typename</em>, <em>rmin</em>, <em>epsilon</em>, <em>rmin14</em>, <em>epsilon14</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.add_nbfix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_nbfix</code><span class="sig-paren">(</span><em>typename</em>, <em>rmin</em>, <em>epsilon</em>, <em>rmin14</em>, <em>epsilon14</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.add_nbfix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.add_nbfix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new NBFIX exclusion for this atom</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.AtomType.set_lj_params">
-<tt class="descname">set_lj_params</tt><big>(</big><em>eps</em>, <em>rmin</em>, <em>eps14=None</em>, <em>rmin14=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.set_lj_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_lj_params</code><span class="sig-paren">(</span><em>eps</em>, <em>rmin</em>, <em>eps14=None</em>, <em>rmin14=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.set_lj_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.set_lj_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets Lennard-Jones parameters on this atom type</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.AtomType.sigma">
-<tt class="descname">sigma</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.sigma" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sigma</code><a class="headerlink" href="#chemistry.topologyobjects.AtomType.sigma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sigma is Rmin / 2^(1/6)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.topologyobjects.AtomType.sigma_14">
-<tt class="descname">sigma_14</tt><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#AtomType.sigma_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.AtomType.sigma_14" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sigma_14</code><a class="headerlink" href="#chemistry.topologyobjects.AtomType.sigma_14" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sigma is Rmin / 2^(1/6)</p>
 </dd></dl>
 
@@ -177,14 +192,16 @@ files</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/chemistry.topologyobjects.AtomType.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/chemistry.topologyobjects.AtomType.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -201,7 +218,7 @@ files</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -210,13 +227,13 @@ files</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

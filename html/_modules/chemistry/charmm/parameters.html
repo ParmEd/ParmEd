@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="chemistry.charmm" href="../charmm.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,16 +37,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../charmm.html" accesskey="U">chemistry.charmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for chemistry.charmm.parameters</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -75,7 +74,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores a parameter set defined by CHARMM files. It stores the equivalent of</span>
 <span class="sd">    the information found in the MASS section of the CHARMM topology file</span>
@@ -143,7 +142,7 @@
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Could not convert </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.__init__"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="c"># Instantiate the list types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
@@ -183,9 +182,9 @@
         <span class="k">for</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">tops</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_topology_file</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">pars</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">strf</span> <span class="ow">in</span> <span class="n">strs</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">strf</span><span class="p">)</span>
-
+</div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="CharmmParameterSet.load_set"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.load_set">[docs]</a>    <span class="k">def</span> <span class="nf">load_set</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sfiles</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.load_set"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.load_set">[docs]</a>    <span class="k">def</span> <span class="nf">load_set</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sfiles</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates a CharmmParameterSet from a Topology file and a Parameter</span>
 <span class="sd">        file (or just a Parameter file if it has all information)</span>
@@ -225,7 +224,7 @@
                 <span class="n">inst</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">sfile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span>
 </div>
-<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads all of the parameters from a parameter file. Versions 36 and</span>
 <span class="sd">        later of the CHARMM force field files have an ATOMS section defining</span>
@@ -547,7 +546,7 @@
         <span class="k">if</span> <span class="n">parameterset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parametersets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parameterset</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="CharmmParameterSet.read_topology_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_topology_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_topology_file"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_topology_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads _only_ the atom type definitions from a topology file. This is</span>
 <span class="sd">        unnecessary for versions 36 and later of the CHARMM force field.</span>
@@ -735,7 +734,7 @@
 
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="CharmmParameterSet.read_stream_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_stream_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_stream_file"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_stream_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads RTF and PAR sections from a stream file and dispatches the</span>
 <span class="sd">        sections to read_topology_file or read_parameter_file</span>
@@ -761,7 +760,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
             <span class="n">title</span><span class="p">,</span> <span class="n">section</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="CharmmParameterSet.condense"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.condense">[docs]</a>    <span class="k">def</span> <span class="nf">condense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_dihedrals</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.condense"><a class="viewcode-back" href="../../../charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.parameters.CharmmParameterSet.condense">[docs]</a>    <span class="k">def</span> <span class="nf">condense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_dihedrals</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function goes through each of the parameter type dicts and</span>
 <span class="sd">        eliminates duplicate types. After calling this function, every unique</span>
@@ -848,9 +847,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -867,7 +866,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -876,14 +875,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../charmm.html" >chemistry.charmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

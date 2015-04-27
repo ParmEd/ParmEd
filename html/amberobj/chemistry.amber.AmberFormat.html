@@ -23,12 +23,11 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="The chemistry.amber package" href="../amber.html" /> 
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,24 +36,23 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-amber-amberformat">
 <h1>chemistry.amber.AmberFormat<a class="headerlink" href="#chemistry-amber-amberformat" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.amber.AmberFormat">
-<em class="property">class </em><tt class="descclassname">chemistry.amber.</tt><tt class="descname">AmberFormat</tt><big>(</big><em>fname=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.amber.</code><code class="descname">AmberFormat</code><span class="sig-paren">(</span><em>fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class that can parse and print files stored in the Amber topology or MDL
 format. In particular, these files have the general form:</p>
-<p><tt class="docutils literal"><span class="pre">`</span>
+<p><code class="docutils literal"><span class="pre">`</span>
 <span class="pre">%VERSION</span> <span class="pre">VERSION_STAMP</span> <span class="pre">=</span> <span class="pre">V00001.000</span>&nbsp; <span class="pre">DATE</span> <span class="pre">=</span> <span class="pre">XX/XX/XX</span>&nbsp; <span class="pre">XX:XX:XX</span>
 <span class="pre">%FLAG</span> <span class="pre">&lt;FLAG_NAME&gt;</span>
 <span class="pre">%COMMENT</span> <span class="pre">&lt;comments&gt;</span>
@@ -64,7 +62,7 @@ format. In particular, these files have the general form:</p>
 <span class="pre">%COMMENT</span> <span class="pre">&lt;comments&gt;</span>
 <span class="pre">%FORMAT(&lt;Fortran_Format&gt;)</span>
 <span class="pre">...</span> <span class="pre">data</span> <span class="pre">corresponding</span> <span class="pre">to</span> <span class="pre">that</span> <span class="pre">Fortran</span> <span class="pre">Format</span>
-<span class="pre">`</span></tt></p>
+<span class="pre">`</span></code></p>
 <p>where the <cite>%COMMENT</cite> sections are entirely optional</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -116,50 +114,11 @@ from the data in this file</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.addFlag" title="chemistry.amber.AmberFormat.addFlag"><tt class="xref py py-obj docutils literal"><span class="pre">addFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Adds a new flag with the given flag name and Fortran format string and</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.add_flag" title="chemistry.amber.AmberFormat.add_flag"><tt class="xref py py-obj docutils literal"><span class="pre">add_flag</span></tt></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
-<td>Adds a new flag with the given flag name and Fortran format string and</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.deleteFlag" title="chemistry.amber.AmberFormat.deleteFlag"><tt class="xref py py-obj docutils literal"><span class="pre">deleteFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Removes a flag from the topology file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.delete_flag" title="chemistry.amber.AmberFormat.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
-<td>Removes a flag from the topology file</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.id_format" title="chemistry.amber.AmberFormat.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
-<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.parse" title="chemistry.amber.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
-<td>Meant for use with the automatic file loader, this will automatically</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm" title="chemistry.amber.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
-<td>Parses the Amber format file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm_old" title="chemistry.amber.AmberFormat.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
-<td>This reads an old-style topology file and stores the results in the</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm_slow" title="chemistry.amber.AmberFormat.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
-<td>Parses the Amber format file.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.set_version" title="chemistry.amber.AmberFormat.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
-<td>Sets the version string</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.view" title="chemistry.amber.AmberFormat.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
-<td>Returns a view of the current object as another object.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.write_parm" title="chemistry.amber.AmberFormat.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
-<td>Writes the current data in parm_data into a new topology file with</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>fname=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.  Read a file if given</p>
 </dd></dl>
 
@@ -170,47 +129,11 @@ from the data in this file</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.__init__" title="chemistry.amber.AmberFormat.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([fname])</td>
-<td>Constructor.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.addFlag" title="chemistry.amber.AmberFormat.addFlag"><tt class="xref py py-obj docutils literal"><span class="pre">addFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Adds a new flag with the given flag name and Fortran format string and</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.add_flag" title="chemistry.amber.AmberFormat.add_flag"><tt class="xref py py-obj docutils literal"><span class="pre">add_flag</span></tt></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
-<td>Adds a new flag with the given flag name and Fortran format string and</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.deleteFlag" title="chemistry.amber.AmberFormat.deleteFlag"><tt class="xref py py-obj docutils literal"><span class="pre">deleteFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Removes a flag from the topology file</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.delete_flag" title="chemistry.amber.AmberFormat.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
-<td>Removes a flag from the topology file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm" title="chemistry.amber.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
-<td>Parses the Amber format file</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm_old" title="chemistry.amber.AmberFormat.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
-<td>This reads an old-style topology file and stores the results in the</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm_slow" title="chemistry.amber.AmberFormat.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
-<td>Parses the Amber format file.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.set_version" title="chemistry.amber.AmberFormat.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
-<td>Sets the version string</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.view" title="chemistry.amber.AmberFormat.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
-<td>Returns a view of the current object as another object.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.write_parm" title="chemistry.amber.AmberFormat.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
-<td>Writes the current data in parm_data into a new topology file with</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.addFlag">
-<tt class="descname">addFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.addFlag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addFlag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.AmberFormat.addFlag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new flag with the given flag name and Fortran format string and
 initializes the array with the values given, or as an array of 0s
 of length num_items</p>
@@ -255,7 +178,7 @@ be raised</p>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.add_flag">
-<tt class="descname">add_flag</tt><big>(</big><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.add_flag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_flag</code><span class="sig-paren">(</span><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.add_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.add_flag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new flag with the given flag name and Fortran format string and
 initializes the array with the values given, or as an array of 0s
 of length num_items</p>
@@ -300,19 +223,19 @@ be raised</p>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.deleteFlag">
-<tt class="descname">deleteFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.deleteFlag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deleteFlag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.AmberFormat.deleteFlag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a flag from the topology file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.delete_flag">
-<tt class="descname">delete_flag</tt><big>(</big><em>flag_name</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.delete_flag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete_flag</code><span class="sig-paren">(</span><em>flag_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.delete_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.delete_flag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a flag from the topology file</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="chemistry.amber.AmberFormat.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as either Amber-format file (like prmtop) or an
 old-style topology file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -337,7 +260,7 @@ old-style topology file.</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.amber.AmberFormat.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meant for use with the automatic file loader, this will automatically
 return a subclass of AmberFormat corresponding to what the information
 in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
@@ -346,13 +269,13 @@ AmoebaParm, or AmberFormat)</p>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.rdparm">
-<tt class="descname">rdparm</tt><big>(</big><em>fname</em>, <em>slow=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rdparm</code><span class="sig-paren">(</span><em>fname</em>, <em>slow=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the Amber format file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.rdparm_old">
-<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm_old" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rdparm_old</code><span class="sig-paren">(</span><em>prmtop_lines</em>, <em>check=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm_old" title="Permalink to this definition">¶</a></dt>
 <dd><p>This reads an old-style topology file and stores the results in the
 same data structures as a new-style topology file</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -376,20 +299,20 @@ this is, in fact, an old-style topology file</p>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.rdparm_slow">
-<tt class="descname">rdparm_slow</tt><big>(</big><em>fname</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm_slow" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rdparm_slow</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.rdparm_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.rdparm_slow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the Amber format file. This parser is written in pure Python and
 is therefore slower than the C++-optimized version</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.set_version">
-<tt class="descname">set_version</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.set_version" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.set_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.set_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the version string</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.view">
-<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
+<code class="descname">view</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a view of the current object as another object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -413,7 +336,7 @@ be converted into</p>
 
 <dl class="method">
 <dt id="chemistry.amber.AmberFormat.write_parm">
-<tt class="descname">write_parm</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.write_parm" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_parm</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/amber/amberformat.html#AmberFormat.write_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.AmberFormat.write_parm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the current data in parm_data into a new topology file with
 the given name</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -438,14 +361,16 @@ the given name</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/amberobj/chemistry.amber.AmberFormat.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/amberobj/chemistry.amber.AmberFormat.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -462,7 +387,7 @@ the given name</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -471,13 +396,12 @@ the given name</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">chemistry.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

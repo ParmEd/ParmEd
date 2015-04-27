@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-formats-package">
 <h1>chemistry.formats package<a class="headerlink" href="#chemistry-formats-package" title="Permalink to this headline">¶</a></h1>
@@ -96,7 +96,7 @@
 formats</p>
 <dl class="function">
 <dt id="chemistry.formats.load_file">
-<tt class="descclassname">chemistry.formats.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.formats.load_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">chemistry.formats.</code><code class="descname">load_file</code><span class="sig-paren">(</span><em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.load_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file format of the specified file and returns its parsed
 contents.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -123,7 +123,7 @@ associated with the file format being parsed</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong></p>
 <blockquote>
-<div><p>If <tt class="docutils literal"><span class="pre">filename</span></tt> does not exist</p>
+<div><p>If <code class="docutils literal"><span class="pre">filename</span></code> does not exist</p>
 </div></blockquote>
 <p><strong>chemistry.exceptions.FormatNotFound</strong></p>
 <blockquote>
@@ -143,16 +143,16 @@ provided as keyword arguments in addition to the file name</p>
 following names are supported:</p>
 <blockquote>
 <div><ul class="simple">
-<li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>
-<li><tt class="docutils literal"><span class="pre">.bz2</span></tt> : bzip2 compressed file</li>
+<li><code class="docutils literal"><span class="pre">.gz</span></code> : gzip compressed file</li>
+<li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.formats.PDBFile">
-<em class="property">class </em><tt class="descclassname">chemistry.formats.</tt><tt class="descname">PDBFile</tt><a class="headerlink" href="#chemistry.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.formats.</code><code class="descname">PDBFile</code><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#PDBFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -161,20 +161,11 @@ following names are supported:</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.PDBFile.id_format" title="chemistry.formats.PDBFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
-<td>Identifies the file type as a PDB file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.PDBFile.parse" title="chemistry.formats.PDBFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
-<td>Read a PDB file and return a populated <cite>Structure</cite> class</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.PDBFile.write" title="chemistry.formats.PDBFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from a Structure instance</td>
-</tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="chemistry.formats.PDBFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#PDBFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDB file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -198,7 +189,7 @@ following names are supported:</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.PDBFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -214,7 +205,7 @@ file.pdb.bz2)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure</p>
-<p><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<p><strong>structure</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
@@ -232,13 +223,13 @@ NATOM*3 lists.</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.PDBFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#chemistry.formats.PDBFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#PDBFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.PDBFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -301,8 +292,8 @@ atom that does not contain a SEGID identifier. Default is False</p>
 
 <dl class="class">
 <dt id="chemistry.formats.CIFFile">
-<em class="property">class </em><tt class="descclassname">chemistry.formats.</tt><tt class="descname">CIFFile</tt><a class="headerlink" href="#chemistry.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.formats.</code><code class="descname">CIFFile</code><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#CIFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -311,20 +302,11 @@ atom that does not contain a SEGID identifier. Default is False</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.CIFFile.id_format" title="chemistry.formats.CIFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
-<td>Identifies the file type as a PDBx/mmCIF file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.CIFFile.parse" title="chemistry.formats.CIFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
-<td>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.CIFFile.write" title="chemistry.formats.CIFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
-</tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="chemistry.formats.CIFFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#CIFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDBx/mmCIF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -348,13 +330,13 @@ atom that does not contain a SEGID identifier. Default is False</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.CIFFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Name of PDB file to read, or a file-like object that can iterate
 over the lines of a PDB. Compressed file names can be specified and
@@ -364,7 +346,7 @@ file.pdb.bz2)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
-<p><strong>structure#</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<p><strong>structure#</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDBx/mmCIF file.  No bonds or other topological features are
@@ -383,30 +365,30 @@ NATOM*3 lists.</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.formats.CIFFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#chemistry.formats.CIFFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/formats/pdb.html#CIFFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.CIFFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDBx/mmCIF file</p>
 </div></blockquote>
-<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -414,7 +396,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -431,7 +413,7 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote class="last">
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
@@ -451,7 +433,7 @@ False, ANISOU records are not written</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -465,12 +447,14 @@ False, ANISOU records are not written</p>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.formats.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.formats.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -487,7 +471,7 @@ False, ANISOU records are not written</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -496,12 +480,12 @@ False, ANISOU records are not written</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

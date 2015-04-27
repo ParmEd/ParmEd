@@ -1,7 +1,0 @@
-ParmedTools
-===========
-
-.. toctree::
-   :maxdepth: 4
-
-   ParmedTools

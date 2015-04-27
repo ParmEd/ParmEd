@@ -1,7 +1,0 @@
-chemistry.unit.standard_dimensions module
-=========================================
-
-.. automodule:: chemistry.unit.standard_dimensions
-    :members:
-    :undoc-members:
-    :show-inheritance:

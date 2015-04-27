@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chemistry.unit.mymatrix">
 <span id="chemistry-unit-mymatrix-module"></span><h1>chemistry.unit.mymatrix module<a class="headerlink" href="#module-chemistry.unit.mymatrix" title="Permalink to this headline">¶</a></h1>
@@ -72,8 +72,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <dl class="class">
 <dt id="chemistry.unit.mymatrix.MyMatrix">
-<em class="property">class </em><tt class="descclassname">chemistry.unit.mymatrix.</tt><tt class="descname">MyMatrix</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.unit.mymatrix.MyVector" title="chemistry.unit.mymatrix.MyVector"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.unit.mymatrix.MyVector</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.unit.mymatrix.</code><code class="descname">MyMatrix</code><span class="sig-paren">(</span><em>collection</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.unit.mymatrix.MyVector" title="chemistry.unit.mymatrix.MyVector"><code class="xref py py-class docutils literal"><span class="pre">chemistry.unit.mymatrix.MyVector</span></code></a></p>
 <p>Pure python linear algebra matrix for internal matrix inversion in UnitSystem.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MyMatrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
@@ -119,46 +119,46 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.is_square" title="chemistry.unit.mymatrix.MyMatrix.is_square"><tt class="xref py py-obj docutils literal"><span class="pre">is_square</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.is_square" title="chemistry.unit.mymatrix.MyMatrix.is_square"><code class="xref py py-obj docutils literal"><span class="pre">is_square</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.numCols" title="chemistry.unit.mymatrix.MyMatrix.numCols"><tt class="xref py py-obj docutils literal"><span class="pre">numCols</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.numCols" title="chemistry.unit.mymatrix.MyMatrix.numCols"><code class="xref py py-obj docutils literal"><span class="pre">numCols</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.numRows" title="chemistry.unit.mymatrix.MyMatrix.numRows"><tt class="xref py py-obj docutils literal"><span class="pre">numRows</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.numRows" title="chemistry.unit.mymatrix.MyMatrix.numRows"><code class="xref py py-obj docutils literal"><span class="pre">numRows</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.transpose" title="chemistry.unit.mymatrix.MyMatrix.transpose"><tt class="xref py py-obj docutils literal"><span class="pre">transpose</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix.transpose" title="chemistry.unit.mymatrix.MyMatrix.transpose"><code class="xref py py-obj docutils literal"><span class="pre">transpose</span></code></a>()</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrix.is_square">
-<tt class="descname">is_square</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.is_square"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.is_square" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_square</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.is_square"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.is_square" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrix.numCols">
-<tt class="descname">numCols</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.numCols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.numCols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">numCols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.numCols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.numCols" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrix.numRows">
-<tt class="descname">numRows</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.numRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.numRows" title="Permalink to this definition">¶</a></dt>
+<code class="descname">numRows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.numRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.numRows" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrix.transpose">
-<tt class="descname">transpose</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.transpose" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transpose</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrix.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrix.transpose" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.unit.mymatrix.MyMatrixTranspose">
-<em class="property">class </em><tt class="descclassname">chemistry.unit.mymatrix.</tt><tt class="descname">MyMatrixTranspose</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix" title="chemistry.unit.mymatrix.MyMatrix"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.unit.mymatrix.MyMatrix</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">chemistry.unit.mymatrix.</code><code class="descname">MyMatrixTranspose</code><span class="sig-paren">(</span><em>collection</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrix" title="chemistry.unit.mymatrix.MyMatrix"><code class="xref py py-class docutils literal"><span class="pre">chemistry.unit.mymatrix.MyMatrix</span></code></a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -166,52 +166,52 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.is_square" title="chemistry.unit.mymatrix.MyMatrixTranspose.is_square"><tt class="xref py py-obj docutils literal"><span class="pre">is_square</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.is_square" title="chemistry.unit.mymatrix.MyMatrixTranspose.is_square"><code class="xref py py-obj docutils literal"><span class="pre">is_square</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numCols" title="chemistry.unit.mymatrix.MyMatrixTranspose.numCols"><tt class="xref py py-obj docutils literal"><span class="pre">numCols</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numCols" title="chemistry.unit.mymatrix.MyMatrixTranspose.numCols"><code class="xref py py-obj docutils literal"><span class="pre">numCols</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numRows" title="chemistry.unit.mymatrix.MyMatrixTranspose.numRows"><tt class="xref py py-obj docutils literal"><span class="pre">numRows</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numRows" title="chemistry.unit.mymatrix.MyMatrixTranspose.numRows"><code class="xref py py-obj docutils literal"><span class="pre">numRows</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.transpose" title="chemistry.unit.mymatrix.MyMatrixTranspose.transpose"><tt class="xref py py-obj docutils literal"><span class="pre">transpose</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.mymatrix.MyMatrixTranspose.transpose" title="chemistry.unit.mymatrix.MyMatrixTranspose.transpose"><code class="xref py py-obj docutils literal"><span class="pre">transpose</span></code></a>()</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrixTranspose.is_square">
-<tt class="descname">is_square</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.is_square" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_square</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.is_square" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrixTranspose.numCols">
-<tt class="descname">numCols</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.numCols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numCols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">numCols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.numCols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numCols" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrixTranspose.numRows">
-<tt class="descname">numRows</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.numRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numRows" title="Permalink to this definition">¶</a></dt>
+<code class="descname">numRows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.numRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.numRows" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.mymatrix.MyMatrixTranspose.transpose">
-<tt class="descname">transpose</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.transpose" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transpose</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyMatrixTranspose.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyMatrixTranspose.transpose" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="chemistry.unit.mymatrix.MyVector">
-<em class="property">class </em><tt class="descclassname">chemistry.unit.mymatrix.</tt><tt class="descname">MyVector</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyVector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">chemistry.unit.mymatrix.</code><code class="descname">MyVector</code><span class="sig-paren">(</span><em>collection</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#MyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.MyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Parent class of MyMatrix and type of Matrix Row.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="chemistry.unit.mymatrix.eye">
-<tt class="descclassname">chemistry.unit.mymatrix.</tt><tt class="descname">eye</tt><big>(</big><em>size</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#eye"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.eye" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">chemistry.unit.mymatrix.</code><code class="descname">eye</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#eye"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.eye" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns identity matrix.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 <span class="go">[[1, 0, 0]</span>
@@ -223,7 +223,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
 <dl class="function">
 <dt id="chemistry.unit.mymatrix.zeros">
-<tt class="descclassname">chemistry.unit.mymatrix.</tt><tt class="descname">zeros</tt><big>(</big><em>m</em>, <em>n=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.zeros" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">chemistry.unit.mymatrix.</code><code class="descname">zeros</code><span class="sig-paren">(</span><em>m</em>, <em>n=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/unit/mymatrix.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.mymatrix.zeros" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns matrix of zeroes</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 <span class="go">[[0, 0, 0]</span>
@@ -239,14 +239,16 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/chemistry/chemistry.unit.mymatrix.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.unit.mymatrix.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -263,7 +265,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -272,12 +274,12 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

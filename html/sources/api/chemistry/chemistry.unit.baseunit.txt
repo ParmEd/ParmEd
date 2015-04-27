@@ -1,7 +1,0 @@
-chemistry.unit.baseunit module
-==============================
-
-.. automodule:: chemistry.unit.baseunit
-    :members:
-    :undoc-members:
-    :show-inheritance:

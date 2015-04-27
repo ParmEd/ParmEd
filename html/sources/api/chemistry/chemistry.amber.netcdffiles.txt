@@ -1,7 +1,0 @@
-chemistry.amber.netcdffiles module
-==================================
-
-.. automodule:: chemistry.amber.netcdffiles
-    :members:
-    :undoc-members:
-    :show-inheritance:

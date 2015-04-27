@@ -23,12 +23,11 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="Dimensional Analysis (working with chemistry.unit)" href="../dimensional_analysis.html" /> 
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +36,20 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../dimensional_analysis.html" accesskey="U">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="chemistry-unit-quantity">
 <h1>chemistry.unit.Quantity<a class="headerlink" href="#chemistry-unit-quantity" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.unit.Quantity">
-<em class="property">class </em><tt class="descclassname">chemistry.unit.</tt><tt class="descname">Quantity</tt><big>(</big><em>value=None</em>, <em>unit=None</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">chemistry.unit.</code><code class="descname">Quantity</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Physical quantity, such as 1.3 meters per second.</p>
 <p>Quantities contain both a value, such as 1.3; and a unit,
 such as &#8216;meters per second&#8217;.</p>
@@ -82,71 +80,11 @@ multiply operator.  e.g.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt>(rhs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">format</span></tt>(format_spec)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.in_unit_system" title="chemistry.unit.Quantity.in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></tt></a>(system)</td>
-<td>Returns a new Quantity equal to this one, expressed in a particular unit system.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.in_units_of" title="chemistry.unit.Quantity.in_units_of"><tt class="xref py py-obj docutils literal"><span class="pre">in_units_of</span></tt></a>(other_unit)</td>
-<td>Returns an equal Quantity expressed in different units.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt>(index,&nbsp;item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.max" title="chemistry.unit.Quantity.max"><tt class="xref py py-obj docutils literal"><span class="pre">max</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the maximum value of the sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.mean" title="chemistry.unit.Quantity.mean"><tt class="xref py py-obj docutils literal"><span class="pre">mean</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the mean of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.min" title="chemistry.unit.Quantity.min"><tt class="xref py py-obj docutils literal"><span class="pre">min</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the minimum value of the sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt>(*args)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.reduce_unit" title="chemistry.unit.Quantity.reduce_unit"><tt class="xref py py-obj docutils literal"><span class="pre">reduce_unit</span></tt></a>([guide_unit])</td>
-<td>Combine similar component units and scale, to form an equal Quantity in simpler units.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.reshape" title="chemistry.unit.Quantity.reshape"><tt class="xref py py-obj docutils literal"><span class="pre">reshape</span></tt></a>(shape[,&nbsp;order])</td>
-<td>Same as numpy.ndarray.reshape, except the result is a Quantity with the</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.sqrt" title="chemistry.unit.Quantity.sqrt"><tt class="xref py py-obj docutils literal"><span class="pre">sqrt</span></tt></a>()</td>
-<td>Returns square root of a Quantity.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.std" title="chemistry.unit.Quantity.std"><tt class="xref py py-obj docutils literal"><span class="pre">std</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the square root of the variance of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.sum" title="chemistry.unit.Quantity.sum"><tt class="xref py py-obj docutils literal"><span class="pre">sum</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the sum of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.value_in_unit" title="chemistry.unit.Quantity.value_in_unit"><tt class="xref py py-obj docutils literal"><span class="pre">value_in_unit</span></tt></a>(unit)</td>
-<td>Returns underlying value, in the specified units.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.value_in_unit_system" title="chemistry.unit.Quantity.value_in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">value_in_unit_system</span></tt></a>(system)</td>
-<td>Returns the underlying value type, after conversion to a particular unit system.</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.unit.Quantity.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>value=None</em>, <em>unit=None</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new Quantity from a value and a unit.</p>
 <dl class="docutils">
 <dt>Parameters</dt>
@@ -165,80 +103,17 @@ multiply operator.  e.g.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.__init__" title="chemistry.unit.Quantity.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([value,&nbsp;unit])</td>
-<td>Create a new Quantity from a value and a unit.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt>(rhs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">format</span></tt>(format_spec)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.in_unit_system" title="chemistry.unit.Quantity.in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></tt></a>(system)</td>
-<td>Returns a new Quantity equal to this one, expressed in a particular unit system.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.in_units_of" title="chemistry.unit.Quantity.in_units_of"><tt class="xref py py-obj docutils literal"><span class="pre">in_units_of</span></tt></a>(other_unit)</td>
-<td>Returns an equal Quantity expressed in different units.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt>(index,&nbsp;item)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.max" title="chemistry.unit.Quantity.max"><tt class="xref py py-obj docutils literal"><span class="pre">max</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the maximum value of the sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.mean" title="chemistry.unit.Quantity.mean"><tt class="xref py py-obj docutils literal"><span class="pre">mean</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the mean of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.min" title="chemistry.unit.Quantity.min"><tt class="xref py py-obj docutils literal"><span class="pre">min</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the minimum value of the sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt>(*args)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.reduce_unit" title="chemistry.unit.Quantity.reduce_unit"><tt class="xref py py-obj docutils literal"><span class="pre">reduce_unit</span></tt></a>([guide_unit])</td>
-<td>Combine similar component units and scale, to form an equal Quantity in simpler units.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt>(item)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.reshape" title="chemistry.unit.Quantity.reshape"><tt class="xref py py-obj docutils literal"><span class="pre">reshape</span></tt></a>(shape[,&nbsp;order])</td>
-<td>Same as numpy.ndarray.reshape, except the result is a Quantity with the</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.sqrt" title="chemistry.unit.Quantity.sqrt"><tt class="xref py py-obj docutils literal"><span class="pre">sqrt</span></tt></a>()</td>
-<td>Returns square root of a Quantity.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.std" title="chemistry.unit.Quantity.std"><tt class="xref py py-obj docutils literal"><span class="pre">std</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the square root of the variance of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.sum" title="chemistry.unit.Quantity.sum"><tt class="xref py py-obj docutils literal"><span class="pre">sum</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Computes the sum of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.unit.Quantity.value_in_unit" title="chemistry.unit.Quantity.value_in_unit"><tt class="xref py py-obj docutils literal"><span class="pre">value_in_unit</span></tt></a>(unit)</td>
-<td>Returns underlying value, in the specified units.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.unit.Quantity.value_in_unit_system" title="chemistry.unit.Quantity.value_in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">value_in_unit_system</span></tt></a>(system)</td>
-<td>Returns the underlying value type, after conversion to a particular unit system.</td>
-</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.unit.Quantity.in_unit_system">
-<tt class="descname">in_unit_system</tt><big>(</big><em>system</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new Quantity equal to this one, expressed in a particular unit system.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.in_units_of">
-<tt class="descname">in_units_of</tt><big>(</big><em>other_unit</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_units_of</code><span class="sig-paren">(</span><em>other_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.in_units_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an equal Quantity expressed in different units.</p>
 <p>If the units are the same as those in self, a reference to self is returned.
 Raises a TypeError if the new unit is not compatible with the original unit.</p>
@@ -251,7 +126,7 @@ and  result = value * factor when post_multiply is True</dd>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.max">
-<tt class="descname">max</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.max" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the maximum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -262,7 +137,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.mean">
-<tt class="descname">mean</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.mean" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mean</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the mean of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -273,7 +148,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.min">
-<tt class="descname">min</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.min" title="Permalink to this definition">¶</a></dt>
+<code class="descname">min</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the minimum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -284,7 +159,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.reduce_unit">
-<tt class="descname">reduce_unit</tt><big>(</big><em>guide_unit=None</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reduce_unit</code><span class="sig-paren">(</span><em>guide_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.reduce_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine similar component units and scale, to form an
 equal Quantity in simpler units.</p>
 <p>Returns underlying value type if unit is dimensionless.</p>
@@ -292,14 +167,14 @@ equal Quantity in simpler units.</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.reshape">
-<tt class="descname">reshape</tt><big>(</big><em>shape</em>, <em>order='C'</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reshape</code><span class="sig-paren">(</span><em>shape</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as numpy.ndarray.reshape, except the result is a Quantity with the
 same units as the current object rather than a plain numpy.ndarray</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.sqrt">
-<tt class="descname">sqrt</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns square root of a Quantity.</p>
 <p>Raises ArithmeticError if component exponents are not even.
 This behavior can be changed if you present a reasonable real life case to me.</p>
@@ -307,7 +182,7 @@ This behavior can be changed if you present a reasonable real life case to me.</
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.std">
-<tt class="descname">std</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.std" title="Permalink to this definition">¶</a></dt>
+<code class="descname">std</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.std" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the square root of the variance of a sequence, with the result
 having the same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -318,7 +193,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.sum">
-<tt class="descname">sum</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.sum" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sum</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the sum of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError (same behavior as if
@@ -330,13 +205,13 @@ is raised</p>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.value_in_unit">
-<tt class="descname">value_in_unit</tt><big>(</big><em>unit</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">value_in_unit</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.value_in_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns underlying value, in the specified units.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.unit.Quantity.value_in_unit_system">
-<tt class="descname">value_in_unit_system</tt><big>(</big><em>system</em><big>)</big><a class="headerlink" href="#chemistry.unit.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="descname">value_in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.value_in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.unit.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the underlying value type, after conversion to a particular unit system.</p>
 </dd></dl>
 
@@ -348,14 +223,16 @@ is raised</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/unitobj/chemistry.unit.Quantity.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/unitobj/chemistry.unit.Quantity.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -372,7 +249,7 @@ is raised</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -381,13 +258,12 @@ is raised</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../dimensional_analysis.html" >Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>
