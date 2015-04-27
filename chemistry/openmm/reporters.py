@@ -71,18 +71,24 @@ class StateDataReporter(object):
         If not None, the density will be computed from this mass, since setting
         a mass to 0 is used to constrain the position of that particle. (Default
         None)
-    unit_system : :class:`UnitSystem`, optional
-        The unit system to which to convert all of the resulting quantities to.
-        Default is ``akma_unit_system``.
+    energyUnit : unit, optional
+        The units to print energies in (default unit.kilocalories_per_mole)
+    timeUnit : unit, optional
+        The units to print time in (default unit.picoseconds)
+    volumeUnit : unit, optional
+        The units print volume in (default unit.angstroms**3)
+    densityUnit : unit, optional
+        The units to print density in (default
+        unit.grams/unit.item/unit.milliliter)
     """
 
     @needs_openmm
     def __init__(self, f, reportInterval, step=True, time=True,
                  potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
                  temperature=True, volume=False, density=False, separator=',',
-                 systemMass=None, unit_system=u.akma_unit_system):
-        """ Create a StateDataReporter.  """
-
+                 systemMass=None, energyUnit=u.kilocalories_per_mole,
+                 timeUnit=u.picoseconds, volumeUnit=u.angstroms**3,
+                 densityUnit=u.grams/u.item/u.milliliter):
         self._reportInterval = reportInterval
         self._openedFile = not hasattr(f, 'write')
         if self._openedFile:
@@ -105,19 +111,26 @@ class StateDataReporter(object):
         self._needsForces = False
         self._needEnergy = (potentialEnergy or kineticEnergy or
                             totalEnergy or temperature)
-        self.unit_system = unit_system
+        self._energyUnit = energyUnit
+        self._densityUnit = densityUnit
+        self._timeUnit = timeUnit
+        self._volumeUnit = volumeUnit
 
     def describeNextReport(self, simulation):
         """
         Get information about the next report this object will generate.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
-        Returns:
-            A five element tuple.  The first element is the number of steps
-            until the next report.  The remaining elements specify whether that
-            report will require positions, velocities, forces, and energies
-            respectively.
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The simulation to generate a report for
+
+        Returns
+        -------
+        nsteps, pos, vel, frc, ene : int, bool, bool, bool, bool
+            nsteps is the number of steps until the next report
+            pos, vel, frc, and ene are flags indicating whether positions,
+            velocities, forces, and/or energies are needed from the Context
         """
         steps_left = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - steps_left
@@ -127,9 +140,12 @@ class StateDataReporter(object):
     def report(self, simulation, state):
         """Generate a report.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
-            - state (State) The current state of the simulation
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
+        state : :class:`mm.State`
+            The current state of the simulation
         """
         if not self._hasInitialized:
             self._initializeConstants(simulation)
@@ -176,22 +192,19 @@ class StateDataReporter(object):
         if self._step:
             values.append(simulation.currentStep)
         if self._time:
-            if self.unit_system is u.akma_unit_system:
-                values.append(time.value_in_unit(u.picoseconds))
-            else:
-                values.append(time.value_in_unit_system(self.unit_system))
+            values.append(time.value_in_unit(self._timeUnit))
         if self._potentialEnergy:
-            values.append(pe.value_in_unit_system(self.unit_system))
+            values.append(pe.value_in_unit(self._energyUnit))
         if self._kineticEnergy:
-            values.append(ke.value_in_unit_system(self.unit_system))
+            values.append(ke.value_in_unit(self._energyUnit))
         if self._totalEnergy:
-            values.append((pe + ke).value_in_unit_system(self.unit_system))
+            values.append((pe + ke).value_in_unit(self._energyUnit))
         if self._temperature:
-            values.append(temp.value_in_unit_system(self.unit_system))
+            values.append(temp.value_in_unit(u.kelvin))
         if self._volume:
-            values.append(volume.value_in_unit_system(self.unit_system))
+            values.append(volume.value_in_unit(self._volumeUnit))
         if self._density:
-            values.append(density.value_in_unit_system(self.densityUnit))
+            values.append(density.value_in_unit(self._densityUnit))
         return values
 
     def _initializeConstants(self, simulation):
@@ -236,34 +249,34 @@ class StateDataReporter(object):
         if self._time:
             headers.append('Time (ps)')
         if self._potentialEnergy:
-            headers.append('Potential Energy (%s)' % self.energyUnit)
+            headers.append('Potential Energy (%s)' % self._energyUnit)
         if self._kineticEnergy:
-            headers.append('Kinetic Energy (%s)' % self.energyUnit)
+            headers.append('Kinetic Energy (%s)' % self._energyUnit)
         if self._totalEnergy:
-            headers.append('Total Energy (%s)' % self.energyUnit)
+            headers.append('Total Energy (%s)' % self._energyUnit)
         if self._temperature:
-            headers.append('Temperature (%s)' % self.temperatureUnit)
+            headers.append('Temperature (K)')
         if self._volume:
-            headers.append('Box Volume (%s)' %
-                           str(self.volumeUnit).replace('**','^'))
+            headers.append('Box Volume (%s)' % self._volumeUnit)
         if self._density:
-            headers.append('Density (%s)' %
-                           str(self.densityUnit).replace('item*', ''))
+            headers.append('Density (%s)' % self._densityUnit)
         return headers
 
     def _checkForErrors(self, simulation, state):
         """Check for errors in the current state of the simulation
 
         Parameters
-            - simulation (Simulation) The Simulation to generate a report for
-            - state (State) The current state of the simulation
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
+        state : :class:`State`
+            The current state of the simulation
         """
         if self._needEnergy:
             energy = state.getKineticEnergy() + state.getPotentialEnergy()
-            energy = energy.value_in_unit(u.kilojoules_per_mole)
-            if isnan(energy):
+            if isnan(energy._value):
                 raise ValueError('Energy is NaN')
-            if isinf(energy):
+            if isinf(energy._value):
                 raise ValueError('Energy is infinite')
 
     def __del__(self):
@@ -315,14 +328,17 @@ class NetCDFReporter(object):
         """
         Get information about the next report this object will generate.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
 
-        Returns:
-            A five element tuple.  The first element is the number of steps
-            until the next report.  The remaining elements specify whether that
-            report will require positions, velocities, forces, and energies
-            respectively.
+        Returns
+        -------
+        nsteps, pos, vel, frc, ene : int, bool, bool, bool, bool
+            nsteps is the number of steps until the next report
+            pos, vel, frc, and ene are flags indicating whether positions,
+            velocities, forces, and/or energies are needed from the Context
         """
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
@@ -332,9 +348,12 @@ class NetCDFReporter(object):
     def report(self, simulation, state):
         """Generate a report.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
-            - state (State) The current state of the simulation
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
+        state : :class:`mm.State`
+            The current state of the simulation
         """
         global VELUNIT, FRCUNIT
         if self.crds:
@@ -393,31 +412,28 @@ class MdcrdReporter(object):
     MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
     be significantly slower than binary file reporters (like DCDReporter or
     NetCDFReporter).
+
+    Parameters
+    ----------
+    file : str
+        Name of the file to write the trajectory to
+    reportInterval : int
+        Number of steps between writing trajectory frames
+    crds : bool=True
+        Write coordinates to this trajectory file?
+    vels : bool=False
+        Write velocities to this trajectory file?
+    frcs : bool=False
+        Write forces to this trajectory file?
+
+    Notes
+    -----
+    You can only write one of coordinates, forces, or velocities to a mdcrd
+    file.
     """
 
     @needs_openmm
     def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
-        """
-        Create a MdcrdReporter instance.
-
-        Parameters
-        ----------
-        file : str
-            Name of the file to write the trajectory to
-        reportInterval : int
-            Number of steps between writing trajectory frames
-        crds : bool=True
-            Write coordinates to this trajectory file?
-        vels : bool=False
-            Write velocities to this trajectory file?
-        frcs : bool=False
-            Write forces to this trajectory file?
-
-        Notes
-        -----
-        You can only write one of coordinates, forces, or velocities to a mdcrd
-        file.
-        """
         # ASCII mdcrds can have either coordinates, forces, or velocities
         ntrue = 0
         if crds: ntrue += 1
@@ -436,14 +452,17 @@ class MdcrdReporter(object):
         """
         Get information about the next report this object will generate.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
 
-        Returns:
-            A five element tuple.  The first element is the number of steps
-            until the next report.  The remaining elements specify whether that
-            report will require positions, velocities, forces, and energies
-            respectively.
+        Returns
+        -------
+        nsteps, pos, vel, frc, ene : int, bool, bool, bool, bool
+            nsteps is the number of steps until the next report
+            pos, vel, frc, and ene are flags indicating whether positions,
+            velocities, forces, and/or energies are needed from the Context
         """
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
@@ -556,30 +575,36 @@ class RestartReporter(object):
         """
         Get information about the next report this object will generate.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
 
-        Returns:
-            A five element tuple.  The first element is the number of steps
-            until the next report.  The remaining elements specify whether that
-            report will require positions, velocities, forces, and energies
-            respectively.
+        Returns
+        -------
+        nsteps, pos, vel, frc, ene : int, bool, bool, bool, bool
+            nsteps is the number of steps until the next report
+            pos, vel, frc, and ene are flags indicating whether positions,
+            velocities, forces, and/or energies are needed from the Context
         """
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, True, True, False, False)
 
-    def report(self, simulation, state):
+    def report(self, sim, state):
         """Generate a report.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
-            - state (State) The current state of the simulation
+        Parameters
+        ----------
+        sim : :class:`app.Simulation`
+            The Simulation to generate a report for
+        state : :class:`mm.State`
+            The current state of the simulation
         """
         global VELUNIT
         crds = state.getPositions().value_in_unit(u.angstrom)
         if self.rst7 is None:
-            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
+            self.uses_pbc = sim.topology.getUnitCellDimensions() is not None
             self.atom = len(crds)
             # First time written
             self.rst7 = Rst7(natom=self.atom,
@@ -608,7 +633,7 @@ class RestartReporter(object):
                              angles[0], angles[1], angles[2]]
 
         if self.write_multiple:
-            fname = self.fname + '.%d' % simulation.currentStep
+            fname = self.fname + '.%d' % sim.currentStep
         else:
             fname = self.fname
 
@@ -623,33 +648,42 @@ class ProgressReporter(StateDataReporter):
     A class that prints out a progress report of how much MD (or minimization)
     has been done, how fast the simulation is running, and how much time is left
     (similar to the mdinfo file in Amber)
+
+    Parameters
+    ----------
+    f : str
+        The file name of the progress report file (overwritten each time)
+    reportInterval : int
+        The step interval between which to write frames
+    totalSteps : int
+        The total number of steps that will be run in the simulation (used to
+        estimate time remaining)
+    potentialEnergy : bool, optional
+        Whether to print the potential energy (default True)
+    kineticEnergy : bool, optional
+        Whether to print the kinetic energy (default True)
+    totalEnergy : bool, optional
+        Whether to print the total energy (default True)
+    temperature : bool, optional
+        Whether to print the system temperature (default True)
+    volume : bool, optional
+        Whether to print the system volume (default False)
+    density : bool, optional
+        Whether to print the system density (default False)
+    systemMass : float or :class:`unit.Quantity`
+        The mass of the system used when reporting density (useful in instances
+        where masses are set to 0 to constrain their positions)
+
+    See Also
+    --------
+    In addition to the above, ProgressReporter also accepts arguments for
+    StateDataReporter
     """
 
     @needs_openmm
     def __init__(self, f, reportInterval, totalSteps, potentialEnergy=True,
                  kineticEnergy=True, totalEnergy=True, temperature=False,
                  volume=False, density=False, systemMass=None, **kwargs):
-        """ Create a StateDataReporter.
-        Parameters:
-        - f (str) The file name of the progress report (overwritten each time)
-        - reportInterval (int) The step interval at which to write frames
-        - totalSteps (int) The total number of steps that will be run in the
-                           simulation (used to estimate the completion time)
-        - potentialEnergy (boolean=False) Whether to write the potential energy
-        - kineticEnergy (boolean=False) Whether to write the kinetic energy
-        - totalEnergy (boolean=False) Whether to write the total energy
-        - temperature (boolean=False) Whether to write the instantaneous temp.
-        - volume (boolean=False) Whether to write the periodic box volume
-        - density (boolean=False) Whether to write the system density
-        - systemMass (mass=None) The total mass to use for the system when
-            reporting density.  If this is None (the default), the system mass
-            is computed by summing the masses of all particles.  This parameter
-            is useful when the particle masses do not reflect their actual
-            physical mass, such as when some particles have had their masses
-            set to 0 to immobilize them.
-        - **kwargs (keyword arguments): any other arguments accepted by
-            StateDataReporter
-        """
         # Make sure we got a file name rather than a file-like object.
         # Immediately close the file after opening. This erases it, which isn't
         # a bad thing, but also prepares it for reports
@@ -678,13 +712,17 @@ class ProgressReporter(StateDataReporter):
         """
         Get information about the next report this object will generate.
 
-        Parameters:
-            - simulation (Simulation) The Simulation to generate a report for
+        Parameters
+        ----------
+        simulation : :class:`app.Simulation`
+            The Simulation to generate a report for
 
-        Returns: A five element tuple.  The first element is the number of steps
-            until the next report.  The remaining elements specify whether that
-            report will require positions, velocities, forces, and energies
-            respectively.
+        Returns
+        -------
+        nsteps, pos, vel, frc, ene : int, bool, bool, bool, bool
+            nsteps is the number of steps until the next report
+            pos, vel, frc, and ene are flags indicating whether positions,
+            velocities, forces, and/or energies are needed from the Context
         """
         if self._startTime is None:
             # First time this is called, initialize the timers
@@ -790,23 +828,26 @@ class ProgressReporter(StateDataReporter):
         values['step'] = simulation.currentStep
         values['time'] = state.getTime()
         volume = state.getPeriodicBoxVolume()
-        pe = state.getPotentialEnergy()
+        pe = state.getPotentialEnergy().value_in_unit(self._energyUnit)
         ke = state.getKineticEnergy()
         if self._temperature:
             temp = 2 * ke / (self._dof * u.MOLAR_GAS_CONSTANT_R)
+        ke = ke.value_in_unit(self._energyUnit)
         if self._potentialEnergy:
-            values['potentialEnergy'] = pe.value_in_unit(self.energyUnit)
+            values['potentialEnergy'] = pe
         if self._kineticEnergy:
-            values['kineticEnergy'] = ke.value_in_unit(self.energyUnit)
+            values['kineticEnergy'] = ke
         if self._totalEnergy:
-            values['totalEnergy'] = (pe + ke).value_in_unit(self.energyUnit)
+            values['totalEnergy'] = pe + ke
         if self._temperature:
-            values['temperature'] = temp.value_in_unit(self.temperatureUnit)
+            values['temperature'] = temp.value_in_unit(u.kelvin)
         if self._volume:
-            values['volume'] = volume.value_in_unit(self.volumeUnit)
+            values['volume'] = volume.value_in_unit(self._volumeUnit)
         if self._density:
             dens = self._totalMass / volume
-            values['density'] = dens.value_in_unit(self.densityUnit)
+            # md_unit_system does the right thing that every unit system would
+            # want
+            values['density'] = dens.value_in_unit(self._densityUnit)
 
         return values
    
@@ -819,30 +860,18 @@ class EnergyMinimizerReporter(StateDataReporter):
     is not meant to be used as a reporter for OpenMM's molecular dynamics
     routines, but instead passed a simulation object for printing out
     single-point energies.
+
+    Parameters
+    ----------
+    f : str or file-like
+        File name or object to write energies to
+    volume : bool, optional
+        If True, write the system volume (default is False)
     """
 
-    def __init__(self, f, volume=False,
-                 energyUnit=u.kilocalories_per_mole,
-                 volumeUnit=u.angstrom*u.angstrom*u.angstrom,
-                 densityUnit=u.grams/u.item/u.milliliter):
-        """
-        Initializes an EnergyMinimizerReporter
-
-        Parameters:
-            - f (string or file object): File to write the energies to
-            - volume (bool): Print system volume?
-            - energyUnit (unit): Units to print energy in
-            - volumeUnit (unit): Units to print volume in
-        """
+    def __init__(self, f, volume=False, **kwargs):
+        StateDataReporter.__init__(self, f, **kwargs)
         self._volume = volume
-        self.energyUnit = energyUnit
-        self.volumeUnit = volumeUnit
-        if hasattr(f, 'write'):
-            self._openedFile = False
-            self._out = f
-        else:
-            self._openedFile = True
-            self._out = open(f, 'w')
 
     def describeNextReport(self, *args, **kwargs):
         """ Disable this reporter inside MD """
@@ -856,13 +885,13 @@ class EnergyMinimizerReporter(StateDataReporter):
                                             enforcePeriodicBox=has_pbc)
         if frame is not None:
             self._out.write('Frame: %10d\n' % frame)
-        self._out.write('   Potential Energy = %12.4f %s\n' %
-                (state.getPotentialEnergy().value_in_unit(self.energyUnit),
-                self.energyUnit))
+        e = state.getPotentialEnergy().value_in_unit(self._energyUnit)
+        self._out.write('   Potential Energy = %12.4f %s\n' % (e,
+                self._energyUnit))
         if has_pbc and (self._volume or self._density):
-            vol = state.getPeriodicBoxVolume().value_in_unit(self.volumeUnit)
+            vol = state.getPeriodicBoxVolume().value_in_unit(self._volumeUnit)
         if has_pbc and self._volume:
-            self._out.write('   Volume = %12.4f %s\n' % (vol, self.volumeUnit))
+            self._out.write('   Volume = %12.4f %s\n' % (vol, self._volumeUnit))
         self._out.write('\n')
 
     def finalize(self):
