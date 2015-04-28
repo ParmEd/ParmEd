@@ -58,18 +58,17 @@ class RosettaPose(object):
                 except KeyError:
                     raise RosettaError('Could not recognize element: %s.'
                                        % atsym)
+
+                params = dict(atomic_number=atomic_number, name=atname,
+                              charge=0.0, mass=mass, occupancy=0.0,
+                              bfactor=0.0, altloc='', number=atnum,
+                              rmin=rmin, epsilon=epsilon)
+
                 if atinfo.is_virtual():
-                    atom = ExtraPoint(atomic_number=atomic_number,
-                                      name=atname, charge=0.0, mass=mass,
-                                      occupancy=0.0, bfactor=0.0,
-                                      altloc='', number=atnum, rmin=rmin,
-                                      epsilon=epsilon)
+                    atom = ExtraPoint(**params)
                 else:
-                    atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=0.0, mass=mass, occupancy=0.0,
-                                bfactor=0.0, altloc='', number=atnum,
-                                rmin=rmin, epsilon=epsilon)
-                atom.xx, atom.xy, atom.xz = tuple(at.xyz())
+                    atom = Atom(**params)
+
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
                 try:
