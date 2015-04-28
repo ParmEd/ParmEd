@@ -21,7 +21,7 @@ directly from a sequence of twelve alanines::
 Mutate a residue
 ~~~~~~~~~~~~~~~~
 
-Want to mutate a residue 5 to a Lysine? PyRosetta
+Want to mutate the fifth residue to a lysine? PyRosetta
 makes it as easy as::
 
     from toolbox import mutate_residue
