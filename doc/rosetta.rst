@@ -2,7 +2,7 @@ PyRosetta Integration
 ====================
 
 ParmEd provides support for the `PyRosetta <http://www.pyrosetta.org/>`_
-:class:`Pose` object. The ability to create a *de novo* molecular system
+API. The ability to create a *de novo* molecular system
 and then seamlessly parameterize and simulate it, all within the Python
 environment, is powerful and fits right within ParmEd's goal of easing
 the molecular modeling process.
@@ -58,4 +58,4 @@ PyRosetta :class:`Pose` please refer to the following:
 .. toctree::
     :maxdepth: 1
 
-    * Using PyRosetta and ParmEd to seed an OpenMM simulation <omm_rosetta>
+    Using PyRosetta and ParmEd to seed an OpenMM simulation <omm_rosetta>
