@@ -28,7 +28,7 @@ class RosettaPose(object):
 
     @staticmethod
     def load(pose):
-        """ Load a Pose object and return a populated ParmEd :class:`Structure`
+        """ Load a :class:`Pose` object and return a populated :class:`Structure` class
 
             Parameters
             ----------

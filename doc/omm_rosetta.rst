@@ -18,15 +18,26 @@ directly from a sequence of twelve alanines::
     pose = pose_from_sequence(seq)
 
 
+Mutate a residue
+~~~~~~~~~~~~~~~~
+
+Want to mutate a residue 5 to a Lysine? PyRosetta
+makes it as easy as::
+
+    from toolbox import mutate_residue
+
+    mutant = mutate_residue(pose, 5, 'K')
+
+
 Load Pose into ParmEd
 ~~~~~~~~~~~~~~~~~~~~~
 
 The next step is to use ParmEd's :func:`load_rosetta` function
-to load the :class:`Pose` into a :class:`Structure`::
+to convert our mutant into a :class:`Structure`::
 
     from chemistry import load_rosetta
 
-    struct = load_rosetta(pose)
+    struct = load_rosetta(mutant)
 
 
 Start an OpenMM simulation
@@ -54,10 +65,9 @@ start simulating our ParmEd :class:`Structure`::
     integrator = LangevinIntegrator(300*kelvin, 1/picoseconds,
                                     2*femtoseconds)
 
-    integrator.setConstraintTolerance(1e-5)
     system.addForce(MonteCarloBarostat(1*bar, 300*kelvin))
 
-    simulation = Simulation(mod.topology, system, integrator, platform, props)
+    simulation = Simulation(mod.topology, system, integrator)
     simulation.context.setPositions(positions)
 
     # Minimize System
