@@ -69,6 +69,8 @@ class RosettaPose(object):
                 else:
                     atom = Atom(**params)
 
+                atom.xx, atom.xy, atom.xz = tuple(at.xyz())
+
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
                 try:
