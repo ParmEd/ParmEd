@@ -1,18 +1,15 @@
 from chemistry import read_PDB, load_rosetta
-from utils import get_fn
+from utils import get_fn, skipIf
 import unittest
-from unittest import skipIf
 
 try:
     from simtk.openmm.app import PDBFile
 except:
     PDBFile = None
-    pass
 try:
     from rosetta import init, pose_from_sequence
 except ImportError:
     init = pose_from_sequence = None
-    pass
 
 
 def _unpackLen(obj):

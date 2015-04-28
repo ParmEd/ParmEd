@@ -40,6 +40,7 @@ import warnings
 import utils
     
 get_fn = utils.get_fn
+skipIf = utils.skipIf
 
 # Suppress warning output from bad psf file... sigh.
 warnings.filterwarnings('ignore', category=CharmmPSFWarning)
@@ -67,6 +68,7 @@ if has_openmm:
         if plat.getName() == 'OpenCL':
             plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
 
+@skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(utils.TestCaseRelative):
 
     def setUp(self):
@@ -310,9 +312,6 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     s = context.getState(getEnergy=True, groups=1<<parm.CMAP_FORCE_GROUP)
     energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
-
-if not has_openmm:
-    del TestCharmmFiles
 
 if __name__ == '__main__':
     unittest.main()

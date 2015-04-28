@@ -8,7 +8,7 @@ from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
 import os
 import unittest
-from utils import get_fn, has_numpy
+from utils import get_fn, has_numpy, skipIf
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -439,7 +439,8 @@ class TestWriteFiles(unittest.TestCase):
         rst.box = box[:]
         rst.close()
         self._check_written_restarts(box)
-    
+
+    @skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberRestartNumpy(self):
         """ Test writing Amber restart file passing numpy arrays """
         import numpy as np
@@ -490,6 +491,7 @@ class TestWriteFiles(unittest.TestCase):
         crd.close()
         self._check_written_mdcrds(box)
 
+    @skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberMdcrdNumpy(self):
         """ Test writing ASCII trajectory file passing numpy arrays """
         import numpy as np
@@ -657,9 +659,6 @@ class TestObjectAPIs(unittest.TestCase):
         mylist.changed = False
         mylist *= 2
         self.assertTrue(mylist.changed)
-
-if not has_numpy():
-    del TestWriteFiles.testAmberRestartNumpy, TestWriteFiles.testAmberMdcrdNumpy
 
 if __name__ == '__main__':
     unittest.main()

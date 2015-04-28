@@ -15,6 +15,7 @@ import unittest
 import utils
 import warnings
 get_fn = utils.get_fn
+skipIf = utils.skipIf
 
 try:
     import cStringIO as StringIO
@@ -467,6 +468,7 @@ class TestAmberOFFLeapCompatibility(unittest.TestCase):
             pass
         os.chdir(self.cwd)
 
+    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoInternal(self):
         """ Test that the internal AA OFF library writes work with LEaP """
         # First create the parm to test against... we are in "writes" right now
@@ -509,6 +511,7 @@ quit
         changeRadii(parm2, 'mbondi2').execute()
         self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
 
+    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoTermini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
         offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
@@ -589,6 +592,5 @@ quit
             # Check residue properties
             self.assertEqual(a1.residue.name, a2.residue.name)
 
-# Only run TestAmberOFFLeapCompatibility if tleap can be found
-if utils.which('tleap') is None:
-    del TestAmberOFFLeapCompatibility
+if __name__ == '__main__':
+    unittest.main()
