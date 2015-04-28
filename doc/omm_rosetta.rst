@@ -60,7 +60,7 @@ start simulating our ParmEd :class:`Structure`::
 
     # Create OpenMM System
     system = ff.createSystem(mod.topology, nonbondedMethod=PME,
-                             nonbondedCutoff=10*nanometers,
+                             nonbondedCutoff=1*nanometers,
                              constraints=HBonds)
     integrator = LangevinIntegrator(300*kelvin, 1/picoseconds,
                                     2*femtoseconds)
