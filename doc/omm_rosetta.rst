@@ -1,8 +1,14 @@
-Seeding OpenMM Simulations with PyRosetta
-==========================================
+Seeding OpenMM Simulations with PyRosetta and ParmEd
+====================================================
+
+In this example, we'll go over starting a small protein
+(dodeca-alanine) simulation from scratch, using PyRosetta and OpenMM.
 
 Generate pose from primary structure
----
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To start, let's create a PyRosetta :class:`Pose`
+directly from a sequence of twelve alanines::
 
     from rosetta import init, pose_from_sequence
 
@@ -12,39 +18,36 @@ Generate pose from primary structure
     pose = pose_from_sequence(seq)
 
 
-Generate pose an exisiting PDB
----
-
-    from rosetta import init, pose_from_pdb
-
-    init()
-
-    pdb = 'dodecaalanine.pdb'
-    pose = pose_from_sequence(seq)
-
-
 Load Pose into ParmEd
----
+~~~~~~~~~~~~~~~~~~~~~
 
-    from chemistry.rosetta import load_rosetta
+The next step is to use ParmEd's :func:`load_rosetta` function
+to load the :class:`Pose` into a :class:`Structure`::
+
+    from chemistry import load_rosetta
 
     struct = load_rosetta(pose)
 
 
 Start an OpenMM simulation
----
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, we can use the following code to solvate and
+start simulating our ParmEd :class:`Structure`::
+
     from simtk.openmm import *
     from simtk.openmm.app import *
     from simtk.unit import *
 
     ff = ForceField('amber99sbildn.xml', 'tip3p.xml')
 
-    #solvate system
+    # Solvate Structure
     mod = Modeller(struct.topology, struct.positions)
     mod.addSolvent(ff, model='tip3p', boxSize=Vec3(4, 4, 4)*nanometers,
                    positiveIon='Na+', negativeIon='Cl-',
-                   ionicStrength=smolar*molar)
+                   ionicStrength=0.1*molar)
 
+    # Create OpenMM System
     system = ff.createSystem(mod.topology, nonbondedMethod=PME,
                              nonbondedCutoff=10*nanometers,
                              constraints=HBonds)
@@ -52,13 +55,15 @@ Start an OpenMM simulation
                                     2*femtoseconds)
 
     integrator.setConstraintTolerance(1e-5)
-
     system.addForce(MonteCarloBarostat(1*bar, 300*kelvin))
+
     simulation = Simulation(mod.topology, system, integrator, platform, props)
     simulation.context.setPositions(positions)
 
+    # Minimize System
     simulation.minimizeEnergy(maxIterations=1000)
 
+    # Equilibrate System
     simulation.reporters.append(
         PDBReporter('dodecaalanine.solv.pdb', 50000))
 

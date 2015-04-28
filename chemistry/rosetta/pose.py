@@ -28,7 +28,12 @@ class RosettaPose(object):
 
     @staticmethod
     def load(pose):
-        """ Load a Pose object and return a populated `Structure` class
+        """ Load a Pose object and return a populated ParmEd :class:`Structure`
+
+            Parameters
+            ----------
+            pose : :class:`Pose`
+                PyRosetta :class:`Pose` object to convert
         """
         if not Pose or not AtomID:
             raise ImportError('Could not load the PyRosetta module.')
