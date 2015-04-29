@@ -14,7 +14,7 @@ except ImportError:
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
-           'ResidueTemplateContainer']
+           'ResidueTemplateContainer', 'PatchTemplate']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -63,6 +63,14 @@ class ResidueTemplate(object):
         The atom that is connected to the residue that comes before this one
     tail : :class:`Atom` or None
         The atom that is connected to the *next* residue after this one
+    first_patch : :class:`ResidueTemplate` or None
+        If it is not None, this is the patch whose tail is added to the head
+        atom of this residue when this residue is the first in a chain
+    last_patch : :class:`ResidueTemplate` or None
+        If it is not None, this is the patch whose head is added to the tail
+        atom of this residue when this residue is the last in a chain
+    groups : list of list(:class:`Atom`)
+        If set, each group is a list of Atom instances making up each group
     """
 
     def __init__(self, name=''):
@@ -74,6 +82,23 @@ class ResidueTemplate(object):
         self.connections = []
         self._atomnames = set()
         self.type = UNKNOWN
+        self.first_patch = None
+        self.last_patch = None
+        self.groups = []
+        self.cmaps = []
+
+    def __repr__(self):
+        if self.head is not None:
+            head = self.head.name
+        else:
+            head = 'None'
+        if self.tail is not None:
+            tail = self.tail.name
+        else:
+            tail = 'None'
+        return '<%s %s: %d atoms; %d bonds; head=%s; tail=%s>' % (
+                    type(self).__name__, self.name, len(self.atoms),
+                    len(self.bonds), head, tail)
 
     def add_atom(self, atom):
         """ Adds an atom to this residue template
@@ -99,11 +124,11 @@ class ResidueTemplate(object):
 
         Parameters
         ----------
-        atom1 : :class:`Atom` or int
+        atom1 : :class:`Atom` or int or str
             One of the atoms in the bond. It must be in the ``atoms`` list of
             this ResidueTemplate. It can also be the atom index (index from 0)
             of the atom in the bond.
-        atom2 : :class:`Atom` or int
+        atom2 : :class:`Atom` or int or str
             The other atom in the bond. It must be in the ``atoms`` list of this
             ResidueTemplate. It can also be the atom index (index from 0) of the
             atom in the bond.
@@ -118,12 +143,14 @@ class ResidueTemplate(object):
 
         Notes
         -----
-        If atom1 and atom2 are already bonded, this routine does nothing
+        If atom1 and atom2 are already bonded, this routine does nothing. If
+        atom1 or atom2 are strings, then they will match the first instance of
+        the atom name that is the same as the atom name passed.
         """
-        if isinstance(atom1, int):
-            atom1 = self.atoms[atom1]
-        if isinstance(atom2, int):
-            atom2 = self.atoms[atom2]
+        if not isinstance(atom1, Atom):
+            atom1 = self[atom1]
+        if not isinstance(atom2, Atom):
+            atom2 = self[atom2]
         if atom1.list is not self.atoms or atom2.list is not self.atoms:
             raise RuntimeError('Both atoms must belong to template.atoms')
         # Do not add the same bond twice
@@ -183,11 +210,61 @@ class ResidueTemplate(object):
             self._crd = np.array([[a.xx, a.xy, a.xz] for a in self]).flatten()
         return self._crd
 
-    # Make ResidueTemplate look like a container of atoms
+    # Make ResidueTemplate look like a container of atoms, also indexable by the
+    # atom name
     def __len__(self):
         return len(self.atoms)
+
+    def __iter__(self):
+        return iter(self.atoms)
+
+    def __contains__(self, atom):
+        if isinstance(atom, Atom):
+            return atom in self.atoms
+        if isinstance(atom, str):
+            for a in self.atoms:
+                if a.name == atom:
+                    return True
+        return False
+
     def __getitem__(self, idx):
+        if isinstance(idx, str):
+            for atom in self.atoms:
+                if atom.name == idx:
+                    return atom
+            raise IndexError('Atom %s not found in %s' % (idx, self.name))
         return self.atoms[idx]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class PatchTemplate(ResidueTemplate):
+    """
+    A residue patch (typically used for CHARMM) that is used to modify existing
+    residues in some way (e.g., terminal patches, disulfide bridges, etc.)
+
+    Parameters
+    ----------
+    name : str, optional
+        If provided, this is the name of the residue
+
+    Attributes
+    ----------
+    delete : list of str
+        List of atoms that need to be deleted in applying the patch
+
+    See Also
+    --------
+    :class:`ResidueTemplate`
+
+    Notes
+    -----
+    This class basically just provides an additional list of atoms that need to
+    be deleted when applying this patch -- something that does not apply to
+    standard Residues
+    """
+    def __init__(self, name=''):
+        super(PatchTemplate, self).__init__(name)
+        self.delete = []
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -244,6 +321,13 @@ class ResidueTemplateContainer(list):
                     rt.name = '%s3' % rt.name
             inst.append(rt)
         return inst
+
+    def __getitem__(self, value):
+        if isinstance(value, str):
+            # Behave like a dict here... albeit a slow one
+            for res in self:
+                if res.name == value: return res
+        return list.__getitem__(self, value)
 
     def to_library(self):
         """

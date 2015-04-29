@@ -289,11 +289,11 @@ class AmberParm(AmberFormat, Structure):
                 or abs(struct.box[5] - 90) > TINY):
             inst.parm_data['POINTERS'][IFBOX] = 2
             inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
         else:
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
-            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
         try:
             coords = []
             for atom in struct.atoms:
@@ -1341,17 +1341,17 @@ class AmberParm(AmberFormat, Structure):
         for k, req in zip(self.parm_data['BOND_FORCE_CONSTANT'],
                           self.parm_data['BOND_EQUIL_VALUE']):
             self.bond_types.append(BondType(k, req, self.bond_types))
-        blist = self.parm_data['BONDS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][MBONA], 3):
+        it = iter(self.parm_data['BONDS_WITHOUT_HYDROGEN'])
+        for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                            self.bond_types[blist[i+2]-1])
+                    Bond(self.atoms[i//3], self.atoms[j//3],
+                         self.bond_types[k-1])
             )
-        blist = self.parm_data['BONDS_INC_HYDROGEN']
-        for i in xrange(0, 3*self.parm_data['POINTERS'][NBONH], 3):
+        it = iter(self.parm_data['BONDS_INC_HYDROGEN'])
+        for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[blist[i]//3], self.atoms[blist[i+1]//3],
-                         self.bond_types[blist[i+2]-1])
+                    Bond(self.atoms[i//3], self.atoms[j//3],
+                         self.bond_types[k-1])
             )
 
     #===================================================
@@ -1363,21 +1363,17 @@ class AmberParm(AmberFormat, Structure):
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
-        alist = self.parm_data['ANGLES_WITHOUT_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][MTHETA], 4):
+        it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
+        for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
+                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
+                          self.angle_types[l-1])
             )
-        alist = self.parm_data['ANGLES_INC_HYDROGEN']
-        for i in xrange(0, 4*self.parm_data['POINTERS'][NTHETH], 4):
+        it = iter(self.parm_data['ANGLES_INC_HYDROGEN'])
+        for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[alist[i]//3],
-                          self.atoms[alist[i+1]//3],
-                          self.atoms[alist[i+2]//3],
-                          self.angle_types[alist[i+3]-1])
+                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
+                          self.angle_types[l-1])
             )
 
     #===================================================
@@ -1401,29 +1397,25 @@ class AmberParm(AmberFormat, Structure):
             self.dihedral_types.append(
                     DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
-        dlist = self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][MPHIA], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
+        it = iter(self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
+            ignore_end = k < 0
+            improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[abs(dlist[i+2])//3],
-                             self.atoms[abs(dlist[i+3])//3],
+                    Dihedral(self.atoms[i//3], self.atoms[j//3],
+                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
                              improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[dlist[i+4]-1])
+                             type=self.dihedral_types[m-1])
             )
-        dlist = self.parm_data['DIHEDRALS_INC_HYDROGEN']
-        for i in xrange(0, 5*self.parm_data['POINTERS'][NPHIH], 5):
-            ignore_end = dlist[i+2] < 0
-            improper = dlist[i+3] < 0
+        it = iter(self.parm_data['DIHEDRALS_INC_HYDROGEN'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
+            ignore_end = k < 0
+            improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]//3],
-                             self.atoms[dlist[i+1]//3],
-                             self.atoms[abs(dlist[i+2])//3],
-                             self.atoms[abs(dlist[i+3])//3],
+                    Dihedral(self.atoms[i//3], self.atoms[j//3],
+                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
                              improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[dlist[i+4]-1])
+                             type=self.dihedral_types[m-1])
             )
 
     #===================================================

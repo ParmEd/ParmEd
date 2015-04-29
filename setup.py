@@ -9,8 +9,8 @@ packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
 # Next the main chemistry packages
 packages += ['chemistry', 'chemistry.amber', 'chemistry.modeller',
              'chemistry.tinker', 'chemistry.unit', 'chemistry.amber.mdin',
-             'chemistry.charmm', 'chemistry.formats.pdbx', 'chemistry.formats',
-             'fortranformat']
+             'chemistry.charmm', 'chemistry.formats.pdbx', 'chemistry.rosetta',
+             'chemistry.formats', 'fortranformat']
 
 # Modules
 modules = ['compat24']
@@ -51,6 +51,13 @@ if __name__ == '__main__':
         fixers = [x for x in get_fixers('lib2to3.fixes')
                     if not 'has_key' in x and not 'itertools_imports' in x]
         Mixin2to3.fixer_names = fixers
+
+    # See if we have the Python development headers.  If not, don't build the
+    # optimized prmtop parser extension
+    from distutils import sysconfig
+    if not os.path.exists(os.path.join(sysconfig.get_config_vars()['INCLUDEPY'],
+                                       'Python.h')):
+        extensions = []
 
     setup(name='ParmEd',
           version='15.0b',

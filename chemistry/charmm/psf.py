@@ -17,6 +17,7 @@ from chemistry.structure import needs_openmm, app, mm
 from chemistry import unit as u
 from math import sqrt
 import os
+import re
 import warnings
 
 def _catchindexerror(func):
@@ -58,6 +59,8 @@ class _ZeroDict(dict):
             return 0, []
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+_resre = re.compile(r'(\d+)([a-zA-Z]*)')
 
 class CharmmPsfFile(Structure):
     """
@@ -167,6 +170,7 @@ class CharmmPsfFile(Structure):
         Opens and parses a PSF file, then instantiates a CharmmPsfFile
         instance from the data.
         """
+        global _resre
         Structure.__init__(self)
         conv = CharmmPsfFile._convert
         # Make sure the file exists
@@ -202,7 +206,12 @@ class CharmmPsfFile(Structure):
             if atid != i + 1:
                 raise CharmmPSFError('Nonsequential atoms detected!')
             segid = words[1]
-            resid = conv(words[2], int, 'residue number')
+            rematch = _resre.match(words[2])
+            if not rematch:
+                raise RuntimeError('Could not interpret residue number %s' %
+                                   words[2])
+            resid, inscode = rematch.groups()
+            resid = conv(resid, int, 'residue number')
             resname = words[3]
             name = words[4]
             attype = words[5]
@@ -217,7 +226,7 @@ class CharmmPsfFile(Structure):
             atom = Atom(name=name, type=attype, charge=charge, mass=mass)
             atom.segid = segid
             atom.props = props
-            self.add_atom(atom, resname, resid, chain=segid)
+            self.add_atom(atom, resname, resid, chain=segid, inscode=inscode)
         # Now get the number of bonds
         nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
         tmp = psfsections['NBOND'][1]

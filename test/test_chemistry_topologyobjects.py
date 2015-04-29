@@ -217,6 +217,27 @@ class TestTopologyObjects(unittest.TestCase):
 
     #=============================================
 
+    def test_ljparams(self):
+        """ Tests handling of Lennard-Jones parameters in Atom and AtomType """
+        atom = Atom(name='CA', type='CX', atomic_number=6, mass=12.01)
+        atype = AtomType('CX', 1, 12.01, 6)
+        atype.set_lj_params(1.0, 1.2)
+        self.assertEqual(atype.epsilon, 1.0)
+        self.assertEqual(atype.rmin, 1.2)
+        self.assertEqual(atype.epsilon_14, 1.0)
+        self.assertEqual(atype.rmin_14, 1.2)
+        self.assertEqual(atype.sigma, 1.2*2**(-1/6))
+        self.assertEqual(atype.sigma_14, atype.sigma)
+        # Now try setting sigma and make sure it also changes rmin
+        atype.sigma = 1.2
+        self.assertEqual(atype.rmin, 1.2*2**(1/6))
+        atom.atom_type = atype
+        self.assertEqual(atom.epsilon, atype.epsilon)
+        self.assertEqual(atom.sigma, atype.sigma)
+        self.assertEqual(atom.rmin, atype.rmin)
+
+    #=============================================
+
     def test_bond(self):
         """ Tests the Bond and BondType classes """
         a1, a2, a3, a4 = Atom(), Atom(), Atom(), Atom()

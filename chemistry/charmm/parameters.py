@@ -5,17 +5,23 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 Contributors:
-Date: Dec. 19, 2014
+Date: Apr. 13, 2015
 """
+from __future__ import division
 from chemistry.constants import DEG_TO_RAD
-from chemistry import (AtomType, BondType, AngleType, DihedralType,
+from chemistry import (Atom, AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
+from chemistry.modeller import ResidueTemplate, PatchTemplate
 from chemistry.parameters import ParameterSet
 from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
 import compat24 # needs to be before collections
 from collections import OrderedDict
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 import os
 import warnings
 
@@ -92,6 +98,9 @@ class CharmmParameterSet(ParameterSet):
     def __init__(self, *args):
         # Instantiate the list types
         super(CharmmParameterSet, self).__init__(self)
+        self.parametersets = []
+        self.residues = dict()
+        self.patches = dict()
 
         # Load all of the files
         tops, pars, strs = [], [], []
@@ -494,35 +503,179 @@ class CharmmParameterSet(ParameterSet):
         conv = CharmmParameterSet._convert
         if isinstance(tfile, str):
             own_handle = True
-            f = CharmmFile(tfile)
+            f = iter(CharmmFile(tfile))
         else:
             own_handle = False
             f = tfile
-        for line in f:
-            line = line.strip()
-            if line[:4] != 'MASS': continue
-            words = line.split()
-            try:
-                idx = conv(words[1], int, 'atom type')
-                name = words[2]
-                mass = conv(words[3], float, 'atom mass')
-            except IndexError:
-                raise CharmmFileError('Could not parse MASS section of %s' %
-                                      tfile)
-            # The parameter file might or might not have an element name
-            try:
-                elem = words[4]
-                if len(elem) == 2:
-                    elem = elem[0] + elem[1].lower()
-                atomic_number = AtomicNum[elem]
-            except (IndexError, KeyError):
-                # Figure it out from the mass
-                atomic_number = AtomicNum[element_by_mass(mass)]
-            atype = AtomType(name=name, number=idx, mass=mass,
-                             atomic_number=atomic_number)
-            self.atom_types_str[atype.name] = atype
-            self.atom_types_int[atype.number] = atype
-            self.atom_types_tuple[(atype.name, atype.number)] = atype
+        hpatch = tpatch = None # default Head and Tail patches
+        residues = dict()
+        patches = dict()
+        hpatches = dict()
+        tpatches = dict()
+        line = next(f)
+        try:
+            while line:
+                line = line.strip()
+                if line[:4] == 'MASS':
+                    words = line.split()
+                    try:
+                        idx = conv(words[1], int, 'atom type')
+                        name = words[2]
+                        mass = conv(words[3], float, 'atom mass')
+                    except IndexError:
+                        raise CharmmFileError('Could not parse MASS section of '
+                                              '%s' % tfile)
+                    # The parameter file might or might not have an element name
+                    try:
+                        elem = words[4]
+                        if len(elem) == 2:
+                            elem = elem[0] + elem[1].lower()
+                        atomic_number = AtomicNum[elem]
+                    except (IndexError, KeyError):
+                        # Figure it out from the mass
+                        atomic_number = AtomicNum[element_by_mass(mass)]
+                    atype = AtomType(name=name, number=idx, mass=mass,
+                                     atomic_number=atomic_number)
+                    self.atom_types_str[atype.name] = atype
+                    self.atom_types_int[atype.number] = atype
+                    self.atom_types_tuple[(atype.name, atype.number)] = atype
+                elif line[:4] == 'DECL':
+                    pass # Not really sure what this means
+                elif line[:4] == 'DEFA':
+                    words = line.split()
+                    if len(words) < 5:
+                        warnings.warn('DEFA line has %d tokens; expected 5' %
+                                      len(words))
+                    else:
+                        it = iter(words[1:5])
+                        for tok, val in zip(it, it):
+                            if val.upper() == 'NONE':
+                                val = None
+                            if tok.upper().startswith('FIRS'):
+                                hpatch = val
+                            elif tok.upper() == 'LAST':
+                                tpatch = val
+                            else:
+                                warnings.warn('DEFA patch %s unknown' % val)
+                elif line[:4].upper() in ('RESI', 'PRES'):
+                    restype = line[:4].upper()
+                    # Get the residue definition
+                    words = line.split()
+                    resname = words[1]
+                    # Assign default patches
+                    hpatches[resname] = hpatch
+                    tpatches[resname] = tpatch
+                    try:
+                        charge = float(words[2])
+                    except (IndexError, ValueError):
+                        warnings.warn('No charge for %s' % resname)
+                    if restype == 'RESI':
+                        res = ResidueTemplate(resname)
+                    elif restype == 'PRES':
+                        res = PatchTemplate(resname)
+                    else:
+                        assert False, 'restype != RESI or PRES'
+                    line = next(f)
+                    group = []
+                    ictable = []
+                    while line:
+                        if line[:5].upper() == 'GROUP':
+                            if group:
+                                res.groups.append(group)
+                            group = []
+                        elif line[:4].upper() == 'ATOM':
+                            words = line.split()
+                            name, type, charge = words[1:4]
+                            charge = float(charge)
+                            atom = Atom(name=name, type=type, charge=charge)
+                            group.append(atom)
+                            res.add_atom(atom)
+                        elif line.strip() and line.split()[0].upper() in \
+                                ('BOND', 'DOUBLE'):
+                            words = line.split()[1:]
+                            it = iter(words)
+                            for a1, a2 in zip(it, it):
+                                if a1.startswith('-'):
+                                    res.head = res[a2]
+                                    continue
+                                if a2.startswith('-'):
+                                    res.head = res[a1]
+                                    continue
+                                if a1.startswith('+'):
+                                    res.tail = res[a2]
+                                    continue
+                                if a2.startswith('+'):
+                                    res.tail = res[a1]
+                                    continue
+                                # Apparently PRES objects do not need to put +
+                                # or - in front of atoms that belong to adjacent
+                                # residues
+                                if restype == 'PRES' and (a1 not in res or
+                                                          a2 not in res):
+                                    continue
+                                res.add_bond(a1, a2)
+                        elif line[:4].upper() == 'CMAP':
+                            pass
+                        elif line[:5].upper() == 'DONOR':
+                            pass
+                        elif line[:6].upper() == 'ACCEPT':
+                            pass
+                        elif line[:2].upper() == 'IC':
+                            w = line.split()[1:]
+                            ictable.append((w[:4], [float(x) for x in w[4:]]))
+                        elif line[:3].upper() == 'END':
+                            break
+                        elif line[:5].upper() == 'PATCH':
+                            it = iter(line.split()[1:])
+                            for tok, val in zip(it, it):
+                                if val.upper() == 'NONE': val = None
+                                if tok.upper().startswith('FIRS'):
+                                    hpatches[resname] = val
+                                elif tok.upper().startswith('LAST'):
+                                    tpatches[resname] = val
+                        elif line[:5].upper() == 'DELETE':
+                            pass
+                        elif line[:4].upper() == 'IMPR':
+                            it = iter(line.split()[1:])
+                            for a1, a2, a3, a4 in zip(it, it, it, it):
+                                if a2[0] == '-' or a3[0] == '-' or a4 == '-':
+                                    res.head = res[a1]
+                        elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
+                            # Back up a line and bail
+                            break
+                        line = next(f)
+                    if group: res.groups.append(group)
+                    _fit_IC_table(res, ictable)
+                    if restype == 'RESI':
+                        residues[resname] = res
+                    elif restype == 'PRES':
+                        patches[resname] = res
+                    else:
+                        assert False, 'restype != RESI or PRES'
+                    # We parsed a line we need to look at. So don't update the
+                    # iterator
+                    continue
+                # Get the next line and cycle through
+                line = next(f)
+        except StopIteration:
+            pass
+
+        # Go through the patches and add the appropriate one
+        for resname, res in residues.iteritems():
+            if hpatches[resname] is not None:
+                try:
+                    res.first_patch = patches[hpatches[resname]]
+                except KeyError:
+                    warnings.warn('Patch %s not found' % hpatches[resname])
+            if tpatches[resname] is not None:
+                try:
+                    res.last_patch = patches[tpatches[resname]]
+                except KeyError:
+                    warnings.warn('Patch %s not found' % tpatches[resname])
+        # Now update the residues and patches with the ones we parsed here
+        self.residues.update(residues)
+        self.patches.update(patches)
+
         if own_handle: f.close()
 
     def read_stream_file(self, sfile):
@@ -545,8 +698,33 @@ class CharmmParameterSet(ParameterSet):
             words = title.lower().split()
             if words[1] == 'rtf':
                 # This is a Residue Topology File section.
-                self.read_topology_file(section)
+                self.read_topology_file(iter(section))
             elif words[1].startswith('para'):
                 # This is a Parameter file section
                 self.read_parameter_file(section)
             title, section = f.next_section()
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _fit_IC_table(res, ictable):
+    """
+    Determines cartesian coordinates from an internal coordinate table stored in
+    CHARMM residue topology files
+
+    Parameters
+    ----------
+    res : ResidueTemplate
+        The residue template for which coordinates are being determined
+    ictable : list[tuple(atoms, measurements)]
+        The internal coordinate table
+
+    Notes
+    -----
+    This method assigns an xx, xy, and xz attribute to ``res``. For the time
+    being, this is just a placeholder, as its functionality has not yet been
+    implemented (CHARMM does not use a 'traditional' Z-matrix, and I don't know
+    of any existing code that will compute the proper cartesian coordinates from
+    the form used by CHARMM)
+    """
+    for atom in res:
+        atom.xx = atom.xy = atom.xz = 0.0

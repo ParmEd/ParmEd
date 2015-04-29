@@ -792,3 +792,6 @@ class TestMol2File(unittest.TestCase):
                                mol3=True)
         self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
                                    get_saved_fn('tripos9struct.mol3')))
+
+if __name__ == '__main__':
+    unittest.main()

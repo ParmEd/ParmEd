@@ -2219,7 +2219,7 @@ class tiMerge(Action):
     """
     usage = ('<mol1mask> <mol2mask> <scmask1> <scmask2> [<scmask1N>] '
              '[<scmask2N>] [tol <tol>]')
-    strictly_supported = (AmberParm,)
+    strictly_supported = (AmberParm, ChamberParm)
     output = sys.stdout
 
     def init(self, arg_list):
@@ -2439,7 +2439,52 @@ class tiMerge(Action):
                             elif dihed.atom4.idx == j:
                                 if (dihed.atom1.idx == k or dihed.atom2.idx == k
                                         or dihed.atom3.idx == k):
-                                    dihed.atom4 = atm_new               
+                                    dihed.atom4 = atm_new
+
+                        for imp in self.parm.impropers:
+                            if imp.atom1.idx == j:
+                                if (imp.atom2.idx == k or imp.atom3.idx == k
+                                        or imp.atom4.idx == k):
+                                    imp.atom1 = atm_new
+                            elif imp.atom2.idx == j:
+                                if (imp.atom1.idx == k or imp.atom3.idx == k
+                                        or imp.atom4.idx == k):
+                                    imp.atom2 = atm_new
+                            elif imp.atom3.idx == j:
+                                if (imp.atom1.idx == k or imp.atom2.idx == k
+                                        or imp.atom4.idx == k):
+                                    imp.atom3 = atm_new
+                            elif imp.atom4.idx == j:
+                                if (imp.atom1.idx == k or imp.atom2.idx == k
+                                        or imp.atom3.idx == k):
+                                    imp.atom4 = atm_new
+
+                        for cmap in self.parm.cmaps:
+                            if cmap.atom1.idx == j:
+                                if (cmap.atom2.idx == k or cmap.atom3.idx == k
+                                        or cmap.atom4.idx == k
+                                        or cmap.atom5.idx == k):
+                                    cmap.atom1 = atm_new
+                            elif cmap.atom2.idx == j:
+                                if (cmap.atom1.idx == k or cmap.atom3.idx == k
+                                        or cmap.atom4.idx == k
+                                        or cmap.atom5.idx == k):
+                                    cmap.atom2 = atm_new
+                            elif cmap.atom3.idx == j:
+                                if (cmap.atom1.idx == k or cmap.atom2.idx == k
+                                        or cmap.atom4.idx == k
+                                        or cmap.atom5.idx == k):
+                                    cmap.atom3 = atm_new
+                            elif cmap.atom4.idx == j:
+                                if (cmap.atom1.idx == k or cmap.atom2.idx == k
+                                        or cmap.atom3.idx == k
+                                        or cmap.atom5.idx == k):
+                                    cmap.atom4 = atm_new
+                            elif cmap.atom5.idx == j:
+                                if (cmap.atom1.idx == k or cmap.atom2.idx == k
+                                        or cmap.atom3.idx == k
+                                        or cmap.atom4.idx == k):
+                                    cmap.atom5 = atm_new
 
         self.parm.atoms.changed = True
 

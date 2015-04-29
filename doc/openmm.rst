@@ -9,7 +9,7 @@ extension.
 
 This page is not meant as an exhaustive description of the OpenMM library and
 its usage. Instead, you should visit the `OpenMM website
-<http://simtk.org/home/openmm>` for that. However, this page *will* provide a
+<http://simtk.org/home/openmm>`_ for that. However, this page *will* provide a
 brief description of OpenMM, what I consider to be its strengths that can make
 it an invaluable tool in the field of molecular mechanics. It will also present
 an introduction to using OpenMM with the tools provided by ParmEd through a
@@ -109,10 +109,10 @@ The *-marked options are *not* available in the OpenMM Python application layer.
 In addition to these file formats, ParmEd also supports several new reporter
 classes in addition to the small number provided by ParmEd:
 
-    * :class:`StateDataReporter` -- This takes an extra argument,
-      ``unit_system`` that allows you to specify what unit system the output
-      data is printed in (such as the AKMA unit system, which is more familiar
-      to Amber and CHARMM users).
+    * :class:`StateDataReporter` -- This takes extra arguments specifying the
+      units of each of the types of data (like the energy, volume, and time
+      units). The defaults correspond to the AKMA unit system, which is more
+      familiar to Amber and CHARMM users.
     * :class:`NetCDFReporter` -- This allows you to write a trajectory file in
       the Amber NetCDF format.
     * :class:`MdcrdReporter` -- This allows you to write a trajectory file in
@@ -135,4 +135,3 @@ the annotated and explained example):
 
     Starting from AMBER prmtop and inpcrd files <omm_amber>
     Starting from CHARMM PSF and coordinate files <omm_charmm>
-

@@ -30,6 +30,12 @@ class CharmmFile(object):
         self.closed = False
         self.line_number = 0
 
+    def tell(self):
+        return self._handle.tell()
+
+    def seek(self, value):
+        return self._handle.seek(value)
+
     def write(self, *args, **kwargs):
         return self._handle.write(*args, **kwargs)
 
