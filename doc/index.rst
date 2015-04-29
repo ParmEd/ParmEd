@@ -24,11 +24,12 @@ Why use it?
 
 You can use it for a variety of modeling purposes, like manipulating system
 topologies (i.e., the *atoms*, *bonds*, and other bonded terms like valence
-angles) and translating between file formats (e.g., PDB, mmCIF/PDBx, Amber
-*prmtop*, and CHARMM *psf*).  What sets ParmEd apart from tools like OpenBabel
-is that it stores and tracks force field parameters so that the resulting files
-can be used to carry out molecular mechanics simulations with tools like Amber,
-OpenMM, NAMD, and CHARMM.
+angles) and translating between file formats (e.g. PDB, mmCIF/PDBx, Amber
+*prmtop*, and CHARMM *psf*) and even other APIs (e.g. PyRosetta).
+What sets ParmEd apart from tools like OpenBabel is that it stores and tracks
+force field parameters so that the resulting files can be used to carry out
+molecular mechanics simulations with tools like Amber, OpenMM, NAMD,
+and CHARMM.
 
 ParmEd has sophisticated machinery built into its core classes that
 substantially reduces the burden of bookkeeping when manipulating chemical
@@ -75,6 +76,7 @@ Program and API Reference
    Working with units <dimensional_analysis>
    The Amber file classes <amber>
    The CHARMM file classes <charmm>
+   PyRosetta Integration <rosetta>
    Using the ParmEd programs (``parmed.py`` and ``xparmed.py``) <parmed>
    The ParmEd API <parmed_api>
    OpenMM Functionality <openmm>
@@ -85,4 +87,3 @@ Search
 ------
 
 * :ref:`search`
-

@@ -28,7 +28,12 @@ class RosettaPose(object):
 
     @staticmethod
     def load(pose):
-        """ Load a Pose object and return a populated `Structure` class
+        """ Load a :class:`Pose` object and return a populated :class:`Structure` class
+
+            Parameters
+            ----------
+            pose : :class:`Pose`
+                PyRosetta :class:`Pose` object to convert
         """
         if not Pose or not AtomID:
             raise ImportError('Could not load the PyRosetta module.')
@@ -58,18 +63,19 @@ class RosettaPose(object):
                 except KeyError:
                     raise RosettaError('Could not recognize element: %s.'
                                        % atsym)
+
+                params = dict(atomic_number=atomic_number, name=atname,
+                              charge=0.0, mass=mass, occupancy=0.0,
+                              bfactor=0.0, altloc='', number=atnum,
+                              rmin=rmin, epsilon=epsilon)
+
                 if atinfo.is_virtual():
-                    atom = ExtraPoint(atomic_number=atomic_number,
-                                      name=atname, charge=0.0, mass=mass,
-                                      occupancy=0.0, bfactor=0.0,
-                                      altloc='', number=atnum, rmin=rmin,
-                                      epsilon=epsilon)
+                    atom = ExtraPoint(**params)
                 else:
-                    atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=0.0, mass=mass, occupancy=0.0,
-                                bfactor=0.0, altloc='', number=atnum,
-                                rmin=rmin, epsilon=epsilon)
+                    atom = Atom(**params)
+
                 atom.xx, atom.xy, atom.xz = tuple(at.xyz())
+
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
                 try:
