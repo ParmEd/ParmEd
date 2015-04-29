@@ -2,7 +2,7 @@
 Tool for parsing and writing OFF library files to and from dictionaries of
 ResidueTemplate objects
 """
-import compat24
+from __future__ import print_function
 
 from chemistry import Atom
 from chemistry.constants import RAD_TO_DEG

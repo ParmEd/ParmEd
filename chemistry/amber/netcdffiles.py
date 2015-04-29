@@ -14,7 +14,7 @@ work correctly---there is no difference from a user perspective). ALL
 NetCDF-file manipulation that the chemistry/amber package does should be
 contained in this module.
 """
-from __future__ import division
+from __future__ import division, print_function
 
 from chemistry.formats.registry import FileFormatType
 from chemistry import unit as u

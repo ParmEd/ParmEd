@@ -7,11 +7,15 @@ Author: Jason Deckman
 Contributors: Jason Swails
 Date: Feb. 24, 2015
 """
+from __future__ import print_function, division
 
-from chemistry.formats import io
+from chemistry.utils import io
 from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import CharmmFileError
 from chemistry import unit as u
+from chemistry.utils.six.moves import range
+from contextlib import closing
+import sys
 
 charmlen = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
@@ -41,7 +45,7 @@ class CharmmCrdFile(object):
 
     Example:
     >>> chm = CharmmCrdFile('testfiles/1tnm.crd')
-    >>> print '%d atoms; %d coords' % (chm.natom, len(chm.coords))
+    >>> print('%d atoms; %d coords' % (chm.natom, len(chm.coords)))
     1414 atoms; 4242 coords
     """
     __metaclass__ = FileFormatType
@@ -60,10 +64,8 @@ class CharmmCrdFile(object):
         is_fmt : bool
             True if it is a CHARMM coordinate file
         """
-        f = io.genopen(filename)
-        line = f.readline().decode()
-
-        try:
+        with io.genopen(filename) as f:
+            line = f.readline().decode()
             while len(line.strip()) == 0:   # Skip whitespace, as a precaution
                 line = f.readline().decode()
 
@@ -84,7 +86,7 @@ class CharmmCrdFile(object):
             try:
                 natom = int(line.strip().split()[0])
 
-                for row in xrange(min(natom, 3)):
+                for row in range(min(natom, 3)):
                     line = f.readline().decode().strip().split()
                     int(line[0])
                     int(line[1])
@@ -97,9 +99,6 @@ class CharmmCrdFile(object):
                 return False
 
             return True
-        finally:
-            f.close()
-
 
     def __init__(self, fname):
         self.atomno = []                   # Atom number
@@ -120,7 +119,7 @@ class CharmmCrdFile(object):
         """
         Atomic coordinates with units attached to them with the shape (natom, 3)
         """
-        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        return ([self.coords[i:i+3] for i in range(0, self.natom*3, 3)] *
                         u.angstroms)
 
     @property
@@ -129,8 +128,7 @@ class CharmmCrdFile(object):
 
     def _parse(self, fname):
 
-        crdfile = open(fname, 'r')
-        try:
+        with closing(io.genopen(fname, 'r')) as crdfile:
             line = crdfile.readline()
 
             while len(line.strip()) == 0:   # Skip whitespace, as a precaution
@@ -154,7 +152,7 @@ class CharmmCrdFile(object):
             try:
                 self.natom = int(line.strip().split()[0])
                 
-                for row in xrange(self.natom):
+                for row in range(self.natom):
                     line = crdfile.readline().strip().split()
                     self.atomno.append(int(line[0]))
                     self.resno.append(int(line[1]))
@@ -176,8 +174,6 @@ class CharmmCrdFile(object):
 
             except (ValueError, IndexError):
                 raise CharmmFileError('Error parsing CHARMM coordinate file')
-        finally:
-            crdfile.close()
 
 class CharmmRstFile(object):
     """
@@ -213,11 +209,11 @@ class CharmmRstFile(object):
 
     Example:
     >>> chm = CharmmRstFile('testfiles/sample-charmm.rst')
-    >>> print chm.header[0]
+    >>> print(chm.header[0])
     REST    37     1
     >>> natom, nc, nco = chm.natom, len(chm.coords), len(chm.coordsold)
     >>> nv = len(chm.vels)
-    >>> print '%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv)
+    >>> print('%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv))
     256 atoms; 768 crds; 768 old crds; 768 vels
     """
     __metaclass__ = FileFormatType
@@ -266,25 +262,24 @@ class CharmmRstFile(object):
     @property
     def positions(self):
         """ Atomic positions with units """
-        return ([self.coords[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        return ([self.coords[i:i+3] for i in range(0, self.natom*3, 3)] *
                         u.angstroms)
 
     @property
     def positionsold(self):
         """ Old atomic positions with units """
-        return ([self.coordsold[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        return ([self.coordsold[i:i+3] for i in range(0, self.natom*3, 3)] *
                         u.angstroms)
 
     @property
     def velocities(self):
         """ Atomic velocities with units """
-        return ([self.vels[i:i+3] for i in xrange(0, self.natom*3, 3)] *
+        return ([self.vels[i:i+3] for i in range(0, self.natom*3, 3)] *
                         u.angstroms / u.picoseconds)
 
     def _parse(self, fname):
 
-        crdfile = open(fname, 'r')
-        try:
+        with closing(io.genopen(fname, 'r')) as crdfile:
             readingHeader = True 
 
             while readingHeader:
@@ -301,7 +296,7 @@ class CharmmRstFile(object):
                 else:
                     self.header.append(line.strip())
 
-            for row in xrange(len(self.header)):
+            for row in range(len(self.header)):
                 if len(self.header[row].strip()) != 0:
                     line = self.header[row].strip().split()
                     if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
@@ -329,8 +324,6 @@ class CharmmRstFile(object):
 
             # Convert velocities to angstroms/ps
             self.vels = [v * ONE_TIMESCALE for v in self.vels]
-        finally:
-            crdfile.close()
 
     def scan(self, handle, str, r=0): # read lines in file till 'str' is found
         scanning = True
@@ -346,9 +339,8 @@ class CharmmRstFile(object):
                 if line.strip().split()[0][0:len(str)] == str:
                     scanning = False
 
-
     def _get_formatted_crds(self, crdfile, crds):
-        for row in xrange(self.natom):
+        for row in range(self.natom):
             line = crdfile.readline()
 
             if not line:
@@ -362,17 +354,15 @@ class CharmmRstFile(object):
             line = line.replace('D','E')     # CHARMM uses 'D' for exponentials
 
             # CHARMM uses fixed format (len = charmlen = 22) for crds in .rst's
-
             crds.append(float(line[0:charmlen]))  
             crds.append(float(line[charmlen:2*charmlen]))
             crds.append(float(line[2*charmlen:3*charmlen]))
 
-
     def printcoords(self, crds):
-        for crd in xrange(len(crds)):
-            print crds[crd],
+        for crd in range(len(crds)):
+            sys.stdout.write(crds[crd])
             if not (crd+1) % 3:
-                print '\n',
+                sys.stdout.write('\n')
 
 if __name__ == '__main__':
     import doctest

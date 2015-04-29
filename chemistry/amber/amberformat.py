@@ -2,7 +2,7 @@
 This is a generalization of the readparm.AmberParm class to handle similar
 Amber-style files with %FLAG/%FORMAT tags
 """
-from __future__ import division
+from __future__ import division, print_function
 
 from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
@@ -10,7 +10,8 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
 from chemistry.exceptions import FlagError
 from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
-from compat24 import wraps
+from chemistry.utils.six import wraps, string_types
+from chemistry.utils.six.moves import range
 from fortranformat import FortranRecordReader, FortranRecordWriter
 from copy import copy
 import datetime
@@ -19,9 +20,6 @@ import re
 from warnings import warn, filterwarnings
 
 filterwarnings('always', message='.', category=DeprecationWarning)
-
-# Some Py3 compatibility tweaks
-if not 'basestring' in dir(__builtins__): basestring = str
 
 def _deprecated(oldname, newname):
     def wrapper(func):
@@ -179,7 +177,7 @@ class FortranFormat(object):
         provided for this format, but the call signatures and behavior are the
         same for each of those functions.
         """
-        if hasattr(items, '__iter__') and not isinstance(items, basestring):
+        if hasattr(items, '__iter__') and not isinstance(items, string_types):
             mod = self.nitems - 1
             for i, item in enumerate(items):
                 dest.write(self.fmt % item)
@@ -195,7 +193,7 @@ class FortranFormat(object):
 
     def _write_string(self, items, dest):
         """ Writes a list/tuple of strings """
-        if hasattr(items, '__iter__') and not isinstance(items, basestring):
+        if hasattr(items, '__iter__') and not isinstance(items, string_types):
             mod = self.nitems - 1
             for i, item in enumerate(items):
                 dest.write((self.fmt % item).ljust(self.itemlen))
@@ -216,9 +214,9 @@ class FortranFormat(object):
         """
         line = line.rstrip('\n')
         nitems = int(ceil(len(line) / self.itemlen))
-        ret = [0 for i in xrange(nitems)]
+        ret = [0 for i in range(nitems)]
         start, end = 0, self.itemlen
-        for i in xrange(nitems):
+        for i in range(nitems):
             ret[i] = self.process_method(self.type(line[start:end]))
             start = end
             end += self.itemlen
@@ -230,9 +228,9 @@ class FortranFormat(object):
         """ Reads the line and returns the converted data """
         line = line.rstrip()
         nitems = int(ceil(len(line) / self.itemlen))
-        ret = [0 for i in xrange(nitems)]
+        ret = [0 for i in range(nitems)]
         start, end = 0, self.itemlen
-        for i in xrange(nitems):
+        for i in range(nitems):
             ret[i] = self.process_method(self.type(line[start:end]))
             start = end
             end += self.itemlen
@@ -811,7 +809,7 @@ class AmberFormat(object):
             CHARGE_SCALE = AMBER_ELECTROSTATIC
 
         if self.charge_flag in self.parm_data.keys():
-            for i in xrange(len(self.parm_data[self.charge_flag])):
+            for i in range(len(self.parm_data[self.charge_flag])):
                 self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
 
         # write version to top of prmtop file
@@ -833,7 +831,7 @@ class AmberFormat(object):
 
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
-            for i in xrange(len(self.parm_data[self.charge_flag])):
+            for i in range(len(self.parm_data[self.charge_flag])):
                 self.parm_data[self.charge_flag][i] /= CHARGE_SCALE
 
     #===================================================
@@ -886,9 +884,9 @@ class AmberFormat(object):
             if num_items < 0:
                 raise FlagError("If you do not supply prmtop data, num_items "
                                 "must be non-negative!")
-            self.parm_data[flag_name.upper()] = [0 for i in xrange(num_items)]
+            self.parm_data[flag_name.upper()] = [0 for i in range(num_items)]
         if comments is not None:
-            if isinstance(comments, basestring):
+            if isinstance(comments, string_types):
                 comments = [comments]
             else:
                 comments = list(comments)

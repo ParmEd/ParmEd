@@ -20,18 +20,14 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division
-try:
-    from itertools import izip as zip
-except ImportError:
-    # This only happens in Python 3, where zip is equivalent to izip
-    pass
+from __future__ import division, print_function
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
 from chemistry.exceptions import AmberParmError
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType)
+from chemistry.utils.six.moves import zip, range
 from math import sqrt
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -155,10 +151,10 @@ class ChamberParm(AmberParm):
         for atom in inst.atoms:
             inst.LJ_types[atom.type] = atom.nb_idx
             ntyp = max(ntyp, atom.nb_idx)
-        inst.LJ_radius = [0 for i in xrange(ntyp)]
-        inst.LJ_depth = [0 for i in xrange(ntyp)]
-        inst.LJ_14_radius = [0 for i in xrange(ntyp)]
-        inst.LJ_14_depth = [0 for i in xrange(ntyp)]
+        inst.LJ_radius = [0 for i in range(ntyp)]
+        inst.LJ_depth = [0 for i in range(ntyp)]
+        inst.LJ_14_radius = [0 for i in range(ntyp)]
+        inst.LJ_14_depth = [0 for i in range(ntyp)]
         for atom in inst.atoms:
             inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
             inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
@@ -236,7 +232,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
         one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
 
-        for i in xrange(ntypes):
+        for i in range(ntypes):
             lj_index = self.parm_data["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if acoef[lj_index] < 1.0e-6:
                 self.LJ_14_radius.append(0)
@@ -258,8 +254,8 @@ class ChamberParm(AmberParm):
         ntypes = self.pointers['NTYPES']
         acoef = self.parm_data['LENNARD_JONES_14_ACOEF']
         bcoef = self.parm_data['LENNARD_JONES_14_BCOEF']
-        for i in xrange(ntypes):
-            for j in xrange(i, ntypes):
+        for i in range(ntypes):
+            for j in range(i, ntypes):
                 index = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 rij = self.LJ_14_radius[i] + self.LJ_14_radius[j]
                 wdij = sqrt(self.LJ_14_depth[i] * self.LJ_14_depth[j])
@@ -323,7 +319,7 @@ class ChamberParm(AmberParm):
         if not self.has_cmap: return
         del self.cmaps[:]
         del self.cmap_types[:]
-        for i in xrange(self.pointers['CMAP_TYPES']):
+        for i in range(self.pointers['CMAP_TYPES']):
             resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
             grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
             cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
@@ -582,25 +578,25 @@ class ChamberParm(AmberParm):
         ntypes = data['POINTERS'][NTYPES]
         ntypes2 = ntypes * ntypes
         # Set up the index lookup tables (not a unique solution)
-        data['NONBONDED_PARM_INDEX'] = [0 for i in xrange(ntypes2)]
-        holder = [0 for i in xrange(ntypes2)]
+        data['NONBONDED_PARM_INDEX'] = [0 for i in range(ntypes2)]
+        holder = [0 for i in range(ntypes2)]
         idx = 0
-        for i in xrange(ntypes):
-            for j in xrange(i+1):
+        for i in range(ntypes):
+            for j in range(i+1):
                 idx += 1
                 holder[ntypes*i+j] = holder[ntypes*j+i] = idx
         idx = 0
-        for i in xrange(ntypes):
-            for j in xrange(ntypes):
+        for i in range(ntypes):
+            for j in range(ntypes):
                 data['NONBONDED_PARM_INDEX'][idx] = \
                             holder[ntypes*i+j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
-        data['LENNARD_JONES_14_ACOEF'] = [0 for i in xrange(nttyp)]
-        data['LENNARD_JONES_14_BCOEF'] = [0 for i in xrange(nttyp)]
-        data['LENNARD_JONES_ACOEF'] = [0 for i in xrange(nttyp)]
-        data['LENNARD_JONES_BCOEF'] = [0 for i in xrange(nttyp)]
+        data['LENNARD_JONES_14_ACOEF'] = [0 for i in range(nttyp)]
+        data['LENNARD_JONES_14_BCOEF'] = [0 for i in range(nttyp)]
+        data['LENNARD_JONES_ACOEF'] = [0 for i in range(nttyp)]
+        data['LENNARD_JONES_BCOEF'] = [0 for i in range(nttyp)]
         self.recalculate_LJ()
         # Now make any NBFIX modifications we had
         if nbfixes is not None:

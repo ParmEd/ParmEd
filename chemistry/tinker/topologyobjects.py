@@ -2,7 +2,6 @@
 Contains all of the class objects for the Tinker topology
 """
 from __future__ import division
-import compat24
 from collections import OrderedDict
 
 class Atom(object):

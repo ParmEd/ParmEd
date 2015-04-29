@@ -19,6 +19,7 @@ This module sets up ANGLE and DIHEDRAL classes to make printing them easier,
 then parses the parameter file, then sets the respective sections of the prmtop
 file.
 """
+from chemistry.utils.six.moves import range
 import warnings
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -253,7 +254,7 @@ def addCoarseGrain(parm, param_file):
     parm.add_flag('DIHEDRAL_PHASE_4','5E16.8',parm.ptr('nptra'),
                  comments='4th Dihedral Phase for coarse grained force field')
 
-    for i in xrange(len(parm.parm_data['ANGLE_FORCE_CONSTANT'])):
+    for i in range(len(parm.parm_data['ANGLE_FORCE_CONSTANT'])):
         try: 
             index = int(parm.parm_data['ANGLE_FORCE_CONSTANT'][i])
             angl = angle_params[index]
@@ -265,7 +266,7 @@ def addCoarseGrain(parm, param_file):
         parm.parm_data['ANGLE_COEF_C'][i] = angl.ccoef
         parm.parm_data['ANGLE_COEF_D'][i] = angl.dcoef
    
-    for i in xrange(len(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])):
+    for i in range(len(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])):
         try:
             index = int(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][i])
             dihe = dihedral_params[index]

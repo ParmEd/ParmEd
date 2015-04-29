@@ -3,6 +3,7 @@ Provides a class for reading CHARMM-style files. The key component to these
 files is that the ! character is a comment character and everything after ! is
 ignored.
 """
+from chemistry.utils.io import genopen
 from chemistry.exceptions import CharmmFileError
 
 class CharmmFile(object):
@@ -24,11 +25,19 @@ class CharmmFile(object):
         else:
             self.status = 'NEW'
         try:
-            self._handle = open(fname, mode)
+            self._handle = genopen(fname, mode)
         except IOError, e:
             raise CharmmFileError(str(e))
         self.closed = False
         self.line_number = 0
+
+    def __enter__(self):
+        self._handle.__enter__()
+        return self
+
+    def __exit__(self):
+        if not self.closed:
+            self.close()
 
     def tell(self):
         return self._handle.tell()

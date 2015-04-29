@@ -1,7 +1,6 @@
 """
 This module contains classes for reading various TINKER-style files
 """
-from compat24 import all
 from chemistry.exceptions import TinkerKeyFileError, TinkerDynFileError
 
 class KeywordControlFile(object):

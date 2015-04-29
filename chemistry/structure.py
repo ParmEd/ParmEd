@@ -21,12 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division
+from __future__ import division, print_function
 
-try:
-    import bz2
-except ImportError:
-    bz2 = None
 from chemistry.constants import DEG_TO_RAD
 from chemistry.exceptions import (ChemError, MissingParameter,
         MissingParameterWarning)
@@ -42,12 +38,9 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         AcceptorDonor, Group, Atom, ExtraPoint, TwoParticleExtraPointFrame,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from chemistry import unit as u
-from compat24 import wraps
+from chemistry.utils.six import string_types, wraps
+from chemistry.utils.six.moves import zip, range
 import copy
-try:
-    import gzip
-except ImportError:
-    gzip = None
 import math
 import re
 import warnings
@@ -61,11 +54,6 @@ try:
     import pandas as pd
 except ImportError:
     pd = None
-
-try:
-    basestring
-except NameError:
-    basestring = str
 
 # Try to import the OpenMM modules
 try:
@@ -528,7 +516,7 @@ class Structure(object):
         if split_dihedrals:
             for d in self.dihedrals:
                 if hasattr(d.type, '__iter__'):
-                    for i in xrange(len(d.type)):
+                    for i in range(len(d.type)):
                         ie = d.ignore_end or i < len(d.type) - 1
                         ti = d.type.starting_index + i
                         c.dihedrals.append(
@@ -943,7 +931,7 @@ class Structure(object):
             if selection.parm is not self:
                 raise TypeError('passed mask does not belong to Structure')
             sel = selection.Selection()
-        elif isinstance(selection, basestring):
+        elif isinstance(selection, string_types):
             sel = AmberMask(self, selection).Selection()
         else:
             try:
@@ -1014,7 +1002,7 @@ class Structure(object):
 
         # Now we select a subset of atoms. Convert "selection" into a natom list
         # with 0s and 1s, depending on what the input selection is
-        if isinstance(selection, basestring):
+        if isinstance(selection, string_types):
             mask = AmberMask(self, selection)
             selection = mask.Selection()
         elif isinstance(selection, slice):
@@ -1034,7 +1022,7 @@ class Structure(object):
                 for r in self.residues:
                     if r.chain not in chainmap:
                         chainmap[r.chain] = r.idx
-                if isinstance(chainsel, basestring):
+                if isinstance(chainsel, string_types):
                     if chainsel in chainmap:
                         chainset = set([chainsel])
                     else:
@@ -1060,13 +1048,13 @@ class Structure(object):
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
                 resset = set(range(len(self.residues))[ressel])
-            elif isinstance(ressel, basestring) or isinstance(ressel, int):
+            elif isinstance(ressel, string_types) or isinstance(ressel, int):
                 resset = set([ressel])
             else:
                 resset = set(ressel)
             if isinstance(atomsel, slice):
                 atomset = set(range(len(self.atoms))[atomsel])
-            elif isinstance(atomsel, basestring) or isinstance(atomsel, int):
+            elif isinstance(atomsel, string_types) or isinstance(atomsel, int):
                 atomset = set([atomsel])
             else:
                 atomset = set(atomsel)
@@ -2191,7 +2179,7 @@ class Structure(object):
 
     def _prune_empty_bonds(self):
         """ Gets rid of any empty bonds """
-        for i in reversed(xrange(len(self.bonds))):
+        for i in reversed(range(len(self.bonds))):
             bond = self.bonds[i]
             if bond.atom1 is None and bond.atom2 is None:
                 del self.bonds[i]
@@ -2203,7 +2191,7 @@ class Structure(object):
 
     def _prune_empty_angles(self):
         """ Gets rid of any empty angles """
-        for i in reversed(xrange(len(self.angles))):
+        for i in reversed(range(len(self.angles))):
             angle = self.angles[i]
             if (angle.atom1 is None and angle.atom2 is None and
                     angle.atom3 is None):
@@ -2217,7 +2205,7 @@ class Structure(object):
 
     def _prune_empty_dihedrals(self):
         """ Gets rid of any empty dihedrals """
-        for i in reversed(xrange(len(self.dihedrals))):
+        for i in reversed(range(len(self.dihedrals))):
             dihed = self.dihedrals[i]
             if (dihed.atom1 is None and dihed.atom2 is None and
                     dihed.atom3 is None and dihed.atom4 is None):
@@ -2231,7 +2219,7 @@ class Structure(object):
 
     def _prune_empty_ureys(self):
         """ Gets rid of any empty Urey-Bradley terms """
-        for i in reversed(xrange(len(self.urey_bradleys))):
+        for i in reversed(range(len(self.urey_bradleys))):
             ub = self.urey_bradleys[i]
             if ub.atom1 is None and ub.atom2 is None:
                 del self.urey_bradleys[i]
@@ -2243,7 +2231,7 @@ class Structure(object):
 
     def _prune_empty_impropers(self):
         """ Gets rid of any empty improper torsions """
-        for i in reversed(xrange(len(self.impropers))):
+        for i in reversed(range(len(self.impropers))):
             imp = self.impropers[i]
             if (imp.atom1 is None and imp.atom2 is None and imp.atom3 is None
                     and imp.atom4 is None):
@@ -2257,7 +2245,7 @@ class Structure(object):
 
     def _prune_empty_cmaps(self):
         """ Gets rid of any empty CMAP terms """
-        for i in reversed(xrange(len(self.cmaps))):
+        for i in reversed(range(len(self.cmaps))):
             cmap = self.cmaps[i]
             if (cmap.atom1 is None and cmap.atom2 is None and cmap.atom3 is None
                     and cmap.atom4 is None and cmap.atom5 is None):
@@ -2272,7 +2260,7 @@ class Structure(object):
 
     def _prune_empty_trigonal_angles(self):
         """ Gets rid of any empty trigonal angles """
-        for i in reversed(xrange(len(self.trigonal_angles))):
+        for i in reversed(range(len(self.trigonal_angles))):
             ta = self.trigonal_angles[i]
             if (ta.atom1 is None and ta.atom2 is None and ta.atom3 is None and
                     ta.atom4 is None):
@@ -2286,7 +2274,7 @@ class Structure(object):
 
     def _prune_empty_out_of_plane_bends(self):
         """ Gets rid of any empty out-of-plane bends """
-        for i in reversed(xrange(len(self.out_of_plane_bends))):
+        for i in reversed(range(len(self.out_of_plane_bends))):
             oop = self.out_of_plane_bends[i]
             if (oop.atom1 is None and oop.atom2 is None and oop.atom3 is None
                     and oop.atom4 is None):
@@ -2300,7 +2288,7 @@ class Structure(object):
 
     def _prune_empty_pi_torsions(self):
         """ Gets rid of any empty pi-torsions """
-        for i in reversed(xrange(len(self.pi_torsions))):
+        for i in reversed(range(len(self.pi_torsions))):
             pit = self.pi_torsions[i]
             if (pit.atom1 is None and pit.atom2 is None and
                     pit.atom3 is None and pit.atom4 is None and
@@ -2316,7 +2304,7 @@ class Structure(object):
 
     def _prune_empty_stretch_bends(self):
         """ Gets rid of any empty stretch-bend terms """
-        for i in reversed(xrange(len(self.stretch_bends))):
+        for i in reversed(range(len(self.stretch_bends))):
             sb = self.stretch_bends[i]
             if sb.atom1 is None and sb.atom2 is None and sb.atom3 is None:
                 del self.stretch_bends[i]
@@ -2329,7 +2317,7 @@ class Structure(object):
 
     def _prune_empty_torsion_torsions(self):
         """ Gets rid of any empty torsion-torsion terms """
-        for i in reversed(xrange(len(self.torsion_torsions))):
+        for i in reversed(range(len(self.torsion_torsions))):
             tt = self.torsion_torsions[i]
             if (tt.atom1 is None and tt.atom2 is None and tt.atom3 is None
                     and tt.atom4 is None and tt.atom5 is None):
@@ -2344,7 +2332,7 @@ class Structure(object):
 
     def _prune_empty_chiral_frames(self):
         """ Gets rid of any empty chiral frame terms """
-        for i in reversed(xrange(len(self.chiral_frames))):
+        for i in reversed(range(len(self.chiral_frames))):
             cf = self.chiral_frames[i]
             if cf.atom1 is None or cf.atom2 is None:
                 del self.chiral_frames[i]
@@ -2355,7 +2343,7 @@ class Structure(object):
 
     def _prune_empty_multipole_frames(self):
         """ Gets rid of any empty multipole frame terms """
-        for i in reversed(xrange(len(self.multipole_frames))):
+        for i in reversed(range(len(self.multipole_frames))):
             mf = self.multipole_frames[i]
             if mf.atom is None or mf.atom.idx == -1:
                 del self.multipole_frames[i]
@@ -2364,7 +2352,7 @@ class Structure(object):
 
     def _prune_empty_adjusts(self):
         """ Gets rid of any empty nonbonded exception adjustments """
-        for i in reversed(xrange(len(self.adjusts))):
+        for i in reversed(range(len(self.adjusts))):
             adj = self.adjusts[i]
             if adj.atom1 is None or adj.atom2 is None:
                 del self.adjusts[i]
@@ -2450,8 +2438,8 @@ class Structure(object):
         radii = [x * length_conv for x in radii]
 
         if implicitSolvent is app.GBn2:
-            return zip(radii, screen, alpha, beta, gamma)
-        return zip(radii, screen)
+            return list(zip(radii, screen, alpha, beta, gamma))
+        return list(zip(radii, screen))
 
     #===================================================
 

@@ -11,14 +11,10 @@ from chemistry.exceptions import (BondError, DihedralError, CmapError,
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from chemistry.periodic_table import Mass, Element as _Element
 import chemistry.unit as u
-from compat24 import all, property
+from chemistry.utils.six.moves import zip, range
 import copy
 import math
 import warnings
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Must be Python 3... zip _is_ izip
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
@@ -1436,9 +1432,9 @@ class OutOfPlaneExtraPointFrame(object):
             cross = (v12[1]*v13[2] - v12[2]*v13[1],
                      v12[2]*v13[0] - v12[0]*v13[2],
                      v12[0]*v13[1] - v12[1]*v13[0])
-            lencross = math.sqrt(sum([cross[i]*cross[i] for i in xrange(3)]))
-            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in xrange(3)]))
-            v1edotcross = sum([v1e[i]*cross[i] for i in xrange(3)])
+            lencross = math.sqrt(sum([cross[i]*cross[i] for i in range(3)]))
+            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in range(3)]))
+            v1edotcross = sum([v1e[i]*cross[i] for i in range(3)])
             costheta = v1edotcross / (lenv1e*lencross)
             if costheta < 0: weightCross = -weightCross
         return weight / 2, weight / 2, weightCross
@@ -2328,8 +2324,8 @@ class Cmap(object):
     def __init__(self, atom1, atom2, atom3, atom4, atom5, type=None):
         # Make sure we're not CMAPping me to myself
         atmlist = [atom1, atom2, atom3, atom4, atom5]
-        for i in xrange(len(atmlist)):
-            for j in xrange(i+1, len(atmlist)):
+        for i in range(len(atmlist)):
+            for j in range(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
                     raise BondError('Cannot cmap atom to itself!')
         # Set up instances
@@ -2562,7 +2558,7 @@ class _CmapGrid(object):
     def __init__(self, resolution, data=None):
         self.resolution = resolution
         if data is None:
-            self._data = [0 for i in xrange(self.resolution*self.resolution)]
+            self._data = [0 for i in range(self.resolution*self.resolution)]
         else:
             self._data = data
 
@@ -2575,8 +2571,8 @@ class _CmapGrid(object):
             pass
         _transpose = []
         size = len(self._data)
-        for i in xrange(self.resolution):
-            piece = [self[j] for j in xrange(i, size, self.resolution)]
+        for i in range(self.resolution):
+            piece = [self[j] for j in range(i, size, self.resolution)]
             _transpose += piece
         self._transpose = _CmapGrid(self.resolution, _transpose)
         return self._transpose
@@ -2597,7 +2593,7 @@ class _CmapGrid(object):
             self._data[self.resolution*idx[0]+idx[1]] = val
         else:
             try:
-                indices = xrange(*idx.indices(len(self._data)))
+                indices = range(*idx.indices(len(self._data)))
             except AttributeError:
                 self._data[idx] = val
             else:
@@ -2655,9 +2651,9 @@ class _CmapGrid(object):
         res = self.resolution
         mid = res // 2
         newgrid = _CmapGrid(res)
-        for i in xrange(res):
+        for i in range(res):
             ii = (i + mid) % res
-            for j in xrange(res):
+            for j in range(res):
                 jj = (j + mid) % res
                 # Start from the middle
                 newgrid[i, j] = self[ii, jj]
@@ -3538,7 +3534,7 @@ class TrackedList(list):
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
         try:
-            indices = xrange(*item.indices(len(self)))
+            indices = range(*item.indices(len(self)))
         except AttributeError:
             indices = [item]
 
@@ -3558,7 +3554,7 @@ class TrackedList(list):
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
         if not self: return
-        indices = xrange(start, min(stop, len(self)))
+        indices = range(start, min(stop, len(self)))
         for index in indices:
             try:
                 self[index]._idx = -1
@@ -3634,7 +3630,7 @@ class TrackedList(list):
         This method inspects the `used` attribute of all of its members, if it
         has one, and deletes any item in which it is set to `False`
         """
-        for i in reversed(xrange(len(self))):
+        for i in reversed(range(len(self))):
             try:
                 if not self[i].used:
                     del self[i]
@@ -3696,7 +3692,7 @@ class ResidueList(TrackedList):
         avoid including empty residues
         """
         # Delete from the back to avoid indexes changing as we iterate
-        for i in reversed(xrange(len(self))):
+        for i in reversed(range(len(self))):
             res = self[i]
             if res.is_empty(): del self[i]
 
@@ -3716,7 +3712,7 @@ class AtomList(TrackedList):
     def __delitem__(self, idx):
         """ Deleting an atom also needs to delete it from the residue """
         try:
-            indices = xrange(*idx.indices(len(self)))
+            indices = range(*idx.indices(len(self)))
         except AttributeError:
             indices = [idx]
 
@@ -3732,7 +3728,7 @@ class AtomList(TrackedList):
     @_changes
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... sigh. """
-        indices = xrange(start, min(stop, len(self)))
+        indices = range(start, min(stop, len(self)))
         for index in indices:
             atom = self[index]
             atom._idx = -1
@@ -3840,7 +3836,7 @@ class AtomList(TrackedList):
             type1._idx = idx
             atom_type_lookups[str(type1)] = type1
             atom_type_list.append(type1)
-            for j in xrange(i+1, natoms):
+            for j in range(i+1, natoms):
                 atom2 = self[j]
                 type2 = atom2.atom_type
                 # Skip atom types that have already been assigned
@@ -3852,7 +3848,7 @@ class AtomList(TrackedList):
         for atom in self:
             atom.nb_idx = atom.atom_type._idx
         # Now collect the nbfixes
-        nbfix_list = [set() for i in xrange(idx-1)]
+        nbfix_list = [set() for i in range(idx-1)]
         # Look through all of the atom types and add the nbfixes
         for i, type in enumerate(atom_type_list):
             for key in type.nbfix:

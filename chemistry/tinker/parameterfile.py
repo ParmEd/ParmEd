@@ -4,7 +4,6 @@ TINKER-based parameter file.
 """
 from chemistry.exceptions import (AmoebaParamFileError, APIError,
             AmoebaParamFileWarning)
-import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
 from collections import OrderedDict
 import re
 import warnings

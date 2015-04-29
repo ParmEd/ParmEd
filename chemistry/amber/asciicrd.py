@@ -6,34 +6,31 @@ alternatives (like DCD and NetCDF, provided in netcdffiles.py) are strongly
 encouraged, but these are provided for more complete compatibility and for
 instances where the prequisites may not be installed.
 """
-from __future__ import division
-
-from chemistry.formats import io
-from chemistry.formats.registry import FileFormatType
-from chemistry.exceptions import ParsingError
-from compat24 import property
-from math import ceil
-import warnings as _warnings
-
-VELSCALE = 20.455
-ONEVELSCALE = 1 / VELSCALE
+from __future__ import division, print_function
 
 try:
     import bz2
 except ImportError:
     bz2 = None
-
+from chemistry.formats import io
+from chemistry.formats.registry import FileFormatType
+from chemistry.exceptions import ParsingError
+from chemistry.utils.six.moves import range
 try:
     import gzip
 except ImportError:
     gzip = None
-
+from math import ceil
 try:
     import numpy as np
 except ImportError:
-    # If we do not have numpy, use Python-optimized array class instead.
     np = None
     from array import array
+
+import warnings as _warnings
+
+VELSCALE = 20.455
+ONEVELSCALE = 1 / VELSCALE
 
 class _AmberAsciiCoordinateFile(object):
     """ Abstract base class for interacting with ASCII coordinate files """

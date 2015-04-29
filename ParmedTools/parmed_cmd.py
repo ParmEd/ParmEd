@@ -4,6 +4,7 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 
 # Load some system modules that may be useful for various users in shell mode
 from chemistry.amber.readparm import AmberParm
+from chemistry.utils.six.moves import range
 import cmd
 from glob import glob
 import os
@@ -226,7 +227,7 @@ class ParmedCmd(cmd.Cmd):
             for line in _COMMANDLOGS:
                 self.stdout.write('%s\n' % line)
         else:
-            for i in xrange(readline.get_current_history_length()):
+            for i in range(readline.get_current_history_length()):
                 self.stdout.write('%s\n' % readline.get_history_item(i+1))
 
     def default(self, line):
