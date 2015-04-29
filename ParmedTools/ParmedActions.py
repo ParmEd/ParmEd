@@ -238,9 +238,9 @@ class parmout(Action):
     """
     Final prmtop written after all actions are complete
     """
-    usage = '<prmtop_name> [<inpcrd_name>] [netcdf]'
+    usage = '<prmtop_name> [<inpcrd_name>] [netcdf] [vmd]'
     supported_subclasses = (AmberParm,)
-
+    
     def init(self, arg_list):
         self.filename = arg_list.get_next_string()
         self.rst_name = arg_list.get_next_string(optional=True)
@@ -248,6 +248,10 @@ class parmout(Action):
             self.netcdf = True
         else:
             self.netcdf = None
+        if arg_list.has_key('vmd'):
+            self.vmd = True
+        else:
+            self.vmd = None
 
     def __str__(self):
         if self.rst_name is not None:
@@ -261,6 +265,8 @@ class parmout(Action):
         if self.rst_name is not None:
             if not Action.overwrite and os.path.exists(self.rst_name):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
+        if self.vmd is not None:
+            self.parm.convert_to_vmd_compat()
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
             self.parm.write_rst7(self.rst_name, netcdf=self.netcdf)
@@ -3628,6 +3634,7 @@ class chamber(Action):
                       before applying it. This might lead to larger prmtop
                       files, but for large parameter sets will dramatically
                       shorten the running time of the chamber action
+        - -vmd        Writes a VMD-compatible prmtop file
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3635,7 +3642,7 @@ class chamber(Action):
     """
     usage = ('-top <RTF> -param <PAR> [-str <STR>] -psf <PSF> [-crd <CRD>] '
              '[-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii '
-             '<radiusset>]')
+             '<radiusset>] [-vmd]')
     needs_parm = False
 
     def init(self, arg_list):
@@ -3738,6 +3745,7 @@ class chamber(Action):
             raise InputError('Illegal radius set %s -- must be one of '
                              '%s' % (self.radii, ', '.join(GB_RADII)))
         self.condense = not arg_list.has_key('nocondense')
+        self.vmd_compat = arg_list.has_key('-vmd')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3762,6 +3770,8 @@ class chamber(Action):
         elif self.box is not None:
             retstr += ' Box info %s.' % (self.box)
         retstr += ' GB Radius set %s.' % self.radii
+        if self.vmd_compat:
+            retstr += ' Writing VMD compatible prmtop'
         return retstr
 
     def execute(self):
@@ -3886,6 +3896,7 @@ class chamber(Action):
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset)
         parm.name = self.psf
+        parm.vmd_compat = self.vmd_compat
         changeRadii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
         self.parm = parm
