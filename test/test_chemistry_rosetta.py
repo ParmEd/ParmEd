@@ -1,4 +1,5 @@
 from chemistry import read_PDB, load_rosetta
+from itertools import chain
 from utils import get_fn, skipIf
 import unittest
 
@@ -19,6 +20,24 @@ def _unpackLen(obj):
 @skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):
     """ Tests loading of a Rosetta pose object """
+
+    def testLoadedPositions(self):
+        """ Test that positions were properly loaded"""
+
+        init()
+        seq = 3*'A'
+        pose = pose_from_sequence(seq)
+
+        struct = load_rosetta(pose)
+
+        posexyz = list(
+            chain(*[[tuple(atom.xyz()) for atom in res.atoms()]
+                    for res in [pose.residue(idx)
+                                for idx in range(1, len(seq)+1)]]))
+
+        structxyz = [(atom.xx, atom.xy, atom.xz) for atom in struct.atoms]
+
+        self.assertEqual(posexyz, structxyz)
 
     def testLoadStruct(self):
         """ Test load_rosetta against read_PDB"""
