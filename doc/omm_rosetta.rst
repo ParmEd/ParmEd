@@ -68,7 +68,7 @@ start simulating our ParmEd :class:`Structure`::
     system.addForce(MonteCarloBarostat(1*bar, 300*kelvin))
 
     simulation = Simulation(mod.topology, system, integrator)
-    simulation.context.setPositions(positions)
+    simulation.context.setPositions(mod.positions)
 
     # Minimize System
     simulation.minimizeEnergy(maxIterations=1000)
