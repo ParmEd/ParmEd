@@ -4,6 +4,9 @@ Seeding OpenMM Simulations with PyRosetta and ParmEd
 In this example, we'll go over starting a small protein
 (dodeca-alanine) simulation from scratch, using PyRosetta and OpenMM.
 
+You can also follow along with the script called
+:code:`simulate_ala12_mutant.py` in :code:`examples/rosetta/`.
+
 Generate pose from primary structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
