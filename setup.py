@@ -10,7 +10,8 @@ packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
 packages += ['chemistry', 'chemistry.amber', 'chemistry.modeller',
              'chemistry.tinker', 'chemistry.unit', 'chemistry.amber.mdin',
              'chemistry.charmm', 'chemistry.formats.pdbx', 'chemistry.rosetta',
-             'chemistry.formats', 'fortranformat', 'chemistry.openmm']
+             'chemistry.formats', 'fortranformat', 'chemistry.openmm',
+             'chemistry.utils']
 
 # Scripts
 scripts = ['parmed.py', 'xparmed.py']
