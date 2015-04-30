@@ -100,11 +100,12 @@ def load_file(filename, **kwargs):
         raise IOError('%s does not have read permissions set' % filename)
 
     for name, cls in iteritems(PARSER_REGISTRY):
-        if not hasattr(cls, 'id_format'): continue
+        if not hasattr(cls, 'id_format'):
+            continue
         try:
             if cls.id_format(filename):
                 break
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as e:
             continue
     else:
         # We found no file format

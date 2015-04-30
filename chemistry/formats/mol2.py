@@ -10,11 +10,12 @@ from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond
 from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
 import copy
 
+@add_metaclass(FileFormatType)
 class Mol2File(object):
     """ Class to read and write TRIPOS Mol2 files """
-    __metaclass__ = FileFormatType
 
     #===================================================
 

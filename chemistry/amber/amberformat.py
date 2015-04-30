@@ -10,7 +10,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
 from chemistry.exceptions import FlagError
 from chemistry.formats.registry import FileFormatType
 from chemistry.utils.io import genopen
-from chemistry.utils.six import wraps, string_types
+from chemistry.utils.six import wraps, string_types, add_metaclass
 from chemistry.utils.six.moves import range
 from contextlib import closing
 from copy import copy
@@ -250,6 +250,7 @@ class FortranFormat(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+@add_metaclass(FileFormatType)
 class AmberFormat(object):
     """ 
     A class that can parse and print files stored in the Amber topology or MDL
@@ -299,8 +300,6 @@ class AmberFormat(object):
     name : str
         The file name of the originally parsed file (set to the fname parameter)
     """
-    __metaclass__ = FileFormatType
-   
     #===================================================
 
     @staticmethod

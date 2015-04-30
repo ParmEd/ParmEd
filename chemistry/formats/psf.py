@@ -7,8 +7,10 @@ from chemistry.charmm import CharmmPsfFile
 from chemistry.charmm.psf import set_molecules
 from chemistry.formats.registry import FileFormatType
 from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
 from chemistry.utils.six.moves import range
 
+@add_metaclass(FileFormatType)
 class PSFFile(object):
     """
     CHARMM- or XPLOR-style PSF file parser and writer. This class is
@@ -17,8 +19,6 @@ class PSFFile(object):
     directly, use :class:`chemistry.charmm.CharmmPsfFile` or the
     :func:`chemistry.formats.load_file` function instead.
     """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -244,5 +244,3 @@ class PSFFile(object):
         # If we opened our own handle, close it
         if own_handle:
             dest.close()
-
-    #===================================================

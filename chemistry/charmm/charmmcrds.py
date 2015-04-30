@@ -13,6 +13,7 @@ from chemistry.utils import io
 from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import CharmmFileError
 from chemistry import unit as u
+from chemistry.utils.six import add_metaclass
 from chemistry.utils.six.moves import range
 from contextlib import closing
 import sys
@@ -21,6 +22,7 @@ charmlen = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
 ONE_TIMESCALE = 1 / TIMESCALE
 
+@add_metaclass(FileFormatType)
 class CharmmCrdFile(object):
     """
     Reads and parses a CHARMM coordinate file (.crd) into its components,
@@ -48,7 +50,6 @@ class CharmmCrdFile(object):
     >>> print('%d atoms; %d coords' % (chm.natom, len(chm.coords)))
     1414 atoms; 4242 coords
     """
-    __metaclass__ = FileFormatType
 
     @staticmethod
     def id_format(filename):
@@ -175,6 +176,7 @@ class CharmmCrdFile(object):
             except (ValueError, IndexError):
                 raise CharmmFileError('Error parsing CHARMM coordinate file')
 
+@add_metaclass(FileFormatType)
 class CharmmRstFile(object):
     """
     Reads and parses data, velocities and coordinates from a CHARMM restart
@@ -216,7 +218,6 @@ class CharmmRstFile(object):
     >>> print('%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv))
     256 atoms; 768 crds; 768 old crds; 768 vels
     """
-    __metaclass__ = FileFormatType
 
     @staticmethod
     def id_format(filename):

@@ -12,7 +12,7 @@ from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from chemistry import periodic_table as pt
 from chemistry.utils.io import genopen
-from chemistry.utils.six import string_types
+from chemistry.utils.six import string_types, add_metaclass
 from collections import OrderedDict
 from contextlib import closing
 try:
@@ -22,13 +22,12 @@ except ImportError:
 import re
 import warnings
 
+@add_metaclass(FileFormatType)
 class AmberOFFLibrary(object):
     """
     Class containing static methods responsible for parsing and writing OFF
     libraries
     """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     # Useful regexes

@@ -18,7 +18,7 @@ from __future__ import division, print_function, absolute_import
 
 from chemistry.formats.registry import FileFormatType
 from chemistry import unit as u
-from chemistry.utils.six import wraps
+from chemistry.utils.six import wraps, add_metaclass
 import warnings
 # This determines which NetCDF package we're going to use...
 NETCDF_PACKAGE = None
@@ -215,9 +215,9 @@ def needs_netcdf(fcn):
         return fcn(*args, **kwargs)
     return new_fcn
 
+@add_metaclass(FileFormatType)
 class NetCDFRestart(object):
     """ Class to read or write NetCDF restart files """
-    __metaclass__ = FileFormatType
 
     @staticmethod
     def id_format(filename):
@@ -537,6 +537,7 @@ class NetCDFRestart(object):
         except AttributeError:
             pass
 
+@add_metaclass(FileFormatType)
 class NetCDFTraj(object):
     """ Class to read or write NetCDF restart files
 
@@ -554,7 +555,6 @@ class NetCDFTraj(object):
     You should use the open_new and open_old alternative constructors instead of
     the default constructor
     """
-    __metaclass__ = FileFormatType
 
     @staticmethod
     def id_format(filename):

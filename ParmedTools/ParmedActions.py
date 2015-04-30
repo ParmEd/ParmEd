@@ -12,7 +12,7 @@ from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.formats import PDBFile, CIFFile, Mol2File
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
-from chemistry.utils.six import iteritems, string_types
+from chemistry.utils.six import iteritems, string_types, add_metaclass
 from chemistry.utils.six.moves import zip, range
 import copy
 import math
@@ -75,6 +75,7 @@ lawsuit = object
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+@add_metaclass(ActionType)
 class Action(lawsuit):
     """
     The base class for all ParmEd actions. The metaclass for Action adds the
@@ -103,7 +104,6 @@ class Action(lawsuit):
     not_supported : tuple
         These classes are *not* supported (supplements supported_subclasses)
     """
-    __metaclass__ = ActionType
     stderr = sys.stderr
     # Does this action need a populated parm_list? If yes, bail out if it's
     # unpopulated

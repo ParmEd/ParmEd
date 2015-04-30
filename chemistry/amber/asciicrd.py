@@ -11,6 +11,7 @@ from __future__ import division, print_function, absolute_import
 from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import ParsingError
 from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
 from chemistry.utils.six.moves import range
 from math import ceil
 try:
@@ -24,6 +25,7 @@ import warnings as _warnings
 VELSCALE = 20.455
 ONEVELSCALE = 1 / VELSCALE
 
+@add_metaclass(FileFormatType)
 class _AmberAsciiCoordinateFile(object):
     """
     Abstract base class for interacting with ASCII coordinate files.
@@ -43,7 +45,6 @@ class _AmberAsciiCoordinateFile(object):
     title : str, optional
         Title to write to a new trajectory (when mode='w')
     """
-    __metaclass__ = FileFormatType
 
     DEFAULT_TITLE = None
     CRDS_PER_LINE = None
