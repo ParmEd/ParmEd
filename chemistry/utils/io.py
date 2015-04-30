@@ -14,6 +14,7 @@ try:
 except ImportError:
     gzip = None
 from io import TextIOWrapper
+from chemistry.utils.six import PY2
 
 def genopen(name, mode='r', buffering=None):
     """
@@ -45,9 +46,15 @@ def genopen(name, mode='r', buffering=None):
         if bz2 is None:
             raise ImportError('bz2 unavailable; cannot read %s' % name)
         if buffering is not None:
-            return TextIOWrapper(bz2.BZ2File(name, mode, buffering))
+            if PY2:
+                return bz2.BZ2File(name, mode, buffering)
+            else:
+                return TextIOWrapper(bz2.BZ2File(name, mode, buffering))
         else:
-            return TextIOWrapper(bz2.BZ2File(name, mode))
+            if PY2:
+                return bz2.BZ2File(name, mode)
+            else:
+                return TextIOWrapper(bz2.BZ2File(name, mode))
     elif name.endswith('.gz'):
         if gzip is None:
             raise ImportError('gzip is unavailable; cannot read %s' % name)
