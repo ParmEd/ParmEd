@@ -2,6 +2,7 @@
 Contains all of the class objects for the Tinker topology
 """
 from __future__ import division
+from chemistry.utils.six.moves import range, zip
 from collections import OrderedDict
 
 class Atom(object):
@@ -226,9 +227,9 @@ class TorsionAngle(object):
             raise TypeError('TorsionAngle expects an equal number of '
                             'Amplitudes, phases, and periodicities.')
         nterms = len(args) // 3
-        self.amplitude = tuple([float(args[3*i]) for i in xrange(nterms)])
-        self.phase = tuple([float(args[3*i+1]) for i in xrange(nterms)])
-        self.periodicity = tuple([int(args[3*i+2]) for i in xrange(nterms)])
+        self.amplitude = tuple([float(args[3*i]) for i in range(nterms)])
+        self.phase = tuple([float(args[3*i+1]) for i in range(nterms)])
+        self.periodicity = tuple([int(args[3*i+2]) for i in range(nterms)])
         if (len(self.amplitude) != len(self.phase) or
                 len(self.amplitude) != len(self.periodicity)):
             raise RuntimeError('BUGBUG!! Inconsistent # of terms in torsion')
@@ -253,7 +254,7 @@ class TorsionAngle(object):
             )
         retstr = 'TorsionAngle %r --- %r --- %r --- %r' % (self.atom1,
                 self.atom2, self.atom3, self.atom4)
-        seq = xrange(len(self.amplitude))
+        seq = range(len(self.amplitude))
         for i, amp, phase, per in enumerate(zip(seq, self.amplitude, self.phase,
                                                 self.periodicity)):
             retstr += ('\n   Term %d\n'
