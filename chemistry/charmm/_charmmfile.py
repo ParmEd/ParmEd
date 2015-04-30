@@ -26,7 +26,7 @@ class CharmmFile(object):
             self.status = 'NEW'
         try:
             self._handle = genopen(fname, mode)
-        except IOError, e:
+        except IOError as e:
             raise CharmmFileError(str(e))
         self.closed = False
         self.line_number = 0

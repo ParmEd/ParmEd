@@ -240,11 +240,11 @@ class PDBFile(object):
                         if res_hex:
                             try:
                                 resid = int(resid, 16)
-                            except ValueError, e:
+                            except ValueError:
                                 if resid == '****':
                                     resid = None # Figure out by unique atoms
                                 else:
-                                    raise e
+                                    raise
                         elif resid == '1000' and line[26] == '0':
                             resend += 1
                             resid = 10000

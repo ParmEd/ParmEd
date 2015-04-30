@@ -291,7 +291,7 @@ class Mol2File(object):
                 return rescont
             else:
                 return restemp
-        except ValueError, e:
+        except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
         finally:
             f.close()

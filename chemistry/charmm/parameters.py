@@ -430,7 +430,7 @@ class CharmmParameterSet(object):
                     # soldier on
                     if not read_first_nonbonded: continue
                     raise CharmmFileError('Could not parse nonbonded terms.')
-                except CharmmFileError, e:
+                except CharmmFileError as e:
                     if not read_first_nonbonded: continue
                     raise CharmmFileError(str(e))
                 else:

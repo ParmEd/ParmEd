@@ -59,9 +59,15 @@ def genopen(name, mode='r', buffering=None):
         if gzip is None:
             raise ImportError('gzip is unavailable; cannot read %s' % name)
         if buffering is not None:
-            return TextIOWrapper(gzip.open(name, mode, buffering))
+            if PY2:
+                return gzip.open(name, mode, buffering)
+            else:
+                return TextIOWrapper(gzip.open(name, mode, buffering))
         else:
-            return TextIOWrapper(gzip.open(name, mode))
+            if PY2:
+                return gzip.open(name, mode, buffering)
+            else:
+                return TextIOWrapper(gzip.open(name, mode))
 
     if buffering is not None:
         return open(name, mode, buffering)

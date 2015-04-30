@@ -33,7 +33,7 @@ def _catchindexerror(func):
         """ Catch the index error """
         try:
             return func(*args, **kwargs)
-        except IndexError, e:
+        except IndexError as e:
             raise CharmmPSFError('Array is too short: %s' % e)
 
     return newfunc
