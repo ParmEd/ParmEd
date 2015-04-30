@@ -25,31 +25,30 @@ VELSCALE = 20.455
 ONEVELSCALE = 1 / VELSCALE
 
 class _AmberAsciiCoordinateFile(object):
-    """ Abstract base class for interacting with ASCII coordinate files """
+    """
+    Abstract base class for interacting with ASCII coordinate files.
+    Opens a new ASCII coordinate file and either parses it (loading
+    everything into memory) or sets it up for writing.
+
+    Parameters
+    ----------
+    fname : str
+        File name to open
+    natom : int
+        Number of atoms in the system
+    hasbox : bool
+        Does the system have PBCs?
+    mode : str={'r', 'w'}
+        Whether to open this file for 'r'eading or 'w'riting
+    title : str, optional
+        Title to write to a new trajectory (when mode='w')
+    """
     __metaclass__ = FileFormatType
 
     DEFAULT_TITLE = None
     CRDS_PER_LINE = None
 
     def __init__(self, fname, natom, hasbox, mode='r', title=None):
-        """
-        Opens a new Mdcrd file and either parses it (loading everything into
-        memory) or sets it up for writing.
-
-        Parameters
-        ----------
-        fname : str
-            File name to open
-        natom : int
-            Number of atoms in the system
-        hasbox : bool
-            Does the system have PBCs?
-        mode : str={'r', 'w'}
-            Whether to open this file for 'r'eading or 'w'riting
-        title : str, optional
-            Title to write to a new trajectory (when mode='w')
-        """
-
         if mode == 'r':
             self._status = 'old'
         elif mode == 'w':

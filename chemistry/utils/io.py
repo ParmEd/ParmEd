@@ -40,35 +40,33 @@ def genopen(name, mode='r', buffering=None):
     if mode not in ['w', 'r']:
         raise ValueError('open mode must be "w" or "r"')
 
-    mode += 'b'
-
     if name.endswith('.bz2'):
         if bz2 is None:
             raise ImportError('bz2 unavailable; cannot read %s' % name)
         if buffering is not None:
             if PY2:
-                return bz2.BZ2File(name, mode, buffering)
+                return bz2.BZ2File(name, mode+'b', buffering)
             else:
-                return TextIOWrapper(bz2.BZ2File(name, mode, buffering))
+                return TextIOWrapper(bz2.BZ2File(name, mode+'b', buffering))
         else:
             if PY2:
-                return bz2.BZ2File(name, mode)
+                return bz2.BZ2File(name, mode+'b')
             else:
-                return TextIOWrapper(bz2.BZ2File(name, mode))
+                return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
     elif name.endswith('.gz'):
         if gzip is None:
             raise ImportError('gzip is unavailable; cannot read %s' % name)
         if buffering is not None:
             if PY2:
-                return gzip.open(name, mode, buffering)
+                return gzip.open(name, mode+'b', buffering)
             else:
-                return TextIOWrapper(gzip.open(name, mode, buffering))
+                return TextIOWrapper(gzip.open(name, mode+'b', buffering))
         else:
             if PY2:
-                return gzip.open(name, mode, buffering)
+                return gzip.open(name, mode+'b', buffering)
             else:
-                return TextIOWrapper(gzip.open(name, mode))
+                return TextIOWrapper(gzip.open(name, mode+'b'))
 
     if buffering is not None:
-        return open(name, mode, buffering)
+        return TextIOWrapper(open(name, mode+'b', buffering))
     return open(name, mode)
