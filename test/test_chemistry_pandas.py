@@ -8,13 +8,14 @@ from chemistry import load_file
 from chemistry.topologyobjects import Atom
 import os
 import unittest
-from utils import get_fn
+from utils import get_fn, skipIf
 try:
     import pandas as pd
     import numpy as np
 except ImportError:
     pd = np = None
 
+@skipIf(pd is None or np is None, "Cannot test without pandas")
 class TestStructureDataFrame(unittest.TestCase):
     """ Tests the conversion of chemistry.Structure to a pd.DataFrame """
 
@@ -221,6 +222,5 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertNotIn('polarizability', df)
         self.assertNotIn('vdw_parent', df)
 
-# Skip this test if pandas is not installed
-if pd is None or np is None:
-    del TestStructureDataFrame
+if __name__ == '__main__':
+    unittest.main()

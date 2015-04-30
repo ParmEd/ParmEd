@@ -11,10 +11,11 @@ from chemistry.structure import Structure
 from chemistry.topologyobjects import *
 from chemistry import unit
 from chemistry.residue import *
-from chemistry import amber, charmm, tinker, openmm
+from chemistry import amber, charmm, tinker, openmm, rosetta
 from chemistry import formats
 load_file = formats.load_file
 read_PDB = formats.PDBFile.parse
 read_CIF = formats.CIFFile.parse
 write_PDB = formats.PDBFile.write
 write_CIF = formats.CIFFile.write
+load_rosetta = rosetta.RosettaPose.load

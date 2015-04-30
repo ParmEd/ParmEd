@@ -296,6 +296,18 @@ class TestCharmmPsf(unittest.TestCase):
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
 
+    def testInscodePSF(self):
+        """ Test PSF with insertion code as part of residue number """
+        cpsf = psf.CharmmPsfFile(get_fn('4TVP-dmj_wat-ion.psf'))
+        self.assertEqual(len(cpsf.atoms), 66264)
+        self.assertEqual(len(cpsf.residues), 20169)
+        self.assertEqual(len(cpsf.bonds), 46634)
+        self.assertEqual(len(cpsf.angles), 32739)
+        self.assertEqual(len(cpsf.dihedrals), 19104)
+        self.assertEqual(len(cpsf.impropers), 1257)
+        self.assertEqual(len(cpsf.cmaps), 447)
+        self.assertEqual(cpsf.residues[281].insertion_code, 'A')
+
 class TestCharmmParameters(unittest.TestCase):
     """ Test CHARMM Parameter file parsing """
     
@@ -325,6 +337,28 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(len(params.nbfix_types), 0)
         self.assertEqual(len(params.parametersets), 1)
         self.assertEqual(len(params.urey_bradley_types), 685)
+        # Look at the parsed residue templates and make sure they line up
+        self.assertEqual(len(params.residues), 32)
+        self.assertEqual(set(params.residues.keys()),
+                set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
+                     'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
+                     'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
+                     'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
+        )
+        self.assertEqual(len(params.patches), 22)
+        for resname, res in params.residues.items():
+            if resname in ('TIP3', 'TP3M', 'SOD', 'MG', 'CLA', 'POT', 'CES',
+                    'CAL', 'ZN2', 'ALAD'):
+                self.assertIs(res.first_patch, None)
+                self.assertIs(res.last_patch, None)
+                continue
+            self.assertIs(res.last_patch, params.patches['CTER'])
+            if resname == 'GLY':
+                self.assertIs(res.first_patch, params.patches['GLYP'])
+            elif resname == 'PRO':
+                self.assertIs(res.first_patch, params.patches['PROP'])
+            else:
+                self.assertIs(res.first_patch, params.patches['NTER'])
         # Look at the number of unique terms
         def uniques(stuff):
             myset = set()

@@ -165,3 +165,6 @@ class CpinInputError(ChemError):
 
 class FormatNotFound(ChemError):
     """ If the file format does not have a registered parser with it """
+
+class RosettaError(ChemError):
+    """ If there is a problem loading a Rosetta pose object """

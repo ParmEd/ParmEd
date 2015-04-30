@@ -70,6 +70,35 @@ if not hasattr(unittest.TestCase, 'assertIsInstance'):
 
     unittest.TestCase = TestCase
 
+try:
+    skipIf = unittest.skipIf
+except AttributeError:
+    # Fake it for Python 2.6 and earlier... not pretty
+    def skipIf(condition, message):
+        def decorator(func):
+            if isinstance(func, type):
+                # Class -- wrap all of its test attributes with skipIf's
+                # (modifying in-place), then return the original, modified class
+                if condition:
+                    for attr in dir(func):
+                        if attr.lower().startswith('test'):
+                            testFunc = getattr(func, attr)
+                            setattr(func, attr, skipIf(testFunc))
+                return func
+            # It's a method -- so wrap it
+            if condition:
+                def wrapped(*args, **kwargs):
+                    return func(*args, **kwargs)
+            else:
+                def wrapped(*args, **kwargs):
+                    sys.stdout.write('SKIP: %s' % message)
+                    return
+            return wrapped
+        return decorator
+
+def skip_big_tests():
+    return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+
 class TestCaseRelative(unittest.TestCase):
 
     def assertRelativeEqual(self, val1, val2, places=7, delta=None):

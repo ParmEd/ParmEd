@@ -21,6 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 from __future__ import division
+try:
+    from itertools import izip as zip
+except ImportError:
+    # This only happens in Python 3, where zip is equivalent to izip
+    pass
 
 from compat24 import property
 from chemistry.amber._amberparm import AmberParm
@@ -386,12 +391,11 @@ class AmoebaParm(AmberParm):
             raise AmoebaError('Bond degree (%d) does not make sense with %d '
                               'coefficients' % (self.bond_types.degree,
                               len(self.bond_types.coeffs)))
-        nbond = data['AMOEBA_REGULAR_BOND_NUM_LIST'][0]
-        blist = self.parm_data['AMOEBA_REGULAR_BOND_LIST']
-        for i in xrange(0, 3*nbond, 3):
+        it = iter(self.parm_data['AMOEBA_REGULAR_BOND_LIST'])
+        for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[blist[i]-1], self.atoms[blist[i+1]-1],
-                         self.bond_types[blist[i+2]-1])
+                    Bond(self.atoms[i-1], self.atoms[j-1],
+                         self.bond_types[k-1])
             )
 
     #=============================================
@@ -411,13 +415,11 @@ class AmoebaParm(AmberParm):
             raise AmoebaError('Angle degree (%d) does not make sense with %d '
                               'coefficients' % (self.angle_types.degree,
                               len(self.angle_types.coeffs)))
-        nang = data['AMOEBA_REGULAR_ANGLE_NUM_LIST'][0]
-        alist = data['AMOEBA_REGULAR_ANGLE_LIST']
-        for i in xrange(0, 4*nang, 4):
+        it = iter(data['AMOEBA_REGULAR_ANGLE_LIST'])
+        for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[alist[i]-1], self.atoms[alist[i+1]-1],
-                          self.atoms[alist[i+2]-1],
-                          self.angle_types[alist[i+3]-1])
+                    Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                          self.angle_types[l-1])
             )
 
     #=============================================
@@ -440,13 +442,11 @@ class AmoebaParm(AmberParm):
         if len(coeffs) != degree + 1:
             raise AmoebaError('Urey-Bradley degree (%d) does not make sense '
                               'with %d coefficients' % (degree, len(coeffs)))
-        nurey = data['AMOEBA_UREY_BRADLEY_NUM_LIST'][0]
-        ulist = data['AMOEBA_UREY_BRADLEY_LIST']
-        for i in xrange(0, 3*nurey, 3):
+        it = iter(data['AMOEBA_UREY_BRADLEY_LIST'])
+        for i, j, k in zip(it, it, it):
             self.urey_bradleys.append(
-                    UreyBradley(self.atoms[ulist[i]-1],
-                                self.atoms[ulist[i+1]-1],
-                                self.urey_bradley_types[ulist[i+2]-1])
+                    UreyBradley(self.atoms[i-1], self.atoms[j-1],
+                                self.urey_bradley_types[k-1])
             )
 
     #=============================================
@@ -469,15 +469,12 @@ class AmoebaParm(AmberParm):
         if len(coeffs) != degree + 1:
             raise AmoebaError('Trigonal Angle degree (%d) does not make sense '
                               'with %d coefficients' % (degree, len(coeffs)))
-        nang = data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'][0]
-        alist = data['AMOEBA_TRIGONAL_ANGLE_LIST']
-        for i in xrange(0, 5*nang, 5):
+        it = iter(data['AMOEBA_TRIGONAL_ANGLE_LIST'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
             self.trigonal_angles.append(
-                    TrigonalAngle(self.atoms[alist[i  ]-1],
-                                  self.atoms[alist[i+1]-1],
-                                  self.atoms[alist[i+2]-1],
-                                  self.atoms[alist[i+3]-1],
-                                  self.trigonal_angle_types[alist[i+4]-1])
+                    TrigonalAngle(self.atoms[i-1], self.atoms[j-1],
+                                  self.atoms[k-1], self.atoms[l-1],
+                                  self.trigonal_angle_types[m-1])
             )
 
     #=============================================
@@ -499,15 +496,12 @@ class AmoebaParm(AmberParm):
         if len(coeffs) != degree + 1:
             raise AmoebaError('OOP-bend angle degree (%d) does not make sense '
                               'with %d coefficients.' % (degree, len(coeffs)))
-        nang = data['AMOEBA_OPBEND_ANGLE_NUM_LIST'][0]
-        alist = data['AMOEBA_OPBEND_ANGLE_LIST']
-        for i in xrange(0, 5*nang, 5):
+        it = iter(data['AMOEBA_OPBEND_ANGLE_LIST'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
             self.out_of_plane_bends.append(
-                    OutOfPlaneBend(self.atoms[alist[i  ]-1],
-                                   self.atoms[alist[i+1]-1],
-                                   self.atoms[alist[i+2]-1],
-                                   self.atoms[alist[i+3]-1],
-                                   self.out_of_plane_bend_types[alist[i+4]-1])
+                    OutOfPlaneBend(self.atoms[i-1], self.atoms[j-1],
+                                   self.atoms[k-1], self.atoms[l-1],
+                                   self.out_of_plane_bend_types[m-1])
             )
 
     #=============================================
@@ -524,13 +518,11 @@ class AmoebaParm(AmberParm):
             self.dihedral_types.append(
                     DihedralType(k, per, phase, list=self.dihedral_types)
             )
-        nphi = data['AMOEBA_TORSION_NUM_LIST'][0]
-        dlist = data['AMOEBA_TORSION_LIST']
-        for i in xrange(0, 5*nphi, 5):
+        it = iter(data['AMOEBA_TORSION_LIST'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
             self.dihedrals.append(
-                    Dihedral(self.atoms[dlist[i]-1], self.atoms[dlist[i+1]-1],
-                             self.atoms[dlist[i+2]-1], self.atoms[dlist[i+3]-1],
-                             type=self.dihedral_types[dlist[i+4]-1])
+                    Dihedral(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                             self.atoms[l-1], type=self.dihedral_types[m-1])
             )
 
     #=============================================
@@ -547,17 +539,12 @@ class AmoebaParm(AmberParm):
             self.pi_torsion_types.append(
                     DihedralType(k, per, phase, list=self.pi_torsion_types)
             )
-        nphi = data['AMOEBA_PI_TORSION_NUM_LIST'][0]
-        tlist = data['AMOEBA_PI_TORSION_LIST']
-        for i in xrange(0, 7*nphi, 7):
+        it = iter(data['AMOEBA_PI_TORSION_LIST'])
+        for i, j, k, l, m, n, o in zip(it, it, it, it, it, it, it):
             self.pi_torsions.append(
-                    PiTorsion(self.atoms[tlist[i  ]-1],
-                              self.atoms[tlist[i+1]-1],
-                              self.atoms[tlist[i+2]-1],
-                              self.atoms[tlist[i+3]-1],
-                              self.atoms[tlist[i+4]-1],
-                              self.atoms[tlist[i+5]-1],
-                              self.pi_torsion_types[tlist[i+6]-1])
+                    PiTorsion(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                              self.atoms[l-1], self.atoms[m-1], self.atoms[n-1],
+                              self.pi_torsion_types[o-1])
             )
 
     #=============================================
@@ -587,14 +574,11 @@ class AmoebaParm(AmberParm):
                         StretchBendType(a, b, c, d, e,
                                 list=self.stretch_bend_types)
                 )
-        nstrbnd = data['AMOEBA_STRETCH_BEND_NUM_LIST'][0]
-        slist = data['AMOEBA_STRETCH_BEND_LIST']
-        for i in xrange(0, 4*nstrbnd, 4):
+        it = iter(data['AMOEBA_STRETCH_BEND_LIST'])
+        for i, j, k, l in zip(it, it, it, it):
             self.stretch_bends.append(
-                    StretchBend(self.atoms[slist[i  ]-1],
-                                self.atoms[slist[i+1]-1],
-                                self.atoms[slist[i+2]-1],
-                                self.stretch_bend_types[slist[i+3]-1])
+                    StretchBend(self.atoms[i-1], self.atoms[j-1],
+                                self.atoms[k-1], self.stretch_bend_types[l-1])
             )
 
     #=============================================
@@ -620,16 +604,13 @@ class AmoebaParm(AmberParm):
                                        dfda2, d2fda1da2,
                                        list=self.torsion_torsion_types)
             )
-        ntor = data['AMOEBA_TORSION_TORSION_NUM_LIST'][0]
-        tlist = data['AMOEBA_TORSION_TORSION_LIST']
-        for i in xrange(0, 6*ntor, 6):
+        it = iter(data['AMOEBA_TORSION_TORSION_LIST'])
+        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
             self.torsion_torsions.append(
-                    TorsionTorsion(self.atoms[tlist[i  ]-1],
-                                   self.atoms[tlist[i+1]-1],
-                                   self.atoms[tlist[i+2]-1],
-                                   self.atoms[tlist[i+3]-1],
-                                   self.atoms[tlist[i+4]-1],
-                                   self.torsion_torsion_types[tlist[i+5]-1])
+                    TorsionTorsion(self.atoms[i-1], self.atoms[j-1],
+                                   self.atoms[k-1], self.atoms[l-1],
+                                   self.atoms[m-1],
+                                   self.torsion_torsion_types[n-1])
             )
 
     #=============================================
@@ -639,25 +620,19 @@ class AmoebaParm(AmberParm):
         data = self.parm_data
         del self.chiral_frames[:]
         try:
-            nframe = data['AMOEBA_CHIRAL_FRAME_NUM_LIST'][0]
-            framelist = data['AMOEBA_CHIRAL_FRAME_LIST']
-            for i in xrange(0, 3*nframe, 3):
+            it = iter(data['AMOEBA_CHIRAL_FRAME_LIST'])
+            for i, j, k in zip(it, it, it):
                 self.chiral_frames.append(
-                        ChiralFrame(self.atoms[framelist[i  ]-1],
-                                    self.atoms[framelist[i+1]-1],
-                                    framelist[i+2])
+                        ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
                 )
         except KeyError:
             pass
         del self.multipole_frames[:]
         try:
-            nframe = data['AMOEBA_FRAME_DEF_NUM_LIST'][0]
-            framelist = data['AMOEBA_FRAME_DEF_LIST']
-            for i in xrange(0, 5*nframe, 5):
+            it = iter(data['AMOEBA_FRAME_DEF_LIST'])
+            for i, j, k, l, m in zip(it, it, it, it, it):
                 self.multipole_frames.append(
-                        MultipoleFrame(self.atoms[framelist[i]-1],
-                                       framelist[i+1], framelist[i+2],
-                                       framelist[i+3], framelist[i+4])
+                        MultipoleFrame(self.atoms[i-1], j, k, l, m)
                 )
         except KeyError:
             pass
@@ -678,13 +653,11 @@ class AmoebaParm(AmberParm):
                 self.adjust_types.append(
                         NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
                 )
-            nadj = data['AMOEBA_ADJUST_NUM_LIST'][0]
-            adjlist = data['AMOEBA_ADJUST_LIST']
-            for i in xrange(0, 3*nadj, 3):
+            it = iter(data['AMOEBA_ADJUST_LIST'])
+            for i, j, k in zip(it, it, it):
                 self.adjusts.append(
-                        NonbondedException(self.atoms[adjlist[i  ]-1],
-                                           self.atoms[adjlist[i+1]-1],
-                                           self.adjust_types[adjlist[i+2]-1])
+                        NonbondedException(self.atoms[i-1], self.atoms[j-1],
+                                           self.adjust_types[k-1])
                 )
         except KeyError:
             pass

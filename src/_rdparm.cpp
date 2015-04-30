@@ -172,8 +172,13 @@ static struct PyModuleDef moduledef = {
 };
 #endif
 
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC
+PyInit__rdparm(void) {
+#else
 PyMODINIT_FUNC
 init_rdparm(void) {
+#endif
     PyObject *m;
 
 #if PY_MAJOR_VERSION >= 3
