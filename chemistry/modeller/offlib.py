@@ -7,16 +7,17 @@ from __future__ import print_function
 from chemistry import Atom
 from chemistry.constants import RAD_TO_DEG
 from chemistry.exceptions import AmberOFFWarning
-from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
 from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
+from chemistry import periodic_table as pt
+from chemistry.utils.io import genopen
 from collections import OrderedDict
+from contextlib import closing
 try:
     import numpy as np
 except ImportError:
     np = None
-from chemistry import periodic_table as pt
 import re
 import warnings
 
@@ -77,13 +78,10 @@ class AmberOFFLibrary(object):
         is_fmt : bool
             True if it is recognized as OFF, False otherwise
         """
-        f = io.genopen(filename, 'r')
-        try:
-            if AmberOFFLibrary._headerre.match(f.readline().decode()):
+        with closing(genopen(filename, 'r')) as f:
+            if AmberOFFLibrary._headerre.match(f.readline()):
                 return True
             return False
-        finally:
-            f.close()
 
     #===================================================
 
@@ -114,7 +112,7 @@ class AmberOFFLibrary(object):
         found
         """
         if isinstance(filename, basestring):
-            fileobj = open(filename, 'r')
+            fileobj = genopen(filename, 'r')
             own_handle = True
         else:
             fileobj = filename
@@ -426,7 +424,7 @@ class AmberOFFLibrary(object):
         """
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = open(dest, 'w')
+            dest = genopen(dest, 'w')
             own_handle = True
         # Write the residues in alphabetical order
         names = sorted(lib.keys())

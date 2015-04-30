@@ -2,14 +2,14 @@
 This module contains parsers for mol2-format files (with support for the mol3
 extension described at http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php
 """
+from __future__ import print_function, division, absolute_import
 from chemistry.exceptions import Mol2Error
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
 from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond
-from compat24 import any
+from chemistry.utils.io import genopen
 import copy
 
 class Mol2File(object):
@@ -32,7 +32,7 @@ class Mol2File(object):
         is_fmt : bool
             True if it is a mol2 (or mol3) file, False otherwise
         """
-        f = TextToBinaryFile(genopen(filename, 'r'))
+        f = genopen(filename, 'r')
         try:
             for line in f:
                 if line.startswith('#'): continue
@@ -71,7 +71,7 @@ class Mol2File(object):
             If the file format is not recognized or non-numeric values are
             present where integers or floating point numbers are expected
         """
-        f = TextToBinaryFile(genopen(filename, 'r'))
+        f = genopen(filename, 'r')
         rescont = ResidueTemplateContainer()
         struct = Structure()
         restemp = ResidueTemplate()
@@ -231,7 +231,6 @@ class Mol2File(object):
                     words = line.split()
                     id = int(words[0])
                     resname = words[1]
-                    root_atom = int(words[2])
                     try:
                         chain = words[5]
                     except IndexError:
@@ -317,7 +316,7 @@ class Mol2File(object):
         own_handle = False
         if not hasattr(dest, 'write'):
             own_handle = True
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
         try:
             if isinstance(struct, ResidueTemplateContainer):
                 natom = sum([len(c) for c in struct])

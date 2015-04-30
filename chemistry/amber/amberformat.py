@@ -8,13 +8,14 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from chemistry.exceptions import FlagError
-from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
+from chemistry.utils.io import genopen
 from chemistry.utils.six import wraps, string_types
 from chemistry.utils.six.moves import range
-from fortranformat import FortranRecordReader, FortranRecordWriter
+from contextlib import closing
 from copy import copy
 import datetime
+from fortranformat import FortranRecordReader, FortranRecordWriter
 from math import ceil
 import re
 from warnings import warn, filterwarnings
@@ -318,9 +319,8 @@ class AmberFormat(object):
         is_fmt : bool
             True if it is an Amber-style format, False otherwise
         """
-        f = io.genopen(filename, 'r')
-        lines = [f.readline().decode() for i in range(5)]
-        f.close()
+        with closing(genopen(filename, 'r')) as f:
+            lines = [f.readline() for i in range(5)]
 
         if lines[0].startswith('%VERSION'):
             return True
@@ -434,7 +434,8 @@ class AmberFormat(object):
             ret = _rdparm.rdparm(fname)
         except TypeError:
             # This is raised if VERSION is not found
-            return self.rdparm_old(open(fname, 'r').readlines())
+            with closing(genopen(fname, 'r')) as f:
+                return self.rdparm_old(f.readlines())
         else:
             # Unpack returned contents
             parm_data, parm_comments, formats, unkflg, flag_list, version = ret
@@ -452,12 +453,10 @@ class AmberFormat(object):
                 self.parm_data[flag] = []
                 for line in rawdata:
                     self.parm_data[flag].extend(self.formats[flag].read(line))
-
             if 'CTITLE' in self.parm_data:
                 CHARGE_SCALE = CHARMM_ELECTROSTATIC
             else:
                 CHARGE_SCALE = AMBER_ELECTROSTATIC
-
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
                     self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
@@ -476,31 +475,30 @@ class AmberFormat(object):
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
 
         # Open up the file and read the data into memory
-        prm = open(self.name, 'r')
-
-        for line in prm:
-            if line[0] == '%':
-                if line[0:8] == '%VERSION':
-                    self.version = line.strip()
-                    continue
-                elif line[0:5] == '%FLAG':
-                    current_flag = line[6:].strip()
-                    self.formats[current_flag] = ''
-                    self.parm_data[current_flag] = []
-                    self.parm_comments[current_flag] = []
-                    self.flag_list.append(current_flag)
-                    continue
-                elif line[0:8] == '%COMMENT':
-                    self.parm_comments[current_flag].append(line[9:].strip())
-                    continue
-                elif line[0:7] == '%FORMAT':
-                    fmt = FortranFormat(fmtre.match(line).groups()[0])
-                    # RESIDUE_ICODE can have a lot of blank data...
-                    if current_flag == 'RESIDUE_ICODE':
-                        fmt.read = fmt._read_nostrip
-                    self.formats[current_flag] = fmt
-                    continue
-            self.parm_data[current_flag].extend(fmt.read(line))
+        with closing(genopen(self.name, 'r')) as prm:
+            for line in prm:
+                if line[0] == '%':
+                    if line[0:8] == '%VERSION':
+                        self.version = line.strip()
+                        continue
+                    elif line[0:5] == '%FLAG':
+                        current_flag = line[6:].strip()
+                        self.formats[current_flag] = ''
+                        self.parm_data[current_flag] = []
+                        self.parm_comments[current_flag] = []
+                        self.flag_list.append(current_flag)
+                        continue
+                    elif line[0:8] == '%COMMENT':
+                        self.parm_comments[current_flag].append(line[9:].strip())
+                        continue
+                    elif line[0:7] == '%FORMAT':
+                        fmt = FortranFormat(fmtre.match(line).groups()[0])
+                        # RESIDUE_ICODE can have a lot of blank data...
+                        if current_flag == 'RESIDUE_ICODE':
+                            fmt.read = fmt._read_nostrip
+                        self.formats[current_flag] = fmt
+                        continue
+                self.parm_data[current_flag].extend(fmt.read(line))
 
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
@@ -512,13 +510,10 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         except KeyError:
             pass
-
-        prm.close()
-
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            self.rdparm_old(open(self.name, 'r').readlines())
-
+            with closing(genopen(self.name, 'r')) as f:
+                self.rdparm_old(f.readlines())
         return
 
     #===================================================
@@ -797,35 +792,32 @@ class AmberFormat(object):
             Name of the file to write the topology file to
         """
         # now that we know we will write the new prmtop file, open the new file
-        new_prm = open(name, 'w')
+        with closing(genopen(name, 'w')) as new_prm:
+            # get current time to put into new prmtop file if we had a %VERSION
+            self.set_version()
+            # convert charges back to amber charges...
+            if 'CTITLE' in self.parm_data:
+                CHARGE_SCALE = CHARMM_ELECTROSTATIC
+            else:
+                CHARGE_SCALE = AMBER_ELECTROSTATIC
 
-        # get current time to put into new prmtop file if we had a %VERSION
-        self.set_version()
+            if self.charge_flag in self.parm_data.keys():
+                for i in range(len(self.parm_data[self.charge_flag])):
+                    self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
+            # write version to top of prmtop file
+            new_prm.write('%s\n' % self.version)
 
-        # convert charges back to amber charges...
-        if 'CTITLE' in self.parm_data:
-            CHARGE_SCALE = CHARMM_ELECTROSTATIC
-        else:
-            CHARGE_SCALE = AMBER_ELECTROSTATIC
-
-        if self.charge_flag in self.parm_data.keys():
-            for i in range(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
-
-        # write version to top of prmtop file
-        new_prm.write('%s\n' % self.version)
-
-        # write data to prmtop file, inserting blank line if it's an empty field
-        for flag in self.flag_list:
-            new_prm.write('%%FLAG %s\n' % flag)
-            # Insert any comments before the %FORMAT specifier
-            for comment in self.parm_comments[flag]:
-                new_prm.write('%%COMMENT %s\n' % comment)
-            new_prm.write('%%FORMAT(%s)\n' % self.formats[flag])
-            if len(self.parm_data[flag]) == 0: # empty field...
-                new_prm.write('\n')
-                continue
-            self.formats[flag].write(self.parm_data[flag], new_prm)
+            # write data to prmtop file, inserting blank line if it's an empty field
+            for flag in self.flag_list:
+                new_prm.write('%%FLAG %s\n' % flag)
+                # Insert any comments before the %FORMAT specifier
+                for comment in self.parm_comments[flag]:
+                    new_prm.write('%%COMMENT %s\n' % comment)
+                new_prm.write('%%FORMAT(%s)\n' % self.formats[flag])
+                if len(self.parm_data[flag]) == 0: # empty field...
+                    new_prm.write('\n')
+                    continue
+                self.formats[flag].write(self.parm_data[flag], new_prm)
 
         new_prm.close() # close new prmtop
 

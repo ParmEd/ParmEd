@@ -3,7 +3,6 @@ Tests the functionality in the chemistry.amber package
 """
 
 from array import array
-from compat24 import all
 from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
 import os

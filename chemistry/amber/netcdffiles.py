@@ -14,10 +14,11 @@ work correctly---there is no difference from a user perspective). ALL
 NetCDF-file manipulation that the chemistry/amber package does should be
 contained in this module.
 """
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 from chemistry.formats.registry import FileFormatType
 from chemistry import unit as u
+from chemistry.utils.six import wraps
 import warnings
 # This determines which NetCDF package we're going to use...
 NETCDF_PACKAGE = None
@@ -192,7 +193,6 @@ def use(package=None):
     NETCDF_INITIALIZED = True # We have now selected a NetCDF implementation
 
 from chemistry import __version__
-from compat24 import property, wraps
 try:
     import numpy as np
 except ImportError:

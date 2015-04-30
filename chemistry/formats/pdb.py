@@ -2,13 +2,16 @@
 This package contains classes responsible for reading and writing both PDB and
 PDBx/mmCIF files.
 """
+from __future__ import division, print_function, absolute_import
+
 from chemistry.exceptions import PDBError, AnisouWarning, PDBWarning
 from chemistry.formats.pdbx import PdbxReader, PdbxWriter, containers
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint
+from chemistry.utils.io import genopen
+from chemistry.utils.six.moves import range
 import itertools
 try:
     import numpy as np
@@ -72,7 +75,7 @@ class PDBFile(object):
             True if it is a PDB file
         """
         f = genopen(filename, 'r')
-        lines = [f.readline().decode() for i in xrange(3)]
+        lines = [f.readline() for i in range(3)]
         f.close()
 
         for line in lines:
@@ -180,11 +183,6 @@ class PDBFile(object):
 
         try:
             for line in fileobj:
-                try:
-                    line = line.decode('ascii')
-                except AttributeError:
-                    # Assume this is a string in Py3 which doesn't have 'decode'
-                    pass
                 rec = line[:6]
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
@@ -531,7 +529,7 @@ class PDBFile(object):
                              "'first', or 'occupancy'" % altlocs)
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
             own_handle = True
         if charmm:
             atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
@@ -703,7 +701,6 @@ class CIFFile(object):
         f = genopen(filename)
         try:
             for line in f:
-                line = line.decode()
                 if line.startswith('#'): continue
                 if line[:5] == 'data_' and len(line.split()) == 1:
                     return True
@@ -776,7 +773,7 @@ class CIFFile(object):
         """
         if isinstance(filename, basestring):
             own_handle = True
-            fileobj = TextToBinaryFile(genopen(filename, 'r'))
+            fileobj = genopen(filename, 'r')
         else:
             own_handle = False
             fileobj = filename
@@ -808,7 +805,7 @@ class CIFFile(object):
                 nameidx = cite.getAttributeIndex('name')
                 if nameidx != -1:
                     journal_authors = []
-                    for i in xrange(cite.getRowCount()):
+                    for i in range(cite.getRowCount()):
                         a = cite.getRow(i)[nameidx]
                         if a not in journal_authors:
                             journal_authors.append(a)
@@ -880,7 +877,7 @@ class CIFFile(object):
             xyz = []
             atommap = dict()
             last_atom = Atom()
-            for i in xrange(atoms.getRowCount()):
+            for i in range(atoms.getRowCount()):
                 row = atoms.getRow(i) + ['']
                 atnum = int(row[atnumid])
                 elem = row[elemid]
@@ -1007,7 +1004,7 @@ class CIFFile(object):
                                   'section. Skipping')
                 else:
                     try:
-                        for i in xrange(anisou.getRowCount()):
+                        for i in range(anisou.getRowCount()):
                             row = anisou.getRow(i) + ['']
                             atnum = int(row[atnumid])
                             atname = row[atnameid]
@@ -1037,7 +1034,6 @@ class CIFFile(object):
                                       'B-factors. Skipping')
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
-                    print len(xyz), len(struct.atoms)
                     raise ValueError('Corrupt CIF; all models must have the '
                                      'same atoms')
                 try:
@@ -1106,7 +1102,7 @@ class CIFFile(object):
                              "'first', or 'occupancy'" % altlocs)
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
             own_handle = True
         # Make the main container
         cont = containers.DataContainer('cell')

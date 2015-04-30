@@ -30,7 +30,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from __future__ import division, print_function, absolute_imports
+from __future__ import division, print_function, absolute_import
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.6"

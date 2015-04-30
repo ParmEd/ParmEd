@@ -2,7 +2,6 @@
 Tests the functionality in the tinker subpackage
 """
 
-from compat24 import any
 import utils
 import unittest
 from chemistry.tinker import parameterfile, system, tinkerfiles
