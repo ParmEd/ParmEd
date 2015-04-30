@@ -2,9 +2,10 @@
 The GUI components of xparmed.py
 """
 from __future__ import division
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range
 from chemistry.utils.six.moves.tkinter import *
-from chemistry.utils.six.moves.tkinter_messagebox as tkMessageBox
+import chemistry.utils.six.moves.tkinter_messagebox as tkMessageBox
 from ParmedTools.gui.guiactions import gui_action_dispatcher
 from ParmedTools.gui._guiwidgets import MessageWindow
 
@@ -24,7 +25,7 @@ class ParmedApp(Frame):
         Frame.__init__(self, master)
         self.parm = amber_prmtop
         actions = {}
-        for action, actioncls in COMMANDMAP.iteritems():
+        for action, actioncls in iteritems(COMMANDMAP):
             action_name = actioncls.__name__
             # Skip actions that don't get buttons
             if action in self.skipped_actions: continue

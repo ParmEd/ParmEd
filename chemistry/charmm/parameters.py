@@ -15,6 +15,7 @@ from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.modeller import ResidueTemplate, PatchTemplate
 from chemistry.periodic_table import AtomicNum, element_by_mass
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range, zip
 from collections import OrderedDict
 import os
@@ -663,7 +664,7 @@ class CharmmParameterSet(object):
             pass
 
         # Go through the patches and add the appropriate one
-        for resname, res in residues.iteritems():
+        for resname, res in iteritems(residues):
             if hpatches[resname] is not None:
                 try:
                     res.first_patch = patches[hpatches[resname]]

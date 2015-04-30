@@ -11,6 +11,7 @@ from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint
 from chemistry.utils.io import genopen
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range
 import itertools
 try:
@@ -585,7 +586,7 @@ class PDBFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in atom.other_locations.iteritems():
+                for key, item in iteritems(atom.other_locations):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item
@@ -1028,7 +1029,7 @@ class CIFFile(object):
                             )
                     except (ValueError, KeyError):
                         # If at least one went wrong, set them all to None
-                        for key, atom in atommap.iteritems():
+                        for key, atom in iteritems(atommap):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping')
@@ -1153,7 +1154,7 @@ class CIFFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in atom.other_locations.iteritems():
+                for key, item in iteritems(atom.other_locations):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item

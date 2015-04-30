@@ -12,6 +12,7 @@ from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.formats import PDBFile, CIFFile, Mol2File
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import zip, range
 import copy
 import math
@@ -142,7 +143,7 @@ class Action(lawsuit):
             else:
                 arg_list = '%s ' % arg_list
             arg_list += ' '.join([str(a) for a in args])
-            for kw, item in kwargs.iteritems():
+            for kw, item in iteritems(kwargs):
                 arg_list += ' %s %s ' % (kw, item)
         elif arg_list is None:
             arg_list = ArgumentList('')

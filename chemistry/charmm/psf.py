@@ -15,7 +15,7 @@ from chemistry.exceptions import (CharmmPSFError, MoleculeError,
 from chemistry.structure import needs_openmm, app, mm
 from chemistry import unit as u
 from chemistry.utils.io import genopen
-from chemistry.utils.six import wraps
+from chemistry.utils.six import wraps, iteritems
 from chemistry.utils.six.moves import zip, range
 from contextlib import closing
 from math import sqrt
@@ -552,7 +552,7 @@ class CharmmPsfFile(Structure):
         # Now we have a map of all atom types that we have defined in our
         # system. Look through all of the atom types and see if any of their
         # NBFIX definitions are also keys in typemap
-        for key, type in typemap.iteritems():
+        for key, type in iteritems(typemap):
             for key in type.nbfix:
                 if key in typemap:
                     return True

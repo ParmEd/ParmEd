@@ -4,6 +4,7 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 
 # Load some system modules that may be useful for various users in shell mode
 from chemistry.amber.readparm import AmberParm
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range
 import cmd
 from glob import glob
@@ -162,7 +163,7 @@ class ParmedCmd(cmd.Cmd):
         auto-complete. This eliminates the need to modify the ParmedCmd class
         when a new command is added
         """
-        for _cmd, cmdclass in COMMANDMAP.iteritems():
+        for _cmd, cmdclass in iteritems(COMMANDMAP):
             if _cmd in ('source', 'go', 'EOF', 'quit', 'help', 'parmout'):
                 continue
             cmdname = cmdclass.__name__

@@ -7,6 +7,7 @@ from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
                                 PROTEIN, SOLVENT, AmberOFFLibrary)
 from chemistry.amber import AmberParm
 from chemistry.exceptions import BondError
+from chemistry.utils.six import iteritems
 import os
 from ParmedTools import changeRadii
 import random
@@ -203,7 +204,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Tests reading Amber amino12 OFF library (internal residues) """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         self.assertEqual(len(offlib), 28)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertEqual(res.head.name, 'N')
@@ -303,7 +304,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Test reading N-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head, None)
@@ -314,7 +315,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Test reading C-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         self.assertEqual(len(offlib), 26)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head.name, 'N')
@@ -326,7 +327,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         warnings.filterwarnings('ignore', module='.', category=AmberOFFWarning)
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertEqual(res.name, name)
             if 'BOX' in name:
                 self.assertIsInstance(res, ResidueTemplateContainer)
