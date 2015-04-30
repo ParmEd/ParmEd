@@ -2,6 +2,7 @@
 This module contains classes regarding the Amoeba potential and loading in a
 TINKER-based parameter file.
 """
+from __future__ import print_function
 from chemistry.exceptions import (AmoebaParamFileError, APIError,
             AmoebaParamFileWarning)
 from collections import OrderedDict
@@ -445,7 +446,6 @@ class AmoebaParameterSet(object):
         # Now loop through all atoms
         while line.lstrip()[:5].lower() == 'atom ':
             rematch = self.atomre.match(line)
-            if not rematch: print line
             num, typenum, name, descrip, anum, mass, val = rematch.groups()
             self.atoms[int(num)] = _Atom(typenum, name, descrip,
                                                  anum, mass, val)
@@ -471,7 +471,7 @@ class AmoebaParameterSet(object):
             try:
                 get_angle_type(rematch.groups()[0], *line.split()[1:])
             except TypeError, err:
-                print repr(rematch.groups()[0]), line.split()[1:]
+                print(repr(rematch.groups()[0]), line.split()[1:])
                 raise err
             line = f.readline().replace('\t', ' ')
             rematch = self.anglere.match(line)

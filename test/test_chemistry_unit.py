@@ -4,6 +4,7 @@ Tests the functionality in the chemistry.unit package.
 from __future__ import division
 
 from chemistry import unit as u
+from chemistry.utils.six import string_types
 import copy
 import math
 import unittest
@@ -671,14 +672,13 @@ class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyIsString(self):
         """ Tests the internal _is_string method with numpy Quantities """
-        from chemistry.unit.quantity import _is_string
         a = np.array([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance("", str)
-        self.assertTrue(_is_string(""))
-        self.assertTrue(_is_string("t"))
-        self.assertTrue(_is_string("test"))
-        self.assertFalse(_is_string(3))
-        self.assertFalse(_is_string(a))
+        self.assertTrue(isinstance("", string_types))
+        self.assertTrue(isinstance("t", string_types))
+        self.assertTrue(isinstance("test", string_types))
+        self.assertFalse(isinstance(3, string_types))
+        self.assertFalse(isinstance(a, string_types))
 
     def testNumpyFunctions(self):
         """ Tests various numpy attributes that they result in Quantities """
