@@ -3773,13 +3773,13 @@ class chamber(Action):
                 parmset.read_stream_file(sfile)
             # All parameters are loaded, now condense the types
             if self.condense: parmset.condense()
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
         # Now read the PSF
         try:
             psf = CharmmPsfFile(self.psf)
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem reading CHARMM PSF: %s' % e)
 
         # Read the PDB and set the box information
@@ -3876,7 +3876,7 @@ class chamber(Action):
         # Now load the parameters
         try:
             psf.load_parameters(parmset)
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset)
         parm.name = self.psf

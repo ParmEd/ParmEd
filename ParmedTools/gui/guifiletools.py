@@ -1,6 +1,6 @@
 """ Tools for getting/giving file names easily for opening and saving """
 
-import tkFileDialog
+import chemistry.utils.six.moves.tkinter_filedialog as tkFileDialog
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 

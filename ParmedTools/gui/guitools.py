@@ -2,8 +2,9 @@
 The GUI components of xparmed.py
 """
 from __future__ import division
-import tkMessageBox
-from Tkinter import *
+from chemistry.utils.six.moves import range
+from chemistry.utils.six.moves.tkinter import *
+from chemistry.utils.six.moves.tkinter_messagebox as tkMessageBox
 from ParmedTools.gui.guiactions import gui_action_dispatcher
 from ParmedTools.gui._guiwidgets import MessageWindow
 
@@ -59,9 +60,9 @@ class ParmedApp(Frame):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
         # Control expandability of action frame
-        for i in xrange(int(math.ceil(len(action_keys)/BPR)) + 1):
+        for i in range(int(math.ceil(len(action_keys)/BPR)) + 1):
             action_frame.rowconfigure(i+1, weight=1)
-        for i in xrange(BPR):
+        for i in range(BPR):
             action_frame.columnconfigure(i, weight=1)
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~

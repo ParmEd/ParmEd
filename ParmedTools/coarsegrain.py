@@ -161,7 +161,7 @@ def addCoarseGrain(parm, param_file):
                 angle_params[idx] = Angle(atom_types[0], atom_types[1],
                                           atom_types[2], acoef, bcoef, ccoef,
                                           dcoef)
-            except ValueError, err:
+            except ValueError as err:
                 raise CoarseGrainError(
                         'Unexpected format in Coarse Grain angles. Expected '
                         'different data type: %s. See format specification'
@@ -192,7 +192,7 @@ def addCoarseGrain(parm, param_file):
                                                 atom_types[2], atom_types[3],
                                                 ampl1, ampl2, ampl3, ampl4,
                                                 phase1, phase2, phase3, phase4)
-            except ValueError, err:
+            except ValueError as err:
                 raise CoarseGrainError(
                         'Unexpected format in Coarse Grain dihedrals. Expected '
                         'different data type: %s. See format specification'

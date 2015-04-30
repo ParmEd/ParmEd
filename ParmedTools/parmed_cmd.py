@@ -135,7 +135,7 @@ class ParmedCmd(cmd.Cmd):
         # Store this action for later use. This action is unique
         try:
             self.parmout = COMMANDMAP['parmout'](self.parm, line)
-        except ParmError, err:
+        except ParmError as err:
             self.stdout.write('Action parmout failed.\n\t')
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -149,7 +149,7 @@ class ParmedCmd(cmd.Cmd):
             if action.valid:
                 self.stdout.write('%s\n' % action)
                 action.execute()
-        except ParmError, err:
+        except ParmError as err:
             self.stdout.write('Action %s failed\n\t' % actionname)
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -201,7 +201,7 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s\n' % self.parmout)
             try:
                 self.parmout.execute()
-            except ParmError, err:
+            except ParmError as err:
                 self.stdout.write('%s: %s\n' % (type(err).__name__, err))
                 if self._exit_on_fatal:
                     raise err
@@ -251,7 +251,7 @@ class ParmedCmd(cmd.Cmd):
         else:
             try:
                 exec(line.strip())
-            except Exception, err:
+            except Exception as err:
                 self.stdout.write("%s: %s\n" % (type(err).__name__, err))
 
     def completedefault(self, text, line, begidx, endidx):
@@ -272,7 +272,7 @@ class ParmedCmd(cmd.Cmd):
         try:
             amber_prmtop = self.parm
             exec(python_interpreter.command_string)
-        except Exception, err:
+        except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
     def do_help(self, arg):
