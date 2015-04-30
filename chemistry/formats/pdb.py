@@ -11,7 +11,7 @@ from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint
 from chemistry.utils.io import genopen
-from chemistry.utils.six import iteritems, string_types
+from chemistry.utils.six import iteritems, string_types, add_metaclass
 from chemistry.utils.six.moves import range
 import itertools
 try:
@@ -55,10 +55,9 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+@add_metaclass(FileFormatType)
 class PDBFile(object):
     """ Standard PDB file format parser and writer """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -679,10 +678,9 @@ class PDBFile(object):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+@add_metaclass(FileFormatType)
 class CIFFile(object):
     """ Standard PDBx/mmCIF file format parser and writer """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod

@@ -13,6 +13,7 @@ from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from chemistry import periodic_table as pt
 from chemistry.utils.io import genopen
 from chemistry.utils.six import string_types, add_metaclass
+from chemistry.utils.six.moves import range
 from collections import OrderedDict
 from contextlib import closing
 try:
@@ -326,7 +327,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             c1,c2,c3,c4,c5,c6 = [int(x) for x in fileobj.readline().split()]
             if templ.head is not None and templ.head is not templ[c1-1]:
                 warnings.warn('HEAD atom is not connect0')
@@ -343,7 +344,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             resname, id, next, start, typ, img = fileobj.readline().split()
             resname = _strip_enveloping_quotes(resname)
             id = int(id)
@@ -374,7 +375,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             #TODO sanity check
             fileobj.readline()
         line = fileobj.readline()
