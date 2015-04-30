@@ -53,7 +53,7 @@
 <span class="sd">parameters and allow users to manipulate that data and write a new</span>
 <span class="sd">prmtop object.</span>
 
-<span class="sd">Copyright (C) 2010 - 2014  Jason Swails</span>
+<span class="sd">Copyright (C) 2010 - 2015  Jason Swails</span>
 
 <span class="sd">This program is free software; you can redistribute it and/or modify</span>
 <span class="sd">it under the terms of the GNU General Public License as published by</span>
@@ -70,14 +70,8 @@
 <span class="sd">Foundation, Inc., 59 Temple Place - Suite 330,</span>
 <span class="sd">Boston, MA 02111-1307, USA.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span> <span class="k">as</span> <span class="nb">zip</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c"># This only happens in Python 3, where zip is equivalent to izip</span>
-    <span class="k">pass</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">property</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber._amberparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.amberformat</span> <span class="kn">import</span> <span class="n">AmberFormat</span>
 <span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">IFBOX</span>
@@ -87,6 +81,7 @@
                 <span class="n">MultipoleFrame</span><span class="p">,</span> <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">NonbondedExceptionType</span><span class="p">,</span>
                 <span class="n">StretchBendType</span><span class="p">,</span> <span class="n">TorsionTorsionType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">FormatError</span><span class="p">,</span> <span class="n">AmoebaError</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
 
 <div class="viewcode-block" id="AmoebaParm"><a class="viewcode-back" href="../../../amberobj/chemistry.amber.AmoebaParm.html#chemistry.amber.AmoebaParm">[docs]</a><span class="k">class</span> <span class="nc">AmoebaParm</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -640,7 +635,7 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">[:]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span>
         <span class="n">ntypes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;AMOEBA_TORSION_TORSION_NUM_PARAMS&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">ntypes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntypes</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;AMOEBA_TORSION_TORSION_TORTOR_TABLE_</span><span class="si">%02d</span><span class="s">_&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s">&#39;DIMS&#39;</span><span class="p">])</span>
             <span class="n">ang1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s">&#39;ANGLE1&#39;</span><span class="p">]</span>

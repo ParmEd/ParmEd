@@ -6,39 +6,39 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chemistry.timer &mdash; ParmEd 2.0 documentation</title>
+    <title>chemistry.utils.timer &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
+        URL_ROOT:    '../../../',
         VERSION:     '2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,7 +47,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for chemistry.timer</h1><div class="highlight"><pre>
+  <h1>Source code for chemistry.utils.timer</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This is a module that contains basic timer facilities. It&#39;s useful for profiling</span>
 <span class="sd">the performance of a script in &quot;chunks&quot;.</span>
@@ -58,7 +58,7 @@
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
-<div class="viewcode-block" id="Timer"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer">[docs]</a><span class="k">class</span> <span class="nc">Timer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer">[docs]</a><span class="k">class</span> <span class="nc">Timer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
    <span class="sd">&quot;&quot;&quot; Timer class. It adds new timers and keeps track of how much time has been</span>
 <span class="sd">       spent. &quot;&quot;&quot;</span>
 
@@ -74,7 +74,7 @@
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 
-<div class="viewcode-block" id="Timer.add_timer"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.add_timer">[docs]</a>   <span class="k">def</span> <span class="nf">add_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.add_timer"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.add_timer">[docs]</a>   <span class="k">def</span> <span class="nf">add_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; Add a new timer &quot;&quot;&quot;</span>
       <span class="c"># Check to make sure it doesn&#39;t already exist. Then add it if it doesn&#39;t</span>
       <span class="k">if</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
@@ -86,7 +86,7 @@
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 </div>
-<div class="viewcode-block" id="Timer.start_timer"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.start_timer">[docs]</a>   <span class="k">def</span> <span class="nf">start_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.start_timer"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.start_timer">[docs]</a>   <span class="k">def</span> <span class="nf">start_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; Start the specified timer &quot;&quot;&quot;</span>
       <span class="c"># Make sure the timer is not on already</span>
       <span class="k">if</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">:</span>
@@ -103,7 +103,7 @@
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 </div>
-<div class="viewcode-block" id="Timer.stop_timer"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.stop_timer">[docs]</a>   <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.stop_timer"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.stop_timer">[docs]</a>   <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; End the specified timer &quot;&quot;&quot;</span>
       <span class="c"># First make sure that it is a timer to begin with</span>
       <span class="k">if</span> <span class="ow">not</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
@@ -119,14 +119,14 @@
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 </div>
-<div class="viewcode-block" id="Timer.end_all"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.end_all">[docs]</a>   <span class="k">def</span> <span class="nf">end_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.end_all"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.end_all">[docs]</a>   <span class="k">def</span> <span class="nf">end_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; End all of the timers &quot;&quot;&quot;</span>
       <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 </div>
-<div class="viewcode-block" id="Timer.done"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.done">[docs]</a>   <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.done"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.done">[docs]</a>   <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; Tell Timer we are done, and we can convert units to best </span>
 <span class="sd">          human-readable option </span>
 <span class="sd">      &quot;&quot;&quot;</span>
@@ -152,7 +152,7 @@
 
    <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
 </div>
-<div class="viewcode-block" id="Timer.print_"><a class="viewcode-back" href="../../api/chemistry/chemistry.timer.html#chemistry.timer.Timer.print_">[docs]</a>   <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Timer.print_"><a class="viewcode-back" href="../../../api/chemistry/chemistry.utils.timer.html#chemistry.utils.timer.Timer.print_">[docs]</a>   <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
       <span class="sd">&quot;&quot;&quot; Prints the value of the timer &quot;&quot;&quot;</span>
       <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%-40s</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descriptions</span><span class="p">[</span><span class="n">timer</span><span class="p">],</span> 
                                         <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
@@ -169,7 +169,7 @@
         <div class="sphinxsidebarwrapper">
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
+    <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -188,13 +188,13 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

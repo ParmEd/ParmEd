@@ -9,7 +9,7 @@ extension.
 
 This page is not meant as an exhaustive description of the OpenMM library and
 its usage. Instead, you should visit the `OpenMM website
-<http://simtk.org/home/openmm>` for that. However, this page *will* provide a
+<http://simtk.org/home/openmm>`_ for that. However, this page *will* provide a
 brief description of OpenMM, what I consider to be its strengths that can make
 it an invaluable tool in the field of molecular mechanics. It will also present
 an introduction to using OpenMM with the tools provided by ParmEd through a
@@ -135,4 +135,3 @@ the annotated and explained example):
 
     Starting from AMBER prmtop and inpcrd files <omm_amber>
     Starting from CHARMM PSF and coordinate files <omm_charmm>
-

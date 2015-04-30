@@ -1,0 +1,7 @@
+chemistry.utils.six module
+==========================
+
+.. automodule:: chemistry.utils.six
+    :members:
+    :undoc-members:
+    :show-inheritance:

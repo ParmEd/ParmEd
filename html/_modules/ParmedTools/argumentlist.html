@@ -234,7 +234,7 @@
                 <span class="n">token</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">argtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenlist</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">InputError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
         <span class="k">raise</span> <span class="n">NoArgument</span><span class="p">(</span><span class="s">&#39;Catch me!&#39;</span><span class="p">)</span>

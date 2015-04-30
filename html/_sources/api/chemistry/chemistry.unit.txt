@@ -9,7 +9,6 @@ Submodules
    chemistry.unit.basedimension
    chemistry.unit.baseunit
    chemistry.unit.constants
-   chemistry.unit.doctests
    chemistry.unit.mymatrix
    chemistry.unit.prefix
    chemistry.unit.quantity

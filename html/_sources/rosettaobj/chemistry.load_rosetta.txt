@@ -1,0 +1,6 @@
+chemistry.load_rosetta
+======================
+
+.. currentmodule:: chemistry
+
+.. autofunction:: load_rosetta

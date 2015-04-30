@@ -13,7 +13,6 @@ Submodules
 
 .. toctree::
 
-   chemistry.formats.io
    chemistry.formats.mol2
    chemistry.formats.pdb
    chemistry.formats.psf

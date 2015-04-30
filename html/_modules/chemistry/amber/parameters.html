@@ -51,11 +51,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Classes helpful for reading/storing Amber parameters</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
 <span class="kn">from</span> <span class="nn">chemistry.topologyobjects</span> <span class="kn">import</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">DihedralType</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="n">RAD_TO_DEG</span><span class="p">,</span> <span class="n">SMALL</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">AmberParameterWarning</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -195,7 +198,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">atype2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">atype3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atype4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parmline</span><span class="p">())</span>
         <span class="n">retstr</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atype1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atype2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">atype3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atype4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">parmline</span><span class="p">(</span><span class="n">multiterm</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
@@ -212,7 +215,7 @@
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">True</span>
@@ -448,7 +451,7 @@
 </div>
 <div class="viewcode-block" id="ParameterSet.write"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.parameters.html#chemistry.amber.parameters.ParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes a parm.dat file with the current parameters &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">outfile</span> <span class="o">=</span> <span class="n">dest</span>
@@ -489,7 +492,7 @@
             <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">lennard_jones</span><span class="p">())</span>
         <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 

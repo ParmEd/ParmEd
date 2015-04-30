@@ -160,7 +160,7 @@
         <span class="c"># Find the first reserved word and begin capturing data.</span>
         <span class="c">#</span>
         <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
@@ -217,7 +217,7 @@
 
 
                 <span class="c"># Get the data for this attribute from the next token</span>
-                <span class="n">tCat</span><span class="p">,</span> <span class="n">tAtt</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">tCat</span><span class="p">,</span> <span class="n">tAtt</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">tCat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">curQuotedString</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s">&quot;Missing data for item _</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">))</span>
@@ -238,7 +238,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s">&quot;Missing value in item-value pair&quot;</span><span class="p">)</span>
 
-                <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="c">#</span>
@@ -248,7 +248,7 @@
 
                 <span class="c"># The category name in the next curCatName,curAttName pair</span>
                 <span class="c">#    defines the name of the category container.</span>
-                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">curAttName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s">&quot;Unexpected token in loop_ declaration&quot;</span><span class="p">)</span>
@@ -271,7 +271,7 @@
 
                 <span class="c"># Read the rest of the loop_ declaration </span>
                 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-                    <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
                     
                     <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                         <span class="k">break</span>
@@ -303,7 +303,7 @@
                         <span class="k">elif</span> <span class="n">curQuotedString</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                             <span class="n">curRow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curQuotedString</span><span class="p">)</span>
 
-                        <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                        <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
                     <span class="c"># loop_ data processing ends if - </span>
 
@@ -329,7 +329,7 @@
                     <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
 
-                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s">&quot;ST_DATA_CONTAINER&quot;</span><span class="p">:</span>
                 <span class="c">#</span>
@@ -340,7 +340,7 @@
                 <span class="n">containerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curContainer</span><span class="p">)</span>
                 <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
-                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s">&quot;ST_STOP&quot;</span><span class="p">:</span>
                 <span class="k">return</span>
@@ -350,7 +350,7 @@
                 <span class="n">containerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curContainer</span><span class="p">)</span>
                 <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
-                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s">&quot;ST_UNKNOWN&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s">&quot;Unrecogized syntax element: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">curWord</span><span class="p">))</span>
@@ -389,7 +389,7 @@
 
         <span class="c">## Tokenizer loop begins here ---</span>
         <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">fileIter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="c"># Dump comments</span>
@@ -402,7 +402,7 @@
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">):</span>
                 <span class="n">mlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
                 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-                    <span class="n">line</span> <span class="o">=</span> <span class="n">fileIter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">):</span>
                         <span class="k">break</span>
@@ -460,7 +460,7 @@
 
         <span class="c">## Tokenizer loop begins here ---</span>
         <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">fileIter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="c"># Dump comments</span>
@@ -473,7 +473,7 @@
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">):</span>
                 <span class="n">mlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
                 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-                    <span class="n">line</span> <span class="o">=</span> <span class="n">fileIter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">):</span>
                         <span class="k">break</span>

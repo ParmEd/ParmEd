@@ -64,10 +64,11 @@
 <span class="sd">NetCDF-file manipulation that the chemistry/amber package does should be</span>
 <span class="sd">contained in this module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">wraps</span><span class="p">,</span> <span class="n">add_metaclass</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="c"># This determines which NetCDF package we&#39;re going to use...</span>
 <span class="n">NETCDF_PACKAGE</span> <span class="o">=</span> <span class="bp">None</span>
@@ -242,7 +243,6 @@
     <span class="n">NETCDF_INITIALIZED</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># We have now selected a NetCDF implementation</span>
 </div>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">__version__</span>
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">property</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -265,9 +265,9 @@
         <span class="k">return</span> <span class="n">fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_fcn</span>
 </div>
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="NetCDFRestart"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.NetCDFRestart">[docs]</a><span class="k">class</span> <span class="nc">NetCDFRestart</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class to read or write NetCDF restart files &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="NetCDFRestart.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.NetCDFRestart.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -587,6 +587,7 @@
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
 </div></div>
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="NetCDFTraj"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.NetCDFTraj">[docs]</a><span class="k">class</span> <span class="nc">NetCDFTraj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class to read or write NetCDF restart files</span>
 
@@ -604,7 +605,6 @@
 <span class="sd">    You should use the open_new and open_old alternative constructors instead of</span>
 <span class="sd">    the default constructor</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="NetCDFTraj.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.netcdffiles.html#chemistry.amber.NetCDFTraj.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>

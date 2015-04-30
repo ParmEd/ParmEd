@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyRosetta Integration &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="next" title="Seeding OpenMM Simulations with PyRosetta and ParmEd" href="omm_rosetta.html" />
+    <link rel="prev" title="The chemistry.charmm package" href="charmm.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="charmm.html" title="The chemistry.charmm package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyrosetta-integration">
+<h1>PyRosetta Integration<a class="headerlink" href="#pyrosetta-integration" title="Permalink to this headline">¶</a></h1>
+<p>ParmEd provides support for the <a class="reference external" href="http://www.pyrosetta.org/">PyRosetta</a>
+API. The ability to create a <em>de novo</em> molecular system
+and then seamlessly parameterize and simulate it, all within the Python
+environment, is powerful and fits right within ParmEd&#8217;s goal of easing
+the molecular modeling process.</p>
+<p>This page is not meant as a tutorial for the PyRosetta library. Instead, you
+should visit the <a class="reference external" href="http://www.pyrosetta.org/tutorials">PyRosetta website</a> for
+that. However, this page <em>will</em> provide a brief description of PyRosetta, and
+how ParmEd can enhance its utility for molecular modeling. It will also present
+a few examples using PyRosetta with the tools provided by ParmEd.</p>
+<div class="section" id="what-is-pyrosetta">
+<h2>What is PyRosetta<a class="headerlink" href="#what-is-pyrosetta" title="Permalink to this headline">¶</a></h2>
+<p>Rosetta is a popular molecular modeling suite that allows scientists to model
+biomolecular systems, and has had a lot of <a class="reference external" href="http://en.wikipedia.org/wiki/Rosetta&#64;home#Project_significance">success in predicting experimental
+structures</a>.
+PyRosetta is a Python-based interface to the Rosetta, and it allows users to
+easily model and manipulate biomolecules, enabling custom algorithms for
+protein folding using Rosetta sampling and scoring functions.
+Its features include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Generating a nucleic or amino acid structure from a text string.</li>
+<li>Mutating residues in an existing structure.</li>
+<li>Manipulating residue positions and torsions in an algorithmic fashion.</li>
+<li>Monte Carlo sampling using the Rosetta force field.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="how-does-parmed-enhance-pyrosetta">
+<h2>How does ParmEd enhance PyRosetta?<a class="headerlink" href="#how-does-parmed-enhance-pyrosetta" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+</tbody>
+</table>
+<p>ParmEd provides a simple function, <a class="reference internal" href="rosettaobj/chemistry.load_rosetta.html#chemistry.load_rosetta" title="chemistry.load_rosetta"><code class="xref py py-func docutils literal"><span class="pre">load_rosetta()</span></code></a>, to load a PyRosetta
+<code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object into ParmEd&#8217;s <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class. This
+<code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> can then be used to easily parameterize a molecular dynamics
+simulation.</p>
+<p>One can imagine that this functionality would be useful to easily seed
+simulations  for <em>ab initio</em> structure predictions or studies of a mutant
+protein using wildtype structures.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>For examples on how to run an simulation starting from a
+PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> please refer to the following:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="omm_rosetta.html">Using PyRosetta and ParmEd to seed an OpenMM simulation</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PyRosetta Integration</a><ul>
+<li><a class="reference internal" href="#what-is-pyrosetta">What is PyRosetta</a></li>
+<li><a class="reference internal" href="#how-does-parmed-enhance-pyrosetta">How does ParmEd enhance PyRosetta?</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/rosetta.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="charmm.html" title="The chemistry.charmm package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

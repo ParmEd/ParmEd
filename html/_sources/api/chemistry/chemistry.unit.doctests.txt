@@ -1,7 +1,0 @@
-chemistry.unit.doctests module
-==============================
-
-.. automodule:: chemistry.unit.doctests
-    :members:
-    :undoc-members:
-    :show-inheritance:

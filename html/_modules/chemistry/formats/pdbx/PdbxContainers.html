@@ -93,6 +93,8 @@
 <span class="n">__license__</span>   <span class="o">=</span> <span class="s">&quot;Creative Commons Attribution 3.0 Unported&quot;</span>
 <span class="n">__version__</span>   <span class="o">=</span> <span class="s">&quot;V0.01&quot;</span>
 
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+
 <span class="kn">import</span> <span class="nn">re</span><span class="o">,</span><span class="nn">sys</span><span class="o">,</span><span class="nn">traceback</span>
 
 <div class="viewcode-block" id="CifName"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.CifName">[docs]</a><span class="k">class</span> <span class="nc">CifName</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -260,7 +262,7 @@
         
 <div class="viewcode-block" id="DataContainer.invokeDataBlockMethod"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod">[docs]</a>    <span class="k">def</span> <span class="nf">invokeDataBlockMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__currentRow</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">exec</span> <span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">()</span>
+        <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span>
 </div>
 <div class="viewcode-block" id="DataContainer.setGlobal"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataContainer.setGlobal">[docs]</a>    <span class="k">def</span> <span class="nf">setGlobal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span><span class="o">=</span><span class="bp">True</span>
@@ -365,9 +367,9 @@
                 <span class="c">#return self._rowList[0][x]</span>
                 <span class="n">ii</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">x</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Should not be here&quot;</span>
         
     
 <div class="viewcode-block" id="DataCategory.getCurrentAttribute"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -503,7 +505,7 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">attribute</span><span class="p">)]</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">IndexError</span>        
-        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="n">attribute</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">attribute</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="DataCategory.setValue"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataCategory.setValue">[docs]</a>    <span class="k">def</span> <span class="nf">setValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -527,7 +529,7 @@
 
                 <span class="c"># extend the list if needed - </span>
                 <span class="k">if</span> <span class="p">(</span> <span class="n">ind</span> <span class="o">&gt;=</span> <span class="n">ll</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span> <span class="o">-</span><span class="n">ll</span><span class="p">)])</span>    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span> <span class="o">-</span><span class="n">ll</span><span class="p">)])</span>    
                 <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="n">value</span>                    
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;DataCategory(setvalue) index error category </span><span class="si">%s</span><span class="s"> attribute </span><span class="si">%s</span><span class="s"> index </span><span class="si">%d</span><span class="s"> value </span><span class="si">%r</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span>
@@ -573,21 +575,21 @@
         <span class="c">#</span>
         <span class="n">ind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">attributeName</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)]</span>
             <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">:</span>
             <span class="n">ll</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ind</span> <span class="o">&gt;=</span> <span class="n">ll</span><span class="p">):</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">-</span><span class="n">ll</span><span class="p">)])</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">-</span><span class="n">ll</span><span class="p">)])</span>
                 <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span>
-            <span class="k">exec</span> <span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">()</span>
+            <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span><span class="o">+=</span><span class="mi">1</span>
 </div>
 <div class="viewcode-block" id="DataCategory.invokeCategoryMethod"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod">[docs]</a>    <span class="k">def</span> <span class="nf">invokeCategoryMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">exec</span> <span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">()</span>
+        <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span>
 </div>
 <div class="viewcode-block" id="DataCategory.getAttributeLengthMaximumList"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList">[docs]</a>    <span class="k">def</span> <span class="nf">getAttributeLengthMaximumList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mList</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)]</span>
@@ -787,7 +789,7 @@
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;attributeName </span><span class="si">%s</span><span class="s"> rowI </span><span class="si">%r</span><span class="s"> rowdata </span><span class="si">%r</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">attributeName</span><span class="p">,</span><span class="n">rowI</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">]))</span>
                 <span class="k">raise</span> <span class="ne">IndexError</span>        
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">attribute</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">attribute</span><span class="p">))</span>
         
 </div>
 <div class="viewcode-block" id="DataCategory.getValueFormattedByIndex"><a class="viewcode-back" href="../../../../api/chemistry/chemistry.formats.pdbx.PdbxContainers.html#chemistry.formats.pdbx.PdbxContainers.DataCategory.getValueFormattedByIndex">[docs]</a>    <span class="k">def</span> <span class="nf">getValueFormattedByIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeIndex</span><span class="p">,</span><span class="n">rowIndex</span><span class="p">):</span>

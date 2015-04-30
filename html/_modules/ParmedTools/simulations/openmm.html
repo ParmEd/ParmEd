@@ -52,19 +52,19 @@
 <span class="sd">This module contains functionality for running simulations with OpenMM using</span>
 <span class="sd">parameters defined in an input file for sander and pmemd.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberMask</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">Rst7</span><span class="p">,</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.mdin</span> <span class="kn">import</span> <span class="n">mdin</span> <span class="k">as</span> <span class="n">Mdin</span>
 <span class="kn">from</span> <span class="nn">chemistry.openmm</span> <span class="kn">import</span> <span class="p">(</span><span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span><span class="p">,</span> <span class="n">MdcrdReporter</span><span class="p">,</span>
         <span class="n">RestartReporter</span><span class="p">,</span> <span class="n">ProgressReporter</span><span class="p">,</span> <span class="n">EnergyMinimizerReporter</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">chemistry.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SimulationError</span><span class="p">,</span> <span class="n">SimulationWarning</span><span class="p">,</span>
-               <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
+        <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="k">try</span><span class="p">:</span>
@@ -78,18 +78,20 @@
 
 <span class="n">_SCRIPT_HEADER</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s">#!/usr/bin/env python</span>
+<span class="s">from __future__ import division, print_function</span>
 
 <span class="s">import os, sys</span>
 
 <span class="s"># Import the OpenMM modules that are necessary</span>
 <span class="s">from simtk.openmm.app import *</span>
 <span class="s">from simtk.openmm import *</span>
-<span class="s">import simtk.unit as u</span>
 
 <span class="s"># Import the Amber/OpenMM modules</span>
 <span class="s">from chemistry.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj</span>
 <span class="s">from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,</span>
 <span class="s">        RestartReporter, ProgressReporter, EnergyMinimizerReporter)</span>
+<span class="s">from chemistry import unit as u</span>
+<span class="s">from chemistry.utils.six.moves import range</span>
 
 <span class="s"># Load the Amber topology file</span>
 <span class="s">parm = AmberParm(&#39;</span><span class="si">%s</span><span class="s">&#39;, &#39;</span><span class="si">%s</span><span class="s">&#39;)</span>
@@ -336,7 +338,7 @@
 
     <span class="c"># Create the OpenMM System object from our current options</span>
     <span class="n">timer</span><span class="o">.</span><span class="n">start_timer</span><span class="p">(</span><span class="s">&#39;system&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the OpenMM system...&#39;</span>
+    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the OpenMM system...&#39;</span><span class="p">)</span>
     <span class="n">system</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">nbmeth</span><span class="p">,</span>
                      <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;cut&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                      <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="n">rw</span><span class="p">,</span>
@@ -392,7 +394,7 @@
     <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;ntr&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">timer</span><span class="o">.</span><span class="n">add_timer</span><span class="p">(</span><span class="s">&#39;restraints&#39;</span><span class="p">,</span> <span class="s">&#39;Setting up positional restraints&#39;</span><span class="p">)</span>
         <span class="n">timer</span><span class="o">.</span><span class="n">start_timer</span><span class="p">(</span><span class="s">&#39;restraints&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the restraints...&#39;</span>
+        <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the restraints...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;restraint_wt&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Restraint weight must be &gt; 0 for restrained &#39;</span>
                                   <span class="s">&#39;dynamics&#39;</span><span class="p">)</span>
@@ -515,7 +517,7 @@
     <span class="c"># Create the Simulation object</span>
     <span class="n">timer</span><span class="o">.</span><span class="n">add_timer</span><span class="p">(</span><span class="s">&#39;simulation&#39;</span><span class="p">,</span> <span class="s">&#39;Creating the Simulation object&#39;</span><span class="p">)</span>
     <span class="n">timer</span><span class="o">.</span><span class="n">start_timer</span><span class="p">(</span><span class="s">&#39;simulation&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the simulation...&#39;</span>
+    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up the simulation...&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;simulation = Simulation(parm.topology, system, &#39;</span>
                          <span class="s">&#39;integrator, platform)</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -548,7 +550,8 @@
     <span class="c"># Set the particle positions and box vectors (if applicable) from either the</span>
     <span class="c"># given restart file or from the topology file object. Also use particle</span>
     <span class="c"># velocities if requested via irest=1</span>
-    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up initial coordinates and velocities...&#39;</span>
+    <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Setting up initial coordinates and velocities...&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">inpcrd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">position_container</span> <span class="o">=</span> <span class="n">Rst7</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">inpcrd</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">position_container</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">):</span>
@@ -613,7 +616,7 @@
         <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;imin&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">add_timer</span><span class="p">(</span><span class="s">&#39;minimization&#39;</span><span class="p">,</span> <span class="s">&#39;Structure minimization&#39;</span><span class="p">)</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">start_timer</span><span class="p">(</span><span class="s">&#39;minimization&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Minimizing...&#39;</span>
+            <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Minimizing...&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;rep = EnergyMinimizerReporter(&quot;</span><span class="si">%s</span><span class="s">&quot;, &#39;</span>
                                  <span class="s">&#39;volume=</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
@@ -655,7 +658,7 @@
         <span class="k">elif</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;imin&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">add_timer</span><span class="p">(</span><span class="s">&#39;minimization&#39;</span><span class="p">,</span> <span class="s">&#39;Structure minimization&#39;</span><span class="p">)</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">start_timer</span><span class="p">(</span><span class="s">&#39;minimization&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Minimizing...&#39;</span>
+            <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Minimizing...&#39;</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">inptraj</span> <span class="o">=</span> <span class="n">NetCDFTraj</span><span class="o">.</span><span class="n">open_old</span><span class="p">(</span><span class="n">inptrajname</span><span class="p">)</span>
                 <span class="n">nframes</span> <span class="o">=</span> <span class="n">inptraj</span><span class="o">.</span><span class="n">frame</span>
@@ -692,22 +695,22 @@
             <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;f = open(&quot;</span><span class="si">%s</span><span class="s">&quot;, &quot;w&quot;, 0)</span><span class="se">\n</span><span class="s">&#39;</span>
                         <span class="s">&#39;rep = EnergyMinimizerReporter(f, volume=</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span>
-                        <span class="s">&#39;for frame in xrange(nframes)</span><span class="se">\n</span><span class="s">&#39;</span>
+                        <span class="s">&#39;for frame in range(nframes)</span><span class="se">\n</span><span class="s">&#39;</span>
                         <span class="s">&#39;    crds = inptraj.coordinates(frame)</span><span class="se">\n</span><span class="s">&#39;</span>
                         <span class="s">&#39;    simulation.context.setPositions(</span><span class="se">\n</span><span class="s">&#39;</span>
                         <span class="s">&#39;         tuple([Vec3(crds[3*i], crds[3*i+1], &#39;</span>
                         <span class="s">&#39;crds[3*i+2])</span><span class="se">\n</span><span class="s">&#39;</span>
-                        <span class="s">&#39;           for i in xrange(parm.ptr(&quot;natom&quot;))]) * &#39;</span>
+                        <span class="s">&#39;           for i in range(parm.ptr(&quot;natom&quot;))]) * &#39;</span>
                         <span class="s">&#39;u.angstroms</span><span class="se">\n</span><span class="s">&#39;</span>
                         <span class="s">&#39;    )</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">outputfile</span>
                 <span class="p">)</span>
             <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">rep</span> <span class="o">=</span> <span class="n">EnergyMinimizerReporter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nframes</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nframes</span><span class="p">):</span>
                 <span class="n">crds</span> <span class="o">=</span> <span class="n">inptraj</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
                 <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span>
                         <span class="nb">tuple</span><span class="p">([</span><span class="n">Vec3</span><span class="p">(</span><span class="n">crds</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">crds</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">crds</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">))])</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">))])</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
                 <span class="p">)</span>
                 <span class="n">rep</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;maxcyc&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -851,7 +854,7 @@
                 <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;simulation.reporters.&#39;</span>
                                  <span class="s">&#39;append(restrt_reporter)</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Running MD...&#39;</span>
+        <span class="k">if</span> <span class="n">printprogress</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Running MD...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">scriptfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;simulation.step(</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span>
                 <span class="s">&#39;final_state = simulation.context.getState(getPositions=True,</span><span class="se">\n</span><span class="s">&#39;</span>
@@ -873,12 +876,12 @@
                         <span class="mf">1000.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">timer</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="s">&#39;md&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">3600</span> <span class="o">/</span> <span class="mi">24</span><span class="p">))</span>
 
     <span class="n">timer</span><span class="o">.</span><span class="n">done</span><span class="p">()</span>
-    <span class="k">print</span> <span class="s">&#39;Done&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Done&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timer</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
         <span class="n">timer</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
    
     <span class="k">if</span> <span class="n">mdin</span><span class="o">.</span><span class="n">cntrl_nml</span><span class="p">[</span><span class="s">&#39;imin&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">runsim</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&#39;MD timing: </span><span class="si">%.3f</span><span class="s"> ns/day&#39;</span> <span class="o">%</span> <span class="n">nsperday</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;MD timing: </span><span class="si">%.3f</span><span class="s"> ns/day&#39;</span> <span class="o">%</span> <span class="n">nsperday</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">scriptfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">scriptfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>

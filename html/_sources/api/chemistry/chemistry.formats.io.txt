@@ -1,7 +1,0 @@
-chemistry.formats.io module
-===========================
-
-.. automodule:: chemistry.formats.io
-    :members:
-    :undoc-members:
-    :show-inheritance:

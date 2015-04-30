@@ -48,14 +48,15 @@
           <div class="body" role="main">
             
   <h1>Source code for chemistry.openmm.reporters</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">chemistry.amber.asciicrd</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
 <span class="kn">from</span> <span class="nn">chemistry.geometry</span> <span class="kn">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.netcdffiles</span> <span class="kn">import</span> <span class="n">NetCDFTraj</span>
 <span class="kn">from</span> <span class="nn">chemistry.amber.readparm</span> <span class="kn">import</span> <span class="n">Rst7</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">isinf</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
@@ -77,7 +78,7 @@
 <span class="n">VELUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">picosecond</span>
 <span class="n">FRCUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie_per_mole</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
 
-<div class="viewcode-block" id="StateDataReporter"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.reporters.StateDataReporter">[docs]</a><span class="k">class</span> <span class="nc">StateDataReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter">[docs]</a><span class="k">class</span> <span class="nc">StateDataReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class acts as a state data reporter for OpenMM simulations, but it is a</span>
 <span class="sd">    little more generalized. Notable differences are:</span>
@@ -166,7 +167,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeUnit</span> <span class="o">=</span> <span class="n">timeUnit</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_volumeUnit</span> <span class="o">=</span> <span class="n">volumeUnit</span>
 </div>
-<div class="viewcode-block" id="StateDataReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.reporters.StateDataReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -187,7 +188,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needsPositions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needsVelocities</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_needsForces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="StateDataReporter.report"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.reporters.StateDataReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a report.</span>
 
 <span class="sd">        Parameters</span>
@@ -271,7 +272,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span><span class="p">:</span>
             <span class="c"># Compute the number of degrees of freedom.</span>
             <span class="n">dof</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">getParticleMass</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">dalton</span><span class="p">:</span>
                     <span class="n">dof</span> <span class="o">+=</span> <span class="mi">3</span>
             <span class="n">dof</span> <span class="o">-=</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumConstraints</span><span class="p">()</span>
@@ -282,7 +283,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="c"># Compute the total system mass.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="o">=</span> <span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">dalton</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="o">+=</span> <span class="n">system</span><span class="o">.</span><span class="n">getParticleMass</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">dalton</span>
@@ -333,7 +334,7 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_openedFile&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="StateDataReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.StateDataReporter.html#chemistry.openmm.reporters.StateDataReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StateDataReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.StateDataReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
@@ -341,7 +342,7 @@
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
 </div></div>
-<div class="viewcode-block" id="NetCDFReporter"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.reporters.NetCDFReporter">[docs]</a><span class="k">class</span> <span class="nc">NetCDFReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.NetCDFReporter">[docs]</a><span class="k">class</span> <span class="nc">NetCDFReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; NetCDFReporter prints a trajectory in NetCDF format &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
@@ -374,7 +375,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># not written yet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="nb">file</span>
 </div>
-<div class="viewcode-block" id="NetCDFReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.reporters.NetCDFReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.NetCDFReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -395,7 +396,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="NetCDFReporter.report"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.reporters.NetCDFReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.NetCDFReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a report.</span>
 
 <span class="sd">        Parameters</span>
@@ -449,7 +450,7 @@
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-<div class="viewcode-block" id="NetCDFReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.NetCDFReporter.html#chemistry.openmm.reporters.NetCDFReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.NetCDFReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -457,7 +458,7 @@
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
 </div></div>
-<div class="viewcode-block" id="MdcrdReporter"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.reporters.MdcrdReporter">[docs]</a><span class="k">class</span> <span class="nc">MdcrdReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MdcrdReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.MdcrdReporter">[docs]</a><span class="k">class</span> <span class="nc">MdcrdReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will</span>
 <span class="sd">    be significantly slower than binary file reporters (like DCDReporter or</span>
@@ -498,7 +499,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># not written yet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="nb">file</span>
 </div>
-<div class="viewcode-block" id="MdcrdReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.reporters.MdcrdReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="MdcrdReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.MdcrdReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -518,7 +519,7 @@
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="MdcrdReporter.report"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.reporters.MdcrdReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="MdcrdReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.MdcrdReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a report.</span>
 
@@ -548,8 +549,8 @@
 
         <span class="c"># Add the coordinates, velocities, and/or forces as needed</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">:</span>
-            <span class="n">flatcrd</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
+            <span class="n">flatcrd</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
                 <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">3</span>
                 <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">crds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">add_coordinates</span><span class="p">(</span><span class="n">flatcrd</span><span class="p">)</span>
@@ -558,14 +559,14 @@
             <span class="c"># This is necessary since AmberMdcrd does not scale before writing</span>
             <span class="c"># (since it expects coordinates)</span>
             <span class="n">vels</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">VELSCALE</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vels</span><span class="p">]</span>
-            <span class="n">flatvel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
+            <span class="n">flatvel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
                 <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">3</span>
                 <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">add_coordinates</span><span class="p">(</span><span class="n">flatvel</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">:</span>
-            <span class="n">flatfrc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
+            <span class="n">flatfrc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
                 <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">3</span>
                 <span class="n">flatfrc</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">flatfrc</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">flatfrc</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">frcs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">add_coordinates</span><span class="p">(</span><span class="n">flatfrc</span><span class="p">)</span>
@@ -582,7 +583,7 @@
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-<div class="viewcode-block" id="MdcrdReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.MdcrdReporter.html#chemistry.openmm.reporters.MdcrdReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MdcrdReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.MdcrdReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -590,7 +591,7 @@
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
 </div></div>
-<div class="viewcode-block" id="RestartReporter"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.reporters.RestartReporter">[docs]</a><span class="k">class</span> <span class="nc">RestartReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="RestartReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.RestartReporter">[docs]</a><span class="k">class</span> <span class="nc">RestartReporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Use a reporter to handle writing restarts at specified intervals.</span>
 
@@ -621,7 +622,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write_velocities</span> <span class="o">=</span> <span class="n">write_velocities</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
-<div class="viewcode-block" id="RestartReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.reporters.RestartReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="RestartReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.RestartReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -641,7 +642,7 @@
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="RestartReporter.report"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.reporters.RestartReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="RestartReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.RestartReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a report.</span>
 
 <span class="sd">        Parameters</span>
@@ -660,16 +661,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span>
                              <span class="n">title</span><span class="o">=</span><span class="s">&#39;Restart file written by ParmEd with OpenMM&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getTime</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">)</span>
-        <span class="n">flatcrd</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
+        <span class="n">flatcrd</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
             <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">3</span>
             <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">flatcrd</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">crds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">flatcrd</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_velocities</span><span class="p">:</span>
             <span class="n">vels</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getVelocities</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">VELUNIT</span><span class="p">)</span>
-            <span class="n">flatvel</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
+            <span class="n">flatvel</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">*</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">):</span>
                 <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">3</span>
                 <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">flatvel</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">vels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span><span class="o">.</span><span class="n">vels</span> <span class="o">=</span> <span class="n">flatvel</span>
@@ -689,11 +690,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">netcdf</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="RestartReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.RestartReporter.html#chemistry.openmm.reporters.RestartReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RestartReporter.finalize"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.RestartReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; No-op here &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </div></div>
-<div class="viewcode-block" id="ProgressReporter"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.reporters.ProgressReporter">[docs]</a><span class="k">class</span> <span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">StateDataReporter</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgressReporter"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.ProgressReporter">[docs]</a><span class="k">class</span> <span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">StateDataReporter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that prints out a progress report of how much MD (or minimization)</span>
 <span class="sd">    has been done, how fast the simulation is running, and how much time is left</span>
@@ -758,7 +759,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_lastReportTime</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeStep</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
-<div class="viewcode-block" id="ProgressReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.reporters.ProgressReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgressReporter.describeNextReport"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.ProgressReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get information about the next report this object will generate.</span>
 
@@ -785,7 +786,7 @@
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span><span class="p">)</span>
    </div>
-<div class="viewcode-block" id="ProgressReporter.report"><a class="viewcode-back" href="../../../openmmobj/chemistry.openmm.ProgressReporter.html#chemistry.openmm.reporters.ProgressReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgressReporter.report"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.reporters.html#chemistry.openmm.reporters.ProgressReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a report and predict the time to completion (and</span>
 <span class="sd">        current/overall MD performance)</span>

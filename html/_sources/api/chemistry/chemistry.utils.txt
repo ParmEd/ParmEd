@@ -1,0 +1,19 @@
+chemistry.utils package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.utils.io
+   chemistry.utils.six
+   chemistry.utils.timer
+
+Module contents
+---------------
+
+.. automodule:: chemistry.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

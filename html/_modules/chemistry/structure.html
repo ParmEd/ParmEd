@@ -71,12 +71,8 @@
 <span class="sd">59 Temple Place - Suite 330</span>
 <span class="sd">Boston, MA 02111-1307, USA.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">bz2</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">bz2</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="n">DEG_TO_RAD</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ChemError</span><span class="p">,</span> <span class="n">MissingParameter</span><span class="p">,</span>
         <span class="n">MissingParameterWarning</span><span class="p">)</span>
@@ -92,12 +88,9 @@
         <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">TwoParticleExtraPointFrame</span><span class="p">,</span>
         <span class="n">ThreeParticleExtraPointFrame</span><span class="p">,</span> <span class="n">OutOfPlaneExtraPointFrame</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">gzip</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">gzip</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -111,11 +104,6 @@
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">pd</span> <span class="o">=</span> <span class="bp">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="nb">basestring</span>
-<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
-    <span class="nb">basestring</span> <span class="o">=</span> <span class="nb">str</span>
 
 <span class="c"># Try to import the OpenMM modules</span>
 <span class="k">try</span><span class="p">:</span>
@@ -245,7 +233,7 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A chemical structure composed of atoms, bonds, angles, torsions, and other</span>
 <span class="sd">    topological features</span>
@@ -395,7 +383,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure, adding a new residue to `residues` if</span>
 <span class="sd">        it has a different name or number as the last residue added and adding</span>
@@ -424,7 +412,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure at the end if the given residue</span>
 
@@ -462,7 +450,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a copy of the current structure as an instance of a specified</span>
 <span class="sd">        subclass</span>
@@ -578,7 +566,7 @@
         <span class="k">if</span> <span class="n">split_dihedrals</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">):</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="p">)):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="p">)):</span>
                         <span class="n">ie</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">ignore_end</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
                         <span class="n">ti</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">starting_index</span> <span class="o">+</span> <span class="n">i</span>
                         <span class="n">c</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -683,7 +671,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates a pandas.DataFrame object from the current Structure</span>
 
 <span class="sd">        Returns</span>
@@ -863,7 +851,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if any of the topology has changed for this structure &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
@@ -886,7 +874,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Toggles all lists so that they do not indicate any changes &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
@@ -924,7 +912,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Looks through all of the topological lists and gets rid of terms</span>
 <span class="sd">        in which at least one of the atoms is None or has an `idx` attribute set</span>
@@ -947,7 +935,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonbonded exclusions and exceptions have the following priority:</span>
 
@@ -975,7 +963,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes a subset of the atoms corresponding to an atom-based selection.</span>
 
@@ -993,7 +981,7 @@
             <span class="k">if</span> <span class="n">selection</span><span class="o">.</span><span class="n">parm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;passed mask does not belong to Structure&#39;</span><span class="p">)</span>
             <span class="n">sel</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">sel</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1064,12 +1052,12 @@
 
         <span class="c"># Now we select a subset of atoms. Convert &quot;selection&quot; into a natom list</span>
         <span class="c"># with 0s and 1s, depending on what the input selection is</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
             <span class="n">selection</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))[</span><span class="n">selection</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">selection</span><span class="p">]:</span>
                 <span class="n">sel</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
@@ -1084,7 +1072,7 @@
                 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">chain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
                         <span class="n">chainmap</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">idx</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">chainsel</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
                         <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">chainsel</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1109,14 +1097,14 @@
                 <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="c"># Residue selection can either be by name or index</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">))[</span><span class="n">ressel</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)))[</span><span class="n">ressel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
                 <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">ressel</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ressel</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))[</span><span class="n">atomsel</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">atomsel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
                 <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atomsel</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atomsel</span><span class="p">)</span>
@@ -1319,7 +1307,7 @@
     <span class="c">#===================================================</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                      <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">switchDistance</span><span class="o">=</span><span class="mf">0.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -1500,7 +1488,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds constraints to a given system</span>
 
 <span class="sd">        Parameters</span>
@@ -1555,7 +1543,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the virtual sites in a given OpenMM `System` object from the extra</span>
 <span class="sd">        points defined in this system</span>
@@ -1598,7 +1586,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                        <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</span>
@@ -1655,7 +1643,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</span>
 <span class="sd">        angles are for an Amoeba-parametrized system)</span>
@@ -1705,7 +1693,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM PeriodicTorsionForce modeling dihedrals</span>
 
 <span class="sd">        Returns</span>
@@ -1735,7 +1723,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM Urey-Bradley force</span>
 
 <span class="sd">        Returns</span>
@@ -1760,7 +1748,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM improper torsion force (quadratic bias)</span>
 
 <span class="sd">        Returns</span>
@@ -1786,7 +1774,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM CMAP torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -1825,7 +1813,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                             <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">switchDistance</span><span class="o">=</span><span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">ewaldErrorTolerance</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
@@ -1995,7 +1983,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
                        <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">30.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                        <span class="n">soluteDielectric</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -2112,7 +2100,7 @@
     <span class="c"># Amoeba-specific forces below</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba trigonal-angle force</span>
 
 <span class="sd">        Returns</span>
@@ -2144,7 +2132,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba out-of-plane bend force</span>
 
 <span class="sd">        Returns</span>
@@ -2175,7 +2163,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba pi-torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -2198,7 +2186,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba stretch-bend force for this system</span>
 
 <span class="sd">        Returns</span>
@@ -2223,7 +2211,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../structobj/chemistry.structure.Structure.html#chemistry.amber.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../api/chemistry/chemistry.structure.html#chemistry.amber.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba coupled-torsion (CMAP) force</span>
 
 <span class="sd">        Returns</span>
@@ -2241,7 +2229,7 @@
 </div>
     <span class="k">def</span> <span class="nf">_prune_empty_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty bonds &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">))):</span>
             <span class="n">bond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2253,7 +2241,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty angles &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">))):</span>
             <span class="n">angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
                     <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2267,7 +2255,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_dihedrals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty dihedrals &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">))):</span>
             <span class="n">dihed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
                     <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2281,7 +2269,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_ureys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty Urey-Bradley terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">))):</span>
             <span class="n">ub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">ub</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">ub</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2293,7 +2281,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_impropers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty improper torsions &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">))):</span>
             <span class="n">imp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span>
                     <span class="ow">and</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2307,7 +2295,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_cmaps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty CMAP terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">))):</span>
             <span class="n">cmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span>
                     <span class="ow">and</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2322,7 +2310,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_trigonal_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty trigonal angles &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="p">))):</span>
             <span class="n">ta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ta</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">ta</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">ta</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
                     <span class="n">ta</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2336,7 +2324,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_out_of_plane_bends</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty out-of-plane bends &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span><span class="p">))):</span>
             <span class="n">oop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">oop</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">oop</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">oop</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span>
                     <span class="ow">and</span> <span class="n">oop</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2350,7 +2338,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_pi_torsions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty pi-torsions &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">))):</span>
             <span class="n">pit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">pit</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">pit</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
                     <span class="n">pit</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">pit</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
@@ -2366,7 +2354,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_stretch_bends</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty stretch-bend terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">))):</span>
             <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">sb</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">sb</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">sb</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2379,7 +2367,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_torsion_torsions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty torsion-torsion terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">))):</span>
             <span class="n">tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">tt</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">tt</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">is</span> <span class="bp">None</span>
                     <span class="ow">and</span> <span class="n">tt</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">tt</span><span class="o">.</span><span class="n">atom5</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
@@ -2394,7 +2382,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_chiral_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty chiral frame terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">))):</span>
             <span class="n">cf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">cf</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">cf</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2405,7 +2393,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_multipole_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty multipole frame terms &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">))):</span>
             <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">mf</span><span class="o">.</span><span class="n">atom</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">mf</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2414,7 +2402,7 @@
 
     <span class="k">def</span> <span class="nf">_prune_empty_adjusts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Gets rid of any empty nonbonded exception adjustments &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">))):</span>
             <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">adj</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">adj</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2500,8 +2488,8 @@
         <span class="n">radii</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">length_conv</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">radii</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">implicitSolvent</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">GBn2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">screen</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">screen</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">screen</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">screen</span><span class="p">))</span>
 
     <span class="c">#===================================================</span>
 

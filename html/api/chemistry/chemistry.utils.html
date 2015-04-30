@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chemistry.molecule module &mdash; ParmEd 2.0 documentation</title>
+    <title>chemistry.utils package &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -45,51 +45,26 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-chemistry.molecule">
-<span id="chemistry-molecule-module"></span><h1>chemistry.molecule module<a class="headerlink" href="#module-chemistry.molecule" title="Permalink to this headline">¶</a></h1>
-<p>Molecule class for manipulating biomolecular structures and storing
-molecular data for use in various transformations.</p>
-<dl class="class">
-<dt id="chemistry.molecule.Molecule">
-<em class="property">class </em><code class="descclassname">chemistry.molecule.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>atoms=[]</em>, <em>atom_types=[]</em>, <em>charges=[]</em>, <em>residues=[]</em>, <em>bonds=[]</em>, <em>residue_pointers=[]</em>, <em>coords=[]</em>, <em>elements=[]</em>, <em>title=''</em>, <em>radii=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/molecule.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.molecule.Molecule" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Molecule class that contains biomolecular data:</dt>
-<dd><p class="first">o  atoms       : sequential list of atoms in an array
-o  atom_types  : atom types associated with each atom
-o  elements    : element of each atom
-o  charges     : partial charges on each atom
-o  residues    : array of residue names
-o  bonds       : array in which each element lists the atom indices</p>
-<blockquote>
-<div>of the other atoms that atom is bonded to</div></blockquote>
-<p>o  residue_pointers : index of first atom of each residue
-o  residue_container: which residue each atom belongs to
-o  coords      : cartesian coordinates (x1,y1,z1,x2,y2,z2,...) of</p>
-<blockquote class="last">
-<div>each atom in the molecule</div></blockquote>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.molecule.Molecule.DeleteAtom" title="chemistry.molecule.Molecule.DeleteAtom"><code class="xref py py-obj docutils literal"><span class="pre">DeleteAtom</span></code></a>(atomno)</td>
-<td>Deletes an atom from the molecule, removing all bonds it&#8217;s involved with</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="chemistry.molecule.Molecule.DeleteAtom">
-<code class="descname">DeleteAtom</code><span class="sig-paren">(</span><em>atomno</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/molecule.html#Molecule.DeleteAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.molecule.Molecule.DeleteAtom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes an atom from the molecule, removing all bonds it&#8217;s involved with
-and translating all bonds by one</p>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="chemistry-utils-package">
+<h1>chemistry.utils package<a class="headerlink" href="#chemistry-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.io.html">chemistry.utils.io module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.six.html">chemistry.utils.six module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.timer.html">chemistry.utils.timer module</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-chemistry.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistry.utils" title="Permalink to this headline">¶</a></h2>
+<p>Various utilities used by ParmEd that don&#8217;t really fit elsewhere</p>
+</div>
 </div>
 
 
@@ -98,10 +73,19 @@ and translating all bonds by one</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">chemistry.utils package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-chemistry.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/chemistry/chemistry.molecule.txt"
+      <li><a href="../../_sources/api/chemistry/chemistry.utils.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>

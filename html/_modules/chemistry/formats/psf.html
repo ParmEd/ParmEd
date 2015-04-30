@@ -55,9 +55,12 @@
 <span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span>
 <span class="c"># TODO -- move this functionality to a more centralized location</span>
 <span class="kn">from</span> <span class="nn">chemistry.charmm.psf</span> <span class="kn">import</span> <span class="n">set_molecules</span>
-<span class="kn">from</span> <span class="nn">chemistry.formats.io</span> <span class="kn">import</span> <span class="n">genopen</span><span class="p">,</span> <span class="n">TextToBinaryFile</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="PSFFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.amber.PSFFile">[docs]</a><span class="k">class</span> <span class="nc">PSFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    CHARMM- or XPLOR-style PSF file parser and writer. This class is</span>
@@ -66,8 +69,6 @@
 <span class="sd">    directly, use :class:`chemistry.charmm.CharmmPsfFile` or the</span>
 <span class="sd">    :func:`chemistry.formats.load_file` function instead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
-
     <span class="c">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
@@ -85,7 +86,7 @@
 <span class="sd">            True if it is a CHARMM or Xplor-style PSF file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;PSF&#39;</span><span class="p">)</span>
 
@@ -141,7 +142,7 @@
         <span class="c"># Index the atoms and residues</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
 
         <span class="c"># Assign the formats we need to write with</span>
         <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
@@ -251,7 +252,7 @@
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="c"># NNB section ??</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span> <span class="o">+</span> <span class="s">&#39; !NNB</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="c"># Write 8 0&#39;s per line</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -292,9 +293,7 @@
         <span class="c"># Done!</span>
         <span class="c"># If we opened our own handle, close it</span>
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="c">#===================================================</span></div></div>
+            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>

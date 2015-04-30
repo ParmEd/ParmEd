@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.utils.timer module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-chemistry.utils.timer">
+<span id="chemistry-utils-timer-module"></span><h1>chemistry.utils.timer module<a class="headerlink" href="#module-chemistry.utils.timer" title="Permalink to this headline">¶</a></h1>
+<p>This is a module that contains basic timer facilities. It&#8217;s useful for profiling
+the performance of a script in &#8220;chunks&#8221;.</p>
+<dl class="class">
+<dt id="chemistry.utils.timer.Timer">
+<em class="property">class </em><code class="descclassname">chemistry.utils.timer.</code><code class="descname">Timer</code><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Timer class. It adds new timers and keeps track of how much time has been
+spent.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.add_timer" title="chemistry.utils.timer.Timer.add_timer"><code class="xref py py-obj docutils literal"><span class="pre">add_timer</span></code></a>(timer_name,&nbsp;description)</td>
+<td>Add a new timer</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.done" title="chemistry.utils.timer.Timer.done"><code class="xref py py-obj docutils literal"><span class="pre">done</span></code></a>()</td>
+<td>Tell Timer we are done, and we can convert units to best</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.end_all" title="chemistry.utils.timer.Timer.end_all"><code class="xref py py-obj docutils literal"><span class="pre">end_all</span></code></a>()</td>
+<td>End all of the timers</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.print_" title="chemistry.utils.timer.Timer.print_"><code class="xref py py-obj docutils literal"><span class="pre">print_</span></code></a>(timer,&nbsp;outfile[,&nbsp;newline])</td>
+<td>Prints the value of the timer</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.start_timer" title="chemistry.utils.timer.Timer.start_timer"><code class="xref py py-obj docutils literal"><span class="pre">start_timer</span></code></a>(timer_name)</td>
+<td>Start the specified timer</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.utils.timer.Timer.stop_timer" title="chemistry.utils.timer.Timer.stop_timer"><code class="xref py py-obj docutils literal"><span class="pre">stop_timer</span></code></a>(timer_name)</td>
+<td>End the specified timer</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.add_timer">
+<code class="descname">add_timer</code><span class="sig-paren">(</span><em>timer_name</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.add_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.add_timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new timer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.done">
+<code class="descname">done</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.done"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tell Timer we are done, and we can convert units to best 
+human-readable option</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.end_all">
+<code class="descname">end_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.end_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.end_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>End all of the timers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.print_">
+<code class="descname">print_</code><span class="sig-paren">(</span><em>timer</em>, <em>outfile</em>, <em>newline=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.print_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.print_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the value of the timer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.start_timer">
+<code class="descname">start_timer</code><span class="sig-paren">(</span><em>timer_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.start_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.start_timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the specified timer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.utils.timer.Timer.stop_timer">
+<code class="descname">stop_timer</code><span class="sig-paren">(</span><em>timer_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/utils/timer.html#Timer.stop_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.timer.Timer.stop_timer" title="Permalink to this definition">¶</a></dt>
+<dd><p>End the specified timer</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/chemistry/chemistry.utils.timer.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

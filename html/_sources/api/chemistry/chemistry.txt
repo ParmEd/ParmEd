@@ -14,6 +14,7 @@ Subpackages
     chemistry.rosetta
     chemistry.tinker
     chemistry.unit
+    chemistry.utils
 
 Submodules
 ----------
@@ -23,11 +24,9 @@ Submodules
    chemistry.constants
    chemistry.exceptions
    chemistry.geometry
-   chemistry.molecule
    chemistry.periodic_table
    chemistry.residue
    chemistry.structure
-   chemistry.timer
    chemistry.topologyobjects
 
 Module contents

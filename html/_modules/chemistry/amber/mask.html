@@ -52,7 +52,11 @@
 <span class="sd">Module for evaluating Amber Mask strings and translating them into lists in</span>
 <span class="sd">which a selected atom is 1 and one that&#39;s not is 0.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">MaskError</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
 <div class="viewcode-block" id="AmberMask"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.mask.html#chemistry.amber.AmberMask">[docs]</a><span class="k">class</span> <span class="nc">AmberMask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -614,7 +618,7 @@
    
     <span class="k">def</span> <span class="nf">_atnum_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array between atom numbers at1 and at2 &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">at1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">at2</span><span class="p">):</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">at1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">at2</span><span class="p">):</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c">#======================================================</span>
    
@@ -712,7 +716,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">natom</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">=</span> <span class="n">natom</span>
-        <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">)])</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)])</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
@@ -730,7 +734,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span> 
             <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&quot;_mask: and() requires another mask of equal size!&quot;</span><span class="p">)</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_mask</span>
 
@@ -738,18 +742,18 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask: or() requires another mask of equal size!&#39;</span><span class="p">)</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">or</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_mask</span>
    
     <span class="k">def</span> <span class="nf">Not</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_mask</span>
 
     <span class="k">def</span> <span class="nf">select_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
