@@ -11,6 +11,7 @@ from chemistry.exceptions import (BondError, DihedralError, CmapError,
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from chemistry.periodic_table import Mass, Element as _Element
 import chemistry.unit as u
+from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import zip, range
 import copy
 import math
@@ -4055,7 +4056,7 @@ class AtomType(object):
                     abs(self.epsilon_14 - other.epsilon_14) > TINY and
                     abs(self.rmin_14 - other.rmin_14) > TINY and
                     self.nbfix == other.nbfix)
-        if isinstance(other, basestring):
+        if isinstance(other, string_types):
             return self.name == other
         if isinstance(other, int):
             return self.number == other

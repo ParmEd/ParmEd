@@ -12,6 +12,7 @@ from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
 from chemistry import periodic_table as pt
 from chemistry.utils.io import genopen
+from chemistry.utils.six import string_types
 from collections import OrderedDict
 from contextlib import closing
 try:
@@ -111,7 +112,7 @@ class AmberOFFLibrary(object):
         RuntimeError if EOF is reached prematurely or other formatting issues
         found
         """
-        if isinstance(filename, basestring):
+        if isinstance(filename, string_types):
             fileobj = genopen(filename, 'r')
             own_handle = True
         else:

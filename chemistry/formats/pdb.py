@@ -11,7 +11,7 @@ from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint
 from chemistry.utils.io import genopen
-from chemistry.utils.six import iteritems
+from chemistry.utils.six import iteritems, string_types
 from chemistry.utils.six.moves import range
 import itertools
 try:
@@ -153,7 +153,7 @@ class PDBFile(object):
         of the coordinates for all of the frames in the PDB file as a list of
         NATOM*3 lists.
         """
-        if isinstance(filename, basestring):
+        if isinstance(filename, string_types):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:
@@ -772,7 +772,7 @@ class CIFFile(object):
         of the coordinates for all of the frames in the PDB file as a list of
         NATOM*3 lists.
         """
-        if isinstance(filename, basestring):
+        if isinstance(filename, string_types):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:

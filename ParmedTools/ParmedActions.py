@@ -12,7 +12,7 @@ from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.formats import PDBFile, CIFFile, Mol2File
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
-from chemistry.utils.six import iteritems
+from chemistry.utils.six import iteritems, string_types
 from chemistry.utils.six.moves import zip, range
 import copy
 import math
@@ -153,7 +153,7 @@ class Action(lawsuit):
             arg_list = arg_list.decode()
             arg_list = ArgumentList(arg_list)
         except AttributeError:
-            if isinstance(arg_list, str):
+            if isinstance(arg_list, string_types):
                 arg_list = ArgumentList(arg_list)
             else:
                 arg_list = ArgumentList(str(arg_list))

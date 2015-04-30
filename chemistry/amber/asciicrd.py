@@ -129,7 +129,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             True if it is an Amber restart/inpcrd file. False otherwise
         """
         f = genopen(filename, 'r')
-        lines = [f.readline().decode() for i in range(5)]
+        lines = [f.readline() for i in range(5)]
         f.close()
         # Look for natom
         try:
@@ -446,7 +446,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             True if it is an Amber mdcrd file. False otherwise
         """
         f = genopen(filename, 'r')
-        lines = [f.readline().decode() for i in range(5)]
+        lines = [f.readline() for i in range(5)]
         f.close()
         # Next 4 lines, make sure we have %8.3f format
         try:
