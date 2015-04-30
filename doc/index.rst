@@ -65,6 +65,43 @@ biomolecular simulations.  For example, some of its features include:
     - Extract metadata from the PDB and PDBx/mmCIF files, such as citation
       information and related database entries
 
+Roadmap: Main goals and future directions
+-----------------------------------------
+
+One of the main goals of ParmEd is to provide a single interface for all of the
+various biomolecular simulation programs and file formats out there and provide
+a platform upon which transferring data between these different formats and
+programs is easy and, most importantly, reliable.
+
+Every program is different--developed by different people for different purposes
+to solve perhaps slightly different scientific problems. As such, each program
+has something to offer that the others don't, be it a fancy new method, improved
+computational performance, better force field for a particular molecule, easier
+simulation setup, etc. It is currently very difficult to combine components of
+different program suites into a single workflow, however, given the highly
+specialized nature of the various file formats for the programs they were
+written around (e.g., the Amber topology file in the Amber programs, the GROMACS
+top and itp files for GROMACS, etc.).
+
+Some programs out there will allow you to take, for instance, an Amber topology
+file and convert it into something GROMACS will understand, but the reverse is
+not available in any tool.  ParmEd hopes to bridge this gap in addition to
+providing a flexible API that will allow you to go beyond what each programs'
+modeling tools allow you to do by themselves.  It is an ambitious goal, to be
+sure, but good progress has already been made.
+
+Check out the `Github repository <http://github.com/ParmEd/ParmEd>`_ and its
+issue tracker to keep up-to-date with the planned as well as on-going
+developments!
+
+Slides and presentations
+------------------------
+
+I will post any slides pertaining to ParmEd from talks that I've given here, in
+the hopes that they may be helpful or informative.
+
+- `April 10, 2015 at MSKCC <http://parmed.github.io/ParmEd/ParmEd_Slides_08Apr2015.pdf>`_
+
 Program and API Reference
 -------------------------
 
