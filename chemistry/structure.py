@@ -1007,7 +1007,7 @@ class Structure(object):
             selection = mask.Selection()
         elif isinstance(selection, slice):
             sel = [0 for a in self.atoms]
-            for idx in range(len(self.atoms))[selection]:
+            for idx in list(range(len(self.atoms)))[selection]:
                 sel[idx] = 1
             selection = sel
         elif isinstance(selection, tuple) and len(selection) in (2, 3):
@@ -1047,13 +1047,13 @@ class Structure(object):
                 has_chain = True
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
-                resset = set(range(len(self.residues))[ressel])
+                resset = set(list(range(len(self.residues)))[ressel])
             elif isinstance(ressel, string_types) or isinstance(ressel, int):
                 resset = set([ressel])
             else:
                 resset = set(ressel)
             if isinstance(atomsel, slice):
-                atomset = set(range(len(self.atoms))[atomsel])
+                atomset = set(list(range(len(self.atoms)))[atomsel])
             elif isinstance(atomsel, string_types) or isinstance(atomsel, int):
                 atomset = set([atomsel])
             else:
