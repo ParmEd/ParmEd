@@ -470,7 +470,7 @@ class AmoebaParameterSet(object):
         while rematch:
             try:
                 get_angle_type(rematch.groups()[0], *line.split()[1:])
-            except TypeError, err:
+            except TypeError as err:
                 print(repr(rematch.groups()[0]), line.split()[1:])
                 raise err
             line = f.readline().replace('\t', ' ')
