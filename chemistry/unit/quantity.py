@@ -67,17 +67,17 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
-from __future__ import division
+from __future__ import division, print_function, absolute_imports
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
 
+from chemistry.utils.six.moves import range
 import math
 import copy
-from standard_dimensions import *
-from unit import Unit, is_unit, dimensionless
+from .standard_dimensions import *
+from .unit import Unit, is_unit, dimensionless
 
 class Quantity(object):
     """Physical quantity, such as 1.3 meters per second.
