@@ -349,6 +349,7 @@ class Mol2File(object):
                     residues = struct.residues
                 charges = [a.charge for a in struct.atoms]
             dest.write('@<TRIPOS>MOLECULE\n')
+            dest.write('%s' % struct.name)
             dest.write('\n')
             dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
             if len(residues) == 1:
