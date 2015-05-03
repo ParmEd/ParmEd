@@ -364,7 +364,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteInternal(self):
         """ Tests reading/writing of Amber OFF internal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -373,7 +373,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteCTerm(self):
         """ Tests reading/writing of Amber OFF C-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -382,7 +382,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteNTerm(self):
         """ Tests reading/writing of Amber OFF N-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -391,7 +391,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteSolventLib(self):
         """ Tests reading/writing of Amber OFF solvent libs """
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)

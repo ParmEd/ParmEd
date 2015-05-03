@@ -166,7 +166,7 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
-@skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
+@unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
 class TestTrajRestartReporter(unittest.TestCase):
 
     def setUp(self):
