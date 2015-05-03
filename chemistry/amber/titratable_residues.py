@@ -3,12 +3,14 @@ This module contains all of the information for the titratable residues,
 including reference energies, model compound pKas, and charge vectors for every
 titratable residue treated.
 """
+from __future__ import print_function, division
 
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
                        'DG', 'DT', 'AP', 'CP', 'G', 'U']
 
 from chemistry.exceptions import (CpinChargeWarning, CpinRefEneWarning,
         CpinResidueError, CpinInputError, CpinInputWarning)
+from chemistry.utils.six.moves import range
 from math import log
 import warnings
 
@@ -163,7 +165,7 @@ class TitratableResidue(object):
     def __str__(self):
         ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
                    ''.join(['%12s' % ('STATE %d' % i) for i in
-                           xrange(len(self.states))]) + '\n'
+                           range(len(self.states))]) + '\n'
         )
         for i, atom in enumerate(self.atom_list):
             ret_str += ('%8s' % atom +
@@ -213,7 +215,7 @@ class TitratableResidue(object):
         if len(protcnts) != len(charges) and len(protcnts) != len(refenes):
             raise CpinResidueError('Inconsistent list of parameters for '
                                    'TitratableResidue.add_states')
-        for i in xrange(len(protcnts)):
+        for i in range(len(protcnts)):
             self.add_state(protcnts[i], charges[i], refenes[i])
 
     def cpin_pointers(self, first_atom):
@@ -252,7 +254,7 @@ class TitratableResidue(object):
         protcnts = [state.protcnt for state in self.states]
         # All we have to do is make sure that the charges/proton counts are
         # consistent between the first state and every other state
-        for i in xrange(1, len(sum_charges)):
+        for i in range(1, len(sum_charges)):
             charge_diff = sum_charges[i] - sum_charges[0]
             prot_diff = protcnts[i] - protcnts[0]
             if abs(charge_diff - prot_diff) >= 0.0001:
@@ -328,7 +330,7 @@ class TitratableResidueList(list):
         nswaps = 1
         while nswaps > 0:
             nswaps = 0
-            for i in xrange(len(self)-1):
+            for i in range(len(self)-1):
                 if self.first_atoms[i] > self.first_atoms[i+1]:
                     nswaps += 1
                     self.first_atoms[i], self.first_atoms[i+1] = \

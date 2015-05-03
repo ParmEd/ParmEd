@@ -11,6 +11,7 @@ import chemistry.topologyobjects as topologyobjects
 from chemistry.topologyobjects import _ListItem, _FourAtomTerm
 from chemistry.topologyobjects import *
 from chemistry.amber.readparm import AmberFormat
+from chemistry.utils.six.moves import range, zip
 import unittest
 from utils import get_fn
 import random

@@ -14,13 +14,10 @@ from chemistry import (Atom, AtomType, BondType, AngleType, DihedralType,
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.modeller import ResidueTemplate, PatchTemplate
-from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
-import compat24 # needs to be before collections
+from chemistry.periodic_table import AtomicNum, element_by_mass
+from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import range, zip
 from collections import OrderedDict
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 import os
 import warnings
 
@@ -434,7 +431,7 @@ class CharmmParameterSet(object):
                     # soldier on
                     if not read_first_nonbonded: continue
                     raise CharmmFileError('Could not parse nonbonded terms.')
-                except CharmmFileError, e:
+                except CharmmFileError as e:
                     if not read_first_nonbonded: continue
                     raise CharmmFileError(str(e))
                 else:
@@ -667,7 +664,7 @@ class CharmmParameterSet(object):
             pass
 
         # Go through the patches and add the appropriate one
-        for resname, res in residues.iteritems():
+        for resname, res in iteritems(residues):
             if hpatches[resname] is not None:
                 try:
                     res.first_patch = patches[hpatches[resname]]
@@ -760,10 +757,10 @@ class CharmmParameterSet(object):
         typedict : dict
             Type dictionary to condense
         """
-        keylist = typedict.keys()
-        for i in xrange(len(keylist) - 1):
+        keylist = list(typedict.keys())
+        for i in range(len(keylist) - 1):
             key1 = keylist[i]
-            for j in xrange(i+1, len(keylist)):
+            for j in range(i+1, len(keylist)):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]

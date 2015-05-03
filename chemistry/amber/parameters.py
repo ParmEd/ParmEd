@@ -1,11 +1,14 @@
 """
 Classes helpful for reading/storing Amber parameters
 """
-from __future__ import division
+from __future__ import division, print_function
+
 from chemistry.topologyobjects import BondType, AngleType, DihedralType
 from chemistry.amber.readparm import AmberParm
 from chemistry.constants import RAD_TO_DEG, SMALL
 from chemistry.exceptions import AmberParameterWarning
+from chemistry.utils.six import string_types
+from chemistry.utils.six.moves import range, zip
 import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -145,7 +148,7 @@ class DihedralParam(list):
                     self.atype2.ljust(2), self.atype3.ljust(2),
                     self.atype4.ljust(2), self[0].parmline())
         retstr = ''
-        for i in xrange(len(self)-1):
+        for i in range(len(self)-1):
             retstr += '%s-%s-%s-%s %s\n' % (self.atype1.ljust(2),
                     self.atype2.ljust(2), self.atype3.ljust(2),
                     self.atype4.ljust(2), self[i].parmline(multiterm=True))
@@ -162,7 +165,7 @@ class DihedralParam(list):
             return False
         if len(self) != len(other):
             return False
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             if self[i] != other[i]:
                 return False
         return True
@@ -398,7 +401,7 @@ class ParameterSet(object):
 
     def write(self, dest):
         """ Writes a parm.dat file with the current parameters """
-        if isinstance(dest, str):
+        if isinstance(dest, string_types):
             outfile = open(dest, 'w')
         elif hasattr(dest, 'write'):
             outfile = dest
@@ -439,5 +442,5 @@ class ParameterSet(object):
             outfile.write('%s\n' % atom.lennard_jones())
         outfile.write('\n')
 
-        if isinstance(dest, str):
+        if isinstance(dest, string_types):
             outfile.close()

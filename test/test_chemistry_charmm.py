@@ -1,11 +1,10 @@
 """
 Tests for the chemistry/charmm subpackage
 """
-
+from chemistry.utils.six import iteritems
 from chemistry.charmm import charmmcrds, parameters, psf
 from chemistry import topologyobjects as to
 from chemistry import exceptions
-from compat24 import all
 import os
 import unittest
 import utils
@@ -346,7 +345,7 @@ class TestCharmmParameters(unittest.TestCase):
                      'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
         )
         self.assertEqual(len(params.patches), 22)
-        for resname, res in params.residues.items():
+        for resname, res in iteritems(params.residues):
             if resname in ('TIP3', 'TP3M', 'SOD', 'MG', 'CLA', 'POT', 'CES',
                     'CAL', 'ZN2', 'ALAD'):
                 self.assertIs(res.first_patch, None)

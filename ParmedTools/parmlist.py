@@ -3,6 +3,9 @@ List of topology file objects that can be edited in ParmEd. They can be indexed
 via either the name of the topology file or by the order in which they were
 loaded.
 """
+from __future__ import print_function, division, absolute_import
+
+from chemistry.utils.six import string_types
 from chemistry import load_file, Structure
 from chemistry.exceptions import FormatNotFound
 from ParmedTools.exceptions import DuplicateParm, ParmIndexError, ParmError
@@ -27,7 +30,7 @@ class ParmList(object):
     def add_parm(self, parm):
         """ Add a parm to the list """
         # Make sure this parm is not part of the list already
-        if isinstance(parm, basestring):
+        if isinstance(parm, string_types):
             if parm in self._parm_names:
                 raise DuplicateParm('%s already in ParmList' % parm)
             try:

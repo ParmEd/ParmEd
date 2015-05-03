@@ -4,15 +4,13 @@ Tests the functionality in the chemistry.unit package.
 from __future__ import division
 
 from chemistry import unit as u
+from chemistry.utils.six import string_types
+from chemistry.utils.six.moves import zip
 import copy
 import math
 import unittest
 import utils
-from utils import has_numpy, numpy as np, skipIf
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Python 3... zip _is_ izip
+from utils import has_numpy, numpy as np
 
 class QuantityTestCase(unittest.TestCase):
 
@@ -641,7 +639,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
-@skipIf(not has_numpy(), "Cannot test without numpy")
+@unittest.skipIf(not has_numpy(), "Cannot test without numpy")
 class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyQuantity(self):
@@ -671,14 +669,13 @@ class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyIsString(self):
         """ Tests the internal _is_string method with numpy Quantities """
-        from chemistry.unit.quantity import _is_string
         a = np.array([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance("", str)
-        self.assertTrue(_is_string(""))
-        self.assertTrue(_is_string("t"))
-        self.assertTrue(_is_string("test"))
-        self.assertFalse(_is_string(3))
-        self.assertFalse(_is_string(a))
+        self.assertTrue(isinstance("", string_types))
+        self.assertTrue(isinstance("t", string_types))
+        self.assertTrue(isinstance("test", string_types))
+        self.assertFalse(isinstance(3, string_types))
+        self.assertFalse(isinstance(a, string_types))
 
     def testNumpyFunctions(self):
         """ Tests various numpy attributes that they result in Quantities """

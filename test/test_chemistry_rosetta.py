@@ -1,6 +1,7 @@
 from chemistry import read_PDB, load_rosetta
+from chemistry.utils.six.moves import range
 from itertools import chain
-from utils import get_fn, skipIf
+from utils import get_fn
 import unittest
 
 try:
@@ -17,7 +18,7 @@ def _unpackLen(obj):
     return len(list(obj))
 
 
-@skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
+@unittest.skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):
     """ Tests loading of a Rosetta pose object """
 
@@ -51,7 +52,7 @@ class TestRosetta(unittest.TestCase):
         self.assertEqual(len(struct.atoms), len(pdb.atoms))
         self.assertEqual(len(struct.residues), len(pdb.residues))
 
-    @skipIf(not PDBFile, "Cannot compare topologies without OpenMM.")
+    @unittest.skipIf(not PDBFile, "Cannot compare topologies without OpenMM.")
     def testLoadedTopology(self):
         """ Test load_rosetta against OpenMM topology"""
 

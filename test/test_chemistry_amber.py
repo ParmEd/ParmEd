@@ -1,14 +1,13 @@
 """
 Tests the functionality in the chemistry.amber package
 """
-
 from array import array
-from compat24 import all
 from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
+from chemistry.utils.six.moves import range, zip
 import os
 import unittest
-from utils import get_fn, has_numpy, skipIf
+from utils import get_fn, has_numpy
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -440,7 +439,7 @@ class TestWriteFiles(unittest.TestCase):
         rst.close()
         self._check_written_restarts(box)
 
-    @skipIf(not has_numpy(), "Cannot test without numpy")
+    @unittest.skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberRestartNumpy(self):
         """ Test writing Amber restart file passing numpy arrays """
         import numpy as np
@@ -491,7 +490,7 @@ class TestWriteFiles(unittest.TestCase):
         crd.close()
         self._check_written_mdcrds(box)
 
-    @skipIf(not has_numpy(), "Cannot test without numpy")
+    @unittest.skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberMdcrdNumpy(self):
         """ Test writing ASCII trajectory file passing numpy arrays """
         import numpy as np

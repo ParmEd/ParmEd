@@ -5,11 +5,11 @@ from __future__ import division
 
 from chemistry import geometry as geo
 from chemistry import unit as u
+from chemistry.utils.six.moves import zip
 import math
 import utils
 import unittest
 np = utils.numpy
-skipIf = utils.skipIf
 
 class TestChemistryGeometry(unittest.TestCase):
     """ Tests the various routines in the geometry package """
@@ -35,7 +35,7 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertEqualVectors(leng, (50, 50, 50))
         self.assertEqualVectors(ang, (rad, rad, rad))
 
-    @skipIf(not utils.has_numpy(), "Cannot test without numpy")
+    @unittest.skipIf(not utils.has_numpy(), "Cannot test without numpy")
     def testCenterOfMass(self):
         """ Tests the center-of-mass calculator """
         almost_equal = np.testing.assert_array_almost_equal
