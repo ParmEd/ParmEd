@@ -6,16 +6,17 @@ from __future__ import division
 import chemistry.structure as structure
 from chemistry import load_file
 from chemistry.topologyobjects import Atom
+from chemistry.utils.six.moves import zip
 import os
 import unittest
-from utils import get_fn, skipIf
+from utils import get_fn
 try:
     import pandas as pd
     import numpy as np
 except ImportError:
     pd = np = None
 
-@skipIf(pd is None or np is None, "Cannot test without pandas")
+@unittest.skipIf(pd is None or np is None, "Cannot test without pandas")
 class TestStructureDataFrame(unittest.TestCase):
     """ Tests the conversion of chemistry.Structure to a pd.DataFrame """
 

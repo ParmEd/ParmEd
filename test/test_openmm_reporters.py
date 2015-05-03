@@ -14,17 +14,17 @@ from chemistry.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
 from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 ProgressReporter, RestartReporter, StateDataReporter,
                 EnergyMinimizerReporter)
+from chemistry.utils.six.moves import range, zip
 import os
 import utils
 import unittest
 
 get_fn = utils.get_fn
-skipIf = utils.skipIf
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
-@skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(unittest.TestCase):
 
     def setUp(self):

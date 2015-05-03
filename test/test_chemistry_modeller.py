@@ -8,6 +8,7 @@ from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
 from chemistry.amber import AmberParm
 from chemistry.exceptions import BondError
 from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import zip, range, StringIO
 import os
 from ParmedTools import changeRadii
 import random
@@ -16,17 +17,6 @@ import unittest
 import utils
 import warnings
 get_fn = utils.get_fn
-skipIf = utils.skipIf
-
-try:
-    import cStringIO as StringIO
-except ImportError:
-    # Must be Python 3
-    import io as StringIO
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Must by py3
 
 class TestResidueTemplate(unittest.TestCase):
     """ Tests the ResidueTemplate class """
@@ -469,7 +459,7 @@ class TestAmberOFFLeapCompatibility(unittest.TestCase):
             pass
         os.chdir(self.cwd)
 
-    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
+    @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoInternal(self):
         """ Test that the internal AA OFF library writes work with LEaP """
         # First create the parm to test against... we are in "writes" right now
@@ -512,7 +502,7 @@ quit
         changeRadii(parm2, 'mbondi2').execute()
         self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
 
-    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
+    @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoTermini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
         offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))

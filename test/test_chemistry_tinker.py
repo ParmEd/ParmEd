@@ -5,6 +5,7 @@ Tests the functionality in the tinker subpackage
 import utils
 import unittest
 from chemistry.tinker import parameterfile, system, tinkerfiles
+from chemistry.utils.six.moves import zip
 
 get_fn = utils.get_fn
 

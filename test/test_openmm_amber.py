@@ -13,13 +13,13 @@ except ImportError:
 
 from chemistry.amber import AmberParm, ChamberParm, Rst7
 import chemistry.unit as u
+from chemistry.utils.six.moves import range, zip
 from copy import copy
 from math import sqrt
 import ParmedTools as PT
 import unittest
 import utils
-skipIf = utils.skipIf
-    
+
 get_fn = utils.get_fn
 
 if has_openmm:
@@ -1102,7 +1102,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
         self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
 
-    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigPME(self):
         """ Compare OpenMM and CHAMBER PME energies on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1129,7 +1129,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
-    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigDispersionCorrection(self):
         """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1159,7 +1159,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
-    @skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigSHAKE(self):
         """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),

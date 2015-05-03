@@ -1,6 +1,7 @@
 """
 Useful functions for the test cases
 """
+from chemistry.utils.six.moves import zip
 import os
 from os.path import join, split, abspath
 import sys
@@ -15,86 +16,6 @@ try:
     openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
 except ImportError:
     openmm_version = None
-
-# Patches for older Pythons.
-
-if not hasattr(unittest.TestCase, 'assertIsInstance'):
-    class TestCase(unittest.TestCase):
-        
-        def assertIsInstance(self, thing, type):
-            if not isinstance(thing, type):
-                standardMsg = '%s is not an instance of %r' % (obj, type)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertIs(self, first, second):
-            if first is not second:
-                standardMsg = "%s is not the same as %s" % (first, second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertGreaterEqual(self, first, second):
-            if not first >= second:
-                standardMsg = "%s is not greater than or equal to %s" % (first,
-                        second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertLessEqual(self, first, second):
-            if not first <= second:
-                standardMsg = "%s is not less than or equal to %s" % (first,
-                        second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertIsNot(self, first, second):
-            if first is second:
-                standardMsg = "%s is the same as %s" (first, second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertIn(self, first, container):
-            if not first in container:
-                standardMsg = "%s is not contained in %s" % (first, container)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertNotIn(self, first, container):
-            if first in container:
-                standardMsg = "%s is contained in %s" % (first, container)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertGreater(self, first, second):
-            if not first > second:
-                standardMsg = "%s is not greater than %s" % (first, second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-        def assertLess(self, first, second):
-            if not first < second:
-                standardMsg = "%s is not less than %s" % (first, second)
-                self.fail(self._formatMessage(None, standardMsg))
-
-    unittest.TestCase = TestCase
-
-try:
-    skipIf = unittest.skipIf
-except AttributeError:
-    # Fake it for Python 2.6 and earlier... not pretty
-    def skipIf(condition, message):
-        def decorator(func):
-            if isinstance(func, type):
-                # Class -- wrap all of its test attributes with skipIf's
-                # (modifying in-place), then return the original, modified class
-                if condition:
-                    for attr in dir(func):
-                        if attr.lower().startswith('test'):
-                            testFunc = getattr(func, attr)
-                            setattr(func, attr, skipIf(testFunc))
-                return func
-            # It's a method -- so wrap it
-            if condition:
-                def wrapped(*args, **kwargs):
-                    return func(*args, **kwargs)
-            else:
-                def wrapped(*args, **kwargs):
-                    sys.stdout.write('SKIP: %s' % message)
-                    return
-            return wrapped
-        return decorator
 
 def skip_big_tests():
     return os.getenv('PARMED_SKIP_BIG_TESTS') is not None

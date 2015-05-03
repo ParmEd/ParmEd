@@ -5,15 +5,12 @@ from __future__ import division
 
 from chemistry import unit as u
 from chemistry.utils.six import string_types
+from chemistry.utils.six.moves import zip
 import copy
 import math
 import unittest
 import utils
-from utils import has_numpy, numpy as np, skipIf
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Python 3... zip _is_ izip
+from utils import has_numpy, numpy as np
 
 class QuantityTestCase(unittest.TestCase):
 
@@ -642,7 +639,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
-@skipIf(not has_numpy(), "Cannot test without numpy")
+@unittest.skipIf(not has_numpy(), "Cannot test without numpy")
 class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyQuantity(self):
