@@ -846,6 +846,15 @@ class TestTopologyObjects(unittest.TestCase):
             for item in items:
                 self.assertIsNot(item, atom)
             self.assertEqual(atom.idx, -1)
+            self.assertTrue(items.changed)
+            items.changed = False
+        # Now test the remove method
+        self.assertFalse(items.changed)
+        items.append(Atom())
+        self.assertTrue(items.changed)
+        items.changed = False
+        items.remove(items[0])
+        self.assertTrue(items.changed)
 
 if __name__ == '__main__':
     unittest.main()
