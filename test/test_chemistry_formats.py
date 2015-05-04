@@ -161,6 +161,14 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.assertEqual(pdbfile.pdbxyz[0][:3], [-8.886, -5.163, 9.647])
         self.assertEqual(pdbfile.pdbxyz[19][-3:], [-12.051, 5.205, -2.146])
 
+    def testPositions(self):
+        """ Tests that positions are Vec3's with units """
+        from chemistry import unit as u
+        from chemistry import Vec3
+        pdbfile = read_PDB(open(self.models))
+        self.assertIsInstance(pdbfile.positions[0], u.Quantity)
+        self.assertIsInstance(pdbfile.positions[0].value_in_unit(u.angstroms), Vec3)
+
     def testGzip(self):
         """ Test Gzipped-PDB file parsing """
         self._check4lyt(read_PDB(self.pdbgz))

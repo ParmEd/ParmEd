@@ -37,6 +37,7 @@ from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
 from chemistry.utils.six.moves import zip, range
+from chemistry.vec3 import Vec3
 import copy
 try:
     import numpy as np
@@ -1886,12 +1887,12 @@ class Rst7(object):
     def positions(self):
         """ Atomic coordinates with units """
         try:
-            return u.Quantity(self.coordinates.reshape(self.natom, 3),
-                              u.angstroms)
+            coordinates = self.coordinates.reshape(self.natom, 3)
+            return [Vec3(*x) for x in coordinates] * u.angstroms
         except AttributeError:
             natom3 = self.natom * 3
-            return ([self.coordinates[i:i+3] for i in range(0, natom3, 3)] *
-                        u.angstroms)
+            return ([Vec3(*self.coordinates[i:i+3]) for i in range(0,natom3,3)]
+                        * u.angstroms)
 
     @property
     def velocities(self):
