@@ -37,6 +37,7 @@ from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
 from chemistry.utils.six.moves import zip, range
+from chemistry.vec3 import Vec3
 import copy
 try:
     import numpy as np

@@ -15,6 +15,7 @@ from chemistry.exceptions import CharmmFileError
 from chemistry import unit as u
 from chemistry.utils.six import add_metaclass
 from chemistry.utils.six.moves import range
+from chemistry.vec3 import Vec3
 from contextlib import closing
 import sys
 
