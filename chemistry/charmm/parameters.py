@@ -24,7 +24,7 @@ import warnings
 
 _penaltyre = re.compile(r'penalty\s*=\s*([\d\.]+)')
 
-class _EmptyStringIterator(self):
+class _EmptyStringIterator(object):
     """ Always yields an empty string """
     def __iter__(self):
         while True:
