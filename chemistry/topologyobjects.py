@@ -3576,7 +3576,7 @@ class TrackedList(list):
 
     @_changes
     def remove(self, thing):
-        self.remove(thing)
+        list.remove(self, thing)
         # If this did not raise an exception, it was part of the list, so
         # de-index it
         if hasattr(thing, '_idx'):
