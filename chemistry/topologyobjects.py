@@ -137,10 +137,14 @@ class _ParameterType(object):
     used : ``bool``
         If ``True``, then this parameter type should be considered *used*. If
         ``False``, it is not being used and does not need to be printed.
+    penalty : float or None
+        If this is assigned from a database, there might be a penalty assigned
+        to the determination of this parameter
     """
 
     def __init__(self):
         self.used = False
+        self.penalty = None
 
 def _delete_from_list(list, item):
     """
