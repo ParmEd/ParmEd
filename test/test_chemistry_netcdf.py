@@ -2,6 +2,7 @@
 Tests the NetCDF file parsing capabilities with the different backends
 """
 
+from chemistry.utils.six.moves import range, zip
 import unittest
 import utils
 

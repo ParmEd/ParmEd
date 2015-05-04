@@ -4,9 +4,9 @@ use
 """
 # Pull in all of Tkinter into our top-level namespace. This is common practice
 # for Tkinter
+from chemistry.utils.six.moves.tkinter import *
+from chemistry.utils.six.moves.tkinter_messagebox import showerror, showinfo
 from ParmedTools.argumentlist import ArgumentList
-from Tkinter import *
-from tkMessageBox import showerror, showinfo
 from ParmedTools.gui.guifiletools import file_chooser
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~

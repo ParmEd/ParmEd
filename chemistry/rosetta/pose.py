@@ -9,6 +9,7 @@ from chemistry.exceptions import RosettaError
 from chemistry.periodic_table import AtomicNum, Mass
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint, Bond
+from chemistry.utils.six.moves import range
 
 try:
     from rosetta import Pose, AtomID
@@ -19,7 +20,7 @@ except ImportError:
 
 def _n_prior(pose, nbr):
     prior = -1
-    for i in xrange(1, nbr.rsd()):
+    for i in range(1, nbr.rsd()):
         prior += pose.residue(i).natoms()
     return prior + nbr.atomno()
 
@@ -44,7 +45,7 @@ class RosettaPose(object):
 
         atnum = 1
         conf = pose.conformation()
-        for resid in xrange(1, pose.total_residue()+1):
+        for resid in range(1, pose.total_residue()+1):
             res = pose.residue(resid)
             resname = res.name3().strip()
             chain = chr(res.chain()+ord('A')-1)

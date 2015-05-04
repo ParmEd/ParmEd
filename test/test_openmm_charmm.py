@@ -33,6 +33,7 @@ from chemistry.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
                               CharmmParameterSet)
 from chemistry.exceptions import CharmmPSFWarning
 from chemistry import unit as u
+from chemistry.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest
@@ -40,7 +41,6 @@ import warnings
 import utils
     
 get_fn = utils.get_fn
-skipIf = utils.skipIf
 
 # Suppress warning output from bad psf file... sigh.
 warnings.filterwarnings('ignore', category=CharmmPSFWarning)
@@ -68,7 +68,7 @@ if has_openmm:
         if plat.getName() == 'OpenCL':
             plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
 
-@skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(utils.TestCaseRelative):
 
     def setUp(self):

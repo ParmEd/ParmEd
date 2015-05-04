@@ -184,7 +184,7 @@ class ArgumentList(object):
                 token.marked = True
                 try:
                     return argtype(self.tokenlist[i+1])
-                except ValueError, err:
+                except ValueError as err:
                     raise InputError(str(err))
 
         raise NoArgument('Catch me!')

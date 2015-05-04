@@ -11,6 +11,7 @@ import chemistry.topologyobjects as topologyobjects
 from chemistry.topologyobjects import _ListItem, _FourAtomTerm
 from chemistry.topologyobjects import *
 from chemistry.amber.readparm import AmberFormat
+from chemistry.utils.six.moves import range, zip
 import unittest
 from utils import get_fn
 import random
@@ -760,11 +761,21 @@ class TestTopologyObjects(unittest.TestCase):
         # Test the indexing
         for i, atom in enumerate(atoms):
             self.assertEqual(atom.idx, i)
+        atoms.changed = False
+        i = 0
+        # Test both pop and remove
         while atoms:
-            atom = atoms.pop()
+            if i % 2 == 0:
+                atom = atoms.pop()
+            else:
+                atom = atoms[-1]
+                atoms.remove(atom)
             self.assertEqual(atom.idx, -1)
             self.assertIs(atom.residue, None)
             self.assertIs(atom.list, None)
+            self.assertTrue(atoms.changed)
+            atoms.changed = False
+            i += 1
         atoms.extend([Atom() for i in range(15)])
         self.assertTrue(res.is_empty())
         for i, atom in enumerate(atoms):
@@ -845,6 +856,15 @@ class TestTopologyObjects(unittest.TestCase):
             for item in items:
                 self.assertIsNot(item, atom)
             self.assertEqual(atom.idx, -1)
+            self.assertTrue(items.changed)
+            items.changed = False
+        # Now test the remove method
+        self.assertFalse(items.changed)
+        items.append(Atom())
+        self.assertTrue(items.changed)
+        items.changed = False
+        items.remove(items[0])
+        self.assertTrue(items.changed)
 
 if __name__ == '__main__':
     unittest.main()

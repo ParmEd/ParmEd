@@ -2,7 +2,11 @@
 Module for evaluating Amber Mask strings and translating them into lists in
 which a selected atom is 1 and one that's not is 0.
 """
+from __future__ import division, print_function
+
 from chemistry.exceptions import MaskError
+from chemistry.utils.six.moves import range
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class AmberMask(object):
@@ -564,7 +568,7 @@ class AmberMask(object):
    
     def _atnum_select(self, at1, at2, mask):
         """ Fills a _mask array between atom numbers at1 and at2 """
-        for i in xrange(at1-1, at2): mask[i] = 1
+        for i in range(at1-1, at2): mask[i] = 1
 
     #======================================================
    
@@ -662,7 +666,7 @@ class _mask(list):
 
     def __init__(self, natom):
         self.natom = natom
-        list.__init__(self, [0 for i in xrange(natom)])
+        list.__init__(self, [0 for i in range(natom)])
 
     def append(self, *args, **kwargs):
         raise MaskError('_mask is a fixed-length array!')
@@ -680,7 +684,7 @@ class _mask(list):
         if self.natom != other.natom: 
             raise MaskError("_mask: and() requires another mask of equal size!")
         new_mask = _mask(self.natom)
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             new_mask[i] = int(self[i] and other[i])
         return new_mask
 
@@ -688,18 +692,18 @@ class _mask(list):
         if self.natom != other.natom:
             raise MaskError('_mask: or() requires another mask of equal size!')
         new_mask = _mask(self.natom)
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             new_mask[i] = int(self[i] or other[i])
         return new_mask
    
     def Not(self):
         new_mask = _mask(self.natom)
-        for i in xrange(self.natom):
+        for i in range(self.natom):
             new_mask[i] = int(not self[i])
         return new_mask
 
     def select_all(self):
-        for i in xrange(self.natom):
+        for i in range(self.natom):
             self[i] = 1
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

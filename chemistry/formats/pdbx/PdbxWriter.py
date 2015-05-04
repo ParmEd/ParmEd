@@ -17,7 +17,7 @@ __email__     = "jwest@rcsb.rutgers.edu"
 __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.01"
 
-
+from chemistry.utils.six.moves import range
 from chemistry.formats.pdbx.PdbxContainers import (DefinitionContainer,
                                                    DataContainer)
 from chemistry.exceptions import PdbxError

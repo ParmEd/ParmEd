@@ -15,13 +15,10 @@ from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.modeller import ResidueTemplate, PatchTemplate
 from chemistry.parameters import ParameterSet
-from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
-import compat24 # needs to be before collections
+from chemistry.periodic_table import AtomicNum, element_by_mass
+from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import range, zip
 from collections import OrderedDict
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 import os
 import warnings
 
@@ -428,7 +425,7 @@ class CharmmParameterSet(ParameterSet):
                     # soldier on
                     if not read_first_nonbonded: continue
                     raise CharmmFileError('Could not parse nonbonded terms.')
-                except CharmmFileError, e:
+                except CharmmFileError as e:
                     if not read_first_nonbonded: continue
                     raise CharmmFileError(str(e))
                 else:
@@ -661,7 +658,7 @@ class CharmmParameterSet(ParameterSet):
             pass
 
         # Go through the patches and add the appropriate one
-        for resname, res in residues.iteritems():
+        for resname, res in iteritems(residues):
             if hpatches[resname] is not None:
                 try:
                     res.first_patch = patches[hpatches[resname]]

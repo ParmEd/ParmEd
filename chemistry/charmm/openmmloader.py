@@ -6,16 +6,13 @@ ParmEd
 
 Author: Jason M. Swails
 Contributors:
-Date: April 20, 2014
+Date: April 29, 2015
 """
-from chemistry.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
-from chemistry.charmm.psf import CharmmPsfFile
+from chemistry.charmm.charmmcrds import (CharmmCrdFile as OpenMMCharmmCrdFile,
+                                         CharmmRstFile as OpenMMCharmmRstFile)
+from chemistry.charmm.psf import CharmmPsfFile as OpenMMCharmmPsfFile
 import warnings
 
 warnings.warn('chemistry.charmm.openmmloader has been deprecated. Use '
               'CharmmPsfFile, CharmmCrdFile, and CharmmRstFile from '
               'the chemistry.charmm package instead', DeprecationWarning)
-
-OpenMMCharmmPsfFile = CharmmPsfFile
-OpenMMCharmmCrdFile = CharmmCrdFile
-OpenMMCharmmRstFile = CharmmRstFile

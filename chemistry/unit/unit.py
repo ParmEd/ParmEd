@@ -31,8 +31,9 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+from chemistry.utils.six import iterkeys
+from chemistry.utils.six.moves import range
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
@@ -40,10 +41,10 @@ __version__ = "0.5"
 
 import math
 import sys
-from mymatrix import MyMatrix, zeros
-from basedimension import BaseDimension
-from baseunit import BaseUnit
-from standard_dimensions import *
+from .mymatrix import MyMatrix, zeros
+from .basedimension import BaseDimension
+from .baseunit import BaseUnit
+from .standard_dimensions import *
 
 class Unit(object):
     """
@@ -100,10 +101,10 @@ class Unit(object):
         # TODO - also handle non-simple units, i.e. units with multiple BaseUnits/ScaledUnits
         assert len(self._top_base_units) == 1
         assert len(self._scaled_units) == 0
-        dimension = self._top_base_units.iterkeys().next()
+        dimension = next(iterkeys(self._top_base_units))
         base_unit_dict = self._top_base_units[dimension]
         assert len(base_unit_dict) == 1
-        parent_base_unit = base_unit_dict.iterkeys().next()
+        parent_base_unit = next(iterkeys(base_unit_dict))
         parent_exponent = base_unit_dict[parent_base_unit]
         new_base_unit = BaseUnit(parent_base_unit.dimension, name, symbol)
         # BaseUnit scale might be different depending on exponent
@@ -119,9 +120,9 @@ class Unit(object):
         Yields (BaseDimension, exponent) tuples comprising this unit.
         """
         # There might be two units with the same dimension? No.
-        for dimension in sorted(self._all_base_units.iterkeys()):
+        for dimension in sorted(self._all_base_units.keys()):
             exponent = 0
-            for base_unit in sorted(self._all_base_units[dimension].iterkeys()):
+            for base_unit in sorted(self._all_base_units[dimension].keys()):
                 exponent += self._all_base_units[dimension][base_unit]
             if exponent != 0:
                 yield (dimension, exponent)
@@ -133,8 +134,8 @@ class Unit(object):
 
         There might be multiple BaseUnits with the same dimension.
         """
-        for dimension in sorted(self._all_base_units.iterkeys()):
-            for base_unit in sorted(self._all_base_units[dimension].iterkeys()):
+        for dimension in sorted(self._all_base_units.keys()):
+            for base_unit in sorted(self._all_base_units[dimension].keys()):
                 exponent = self._all_base_units[dimension][base_unit]
                 yield (base_unit, exponent)
 
@@ -142,8 +143,8 @@ class Unit(object):
         """
         Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.
         """
-        for dimension in sorted(self._top_base_units.iterkeys()):
-            for unit in sorted(self._top_base_units[dimension].iterkeys()):
+        for dimension in sorted(self._top_base_units.keys()):
+            for unit in sorted(self._top_base_units[dimension].keys()):
                 exponent = self._top_base_units[dimension][unit]
                 yield (unit, exponent)
 
@@ -514,7 +515,7 @@ class ScaledUnit(object):
         self.symbol = symbol
 
     def __iter__(self):
-        for dim in sorted(self.base_units.iterkeys()):
+        for dim in sorted(self.base_units.keys()):
             yield self.base_units[dim]
 
     def iter_base_units(self):
@@ -598,7 +599,7 @@ class UnitSystem(object):
         if not len(self.base_units) == len(self.units):
             raise ArithmeticError("UnitSystem must have same number of units as base dimensions")
         # self.dimensions is a dict of {BaseDimension: index}
-        dimensions = base_units.keys()
+        dimensions = list(base_units.keys())
         dimensions.sort()
         self.dimensions = {}
         for d in range(len(dimensions)):
@@ -612,7 +613,7 @@ class UnitSystem(object):
                 to_base_units[m][n] = power
         try:
             self.from_base_units = ~to_base_units
-        except ArithmeticError, e:
+        except ArithmeticError as e:
             raise ArithmeticError("UnitSystem is not a valid basis set.  " + str(e))
 
     def __iter__(self):

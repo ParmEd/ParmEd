@@ -2,13 +2,17 @@
 This package contains classes responsible for reading and writing both PDB and
 PDBx/mmCIF files.
 """
+from __future__ import division, print_function, absolute_import
+
 from chemistry.exceptions import PDBError, AnisouWarning, PDBWarning
 from chemistry.formats.pdbx import PdbxReader, PdbxWriter, containers
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.periodic_table import AtomicNum, Mass, Element
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, ExtraPoint
+from chemistry.utils.io import genopen
+from chemistry.utils.six import iteritems, string_types, add_metaclass
+from chemistry.utils.six.moves import range
 import itertools
 try:
     import numpy as np
@@ -51,10 +55,9 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+@add_metaclass(FileFormatType)
 class PDBFile(object):
     """ Standard PDB file format parser and writer """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -72,7 +75,7 @@ class PDBFile(object):
             True if it is a PDB file
         """
         f = genopen(filename, 'r')
-        lines = [f.readline().decode() for i in xrange(3)]
+        lines = [f.readline() for i in range(3)]
         f.close()
 
         for line in lines:
@@ -149,7 +152,7 @@ class PDBFile(object):
         of the coordinates for all of the frames in the PDB file as a list of
         NATOM*3 lists.
         """
-        if isinstance(filename, basestring):
+        if isinstance(filename, string_types):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:
@@ -180,11 +183,6 @@ class PDBFile(object):
 
         try:
             for line in fileobj:
-                try:
-                    line = line.decode('ascii')
-                except AttributeError:
-                    # Assume this is a string in Py3 which doesn't have 'decode'
-                    pass
                 rec = line[:6]
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
@@ -242,11 +240,11 @@ class PDBFile(object):
                         if res_hex:
                             try:
                                 resid = int(resid, 16)
-                            except ValueError, e:
+                            except ValueError:
                                 if resid == '****':
                                     resid = None # Figure out by unique atoms
                                 else:
-                                    raise e
+                                    raise
                         elif resid == '1000' and line[26] == '0':
                             resend += 1
                             resid = 10000
@@ -531,7 +529,7 @@ class PDBFile(object):
                              "'first', or 'occupancy'" % altlocs)
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
             own_handle = True
         if charmm:
             atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
@@ -587,7 +585,7 @@ class PDBFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in atom.other_locations.iteritems():
+                for key, item in iteritems(atom.other_locations):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item
@@ -680,10 +678,9 @@ class PDBFile(object):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+@add_metaclass(FileFormatType)
 class CIFFile(object):
     """ Standard PDBx/mmCIF file format parser and writer """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -703,7 +700,6 @@ class CIFFile(object):
         f = genopen(filename)
         try:
             for line in f:
-                line = line.decode()
                 if line.startswith('#'): continue
                 if line[:5] == 'data_' and len(line.split()) == 1:
                     return True
@@ -774,9 +770,9 @@ class CIFFile(object):
         of the coordinates for all of the frames in the PDB file as a list of
         NATOM*3 lists.
         """
-        if isinstance(filename, basestring):
+        if isinstance(filename, string_types):
             own_handle = True
-            fileobj = TextToBinaryFile(genopen(filename, 'r'))
+            fileobj = genopen(filename, 'r')
         else:
             own_handle = False
             fileobj = filename
@@ -808,7 +804,7 @@ class CIFFile(object):
                 nameidx = cite.getAttributeIndex('name')
                 if nameidx != -1:
                     journal_authors = []
-                    for i in xrange(cite.getRowCount()):
+                    for i in range(cite.getRowCount()):
                         a = cite.getRow(i)[nameidx]
                         if a not in journal_authors:
                             journal_authors.append(a)
@@ -880,7 +876,7 @@ class CIFFile(object):
             xyz = []
             atommap = dict()
             last_atom = Atom()
-            for i in xrange(atoms.getRowCount()):
+            for i in range(atoms.getRowCount()):
                 row = atoms.getRow(i) + ['']
                 atnum = int(row[atnumid])
                 elem = row[elemid]
@@ -1007,7 +1003,7 @@ class CIFFile(object):
                                   'section. Skipping')
                 else:
                     try:
-                        for i in xrange(anisou.getRowCount()):
+                        for i in range(anisou.getRowCount()):
                             row = anisou.getRow(i) + ['']
                             atnum = int(row[atnumid])
                             atname = row[atnameid]
@@ -1031,13 +1027,12 @@ class CIFFile(object):
                             )
                     except (ValueError, KeyError):
                         # If at least one went wrong, set them all to None
-                        for key, atom in atommap.iteritems():
+                        for key, atom in iteritems(atommap):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping')
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
-                    print len(xyz), len(struct.atoms)
                     raise ValueError('Corrupt CIF; all models must have the '
                                      'same atoms')
                 try:
@@ -1106,7 +1101,7 @@ class CIFFile(object):
                              "'first', or 'occupancy'" % altlocs)
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
             own_handle = True
         # Make the main container
         cont = containers.DataContainer('cell')
@@ -1157,7 +1152,7 @@ class CIFFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in atom.other_locations.iteritems():
+                for key, item in iteritems(atom.other_locations):
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item

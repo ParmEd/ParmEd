@@ -9,6 +9,7 @@ from chemistry import exceptions
 from chemistry import formats
 from chemistry import Structure, read_PDB, write_PDB, read_CIF
 from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
+from chemistry.utils.six import iteritems
 try:
     import cStringIO as StringIO
     from itertools import izip as zip
@@ -32,7 +33,7 @@ class TestFileLoader(unittest.TestCase):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in off.items():
+        for key, item in iteritems(off):
             self.assertIsInstance(item, ResidueTemplate)
 
     def testLoadAmberParm(self):
@@ -371,7 +372,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in a1.other_locations.items():
+                for key, oa in iteritems(a1.other_locations):
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa
