@@ -3750,6 +3750,15 @@ class AtomList(TrackedList):
         if atom.residue is not None: atom.residue.delete_atom(atom)
         return atom
 
+    @_changes
+    def remove(self, atom):
+        if atom.list is not self:
+            raise ValueError('%r is not in list' % atom)
+        if atom.residue is not None: atom.residue.delete_atom(atom)
+        atom._idx = -1
+        atom.list = None
+        list.remove(self, atom)
+
     def unmark(self):
         """ Unmark all atoms in this list """
         for atm in self: atm.marked = 0
