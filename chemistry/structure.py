@@ -40,6 +40,7 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
 from chemistry import unit as u
 from chemistry.utils.six import string_types, wraps
 from chemistry.utils.six.moves import zip, range
+from chemistry.vec3 import Vec3
 import copy
 import math
 import re
@@ -1175,7 +1176,7 @@ class Structure(object):
         atomic positions for every atom in the system. If set with unitless
         numbers, those numbers are assumed to be in angstroms
         """
-        return [(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+        return [Vec3(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
 
     @positions.setter
     def positions(self, value):
@@ -1206,7 +1207,8 @@ class Structure(object):
         A list of 3-element Quantity tuples of dimension length representing the
         atomic velocities for every atom in the system
         """
-        return [(a.vx,a.vy,a.vz) for a in self.atoms] * u.angstrom/u.picosecond
+        unit = u.angstroms / u.picoseconds
+        return [Vec3(a.vx,a.vy,a.vz) for a in self.atoms] * unit
 
     @velocities.setter
     def velocities(self, value):
