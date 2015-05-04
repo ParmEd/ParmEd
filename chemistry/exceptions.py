@@ -168,3 +168,9 @@ class FormatNotFound(ChemError):
 
 class RosettaError(ChemError):
     """ If there is a problem loading a Rosetta pose object """
+
+class PreProcessorError(ChemError):
+    """ If there is a problem running the C-like preprocessor """
+
+class PreProcessorWarning(ChemWarning):
+    """ If there is something we should warn about in preprocessing """

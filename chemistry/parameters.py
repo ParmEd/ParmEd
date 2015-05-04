@@ -4,18 +4,11 @@ topology, and stream files. It only extracts atom properties from the
 topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
-Contributors:
-Date: Dec. 19, 2014
 """
-from chemistry.constants import DEG_TO_RAD
 from chemistry import (AtomType, BondType, AngleType, DihedralType,
-                       DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
-from chemistry.periodic_table import AtomicNum, Mass, Element
-import compat24 # needs to be before collections
+                       ImproperType, CmapType)
+from chemistry.utils.six.moves import range
 from collections import OrderedDict
-import math
-import os
-import warnings
 
 class ParameterSet(object):
     """
@@ -128,9 +121,9 @@ class ParameterSet(object):
             Type dictionary to condense
         """
         keylist = typedict.keys()
-        for i in xrange(len(keylist) - 1):
+        for i in range(len(keylist) - 1):
             key1 = keylist[i]
-            for j in xrange(i+1, len(keylist)):
+            for j in range(i+1, len(keylist)):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]

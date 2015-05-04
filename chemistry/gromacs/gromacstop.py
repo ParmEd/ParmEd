@@ -3,7 +3,6 @@ This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry.gromacs import _cpp as cpp
@@ -12,10 +11,14 @@ from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, TrackedList,
             NonbondedException)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
+from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
+from contextmanager import closing
 import warnings
 
 _ppre = re.compile(r'#([A-Za-z]+) *(\S+)?')
 
+@add_metaclass(FileFormatType)
 class GromacsTopologyFile(Structure):
     """
     Loads a GROMACS topology file
@@ -30,8 +33,6 @@ class GromacsTopologyFile(Structure):
     parameterset : ParameterSet
         The set of parameters defining a force field
     """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -49,8 +50,7 @@ class GromacsTopologyFile(Structure):
             If it is identified as a gromacs topology, return True. False
             otherwise
         """
-        f = TextToBinaryFile(genopen(filename))
-        try:
+        with closing(genopen(filename)) as f:
             for line in f:
                 if line.startswith(';'): continue
                 if line.startswith('#'):
@@ -62,8 +62,6 @@ class GromacsTopologyFile(Structure):
                 if line.strip() == '[ moleculetype ]': return True
                 return False
             return False
-        finally:
-            f.close()
 
     #===================================================
 
@@ -108,7 +106,7 @@ class GromacsTopologyFile(Structure):
                         (current_define in defines and not negated) or
                         (current_define not in defines and negated)
                 )
-                elif line[0] == '#':
+                if line[0] == '#':
                     rematch = _ppre.match(line)
                     if not rematch:
                         raise GromacsTopologyError('Trouble matching command '
