@@ -120,7 +120,7 @@ class CharmmCrdFile(object):
         """
         Atomic coordinates with units attached to them with the shape (natom, 3)
         """
-        return ([self.coords[i:i+3] for i in range(0, self.natom*3, 3)] *
+        return ([Vec3(*self.coords[i:i+3]) for i in range(0, self.natom*3, 3)] *
                         u.angstroms)
 
     @property
@@ -263,14 +263,14 @@ class CharmmRstFile(object):
     @property
     def positions(self):
         """ Atomic positions with units """
-        return ([self.coords[i:i+3] for i in range(0, self.natom*3, 3)] *
+        return ([Vec3(*self.coords[i:i+3]) for i in range(0, self.natom*3, 3)] *
                         u.angstroms)
 
     @property
     def positionsold(self):
         """ Old atomic positions with units """
-        return ([self.coordsold[i:i+3] for i in range(0, self.natom*3, 3)] *
-                        u.angstroms)
+        return ([Vec3(*self.coordsold[i:i+3]) for i in range(0,self.natom*3,3)]
+                        * u.angstroms)
 
     @property
     def velocities(self):
