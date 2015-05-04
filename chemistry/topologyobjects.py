@@ -3570,12 +3570,17 @@ class TrackedList(list):
     @_changes
     def pop(self, idx=-1):
         item = list.pop(self, idx)
-        try:
+        if hasattr(item, '_idx'):
             item._idx = -1
-        except AttributeError:
-            # Must be an immutable type, so don't complain
-            pass
         return item
+
+    @_changes
+    def remove(self, thing):
+        list.remove(self, thing)
+        # If this did not raise an exception, it was part of the list, so
+        # de-index it
+        if hasattr(thing, '_idx'):
+            thing._idx = -1
 
     append = _changes(list.append)
     extend = _changes(list.extend)
@@ -3744,6 +3749,15 @@ class AtomList(TrackedList):
         atom.list = None
         if atom.residue is not None: atom.residue.delete_atom(atom)
         return atom
+
+    @_changes
+    def remove(self, atom):
+        if atom.list is not self:
+            raise ValueError('%r is not in list' % atom)
+        if atom.residue is not None: atom.residue.delete_atom(atom)
+        atom._idx = -1
+        atom.list = None
+        list.remove(self, atom)
 
     def unmark(self):
         """ Unmark all atoms in this list """
