@@ -2011,6 +2011,17 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
+    @property
+    def penalty(self):
+        penalty = None
+        for dt in self:
+            if dt.penalty is not None:
+                if penalty is None:
+                    penalty = dt.penalty
+                else:
+                    penalty = max(dt.penalty, penalty)
+        return penalty
+
     def __repr__(self):
         return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
 
