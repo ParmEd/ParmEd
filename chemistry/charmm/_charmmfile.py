@@ -36,7 +36,7 @@ class CharmmFile(object):
         self._handle.__enter__()
         return self
 
-    def __exit__(self):
+    def __exit__(self, *args):
         if not self.closed:
             self.close()
 
