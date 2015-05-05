@@ -201,3 +201,13 @@ pptest1 line 3""")
         f = StringIO('#undef VAR1 misplaced comments\n')
         pp = CPreProcessor(f)
         self.assertRaises(PreProcessorWarning, lambda: pp.read())
+
+    def test_missing_include(self):
+        """ Tests CPreProcessor controllable behavior of missing #includes """
+        warnings.filterwarnings('error', category=PreProcessorWarning)
+        f = StringIO("#include \"nofile.h\"\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        f.seek(0)
+        pp = CPreProcessor(f, notfound_fatal=False)
+        self.assertRaises(PreProcessorWarning, lambda: pp.read())
