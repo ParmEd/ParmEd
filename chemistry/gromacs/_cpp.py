@@ -291,12 +291,21 @@ class CPreProcessor(object):
             return
         # Define a new variable
         words = args.split()
+        if len(words) == 0:
+            raise PreProcessorError('Nothing defined in #define')
+        # Warn about a double-define
+        if words[0] in self.defines:
+            warnings.warn('%s already defined; overwriting' % words[0],
+                          PreProcessorWarning)
+        # Substitute in any pre-defined variables if applicable
+        for i, word in enumerate(words):
+            if i == 0: continue
+            if word in self.defines:
+                words[i] = self.defines[word]
         if len(words) == 1:
             self.defines[words[0]] = '1'
         elif len(words) >= 2:
             self.defines[words[0]] = args[len(words[0]):].strip()
-        elif len(words) == 0:
-            raise PreProcessorError('Nothing defined in #define')
 
     @_strip_pp_comments
     def _pp_undef(self, args):

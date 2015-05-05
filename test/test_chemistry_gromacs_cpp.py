@@ -170,6 +170,13 @@ pptest1 line 3""")
         pp = CPreProcessor(f, defines=dict(MY_VAR='taken'))
         self.assertEqual(pp.read().strip(), "This is NOT_MY_VAR, but 'MY_VAR' is taken")
 
+    def test_nested_defines(self):
+        """ Tests CPreProcessor nested #define token replacement """
+        f = StringIO("#define MY_VAR replace1\n#define MY_VAR2 MY_VAR\n"
+                     "MY_VAR2\n")
+        pp = CPreProcessor(f)
+        self.assertEqual(pp.read().strip(), 'replace1')
+
     def test_bad_ifdef(self):
         """ Tests CPreProcessor error processing of bad #ifdef/#ifndef """
         f = StringIO("#ifdef\n#endif")
