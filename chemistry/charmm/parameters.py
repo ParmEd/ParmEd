@@ -729,7 +729,7 @@ class CharmmParameterSet(object):
         else:
             f = CharmmStreamFile(sfile)
 
-        title, section, section_comments = f.next_section()
+        title, section, comments = f.next_section()
         while title is not None and section is not None:
             words = title.lower().split()
             if words[1] == 'rtf':
@@ -738,7 +738,7 @@ class CharmmParameterSet(object):
             elif words[1].startswith('para'):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
-            title, section = f.next_section()
+            title, section, comments = f.next_section()
 
     def condense(self, do_dihedrals=True):
         """
