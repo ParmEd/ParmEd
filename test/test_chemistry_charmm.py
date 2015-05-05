@@ -424,6 +424,55 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertAlmostEqual(p.atom_types_str['OND'].epsilon, -0.05)
         self.assertAlmostEqual(p.atom_types_str['OND'].rmin, 2.0)
 
+    def testPenalty(self):
+        """ Test parsing penalty scores for CGenFF parameters from comments """
+        p = parameters.CharmmParameterSet(get_fn('pyrrol.str'))
+        # Check bond types
+        self.assertEqual(p.bond_types[('CG251O', 'CG2D2')].penalty, 210)
+        self.assertEqual(p.bond_types[('CG251O', 'CG3C52')].penalty, 64)
+        self.assertEqual(p.bond_types[('CG251O', 'NG3C51')].penalty, 64)
+        self.assertEqual(p.bond_types[('CG321', 'NG3C51')].penalty, 20)
+        # Check angle types
+        self.assertEqual(p.angle_types[('CG2D2','CG251O','CG3C52')].penalty, 268)
+        self.assertEqual(p.angle_types[('CG2D2','CG251O','NG3C51')].penalty, 264.5)
+        self.assertEqual(p.angle_types[('CG3C52','CG251O','NG3C51')].penalty, 328)
+        self.assertEqual(p.angle_types[('CG251O','CG2D2','HGA5')].penalty, 23)
+        self.assertEqual(p.angle_types[('CG321','CG321','NG3C51')].penalty, 3.9)
+        self.assertEqual(p.angle_types[('NG3C51','CG321','HGA2')].penalty, 3)
+        self.assertEqual(p.angle_types[('CG251O','CG3C52','CG2R51')].penalty, 4)
+        self.assertEqual(p.angle_types[('CG251O','CG3C52','HGA2')].penalty, 3.5)
+        self.assertEqual(p.angle_types[('CG251O','NG3C51','CG2R51')].penalty, 75)
+        self.assertEqual(p.angle_types[('CG251O','NG3C51','CG321')].penalty, 123.5)
+        self.assertEqual(p.angle_types[('CG2R51','NG3C51','CG321')].penalty, 122.5)
+        # Check dihedral types
+        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','CG2D2','HGA5')].penalty, 295)
+        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG2D2','HGA5')].penalty, 294)
+        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','CG3C52','CG2R51')].penalty, 136.5)
+        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','CG3C52','HGA2')].penalty, 136.5)
+        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG3C52','CG2R51')].penalty, 165.5)
+        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG3C52','HGA2')].penalty, 148)
+        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','NG3C51','CG2R51')].penalty, 210.5)
+        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','NG3C51','CG321')].penalty, 167.5)
+        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','NG3C51','CG2R51')].penalty, 232.5)
+        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','NG3C51','CG321')].penalty, 189.5)
+        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','CG3C52','CG251O')].penalty, 4)
+        self.assertEqual(p.dihedral_types[('HGR51','CG2R51','CG3C52','CG251O')].penalty, 4)
+        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','NG3C51','CG251O')].penalty, 75)
+        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','NG3C51','CG321')].penalty, 31)
+        self.assertEqual(p.dihedral_types[('HGR52','CG2R51','NG3C51','CG251O')].penalty, 75)
+        self.assertEqual(p.dihedral_types[('HGR52','CG2R51','NG3C51','CG321')].penalty, 31)
+        self.assertEqual(p.dihedral_types[('CG331','CG321','CG321','NG3C51')].penalty, 33)
+        self.assertEqual(p.dihedral_types[('CG331','CG321','CG321','NG3C51')].penalty, 33)
+        self.assertEqual(p.dihedral_types[('NG3C51','CG321','CG321','HGA2')].penalty, 9)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
+        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
+        self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
+        self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
+
 class TestFileWriting(unittest.TestCase):
     """ Tests the various file writing capabilities """
 

@@ -162,10 +162,14 @@ class _ParameterType(object):
     used : ``bool``
         If ``True``, then this parameter type should be considered *used*. If
         ``False``, it is not being used and does not need to be printed.
+    penalty : float or None
+        If this is assigned from a database, there might be a penalty assigned
+        to the determination of this parameter
     """
 
     def __init__(self):
         self.used = False
+        self.penalty = None
 
 def _delete_from_list(list, item):
     """
@@ -2108,6 +2112,17 @@ class DihedralTypeList(list, _ListItem):
             if not t1 == t2:
                 return False
         return True
+
+    @property
+    def penalty(self):
+        penalty = None
+        for dt in self:
+            if dt.penalty is not None:
+                if penalty is None:
+                    penalty = dt.penalty
+                else:
+                    penalty = max(dt.penalty, penalty)
+        return penalty
 
     def __repr__(self):
         return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
