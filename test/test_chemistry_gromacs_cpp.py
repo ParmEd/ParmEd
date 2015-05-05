@@ -1,14 +1,19 @@
 """
 Tests the functionality in the chemistry.gromacs package
 """
+from chemistry.exceptions import PreProcessorError, PreProcessorWarning
 from chemistry.gromacs._cpp import CPreProcessor
 from chemistry.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 from utils import get_fn, has_numpy
+import warnings
 
 class TestGromacsCpp(unittest.TestCase):
     """ Tests the C-preprocessor written for the Gromacs classes """
+
+    def setUp(self):
+        warnings.filterwarnings('ignore', category=PreProcessorWarning)
 
     def test_ifdef(self):
         """ Tests CPreProcessor #ifdef/#else/#endif preprocessing """
@@ -44,8 +49,9 @@ class TestGromacsCpp(unittest.TestCase):
 
     def test_undef(self):
         """ Tests CPreProcessor #undef preprocessing """
+        # This tests undef-ing both a defined and not-defined variable.
         f = StringIO("MY_DEFINE\n#define MY_DEFINE Changed\nMY_DEFINE\n"
-                     "#undef MY_DEFINE\nMY_DEFINE\n")
+                     "#undef MY_DEFINE\nMY_DEFINE\n#undef NO_VARIABLE\n")
         pp = CPreProcessor(f)
         self.assertEqual(pp.read().strip(), "MY_DEFINE\nChanged\nMY_DEFINE")
 
@@ -61,9 +67,9 @@ class TestGromacsCpp(unittest.TestCase):
         self.assertEqual(CPreProcessor(f).read().strip(), "Something")
         f = StringIO("#       ifdef      MY_VAR    \nMY_VAR\n#endif\n"
                      "#\t\tdefine MY_VAR       NoSpaces    \n"
-                     "#       ifdef      MY_VAR    \n\"MY_VAR\"\n#endif")
+                     "#       ifdef      MY_VAR    \nMY_VAR\n#endif")
         f.seek(0)
-        self.assertEqual(CPreProcessor(f).read().strip(), '"NoSpaces"')
+        self.assertEqual(CPreProcessor(f).read().strip(), 'NoSpaces')
 
     def test_define_inside_ifdef(self):
         """ Tests CPreProcessor #define inside #ifdef/#ifndef """
@@ -130,7 +136,7 @@ pptest3 line 1
 pptest1 line 3""")
 
     def test_include_defines(self):
-        """ Tests passing defines between included files """
+        """ Tests CPreProcessor passing defines between included files """
         pp = CPreProcessor(get_fn('pptest2/pptest1.h'))
         self.assertEqual(pp.read().strip(), """\
 pptest1 line 1
@@ -140,3 +146,58 @@ pptest1 line 2
 pptest1 line 3
 pptest3 line 1
 pptest1 line 4""")
+
+    def test_include_dir(self):
+        """ Tests CPreProcessor passing include directories to search """
+        f = StringIO('#include "pptest1.h"')
+        pp = CPreProcessor(f, includes=[get_fn('pptest1')])
+        self.assertEqual(pp.read().strip(), """\
+pptest1 line 1
+pptest2 line 1
+pptest3 line 1
+pptest2 line 2
+pptest1 line 2
+pptest3 line 1
+pptest1 line 3""")
+
+    def test_conservative_defines(self):
+        """ Tests CPreProcessor #define token replacement """
+        # Check that it does not replace tokens inside quotes
+        f = StringIO("'MY_VAR' is MY_VAR\n\"MY_VAR\" is MY_VAR still\n")
+        pp = CPreProcessor(f, defines=dict(MY_VAR='set'))
+        self.assertEqual(pp.read().strip(), "'MY_VAR' is set\n\"MY_VAR\" is set still")
+        f = StringIO("This is NOT_MY_VAR, but 'MY_VAR' is MY_VAR\n")
+        pp = CPreProcessor(f, defines=dict(MY_VAR='taken'))
+        self.assertEqual(pp.read().strip(), "This is NOT_MY_VAR, but 'MY_VAR' is taken")
+
+    def test_bad_ifdef(self):
+        """ Tests CPreProcessor error processing of bad #ifdef/#ifndef """
+        f = StringIO("#ifdef\n#endif")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        f = StringIO("#ifndef\n#endif")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        f = StringIO("#ifdef SOME_VAR\ndangling ifdef\n\n\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        warnings.filterwarnings('error', category=PreProcessorWarning)
+        f = StringIO("#ifdef SOME_VAR misplaced comments\n#endif\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorWarning, lambda: pp.read())
+        f = StringIO("#ifdef SOME_VAR\n#endif misplaced comments\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorWarning, lambda: pp.read())
+
+    def test_bad_define_undef(self):
+        """ Tests CPreProcessor error processing of bad #define/#undef """
+        f = StringIO("#define\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        f = StringIO("#undef\n")
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorError, lambda: pp.read())
+        warnings.filterwarnings('error', category=PreProcessorWarning)
+        f = StringIO('#undef VAR1 misplaced comments\n')
+        pp = CPreProcessor(f)
+        self.assertRaises(PreProcessorWarning, lambda: pp.read())

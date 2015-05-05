@@ -6,6 +6,7 @@ Written by Jason Swails
 """
 from chemistry.exceptions import PreProcessorError, PreProcessorWarning
 from chemistry.utils.six import string_types, iteritems, wraps
+from chemistry.utils.six.moves import range
 from os import path
 import re
 import warnings
@@ -14,6 +15,7 @@ ppre = re.compile(r'#\s*(ifdef|ifndef|if|else|elif|endif|define|undef|include)'
                   r'\s*(.+)?')
 ppcomments = re.compile(r'(?://.+|/\*(?:.*)\*/)')
 includere = re.compile(r'[<"](.+)[>"]')
+novarcharre = re.compile(r'\W')
 
 def _strip_pp_comments(func):
     """
@@ -26,6 +28,55 @@ def _strip_pp_comments(func):
         args = ppcomments.sub('', args)
         return func(self, args)
     return wrapper
+
+def _find_all_instances_in_string(string, substr):
+    """ Find indices of all instances of substr in string """
+    indices = []
+    idx = string.find(substr, 0)
+    while idx > -1:
+        indices.append(idx)
+        idx = string.find(substr, idx+1)
+    return indices
+
+def _replace_defines(line, defines):
+    """ Replaces defined tokens in a given line """
+    if not defines: return line
+    # Pad with spaces to facilitate our simplified regex substitution
+    for define, value in iteritems(defines):
+        indices = _find_all_instances_in_string(line, define)
+        if not indices: continue
+        # Check to see if it's inside of quotes
+        inside = ''
+        idx = 0
+        n_to_skip = 0
+        new_line = []
+        for i, char in enumerate(line):
+            if n_to_skip:
+                n_to_skip -= 1
+                continue
+            if char in ('\'"'):
+                if not inside:
+                    inside = char
+                else:
+                    if inside == char:
+                        inside = ''
+            if idx < len(indices) and i == indices[idx]:
+                if inside:
+                    new_line.append(char)
+                    idx += 1
+                    continue
+                if i == 0 or novarcharre.match(line[i-1]):
+                    endidx = indices[idx] + len(define)
+                    if endidx >= len(line) or novarcharre.match(line[endidx]):
+                        new_line.extend(list(value))
+                        n_to_skip = len(define) - 1
+                        idx += 1
+                        continue
+                idx += 1
+            new_line.append(char)
+        line = ''.join(new_line)
+                        
+    return line
 
 # To track where in the "if-elif-else" block each conditional is
 _IN_IF = 'in if'
@@ -128,10 +179,11 @@ class CPreProcessor(object):
             if self._satisfiedstack and not self._satisfiedstack[-1]:
                 # We are inside an unsatisfied conditional
                 continue
-            for define, value in iteritems(self.defines):
-                line = line.replace(define, value)
 
-            yield line
+            yield _replace_defines(line, self.defines)
+        # Make sure we don't have any dangling ifs
+        if self._ifstack:
+            raise PreProcessorError('EOF: Unterminated #if(def)')
 
     @_strip_pp_comments
     def _pp_if(self, args):
@@ -156,7 +208,7 @@ class CPreProcessor(object):
         if len(words) == 0:
             raise PreProcessorError('Bad #ifdef syntax: "#ifdef %s"' % args)
         elif len(words) > 1:
-            warnings.warn('Ignored tokens in #ifdef: %s' % ','.join(words[1:]),
+            warnings.warn('Ignored tokens in #ifdef: %s' % ', '.join(words[1:]),
                           PreProcessorWarning)
         self._ifstack.append('%s in self.defines' % words[0])
         self._elsestack.append(_IN_IF)
@@ -171,7 +223,7 @@ class CPreProcessor(object):
         if len(words) == 0:
             raise PreProcessorError('Bad #ifndef syntax: "#ifndef %s"' % args)
         elif len(words) > 1:
-            warnings.warn('Ignored tokens in #ifndef: %s' % ','.join(words[1:]),
+            warnings.warn('Ignored tokens in #ifndef: %s' % ', '.join(words[1:]),
                           PreProcessorWarning)
         self._ifstack.append('%s not in self.defines' % words[0])
         self._elsestack.append(_IN_IF)
@@ -189,7 +241,7 @@ class CPreProcessor(object):
             raise PreProcessorError('#else missing #if(def)')
         words = args.split()
         if len(words) > 0:
-            warnings.warn('Ignored tokens in #else: %s' % ','.join(words[1:]),
+            warnings.warn('Ignored tokens in #else: %s' % ', '.join(words[1:]),
                           PreProcessorWarning)
         if self._elsestack[-1] == _IN_ELSE:
             raise PreProcessorError('#else following #else')
@@ -201,6 +253,9 @@ class CPreProcessor(object):
         if self._num_ignoring_if > 0:
             self._num_ignoring_if -= 1
             return
+        if args.strip():
+            warnings.warn('Ignored tokens in #endif: %s' % args.strip(),
+                          PreProcessorWarning)
         if not self._ifstack:
             raise PreProcessorError('#endif missing #if(def)')
         self._ifstack.pop()
@@ -255,8 +310,8 @@ class CPreProcessor(object):
             except KeyError:
                 pass
         elif len(words) > 1:
-            raise PreProcessorError("Too many tokens found in #undef: %s" %
-                                    ','.join(words))
+            warnings.warn('Ignored tokens in #undef: %s' % ', '.join(words[1:]),
+                          PreProcessorWarning)
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #undef')
 
