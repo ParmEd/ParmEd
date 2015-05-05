@@ -4,7 +4,6 @@ files is that the ; character is a comment character and everything after ; is
 ignored.
 """
 from chemistry.exceptions import GromacsFileError
-from chemistry.gromacs import GROMACS_TOPDIR
 from chemistry.gromacs._cpp import CPreProcessor
 
 class GromacsFile(object):
@@ -33,21 +32,10 @@ class GromacsFile(object):
         Default is True
     """
 
-    def __init__(self, fname, defines=None, includes=None, notfound_fatal=True):
-        if mode not in ('r',):
-            raise ValueError('Cannot open GromacsFile with mode "%s"' % mode)
-        if mode == 'r':
-            self.status = 'OLD'
-        try:
-            self._handle = CPreProcessor(fname, defines=defines,
-                    includes=includes, notfound_fatal=notfound_fatal)
-        except IOError, e:
-            raise GromacsFileError(str(e))
+    def __init__(self, fname, **kwargs):
+        self._handle = CPreProcessor(fname, **kwargs)
         self.closed = False
         self.line_number = 0
-
-    def write(self, *args, **kwargs):
-        return self._handle.write(*args, **kwargs)
 
     def __iter__(self):
         # Iterate over the file
