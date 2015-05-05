@@ -319,3 +319,44 @@ class CPreProcessor(object):
                  'else' : _pp_else, 'define' : _pp_define, 'undef' : _pp_undef,
                  'include' : _pp_include, 'endif' : _pp_endif,
                  'ifndef' : _pp_ifndef}
+
+if __name__ == '__main__':
+    # Act as a stand-alone preprocessor
+    import argparse
+    import sys
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input-file', dest='input', metavar='FILE',
+                required=True, help='''Input file to pre-process. Either a file
+                name or, if '--' is given, from standard input.''')
+    parser.add_argument('-o', '--output-file', dest='output', metavar='FILE',
+                default=None, help='''Output file with preprocessed results.
+                Default is standard output''')
+    parser.add_argument('-D', dest='defines', metavar='VAR[=VAL]',
+                action='append', help='''List of predefined variables to pass to
+                the preprocessor. Default VAL is 1 when missing.''')
+    parser.add_argument('-I', dest='includes', metavar='DIRECTORY',
+                action='append', help='''List of include directories to search
+                for included files''')
+
+    opt = parser.parse_args()
+
+    defines = dict()
+    for define in opt.defines:
+        if '=' in define:
+            define, val = define.split('=')
+        else:
+            val = '1'
+        defines[define] = val
+
+    if opt.input == '--':
+        f = sys.stdin
+    else:
+        f = opt.input
+    pp = CPreProcessor(f, defines=defines, includes=opt.includes)
+    if opt.output is None:
+        output = sys.stdout
+    else:
+        output = open(opt.output, 'w')
+
+    for line in pp:
+        output.write(line)
