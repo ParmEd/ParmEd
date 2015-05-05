@@ -48,26 +48,34 @@ class CPreProcessor(object):
     notfound_fatal : bool, optional
         If True, include files not found are fatal. If False, they will simply
         be skipped (with a warning emitted). Default True
+
+    Notes
+    -----
+    If ``fname`` is a file name, the directory containing that file name is the
+    first directory searched for include files. If ``fname`` is a file-like
+    object, then the current directory is the first searched.
     """
 
     def __init__(self, fname, defines=None, includes=None, notfound_fatal=True):
         if isinstance(fname, string_types):
             self._fileobj = open(fname, 'r')
             self._ownhandle = True
+            curpath = path.abspath(path.split(fname)[0])
         else:
             self._fileobj = fname
             self._ownhandle = False
+            curpath = path.abspath(path.curdir)
         if includes is None:
-            self._includes = []
+            self._includes = [curpath]
         else:
-            self._includes = includes
+            self._includes = [curpath] + list(includes)
         if defines is None:
-            self._defines = {}
+            self.defines = {}
         else:
             # Convert every define to a string
-            self._defines = dict()
+            self.defines = dict()
             for define, value in iteritems(defines):
-                self._defines[define] = str(value)
+                self.defines[define] = str(value)
         self._notfound_fatal = notfound_fatal
 
         # Now to keep track of other basic logic stuff
@@ -107,19 +115,20 @@ class CPreProcessor(object):
                 cmd, args = rematch.groups()
                 args = args or ''
                 self._ppcmdmap[cmd](self, args)
+                # If we defined an include file, step through it
+                if self._includefile is not None:
+                    for line in self._includefile:
+                        yield line
+                    self._includefile.close()
+                    # We have to pass our defines back to our caller
+                    self.defines = self._includefile.defines
+                    self._includefile = None
                 continue
-
-            # Step through the included file, if there is one
-            if self._includefile:
-                for line in self._includefile:
-                    yield line
-                self._includefile.close()
-                self._includefile = None
 
             if self._satisfiedstack and not self._satisfiedstack[-1]:
                 # We are inside an unsatisfied conditional
                 continue
-            for define, value in iteritems(self._defines):
+            for define, value in iteritems(self.defines):
                 line = line.replace(define, value)
 
             yield line
@@ -149,9 +158,9 @@ class CPreProcessor(object):
         elif len(words) > 1:
             warnings.warn('Ignored tokens in #ifdef: %s' % ','.join(words[1:]),
                           PreProcessorWarning)
-        self._ifstack.append('%s in self._defines' % words[0])
+        self._ifstack.append('%s in self.defines' % words[0])
         self._elsestack.append(_IN_IF)
-        self._satisfiedstack.append(words[0] in self._defines)
+        self._satisfiedstack.append(words[0] in self.defines)
 
     @_strip_pp_comments
     def _pp_ifndef(self, args):
@@ -164,9 +173,9 @@ class CPreProcessor(object):
         elif len(words) > 1:
             warnings.warn('Ignored tokens in #ifndef: %s' % ','.join(words[1:]),
                           PreProcessorWarning)
-        self._ifstack.append('%s not in self._defines' % words[0])
+        self._ifstack.append('%s not in self.defines' % words[0])
         self._elsestack.append(_IN_IF)
-        self._satisfiedstack.append(words[0] not in self._defines)
+        self._satisfiedstack.append(words[0] not in self.defines)
 
     @_strip_pp_comments
     def _pp_elif(self, args):
@@ -207,7 +216,7 @@ class CPreProcessor(object):
         if not rematch:
             raise PreProcessorError('Bad #include syntax')
         includefile = rematch.groups()[0]
-        for folder in [path.curdir] + self._includes:
+        for folder in self._includes:
             testfile = path.join(folder, includefile)
             if path.isfile(testfile):
                 break
@@ -217,7 +226,7 @@ class CPreProcessor(object):
             warnings.warn('Could not find %s; skipping' % includefile,
                           PreProcessorWarning)
         self._includefile = CPreProcessor(testfile,
-                                          defines=self._defines,
+                                          defines=self.defines,
                                           includes=self._includes,
                                           notfound_fatal=self._notfound_fatal)
 
@@ -228,9 +237,9 @@ class CPreProcessor(object):
         # Define a new variable
         words = args.split()
         if len(words) == 1:
-            self._defines[words[0]] = '1'
+            self.defines[words[0]] = '1'
         elif len(words) >= 2:
-            self._defines[words[0]] = args[len(words[0]):].strip()
+            self.defines[words[0]] = args[len(words[0]):].strip()
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #define')
 
@@ -242,7 +251,7 @@ class CPreProcessor(object):
         words = args.split()
         if len(words) == 1:
             try:
-                del self._defines[words[0]]
+                del self.defines[words[0]]
             except KeyError:
                 pass
         elif len(words) > 1:

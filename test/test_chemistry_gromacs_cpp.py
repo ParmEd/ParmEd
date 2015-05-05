@@ -116,3 +116,27 @@ line 4
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_VAR=1))
         self.assertEqual(pp.read().strip(), "line 1\nline 2")
+
+    def test_simple_include(self):
+        """ Tests CPreProcessor simple #include directive """
+        pp = CPreProcessor(get_fn('pptest1/pptest1.h'))
+        self.assertEqual(pp.read().strip(), """\
+pptest1 line 1
+pptest2 line 1
+pptest3 line 1
+pptest2 line 2
+pptest1 line 2
+pptest3 line 1
+pptest1 line 3""")
+
+    def test_include_defines(self):
+        """ Tests passing defines between included files """
+        pp = CPreProcessor(get_fn('pptest2/pptest1.h'))
+        self.assertEqual(pp.read().strip(), """\
+pptest1 line 1
+pptest2 line 1
+pptest3 line 1
+pptest1 line 2
+pptest1 line 3
+pptest3 line 1
+pptest1 line 4""")
