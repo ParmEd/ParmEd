@@ -333,10 +333,10 @@ if __name__ == '__main__':
                 Default is standard output''')
     parser.add_argument('-D', dest='defines', metavar='VAR[=VAL]',
                 action='append', help='''List of predefined variables to pass to
-                the preprocessor. Default VAL is 1 when missing.''')
+                the preprocessor. Default VAL is 1 when missing.''', default=[])
     parser.add_argument('-I', dest='includes', metavar='DIRECTORY',
                 action='append', help='''List of include directories to search
-                for included files''')
+                for included files''', default=[])
 
     opt = parser.parse_args()
 
