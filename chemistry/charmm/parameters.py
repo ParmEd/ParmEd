@@ -19,7 +19,18 @@ from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range, zip
 from collections import OrderedDict
 import os
+import re
 import warnings
+
+_penaltyre = re.compile(r'penalty\s*=\s*([\d\.]+)')
+
+class _EmptyStringIterator(object):
+    """ Always yields an empty string """
+    def __iter__(self):
+        while True:
+            yield ''
+    def __getitem__(self, idx):
+        return ''
 
 class CharmmParameterSet(object):
     """
@@ -171,7 +182,7 @@ class CharmmParameterSet(object):
                 inst.read_stream_file(sfile)
         return inst
 
-    def read_parameter_file(self, pfile):
+    def read_parameter_file(self, pfile, comments=None):
         """
         Reads all of the parameters from a parameter file. Versions 36 and
         later of the CHARMM force field files have an ATOMS section defining
@@ -180,8 +191,12 @@ class CharmmParameterSet(object):
 
         Parameters
         ----------
-        pfile : str
-            Name of the CHARMM parameter file to read
+        pfile : str or list of lines
+            Name of the CHARMM parameter file to read or list of lines to parse
+            as a file
+        comments : list of str, optional
+            List of comments on each of the pfile lines (if pfile is a list of
+            lines)
 
         Notes
         -----
@@ -196,6 +211,8 @@ class CharmmParameterSet(object):
         else:
             own_handle = False
             f = pfile
+            if not isinstance(f, CharmmFile) and comments is None:
+                comments = _EmptyStringIterator()
         # What section are we parsing?
         section = None
         # The current cmap we are building (these span multiple lines)
@@ -206,8 +223,12 @@ class CharmmParameterSet(object):
         nonbonded_types = dict() # Holder
         parameterset = None
         read_first_nonbonded = False
-        for line in f:
+        for i, line in enumerate(f):
             line = line.strip()
+            try:
+                comment = f.comment
+            except AttributeError:
+                comment = comments[i]
             if not line:
                 # This is a blank line
                 continue
@@ -249,6 +270,12 @@ class CharmmParameterSet(object):
                 continue
             # If we have no section, skip
             if section is None: continue
+            # See if our comments define a penalty for this line
+            pens = _penaltyre.findall(comment)
+            if len(pens) == 1:
+                penalty = float(pens[0])
+            else:
+                penalty = None
             # Now handle each section specifically
             if section == 'ATOMS':
                 if not line.startswith('MASS'): continue # Should this happen?
@@ -287,6 +314,7 @@ class CharmmParameterSet(object):
                 bond_type = BondType(k, req)
                 self.bond_types[(type1, type2)] = bond_type
                 self.bond_types[(type2, type1)] = bond_type
+                bond_type.penalty = penalty
                 continue
             if section == 'ANGLES':
                 words = line.split()
@@ -306,10 +334,12 @@ class CharmmParameterSet(object):
                     ubk = conv(words[5], float, 'Urey-Bradley force constant')
                     ubeq = conv(words[6], float, 'Urey-Bradley equil. value')
                     ubtype = BondType(ubk, ubeq)
+                    ubtype.penalty = penalty
                 except IndexError:
                     ubtype = NoUreyBradley
                 self.urey_bradley_types[(type1, type2, type3)] = ubtype
                 self.urey_bradley_types[(type3, type2, type1)] = ubtype
+                angle_type.penalty = penalty
                 continue
             if section == 'DIHEDRALS':
                 words = line.split()
@@ -327,6 +357,7 @@ class CharmmParameterSet(object):
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
                 dihedral = DihedralType(k, n, phase*DEG_TO_RAD)
+                dihedral.penalty = penalty
                 if key in self.dihedral_types:
                     # See if the existing dihedral type list has a term with
                     # the same periodicity -- If so, replace it
@@ -380,7 +411,9 @@ class CharmmParameterSet(object):
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                self.improper_types[key] = ImproperType(k, theteq*DEG_TO_RAD)
+                improp = ImproperType(k, theteq*DEG_TO_RAD)
+                self.improper_types[key] = improp
+                improp.penalty = penalty
                 continue
             if section == 'CMAP':
                 # This is the most complicated part, since cmap parameters span
@@ -696,7 +729,7 @@ class CharmmParameterSet(object):
         else:
             f = CharmmStreamFile(sfile)
 
-        title, section = f.next_section()
+        title, section, comments = f.next_section()
         while title is not None and section is not None:
             words = title.lower().split()
             if words[1] == 'rtf':
@@ -704,8 +737,8 @@ class CharmmParameterSet(object):
                 self.read_topology_file(iter(section))
             elif words[1].startswith('para'):
                 # This is a Parameter file section
-                self.read_parameter_file(section)
-            title, section = f.next_section()
+                self.read_parameter_file(section, comments)
+            title, section, comments = f.next_section()
 
     def condense(self, do_dihedrals=True):
         """
