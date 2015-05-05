@@ -211,7 +211,7 @@ class CharmmParameterSet(object):
         else:
             own_handle = False
             f = pfile
-            if not isinstance(f, CharmmFile):
+            if not isinstance(f, CharmmFile) and comments is None:
                 comments = _EmptyStringIterator()
         # What section are we parsing?
         section = None
