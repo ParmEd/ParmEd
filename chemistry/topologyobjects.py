@@ -2112,11 +2112,24 @@ class DihedralTypeList(list, _ListItem):
     In cases where `DihedralType`s are stored with every term in the same
     container, this object supports list assignment and indexing like
     :class:`DihedralType`.
+
+    Parameters
+    ----------
+    *args : objects
+        Any arguments that ``list`` would take.
+    list : TrackedList, optional
+        A list that "contains" this DihedralTypeList instance. This is a
+        keyword-only argument. Default is ``None`` (i.e., belonging to no list)
+    **kwargs : keyword argument list
+        All other keyword arguments passed directly to the ``list`` constructor
     """
     def __init__(self, *args, **kwargs):
+        if 'list' in kwargs:
+            self.list = kwargs.pop('list')
+        else:
+            self.list = None
         list.__init__(self, *args, **kwargs)
         self._idx = -1
-        self.list = None
         self.used = False
 
     def __eq__(self, other):

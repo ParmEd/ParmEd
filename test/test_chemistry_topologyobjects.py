@@ -12,6 +12,7 @@ from chemistry.topologyobjects import _ListItem, _FourAtomTerm
 from chemistry.topologyobjects import *
 from chemistry.amber.readparm import AmberFormat
 from chemistry.utils.six.moves import range, zip
+from copy import copy
 import unittest
 from utils import get_fn
 import random
@@ -218,6 +219,57 @@ class TestTopologyObjects(unittest.TestCase):
 
     #=============================================
 
+    def test_copy_atom(self):
+        """ Tests Atom's __copy__ ability """
+        atom = Atom(name='CA', type='CX', atomic_number=6, mass=12.01)
+        atom2 = Atom(name='CB', type='CY', atomic_number=6, mass=12.01)
+        atype = AtomType('CX', 1, 12.01, 6)
+        atype.set_lj_params(1.0, 1.2)
+        atom.atom_type = atype
+        bond = Bond(atom, atom2)
+        # Copy the atom -- it should *not* inherit any valence terms
+        copy1 = copy(atom)
+        # Black hole conditions
+        atom.xx = atom.xy = atom.xz = 0.0
+        atom2.xx = atom2.xy = atom2.xz = 0.0
+        atom.vx = atom.vy = atom.vz = 0.0
+        atom2.vx = atom2.vy = atom2.vz = 0.0
+        copy2 = copy(atom)
+        # Now check that all attributes were transferred, they are different
+        # objects, and that they did not inherit any bonds or bond_partners
+        self.assertEqual(copy1.name, atom.name)
+        self.assertEqual(copy1.mass, atom.mass)
+        self.assertEqual(copy1.atomic_number, atom.atomic_number)
+        self.assertEqual(copy1.type, atom.type)
+        self.assertEqual(copy1.rmin, atom.rmin)
+        self.assertEqual(copy1.epsilon, atom.epsilon)
+        self.assertEqual(copy1.rmin_14, atom.rmin_14)
+        self.assertEqual(copy1.epsilon_14, atom.epsilon_14)
+        self.assertRaises(AttributeError, lambda: copy1.xx)
+        self.assertRaises(AttributeError, lambda: copy1.vx)
+        self.assertIs(copy1.atom_type, atom.atom_type) # shallow copy
+        self.assertIsNot(copy1, atom)
+        # Check copy 2
+        self.assertEqual(copy2.name, atom.name)
+        self.assertEqual(copy2.mass, atom.mass)
+        self.assertEqual(copy2.atomic_number, atom.atomic_number)
+        self.assertEqual(copy2.type, atom.type)
+        self.assertEqual(copy2.xx, atom.xx)
+        self.assertEqual(copy2.xy, atom.xy)
+        self.assertEqual(copy2.xz, atom.xz)
+        self.assertEqual(copy2.vx, atom.vx)
+        self.assertEqual(copy2.vy, atom.vy)
+        self.assertEqual(copy2.vz, atom.vz)
+        self.assertEqual(copy2.rmin, atom.rmin)
+        self.assertEqual(copy2.epsilon, atom.epsilon)
+        self.assertEqual(copy2.rmin_14, atom.rmin_14)
+        self.assertEqual(copy2.epsilon_14, atom.epsilon_14)
+        self.assertIs(copy2.atom_type, atom.atom_type)
+        self.assertIsNot(copy2, atom)
+        self.assertIsNot(copy1, copy2)
+
+    #=============================================
+
     def test_ljparams(self):
         """ Tests handling of Lennard-Jones parameters in Atom and AtomType """
         atom = Atom(name='CA', type='CX', atomic_number=6, mass=12.01)
@@ -282,6 +334,13 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(bond2.type.idx, 1)
         self.assertEqual(bond3.type.idx, 2)
         self.assertIs(bond1.type.list, bond_types)
+        # Test the BondTypes.__copy__ method
+        cp = copy(bond_types[0])
+        self.assertIsNot(cp, bond_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.k, bond_types[0].k)
+        self.assertEqual(cp.req, bond_types[0].req)
 
     #=============================================
 
@@ -332,6 +391,13 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(angle_types[0].idx, 0)
         self.assertEqual(angle_types[1].idx, 1)
         self.assertEqual(angle_types[2].idx, 2)
+        # Test the AngleType.__copy__ method
+        cp = copy(angle_types[0])
+        self.assertIsNot(cp, angle_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.k, angle_types[0].k)
+        self.assertEqual(cp.theteq, angle_types[0].theteq)
 
     #=============================================
 
@@ -415,6 +481,48 @@ class TestTopologyObjects(unittest.TestCase):
         d3.delete()
         self.assertNotIn(atoms[0], atoms[3].dihedral_partners)
         self.assertNotIn(atoms[3], atoms[0].dihedral_partners)
+        # Test the DihedralType.__copy__ method
+        cp = copy(dihed_types[0])
+        self.assertIsNot(cp, dihed_types[0])
+        self.assertIsNot(cp, dihed_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.phi_k, dihed_types[0].phi_k)
+        self.assertEqual(cp.per, dihed_types[0].per)
+        self.assertEqual(cp.phase, dihed_types[0].phase)
+        self.assertEqual(cp.scee, dihed_types[0].scee)
+        self.assertEqual(cp.scnb, dihed_types[0].scnb)
+
+    #=============================================
+
+    def test_dihedral_type_list(self):
+        """ Tests the DihedralTypeList class """
+        dihed_types = TrackedList()
+        dihed_types.append(DihedralTypeList(list=dihed_types))
+        dihed_types[0].append(DihedralType(5.0, 2, 0.0, 1.2, 2.0))
+        dihed_types[0].append(DihedralType(1.0, 3, 180.0, 1.2, 2.0))
+        dihed_types[0].append(DihedralType(2.0, 4, 180.0, 1.2, 2.0))
+        dihed_types[0].append(DihedralType(10.0, 1, 180.0, 0., 0.))
+        self.assertIs(dihed_types[0].list, dihed_types)
+        self.assertEqual(len(dihed_types), 1)
+        self.assertEqual(dihed_types[0].idx, 0)
+        self.assertEqual(len(dihed_types[0]), 4)
+        # Now test DihedralTypeList.__copy__
+        cp = copy(dihed_types[0])
+        self.assertIsNot(cp, dihed_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(len(cp), 4)
+        i = 0
+        for t1, t2 in zip(cp, dihed_types[0]):
+            self.assertIsNot(t1, t2)
+            self.assertEqual(t1.phi_k, t2.phi_k)
+            self.assertEqual(t1.per, t2.per)
+            self.assertEqual(t1.phase, t2.phase)
+            self.assertEqual(t1.scee, t2.scee)
+            self.assertEqual(t1.scnb, t2.scnb)
+            i += 1
+        self.assertEqual(i, 4)
 
     #=============================================
 
@@ -461,6 +569,13 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertFalse(imp.same_atoms((3, 2, 1, 0)))
         self.assertTrue(imp.same_atoms(imp2))
         self.assertTrue(imp.same_atoms(imp))
+        # Test ImproperType.__copy__
+        cp = copy(imp_types[0])
+        self.assertIsNot(cp, imp_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.psi_k, imp_types[0].psi_k)
+        self.assertEqual(cp.psi_eq, imp_types[0].psi_eq)
 
     #=============================================
 
@@ -524,6 +639,13 @@ class TestTopologyObjects(unittest.TestCase):
         for i in range(6):
             for j in range(6):
                 self.assertEqual(sg[i,j], cmap_types[0].grid[(i+3)%6,(j+3)%6])
+        # Check the CmapType.__copy__ functionality
+        cp = copy(cmap_types[0])
+        self.assertIsNot(cp, cmap_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.resolution, cmap_types[0].resolution)
+        self.assertEqual(cp.grid, cmap_types[0].grid)
 
     #=============================================
 
@@ -606,14 +728,28 @@ class TestTopologyObjects(unittest.TestCase):
         bonds = [Bond(atoms[0], atoms[1]), Bond(atoms[1], atoms[2])]
         strbnd = StretchBend(atoms[0], atoms[1], atoms[2],
                              StretchBendType(10.0, 11.0, 1.1, 1.2, 109.0))
+        strbnds = TrackedList()
+        strbnds.append(strbnd.type)
+        strbnd.type.list = strbnds
         for obj in atoms + bonds:
             self.assertIn(obj, strbnd)
-        self.assertEqual(strbnd.type.idx, -1)
+        self.assertEqual(strbnd.type.idx, 0)
+        self.assertIs(strbnd.type.list, strbnds)
         self.assertEqual(strbnd.type.k1, 10)
         self.assertEqual(strbnd.type.k2, 11)
         self.assertEqual(strbnd.type.req1, 1.1)
         self.assertEqual(strbnd.type.req2, 1.2)
         self.assertEqual(strbnd.type.theteq, 109.0)
+        # Test the StretchBendType.__copy__ method
+        cp = copy(strbnd.type)
+        self.assertIsNot(cp, strbnd.type)
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.k1, 10)
+        self.assertEqual(cp.k2, 11)
+        self.assertEqual(cp.req1, 1.1)
+        self.assertEqual(cp.req2, 1.2)
+        self.assertEqual(cp.theteq, 109.0)
 
     #=============================================
 
@@ -687,9 +823,18 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(tortor2.type.idx, 1)
         self.assertEqual(tortor3.type.idx, 2)
         # Now check the _TorTorTable API
-
         self.assertEqual(tortor1.type.f, tortor2.type.f)
         self.assertNotEqual(tortor1.type.f, tortor3.type.f)
+        # Check the TorsionTorsionType.__copy__ method
+        cp = copy(tortor_types[-1])
+        self.assertIsNot(cp, tortor_types[-1])
+        self.assertIsNot(cp.dfda1, tortor_types[-1].dfda1)
+        self.assertIsNot(cp.dfda2, tortor_types[-1].dfda2)
+        self.assertIsNot(cp.d2fda1da2, tortor_types[-1].d2fda1da2)
+        self.assertIsNot(cp.dfda1.data, tortor_types[-1].dfda1.data)
+        self.assertIsNot(cp.dfda2.data, tortor_types[-1].dfda2.data)
+        self.assertIsNot(cp.d2fda1da2.data, tortor_types[-1].d2fda1da2.data)
+        self.assertEqual(cp, tortor_types[-1])
 
     #=============================================
 
@@ -711,12 +856,7 @@ class TestTopologyObjects(unittest.TestCase):
         """ Running the topologyobjects docstring examples/tests """
         import doctest
         results = doctest.testmod(topologyobjects)
-        try:
-            self.assertEqual(results.failed, 0)
-        except AttributeError:
-            # Python 2.4 does not return a "results" record, but instead a tuple
-            # of (failed, succeeded)
-            self.assertEqual(results[0], 0)
+        self.assertEqual(results.failed, 0)
 
     #=============================================
 
