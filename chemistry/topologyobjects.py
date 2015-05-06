@@ -9,11 +9,10 @@ from __future__ import division
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
-from chemistry.periodic_table import Mass, Element as _Element
 import chemistry.unit as u
 from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import zip, range
-import copy
+from copy import copy
 import math
 import warnings
 
@@ -485,7 +484,7 @@ class Atom(_ListItem):
                   bfactor=item.bfactor, altloc=item.altloc)
         new.atom_type = item.atom_type
         for key in item.other_locations:
-            new.other_locations[key] = copy.copy(item.other_locations[key])
+            new.other_locations[key] = copy(item.other_locations[key])
         _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
                       'vdw_parent', 'vdw_weight'))
@@ -1600,6 +1599,10 @@ class BondType(_ListItem, _ParameterType):
         return '<%s; k=%.3f, req=%.3f>' % (type(self).__name__,
                 self.k, self.req)
 
+    def __copy__(self):
+        """ Not bound to any list """
+        return BondType(self.k, self.req)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Angle(object):
@@ -1746,6 +1749,9 @@ class AngleType(_ListItem, _ParameterType):
     def __repr__(self):
         return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__,
                 self.k, self.theteq)
+
+    def __copy__(self):
+        return AngleType(self.k, self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2011,6 +2017,10 @@ class DihedralType(_ListItem, _ParameterType):
                 (type(self).__name__, self.phi_k, self.per, self.phase,
                  self.scee, self.scnb))
 
+    def __copy__(self):
+        return DihedralType(self.phi_k, self.per, self.phase, self.scee,
+                            self.scnb)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class RBTorsionType(_ListItem, _ParameterType):
@@ -2070,7 +2080,6 @@ class RBTorsionType(_ListItem, _ParameterType):
     #===================================================
    
     def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
-        """ RBTorsionType constructor """
         _ParameterType.__init__(self)
         self.c0 = _strip_units(c0)
         self.c1 = _strip_units(c1)
@@ -2087,6 +2096,10 @@ class RBTorsionType(_ListItem, _ParameterType):
         return (self.c0 == other.c0 and self.c1 == other.c1 and
                 self.c2 == other.c2 and self.c3 == other.c3 and
                 self.c4 == other.c4 and self.c5 == other.c5)
+
+    def __copy__(self, other):
+        return RBTorsionType(self.c0, self.c1, self.c2,
+                             self.c3, self.c4, self.c5)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2126,6 +2139,9 @@ class DihedralTypeList(list, _ListItem):
 
     def __repr__(self):
         return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
+
+    def __copy__(self):
+        return DihedralTypeList([copy(x) for x in self])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2401,6 +2417,9 @@ class ImproperType(_ListItem, _ParameterType):
         return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__,
                 self.psi_k, self.psi_eq)
 
+    def __copy__(self):
+        return ImproperType(self.psi_k, self.psi_eq)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Cmap(object):
@@ -2642,6 +2661,9 @@ class CmapType(_ListItem, _ParameterType):
     def __repr__(self):
         return '<%s; resolution=%d>' % (type(self).__name__, self.resolution)
 
+    def __copy__(self):
+        return CmapType(self.resolution, copy(self.grid._data), self.comments)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class _CmapGrid(object):
@@ -2776,6 +2798,9 @@ class _CmapGrid(object):
                 # Start from the middle
                 newgrid[i, j] = self[ii, jj]
         return newgrid
+
+    def __copy__(self):
+        return _CmapGrid(self.resolution, copy(self._data))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2926,6 +2951,9 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return '<%s; k=%.3f>' % (type(self).__name__, self.k)
+
+    def __copy__(self):
+        return OutOfPlaneBendType(self.k)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3128,6 +3156,10 @@ class StretchBendType(_ListItem, _ParameterType):
         return '<%s; req1=%.3f, req2=%.3f, theteq=%.3f, k1=%.3f, k2=%.3f>' \
                 % (type(self).__name__, self.req1, self.req2, self.theteq,
                    self.k1, self.k2)
+
+    def __copy__(self):
+        return StretchBendType(self.k1, self.k2, self.req1, self.req2,
+                               self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3388,6 +3420,27 @@ class TorsionTorsionType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return '<%s; %dx%d>' % (type(self).__name__, self.dims[0], self.dims[1])
+
+    def __copy__(self):
+        f = copy(self.f.data)
+        # dfda1
+        if self.dfda1 is None:
+            dfda1 = None
+        else:
+            dfda1 = copy(self.dfda1.data)
+        # dfda2
+        if self.dfda2 is None:
+            dfda2 = None
+        else:
+            dfda2 = copy(self.dfda2.data)
+        # d2fda1da2
+        if self.d2fda1da2 is None:
+            d2fda1da2 = None
+        else:
+            d2fda1da2 = copy(self.d2fda1da2.data)
+        # Copy
+        return TorsionTorsionType(self.dims, self.ang1, self.ang2, f, dfda1,
+                                  dfda2, d2fda1da2)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4098,6 +4151,10 @@ class NonbondedExceptionType(_ListItem):
                 self.polar_weight == other.polar_weight and
                 self.mutual_weight == other.mutual_weight)
 
+    def __copy__(self):
+        return NonbondedExceptionType(self.vdw_weight, self.multipole_weight,
+                self.direct_weight, self.polar_weight, self.mutual_weight)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AtomType(object):
@@ -4244,6 +4301,15 @@ class AtomType(object):
         return self._member_number > other._member_number or self == other
     def __le__(self, other):
         return self._member_number < other._member_number or self == other
+
+    def __copy__(self):
+        cp = AtomType(self.name, self.number, self.mass, self.atomic_number)
+        cp.epsilon = self.epsilon
+        cp.rmin = self.rmin
+        cp.epsilon_14 = self.epsilon_14
+        cp.rmin_14 = self.rmin_14
+        cp.nbfix = self.nbfix.copy()
+        return cp
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

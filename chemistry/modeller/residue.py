@@ -5,7 +5,6 @@ typically used in modelling applications
 
 import copy
 from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
-from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond, AtomList, TrackedList
 try:
     import numpy as np
@@ -290,7 +289,7 @@ class ResidueTemplateContainer(list):
 
         Parameters
         ----------
-        struct : :class:`Structure`
+        struct : :class:`chemistry.structure.Structure`
             The structure from which to generate the ResidueTemplateContainer
             from
         term_decorate : bool, optional

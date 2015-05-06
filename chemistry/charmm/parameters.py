@@ -17,8 +17,7 @@ from chemistry.modeller import ResidueTemplate, PatchTemplate
 from chemistry.parameters import ParameterSet
 from chemistry.periodic_table import AtomicNum, element_by_mass
 from chemistry.utils.six import iteritems
-from chemistry.utils.six.moves import range, zip
-from collections import OrderedDict
+from chemistry.utils.six.moves import zip
 import os
 import re
 import warnings

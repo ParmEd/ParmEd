@@ -36,12 +36,12 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
         TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
         AcceptorDonor, Group, Atom, ExtraPoint, TwoParticleExtraPointFrame,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, RBTorsionType)
 from chemistry import unit as u
-from chemistry.utils.six import string_types, wraps
+from chemistry.utils.six import string_types, wraps, integer_types
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
-import copy
+from copy import copy
 import math
 import re
 import warnings
@@ -237,6 +237,8 @@ class Structure(object):
     space_group : ``str``
         The space group of the structure (default is "P 1")
 
+    Notes
+    -----
     This class also has a handful of type lists for each of the attributes above
     (excluding `atoms`, `residues`, `chiral_frames`, and `multipole_frames`).
     They are all TrackedList instances that are designed to hold the relevant
@@ -246,8 +248,6 @@ class Structure(object):
         out_of_plane_bend_types, pi_torsion_types, stretch_bend_types,
         torsion_torsion_types, adjust_types
 
-    Notes
-    -----
     dihedral_types _may_ be a list of :class:`DihedralType` instances, since
     torsion profiles are often represented by a Fourier series with multiple
     terms
@@ -426,7 +426,7 @@ class Structure(object):
         c = cls()
         for atom in self.atoms:
             res = atom.residue
-            a = copy.copy(atom)
+            a = copy(atom)
             c.add_atom(a, res.name, res.number, res.chain, res.insertion_code)
         # Now copy all of the types
         for bt in self.bond_types:
@@ -628,7 +628,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
-        c.box = copy.copy(self.box)
+        c.box = copy(self.box)
         return c
 
     #===================================================
@@ -832,7 +832,8 @@ class Structure(object):
                 self.out_of_plane_bends.changed or
                 self.stretch_bend_types.changed or
                 self.torsion_torsion_types.changed or
-                self.pi_torsion_types.changed)
+                self.pi_torsion_types.changed or self.rb_torsions.changed or
+                self.rb_torsion_types.changed)
 
     #===================================================
 
@@ -883,6 +884,7 @@ class Structure(object):
         self._prune_empty_bonds()
         self._prune_empty_angles()
         self._prune_empty_dihedrals()
+        self._prune_empty_rb_torsions()
         self._prune_empty_ureys()
         self._prune_empty_impropers()
         self._prune_empty_cmaps()
@@ -1007,9 +1009,8 @@ class Structure(object):
         ``ValueError`` : if the selection is a boolean-like list and its length
                          is not the same as the number of atoms in the system
         """
-        from copy import copy
         from chemistry.amber import AmberMask
-        if isinstance(selection, int):
+        if isinstance(selection, integer_types):
             return self.atoms[selection]
 
         # Now we select a subset of atoms. Convert "selection" into a natom list
@@ -1060,13 +1061,15 @@ class Structure(object):
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
                 resset = set(list(range(len(self.residues)))[ressel])
-            elif isinstance(ressel, string_types) or isinstance(ressel, int):
+            elif isinstance(ressel, string_types) or isinstance(ressel,
+                    integer_types):
                 resset = set([ressel])
             else:
                 resset = set(ressel)
             if isinstance(atomsel, slice):
                 atomset = set(list(range(len(self.atoms)))[atomsel])
-            elif isinstance(atomsel, string_types) or isinstance(atomsel, int):
+            elif isinstance(atomsel, string_types) or isinstance(atomsel,
+                    integer_types):
                 atomset = set([atomsel])
             else:
                 atomset = set(atomsel)
@@ -2230,6 +2233,20 @@ class Structure(object):
 
     #===================================================
 
+    def _prune_empty_rb_torsions(self):
+        """ Gets rid of any empty R-B torsions """
+        for i in reversed(range(len(self.rb_torsions))):
+            dihed = self.rb_torsions[i]
+            if (dihed.atom1 is None and dihed.atom2 is None and
+                    dihed.atom3 is None and dihed.atom4 is None):
+                del self.dihedrals[i]
+            elif (dihed.atom1.idx == -1 or dihed.atom2.idx == -1 or
+                    dihed.atom3.idx == -1 or dihed.atom4.idx == -1):
+                dihed.delete()
+                del self.dihedrals[i]
+
+    #===================================================
+
     def _prune_empty_ureys(self):
         """ Gets rid of any empty Urey-Bradley terms """
         for i in reversed(range(len(self.urey_bradleys))):
@@ -2460,6 +2477,191 @@ class Structure(object):
         if hasattr(self, 'name') and self.name:
             return self.name
         return repr(self)
+
+    #===================================================
+
+    # Support concatenating and replicating the Structure
+
+    def __add__(self, other):
+        cp = self.copy()
+        cp += other
+        return cp
+
+    def __iadd__(self, other):
+        if not isinstance(other, Structure):
+            raise TypeError('Must concatenate with Structure')
+        # The basic approach taken here is to extend the atom list, then scan
+        # through all of the valence terms in `other`, adding them to the
+        # corresponding arrays of `self`, using an offset to look into the atom
+        # array. The types are done a little differently. The types are all
+        # copied into a "temporary" array so they have the same index as the
+        # original Structure `other`, and as the valence terms are created the
+        # reference to that type is added. Afterwards, those types are tacked on
+        # to the end of the types list on `self`
+        aoffset = len(self.atoms)
+        roffset = self.residues[-1].number + 1
+        for atom in other.atoms:
+            res = atom.residue
+            self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
+                          res.inscode)
+        def copy_valence_terms(oval, otyp, sval, styp, attrlist):
+            """ Copies the valence terms from one list to another;
+            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
+            styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
+            """
+            otypcp = [copy(typ) for typ in otyp]
+            for val in oval:
+                ats = [getattr(val, attr) for attr in attrlist]
+                # Replace any atoms with the ones from self.atoms
+                for i, at in enumerate(ats):
+                    if isinstance(at, Atom):
+                        ats[i] = self.atoms[at.idx+aoffset]
+                kws = dict()
+                if val.type is not None:
+                    kws['type'] = otypcp[val.type.idx]
+                sval.append(type(val)(*ats, **kws))
+            # Now tack on the "new" types copied from `other`
+            styp.extend(otypcp)
+            if hasattr(styp, 'claim'):
+                styp.claim()
+        copy_valence_terms(other.bonds, other.bond_types, self.bonds,
+                           self.bond_types, ['atom1', 'atom2'])
+        copy_valence_terms(other.angles, other.angle_types, self.angles,
+                           self.angle_types, ['atom1', 'atom2', 'atom3'])
+        copy_valence_terms(other.dihedrals, other.dihedral_types,
+                           self.dihedrals, self.dihedral_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
+                           'ignore_end'])
+        copy_valence_terms(other.rb_torsions, other.rb_torsion_types,
+                           self.rb_torsions, self.rb_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(other.urey_bradleys, other.urey_bradley_types,
+                           self.urey_bradleys, self.urey_bradley_types,
+                           ['atom1', 'atom2'])
+        copy_valence_terms(other.impropers, other.improper_types,
+                           self.impropers, self.improper_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(other.cmaps, other.cmap_types,
+                           self.cmaps, self.cmap_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        copy_valence_terms(other.trigonal_angles, other.trigonal_angle_types,
+                           self.trigonal_angles, self.trigonal_angle_types,
+                           ['atom1',' atom2', 'atom3', 'atom4'])
+        copy_valence_terms(other.out_of_plane_bends,
+                           other.out_of_plane_bend_types,
+                           self.out_of_plane_bends,
+                           self.out_of_plane_bend_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(other.pi_torsions, other.pi_torsion_types,
+                           self.pi_torsions, self.pi_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
+                            'atom6'])
+        copy_valence_terms(other.stretch_bends, other.stretch_bend_types,
+                           self.stretch_bends, self.stretch_bend_types,
+                           ['atom1', 'atom2', 'atom3'])
+        copy_valence_terms(other.torsion_torsions, other.torsion_torsion_types,
+                           self.torsion_torsions, self.torsion_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        copy_valence_terms(other.chiral_frames, [], self.chiral_frames, [],
+                           ['atom1', 'atom2', 'chirality'])
+        copy_valence_terms(other.multipole_frames, [], self.multipole_frames,
+                           [], ['atom', 'frame_pt_num', 'vectail', 'vechead',
+                           'nvec'])
+        copy_valence_terms(other.adjusts, other.adjust_types, self.adjusts,
+                           self.adjust_types, ['atom1', 'atom2'])
+        copy_valence_terms(other.donors, [], self.donors, [],
+                           ['atom1', 'atom2'])
+        copy_valence_terms(other.acceptors, [], self.acceptors, [],
+                           ['atom1', 'atom2'])
+        copy_valence_terms(other.groups, [], self.groups, [],
+                           ['bs', 'type', 'move'])
+        return self
+
+    def __mul__(self, ncopies):
+        """ Replicates the current Structure `ncopies` times """
+        cp = copy(self)
+        return cp.__imul__(ncopies, self)
+
+    def __imul__(self, ncopies, other=None):
+        if not isinstance(ncopies, integer_types):
+            raise TypeError('Can only multiply a structure by an integer')
+        # The basic approach here is similar to what we used in __iadd__, except
+        # we don't have to extend the type arrays at all -- we just point to the
+        # same one that the first copy pointed to.
+        def copy_valence_terms(oval, aoffset, sval, styp, attrlist):
+            """ Copies the valence terms from one list to another;
+            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
+            styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
+            """
+            for val in oval:
+                ats = [getattr(val, attr) for attr in attrlist]
+                # Replace any atoms with the ones from self.atoms
+                for i, at in enumerate(ats):
+                    if isinstance(at, Atom):
+                        ats[i] = self.atoms[at.idx+aoffset]
+                kws = dict()
+                if val.type is not None:
+                    kws['type'] = styp[val.type.idx]
+                sval.append(type(val)(*ats, **kws))
+        if other is None: other = copy(self)
+        for i in range(ncopies):
+            aoffset = len(self.atoms)
+            roffset = self.residues[-1].number + 1
+            for atom in other.atoms:
+                res = atom.residue
+                self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
+                              res.inscode)
+            copy_valence_terms(other.bonds, aoffset, self.bonds,
+                               self.bond_types, ['atom1', 'atom2'])
+            copy_valence_terms(other.angles, aoffset, self.angles,
+                               self.angle_types, ['atom1', 'atom2', 'atom3'])
+            copy_valence_terms(other.dihedrals, aoffset, self.dihedrals,
+                               self.dihedral_types, ['atom1', 'atom2', 'atom3',
+                               'atom4', 'improper', 'ignore_end'])
+            copy_valence_terms(other.rb_torsions, aoffset,
+                               self.rb_torsions, self.rb_torsion_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4'])
+            copy_valence_terms(other.urey_bradleys, aoffset,
+                               self.urey_bradleys, self.urey_bradley_types,
+                               ['atom1', 'atom2'])
+            copy_valence_terms(other.impropers, aoffset,
+                               self.impropers, self.improper_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4'])
+            copy_valence_terms(other.cmaps, aoffset,
+                               self.cmaps, self.cmap_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+            copy_valence_terms(other.trigonal_angles, aoffset,
+                               self.trigonal_angles, self.trigonal_angle_types,
+                               ['atom1',' atom2', 'atom3', 'atom4'])
+            copy_valence_terms(other.out_of_plane_bends,
+                               aoffset, self.out_of_plane_bends,
+                               self.out_of_plane_bend_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4'])
+            copy_valence_terms(other.pi_torsions, aoffset,
+                               self.pi_torsions, self.pi_torsion_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
+                                'atom6'])
+            copy_valence_terms(other.stretch_bends, aoffset,
+                               self.stretch_bends, self.stretch_bend_types,
+                               ['atom1', 'atom2', 'atom3'])
+            copy_valence_terms(other.torsion_torsions, aoffset,
+                               self.torsion_torsions, self.torsion_torsion_types,
+                               ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+            copy_valence_terms(other.chiral_frames, aoffset, self.chiral_frames,
+                               [], ['atom1', 'atom2', 'chirality'])
+            copy_valence_terms(other.multipole_frames, aoffset,
+                               self.multipole_frames, [],
+                               ['atom', 'frame_pt_num', 'vectail', 'vechead',
+                               'nvec'])
+            copy_valence_terms(other.adjusts, aoffset, self.adjusts,
+                               self.adjust_types, ['atom1', 'atom2'])
+            copy_valence_terms(other.donors, aoffset, self.donors, [],
+                               ['atom1', 'atom2'])
+            copy_valence_terms(other.acceptors, aoffset, self.acceptors, [],
+                               ['atom1', 'atom2'])
+            copy_valence_terms(other.groups, aoffset, self.groups, [],
+                               ['bs', 'type', 'move'])
+        return self
 
     #===================================================
 

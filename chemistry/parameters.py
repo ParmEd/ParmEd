@@ -5,8 +5,6 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 """
-from chemistry import (AtomType, BondType, AngleType, DihedralType,
-                       ImproperType, CmapType)
 from chemistry.utils.six.moves import range
 from collections import OrderedDict
 

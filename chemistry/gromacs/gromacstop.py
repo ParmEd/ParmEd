@@ -134,7 +134,7 @@ class GromacsTopologyFile(Structure):
             topology file
         """
         params = self.parameterset
-        f = GromacsFile(fname)
+        molecules = dict()
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
                                  defines=defines)) as f:
             current_section = None
