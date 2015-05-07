@@ -12,6 +12,10 @@ import random
 import string
 import unittest
 import os
+try:
+    from string import uppercase
+except ImportError:
+    from string import ascii_uppercase as uppercase
 
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """
@@ -95,7 +99,7 @@ class TestStructureAdd(unittest.TestCase):
         """
         if parametrized: novalence = False
         # Generate random atom and parameter types
-        atom_types = [AtomType(''.join(random.sample(string.uppercase, 3)),
+        atom_types = [AtomType(''.join(random.sample(uppercase, 3)),
                                i, random.random()*16+1, random.randint(1, 8))
                       for i in range(random.randint(8, 20))]
         bond_types = [BondType(random.random()*2, random.random()*100)
@@ -126,17 +130,17 @@ class TestStructureAdd(unittest.TestCase):
         struct = structure.Structure()
         # Add atoms in residues
         for res in range(random.randint(20, 30)):
-            resname = ''.join(random.sample(string.uppercase, 3))
+            resname = ''.join(random.sample(uppercase, 3))
             resid = res + 1
             for i in range(random.randint(10, 25)):
-                name = ''.join(random.sample(string.uppercase, 4))
+                name = ''.join(random.sample(uppercase, 4))
                 if parametrized:
                     typ = random.choice(atom_types)
                     type = str(typ)
                     mass = typ.mass
                     atomic_number = typ.atomic_number
                 else:
-                    type = ''.join(random.sample(string.uppercase, 3))
+                    type = ''.join(random.sample(uppercase, 3))
                     mass = random.random() * 16 + 1
                     atomic_number = random.randint(1, 8)
                 charge = random.random() * 2 - 1
