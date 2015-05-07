@@ -598,7 +598,7 @@ class Structure(object):
                     AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
             )
         for d in self.donors:
-            c.acceptors.append(
+            c.donors.append(
                     AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
