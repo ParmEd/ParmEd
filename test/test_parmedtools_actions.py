@@ -1,19 +1,15 @@
 """
 Tests for the various actions in ParmEd
 """
-from __future__ import division
+from __future__ import division, print_function
 
 from chemistry import periodic_table
 from chemistry.amber import AmberParm, ChamberParm, AmoebaParm
 from chemistry.charmm import CharmmPsfFile
 from chemistry.exceptions import MoleculeWarning, CharmmPSFWarning
 from chemistry.formats import PDBFile, CIFFile
-from compat24 import all
+from chemistry.utils.six.moves import range, zip
 from copy import copy
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 import os
 from ParmedTools import exceptions as exc
 from ParmedTools import ParmedActions as PT

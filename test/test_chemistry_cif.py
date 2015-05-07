@@ -20,6 +20,7 @@ from utils import get_fn, get_saved_fn, diff_files
 
 from chemistry.formats.pdbx import PdbxReader, PdbxWriter
 from chemistry.formats.pdbx.PdbxContainers import *
+from chemistry.utils.six.moves import range
 
 class PdbxReaderTests(unittest.TestCase):
     def setUp(self):

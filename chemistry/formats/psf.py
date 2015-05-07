@@ -5,9 +5,12 @@ files
 from chemistry.charmm import CharmmPsfFile
 # TODO -- move this functionality to a more centralized location
 from chemistry.charmm.psf import set_molecules
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
+from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
+from chemistry.utils.six.moves import range
 
+@add_metaclass(FileFormatType)
 class PSFFile(object):
     """
     CHARMM- or XPLOR-style PSF file parser and writer. This class is
@@ -16,8 +19,6 @@ class PSFFile(object):
     directly, use :class:`chemistry.charmm.CharmmPsfFile` or the
     :func:`chemistry.formats.load_file` function instead.
     """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     @staticmethod
@@ -35,7 +36,7 @@ class PSFFile(object):
             True if it is a CHARMM or Xplor-style PSF file
         """
         f = genopen(filename, 'r')
-        line = f.readline().decode()
+        line = f.readline()
         f.close()
         return line.strip().startswith('PSF')
 
@@ -91,7 +92,7 @@ class PSFFile(object):
         # Index the atoms and residues
         if not hasattr(dest, 'write'):
             own_handle = True
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
 
         # Assign the formats we need to write with
         if ext:
@@ -201,7 +202,7 @@ class PSFFile(object):
         dest.write('\n')
         # NNB section ??
         dest.write(intfmt % 0 + ' !NNB\n\n')
-        for i in xrange(len(struct.atoms)):
+        for i in range(len(struct.atoms)):
             dest.write(intfmt % 0)
             if i % 8 == 7: # Write 8 0's per line
                 dest.write('\n')
@@ -243,5 +244,3 @@ class PSFFile(object):
         # If we opened our own handle, close it
         if own_handle:
             dest.close()
-
-    #===================================================

@@ -8,13 +8,16 @@ Date: April 20, 2014
 """
 from __future__ import division
 
-from compat24 import wraps
 from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                        Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
 from chemistry.structure import needs_openmm, app, mm
 from chemistry import unit as u
+from chemistry.utils.io import genopen
+from chemistry.utils.six import wraps, iteritems
+from chemistry.utils.six.moves import zip, range
+from contextlib import closing
 from math import sqrt
 import os
 import re
@@ -30,7 +33,7 @@ def _catchindexerror(func):
         """ Catch the index error """
         try:
             return func(*args, **kwargs)
-        except IndexError, e:
+        except IndexError as e:
             raise CharmmPSFError('Array is too short: %s' % e)
 
     return newfunc
@@ -177,166 +180,160 @@ class CharmmPsfFile(Structure):
         if not os.path.exists(psf_name):
             raise IOError('Could not find PSF file %s' % psf_name)
         # Open the PSF and read the first line. It must start with "PSF"
-        psf = open(psf_name, 'r')
-        self.name = psf_name
-        line = psf.readline()
-        if not line.startswith('PSF'):
-            raise CharmmPSFError('Unrecognized PSF file. First line is %s' %
-                                 line.strip())
-        # Store the flags
-        psf_flags = line.split()[1:]
-        # Now get all of the sections and store them in a dict
-        psf.readline()
-        # Now get all of the sections
-        psfsections = _ZeroDict()
-        while True:
+        with closing(genopen(psf_name, 'r')) as psf:
+            self.name = psf_name
+            line = psf.readline()
+            if not line.startswith('PSF'):
+                raise CharmmPSFError('Unrecognized PSF file. First line is %s' %
+                                     line.strip())
+            # Store the flags
+            psf_flags = line.split()[1:]
+            # Now get all of the sections and store them in a dict
+            psf.readline()
+            # Now get all of the sections
+            psfsections = _ZeroDict()
+            while True:
+                try:
+                    sec, ptr, data = CharmmPsfFile._parse_psf_section(psf)
+                except CharmmPsfEOF:
+                    break
+                psfsections[sec] = (ptr, data)
+            # store the title
+            self.title = psfsections['NTITLE'][1]
+            # Next is the number of atoms
+            natom = conv(psfsections['NATOM'][0], int, 'natom')
+            # Parse all of the atoms
+            for i in range(natom):
+                words = psfsections['NATOM'][1][i].split()
+                atid = int(words[0])
+                if atid != i + 1:
+                    raise CharmmPSFError('Nonsequential atoms detected!')
+                segid = words[1]
+                rematch = _resre.match(words[2])
+                if not rematch:
+                    raise RuntimeError('Could not interpret residue number %s' %
+                                       words[2])
+                resid, inscode = rematch.groups()
+                resid = conv(resid, int, 'residue number')
+                resname = words[3]
+                name = words[4]
+                attype = words[5]
+                # Try to convert the atom type to an integer a la CHARMM
+                try:
+                    attype = int(attype)
+                except ValueError:
+                    pass
+                charge = conv(words[6], float, 'partial charge')
+                mass = conv(words[7], float, 'atomic mass')
+                props = words[8:]
+                atom = Atom(name=name, type=attype, charge=charge, mass=mass)
+                atom.segid = segid
+                atom.props = props
+                self.add_atom(atom,resname,resid,chain=segid,inscode=inscode)
+            # Now get the number of bonds
+            nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
+            if len(psfsections['NBOND'][1]) != nbond * 2:
+                raise CharmmPSFError('Got %d indexes for %d bonds' %
+                                     (len(psfsections['NBOND'][1]), nbond))
+            it = iter(psfsections['NBOND'][1])
+            for i, j in zip(it, it):
+                self.bonds.append(Bond(self.atoms[i-1], self.atoms[j-1]))
+            # Now get the number of angles and the angle list
+            ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
+            if len(psfsections['NTHETA'][1]) != ntheta * 3:
+                raise CharmmPSFError('Got %d indexes for %d angles' %
+                                     (len(psfsections['NTHETA'][1]), ntheta))
+            it = iter(psfsections['NTHETA'][1])
+            for i, j, k in zip(it, it, it):
+                self.angles.append(
+                        Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1])
+                )
+            # Now get the number of torsions and the torsion list
+            nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
+            if len(psfsections['NPHI'][1]) != nphi * 4:
+                raise CharmmPSFError('Got %d indexes for %d torsions' %
+                                     (len(psfsections['NPHI']), nphi))
+            it = iter(psfsections['NPHI'][1])
+            for i, j, k, l in zip(it, it, it, it):
+                self.dihedrals.append(
+                        Dihedral(self.atoms[i-1], self.atoms[j-1],
+                                 self.atoms[k-1], self.atoms[l-1])
+                )
+            self.dihedrals.split = False
+            # Now get the number of improper torsions
+            nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
+            if len(psfsections['NIMPHI'][1]) != nimphi * 4:
+                raise CharmmPSFError('Got %d indexes for %d impropers' %
+                                     (len(psfsections['NIMPHI'][1]), nimphi))
+            it = iter(psfsections['NIMPHI'][1])
+            for i, j, k, l in zip(it, it, it, it):
+                self.impropers.append(
+                        Improper(self.atoms[i-1], self.atoms[j-1],
+                                 self.atoms[k-1], self.atoms[l-1])
+                )
+            # Now handle the donors (what is this used for??)
+            ndon = conv(psfsections['NDON'][0], int, 'number of donors')
+            if len(psfsections['NDON'][1]) != ndon * 2:
+                raise CharmmPSFError('Got %d indexes for %d donors' %
+                                     (len(psfsections['NDON'][1]), ndon))
+            it = iter(psfsections['NDON'][1])
+            for i, j in zip(it, it):
+                self.donors.append(
+                        AcceptorDonor(self.atoms[i-1], self.atoms[j-1])
+                )
+            # Now handle the acceptors (what is this used for??)
+            nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
+            if len(psfsections['NACC'][1]) != nacc * 2:
+                raise CharmmPSFError('Got %d indexes for %d acceptors' %
+                                     (len(psfsections['NACC'][1]), nacc))
+            it = iter(psfsections['NACC'][1])
+            for i, j in zip(it, it):
+                self.acceptors.append(
+                        AcceptorDonor(self.atoms[i-1], self.atoms[j-1])
+                )
+            # Now get the group sections
             try:
-                sec, ptr, data = CharmmPsfFile._parse_psf_section(psf)
-            except CharmmPsfEOF:
-                break
-            psfsections[sec] = (ptr, data)
-        # store the title
-        self.title = psfsections['NTITLE'][1]
-        # Next is the number of atoms
-        natom = conv(psfsections['NATOM'][0], int, 'natom')
-        # Parse all of the atoms
-        for i in xrange(natom):
-            words = psfsections['NATOM'][1][i].split()
-            atid = int(words[0])
-            if atid != i + 1:
-                raise CharmmPSFError('Nonsequential atoms detected!')
-            segid = words[1]
-            rematch = _resre.match(words[2])
-            if not rematch:
-                raise RuntimeError('Could not interpret residue number %s' %
-                                   words[2])
-            resid, inscode = rematch.groups()
-            resid = conv(resid, int, 'residue number')
-            resname = words[3]
-            name = words[4]
-            attype = words[5]
-            # Try to convert the atom type to an integer a la CHARMM
-            try:
-                attype = int(attype)
+                ngrp, nst2 = psfsections['NGRP NST2'][0]
             except ValueError:
-                pass
-            charge = conv(words[6], float, 'partial charge')
-            mass = conv(words[7], float, 'atomic mass')
-            props = words[8:]
-            atom = Atom(name=name, type=attype, charge=charge, mass=mass)
-            atom.segid = segid
-            atom.props = props
-            self.add_atom(atom, resname, resid, chain=segid, inscode=inscode)
-        # Now get the number of bonds
-        nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
-        tmp = psfsections['NBOND'][1]
-        if len(tmp) != nbond * 2:
-            raise CharmmPSFError('Got %d indexes for %d bonds' %
-                                 (len(tmp), nbond))
-        for i in xrange(0, 2*nbond, 2):
-            self.bonds.append(
-                    Bond(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
-            )
-        # Now get the number of angles and the angle list
-        ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
-        tmp = psfsections['NTHETA'][1]
-        if len(tmp) != ntheta * 3:
-            raise CharmmPSFError('Got %d indexes for %d angles' %
-                                 (len(tmp), ntheta))
-        for i in xrange(0, 3*ntheta, 3):
-            self.angles.append(
-                    Angle(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1],
-                          self.atoms[tmp[i+2]-1])
-            )
-        # Now get the number of torsions and the torsion list
-        nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
-        tmp = psfsections['NPHI'][1]
-        if len(tmp) != nphi * 4:
-            raise CharmmPSFError('Got %d indexes for %d torsions' %
-                                 (len(tmp), nphi))
-        for i in xrange(0, 4*nphi, 4):
-            self.dihedrals.append(
-                    Dihedral(self.atoms[tmp[i  ]-1], self.atoms[tmp[i+1]-1],
-                             self.atoms[tmp[i+2]-1], self.atoms[tmp[i+3]-1])
-            )
-        self.dihedrals.split = False
-        # Now get the number of improper torsions
-        nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
-        tmp = psfsections['NIMPHI'][1]
-        if len(tmp) != nimphi * 4:
-            raise CharmmPSFError('Got %d indexes for %d impropers' %
-                                 (len(tmp), nimphi))
-        for i in xrange(0, 4*nimphi, 4):
-            self.impropers.append(
-                    Improper(self.atoms[tmp[i  ]-1], self.atoms[tmp[i+1]-1],
-                             self.atoms[tmp[i+2]-1], self.atoms[tmp[i+3]-1])
-            )
-        # Now handle the donors (what is this used for??)
-        ndon = conv(psfsections['NDON'][0], int, 'number of donors')
-        tmp = psfsections['NDON'][1]
-        if len(tmp) != ndon * 2:
-            raise CharmmPSFError('Got %d indexes for %d donors' %
-                                 (len(tmp), ndon))
-        for i in xrange(0, 2*ndon, 2):
-            self.donors.append(
-                    AcceptorDonor(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
-            )
-        # Now handle the acceptors (what is this used for??)
-        nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
-        tmp = psfsections['NACC'][1]
-        if len(tmp) != nacc * 2:
-            raise CharmmPSFError('Got %d indexes for %d acceptors' %
-                                 (len(tmp), ndon))
-        for i in xrange(0, 2*nacc, 2):
-            self.acceptors.append(
-                    AcceptorDonor(self.atoms[tmp[i]-1], self.atoms[tmp[i+1]-1])
-            )
-        # Now get the group sections
-        try:
-            ngrp, nst2 = psfsections['NGRP NST2'][0]
-        except ValueError:
-            raise CharmmPSFError('Could not unpack GROUP pointers')
-        tmp = psfsections['NGRP NST2'][1]
-        self.groups.nst2 = nst2
-        # Now handle the groups
-        if len(tmp) != ngrp * 3:
-            raise CharmmPSFError('Got %d indexes for %d groups' %
-                                 (len(tmp), ngrp))
-        for i in xrange(0, 3*ngrp, 3):
-            self.groups.append(Group(tmp[i], tmp[i+1], tmp[i+2]))
-        # Assign all of the atoms to molecules recursively
-        tmp = psfsections['MOLNT'][1]
-        set_molecules(self.atoms)
-        molecule_list = [a.marked for a in self.atoms]
-        if len(tmp) == len(self.atoms):
-            if molecule_list != tmp:
-                warnings.warn('Detected PSF molecule section that is WRONG. '
-                              'Resetting molecularity.', CharmmPSFWarning)
-            # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
-            numlp, numlph = psfsections['NUMLP NUMLPH'][0]
-            if numlp != 0 or numlph != 0:
-                raise NotImplementedError('Cannot currently handle PSFs with '
-                                          'lone pairs defined in the NUMLP/'
-                                          'NUMLPH section.')
-        # Now do the CMAPs
-        ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
-        tmp = psfsections['NCRTERM'][1]
-        if len(tmp) != ncrterm * 8:
-            raise CharmmPSFError('Got %d CMAP indexes for %d cmap terms' %
-                                 (len(tmp), ncrterm))
-        for i in xrange(0, 8*ncrterm, 8):
-            self.cmaps.append(
-                    Cmap.extended(self.atoms[tmp[i  ]-1],
-                                  self.atoms[tmp[i+1]-1],
-                                  self.atoms[tmp[i+2]-1],
-                                  self.atoms[tmp[i+3]-1],
-                                  self.atoms[tmp[i+4]-1],
-                                  self.atoms[tmp[i+5]-1],
-                                  self.atoms[tmp[i+6]-1],
-                                  self.atoms[tmp[i+7]-1])
-            )
-        self.unchange()
-        self.flags = psf_flags
+                raise CharmmPSFError('Could not unpack GROUP pointers')
+            tmp = psfsections['NGRP NST2'][1]
+            self.groups.nst2 = nst2
+            # Now handle the groups
+            if len(psfsections['NGRP NST2'][1]) != ngrp * 3:
+                raise CharmmPSFError('Got %d indexes for %d groups' %
+                                     (len(tmp), ngrp))
+            it = iter(psfsections['NGRP NST2'][1])
+            for i, j, k in zip(it, it, it):
+                self.groups.append(Group(i, j, k))
+            # Assign all of the atoms to molecules recursively
+            tmp = psfsections['MOLNT'][1]
+            set_molecules(self.atoms)
+            molecule_list = [a.marked for a in self.atoms]
+            if len(tmp) == len(self.atoms):
+                if molecule_list != tmp:
+                    warnings.warn('Detected PSF molecule section that is WRONG. '
+                                  'Resetting molecularity.', CharmmPSFWarning)
+                # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
+                numlp, numlph = psfsections['NUMLP NUMLPH'][0]
+                if numlp != 0 or numlph != 0:
+                    raise NotImplementedError('Cannot currently handle PSFs with '
+                                              'lone pairs defined in the NUMLP/'
+                                              'NUMLPH section.')
+            # Now do the CMAPs
+            ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
+            if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
+                raise CharmmPSFError('Got %d CMAP indexes for %d cmap terms' %
+                                     (len(psfsections['NCRTERM']), ncrterm))
+            it = iter(psfsections['NCRTERM'][1])
+            for i, j, k, l, m, n, o, p in zip(it, it, it, it, it, it, it, it):
+                self.cmaps.append(
+                        Cmap.extended(self.atoms[i-1], self.atoms[j-1],
+                                      self.atoms[k-1], self.atoms[l-1],
+                                      self.atoms[m-1], self.atoms[n-1],
+                                      self.atoms[o-1], self.atoms[p-1])
+                )
+            self.unchange()
+            self.flags = psf_flags
 
     #===================================================
 
@@ -555,7 +552,7 @@ class CharmmPsfFile(Structure):
         # Now we have a map of all atom types that we have defined in our
         # system. Look through all of the atom types and see if any of their
         # NBFIX definitions are also keys in typemap
-        for key, type in typemap.iteritems():
+        for key, type in iteritems(typemap):
             for key in type.nbfix:
                 if key in typemap:
                     return True
@@ -632,7 +629,7 @@ class CharmmPsfFile(Structure):
             lj_type_list.append(atype)
             lj_radii.append(atype.rmin)
             lj_depths.append(abs(atype.epsilon))
-            for j in xrange(i+1, len(self.atoms)):
+            for j in range(i+1, len(self.atoms)):
                 atype2 = self.atoms[j].atom_type
                 if lj_idx_list[j] > 0: continue # already assigned
                 if atype2 is atype:
@@ -643,10 +640,10 @@ class CharmmPsfFile(Structure):
                     if ljtype == ljtype2:
                         lj_idx_list[j] = num_lj_types
         # Now everything is assigned. Create the A- and B-coefficient arrays
-        acoef = [0 for i in xrange(num_lj_types*num_lj_types)]
+        acoef = [0 for i in range(num_lj_types*num_lj_types)]
         bcoef = acoef[:]
-        for i in xrange(num_lj_types):
-            for j in xrange(num_lj_types):
+        for i in range(num_lj_types):
+            for j in range(num_lj_types):
                 namej = lj_type_list[j].name
                 try:
                     rij, wdij, rij14, wdij14 = lj_type_list[i].nbfix[namej]
@@ -682,11 +679,11 @@ class CharmmPsfFile(Structure):
         for i in lj_idx_list:
             force.addParticle((i-1,))
         # Now wipe out the L-J parameters in the nonbonded force
-        for i in xrange(nonbfrc.getNumParticles()):
+        for i in range(nonbfrc.getNumParticles()):
             chg, sig, eps = nonbfrc.getParticleParameters(i)
             nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
         # Now transfer the exclusions
-        for ii in xrange(nonbfrc.getNumExceptions()):
+        for ii in range(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
             force.addExclusion(i, j)
         # Now transfer the other properties (cutoff, switching function, etc.)
@@ -734,7 +731,7 @@ def set_molecules(atoms):
     # has, which in turn calls set_owner for each of its partners and 
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
-    for i in xrange(len(atoms)):
+    for i in range(len(atoms)):
         # If this atom has not yet been "owned", make it the next molecule
         # However, we only increment which molecule number we're on if 
         # we actually assigned a new molecule (obviously)

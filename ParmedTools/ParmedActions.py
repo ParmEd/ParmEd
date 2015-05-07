@@ -1,7 +1,7 @@
 """ 
 All of the prmtop actions used in PARMED. Each class is a separate action.
 """
-from __future__ import division
+from __future__ import division, print_function
 
 from chemistry import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
         Structure, load_file)
@@ -12,13 +12,9 @@ from chemistry.exceptions import ChemError, CharmmFileError
 from chemistry.formats import PDBFile, CIFFile, Mol2File
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
-from compat24 import any
+from chemistry.utils.six import iteritems, string_types, add_metaclass
+from chemistry.utils.six.moves import zip, range
 import copy
-try:
-    from itertools import izip as zip
-except ImportError:
-    # Must be Python 3, zip already is izip
-    pass
 import math
 try:
     import numpy as np
@@ -79,6 +75,7 @@ lawsuit = object
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+@add_metaclass(ActionType)
 class Action(lawsuit):
     """
     The base class for all ParmEd actions. The metaclass for Action adds the
@@ -107,7 +104,6 @@ class Action(lawsuit):
     not_supported : tuple
         These classes are *not* supported (supplements supported_subclasses)
     """
-    __metaclass__ = ActionType
     stderr = sys.stderr
     # Does this action need a populated parm_list? If yes, bail out if it's
     # unpopulated
@@ -123,7 +119,6 @@ class Action(lawsuit):
     strictly_supported = ()
     not_supported = ()
     def __init__(self, input_parm, arg_list=None, *args, **kwargs):
-        """ Constructor """
         # Is this action 'valid' (i.e., can we run 'execute')?
         self.valid = False
         # Accept both an AmberParm or ParmList instance to simplify the API
@@ -148,7 +143,7 @@ class Action(lawsuit):
             else:
                 arg_list = '%s ' % arg_list
             arg_list += ' '.join([str(a) for a in args])
-            for kw, item in kwargs.iteritems():
+            for kw, item in iteritems(kwargs):
                 arg_list += ' %s %s ' % (kw, item)
         elif arg_list is None:
             arg_list = ArgumentList('')
@@ -158,7 +153,7 @@ class Action(lawsuit):
             arg_list = arg_list.decode()
             arg_list = ArgumentList(arg_list)
         except AttributeError:
-            if isinstance(arg_list, str):
+            if isinstance(arg_list, string_types):
                 arg_list = ArgumentList(arg_list)
             else:
                 arg_list = ArgumentList(str(arg_list))
@@ -172,7 +167,7 @@ class Action(lawsuit):
                 parm = int(parm)
             except ValueError:
                 if parm in self.parm_list:
-                    print 'Using parm %s' % parm
+                    print('Using parm %s' % parm)
                     self.parm = self.parm_list[parm]
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
@@ -180,7 +175,7 @@ class Action(lawsuit):
                     return
             else:
                 if parm >= 0 and parm < len(self.parm_list):
-                    print 'Using parm %s' % self.parm_list[parm]
+                    print('Using parm %s' % self.parm_list[parm])
                     self.parm = self.parm_list[parm]
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
@@ -951,7 +946,7 @@ class printLJTypes(Action):
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
                     if begin < 0 or end < begin: 
                         raise ParmError('printLJTypes: Bad atom type range')
-                    self.type_list.extend([i for i in xrange(begin, end+1)])
+                    self.type_list.extend([i for i in range(begin, end+1)])
                 else:
                     self.type_list.append(int(field))
 
@@ -1001,11 +996,11 @@ class scee(Action):
             if not 'SCEE_SCALE_FACTOR' in self.parm.flag_list:
                 self.parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8',
                                    data=[self.scee_value
-                                         for i in xrange(self.parm.ptr('nptra'))]
+                                         for i in range(self.parm.ptr('nptra'))]
                 )
             else:
                 self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value 
-                                    for i in xrange(self.parm.ptr('nptra'))]
+                                    for i in range(self.parm.ptr('nptra'))]
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1028,10 +1023,10 @@ class scnb(Action):
         if isinstance(self.parm, AmberParm):
             if not 'SCNB_SCALE_FACTOR' in self.parm.flag_list:
                 self.parm.add_flag('SCNB_SCALE_FACTOR','5E16.8', data=[self.scnb_value
-                                            for i in xrange(self.parm.ptr('nptra'))])
+                                            for i in range(self.parm.ptr('nptra'))])
             else:
                 self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value 
-                                        for i in xrange(self.parm.ptr('nptra'))]
+                                        for i in range(self.parm.ptr('nptra'))]
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1094,7 +1089,7 @@ class changeLJSingleType(Action):
         self.parm.LJ_radius[attype-1] = self.radius
         self.parm.LJ_depth[attype-1] = self.depth
         ntypes = self.parm.ptr('NTYPES')
-        for i in xrange(ntypes):
+        for i in range(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][
                                     ntypes*i+attype-1] - 1
             rij = self.parm.LJ_radius[i] + self.radius
@@ -1796,7 +1791,7 @@ class setBond(Action):
 
         atnum1, atnum2 = -1, -1
         # Loop through all of the selected atoms
-        for it in xrange(sum(sel1)):
+        for it in range(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1877,7 +1872,7 @@ class setAngle(Action):
         atnum1, atnum2, atnum3 = -1, -1, -1
 
         # Loop through all of the selections
-        for it in xrange(sum(sel1)):
+        for it in range(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -1992,7 +1987,7 @@ class addDihedral(Action):
         # Loop through all of the atoms
         atnum1, atnum2, atnum3, atnum4 = -1, -1, -1, -1
 
-        for it in xrange(sum(sel1)):
+        for it in range(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -2087,7 +2082,7 @@ class deleteDihedral(Action):
         # Now, loop through the atoms and see if any dihedrals match that spec
         atnum1 = atnum2 = atnum3 = atnum4 = -1
         total_diheds = 0
-        for i in xrange(sum(sel1)):
+        for i in range(sum(sel1)):
             # Collect the atoms involved
             atnum1 = sel1.index(1, atnum1+1)
             atnum2 = sel2.index(1, atnum2+1)
@@ -2155,7 +2150,7 @@ class printLJMatrix(Action):
         # If we selected no atoms, bail out
         if sum(sel) == 0: return 'No atom types selected'
         # Figure out which types correspond to which names
-        typenames = [set() for i in xrange(self.parm.ptr('NTYPES'))]
+        typenames = [set() for i in range(self.parm.ptr('NTYPES'))]
         for i, atom in enumerate(self.parm.atoms):
             typenames[atom.nb_idx-1].add(atom.type)
         # Otherwise, collect our list of atom types that we selected
@@ -2175,7 +2170,7 @@ class printLJMatrix(Action):
                     'B coefficient', 'R i,j', 'Eps i,j')
         ret_str += '\n' + '-'*len(ret_str) + '\n'
         for ty in sel_types:
-            for ty2 in xrange(1,ntypes+1):
+            for ty2 in range(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
                 idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][
                             ntypes*(type1-1)+type2-1]
@@ -2261,14 +2256,14 @@ class tiMerge(Action):
         if self.molmask1N is not None:
             molsel1N = self.molmask1N.Selection()
         else:
-            molsel1N = [0 for i in xrange(natom)]
+            molsel1N = [0 for i in range(natom)]
 
         if self.molmask2N is not None:
             molsel2N = self.molmask2N.Selection()
         else:
-            molsel2N = [0 for i in xrange(natom)]
+            molsel2N = [0 for i in range(natom)]
 
-        for i in xrange(natom):
+        for i in range(natom):
             if sel1[i] and not molsel1[i]:
                 raise TiMergeError('scmask1 must be a subset of mol1mask.')
             if sel2[i] and not molsel2[i]:
@@ -2290,11 +2285,11 @@ class tiMerge(Action):
         # molsel2 has no overlap (dihedrals, angles, bonds) with sel2 then we
         # can just delete it (it is redundant).
 
-        keep_mask = [0 for i in xrange(natom)]
+        keep_mask = [0 for i in range(natom)]
 
-        for i in xrange(natom):
+        for i in range(natom):
             if molsel2[i]:
-                for j in xrange(natom):
+                for j in range(natom):
                     if sel2[j]:
                         atm1 = self.parm.atoms[i]
                         atm2 = self.parm.atoms[j]
@@ -2310,10 +2305,10 @@ class tiMerge(Action):
         # not introduce extra maintenance issues
         remove_mask = []
         # remove_map[old_atm_idx] = new_atm_idx
-        remove_map = [0 for i in xrange(natom)] 
+        remove_map = [0 for i in range(natom)] 
 
         new_atm_idx = 0
-        for i in xrange(natom):
+        for i in range(natom):
             if molsel2[i] == 1 and sel2[i] == 0:
                 remove_mask.append('%d' % (i+1))
             else:
@@ -2328,11 +2323,11 @@ class tiMerge(Action):
         mol1common = []
         mol2common = []
 
-        for i in xrange(natom):
+        for i in range(natom):
             if molsel1[i] == 1 and sel1[i] == 0:                  
                 mol1common.append(i)
 
-        for i in xrange(natom):
+        for i in range(natom):
             if molsel2[i] == 1 and sel2[i] == 0:                  
                 mol2common.append(i)
 
@@ -2342,12 +2337,12 @@ class tiMerge(Action):
 
         mol2common_sort = []
         # reorder mol2common so that it matches mol1common
-        for i in xrange(len(mol1common)):
+        for i in range(len(mol1common)):
             atm_i = mol1common[i]
-            for j in xrange(len(mol2common)):
+            for j in range(len(mol2common)):
                 atm_j = mol2common[j]
                 diff_count = 0
-                for k in xrange(3):
+                for k in range(3):
                     diff = (self.parm.coords[3*atm_i + k] - 
                             self.parm.coords[3*atm_j + k])
                     if abs(diff) < self.tol:
@@ -2365,24 +2360,24 @@ class tiMerge(Action):
                                'masks. If these look correct try using a '
                                'larger tolerance.')
 
-        for i in xrange(len(mol1common)):
+        for i in range(len(mol1common)):
             atm_i = mol1common[i]
             atm_j = mol2common[i]               
-            for k in xrange(3):
+            for k in range(3):
                 diff = (self.parm.coords[3*atm_i + k] - 
                         self.parm.coords[3*atm_j + k])
                 if abs(diff) > self.tol:
                     raise TiMergeError('Common (nonsoftcore) atoms must have '
                                        'the same coordinates.')
       
-        for j in xrange(natom):
+        for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
                 atm = self.parm.atoms[j]
                 idx = mol1common[mol2common.index(j)]
                 atm_new = self.parm.atoms[idx]
 
                 # What is happening here???
-                for k in xrange(natom):
+                for k in range(natom):
                     if sel2[k]:
                         atm2 = self.parm.atoms[k]
                         # update partners -- the exclusion list will be updated 
@@ -2495,7 +2490,7 @@ class tiMerge(Action):
         new_sc_atm2 = []
         new_sc_atm1_int = []
         new_sc_atm2_int = []
-        for i in xrange(natom):
+        for i in range(natom):
             if sel1[i] or molsel1N[i]:
                 new_sc_atm1_int.append(remove_map[i])
                 new_sc_atm1.append('%d' % (remove_map[i]+1))
@@ -2853,12 +2848,12 @@ class interpolate(Action):
         chg2 = NumberArray(parm2.parm_data['CHARGE'])
         diff = chg2 - chg1
         diff *= 1 / (self.nparm + 1)
-        for i in xrange(self.nparm):
+        for i in range(self.nparm):
             new_chg = chg1 + diff * (i + 1)
             parm1.parm_data['CHARGE'] = [c for c in new_chg]
             parm1.load_atom_info()
             newname = '%s.%d' % (self.prefix, i+self.startnum)
-            print 'Printing %s' % newname
+            print('Printing %s' % newname)
             parm1.write_parm(newname)
         # Restore the original charges
         parm1.parm_data['CHARGE'] = orig_chg1
@@ -2964,7 +2959,7 @@ class scale(Action):
 
     def execute(self):
         try:
-            for i in xrange(len(self.parm.parm_data[self.flag])):
+            for i in range(len(self.parm.parm_data[self.flag])):
                 self.parm.parm_data[self.flag][i] *= self.factor
         except TypeError:
             raise ArgumentError('Cannot scale data in %%FLAG %s' % self.flag)
@@ -3779,13 +3774,13 @@ class chamber(Action):
                 parmset.read_stream_file(sfile)
             # All parameters are loaded, now condense the types
             if self.condense: parmset.condense()
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
         # Now read the PSF
         try:
             psf = CharmmPsfFile(self.psf)
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem reading CHARMM PSF: %s' % e)
 
         # Read the PDB and set the box information
@@ -3838,7 +3833,7 @@ class chamber(Action):
                 # Define the bounding box
                 xmin, ymin, zmin = coords[:3]
                 xmax, ymax, zmax = xmin, ymin, zmin
-                for i in xrange(1, len(psf.atoms)):
+                for i in range(1, len(psf.atoms)):
                     i3 = i * 3
                     xmin = min(xmin, coords[i3  ])
                     xmax = max(xmax, coords[i3  ])
@@ -3882,7 +3877,7 @@ class chamber(Action):
         # Now load the parameters
         try:
             psf.load_parameters(parmset)
-        except ChemError, e:
+        except ChemError as e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset)
         parm.name = self.psf

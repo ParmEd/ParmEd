@@ -9,16 +9,12 @@ from __future__ import division
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
-from chemistry.periodic_table import Mass, Element as _Element
 import chemistry.unit as u
-from compat24 import all, property
-import copy
+from chemistry.utils.six import string_types
+from chemistry.utils.six.moves import zip, range
+from copy import copy
 import math
 import warnings
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Must be Python 3... zip _is_ izip
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
@@ -29,7 +25,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
            'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
            'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
-           'OutOfPlaneExtraPointFrame']
+           'OutOfPlaneExtraPointFrame', 'RBTorsionType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -165,10 +161,14 @@ class _ParameterType(object):
     used : ``bool``
         If ``True``, then this parameter type should be considered *used*. If
         ``False``, it is not being used and does not need to be printed.
+    penalty : float or None
+        If this is assigned from a database, there might be a penalty assigned
+        to the determination of this parameter
     """
 
     def __init__(self):
         self.used = False
+        self.penalty = None
 
 def _delete_from_list(list, item):
     """
@@ -484,7 +484,7 @@ class Atom(_ListItem):
                   bfactor=item.bfactor, altloc=item.altloc)
         new.atom_type = item.atom_type
         for key in item.other_locations:
-            new.other_locations[key] = copy.copy(item.other_locations[key])
+            new.other_locations[key] = copy(item.other_locations[key])
         _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
                       'vdw_parent', 'vdw_weight'))
@@ -1461,9 +1461,9 @@ class OutOfPlaneExtraPointFrame(object):
             cross = (v12[1]*v13[2] - v12[2]*v13[1],
                      v12[2]*v13[0] - v12[0]*v13[2],
                      v12[0]*v13[1] - v12[1]*v13[0])
-            lencross = math.sqrt(sum([cross[i]*cross[i] for i in xrange(3)]))
-            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in xrange(3)]))
-            v1edotcross = sum([v1e[i]*cross[i] for i in xrange(3)])
+            lencross = math.sqrt(sum([cross[i]*cross[i] for i in range(3)]))
+            lenv1e = math.sqrt(sum([v1e[i]*v1e[i] for i in range(3)]))
+            v1edotcross = sum([v1e[i]*cross[i] for i in range(3)])
             costheta = v1edotcross / (lenv1e*lencross)
             if costheta < 0: weightCross = -weightCross
         return weight / 2, weight / 2, weightCross
@@ -1598,6 +1598,10 @@ class BondType(_ListItem, _ParameterType):
     def __repr__(self):
         return '<%s; k=%.3f, req=%.3f>' % (type(self).__name__,
                 self.k, self.req)
+
+    def __copy__(self):
+        """ Not bound to any list """
+        return BondType(self.k, self.req)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1745,6 +1749,9 @@ class AngleType(_ListItem, _ParameterType):
     def __repr__(self):
         return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__,
                 self.k, self.theteq)
+
+    def __copy__(self):
+        return AngleType(self.k, self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2010,6 +2017,10 @@ class DihedralType(_ListItem, _ParameterType):
                 (type(self).__name__, self.phi_k, self.per, self.phase,
                  self.scee, self.scnb))
 
+    def __copy__(self):
+        return DihedralType(self.phi_k, self.per, self.phase, self.scee,
+                            self.scnb)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class RBTorsionType(_ListItem, _ParameterType):
@@ -2069,7 +2080,6 @@ class RBTorsionType(_ListItem, _ParameterType):
     #===================================================
    
     def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
-        """ RBTorsionType constructor """
         _ParameterType.__init__(self)
         self.c0 = _strip_units(c0)
         self.c1 = _strip_units(c1)
@@ -2087,6 +2097,10 @@ class RBTorsionType(_ListItem, _ParameterType):
                 self.c2 == other.c2 and self.c3 == other.c3 and
                 self.c4 == other.c4 and self.c5 == other.c5)
 
+    def __copy__(self):
+        return RBTorsionType(self.c0, self.c1, self.c2,
+                             self.c3, self.c4, self.c5)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralTypeList(list, _ListItem):
@@ -2098,11 +2112,24 @@ class DihedralTypeList(list, _ListItem):
     In cases where `DihedralType`s are stored with every term in the same
     container, this object supports list assignment and indexing like
     :class:`DihedralType`.
+
+    Parameters
+    ----------
+    *args : objects
+        Any arguments that ``list`` would take.
+    list : TrackedList, optional
+        A list that "contains" this DihedralTypeList instance. This is a
+        keyword-only argument. Default is ``None`` (i.e., belonging to no list)
+    **kwargs : keyword argument list
+        All other keyword arguments passed directly to the ``list`` constructor
     """
     def __init__(self, *args, **kwargs):
+        if 'list' in kwargs:
+            self.list = kwargs.pop('list')
+        else:
+            self.list = None
         list.__init__(self, *args, **kwargs)
         self._idx = -1
-        self.list = None
         self.used = False
 
     def __eq__(self, other):
@@ -2112,8 +2139,22 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
+    @property
+    def penalty(self):
+        penalty = None
+        for dt in self:
+            if dt.penalty is not None:
+                if penalty is None:
+                    penalty = dt.penalty
+                else:
+                    penalty = max(dt.penalty, penalty)
+        return penalty
+
     def __repr__(self):
         return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
+
+    def __copy__(self):
+        return DihedralTypeList([copy(x) for x in self])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2389,6 +2430,9 @@ class ImproperType(_ListItem, _ParameterType):
         return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__,
                 self.psi_k, self.psi_eq)
 
+    def __copy__(self):
+        return ImproperType(self.psi_k, self.psi_eq)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Cmap(object):
@@ -2430,8 +2474,8 @@ class Cmap(object):
     def __init__(self, atom1, atom2, atom3, atom4, atom5, type=None):
         # Make sure we're not CMAPping me to myself
         atmlist = [atom1, atom2, atom3, atom4, atom5]
-        for i in xrange(len(atmlist)):
-            for j in xrange(i+1, len(atmlist)):
+        for i in range(len(atmlist)):
+            for j in range(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
                     raise BondError('Cannot cmap atom to itself!')
         # Set up instances
@@ -2630,6 +2674,10 @@ class CmapType(_ListItem, _ParameterType):
     def __repr__(self):
         return '<%s; resolution=%d>' % (type(self).__name__, self.resolution)
 
+    def __copy__(self):
+        return CmapType(self.resolution, copy(self.grid._data),
+                        self.comments[:])
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class _CmapGrid(object):
@@ -2664,7 +2712,7 @@ class _CmapGrid(object):
     def __init__(self, resolution, data=None):
         self.resolution = resolution
         if data is None:
-            self._data = [0 for i in xrange(self.resolution*self.resolution)]
+            self._data = [0 for i in range(self.resolution*self.resolution)]
         else:
             self._data = _strip_units(data)
 
@@ -2677,8 +2725,8 @@ class _CmapGrid(object):
             pass
         _transpose = []
         size = len(self._data)
-        for i in xrange(self.resolution):
-            piece = [self[j] for j in xrange(i, size, self.resolution)]
+        for i in range(self.resolution):
+            piece = [self[j] for j in range(i, size, self.resolution)]
             _transpose += piece
         self._transpose = _CmapGrid(self.resolution, _transpose)
         return self._transpose
@@ -2699,7 +2747,7 @@ class _CmapGrid(object):
             self._data[self.resolution*idx[0]+idx[1]] = val
         else:
             try:
-                indices = xrange(*idx.indices(len(self._data)))
+                indices = range(*idx.indices(len(self._data)))
             except AttributeError:
                 self._data[idx] = val
             else:
@@ -2757,13 +2805,16 @@ class _CmapGrid(object):
         res = self.resolution
         mid = res // 2
         newgrid = _CmapGrid(res)
-        for i in xrange(res):
+        for i in range(res):
             ii = (i + mid) % res
-            for j in xrange(res):
+            for j in range(res):
                 jj = (j + mid) % res
                 # Start from the middle
                 newgrid[i, j] = self[ii, jj]
         return newgrid
+
+    def __copy__(self):
+        return _CmapGrid(self.resolution, copy(self._data))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2847,7 +2898,7 @@ class OutOfPlaneBend(_FourAtomTerm):
     def oopbend_type(self):
         warnings.warn('oopbend_type has been replaced with type',
                       DeprecationWarning)
-        return type
+        return self.type
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):
@@ -2914,6 +2965,9 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return '<%s; k=%.3f>' % (type(self).__name__, self.k)
+
+    def __copy__(self):
+        return OutOfPlaneBendType(self.k)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3116,6 +3170,10 @@ class StretchBendType(_ListItem, _ParameterType):
         return '<%s; req1=%.3f, req2=%.3f, theteq=%.3f, k1=%.3f, k2=%.3f>' \
                 % (type(self).__name__, self.req1, self.req2, self.theteq,
                    self.k1, self.k2)
+
+    def __copy__(self):
+        return StretchBendType(self.k1, self.k2, self.req1, self.req2,
+                               self.theteq)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3376,6 +3434,27 @@ class TorsionTorsionType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return '<%s; %dx%d>' % (type(self).__name__, self.dims[0], self.dims[1])
+
+    def __copy__(self):
+        f = copy(self.f.data)
+        # dfda1
+        if self.dfda1 is None:
+            dfda1 = None
+        else:
+            dfda1 = copy(self.dfda1.data)
+        # dfda2
+        if self.dfda2 is None:
+            dfda2 = None
+        else:
+            dfda2 = copy(self.dfda2.data)
+        # d2fda1da2
+        if self.d2fda1da2 is None:
+            d2fda1da2 = None
+        else:
+            d2fda1da2 = copy(self.d2fda1da2.data)
+        # Copy
+        return TorsionTorsionType(self.dims, self.ang1, self.ang2, f, dfda1,
+                                  dfda2, d2fda1da2)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3640,7 +3719,7 @@ class TrackedList(list):
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
         try:
-            indices = xrange(*item.indices(len(self)))
+            indices = range(*item.indices(len(self)))
         except AttributeError:
             indices = [item]
 
@@ -3660,7 +3739,7 @@ class TrackedList(list):
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
         if not self: return
-        indices = xrange(start, min(stop, len(self)))
+        indices = range(start, min(stop, len(self)))
         for index in indices:
             try:
                 self[index]._idx = -1
@@ -3675,12 +3754,17 @@ class TrackedList(list):
     @_changes
     def pop(self, idx=-1):
         item = list.pop(self, idx)
-        try:
+        if hasattr(item, '_idx'):
             item._idx = -1
-        except AttributeError:
-            # Must be an immutable type, so don't complain
-            pass
         return item
+
+    @_changes
+    def remove(self, thing):
+        list.remove(self, thing)
+        # If this did not raise an exception, it was part of the list, so
+        # de-index it
+        if hasattr(thing, '_idx'):
+            thing._idx = -1
 
     append = _changes(list.append)
     extend = _changes(list.extend)
@@ -3736,7 +3820,7 @@ class TrackedList(list):
         This method inspects the `used` attribute of all of its members, if it
         has one, and deletes any item in which it is set to `False`
         """
-        for i in reversed(xrange(len(self))):
+        for i in reversed(range(len(self))):
             try:
                 if not self[i].used:
                     del self[i]
@@ -3798,7 +3882,7 @@ class ResidueList(TrackedList):
         avoid including empty residues
         """
         # Delete from the back to avoid indexes changing as we iterate
-        for i in reversed(xrange(len(self))):
+        for i in reversed(range(len(self))):
             res = self[i]
             if res.is_empty(): del self[i]
 
@@ -3818,7 +3902,7 @@ class AtomList(TrackedList):
     def __delitem__(self, idx):
         """ Deleting an atom also needs to delete it from the residue """
         try:
-            indices = xrange(*idx.indices(len(self)))
+            indices = range(*idx.indices(len(self)))
         except AttributeError:
             indices = [idx]
 
@@ -3834,7 +3918,7 @@ class AtomList(TrackedList):
     @_changes
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... sigh. """
-        indices = xrange(start, min(stop, len(self)))
+        indices = range(start, min(stop, len(self)))
         for index in indices:
             atom = self[index]
             atom._idx = -1
@@ -3849,6 +3933,15 @@ class AtomList(TrackedList):
         atom.list = None
         if atom.residue is not None: atom.residue.delete_atom(atom)
         return atom
+
+    @_changes
+    def remove(self, atom):
+        if atom.list is not self:
+            raise ValueError('%r is not in list' % atom)
+        if atom.residue is not None: atom.residue.delete_atom(atom)
+        atom._idx = -1
+        atom.list = None
+        list.remove(self, atom)
 
     def unmark(self):
         """ Unmark all atoms in this list """
@@ -3942,7 +4035,7 @@ class AtomList(TrackedList):
             type1._idx = idx
             atom_type_lookups[str(type1)] = type1
             atom_type_list.append(type1)
-            for j in xrange(i+1, natoms):
+            for j in range(i+1, natoms):
                 atom2 = self[j]
                 type2 = atom2.atom_type
                 # Skip atom types that have already been assigned
@@ -3954,7 +4047,7 @@ class AtomList(TrackedList):
         for atom in self:
             atom.nb_idx = atom.atom_type._idx
         # Now collect the nbfixes
-        nbfix_list = [set() for i in xrange(idx-1)]
+        nbfix_list = [set() for i in range(idx-1)]
         # Look through all of the atom types and add the nbfixes
         for i, type in enumerate(atom_type_list):
             for key in type.nbfix:
@@ -4072,6 +4165,10 @@ class NonbondedExceptionType(_ListItem):
                 self.polar_weight == other.polar_weight and
                 self.mutual_weight == other.mutual_weight)
 
+    def __copy__(self):
+        return NonbondedExceptionType(self.vdw_weight, self.multipole_weight,
+                self.direct_weight, self.polar_weight, self.mutual_weight)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AtomType(object):
@@ -4158,10 +4255,10 @@ class AtomType(object):
             # also equal
             return (abs(self.epsilon - other.epsilon) < TINY and
                     abs(self.rmin - other.rmin) < TINY and
-                    abs(self.epsilon_14 - other.epsilon_14) > TINY and
-                    abs(self.rmin_14 - other.rmin_14) > TINY and
+                    abs(self.epsilon_14 - other.epsilon_14) < TINY and
+                    abs(self.rmin_14 - other.rmin_14) < TINY and
                     self.nbfix == other.nbfix)
-        if isinstance(other, basestring):
+        if isinstance(other, string_types):
             return self.name == other
         if isinstance(other, int):
             return self.number == other
@@ -4218,6 +4315,15 @@ class AtomType(object):
         return self._member_number > other._member_number or self == other
     def __le__(self, other):
         return self._member_number < other._member_number or self == other
+
+    def __copy__(self):
+        cp = AtomType(self.name, self.number, self.mass, self.atomic_number)
+        cp.epsilon = self.epsilon
+        cp.rmin = self.rmin
+        cp.epsilon_14 = self.epsilon_14
+        cp.rmin_14 = self.rmin_14
+        cp.nbfix = self.nbfix.copy()
+        return cp
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

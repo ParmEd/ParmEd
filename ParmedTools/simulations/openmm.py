@@ -2,19 +2,19 @@
 This module contains functionality for running simulations with OpenMM using
 parameters defined in an input file for sander and pmemd.
 """
-
-from __future__ import division
+from __future__ import division, print_function
 
 from chemistry.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7, AmberParm
 from chemistry.amber.mdin import mdin as Mdin
 from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
-from chemistry.timer import Timer
+from chemistry.utils.timer import Timer
 from chemistry import unit as u
+from chemistry.utils.six.moves import range
 from math import sqrt
 import os
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
-               UnhandledArgumentWarning)
+        UnhandledArgumentWarning)
 import sys
 import warnings
 try:
@@ -28,18 +28,20 @@ except ImportError:
 
 _SCRIPT_HEADER = """\
 #!/usr/bin/env python
+from __future__ import division, print_function
 
 import os, sys
 
 # Import the OpenMM modules that are necessary
 from simtk.openmm.app import *
 from simtk.openmm import *
-import simtk.unit as u
 
 # Import the Amber/OpenMM modules
 from chemistry.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
 from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
+from chemistry import unit as u
+from chemistry.utils.six.moves import range
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')
@@ -286,7 +288,7 @@ def simulate(parm, args):
 
     # Create the OpenMM System object from our current options
     timer.start_timer('system')
-    if printprogress: print '\tSetting up the OpenMM system...'
+    if printprogress: print('\tSetting up the OpenMM system...')
     system = parm.createSystem(nonbondedMethod=nbmeth,
                      nonbondedCutoff=mdin.cntrl_nml['cut']*u.angstrom,
                      constraints=constraints, rigidWater=rw,
@@ -342,7 +344,7 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ntr'] != 0:
         timer.add_timer('restraints', 'Setting up positional restraints')
         timer.start_timer('restraints')
-        if printprogress: print '\tSetting up the restraints...'
+        if printprogress: print('\tSetting up the restraints...')
         if mdin.cntrl_nml['restraint_wt'] <= 0:
             raise SimulationError('Restraint weight must be > 0 for restrained '
                                   'dynamics')
@@ -465,7 +467,7 @@ def simulate(parm, args):
     # Create the Simulation object
     timer.add_timer('simulation', 'Creating the Simulation object')
     timer.start_timer('simulation')
-    if printprogress: print '\tSetting up the simulation...'
+    if printprogress: print('\tSetting up the simulation...')
     if scriptfile is not None:
         scriptfile.write('simulation = Simulation(parm.topology, system, '
                          'integrator, platform)\n\n')
@@ -498,7 +500,8 @@ def simulate(parm, args):
     # Set the particle positions and box vectors (if applicable) from either the
     # given restart file or from the topology file object. Also use particle
     # velocities if requested via irest=1
-    if printprogress: print '\tSetting up initial coordinates and velocities...'
+    if printprogress:
+        print('\tSetting up initial coordinates and velocities...')
     if inpcrd is not None:
         position_container = Rst7.open(inpcrd)
         if position_container.natom != parm.ptr('natom'):
@@ -563,7 +566,7 @@ def simulate(parm, args):
         if mdin.cntrl_nml['imin'] == 1:
             timer.add_timer('minimization', 'Structure minimization')
             timer.start_timer('minimization')
-            if printprogress: print '\tMinimizing...'
+            if printprogress: print('\tMinimizing...')
             if scriptfile is not None:
                 scriptfile.write('rep = EnergyMinimizerReporter("%s", '
                                  'volume=%s)\n' %
@@ -605,7 +608,7 @@ def simulate(parm, args):
         elif mdin.cntrl_nml['imin'] == 5:
             timer.add_timer('minimization', 'Structure minimization')
             timer.start_timer('minimization')
-            if printprogress: print '\tMinimizing...'
+            if printprogress: print('\tMinimizing...')
             try:
                 inptraj = NetCDFTraj.open_old(inptrajname)
                 nframes = inptraj.frame
@@ -642,22 +645,22 @@ def simulate(parm, args):
             if scriptfile is not None:
                 scriptfile.write('f = open("%s", "w", 0)\n'
                         'rep = EnergyMinimizerReporter(f, volume=%s)\n'
-                        'for frame in xrange(nframes)\n'
+                        'for frame in range(nframes)\n'
                         '    crds = inptraj.coordinates(frame)\n'
                         '    simulation.context.setPositions(\n'
                         '         tuple([Vec3(crds[3*i], crds[3*i+1], '
                         'crds[3*i+2])\n'
-                        '           for i in xrange(parm.ptr("natom"))]) * '
+                        '           for i in range(parm.ptr("natom"))]) * '
                         'u.angstroms\n'
                         '    )\n' % outputfile
                 )
             f = open(outputfile, 'w', 0)
             rep = EnergyMinimizerReporter(f, volume=parm.ptr('ifbox') > 0)
-            for frame in xrange(nframes):
+            for frame in range(nframes):
                 crds = inptraj.coordinates(frame)
                 simulation.context.setPositions(
                         tuple([Vec3(crds[3*i], crds[3*i+1], crds[3*i+2])
-                        for i in xrange(parm.ptr('natom'))]) * u.angstroms
+                        for i in range(parm.ptr('natom'))]) * u.angstroms
                 )
                 rep.report(simulation, frame=frame+1)
                 if mdin.cntrl_nml['maxcyc'] > 1:
@@ -801,7 +804,7 @@ def simulate(parm, args):
                 scriptfile.write('simulation.reporters.'
                                  'append(restrt_reporter)\n')
 
-        if printprogress: print '\tRunning MD...'
+        if printprogress: print('\tRunning MD...')
         if scriptfile is not None:
             scriptfile.write('simulation.step(%s)\n'
                 'final_state = simulation.context.getState(getPositions=True,\n'
@@ -823,12 +826,12 @@ def simulate(parm, args):
                         1000.0 / (timer.timers['md'] / 3600 / 24))
 
     timer.done()
-    print 'Done'
+    print('Done')
     for t in timer.timer_names:
         timer.print_(t, sys.stdout)
    
     if mdin.cntrl_nml['imin'] == 0 and runsim:
-        print 'MD timing: %.3f ns/day' % nsperday
+        print('MD timing: %.3f ns/day' % nsperday)
 
     if scriptfile is not None: scriptfile.close()
 

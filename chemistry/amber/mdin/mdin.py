@@ -29,10 +29,8 @@ from chemistry.amber.mdin.ewald import ewald
 from chemistry.amber.mdin.pb import pb
 from chemistry.amber.mdin.qmmm import qmmm
 from chemistry.exceptions import CreateInputError
-
-# For Python3 support: unicode and str are the same in Python3, so make that
-# name available here
-if not 'unicode' in dir(__builtins__): unicode = str
+from chemistry.utils.six import string_types
+from chemistry.utils.six.moves import range
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -114,7 +112,7 @@ class Mdin(object):
       # add any variable that is different from the default to the mdin file
       for var in self.cntrl_nml.keys():
          if self.cntrl_nml[var] == self.cntrl_nml_defaults[var]: continue
-         if type(self.cntrl_nml[var]) in (str, unicode):
+         if isinstance(self.cntrl_nml[var], string_types):
             line = addOn(line, "%s='%s', " % (var, self.cntrl_nml[var]), file)
          else:
             line = addOn(line, "%s=%s, " % (var, self.cntrl_nml[var]), file)
@@ -134,7 +132,7 @@ class Mdin(object):
          if not has_been_printed:
             file.write('&ewald\n')
             has_been_printed = True
-         if type(self.ewald_nml_defaults[var]) in (str, unicode):
+         if isinstance(self.ewald_nml_defaults[var], string_types):
             line = addOn(line, "%s='%s', " % (var, self.ewald_nml[var]), file)
          else:
             line = addOn(line, "%s='%s', " % (var, self.ewald_nml[var]), file)
@@ -158,7 +156,7 @@ class Mdin(object):
             else:
                file.write('&pb\n')
             has_been_printed = True
-         if type(self.pb_nml[var]) in (str, unicode):
+         if isinstance(self.pb_nml[var], string_types):
             line = addOn(line,"%s='%s', " % (var, self.pb_nml[var]), file)
          else:
             line = addOn(line,"%s=%s, " % (var, self.pb_nml[var]), file)
@@ -180,7 +178,7 @@ class Mdin(object):
             if not has_been_printed:
                file.write('&qmmm\n')
                has_been_printed = True
-            if type(self.qmmm_nml_defaults[var]) in (str, unicode):
+            if isinstance(self.qmmm_nml_defaults[var], string_types):
                line = addOn(line, "%s='%s', " % (var, self.qmmm_nml[var]), file)
             else:
                line = addOn(line, "%s=%s, " % (var, self.qmmm_nml[var]), file)
@@ -194,7 +192,7 @@ class Mdin(object):
             file.write('/\n')
 
       # Write the cards to the input file
-      for i in xrange(len(self.cards)):
+      for i in range(len(self.cards)):
          file.write(self.cards[i].strip() + '\n')
       if len(self.cards) != 0:
          file.write('END\n')
@@ -212,14 +210,14 @@ class Mdin(object):
                         # namelists found in "blocks" above
       inblock = False
       lead_comment = True
-      for i in xrange(len(lines)):
+      for i in range(len(lines)):
          if not inblock and not lines[i].strip().startswith('&') and \
                 lead_comment:
             continue
          elif not inblock and not lines[i].strip().startswith('&') and \
                 not lead_comment:
             final_ended = True
-            for j in xrange(i,len(lines)):
+            for j in range(i,len(lines)):
                if lines[j].strip().startswith('&'):
                   final_ended = False
             if final_ended and len(lines[i].strip()) != 0:
@@ -258,8 +256,8 @@ class Mdin(object):
 
       # combine any multi-element fields: e.g. rstwt=1,2,3,
       begin_field = -1
-      for i in xrange(len(block_fields)):
-         for j in xrange(len(block_fields[i])):
+      for i in range(len(block_fields)):
+         for j in range(len(block_fields[i])):
             if not '=' in block_fields[i][j]:
                if begin_field == -1:
                   raise CreateInputError('Invalid input file (%s).' % filename)
@@ -269,8 +267,8 @@ class Mdin(object):
                begin_field = j
 
       # now parse through the options and add them to the dictionaries
-      for i in xrange(len(block_fields)):
-         for j in xrange(len(block_fields[i])):
+      for i in range(len(block_fields)):
+         for j in range(len(block_fields[i])):
             if not '=' in block_fields[i][j]:
                continue
             else:

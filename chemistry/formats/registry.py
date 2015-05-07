@@ -16,6 +16,8 @@ Note, id_format must be IMPLEMENTED for each class added to the registry, not
 simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
+from __future__ import division, print_function, absolute_import
+from chemistry.utils.six import iteritems
 from chemistry.exceptions import FormatNotFound
 import os
 
@@ -97,12 +99,13 @@ def load_file(filename, **kwargs):
     if not os.access(filename, os.R_OK):
         raise IOError('%s does not have read permissions set' % filename)
 
-    for name, cls in PARSER_REGISTRY.iteritems():
-        if not hasattr(cls, 'id_format'): continue
+    for name, cls in iteritems(PARSER_REGISTRY):
+        if not hasattr(cls, 'id_format'):
+            continue
         try:
             if cls.id_format(filename):
                 break
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as e:
             continue
     else:
         # We found no file format

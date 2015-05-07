@@ -2,19 +2,20 @@
 This module contains parsers for mol2-format files (with support for the mol3
 extension described at http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php
 """
+from __future__ import print_function, division, absolute_import
 from chemistry.exceptions import Mol2Error
-from chemistry.formats.io import genopen, TextToBinaryFile
 from chemistry.formats.registry import FileFormatType
 from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
 from chemistry.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from chemistry.structure import Structure
 from chemistry.topologyobjects import Atom, Bond
-from compat24 import any
+from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
 import copy
 
+@add_metaclass(FileFormatType)
 class Mol2File(object):
     """ Class to read and write TRIPOS Mol2 files """
-    __metaclass__ = FileFormatType
 
     #===================================================
 
@@ -32,7 +33,7 @@ class Mol2File(object):
         is_fmt : bool
             True if it is a mol2 (or mol3) file, False otherwise
         """
-        f = TextToBinaryFile(genopen(filename, 'r'))
+        f = genopen(filename, 'r')
         try:
             for line in f:
                 if line.startswith('#'): continue
@@ -71,7 +72,7 @@ class Mol2File(object):
             If the file format is not recognized or non-numeric values are
             present where integers or floating point numbers are expected
         """
-        f = TextToBinaryFile(genopen(filename, 'r'))
+        f = genopen(filename, 'r')
         rescont = ResidueTemplateContainer()
         struct = Structure()
         restemp = ResidueTemplate()
@@ -96,6 +97,7 @@ class Mol2File(object):
                     #   charge_type
                     #   [status_bits]
                     #   [mol_comment]
+                    # TODO: Do something with the name.
                     if len(mol_info) == 0:
                         mol_info.append(line.strip())
                     elif len(mol_info) == 1:
@@ -231,7 +233,6 @@ class Mol2File(object):
                     words = line.split()
                     id = int(words[0])
                     resname = words[1]
-                    root_atom = int(words[2])
                     try:
                         chain = words[5]
                     except IndexError:
@@ -292,7 +293,7 @@ class Mol2File(object):
                 return rescont
             else:
                 return restemp
-        except ValueError, e:
+        except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
         finally:
             f.close()
@@ -317,7 +318,7 @@ class Mol2File(object):
         own_handle = False
         if not hasattr(dest, 'write'):
             own_handle = True
-            dest = TextToBinaryFile(genopen(dest, 'w'))
+            dest = genopen(dest, 'w')
         try:
             if isinstance(struct, ResidueTemplateContainer):
                 natom = sum([len(c) for c in struct])
@@ -340,15 +341,22 @@ class Mol2File(object):
                                       struct[i+1].head.idx+bases[i+1]))
                     charges.extend([a.charge for a in res])
                 residues = struct
+                if not struct.name:
+                    name = struct[0].name
+                else:
+                    name = struct.name
             else:
                 natom = len(struct.atoms)
                 bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
                 if isinstance(struct, ResidueTemplate):
                     residues = [struct]
+                    name = struct.name
                 else:
                     residues = struct.residues
+                    name = struct.residues[0].name
                 charges = [a.charge for a in struct.atoms]
             dest.write('@<TRIPOS>MOLECULE\n')
+            dest.write('%s' % name)
             dest.write('\n')
             dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
             if len(residues) == 1:
@@ -387,16 +395,16 @@ class Mol2File(object):
                         z = atom.xz
                     except AttributeError:
                         z = 0
-                    dest.write('%d %s %.4f %.4f %.4f %s %d %s' % (j, atom.name,
-                               x, y, z, atom.type, i+1, res.name))
+                    dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
+                               j, atom.name, x, y, z, atom.type, i+1, res.name))
                     if printchg:
-                        dest.write(' %.4f\n' % atom.charge)
+                        dest.write(' %10.6f\n' % atom.charge)
                     else:
                         dest.write('\n')
                     j += 1
             dest.write('@<TRIPOS>BOND\n')
             for i, bond in enumerate(bonds):
-                dest.write('%d %d %d 1\n' % (i+1, bond[0], bond[1]))
+                dest.write('%8d %8d %8d 1\n' % (i+1, bond[0], bond[1]))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
@@ -417,8 +425,8 @@ class Mol2File(object):
                         for a2 in atom.bond_partners:
                             if a2.residue is not res:
                                 intresbonds += 1
-                dest.write('%d %s %d RESIDUE %d %s ROOT %d\n' % (i+1, res.name,
-                           first_atom+1, 0, chain[:4], intresbonds))
+                dest.write('%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n' % (i+1,
+                           res.name, first_atom+1, 0, chain[:4], intresbonds))
                 first_atom += len(res)
             if mol3:
                 dest.write('@<TRIPOS>HEADTAIL\n')

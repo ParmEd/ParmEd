@@ -6,67 +6,50 @@ alternatives (like DCD and NetCDF, provided in netcdffiles.py) are strongly
 encouraged, but these are provided for more complete compatibility and for
 instances where the prequisites may not be installed.
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
-from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
 from chemistry.exceptions import ParsingError
-from compat24 import property
+from chemistry.utils.io import genopen
+from chemistry.utils.six import add_metaclass
+from chemistry.utils.six.moves import range
 from math import ceil
+try:
+    import numpy as np
+except ImportError:
+    np = None
+    from array import array
+
 import warnings as _warnings
 
 VELSCALE = 20.455
 ONEVELSCALE = 1 / VELSCALE
 
-try:
-    import bz2
-except ImportError:
-    bz2 = None
-
-try:
-    import gzip
-except ImportError:
-    gzip = None
-
-try:
-    import numpy as np
-except ImportError:
-    # If we do not have numpy, use Python-optimized array class instead.
-    np = None
-    from array import array
-
+@add_metaclass(FileFormatType)
 class _AmberAsciiCoordinateFile(object):
-    """ Abstract base class for interacting with ASCII coordinate files """
-    __metaclass__ = FileFormatType
+    """
+    Abstract base class for interacting with ASCII coordinate files.
+    Opens a new ASCII coordinate file and either parses it (loading
+    everything into memory) or sets it up for writing.
+
+    Parameters
+    ----------
+    fname : str
+        File name to open
+    natom : int
+        Number of atoms in the system
+    hasbox : bool
+        Does the system have PBCs?
+    mode : str={'r', 'w'}
+        Whether to open this file for 'r'eading or 'w'riting
+    title : str, optional
+        Title to write to a new trajectory (when mode='w')
+    """
 
     DEFAULT_TITLE = None
     CRDS_PER_LINE = None
 
     def __init__(self, fname, natom, hasbox, mode='r', title=None):
-        """
-        Opens a new Mdcrd file and either parses it (loading everything into
-        memory) or sets it up for writing.
-
-        Parameters
-        ----------
-        fname : str
-            File name to open
-        natom : int
-            Number of atoms in the system
-        hasbox : bool
-            Does the system have PBCs?
-        mode : str={'r', 'w'}
-            Whether to open this file for 'r'eading or 'w'riting
-        title : str, optional
-            Title to write to a new trajectory (when mode='w')
-
-        Notes
-        -----
-        This module automatically handles compressed files using either gzip or
-        bzip2, and compression is determined automatically by filename extension
-        (.gz for gzip and .bz2 for bzip2 files).
-        """
-
         if mode == 'r':
             self._status = 'old'
         elif mode == 'w':
@@ -77,18 +60,7 @@ class _AmberAsciiCoordinateFile(object):
             self._writebox = False
         else:
             raise ValueError("%s mode must be 'r' or 'w'" % type(self).__name__)
-        if fname.endswith('.gz'):
-            if gzip is None:
-                raise ImportError('Python could not import the gzip library. '
-                                  'Cannot open compressed trajectory files')
-            self._file = gzip.open(fname, mode)
-        elif fname.endswith('.bz2'):
-            if bz2 is None:
-                raise ImportError('Python could not import the bz2 library. '
-                                  'Cannot open compressed trajectory files')
-            self._file = bz2.BZ2File(fname, mode)
-        else:
-            self._file = open(fname, mode)
+        self._file = genopen(fname, mode)
 
         self.natom = natom
         self.hasbox = hasbox
@@ -157,8 +129,8 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         is_fmt : bool
             True if it is an Amber restart/inpcrd file. False otherwise
         """
-        f = io.genopen(filename, 'r')
-        lines = [f.readline().decode() for i in xrange(5)]
+        f = genopen(filename, 'r')
+        lines = [f.readline() for i in range(5)]
         f.close()
         # Look for natom
         try:
@@ -167,9 +139,9 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             return False
         # Next 3 lines, make sure we have %12.7f format
         try:
-            for i in xrange(3):
+            for i in range(3):
                 i += 2
-                for j in xrange(6):
+                for j in range(6):
                     j12 = j * 12
                     if lines[i][j12+4] != '.': return False
                     float(lines[i][j12:j12+12])
@@ -245,7 +217,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 self._cell_angles = np.zeros(3)
         else:
             converter = lambda x: array('f', x)
-            self._coordinates = array('f', [0 for i in xrange(self.natom * 3)])
+            self._coordinates = array('f', [0 for i in range(self.natom * 3)])
             if self.hasvels:
                 self._velocities = self._coordinates[:] # copy for efficiency
             if self.hasbox:
@@ -255,7 +227,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         startline = 2
         endline = startline + int(ceil(self.natom / 2.0))
         idx = 0
-        for i in xrange(startline, endline):
+        for i in range(startline, endline):
             line = lines[i]
             x1 = float(line[ 0:12])
             y1 = float(line[12:24])
@@ -274,7 +246,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self.hasvels:
             endline = startline + int(ceil(self.natom / 2.0))
             idx = 0
-            for i in xrange(startline, endline):
+            for i in range(startline, endline):
                 line = lines[i]
                 x1 = float(line[ 0:12]) * VELSCALE
                 y1 = float(line[12:24]) * VELSCALE
@@ -330,7 +302,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._file.write('%5d%15.7e\n' % (self.natom, self.time))
         numwrit = 0
         fmt = '%12.7f%12.7f%12.7f'
-        for i in xrange(self.natom):
+        for i in range(self.natom):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3], stuff[i3 + 1], stuff[i3 + 2]))
             numwrit += 1
@@ -367,7 +339,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._velocities = stuff
         fmt = '%12.7f%12.7f%12.7f'
         numwrit = 0
-        for i in xrange(self.natom):
+        for i in range(self.natom):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3  ] * ONEVELSCALE,
                                     stuff[i3+1] * ONEVELSCALE,
@@ -474,14 +446,14 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         is_fmt : bool
             True if it is an Amber mdcrd file. False otherwise
         """
-        f = io.genopen(filename, 'r')
-        lines = [f.readline().decode() for i in xrange(5)]
+        f = genopen(filename, 'r')
+        lines = [f.readline() for i in range(5)]
         f.close()
         # Next 4 lines, make sure we have %8.3f format
         try:
-            for i in xrange(4):
+            for i in range(4):
                 i += 1
-                for j in xrange(10):
+                for j in range(10):
                     j8 = j * 8
                     if lines[i][j8+4] != '.': return False
                     float(lines[i][j8:j8+8])
@@ -512,7 +484,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         if np is not None:
             converter = lambda x: x
         else:
-            natom3iter = xrange(self.natom * 3)
+            natom3iter = range(self.natom * 3)
             converter = lambda x: array('f', x)
         try:
             while rawline:
@@ -526,7 +498,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 idx = 0
                 rawline = self._file.readline()
                 if not rawline: raise StopIteration()
-                for i in xrange(self._full_lines_per_frame):
+                for i in range(self._full_lines_per_frame):
                     if not rawline: raise ParsingError()
                     frame[idx:idx+10] = converter([float(rawline[j:j+8]) 
                                                    for j in mainiter])
@@ -640,9 +612,10 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                              'natom*3')
 
         # If we can, write the coordinates
-        for i in xrange(self._full_lines_per_frame):
-            for j in xrange(10):
-                self._file.write('%8.3f' % stuff[i*10+j])
+        for i in range(self._full_lines_per_frame):
+            i10 = i * 10
+            for j in range(10):
+                self._file.write('%8.3f' % stuff[i10+j])
             self._file.write('\n')
         if self._nextras:
             extra = i*10+j + 1

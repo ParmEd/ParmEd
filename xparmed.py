@@ -10,6 +10,8 @@ everything parmed can do
 """
 
 from chemistry import load_file
+from chemistry.utils.six.moves import tkinter as tk
+from chemistry.utils.six.moves.tkinter_messagebox import showerror
 from optparse import OptionParser
 from os.path import exists, split
 from ParmedTools.exceptions import ParmError
@@ -20,8 +22,6 @@ from ParmedTools.gui.guifiletools import file_chooser
 from ParmedTools.logos import Logo
 from ParmedTools.ParmedActions import Action
 from ParmedTools.parmlist import ParmList
-import Tkinter as tk
-from tkMessageBox import showerror
 import sys
 
 debug = False

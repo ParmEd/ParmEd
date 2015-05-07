@@ -1,6 +1,7 @@
 """
 Some support classes for easy array manipulation
 """
+from chemistry.utils.six.moves import zip, range
 
 def _same_len(operation):
     """ Make sure all arrays are the same length """
@@ -28,7 +29,7 @@ class NumberArray(list):
     __rmul__ = __mul__
 
     def __imul__(self, scalar):
-        for i in xrange(len(self)): self[i] *= scalar
+        for i in range(len(self)): self[i] *= scalar
         return self
    
     @_same_len('addition')

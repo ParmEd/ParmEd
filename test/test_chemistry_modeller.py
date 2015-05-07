@@ -7,6 +7,8 @@ from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
                                 PROTEIN, SOLVENT, AmberOFFLibrary)
 from chemistry.amber import AmberParm
 from chemistry.exceptions import BondError
+from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import zip, range, StringIO
 import os
 from ParmedTools import changeRadii
 import random
@@ -15,17 +17,6 @@ import unittest
 import utils
 import warnings
 get_fn = utils.get_fn
-skipIf = utils.skipIf
-
-try:
-    import cStringIO as StringIO
-except ImportError:
-    # Must be Python 3
-    import io as StringIO
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass # Must by py3
 
 class TestResidueTemplate(unittest.TestCase):
     """ Tests the ResidueTemplate class """
@@ -203,7 +194,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Tests reading Amber amino12 OFF library (internal residues) """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         self.assertEqual(len(offlib), 28)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertEqual(res.head.name, 'N')
@@ -303,7 +294,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Test reading N-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head, None)
@@ -314,7 +305,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         """ Test reading C-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         self.assertEqual(len(offlib), 26)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head.name, 'N')
@@ -326,7 +317,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         warnings.filterwarnings('ignore', module='.', category=AmberOFFWarning)
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in offlib.items():
+        for name, res in iteritems(offlib):
             self.assertEqual(res.name, name)
             if 'BOX' in name:
                 self.assertIsInstance(res, ResidueTemplateContainer)
@@ -373,7 +364,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteInternal(self):
         """ Tests reading/writing of Amber OFF internal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -382,7 +373,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteCTerm(self):
         """ Tests reading/writing of Amber OFF C-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -391,7 +382,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteNTerm(self):
         """ Tests reading/writing of Amber OFF N-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -400,7 +391,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadWriteSolventLib(self):
         """ Tests reading/writing of Amber OFF solvent libs """
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
-        outfile = StringIO.StringIO()
+        outfile = StringIO()
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
@@ -468,7 +459,7 @@ class TestAmberOFFLeapCompatibility(unittest.TestCase):
             pass
         os.chdir(self.cwd)
 
-    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
+    @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoInternal(self):
         """ Test that the internal AA OFF library writes work with LEaP """
         # First create the parm to test against... we are in "writes" right now
@@ -511,7 +502,7 @@ quit
         changeRadii(parm2, 'mbondi2').execute()
         self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
 
-    @skipIf(utils.which('tleap') is None, "Cannot test without tleap")
+    @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoTermini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
         offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))

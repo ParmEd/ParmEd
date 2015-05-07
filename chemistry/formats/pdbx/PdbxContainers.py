@@ -43,6 +43,8 @@ __email__     = "jwest@rcsb.rutgers.edu"
 __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.01"
 
+from chemistry.utils.six.moves import range
+
 import re,sys,traceback
 
 class CifName(object):
@@ -210,7 +212,7 @@ class DataContainer(ContainerBase):
         
     def invokeDataBlockMethod(self,type,method,db):
         self.__currentRow = 1
-        exec method.getInline()
+        exec(method.getInline())
 
     def setGlobal(self):
         self.__globalFlag=True
@@ -315,9 +317,9 @@ class DataCategory(DataCategoryBase):
                 #return self._rowList[0][x]
                 ii=self.getAttributeIndex(x)
                 return self._rowList[0][ii]
-            except (IndexError, KeyError):
-                raise KeyError
-        raise TypeError, x
+            except (IndexError, KeyError) as e:
+                raise KeyError(str(e))
+        assert False, "Should not be here"
         
     
     def getCurrentAttribute(self):
@@ -453,7 +455,7 @@ class DataCategory(DataCategoryBase):
                 return self._rowList[rowI][self._attributeNameList.index(attribute)]
             except (IndexError):
                 raise IndexError        
-        raise IndexError, attribute
+        raise IndexError(str(attribute))
 
     def setValue(self,value,attributeName=None,rowIndex=None):
         if attributeName is None:
@@ -477,7 +479,7 @@ class DataCategory(DataCategoryBase):
 
                 # extend the list if needed - 
                 if ( ind >= ll):
-                    self._rowList[rowI].extend([None for ii in xrange(2*ind -ll)])    
+                    self._rowList[rowI].extend([None for ii in range(2*ind -ll)])    
                 self._rowList[rowI][ind]=value                    
             except (IndexError):
                 self.__lfh.write("DataCategory(setvalue) index error category %s attribute %s index %d value %r\n" %
@@ -523,21 +525,21 @@ class DataCategory(DataCategoryBase):
         #
         ind=self._attributeNameList.index(attributeName)
         if len(self._rowList) == 0:
-            row=[None for ii in xrange(len(self._attributeNameList)*2)]
+            row=[None for ii in range(len(self._attributeNameList)*2)]
             row[ind]=None
             self._rowList.append(row)
             
         for row in self._rowList:
             ll = len(row)
             if (ind >= ll):
-                row.extend([None for ii in xrange(2*ind-ll)])
+                row.extend([None for ii in range(2*ind-ll)])
                 row[ind]=None
-            exec method.getInline()
+            exec(method.getInline())
             self.__currentRowIndex+=1
 
     def invokeCategoryMethod(self,type,method,db):
         self.__currentRowIndex = 0
-        exec method.getInline()
+        exec(method.getInline())
 
     def getAttributeLengthMaximumList(self):
         mList=[0 for i in len(self._attributeNameList)]
@@ -737,7 +739,7 @@ class DataCategory(DataCategoryBase):
             except (IndexError):
                 self.__lfh.write("attributeName %s rowI %r rowdata %r\n" % (attributeName,rowI,self._rowList[rowI]))
                 raise IndexError        
-        raise TypeError, attribute
+        raise TypeError(str(attribute))
         
 
     def getValueFormattedByIndex(self,attributeIndex,rowIndex):

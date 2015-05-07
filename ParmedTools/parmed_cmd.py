@@ -4,6 +4,8 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 
 # Load some system modules that may be useful for various users in shell mode
 from chemistry.amber.readparm import AmberParm
+from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import range
 import cmd
 from glob import glob
 import os
@@ -134,7 +136,7 @@ class ParmedCmd(cmd.Cmd):
         # Store this action for later use. This action is unique
         try:
             self.parmout = COMMANDMAP['parmout'](self.parm, line)
-        except ParmError, err:
+        except ParmError as err:
             self.stdout.write('Action parmout failed.\n\t')
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -148,7 +150,7 @@ class ParmedCmd(cmd.Cmd):
             if action.valid:
                 self.stdout.write('%s\n' % action)
                 action.execute()
-        except ParmError, err:
+        except ParmError as err:
             self.stdout.write('Action %s failed\n\t' % actionname)
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -161,7 +163,7 @@ class ParmedCmd(cmd.Cmd):
         auto-complete. This eliminates the need to modify the ParmedCmd class
         when a new command is added
         """
-        for _cmd, cmdclass in COMMANDMAP.iteritems():
+        for _cmd, cmdclass in iteritems(COMMANDMAP):
             if _cmd in ('source', 'go', 'EOF', 'quit', 'help', 'parmout'):
                 continue
             cmdname = cmdclass.__name__
@@ -200,7 +202,7 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s\n' % self.parmout)
             try:
                 self.parmout.execute()
-            except ParmError, err:
+            except ParmError as err:
                 self.stdout.write('%s: %s\n' % (type(err).__name__, err))
                 if self._exit_on_fatal:
                     raise err
@@ -226,7 +228,7 @@ class ParmedCmd(cmd.Cmd):
             for line in _COMMANDLOGS:
                 self.stdout.write('%s\n' % line)
         else:
-            for i in xrange(readline.get_current_history_length()):
+            for i in range(readline.get_current_history_length()):
                 self.stdout.write('%s\n' % readline.get_history_item(i+1))
 
     def default(self, line):
@@ -250,7 +252,7 @@ class ParmedCmd(cmd.Cmd):
         else:
             try:
                 exec(line.strip())
-            except Exception, err:
+            except Exception as err:
                 self.stdout.write("%s: %s\n" % (type(err).__name__, err))
 
     def completedefault(self, text, line, begidx, endidx):
@@ -271,7 +273,7 @@ class ParmedCmd(cmd.Cmd):
         try:
             amber_prmtop = self.parm
             exec(python_interpreter.command_string)
-        except Exception, err:
+        except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
     def do_help(self, arg):

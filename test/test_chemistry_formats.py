@@ -9,6 +9,7 @@ from chemistry import exceptions
 from chemistry import formats
 from chemistry import Structure, read_PDB, write_PDB, read_CIF
 from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
+from chemistry.utils.six import iteritems
 try:
     import cStringIO as StringIO
     from itertools import izip as zip
@@ -32,7 +33,7 @@ class TestFileLoader(unittest.TestCase):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in off.items():
+        for key, item in iteritems(off):
             self.assertIsInstance(item, ResidueTemplate)
 
     def testLoadAmberParm(self):
@@ -159,6 +160,14 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.assertEqual(len(pdbfile.pdbxyz), 20)
         self.assertEqual(pdbfile.pdbxyz[0][:3], [-8.886, -5.163, 9.647])
         self.assertEqual(pdbfile.pdbxyz[19][-3:], [-12.051, 5.205, -2.146])
+
+    def testPositions(self):
+        """ Tests that positions are Vec3's with units """
+        from chemistry import unit as u
+        from chemistry import Vec3
+        pdbfile = read_PDB(open(self.models))
+        self.assertIsInstance(pdbfile.positions[0], u.Quantity)
+        self.assertIsInstance(pdbfile.positions[0].value_in_unit(u.angstroms), Vec3)
 
     def testGzip(self):
         """ Test Gzipped-PDB file parsing """
@@ -371,7 +380,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in a1.other_locations.items():
+                for key, oa in iteritems(a1.other_locations):
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa

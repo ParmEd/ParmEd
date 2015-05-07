@@ -4,7 +4,9 @@ This module contains the following classes:
    TinkerAnalout - Reads the output from the "analyze" command
 
 """
+from __future__ import print_function, absolute_import, division
 
+from chemistry.utils.six.moves import range
 from chemistry.exceptions import TinkerAnaloutError
 from chemistry.tinker.topologyobjects import (AtomList, BondList, AngleList,
       StretchBendList, UreyBradleyList, OutOfPlaneBendList, OutOfPlaneDistList,
@@ -122,7 +124,7 @@ class TinkerAnalout(object):
         # Eat 3 lines, then begin
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['natom']):
+        for i in range(self.pointers['natom']):
             try:
                 atnum = int(line[:6])
                 self.atom_list.add(
@@ -145,7 +147,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['natom']):
+        for i in range(self.pointers['natom']):
             try:
                 int(line[0:6])
                 atnum = int(line[9:15])
@@ -166,7 +168,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nbond']):
+        for i in range(self.pointers['nbond']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -183,7 +185,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nangle']):
+        for i in range(self.pointers['nangle']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -202,7 +204,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nstrbnd']):
+        for i in range(self.pointers['nstrbnd']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -223,7 +225,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nurey']):
+        for i in range(self.pointers['nurey']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -248,7 +250,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nopbend']):
+        for i in range(self.pointers['nopbend']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -269,7 +271,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['nopdist']):
+        for i in range(self.pointers['nopdist']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -290,7 +292,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['ntors']):
+        for i in range(self.pointers['ntors']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -313,7 +315,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['npitors']):
+        for i in range(self.pointers['npitors']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -330,7 +332,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['ntortor']):
+        for i in range(self.pointers['ntortor']):
             try:
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
@@ -351,7 +353,7 @@ class TinkerAnalout(object):
             # need to eat the next dim1*dim2 lines
             if len(line.split()) == 3:
                 gridvals = []
-                for j in xrange(dim1*dim2):
+                for j in range(dim1*dim2):
                     gridvals.append(tuple([float(x) for x in line.split()]))
                     line = f.readline()
                 self.tortor_list[-1].type = TorsionTorsionGrid.new(gridvals)
@@ -362,7 +364,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['npole']):
+        for i in range(self.pointers['npole']):
             try:
                 int(line[0:6])
                 at = int(line[9:15]) - 1
@@ -391,7 +393,7 @@ class TinkerAnalout(object):
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['npole']):
+        for i in range(self.pointers['npole']):
             try:
                 int(line[0:6])
                 at = int(line[9:15]) - 1
@@ -421,7 +423,7 @@ class TinkerAnalout(object):
         self.pair12_list = set()
         f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['pair12']):
+        for i in range(self.pointers['pair12']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
             self.pair12_list.add( (self.atom_list[at1], self.atom_list[at2]) )
             line = f.readline()
@@ -431,7 +433,7 @@ class TinkerAnalout(object):
         self.pair13_list = set()
         f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['pair13']):
+        for i in range(self.pointers['pair13']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
             self.pair13_list.add( (self.atom_list[at1], self.atom_list[at2]) )
             line = f.readline()
@@ -441,7 +443,7 @@ class TinkerAnalout(object):
         self.pair14_list = set()
         f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['pair14']):
+        for i in range(self.pointers['pair14']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
             self.pair14_list.add( (self.atom_list[at1], self.atom_list[at2]) )
             line = f.readline()
@@ -451,7 +453,7 @@ class TinkerAnalout(object):
         self.pair15_list = set()
         f.readline()
         line = f.readline()
-        for i in xrange(self.pointers['pair15']):
+        for i in range(self.pointers['pair15']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
             self.pair15_list.add( (self.atom_list[at1], self.atom_list[at2]) )
             line = f.readline()

@@ -3,6 +3,7 @@ Provides a class for reading CHARMM-style files. The key component to these
 files is that the ! character is a comment character and everything after ! is
 ignored.
 """
+from chemistry.utils.io import genopen
 from chemistry.exceptions import CharmmFileError
 
 class CharmmFile(object):
@@ -24,11 +25,20 @@ class CharmmFile(object):
         else:
             self.status = 'NEW'
         try:
-            self._handle = open(fname, mode)
-        except IOError, e:
+            self._handle = genopen(fname, mode)
+        except IOError as e:
             raise CharmmFileError(str(e))
         self.closed = False
         self.line_number = 0
+        self.comment = ''
+
+    def __enter__(self):
+        self._handle.__enter__()
+        return self
+
+    def __exit__(self, *args):
+        if not self.closed:
+            self.close()
 
     def tell(self):
         return self._handle.tell()
@@ -45,10 +55,12 @@ class CharmmFile(object):
             try:
                 idx = line.index('!')
                 end = '\n'
+                self.comment = line[idx:].rstrip()
             except ValueError:
                 # There is no comment...
                 idx = None
                 end = ''
+                self.comment = ''
             yield line[:idx] + end
 
     def readline(self):
@@ -56,10 +68,12 @@ class CharmmFile(object):
         line = self._handle.readline()
         try:
             idx = line.index('!')
+            self.comment = line[idx:].rstrip()
             end = '\n'
         except ValueError:
             idx = None
             end = ''
+            self.comment = ''
         return line[:idx] + end
 
     def readlines(self):
@@ -98,7 +112,12 @@ class CharmmStreamFile(object):
 
     """
     def __init__(self, fname):
-        self.lines = CharmmFile(fname, 'r').readlines()
+        self.lines = []
+        self.comments = []
+        with CharmmFile(fname, 'r') as f:
+            for line in f:
+                self.lines.append(line)
+                self.comments.append(f.comment)
         self.line_number = 0
 
     def __iter__(self):
@@ -112,32 +131,37 @@ class CharmmStreamFile(object):
         """
         Fast-forwards the file to the next CHARMM command section
 
-        Returns: (str, list)
-            - The first string is the line defining the section that's being
-              returned
-            - The list is a list of all lines contained in the section
-              excluding the "read <blah>" and "end" lines.
+        Returns
+        -------
+        name, data, comments : str, list of str, list of str
+            name is the line defining the section that's being returned, whereas
+            data is a list of all lines in the section, and comments is a list
+            of all comments (same size as data) for all those lines
 
-        Notes:
-            The line pointer will be set to the line defining the 
+        Notes
+        -----
+        The line pointer will be set to the line defining the section
         """
         lines = []
+        comments = []
         while self.line_number < len(self.lines):
             line = self.lines[self.line_number].strip()
+            comment = self.comments[self.line_number].strip()
             if line[:4].lower() == 'read':
                 title = line.strip()
                 self.line_number += 1
                 line = self.lines[self.line_number]
                 while line and not line.strip().lower().startswith('end'):
                     lines.append(line)
+                    comments.append(comment)
                     self.line_number += 1
                     line = self.lines[self.line_number]
-                return title, lines
+                    comment = self.comments[self.line_number]
+                return title, lines, comments
             self.line_number += 1
         # No sections left
-        return None, None
+        return None, None, None
 
 
     def __del__(self): 
-
         pass

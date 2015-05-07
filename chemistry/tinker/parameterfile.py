@@ -2,9 +2,10 @@
 This module contains classes regarding the Amoeba potential and loading in a
 TINKER-based parameter file.
 """
+from __future__ import print_function
+from chemistry.utils.six.moves import range
 from chemistry.exceptions import (AmoebaParamFileError, APIError,
             AmoebaParamFileWarning)
-import compat24 # adds OrderedDict to collections in Py2.4 -- Py2.6
 from collections import OrderedDict
 import re
 import warnings
@@ -215,7 +216,7 @@ class _DihedralType(_ParamType):
         elif idx2 > idx3 or (idx2 == idx3 and idx1 > idx4):
             key = '%d-%d-%d-%d' % (idx4, idx3, idx2, idx1)
         self.k, self.phase, self.periodicity = [], [], []
-        for i in xrange(len(args)//3):
+        for i in range(len(args)//3):
             self.k.append(float(args[i*3]))
             self.phase.append(float(args[i*3+1]))
             self.periodicity.append(float(args[i*3+2]))
@@ -446,7 +447,6 @@ class AmoebaParameterSet(object):
         # Now loop through all atoms
         while line.lstrip()[:5].lower() == 'atom ':
             rematch = self.atomre.match(line)
-            if not rematch: print line
             num, typenum, name, descrip, anum, mass, val = rematch.groups()
             self.atoms[int(num)] = _Atom(typenum, name, descrip,
                                                  anum, mass, val)
@@ -471,8 +471,8 @@ class AmoebaParameterSet(object):
         while rematch:
             try:
                 get_angle_type(rematch.groups()[0], *line.split()[1:])
-            except TypeError, err:
-                print repr(rematch.groups()[0]), line.split()[1:]
+            except TypeError as err:
+                print(repr(rematch.groups()[0]), line.split()[1:])
                 raise err
             line = f.readline().replace('\t', ' ')
             rematch = self.anglere.match(line)

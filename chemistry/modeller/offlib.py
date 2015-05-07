@@ -2,31 +2,33 @@
 Tool for parsing and writing OFF library files to and from dictionaries of
 ResidueTemplate objects
 """
-import compat24
+from __future__ import print_function
 
 from chemistry import Atom
 from chemistry.constants import RAD_TO_DEG
 from chemistry.exceptions import AmberOFFWarning
-from chemistry.formats import io
 from chemistry.formats.registry import FileFormatType
 from chemistry.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from chemistry.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
+from chemistry import periodic_table as pt
+from chemistry.utils.io import genopen
+from chemistry.utils.six import string_types, add_metaclass
+from chemistry.utils.six.moves import range
 from collections import OrderedDict
+from contextlib import closing
 try:
     import numpy as np
 except ImportError:
     np = None
-from chemistry import periodic_table as pt
 import re
 import warnings
 
+@add_metaclass(FileFormatType)
 class AmberOFFLibrary(object):
     """
     Class containing static methods responsible for parsing and writing OFF
     libraries
     """
-    __metaclass__ = FileFormatType
-
     #===================================================
 
     # Useful regexes
@@ -77,13 +79,10 @@ class AmberOFFLibrary(object):
         is_fmt : bool
             True if it is recognized as OFF, False otherwise
         """
-        f = io.genopen(filename, 'r')
-        try:
-            if AmberOFFLibrary._headerre.match(f.readline().decode()):
+        with closing(genopen(filename, 'r')) as f:
+            if AmberOFFLibrary._headerre.match(f.readline()):
                 return True
             return False
-        finally:
-            f.close()
 
     #===================================================
 
@@ -113,8 +112,8 @@ class AmberOFFLibrary(object):
         RuntimeError if EOF is reached prematurely or other formatting issues
         found
         """
-        if isinstance(filename, basestring):
-            fileobj = open(filename, 'r')
+        if isinstance(filename, string_types):
+            fileobj = genopen(filename, 'r')
             own_handle = True
         else:
             fileobj = filename
@@ -328,7 +327,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             c1,c2,c3,c4,c5,c6 = [int(x) for x in fileobj.readline().split()]
             if templ.head is not None and templ.head is not templ[c1-1]:
                 warnings.warn('HEAD atom is not connect0')
@@ -345,7 +344,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             resname, id, next, start, typ, img = fileobj.readline().split()
             resname = _strip_enveloping_quotes(resname)
             id = int(id)
@@ -376,7 +375,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        for i in xrange(nres):
+        for i in range(nres):
             #TODO sanity check
             fileobj.readline()
         line = fileobj.readline()
@@ -426,7 +425,7 @@ class AmberOFFLibrary(object):
         """
         own_handle = False
         if not hasattr(dest, 'write'):
-            dest = open(dest, 'w')
+            dest = genopen(dest, 'w')
             own_handle = True
         # Write the residues in alphabetical order
         names = sorted(lib.keys())

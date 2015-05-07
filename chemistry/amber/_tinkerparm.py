@@ -3,7 +3,7 @@ This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
 
-Copyright (C) 2010 - 2014  Jason Swails
+Copyright (C) 2010 - 2015  Jason Swails
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,14 +20,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division
-try:
-    from itertools import izip as zip
-except ImportError:
-    # This only happens in Python 3, where zip is equivalent to izip
-    pass
+from __future__ import division, print_function, absolute_import
 
-from compat24 import property
 from chemistry.amber._amberparm import AmberParm
 from chemistry.amber.amberformat import AmberFormat
 from chemistry.constants import NATOM, NRES, IFBOX
@@ -37,6 +31,7 @@ from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 MultipoleFrame, NonbondedException, NonbondedExceptionType,
                 StretchBendType, TorsionTorsionType)
 from chemistry.exceptions import FormatError, AmoebaError
+from chemistry.utils.six.moves import range, zip
 
 class AmoebaParm(AmberParm):
     """
@@ -590,7 +585,7 @@ class AmoebaParm(AmberParm):
         del self.torsion_torsions[:]
         data = self.parm_data
         ntypes = data['AMOEBA_TORSION_TORSION_NUM_PARAMS'][0]
-        for i in xrange(ntypes):
+        for i in range(ntypes):
             prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_' % (i + 1)
             dims = tuple(data[prefix + 'DIMS'])
             ang1 = data[prefix + 'ANGLE1']

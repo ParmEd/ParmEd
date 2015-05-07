@@ -15,15 +15,22 @@ from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.modeller import ResidueTemplate, PatchTemplate
 from chemistry.parameters import ParameterSet
-from chemistry.periodic_table import AtomicNum, Mass, Element, element_by_mass
-import compat24 # needs to be before collections
-from collections import OrderedDict
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
+from chemistry.periodic_table import AtomicNum, element_by_mass
+from chemistry.utils.six import iteritems
+from chemistry.utils.six.moves import zip
 import os
+import re
 import warnings
+
+_penaltyre = re.compile(r'penalty\s*=\s*([\d\.]+)')
+
+class _EmptyStringIterator(object):
+    """ Always yields an empty string """
+    def __iter__(self):
+        while True:
+            yield ''
+    def __getitem__(self, idx):
+        return ''
 
 class CharmmParameterSet(ParameterSet):
     """
@@ -168,7 +175,7 @@ class CharmmParameterSet(ParameterSet):
                 inst.read_stream_file(sfile)
         return inst
 
-    def read_parameter_file(self, pfile):
+    def read_parameter_file(self, pfile, comments=None):
         """
         Reads all of the parameters from a parameter file. Versions 36 and
         later of the CHARMM force field files have an ATOMS section defining
@@ -177,8 +184,12 @@ class CharmmParameterSet(ParameterSet):
 
         Parameters
         ----------
-        pfile : str
-            Name of the CHARMM parameter file to read
+        pfile : str or list of lines
+            Name of the CHARMM parameter file to read or list of lines to parse
+            as a file
+        comments : list of str, optional
+            List of comments on each of the pfile lines (if pfile is a list of
+            lines)
 
         Notes
         -----
@@ -193,6 +204,8 @@ class CharmmParameterSet(ParameterSet):
         else:
             own_handle = False
             f = pfile
+            if not isinstance(f, CharmmFile) and comments is None:
+                comments = _EmptyStringIterator()
         # What section are we parsing?
         section = None
         # The current cmap we are building (these span multiple lines)
@@ -203,8 +216,12 @@ class CharmmParameterSet(ParameterSet):
         nonbonded_types = dict() # Holder
         parameterset = None
         read_first_nonbonded = False
-        for line in f:
+        for i, line in enumerate(f):
             line = line.strip()
+            try:
+                comment = f.comment
+            except AttributeError:
+                comment = comments[i]
             if not line:
                 # This is a blank line
                 continue
@@ -246,6 +263,12 @@ class CharmmParameterSet(ParameterSet):
                 continue
             # If we have no section, skip
             if section is None: continue
+            # See if our comments define a penalty for this line
+            pens = _penaltyre.findall(comment)
+            if len(pens) == 1:
+                penalty = float(pens[0])
+            else:
+                penalty = None
             # Now handle each section specifically
             if section == 'ATOMS':
                 if not line.startswith('MASS'): continue # Should this happen?
@@ -284,6 +307,7 @@ class CharmmParameterSet(ParameterSet):
                 bond_type = BondType(k, req)
                 self.bond_types[(type1, type2)] = bond_type
                 self.bond_types[(type2, type1)] = bond_type
+                bond_type.penalty = penalty
                 continue
             if section == 'ANGLES':
                 words = line.split()
@@ -303,10 +327,12 @@ class CharmmParameterSet(ParameterSet):
                     ubk = conv(words[5], float, 'Urey-Bradley force constant')
                     ubeq = conv(words[6], float, 'Urey-Bradley equil. value')
                     ubtype = BondType(ubk, ubeq)
+                    ubtype.penalty = penalty
                 except IndexError:
                     ubtype = NoUreyBradley
                 self.urey_bradley_types[(type1, type2, type3)] = ubtype
                 self.urey_bradley_types[(type3, type2, type1)] = ubtype
+                angle_type.penalty = penalty
                 continue
             if section == 'DIHEDRALS':
                 words = line.split()
@@ -324,6 +350,7 @@ class CharmmParameterSet(ParameterSet):
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
                 dihedral = DihedralType(k, n, phase*DEG_TO_RAD)
+                dihedral.penalty = penalty
                 if key in self.dihedral_types:
                     # See if the existing dihedral type list has a term with
                     # the same periodicity -- If so, replace it
@@ -377,7 +404,9 @@ class CharmmParameterSet(ParameterSet):
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                self.improper_types[key] = ImproperType(k, theteq*DEG_TO_RAD)
+                improp = ImproperType(k, theteq*DEG_TO_RAD)
+                self.improper_types[key] = improp
+                improp.penalty = penalty
                 continue
             if section == 'CMAP':
                 # This is the most complicated part, since cmap parameters span
@@ -428,7 +457,7 @@ class CharmmParameterSet(ParameterSet):
                     # soldier on
                     if not read_first_nonbonded: continue
                     raise CharmmFileError('Could not parse nonbonded terms.')
-                except CharmmFileError, e:
+                except CharmmFileError as e:
                     if not read_first_nonbonded: continue
                     raise CharmmFileError(str(e))
                 else:
@@ -661,7 +690,7 @@ class CharmmParameterSet(ParameterSet):
             pass
 
         # Go through the patches and add the appropriate one
-        for resname, res in residues.iteritems():
+        for resname, res in iteritems(residues):
             if hpatches[resname] is not None:
                 try:
                     res.first_patch = patches[hpatches[resname]]
@@ -693,7 +722,7 @@ class CharmmParameterSet(ParameterSet):
         else:
             f = CharmmStreamFile(sfile)
 
-        title, section = f.next_section()
+        title, section, comments = f.next_section()
         while title is not None and section is not None:
             words = title.lower().split()
             if words[1] == 'rtf':
@@ -701,8 +730,8 @@ class CharmmParameterSet(ParameterSet):
                 self.read_topology_file(iter(section))
             elif words[1].startswith('para'):
                 # This is a Parameter file section
-                self.read_parameter_file(section)
-            title, section = f.next_section()
+                self.read_parameter_file(section, comments)
+            title, section, comments = f.next_section()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -1,7 +1,6 @@
-"""
-Helpful utilities for ParmEd
-"""
-import os
+""" Various utilities used by ParmEd that don't really fit elsewhere """
+
+__all__ = ['six', 'io', 'timer', 'which']
 
 def which(prog):
     """ Returns the full path of a program if it exists in PATH
@@ -16,6 +15,7 @@ def which(prog):
     path : str or None
         The full path of the program. If it cannot be found, None
     """
+    import os
     def is_exe(fpath):
         if os.path.isdir(fpath): return False
         return os.path.exists(fpath) and os.access(fpath, os.X_OK)

@@ -2,6 +2,7 @@
 This package contains some useful functionality for common tasks in OpenMM
 """
 from chemistry import unit as u
+from chemistry.utils.six import iteritems
 
 def energy_decomposition(structure, context):
     """
@@ -38,7 +39,7 @@ def energy_decomposition(structure, context):
         gp = force.getForceGroup()
         force_group_names[gp] = all_names[gp]
 
-    for grp, name in force_group_names.iteritems():
+    for grp, name in iteritems(force_group_names):
         state = context.getState(getEnergy=True, groups=1<<grp)
         energy_components[name] = state.getPotentialEnergy().value_in_unit(kcal)
 
