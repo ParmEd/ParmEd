@@ -526,6 +526,35 @@ class TestTopologyObjects(unittest.TestCase):
 
     #=============================================
 
+    def test_rb_torsion_type(self):
+        """ Tests the RBTorsionType class """
+        rb_types = TrackedList()
+        rb_types.append(RBTorsionType(10, 20, 30, 40, 50, 60))
+        rb_types.append(RBTorsionType(11, 21, 31, 41, 51, 61))
+        rb_types.append(RBTorsionType(12, 22, 32, 42, 52, 62, list=rb_types))
+        rb_types.claim()
+        for i, rb_typ in enumerate(rb_types):
+            self.assertEqual(i, rb_typ.idx)
+            self.assertEqual(rb_typ.c0, 10+i)
+            self.assertEqual(rb_typ.c1, 20+i)
+            self.assertEqual(rb_typ.c2, 30+i)
+            self.assertEqual(rb_typ.c3, 40+i)
+            self.assertEqual(rb_typ.c4, 50+i)
+            self.assertEqual(rb_typ.c5, 60+i)
+        # Test RBTorsion.__copy__
+        cp = copy(rb_types[0])
+        self.assertIsNot(cp, rb_types[0])
+        self.assertIs(cp.list, None)
+        self.assertEqual(cp.idx, -1)
+        self.assertEqual(cp.c0, 10)
+        self.assertEqual(cp.c1, 20)
+        self.assertEqual(cp.c2, 30)
+        self.assertEqual(cp.c3, 40)
+        self.assertEqual(cp.c4, 50)
+        self.assertEqual(cp.c5, 60)
+
+    #=============================================
+
     def test_urey_bradley(self):
         """ Tests the Urey-Bradley term """
         atoms = TrackedList()
