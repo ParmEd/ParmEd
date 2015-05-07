@@ -207,7 +207,7 @@ class TestStructureAdd(unittest.TestCase):
         for i in range(random.randint(25, 35)):
             struct.cmaps.append(Cmap(*random.sample(struct.atoms, 5)))
             if parametrized:
-                struct.cmaps[-1].type = random.choice(struct.cmaps)
+                struct.cmaps[-1].type = random.choice(struct.cmap_types)
         for i in range(random.randint(30, 40)):
             struct.trigonal_angles.append(TrigonalAngle(*random.sample(struct.atoms, 4)))
             if parametrized:
@@ -249,12 +249,22 @@ class TestStructureAdd(unittest.TestCase):
         """ Tests addition of two parametrized Structure instances """
         s1 = self._createStructure(parametrized=True)
         s2 = self._createStructure(parametrized=True)
+        self.assertTrue(bool(s1.bond_types))
+        self.assertTrue(bool(s2.bond_types))
         s = s1 + s2
+
+    def testIAdd(self):
+        """ Tests in-place addition of two Structure instances """
+        s1 = self._createStructure(parametrized=True)
+        s2 = self._createStructure(parametrized=True)
+        s1cp = copy(s1)
+        s1 += s2
 
     def testAddNotParametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = self._createStructure(parametrized=False)
         s2 = self._createStructure(parametrized=False)
+        s = s1 + s2
 
     def testAddNoValence(self):
         """ Tests addition of two minimal Structure instances """

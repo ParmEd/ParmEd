@@ -25,7 +25,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
            'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
            'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
-           'OutOfPlaneExtraPointFrame']
+           'OutOfPlaneExtraPointFrame', 'RBTorsionType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -2097,7 +2097,7 @@ class RBTorsionType(_ListItem, _ParameterType):
                 self.c2 == other.c2 and self.c3 == other.c3 and
                 self.c4 == other.c4 and self.c5 == other.c5)
 
-    def __copy__(self, other):
+    def __copy__(self):
         return RBTorsionType(self.c0, self.c1, self.c2,
                              self.c3, self.c4, self.c5)
 
@@ -2675,7 +2675,8 @@ class CmapType(_ListItem, _ParameterType):
         return '<%s; resolution=%d>' % (type(self).__name__, self.resolution)
 
     def __copy__(self):
-        return CmapType(self.resolution, copy(self.grid._data), self.comments)
+        return CmapType(self.resolution, copy(self.grid._data),
+                        self.comments[:])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
