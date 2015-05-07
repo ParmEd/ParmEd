@@ -2898,7 +2898,7 @@ class OutOfPlaneBend(_FourAtomTerm):
     def oopbend_type(self):
         warnings.warn('oopbend_type has been replaced with type',
                       DeprecationWarning)
-        return type
+        return self.type
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):

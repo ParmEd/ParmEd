@@ -554,8 +554,8 @@ class Structure(object):
             )
         for o in self.out_of_plane_bends:
             c.out_of_plane_bends.append(
-                    OutOfPlaneBend(atoms[t.atom1.idx], atoms[t.atom2.idx],
-                                   atoms[t.atom3.idx], atoms[t.atom4.idx],
+                    OutOfPlaneBend(atoms[o.atom1.idx], atoms[o.atom2.idx],
+                                   atoms[o.atom3.idx], atoms[o.atom4.idx],
                                    o.type and c.out_of_plane_bend_types[o.type.idx])
             )
         for p in self.pi_torsions:
