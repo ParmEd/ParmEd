@@ -537,7 +537,7 @@ class Structure(object):
             c.rb_torsions.append(
                     Dihedral(atoms[r.atom1.idx], atoms[r.atom2.idx],
                              atoms[r.atom3.idx], atoms[r.atom4.idx],
-                             r.type and c.rb_torsion_types[r.type.idx])
+                             type=r.type and c.rb_torsion_types[r.type.idx])
             )
         for cm in self.cmaps:
             c.cmaps.append(
@@ -2509,7 +2509,8 @@ class Structure(object):
                            'ignore_end'])
         copy_valence_terms(other.rb_torsions, other.rb_torsion_types,
                            self.rb_torsions, self.rb_torsion_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4'])
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
+                           'ignore_end'])
         copy_valence_terms(other.urey_bradleys, other.urey_bradley_types,
                            self.urey_bradleys, self.urey_bradley_types,
                            ['atom1', 'atom2'])
