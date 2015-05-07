@@ -4255,8 +4255,8 @@ class AtomType(object):
             # also equal
             return (abs(self.epsilon - other.epsilon) < TINY and
                     abs(self.rmin - other.rmin) < TINY and
-                    abs(self.epsilon_14 - other.epsilon_14) > TINY and
-                    abs(self.rmin_14 - other.rmin_14) > TINY and
+                    abs(self.epsilon_14 - other.epsilon_14) < TINY and
+                    abs(self.rmin_14 - other.rmin_14) < TINY and
                     self.nbfix == other.nbfix)
         if isinstance(other, string_types):
             return self.name == other

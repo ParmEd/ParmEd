@@ -252,6 +252,16 @@ class TestStructureAdd(unittest.TestCase):
         self.assertTrue(bool(s1.bond_types))
         self.assertTrue(bool(s2.bond_types))
         s = s1 + s2
+        # Make sure that s is really the sum of s1 and s2
+        self.assertEqual(len(s.atoms), len(s1.atoms) + len(s2.atoms))
+        self.assertEqual(len(s.residues), len(s1.residues) + len(s2.residues))
+        for a1, a2 in zip(s.atoms, s1.atoms + s2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.atom_type, a2.atom_type)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
 
     def testIAdd(self):
         """ Tests in-place addition of two Structure instances """
@@ -264,6 +274,8 @@ class TestStructureAdd(unittest.TestCase):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = self._createStructure(parametrized=False)
         s2 = self._createStructure(parametrized=False)
+        self.assertFalse(bool(s1.bond_types))
+        self.assertFalse(bool(s2.bond_types))
         s = s1 + s2
 
     def testAddNoValence(self):
