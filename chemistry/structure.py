@@ -2586,7 +2586,7 @@ class Structure(object):
             for atom in other.atoms:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                              res.inscode)
+                              res.insertion_code)
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'])
             copy_valence_terms(other.angles, aoffset, self.angles,
@@ -2596,7 +2596,8 @@ class Structure(object):
                                'atom4', 'improper', 'ignore_end'])
             copy_valence_terms(other.rb_torsions, aoffset,
                                self.rb_torsions, self.rb_torsion_types,
-                               ['atom1', 'atom2', 'atom3', 'atom4'])
+                               ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
+                                'ignore_end'])
             copy_valence_terms(other.urey_bradleys, aoffset,
                                self.urey_bradleys, self.urey_bradley_types,
                                ['atom1', 'atom2'])
@@ -2608,7 +2609,7 @@ class Structure(object):
                                ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
             copy_valence_terms(other.trigonal_angles, aoffset,
                                self.trigonal_angles, self.trigonal_angle_types,
-                               ['atom1',' atom2', 'atom3', 'atom4'])
+                               ['atom1', 'atom2', 'atom3', 'atom4'])
             copy_valence_terms(other.out_of_plane_bends,
                                aoffset, self.out_of_plane_bends,
                                self.out_of_plane_bend_types,
