@@ -118,7 +118,7 @@ class ParameterSet(object):
         typedict : dict
             Type dictionary to condense
         """
-        keylist = typedict.keys()
+        keylist = list(typedict.keys())
         for i in range(len(keylist) - 1):
             key1 = keylist[i]
             for j in range(i+1, len(keylist)):
