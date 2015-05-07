@@ -5,6 +5,7 @@ from __future__ import division
 
 import chemistry.structure as structure
 from chemistry.topologyobjects import *
+from chemistry.utils.six import integer_types
 from chemistry.utils.six.moves import range, zip
 from copy import copy
 import random
@@ -213,7 +214,7 @@ class TestStructureAdd(unittest.TestCase):
             if parametrized:
                 struct.trigonal_angles[-1].type = random.choice(struct.trigonal_angle_types)
         for i in range(random.randint(30, 40)):
-            struct.out_of_plane_bends.append(TrigonalAngle(*random.sample(struct.atoms, 4)))
+            struct.out_of_plane_bends.append(OutOfPlaneBend(*random.sample(struct.atoms, 4)))
             if parametrized:
                 struct.out_of_plane_bends[-1].type = random.choice(struct.out_of_plane_bend_types)
         for i in range(random.randint(30, 40)):
@@ -243,6 +244,7 @@ class TestStructureAdd(unittest.TestCase):
                 struct.adjusts[-1].type = random.choice(struct.adjust_types)
         struct.prune_empty_terms()
         struct.unchange()
+        struct.update_dihedral_exclusions()
         return struct
 
     def testAddParametrized(self):
@@ -255,13 +257,110 @@ class TestStructureAdd(unittest.TestCase):
         # Make sure that s is really the sum of s1 and s2
         self.assertEqual(len(s.atoms), len(s1.atoms) + len(s2.atoms))
         self.assertEqual(len(s.residues), len(s1.residues) + len(s2.residues))
-        for a1, a2 in zip(s.atoms, s1.atoms + s2.atoms):
+
+        def cmp_atoms(a1, a2):
+            self.assertIsNot(a1, a2)
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(a1.atom_type, a2.atom_type)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
             self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.screen, a2.screen)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.insertion_code, a2.residue.insertion_code)
+            self.assertEqual(len(a1.bond_partners), len(a2.bond_partners))
+            self.assertEqual(len(a1.angle_partners), len(a2.angle_partners))
+            self.assertEqual(len(a1.dihedral_partners), len(a2.dihedral_partners))
+            self.assertEqual(len(a1.bonds), len(a2.bonds))
+            self.assertEqual(len(a1.angles), len(a2.angles))
+            self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
+            self.assertEqual(len(a1.impropers), len(a2.impropers))
+
+        for a1, a2 in zip(s.atoms, s1.atoms + s2.atoms):
+            cmp_atoms(a1, a2)
+        for r1, r2 in zip(s.residues, s1.residues + s2.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+            self.assertEqual(r1.insertion_code, r2.insertion_code)
+        self.assertEqual(len(s.bonds), len(s1.bonds)+len(s2.bonds))
+        self.assertEqual(len(s.angles), len(s1.angles)+len(s2.angles))
+        self.assertEqual(len(s.dihedrals), len(s1.dihedrals)+len(s2.dihedrals))
+        self.assertEqual(len(s.urey_bradleys), len(s1.urey_bradleys)+len(s2.urey_bradleys))
+        self.assertEqual(len(s.impropers), len(s1.impropers)+len(s2.impropers))
+        self.assertEqual(len(s.rb_torsions), len(s1.rb_torsions)+len(s2.rb_torsions))
+        self.assertEqual(len(s.cmaps), len(s1.cmaps)+len(s2.cmaps))
+        self.assertEqual(len(s.stretch_bends), len(s1.stretch_bends)+len(s2.stretch_bends))
+        self.assertEqual(len(s.trigonal_angles), len(s1.trigonal_angles)+len(s2.trigonal_angles))
+        self.assertEqual(len(s.out_of_plane_bends), len(s1.out_of_plane_bends)+len(s2.out_of_plane_bends))
+        self.assertEqual(len(s.torsion_torsions), len(s1.torsion_torsions)+len(s2.torsion_torsions))
+        self.assertEqual(len(s.acceptors), len(s1.acceptors)+len(s2.acceptors))
+        self.assertEqual(len(s.donors), len(s1.donors)+len(s2.donors))
+        self.assertEqual(len(s.pi_torsions), len(s1.pi_torsions)+len(s2.pi_torsions))
+        self.assertEqual(len(s.chiral_frames), len(s1.chiral_frames)+len(s2.chiral_frames))
+        self.assertEqual(len(s.multipole_frames), len(s1.multipole_frames)+len(s2.multipole_frames))
+        self.assertEqual(len(s.groups), len(s1.groups)+len(s2.groups))
+        self.assertEqual(len(s.adjusts), len(s1.adjusts)+len(s2.adjusts))
+        self.assertEqual(len(s.adjust_types), len(s1.adjust_types)+len(s2.adjust_types))
+        # Check types
+        self.assertEqual(len(s.bond_types), len(s1.bond_types) +
+                len(s2.bond_types))
+        self.assertEqual(len(s.angle_types),
+                         len(s1.angle_types)+len(s2.angle_types))
+        self.assertEqual(len(s.dihedral_types),
+                         len(s1.dihedral_types)+len(s2.dihedral_types))
+        self.assertEqual(len(s.urey_bradley_types),
+                         len(s1.urey_bradley_types)+len(s2.urey_bradley_types))
+        self.assertEqual(len(s.improper_types),
+                         len(s1.improper_types)+len(s2.improper_types))
+        self.assertEqual(len(s.rb_torsion_types),
+                         len(s1.rb_torsion_types)+len(s2.rb_torsion_types))
+        self.assertEqual(len(s.cmap_types),
+                         len(s1.cmap_types)+len(s2.cmap_types))
+        self.assertEqual(len(s.stretch_bend_types),
+                         len(s1.stretch_bend_types)+len(s2.stretch_bend_types))
+        self.assertEqual(len(s.trigonal_angle_types),
+                         len(s1.trigonal_angle_types)+len(s2.trigonal_angle_types))
+        self.assertEqual(len(s.out_of_plane_bend_types),
+                         len(s1.out_of_plane_bend_types)+len(s2.out_of_plane_bend_types))
+        self.assertEqual(len(s.torsion_torsion_types),
+                         len(s1.torsion_torsion_types)+len(s2.torsion_torsion_types))
+        self.assertEqual(len(s.pi_torsion_types),
+                         len(s1.pi_torsion_types)+len(s2.pi_torsion_types))
+        # Check all valence terms
+        def chk_valence(val1, val2):
+            self.assertIs(type(val1[0]), type(val2[0]))
+            self.assertEqual(len(val1), len(val2))
+            attrs = [attr for attr in dir(val1[0]) if attr.startswith('atom')]
+            for v1, v2 in zip(val1, val2):
+                at1 = [getattr(v1, attr) for attr in attrs]
+                at2 = [getattr(v2, attr) for attr in attrs]
+                self.assertIsNot(v1, v2)
+                for a1, a2 in zip(at1, at2):
+                    cmp_atoms(a1, a2)
+                if hasattr(v1, 'type'):
+                    self.assertEqual(v1.type, v2.type)
+                    if not isinstance(v1.type, integer_types):
+                        self.assertIsNot(v1.type, v2.type)
+        chk_valence(s.bonds, s1.bonds+s2.bonds)
+        chk_valence(s.angles, s1.angles+s2.angles)
+        chk_valence(s.dihedrals, s1.dihedrals+s2.dihedrals)
+        chk_valence(s.rb_torsions, s1.rb_torsions+s2.rb_torsions)
+        chk_valence(s.urey_bradleys, s1.urey_bradleys+s2.urey_bradleys)
+        chk_valence(s.impropers, s1.impropers+s2.impropers)
+        chk_valence(s.cmaps, s1.cmaps+s2.cmaps)
+        chk_valence(s.trigonal_angles, s1.trigonal_angles+s2.trigonal_angles)
+        chk_valence(s.out_of_plane_bends, s1.out_of_plane_bends+s2.out_of_plane_bends)
+        chk_valence(s.pi_torsions, s1.pi_torsions+s2.pi_torsions)
+        chk_valence(s.torsion_torsions, s1.torsion_torsions+s2.torsion_torsions)
+        chk_valence(s.stretch_bends, s1.stretch_bends+s2.stretch_bends)
+        chk_valence(s.chiral_frames, s1.chiral_frames+s2.chiral_frames)
+        chk_valence(s.multipole_frames, s1.multipole_frames+s2.multipole_frames)
+        chk_valence(s.donors, s1.donors+s2.donors)
+        chk_valence(s.acceptors, s1.acceptors+s2.acceptors)
+        chk_valence(s.groups, s1.groups+s2.groups)
 
     def testIAdd(self):
         """ Tests in-place addition of two Structure instances """
