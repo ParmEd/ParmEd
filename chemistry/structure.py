@@ -2580,7 +2580,7 @@ class Structure(object):
                     kws['type'] = styp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
         if other is None: other = copy(self)
-        for i in range(ncopies):
+        for i in range(ncopies-1):
             aoffset = len(self.atoms)
             roffset = self.residues[-1].number + 1
             for atom in other.atoms:
