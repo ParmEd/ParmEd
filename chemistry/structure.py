@@ -2474,7 +2474,11 @@ class Structure(object):
         # reference to that type is added. Afterwards, those types are tacked on
         # to the end of the types list on `self`
         aoffset = len(self.atoms)
-        roffset = self.residues[-1].number + 1
+        try:
+            roffset = self.residues[-1].number + 1
+        except IndexError:
+            # No residues... must be an empty structure
+            roffset = 0
         for atom in other.atoms:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
