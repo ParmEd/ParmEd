@@ -1228,6 +1228,77 @@ class ThreeParticleExtraPointFrame(object):
             oatom2 = b2.atom1
         return self.ep.parent, oatom1, oatom2
 
+    @staticmethod
+    def from_weights(parent, a1, a2, w1, w2):
+        """
+        This function determines the necessary bond length between an ExtraPoint
+        and its parent atom from the weights that are calculated in
+        ``get_weights``.
+
+        Parameters
+        ----------
+        parent : :class:`Atom`
+            The parent atom to the ExtraPoint
+        a1 : :class:`Atom`
+            The first atom in the frame bonded to the parent
+        a2 : :class:`Atom`
+            The second atom in the frame bonded to the parent
+        w1 : float
+            The first weight defining the ExtraPoint position wrt ``a1``
+        w2 : float
+            The second weight defining the ExtraPoint position wrt ``a2``
+
+        Returns
+        -------
+        dist : float
+            The distance between the ExtraPoint and its parent atom that
+            satisfies the weights
+
+        Notes
+        -----
+        parent must form a Bond with both a1 and a2.  Then, if a1-parent-a2
+        forms an angle and it has an assigned type, that equilibrium value is
+        used. Otherwise, the a1-a2 bond distance is used.  If neither of those
+        are defined, a ValueError is raised.
+
+        Raises
+        ------
+        ValueError if the necessary geometry requirements are not set or if the
+        two weights are different
+        """
+        if a1 not in parent.bond_partners or a2 not in parent.bond_partners:
+            raise ValueError('Parent atom not bound to other 2 atoms in frame')
+        if a2 not in a1.angle_partners and a2 not in a1.bond_partners:
+            raise ValueError('No geometry defined between 2 non-parent atoms')
+        if w1 != w2:
+            raise ValueError('Currently only equal weights are supported')
+        # distance(OV) = w1 * cos(EP-Parent-a1) * parent-a1 dist
+        dp1 = dp2 = None
+        for bond in parent.bonds:
+            if a1 in bond:
+                dp1 = bond.type.req
+            if a2 in bond:
+                dp2 = bond.type.req
+        assert dp1 is not None and dp2 is not None, \
+                "Could not find bonds with a1 and a2 in them"
+        if a2 not in a1.angle_partners:
+            for bond in a1.bonds:
+                if a2 not in bond: continue
+                d12 = bond.type.req
+            # Get angle from law of cosines
+            theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
+        else:
+            for angle in a1.angles:
+                if a2 in angle and a2 is not angle.atom2:
+                    theteq = angle.type.theteq * DEG_TO_RAD
+                    break
+            else:
+                assert False, "Could not find matching angle"
+        if abs(dp1 - dp2) > TINY:
+            raise ValueError('Cannot deal with asymmetry in EP frame')
+        # Assume EP bisects
+        return w1 * math.cos(theteq * 0.5) * dp1
+
     def get_weights(self):
         """
         Returns the weights for the three particles

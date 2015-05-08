@@ -8,21 +8,19 @@ from chemistry import gromacs as gmx, ParameterSet
 from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
-            NonbondedException)
+            NonbondedException, ExtraPoint, BondType)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
 from chemistry.utils.six import add_metaclass
+from chemistry.utils.six.moves import range
 from contextlib import closing
 import warnings
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
-# functional form is used for each of its different parameter types. There is no
-# real documentation that I could find explaining the mapping between the funct
-# flag integers and the functional form corresponding to it. I found it in the
-# topdirs.c file of the gromacs 5 source code.  The table below summarizes my
-# findings, for reference (reference this with Ch.4, section 2 of the Gromacs
-# (5.0.4) manual):
+# functional form is used for each of its different parameter types. This is
+# taken from the topdirs.c source code file along with a table in the Gromacs
+# user manual. The table below summarizes my findings, for reference:
 
 # Bonds
 # -----
@@ -135,6 +133,7 @@ class GromacsTopologyFile(Structure):
         """
         params = self.parameterset
         molecules = dict()
+        structure_contents = []
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
                                  defines=defines)) as f:
             current_section = None
@@ -146,7 +145,13 @@ class GromacsTopologyFile(Structure):
                 if line[0] == '[':
                     current_section = line[1:-1].strip()
                 elif current_section == 'moleculetype':
-                    self.molecule_type = line.split()
+                    molname, nrexcl = line.split()
+                    nrexcl = int(nrexcl)
+                    if molname in molecules:
+                        raise GromacsTopologyError('Duplicate definition of '
+                                                   'molecule %s' % molname)
+                    molecule = Structure()
+                    molecules[molname] = (molecule, nrexcl)
                 elif current_section == 'atoms':
                     words = line.split()
                     if len(words) < 8:
@@ -159,10 +164,13 @@ class GromacsTopologyFile(Structure):
                         charge = None
                     else:
                         charge = float(words[6])
-                    atom = Atom(atomic_number=atomic_number, name=words[4],
-                                type=words[1], charge=charge)
-                    self.residues.add_atom(atom, words[3], int(words[2]))
-                    self.atoms.append(atom)
+                    if atomic_number == 0:
+                        atom = ExtraPoint(name=words[4], type=words[1],
+                                          charge=charge)
+                    else:
+                        atom = Atom(atomic_number=atomic_number, name=words[4],
+                                    type=words[1], charge=charge)
+                    molecule.add_atom(atom, words[3], int(words[2]))
                 elif current_section == 'bonds':
                     words = line.split()
                     i, j = int(words[0]), int(words[1])
@@ -170,7 +178,8 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('bond funct != 1; unknown functional',
                                       GromacsTopologyWarning)
                         self.unknown_functional = True
-                    self.bonds.append(Bond(self.atoms[i-1], self.atoms[j-1]))
+                    molecule.bonds.append(Bond(molecule.atoms[i-1],
+                                               molecule.atoms[j-1]))
                 elif current_section == 'pairs':
                     words = line.split()
                     i, j = int(words[0]), int(words[1])
@@ -179,8 +188,10 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('pairs funct != 1; unknown functional',
                                       GromacsTopologyWarning)
                         self.unknown_functional = True
-                    self.adjusts.append(NonbondedException(self.atoms[i-1],
-                                                           self.atoms[j-1]))
+                    molecule.adjusts.append(
+                            NonbondedException(molecule.atoms[i-1],
+                                               molecule.atoms[j-1])
+                    )
                 elif current_section == 'angles':
                     words = line.split()
                     i, j, k = int(words[0]), int(words[1]), int(words[2])
@@ -188,28 +199,29 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('angles funct != 1; unknown functional',
                                       GromacsTopologyWarning)
                         self.unknown_functional = True
-                    self.angles.append(Angle(self.atoms[i-1], self.atoms[j-1],
-                                             self.atoms[k-1])
+                    molecule.angles.append(
+                            Angle(molecule.atoms[i-1], molecule.atoms[j-1],
+                                  molecule.atoms[k-1])
                     )
                 elif current_section == 'dihedrals':
                     words = line.split()
                     i, j, k, l = [int(x) for x in words[:4]]
                     if words[4] in ('1', '9', '4'):
                         # Normal dihedral
-                        dih = Dihedral(self.atoms[i-1], self.atoms[j-1],
-                                       self.atoms[k-1], self.atoms[l-1])
-                        self.dihedrals.append(dih)
+                        dih = Dihedral(molecule.atoms[i-1], molecule.atoms[j-1],
+                                       molecule.atoms[k-1], molecule.atoms[l-1])
+                        molecule.dihedrals.append(dih)
                     elif words[4] == '2':
                         # Improper
-                        imp = Improper(self.atoms[i-1], self.atoms[j-1],
-                                       self.atoms[k-1], self.atoms[l-1])
+                        imp = Improper(molecule.atoms[i-1], molecule.atoms[j-1],
+                                       molecule.atoms[k-1], molecule.atoms[l-1])
                         self.impropers.append(imp)
                     else:
                         # ??? unknown
-                        warnings.warn('dihedrals funct != 1, 2, 4, or 9; unknown '
-                                      'functional', GromacsTopologyWarning)
-                        dih = Dihedral(self.atoms[i-1], self.atoms[j-1],
-                                       self.atoms[k-1], self.atoms[l-1])
+                        warnings.warn('torsions funct != 1, 2, 4, or 9; unknown'
+                                      ' functional', GromacsTopologyWarning)
+                        dih = Dihedral(molecule.atoms[i-1], molecule.atoms[j-1],
+                                       molecule.atoms[k-1], molecule.atoms[l-1])
                         self.dihedrals.append(dih)
                 elif current_section == 'system':
                     self.title = line
@@ -231,6 +243,69 @@ class GromacsTopologyFile(Structure):
                         self.unknown_functional = True
                     self._fudgeLJ = float(words[3])
                     self._fudgeQQ = float(words[4])
+                elif current_section == 'molecules':
+                    name, num = line.split()
+                    num = int(num)
+                    structure_contents.append((name, num))
+                elif current_section == 'settles':
+                    # Instead of adding bonds that get constrained for waters
+                    # (or other 3-atom molecules), GROMACS uses a "settles"
+                    # section to specify the constraint geometry. We have to
+                    # translate that into bonds.
+                    natoms = len([a for a in molecule.atoms
+                                    if not isinstance(a, ExtraPoint)])
+                    if natoms != 3:
+                        raise GromacsTopologyError("Cannot SETTLE a %d-atom "
+                                                   "molecule" % natoms)
+                    try:
+                        oxy, = [atom for atom in molecule.atoms
+                                    if atom.atomic_number == 8]
+                        hyd1, hyd2 = [atom for atom in molecule.atoms
+                                        if atom.atomic_number == 1]
+                    except ValueError:
+                        raise GromacsTopologyError("Can only SETTLE water; "
+                                    "Could not detect 2 hydrogens and 1 oxygen")
+                    #TODO see if there's a bond_type entry in the parameter set
+                    #     that we can fill in
+                    try:
+                        i, funct, doh, dhh = line.split()
+                        doh, dhh = float(doh), float(dhh)
+                    except ValueError:
+                        raise GromacsTopologyError('Bad [ settles ] line')
+                    bt_oh = BondType(1000*u.kilojoules_per_mole/u.nanometers**2,
+                                     doh*u.nanometers, list=molecule.bond_types)
+                    bt_hh = BondType(1000*u.kilojoules_per_mole/u.nanometers**2,
+                                     dhh*u.nanometers, list=molecule.bond_types)
+                    molecule.bond_types.extend([bt_oh, bt_hh])
+                    molecule.bonds.append(Bond(oxy, hyd1, bt_oh))
+                    molecule.bonds.append(Bond(oxy, hyd2, bt_oh))
+                    molecule.bonds.append(Bond(hyd1, hyd2, bt_hh))
+                elif current_section in ('virtual_sites3', 'dummies3'):
+                    words = line.split()
+                    vsite = molecule.atoms[int(words[0])-1]
+                    atoms = [molecule.atoms[int(i)-1] for i in words[1:4]]
+                    funct = int(words[4])
+                    if funct == 1:
+                        a, b = float(words[5]), float(words[6])
+                        if abs(a - b) > TINY:
+                            raise GromacsTopologyError('Cannot handle virtual '
+                                    'site frames with different weights')
+                    else:
+                        raise GromacsTopologyError('Only 3-point virtual site '
+                                                   'type "1" is supported')
+                    parent = atoms[0]
+                    bondlen = ThreeParticleVirtualSite.from_weights(parent,
+                            atoms[1], atoms[2], a, b)
+                    bt_vs = BondType(0, bondlen*u.nanometers,
+                                     list=molecule.bond_types)
+                    if vsite in parent.bond_partners:
+                        raise GromacsTopologyError('Unexpected bond b/w '
+                                    'virtual site and its parent')
+                    molecule.bonds.append(Bond(vsite, parent, bt_vs))
+                elif current_section == 'exclusions':
+                    atoms = [molecule.atoms[int(w)-1] for w in line.split()]
+                    for a in atoms[1:]:
+                        atom.exclude(a)
 #               elif current_section == 'bondtypes':
 #                   words = line.split()
 #                   r = float(words[3]) * u.nanometers
@@ -314,3 +389,72 @@ class GromacsTopologyFile(Structure):
 #                       ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
 #                       params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
 #                       params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
+        # TODO: What should come first? Combining, or parametrization?
+        for molname, num in structure_contents:
+            if molname not in molecules:
+                raise GromacsTopologyError('Structure contains %s molecules, '
+                                           'but no template defined' % molname)
+            molecule, nrexcl = molecules[molname]
+            if nrexcl < 3 and _any_atoms_farther_than(molecule, nrexcl):
+                warnings.warn('nrexcl %d not currently supported' % nrexcl,
+                              GromacsTopologyWarning)
+            elif nrexcl > 3 and _any_atoms_farther_than(molecule, 3):
+                warnings.warn('nrexcl %d not currently supported' % nrexcl,
+                              GromacsTopologyWarning)
+            if num == 0:
+                warnings.warn('Detected addition of 0 %s molecules in topology '
+                              'file' % molname, GromacsTopologyWarning)
+            if num == 1:
+                self += molecules[molname][0]
+            elif num > 1:
+                self += molecules[molname][0] * num
+            else:
+                raise GromacsTopologyError('Cannot add %d %s molecules' %
+                                           (num, molname))
+        self.molecules = molecules
+
+def _any_atoms_farther_than(structure, limit=3):
+    """
+    This function checks to see if there are any atom pairs farther away in the
+    bond graph than the desired limit
+
+    Parameters
+    ----------
+    structure : :class:`Structure`
+        The structure to search through
+    limit : int, optional
+        The most number of bonds away to check for. Default is 3
+
+    Returns
+    -------
+    within : bool
+        True if any atoms are *more* than ``limit`` bonds away from any other
+        atom
+    """
+    import sys
+    if len(structure.atoms) <= limit + 1: return False
+    sys.setrecursionlimit(max(sys.getrecursionlimit(), limit+1))
+    for atom in structure.atoms:
+        for atom in structure.atoms: atom.marked = limit + 1
+        _mark_graph(atom, 0)
+        if any((atom.marked > limit for atom in structure.atoms)):
+            return True
+    return False
+
+def _mark_graph(atom, num):
+    """ Marks all atoms in the graph listing the minimum number of bonds each
+    atom is away from the current atom
+
+    Parameters
+    ----------
+    atom : :class:`Atom`
+        The current atom to evaluate in the bond graph
+    num : int
+        The current depth in our search
+    limit : int
+        The maximum depth we want to search
+    """
+    atom.marked = num
+    for a in atom.bond_partners:
+        if a.marked <= num: continue
+        _mark_graph(a, num+1)
