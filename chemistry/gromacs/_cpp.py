@@ -7,6 +7,7 @@ Written by Jason Swails
 from chemistry.exceptions import PreProcessorError, PreProcessorWarning
 from chemistry.utils.six import string_types, iteritems, wraps
 from chemistry.utils.six.moves import range
+from collections import OrderedDict
 from os import path
 import re
 import warnings
@@ -42,7 +43,8 @@ def _replace_defines(line, defines):
     """ Replaces defined tokens in a given line """
     if not defines: return line
     # Pad with spaces to facilitate our simplified regex substitution
-    for define, value in iteritems(defines):
+    for define in reversed(defines):
+        value = defines[define]
         indices = _find_all_instances_in_string(line, define)
         if not indices: continue
         # Check to see if it's inside of quotes
@@ -121,10 +123,10 @@ class CPreProcessor(object):
         else:
             self._includes = [curpath] + list(includes)
         if defines is None:
-            self.defines = {}
+            self.defines = OrderedDict()
         else:
             # Convert every define to a string
-            self.defines = dict()
+            self.defines = OrderedDict()
             for define, value in iteritems(defines):
                 self.defines[define] = str(value)
         self._notfound_fatal = notfound_fatal
@@ -349,7 +351,7 @@ if __name__ == '__main__':
 
     opt = parser.parse_args()
 
-    defines = dict()
+    defines = OrderedDict()
     for define in opt.defines:
         if '=' in define:
             define, val = define.split('=')
