@@ -311,6 +311,7 @@ class Structure(object):
 
         self.box = None
         self.space_group = "P 1"
+        self.unknown_functional = False
 
     #===================================================
 
@@ -1332,6 +1333,8 @@ class Structure(object):
         -----
         This function calls prune_empty_terms if any Topology lists have changed
         """
+        if self.unknown_functional:
+            raise ChemError('Cannot createSystem from an unknown functional')
         # Establish defaults
         if nonbondedMethod is None:
             nonbondedMethod = app.NoCutoff

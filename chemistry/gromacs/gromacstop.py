@@ -2,13 +2,16 @@
 This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
+from chemistry.constants import TINY
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
 from chemistry.formats.registry import FileFormatType
 from chemistry import gromacs as gmx, ParameterSet
 from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
-            NonbondedException, ExtraPoint, BondType)
+            NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
+            AngleType, DihedralType, DihedralTypeList, ImproperType,
+            RBTorsionType, ThreeParticleExtraPointFrame, AtomType)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
@@ -93,7 +96,9 @@ class GromacsTopologyFile(Structure):
         """
         with closing(genopen(filename)) as f:
             for line in f:
-                if line.startswith(';'): continue
+                if line.startswith(';'):
+                    line = line[:line.index(';')]
+                if not line.strip(): continue
                 if line.startswith('#'):
                     if line.startswith('#if'): continue
                     if line.startswith('#define'): continue
@@ -107,21 +112,11 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def __init__(self, fname=None, defines=None):
-        super(GromacsTopologyFile, self).__init__()
-        self.name = fname
-        self.parameterset = ParameterSet()
-        # This protects us agaself using topologies defining a functional form
-        # that I have no idea how to deal with
-        self.unknown_functional = False
-        if fname is not None:
-            self.rdparm(fname, defines)
-
-    #===================================================
-
-    def rdparm(self, fname, defines=None):
+    @staticmethod
+    def parse(fname, defines=None):
         """
-        Reads the GROMACS topology file
+        Reads the GROMACS topology file and returns a Structure (parametrized if
+        the ITP files can be found, and not otherwise)
 
         Parameters
         ----------
@@ -130,14 +125,19 @@ class GromacsTopologyFile(Structure):
         defines : list of str=None
             If specified, this is the set of defines to use when parsing the
             topology file
+
+        Returns
+        -------
+        struct : :class:`Structure`
+            The Structure structance defined by the Gromacs topology file
         """
-        params = self.parameterset
+        struct = Structure()
+        params = struct.parameterset = ParameterSet()
         molecules = dict()
         structure_contents = []
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
                                  defines=defines)) as f:
             current_section = None
-            current_define = None
             for line in f:
                 line = line.strip()
                 if not line: continue
@@ -154,12 +154,23 @@ class GromacsTopologyFile(Structure):
                     molecules[molname] = (molecule, nrexcl)
                 elif current_section == 'atoms':
                     words = line.split()
+                    try:
+                        attype = params.atom_types[words[1]]
+                    except KeyError:
+                        attype = None
                     if len(words) < 8:
-                        mass = -1
-                        atomic_number = -1
+                        if attype is not None:
+                            mass = attype.mass
+                            atomic_number = attype.atomic_number
+                        else:
+                            mass = -1
+                            atomic_number = -1
                     else:
                         mass = float(words[7])
-                        atomic_number = AtomicNum[element_by_mass(mass)]
+                        if attype is not None:
+                            atomic_number = attype.atomic_number
+                        else:
+                            atomic_number = AtomicNum[element_by_mass(mass)]
                     if len(words) < 7:
                         charge = None
                     else:
@@ -173,58 +184,80 @@ class GromacsTopologyFile(Structure):
                     molecule.add_atom(atom, words[3], int(words[2]))
                 elif current_section == 'bonds':
                     words = line.split()
-                    i, j = int(words[0]), int(words[1])
-                    if words[2] != '1':
+                    i, j = int(words[0])-1, int(words[1])-1
+                    funct = int(words[2])
+                    if funct != 1:
                         warnings.warn('bond funct != 1; unknown functional',
                                       GromacsTopologyWarning)
-                        self.unknown_functional = True
-                    molecule.bonds.append(Bond(molecule.atoms[i-1],
-                                               molecule.atoms[j-1]))
+                        struct.unknown_functional = True
+                    molecule.bonds.append(Bond(molecule.atoms[i],
+                                               molecule.atoms[j]))
+                    molecule.bonds[-1].funct = funct
                 elif current_section == 'pairs':
                     words = line.split()
-                    i, j = int(words[0]), int(words[1])
-                    if words[2] != '1':
+                    i, j = int(words[0])-1, int(words[1])-1
+                    funct = int(words[2])
+                    if funct != 1:
                         # This is not even supported in Gromacs
                         warnings.warn('pairs funct != 1; unknown functional',
                                       GromacsTopologyWarning)
-                        self.unknown_functional = True
+                        struct.unknown_functional = True
                     molecule.adjusts.append(
-                            NonbondedException(molecule.atoms[i-1],
-                                               molecule.atoms[j-1])
+                            NonbondedException(molecule.atoms[i],
+                                               molecule.atoms[j])
                     )
+                    molecule.adjusts[-1].funct = funct
                 elif current_section == 'angles':
                     words = line.split()
-                    i, j, k = int(words[0]), int(words[1]), int(words[2])
-                    if words[3] != '1':
-                        warnings.warn('angles funct != 1; unknown functional',
-                                      GromacsTopologyWarning)
-                        self.unknown_functional = True
+                    i, j, k = [int(w)-1 for w in words[:3]]
+                    funct = int(words[3])
+                    if funct not in (1, 5):
+                        warnings.warn('angles funct != 1 or 5; unknown '
+                                      'functional', GromacsTopologyWarning)
+                        struct.unknown_functional = True
                     molecule.angles.append(
-                            Angle(molecule.atoms[i-1], molecule.atoms[j-1],
-                                  molecule.atoms[k-1])
+                            Angle(molecule.atoms[i], molecule.atoms[j],
+                                  molecule.atoms[k])
                     )
+                    molecule.angles[-1].funct = funct
                 elif current_section == 'dihedrals':
                     words = line.split()
-                    i, j, k, l = [int(x) for x in words[:4]]
-                    if words[4] in ('1', '9', '4'):
+                    i, j, k, l = [int(x)-1 for x in words[:4]]
+                    funct = int(words[4])
+                    if funct in (1, 9, 4):
                         # Normal dihedral
-                        dih = Dihedral(molecule.atoms[i-1], molecule.atoms[j-1],
-                                       molecule.atoms[k-1], molecule.atoms[l-1])
+                        dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
+                                       molecule.atoms[k], molecule.atoms[l])
                         molecule.dihedrals.append(dih)
-                    elif words[4] == '2':
+                        molecule.dihedrals[-1].funct = funct
+                    elif funct == 2:
                         # Improper
-                        imp = Improper(molecule.atoms[i-1], molecule.atoms[j-1],
-                                       molecule.atoms[k-1], molecule.atoms[l-1])
-                        self.impropers.append(imp)
+                        imp = Improper(molecule.atoms[i], molecule.atoms[j],
+                                       molecule.atoms[k], molecule.atoms[l])
+                        molecule.impropers.append(imp)
+                        molecule.impropers[-1].funct = funct
                     else:
                         # ??? unknown
                         warnings.warn('torsions funct != 1, 2, 4, or 9; unknown'
                                       ' functional', GromacsTopologyWarning)
-                        dih = Dihedral(molecule.atoms[i-1], molecule.atoms[j-1],
-                                       molecule.atoms[k-1], molecule.atoms[l-1])
-                        self.dihedrals.append(dih)
+                        dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
+                                       molecule.atoms[k], molecule.atoms[l])
+                        molecule.dihedrals.append(dih)
+                        molecule.dihedrals[-1].funct == funct
+                elif current_section == 'cmap':
+                    words = line.split()
+                    i, j, k, l, m = [int(w)-1 for w in words[:5]]
+                    funct = int(words[5])
+                    if funct != 1:
+                        warnings.warn('cmap funct != 1; unknown functional',
+                                      GromacsTopologyWarning)
+                    cmap = Cmap(molecule.atoms[i], molecule.atoms[j],
+                                molecule.atoms[k], molecule.atoms[l],
+                                molecule.atoms[m])
+                    molecule.cmaps.append(cmap)
+                    molecule.cmaps[-1].funct = funct
                 elif current_section == 'system':
-                    self.title = line
+                    struct.title = line
                 elif current_section == 'defaults':
                     words = line.split()
                     if len(words) < 4:
@@ -233,16 +266,17 @@ class GromacsTopologyFile(Structure):
                     if words[0] != '1':
                         warnings.warn('Unsupported nonbonded type; unknown '
                                       'functional', GromacsTopologyWarning)
-                        self.unknown_functional = True
+                        struct.unknown_functional = True
                     if words[1] != '2':
                         warnings.warn('Unsupported combining rule',
                                       GromacsTopologyWarning)
-                        self.unknown_functional = True
+                        struct.unknown_functional = True
                     if words[2].lower() == 'no':
-                        warnings.warn('gen_pairs=no is not supported')
-                        self.unknown_functional = True
-                    self._fudgeLJ = float(words[3])
-                    self._fudgeQQ = float(words[4])
+                        warnings.warn('gen_pairs=no is not supported',
+                                      GromacsTopologyWarning)
+                        struct.unknown_functional = True
+                    fudgeLJ = float(words[3])
+                    fudgeQQ = float(words[4])
                 elif current_section == 'molecules':
                     name, num = line.split()
                     num = int(num)
@@ -294,7 +328,7 @@ class GromacsTopologyFile(Structure):
                         raise GromacsTopologyError('Only 3-point virtual site '
                                                    'type "1" is supported')
                     parent = atoms[0]
-                    bondlen = ThreeParticleVirtualSite.from_weights(parent,
+                    bondlen = ThreeParticleExtraPointFrame.from_weights(parent,
                             atoms[1], atoms[2], a, b)
                     bt_vs = BondType(0, bondlen*u.nanometers,
                                      list=molecule.bond_types)
@@ -305,7 +339,19 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'exclusions':
                     atoms = [molecule.atoms[int(w)-1] for w in line.split()]
                     for a in atoms[1:]:
-                        atom.exclude(a)
+                        atoms[0].exclude(a)
+                elif current_section == 'atomtypes':
+                    words = line.split()
+                    attype = words[0]
+                    atnum = int(words[1])
+                    mass = float(words[2])
+                    chg = float(words[3])
+                    ptype = words[4]
+                    sig = float(words[5]) * u.nanometers
+                    eps = float(words[6]) * u.kilojoules_per_mole
+                    typ = AtomType(attype, None, mass, atnum)
+                    typ.set_lj_params(eps, sig*2**(1/6))
+                    params.atom_types[attype] = typ
 #               elif current_section == 'bondtypes':
 #                   words = line.split()
 #                   r = float(words[3]) * u.nanometers
@@ -314,7 +360,7 @@ class GromacsTopologyFile(Structure):
 #                   if words[2] != '1':
 #                       warnings.warn('bondtypes funct != 1; unknown '
 #                                     'functional', GromacsTopologyWarning)
-#                       unst.unknown_functional = True
+#                       struct.unknown_functional = True
 #                   ptype = BondType(k, r)
 #                   params.bond_types[(words[0], words[1])] = ptype
 #                   params.bond_types[(words[1], words[0])] = ptype
@@ -326,7 +372,7 @@ class GromacsTopologyFile(Structure):
 #                   if words[2] != '1' and words[2] != '5':
 #                       warnings.warn('angletypes funct != 1; unknown '
 #                                     'functional', GromacsTopologyWarning)
-#                       self.unknown_functional = True
+#                       struct.unknown_functional = True
 #                   if words[2] == '5':
 #                       # Contains the angle with urey-bradley
 #                       ub0 = float(words[6])
@@ -361,7 +407,7 @@ class GromacsTopologyFile(Structure):
 #                   else:
 #                       warnings.warn('dihedraltypes funct not supported',
 #                                     GromacsTopologyWarning)
-#                       self.unknown_functional = True
+#                       struct.unknown_functional = True
 #                   # Do the proper types
 #                   if dtype == 'normal':
 #                       phase = float(words[5]) * u.degrees
@@ -385,7 +431,8 @@ class GromacsTopologyFile(Structure):
 #                       params.improper_types[(a1, a2, a3, a4)] = ptype
 #                   elif dtype == 'rbtorsion':
 #                       a1, a2, a3, a4 = words[:4]
-#                       c0, c1, c2, c3, c4, c5 = [float(x) for x in words[5:11]]
+#                       c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
+#                                                   for x in words[5:11]]
 #                       ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
 #                       params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
 #                       params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
@@ -405,13 +452,13 @@ class GromacsTopologyFile(Structure):
                 warnings.warn('Detected addition of 0 %s molecules in topology '
                               'file' % molname, GromacsTopologyWarning)
             if num == 1:
-                self += molecules[molname][0]
+                struct += molecules[molname][0]
             elif num > 1:
-                self += molecules[molname][0] * num
+                struct += molecules[molname][0] * num
             else:
                 raise GromacsTopologyError('Cannot add %d %s molecules' %
                                            (num, molname))
-        self.molecules = molecules
+        return struct
 
 def _any_atoms_farther_than(structure, limit=3):
     """

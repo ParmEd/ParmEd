@@ -60,7 +60,7 @@ class CharmmParameterSet(ParameterSet):
     atom_types_int : dict(int:AtomType)
         Dictionary mapping the serial indexes of the atom types to the
         corresponding AtomType instances
-    atom_types_double : dict((str,int):AtomType)
+    atom_types_tuple : dict((str,int):AtomType)
         Dictionary mapping the (name,number) tuple of the atom types to the
         corresponding AtomType instances
     bond_types : dict((str,str):AtomType)

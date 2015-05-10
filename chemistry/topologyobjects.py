@@ -40,16 +40,19 @@ akma_unit_system = u.UnitSystem([
         u.mole_base_unit, u.radian_base_unit]
 )
 
-def _strip_units(value):
+def _strip_units(value, unit=None):
     """
     Strips any units from the given value by casting them into the AKMA unit
-    system
+    system (or the requested unit)
     """
     if u.is_quantity(value):
         # special-case angles, since pure angles are always in degrees
-        if value.unit.is_compatible_with(u.degrees):
-            return value.value_in_unit(u.degrees)
-        return value.value_in_unit_system(akma_unit_system)
+        if unit is None:
+            if value.unit.is_compatible(u.degrees):
+                return value.value_in_unit(u.degrees)
+            return value.value_in_unit_system(akma_unit_system)
+        else:
+            return value.value_in_unit(unit)
     return value
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -441,10 +444,10 @@ class Atom(_ListItem):
             self.type = type.strip()
         except AttributeError:
             self.type = type
-        self.charge = _strip_units(charge)
-        self.mass = _strip_units(mass)
+        self.charge = _strip_units(charge, u.elementary_charge)
+        self.mass = _strip_units(mass, u.dalton)
         self.nb_idx = nb_idx
-        self.radii = _strip_units(radii)
+        self.radii = _strip_units(radii, u.angstrom)
         self.screen = screen
         self.tree = tree
         self.join = join
@@ -1583,6 +1586,7 @@ class Bond(object):
         self.atom2.bonds.append(self)
         atom1.bond_to(atom2)
         self.type = type
+        self.funct = 1
 
     @property
     def bond_type(self):
@@ -1658,8 +1662,8 @@ class BondType(_ListItem, _ParameterType):
 
     def __init__(self, k, req, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k)
-        self.req = _strip_units(req)
+        self.k = _strip_units(k, u.kilocalories_per_mole/u.angstrom**2)
+        self.req = _strip_units(req, u.angstrom)
         self.list = list
         self._idx = -1
 
@@ -1724,6 +1728,7 @@ class Angle(object):
         atom1.angle_to(atom2)
         atom1.angle_to(atom3)
         atom2.angle_to(atom3)
+        self.funct = 1
 
     @property
     def angle_type(self):
@@ -1809,8 +1814,8 @@ class AngleType(_ListItem, _ParameterType):
     """
     def __init__(self, k, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k)
-        self.theteq = _strip_units(theteq)
+        self.k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
+        self.theteq = _strip_units(theteq, u.degrees)
         self._idx = -1
         self.list = list
 
@@ -1894,20 +1899,38 @@ class Dihedral(_FourAtomTerm):
         self.ignore_end = ignore_end
         self.signs = [1, 1]
         if ignore_end: self.signs[0] = -1
-        if improper: self.signs[1] = -1
-        if not improper:
+        if improper:
+            self.signs[1] = -1
+            self._funct = 4
+        else:
             atom1.dihedral_to(atom2)
             atom1.dihedral_to(atom3)
             atom1.dihedral_to(atom4)
             atom2.dihedral_to(atom3)
             atom2.dihedral_to(atom4)
             atom3.dihedral_to(atom4)
+            self._funct = None
 
     @property
     def dihed_type(self):
         warnings.warn('dihed_type has been replaced by type',
                       DeprecationWarning)
         return self.type
+
+    @property
+    def funct(self):
+        if self._funct is None:
+            if self.type is not None and isinstance(self.type,
+                    DihedralTypeList):
+                return 9
+            elif self.type is not None and isinstance(self.type, RBTorsionType):
+                return 5
+            return 1
+        return self._funct
+
+    @funct.setter
+    def funct(self, value):
+        self._funct = value
 
     def __contains__(self, thing):
         """
@@ -2068,7 +2091,7 @@ class DihedralType(_ListItem, _ParameterType):
     def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
-        self.phi_k = _strip_units(phi_k)
+        self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
         self.per = per
         self.phase = phase
         self.scee = scee
@@ -2152,12 +2175,12 @@ class RBTorsionType(_ListItem, _ParameterType):
    
     def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
         _ParameterType.__init__(self)
-        self.c0 = _strip_units(c0)
-        self.c1 = _strip_units(c1)
-        self.c2 = _strip_units(c2)
-        self.c3 = _strip_units(c3)
-        self.c4 = _strip_units(c4)
-        self.c5 = _strip_units(c5)
+        self.c0 = _strip_units(c0, u.kilocalories_per_mole)
+        self.c1 = _strip_units(c1, u.kilocalories_per_mole)
+        self.c2 = _strip_units(c2, u.kilocalories_per_mole)
+        self.c3 = _strip_units(c3, u.kilocalories_per_mole)
+        self.c4 = _strip_units(c4, u.kilocalories_per_mole)
+        self.c5 = _strip_units(c5, u.kilocalories_per_mole)
         self.list = list
         self._idx = -1
 
@@ -2380,6 +2403,7 @@ class Improper(_FourAtomTerm):
         atom4.impropers.append(self)
         # Load the force constant and equilibrium angle
         self.type = type
+        self.funct = 2
 
     @property
     def improp_type(self):
@@ -2489,8 +2513,8 @@ class ImproperType(_ListItem, _ParameterType):
     """
     def __init__(self, psi_k, psi_eq, list=None):
         _ParameterType.__init__(self)
-        self.psi_k = _strip_units(psi_k)
-        self.psi_eq = _strip_units(psi_eq)
+        self.psi_k = _strip_units(psi_k, u.kilocalories_per_mole/u.radians**2)
+        self.psi_eq = _strip_units(psi_eq, u.degrees)
         self.list = list
         self._idx = -1
 
@@ -2563,6 +2587,7 @@ class Cmap(object):
         atom5.cmaps.append(self)
         # Load the CMAP interpolation table
         self.type = type
+        self.funct = 1
 
     @classmethod
     def extended(cls, atom1, atom2, atom3, atom4,
@@ -2785,7 +2810,7 @@ class _CmapGrid(object):
         if data is None:
             self._data = [0 for i in range(self.resolution*self.resolution)]
         else:
-            self._data = _strip_units(data)
+            self._data = _strip_units(data, u.kilocalories_per_mole)
 
     @property
     def transpose(self):
@@ -3027,7 +3052,7 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k)
+        self.k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
         self._idx = -1
         self.list = list
 
@@ -3224,11 +3249,11 @@ class StretchBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k1 = _strip_units(k1)
-        self.k2 = _strip_units(k2)
-        self.req1 = _strip_units(req1)
-        self.req2 = _strip_units(req2)
-        self.theteq = _strip_units(theteq)
+        self.k1 = _strip_units(k1, u.kilocalories/u.mole/u.radian)
+        self.k2 = _strip_units(k2, u.kilocalories/u.mole/u.radian)
+        self.req1 = _strip_units(req1, u.angstrom)
+        self.req2 = _strip_units(req2, u.angstrom)
+        self.theteq = _strip_units(theteq, u.degrees)
         self._idx = -1
         self.list = list
 
@@ -3387,7 +3412,7 @@ class _TorTorTable(object):
             raise AmoebaError('Coupled torsion parameter size mismatch. %dx%d '
                               'grid expects %d elements (got %d)' % (len(ang1),
                               len(ang2), len(ang1)*len(ang2), len(data)))
-        self.data = _strip_units(data)
+        self.data = _strip_units(data, u.kilocalories_per_mole)
         self._indexes = dict()
         i = 0
         for a1 in ang1:
@@ -3402,11 +3427,12 @@ class _TorTorTable(object):
 
     def __setitem__(self, idx, second, third=None):
         if third is not None:
-            idx = self._indexes[(_strip_units(idx), _strip_units(second))]
-            value = _strip_units(third)
+            idx = self._indexes[(_strip_units(idx, u.degrees),
+                                 _strip_units(second, u.degrees))]
+            value = _strip_units(third, u.kilocalories_per_mole)
         else:
-            idx = self._indexes[_strip_units(idx)]
-            value = _strip_units(second)
+            idx = self._indexes[_strip_units(idx, u.degrees)]
+            value = _strip_units(second, u.kilocalories_per_mole)
         self.data[idx] = value
 
     def __eq__(self, other):
@@ -3478,8 +3504,8 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         if len(ang1) != dims[0] or len(ang2) != dims[1]:
             raise ValueError('dims does match the angle definitions')
         self.dims = tuple(dims)
-        self.ang1 = _strip_units(ang1)
-        self.ang2 = _strip_units(ang2)
+        self.ang1 = _strip_units(ang1, u.degrees)
+        self.ang2 = _strip_units(ang2, u.degrees)
         self.f = _TorTorTable(ang1, ang2, f)
         if dfda1 is None:
             self.dfda1 = None
@@ -4188,6 +4214,7 @@ class NonbondedException(object):
         self.atom1 = atom1
         self.atom2 = atom2
         self.type = type
+        self.funct = 1
 
     def __contains__(self, thing):
         return thing is self.atom1 or thing is self.atom2
@@ -4337,6 +4364,10 @@ class AtomType(object):
 
     def set_lj_params(self, eps, rmin, eps14=None, rmin14=None):
         """ Sets Lennard-Jones parameters on this atom type """
+        if u.is_quantity(eps):
+            eps = eps.value_in_unit(u.kilocalories_per_mole)
+        if u.is_quantity(rmin):
+            rmin = rmin.value_in_unit(u.angstroms)
         if eps14 is None:
             eps14 = eps
         if rmin14 is None:

@@ -11,7 +11,7 @@ from chemistry import unit, utils
 from chemistry.topologyobjects import *
 from chemistry.residue import *
 from chemistry.structure import Structure
-from chemistry import amber, charmm, tinker, openmm, rosetta
+from chemistry import amber, charmm, gromacs, tinker, openmm, rosetta
 from chemistry import formats
 from chemistry.vec3 import Vec3
 from chemistry.parameters import ParameterSet
