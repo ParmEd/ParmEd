@@ -177,3 +177,25 @@ class TestGromacsGro(unittest.TestCase):
         self.assertAlmostEqual(gro.box[3], 70.52882666)
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
+
+    def testWriteGroFile(self):
+        """ Tests writing GRO file """
+        gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
+        GromacsGroFile.write(gro, get_fn('1aki.ff99sbildn.gro', written=True))
+        gro = load_file(get_fn('1aki.ff99sbildn.gro', written=True))
+        self.assertIsInstance(gro, Structure)
+        self.assertEqual(len(gro.atoms), 1960)
+        self.assertEqual(len(gro.residues), 129)
+        self.assertAlmostEqual(gro.atoms[0].xx, 44.6)
+        self.assertAlmostEqual(gro.atoms[0].xy, 49.86)
+        self.assertAlmostEqual(gro.atoms[0].xz, 18.10)
+        self.assertAlmostEqual(gro.atoms[1959].xx, 50.97)
+        self.assertAlmostEqual(gro.atoms[1959].xy, 39.80)
+        self.assertAlmostEqual(gro.atoms[1959].xz, 38.64)
+        self.assertAlmostEqual(gro.box[0], 74.1008)
+        self.assertAlmostEqual(gro.box[1], 74.10080712)
+        self.assertAlmostEqual(gro.box[2], 74.10074585)
+        self.assertAlmostEqual(gro.box[3], 70.52882666)
+        self.assertAlmostEqual(gro.box[4], 109.47126278)
+        self.assertAlmostEqual(gro.box[5], 70.52875398)
+

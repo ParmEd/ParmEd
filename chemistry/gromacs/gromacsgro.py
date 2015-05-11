@@ -14,6 +14,7 @@ from chemistry.topologyobjects import Atom
 from chemistry import unit as u
 from chemistry.utils.io import genopen
 from chemistry.utils.six import add_metaclass, string_types
+from contextlib import closing
 try:
     import numpy as np
 except ImportError:
@@ -42,7 +43,7 @@ class GromacsGroFile(object):
         with closing(genopen(filename)) as f:
             f.readline() # Title line
             try:
-                int(f.readline.strip()) # number of atoms
+                int(f.readline().strip()) # number of atoms
             except ValueError:
                 return False
             line = f.readline()
