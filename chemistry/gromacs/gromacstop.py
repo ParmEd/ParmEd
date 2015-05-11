@@ -2,6 +2,8 @@
 This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
+from __future__ import print_function, division, absolute_import
+
 from chemistry.constants import TINY
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
 from chemistry.formats.registry import FileFormatType
@@ -67,19 +69,7 @@ import warnings
 
 @add_metaclass(FileFormatType)
 class GromacsTopologyFile(Structure):
-    """
-    Loads a GROMACS topology file
-
-    Parameters
-    ----------
-    fname : str=None
-        Name of the GROMACS topology file to parse, if any
-
-    Attributes
-    ----------
-    parameterset : ParameterSet
-        The set of parameters defining a force field
-    """
+    """ Class providing a parser and writer for a GROMACS topology file """
     #===================================================
 
     @staticmethod

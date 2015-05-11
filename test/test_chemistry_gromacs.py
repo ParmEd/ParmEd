@@ -1,9 +1,9 @@
 """
 Tests the functionality in the chemistry.gromacs package
 """
-from chemistry import load_file
+from chemistry import load_file, Structure
 from chemistry.exceptions import PreProcessorError, PreProcessorWarning
-from chemistry.gromacs import GromacsTopologyFile
+from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.utils.six.moves import range, zip, StringIO
 import os
 import unittest
@@ -141,3 +141,39 @@ class TestGromacsTop(unittest.TestCase):
                                       return_params=True, return_itps=True)
         self.assertEqual(itp, ['charmm27.ff/forcefield.itp'])
         self._charmm27_checks(top)
+
+class TestGromacsGro(unittest.TestCase):
+    """ Tests the Gromacs GRO file parser """
+
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testReadGroFile(self):
+        """ Tests reading GRO file """
+        gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
+        self.assertIsInstance(gro, Structure)
+        self.assertEqual(len(gro.atoms), 1960)
+        self.assertEqual(len(gro.residues), 129)
+        self.assertAlmostEqual(gro.atoms[0].xx, 44.6)
+        self.assertAlmostEqual(gro.atoms[0].xy, 49.86)
+        self.assertAlmostEqual(gro.atoms[0].xz, 18.10)
+        self.assertAlmostEqual(gro.atoms[1959].xx, 50.97)
+        self.assertAlmostEqual(gro.atoms[1959].xy, 39.80)
+        self.assertAlmostEqual(gro.atoms[1959].xz, 38.64)
+        self.assertAlmostEqual(gro.box[0], 74.1008)
+        self.assertAlmostEqual(gro.box[1], 74.10080712)
+        self.assertAlmostEqual(gro.box[2], 74.10074585)
+        self.assertAlmostEqual(gro.box[3], 70.52882666)
+        self.assertAlmostEqual(gro.box[4], 109.47126278)
+        self.assertAlmostEqual(gro.box[5], 70.52875398)
