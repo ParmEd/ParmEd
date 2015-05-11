@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -qq -y g++ gfortran csh
+sudo apt-get install -qq -y g++ gfortran csh gromacs
 
 MINICONDA=Miniconda-latest-Linux-x86_64.sh
 MINICONDA_MD5=$(curl -s http://repo.continuum.io/miniconda/ | grep -A3 $MINICONDA | sed -n '4p' | sed -n 's/ *<td>\(.*\)<\/td> */\1/p')
