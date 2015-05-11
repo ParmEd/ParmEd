@@ -484,12 +484,14 @@ class Structure(object):
                     Bond(atoms[b.atom1.idx], atoms[b.atom2.idx],
                          b.type and c.bond_types[b.type.idx])
             )
+            c.bonds[-1].funct = b.funct
         for a in self.angles:
             c.angles.append(
                     Angle(atoms[a.atom1.idx], atoms[a.atom2.idx],
                           atoms[a.atom3.idx],
                           a.type and c.angle_types[a.type.idx])
             )
+            c.angles[-1].funct = a.funct
         if split_dihedrals:
             for d in self.dihedrals:
                 if hasattr(d.type, '__iter__'):
@@ -504,6 +506,7 @@ class Structure(object):
                                          improper=d.improper, ignore_end=ie,
                                          type=c.dihedral_types[ti])
                         )
+                        c.dihedrals[-1]._funct = d._funct
                 else:
                     c.dihedrals.append(
                         Dihedral(c.atoms[d.atom1.idx], c.atoms[d.atom2.idx],
@@ -511,6 +514,7 @@ class Structure(object):
                                  improper=d.improper, ignore_end=d.ignore_end,
                                  type=d.type and c.dihedral_types[d.type.idx])
                     )
+                    c.dihedrals[-1]._funct = d._funct
         else:
             for d in self.dihedrals:
                 if d.type is None:
@@ -523,6 +527,7 @@ class Structure(object):
                                  improper=d.improper, ignore_end=d.ignore_end,
                                  type=typ)
                 )
+                c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
             c.urey_bradleys.append(
                     UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
@@ -540,6 +545,7 @@ class Structure(object):
                              atoms[r.atom3.idx], atoms[r.atom4.idx],
                              type=r.type and c.rb_torsion_types[r.type.idx])
             )
+            c.rb_torsions[-1]._funct = r._funct
         for cm in self.cmaps:
             c.cmaps.append(
                     Cmap(atoms[cm.atom1.idx], atoms[cm.atom2.idx],
@@ -547,6 +553,7 @@ class Structure(object):
                          atoms[cm.atom5.idx],
                          cm.type and c.cmap_types[cm.type.idx])
             )
+            c.cmaps[-1].funct = cm.funct
         for t in self.trigonal_angles:
             c.trigonal_angles.append(
                     TrigonalAngle(atoms[t.atom1.idx], atoms[t.atom2.idx],
@@ -2502,6 +2509,8 @@ class Structure(object):
                 if otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
+                if hasattr(val, 'funct'):
+                    sval[-1].funct = val.funct
             # Now tack on the "new" types copied from `other`
             styp.extend(otypcp)
             if hasattr(styp, 'claim'):
@@ -2586,6 +2595,8 @@ class Structure(object):
                 if styp and val.type is not None:
                     kws['type'] = styp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
+                if hasattr(val, 'funct'):
+                    sval[-1].funct = val.funct
         if other is None: other = copy(self)
         for i in range(ncopies-1):
             aoffset = len(self.atoms)

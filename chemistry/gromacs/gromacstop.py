@@ -5,7 +5,7 @@ and building a Structure from it
 from chemistry.constants import TINY
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
 from chemistry.formats.registry import FileFormatType
-from chemistry import gromacs as gmx, ParameterSet
+from chemistry.parameters import ParameterSet
 from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
@@ -131,6 +131,7 @@ class GromacsTopologyFile(Structure):
         struct : :class:`Structure`
             The Structure structance defined by the Gromacs topology file
         """
+        from chemistry import gromacs as gmx
         struct = Structure()
         params = struct.parameterset = ParameterSet()
         molecules = dict()
@@ -180,7 +181,7 @@ class GromacsTopologyFile(Structure):
                                           charge=charge)
                     else:
                         atom = Atom(atomic_number=atomic_number, name=words[4],
-                                    type=words[1], charge=charge)
+                                    type=words[1], charge=charge, mass=mass)
                     molecule.add_atom(atom, words[3], int(words[2]))
                 elif current_section == 'bonds':
                     words = line.split()
