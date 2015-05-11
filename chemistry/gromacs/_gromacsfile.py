@@ -38,16 +38,28 @@ class GromacsFile(object):
         self.line_number = 0
 
     def __iter__(self):
-        # Iterate over the file
+        # Iterate over the file, treating an ending \ as a continuation
+        parts = []
         for line in self._handle:
             try:
                 idx = line.index(';')
                 end = '\n'
+                if not parts:
+                    yield '%s\n' % line[:idx]
+                else:
+                    parts.append(line)
+                    yield '%s\n' % ''.join(parts)
+                    parts = []
             except ValueError:
                 # There is no comment...
-                idx = None
-                end = ''
-            yield '%s%s' % (line[:idx], end)
+                if line.rstrip('\r\n').endswith('\\'):
+                    parts.append(line)
+                elif parts:
+                    parts.append(line)
+                    yield ''.join(parts)
+                    parts = []
+                else:
+                    yield line
 
     def readline(self):
         self.line_number += 1

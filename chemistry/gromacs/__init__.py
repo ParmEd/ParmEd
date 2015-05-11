@@ -22,8 +22,8 @@ else:
             break
 
 if GROMACS_TOPDIR is None:
-    if _which('mdrun') is not None:
-        GROMACS_TOPDIR = _os.path.join(_os.path.split(_which('mdrun'))[0],
+    if _which('gmx') is not None:
+        GROMACS_TOPDIR = _os.path.join(_os.path.split(_which('gmx'))[0],
                                        '..', 'share', 'gromacs', 'top')
 
 if GROMACS_TOPDIR is not None:
@@ -31,3 +31,5 @@ if GROMACS_TOPDIR is not None:
     GROMACS_TOPDIR = _os.path.realpath(GROMACS_TOPDIR)
 
 del _testdir, _os, _which
+
+from chemistry.gromacs.gromacstop import GromacsTopologyFile

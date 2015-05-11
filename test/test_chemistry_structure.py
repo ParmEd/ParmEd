@@ -472,6 +472,13 @@ class TestStructureAdd(unittest.TestCase):
         s = s1 + s2
         self._check_sum(s, s1, s2)
 
+    def testAddToEmptyStructure(self):
+        """ Tests addition to empty Structure """
+        s1 = self._createStructure(parametrized=True)
+        s2 = structure.Structure()
+        s2 += s1
+        self._check_sum(s2, structure.Structure(), s1)
+
     def testIAdd(self):
         """ Tests in-place addition of two Structure instances """
         s1 = self._createStructure(parametrized=True)
