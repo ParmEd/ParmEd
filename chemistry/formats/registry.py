@@ -113,13 +113,10 @@ def load_file(filename, **kwargs):
 
     # We found a file format that is compatible. Parse it!
     other_args = PARSER_ARGUMENTS[name]
-    kws = dict()
     for arg in other_args:
-        try:
-            kws[arg] = kwargs[arg]
-        except KeyError:
+        if not arg in kwargs:
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
     if hasattr(cls, 'parse'):
-        return cls.parse(filename, **kws)
-    return cls(filename, **kws)
+        return cls.parse(filename, **kwargs)
+    return cls(filename, **kwargs)

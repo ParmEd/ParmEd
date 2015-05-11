@@ -15,9 +15,12 @@ from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
-from chemistry.utils.six import add_metaclass
+from chemistry.utils.six import add_metaclass, string_types
 from chemistry.utils.six.moves import range
 from contextlib import closing
+from datetime import datetime
+import os
+import sys
 import warnings
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
@@ -113,7 +116,7 @@ class GromacsTopologyFile(Structure):
     #===================================================
 
     @staticmethod
-    def parse(fname, defines=None):
+    def parse(fname, defines=None, return_params=False, return_itps=False):
         """
         Reads the GROMACS topology file and returns a Structure (parametrized if
         the ITP files can be found, and not otherwise)
@@ -125,11 +128,19 @@ class GromacsTopologyFile(Structure):
         defines : list of str=None
             If specified, this is the set of defines to use when parsing the
             topology file
+        return_params : bool, optional
+            If True, the ParameterSet populated from the ITP files will also be
+            returned. Default is False
+        return_itps : bool, optional
+            If True, a list of ITP file names will be returned. Default is False
 
         Returns
         -------
-        struct : :class:`Structure`
-            The Structure structance defined by the Gromacs topology file
+        struct[, params[, itplist]] : Structure, ParameterSet, list of str
+            The Structure structance defined by the Gromacs topology file, and
+            depending on the value of ``return_params`` and ``return_itps``, the
+            ParameterSet populated from the ITP files and the list of ITP files
+            parsed while reading the topology file
         """
         from chemistry import gromacs as gmx
         struct = Structure()
@@ -153,6 +164,7 @@ class GromacsTopologyFile(Structure):
                                                    'molecule %s' % molname)
                     molecule = Structure()
                     molecules[molname] = (molecule, nrexcl)
+                    molecule.nrexcl = nrexcl
                 elif current_section == 'atoms':
                     words = line.split()
                     try:
@@ -437,6 +449,8 @@ class GromacsTopologyFile(Structure):
 #                       ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
 #                       params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
 #                       params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
+            itplist = f.included_files
+
         # TODO: What should come first? Combining, or parametrization?
         for molname, num in structure_contents:
             if molname not in molecules:
@@ -459,7 +473,194 @@ class GromacsTopologyFile(Structure):
             else:
                 raise GromacsTopologyError('Cannot add %d %s molecules' %
                                            (num, molname))
-        return struct
+        retvals = [struct]
+        if return_params:
+            retvals.append(params)
+        if return_itps:
+            retvals.append(itplist)
+        if len(retvals) == 1:
+            return retvals[0]
+        return tuple(retvals)
+
+    #===================================================
+
+    @staticmethod
+    def write(struct, dest, include_itps=None):
+        """ Write a Gromacs Topology File from a Structure
+
+        Parameters
+        ----------
+        struct : :class:`Structure`
+            The structure to write to a Gromacs topology file
+        dest : str or file-like
+            The name of a file or a file object to write the Gromacs topology to
+        include_itps : list of str
+            This keyword-only parameter contains a list of ITP files to include
+            in the beginning of the generated Gromacs topology file
+        """
+        import chemistry.gromacs as gmx
+        from chemistry import __version__
+        own_handle = False
+        fname = ''
+        if isinstance(dest, string_types):
+            fname = '%s ' % dest
+            dest = genopen(dest, 'w')
+            own_handle = True
+        elif not hasattr(dest, 'write'):
+            raise TypeError('dest must be a file name or file-like object')
+
+        try:
+            # Write the header
+            now = datetime.now()
+            dest.write('''\
+;
+;   File %swas generated
+;   By user: %s (%d)
+;   On host: %s
+;   At date: %s
+;
+;   This is a standalone topology file
+;
+;   Created by:
+;   ParmEd:       %s, VERSION %s
+;   Executable:   %s
+;   Library dir:  %s
+;   Command line:
+;     %s
+;   Force field was read from the standard Gromacs share directory
+;
+''' % (fname, os.getlogin(), os.getuid(), os.uname()[1],
+       now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],
+       __version__, os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
+       ' '.join(sys.argv)))
+            if include_itps is not None:
+                dest.write('; Include forcefield parameters\n')
+                if isinstance(include_itps, string_types):
+                    dest.write('#include "%s"\n' % include_itps)
+                else:
+                    for include in include_itps:
+                        dest.write('#include "%s"\n' % include)
+            # TODO split the molecule and add a separate "moleculetypes" for
+            # each molecule
+
+            if struct.title:
+                title = struct.title.split()[0]
+            else:
+                title = 'Protein'
+            dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
+            dest.write('%s          %d\n\n' % (title, struct.nrexcl))
+            dest.write('[ atoms ]\n')
+            dest.write(';   nr       type  resnr residue  atom   cgnr    '
+                       'charge       mass  typeB    chargeB      massB\n')
+            runchg = 0
+            for residue in struct.residues:
+                dest.write('; residue %4d %s rtp %s q %.1f\n' %
+                           (residue.idx+1, residue.name, residue.name,
+                            sum(a.charge for a in residue)))
+                for atom in residue:
+                    runchg += atom.charge
+                    dest.write('%5d %10s %6d %6s %6s %6d %8.4f %10.3f   ; '
+                               'qtot %.4f\n' % (atom.idx+1, atom.type,
+                                residue.idx+1, residue.name, atom.name,
+                                atom.idx+1, atom.charge, atom.mass, runchg))
+            dest.write('\n')
+            # Do valence terms now
+            if struct.bonds:
+                dest.write('[ bonds ]\n')
+                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                           'funct', 'c0', 'c1', 'c2', 'c3'))
+                for bond in struct.bonds:
+                    dest.write('%7d %6d %5d\n' % (bond.atom1.idx+1,
+                               bond.atom2.idx+1, bond.funct))
+                dest.write('\n')
+            # Do the pair-exceptions
+            if struct.adjusts:
+                dest.write('[ pairs ]\n')
+                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                           'funct', 'c0', 'c1', 'c2', 'c3'))
+                for adjust in struct.adjusts:
+                    dest.write('%7d %6d %5d\n' % (adjust.atom1.idx+1,
+                               adjust.atom2.idx+1, adjust.funct))
+                dest.write('\n')
+            elif struct.dihedrals:
+                dest.write('[ pairs ]\n')
+                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                           'funct', 'c0', 'c1', 'c2', 'c3'))
+                # Get the 1-4 pairs from the dihedral list
+                for dihed in struct.dihedrals:
+                    if dihed.ignore_end or dihed.improper: continue
+                    a1, a2 = dihed.atom1, dihed.atom4
+                    if a1 in a2.bond_partners or a1 in a2.angle_partners:
+                        continue
+                    dest.write('%7d %6d %5d\n' % (a1.idx+1, a2.idx+1, 1))
+                dest.write('\n')
+            # Angles
+            if struct.angles:
+                dest.write('[ angles ]\n')
+                dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
+                           ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
+                for angle in struct.angles:
+                    dest.write('%7d %6d %6d %5d\n' % (angle.atom1.idx+1,
+                               angle.atom2.idx+1, angle.atom3.idx+1,
+                               angle.funct))
+                dest.write('\n')
+            # Dihedrals
+            if struct.dihedrals:
+                dest.write('[ dihedrals ]\n')
+                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
+                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
+                           'c4', 'c5'))
+                dest.write('\n')
+                for dihed in struct.dihedrals:
+                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                               dihed.atom2.idx+1, dihed.atom3.idx+1,
+                               dihed.atom4.idx+1, dihed.funct))
+                dest.write('\n')
+            # RB-torsions
+            if struct.rb_torsions:
+                dest.write('[ dihedrals ]\n')
+                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
+                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
+                           'c4', 'c5'))
+                dest.write('\n')
+                for dihed in struct.rb_torsions:
+                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                               dihed.atom2.idx+1, dihed.atom3.idx+1,
+                               dihed.atom4.idx+1, dihed.funct))
+                dest.write('\n')
+            # Impropers
+            if struct.impropers:
+                dest.write('[ dihedrals ]\n')
+                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*4) % ('ai', 'aj',
+                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3'))
+                dest.write('\n')
+                for dihed in struct.impropers:
+                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                               dihed.atom2.idx+1, dihed.atom3.idx+1,
+                               dihed.atom4.idx+1, dihed.funct))
+                dest.write('\n')
+            # Cmaps
+            if struct.cmaps:
+                dest.write('[ cmap ]\n')
+                dest.write(';%6s %6s %6s %6s %6s %5s\n' % ('ai', 'aj', 'ak',
+                           'al', 'am', 'funct'))
+                for cmap in struct.cmaps:
+                    dest.write('%7d %6d %6d %6d %6d %5d\n' % (cmap.atom1.idx+1,
+                               cmap.atom2.idx+1, cmap.atom3.idx+1,
+                               cmap.atom4.idx+1, cmap.atom5.idx+1, cmap.funct))
+            # System
+            dest.write('[ system ]\n; Name\n')
+            if struct.title:
+                dest.write(struct.title)
+            else:
+                dest.write('Generic title')
+            dest.write('\n\n')
+            # Molecules
+            dest.write('[ molecules ]\n; Compound       #mols\n')
+            dest.write('%s     1\n' % title)
+        finally:
+            if own_handle:
+                dest.close()
 
 def _any_atoms_farther_than(structure, limit=3):
     """

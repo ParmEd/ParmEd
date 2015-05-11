@@ -113,10 +113,12 @@ class CPreProcessor(object):
             self._fileobj = open(fname, 'r')
             self._ownhandle = True
             curpath = path.abspath(path.split(fname)[0])
+            self.filename = fname
         else:
             self._fileobj = fname
             self._ownhandle = False
             curpath = path.abspath(path.curdir)
+            self.filename = None
         if includes is None:
             self._includes = [curpath]
         else:
@@ -131,6 +133,7 @@ class CPreProcessor(object):
         self._notfound_fatal = notfound_fatal
 
         # Now to keep track of other basic logic stuff
+        self.included_files = []
         self._ifstack = []
         self._elsestack = []
         self._satisfiedstack = []
@@ -272,6 +275,7 @@ class CPreProcessor(object):
         if not rematch:
             raise PreProcessorError('Bad #include syntax')
         includefile = rematch.groups()[0]
+        self.included_files.append(includefile)
         for folder in self._includes:
             testfile = path.join(folder, includefile)
             if path.isfile(testfile):
