@@ -61,6 +61,10 @@ class GromacsFile(object):
                 else:
                     yield line
 
+    @property
+    def included_files(self):
+        return self._handle.included_files
+
     def readline(self):
         self.line_number += 1
         line = self._handle.readline()

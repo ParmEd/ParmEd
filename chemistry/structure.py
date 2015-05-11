@@ -236,6 +236,12 @@ class Structure(object):
         box is defined, `box` is set to `None`
     space_group : ``str``
         The space group of the structure (default is "P 1")
+    nrexcl : ``int``
+        The number of bonds away that an atom can be in order to be excluded
+        from the direct nonbonded summation
+    title : ``str``
+        Cosmetic only, it is an arbitrary title assigned to the system. Default
+        value is an empty string
 
     Notes
     -----
@@ -312,6 +318,8 @@ class Structure(object):
         self.box = None
         self.space_group = "P 1"
         self.unknown_functional = False
+        self.nrexcl = 3
+        self.title = ''
 
     #===================================================
 
