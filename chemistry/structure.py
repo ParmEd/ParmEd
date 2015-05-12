@@ -1209,67 +1209,63 @@ class Structure(object):
 
     #===================================================
 
-    def split(self, uniques=False):
+    def split(self):
         """
         Split the current Structure into separate Structure instances for each
-        molecule. A molecule is defined as all atoms connected by a graph of
-        covalent bonds.
-
-        Parameters
-        ----------
-        uniques : bool, optional
-            If True, only a list of *unique* molecules will be returned. Two
-            molecules are defined as *equal* if they are composed of the same
-            number of atoms with the same atom types (or atom names if the types
-            are not defined) in the same residues. Default is False
+        unique molecule. A molecule is defined as all atoms connected by a graph
+        of covalent bonds.
 
         Returns
         -------
         structs : list of :class:`Structure`
-            List of all molecules in the order that they appear in the parent
-            structure
+            List of all molecules in the order that they appear first in the
+            parent structure
         """
         tag_molecules(self)
         mollist = [atom.marked for atom in self.atoms]
         nmol = max(mollist)
         structs = []
+        single_residue_molecules = set()
+        # Divvy up the atoms into their separate molecules
+        molatoms = [[] for i in range(nmol)]
+        for atom in self.atoms:
+            molatoms[atom.marked-1].append(atom)
         for i in range(nmol):
-            sel = [atom for atom in self.atoms if atom.marked == i + 1]
-            if uniques:
-                is_duplicate = False
-                for struct in structs:
-                    if len(struct.atoms) == len(sel):
-                        for a1, a2 in zip(struct.atoms, sel):
-                            if a1.residue is None:
-                                if a2.residue is not None:
-                                    break
-                            elif a2.residue is None:
+            sel = molatoms[i]
+            involved_residues = set(atom.residue.idx for atom in sel)
+            # Shortcut -- keep names of single-residue molecules in a set and
+            # use that to see if two molecules are unique -- this gives drastic
+            # speedup for systems with many duplicated single-residue molecules
+            # (i.e., just about every solvent out there)
+            if len(involved_residues) == 1:
+                if sel[0].residue.name in single_residue_molecules:
+                    continue
+                else:
+                    single_residue_molecules.add(sel[0].residue.name)
+            is_duplicate = False
+            for struct in structs:
+                if len(struct.atoms) == len(sel):
+                    for a1, a2 in zip(struct.atoms, sel):
+                        if a1.residue is None:
+                            if a2.residue is not None:
                                 break
-                            elif a1.residue.name != a1.residue.name:
-                                break
-                            if not a1.type and not a2.type:
-                                if a1.name != a2.name: break
-                            else:
-                                if a1.type != a2.type: break
+                        elif a2.residue is None:
+                            break
+                        elif a1.residue.name != a1.residue.name:
+                            break
+                        if not a1.type and not a2.type:
+                            if a1.name != a2.name: break
                         else:
-                            is_duplicate = True
-                if not is_duplicate:
-                    mol = self[[atom.marked == i+1 for atom in self.atoms]]
-                    if isinstance(mol, Atom):
-                        s = type(self)()
-                        s.add_atom(copy(mol), mol.residue.name,
-                                   mol.residue.number, mol.residue.chain,
-                                   mol.residue.insertion_code)
-                        mol = s
-                    structs.append(mol)
-            else:
-                # We want all molecules
+                            if a1.type != a2.type: break
+                    else:
+                        is_duplicate = True
+            if not is_duplicate:
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
                 if isinstance(mol, Atom):
-                    s = Structure()
+                    s = type(self)()
                     s.add_atom(copy(mol), mol.residue.name,
-                                mol.residue.number, mol.residue.chain,
-                                mol.residue.insertion_code)
+                               mol.residue.number, mol.residue.chain,
+                               mol.residue.insertion_code)
                     mol = s
                 structs.append(mol)
         return structs
