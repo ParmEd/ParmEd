@@ -668,6 +668,9 @@ class TestAmberParmSlice(unittest.TestCase):
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
         parm2.strip('!@CA,C,O,N,HA,H')
         selection = parm1['@CA,C,O,N,HA,H']
+        self.assertIs(type(parm1), readparm.AmberParm)
+        self.assertIs(type(parm2), readparm.AmberParm)
+        self.assertIs(type(selection), readparm.AmberParm)
         self.assertEqual(len(parm2.atoms), len(selection.atoms))
         self.assertEqual(len(parm2.residues), len(selection.residues))
         self.assertLess(len(parm2.atoms), len(parm1.atoms))
