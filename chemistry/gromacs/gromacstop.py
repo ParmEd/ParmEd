@@ -2,6 +2,8 @@
 This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
+from __future__ import print_function, division, absolute_import
+
 from chemistry.constants import TINY
 from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
 from chemistry.formats.registry import FileFormatType
@@ -20,6 +22,7 @@ from chemistry.utils.six.moves import range
 from contextlib import closing
 from datetime import datetime
 import os
+import re
 import sys
 import warnings
 
@@ -65,21 +68,11 @@ import warnings
 # 10 - F_RESTRDIHS : Restricted torsion potential
 # 11 - F_CBTDIHS : combined bending-torsion potential
 
+_sectionre = re.compile(r'\[ (\w+) \]\s*$')
+
 @add_metaclass(FileFormatType)
 class GromacsTopologyFile(Structure):
-    """
-    Loads a GROMACS topology file
-
-    Parameters
-    ----------
-    fname : str=None
-        Name of the GROMACS topology file to parse, if any
-
-    Attributes
-    ----------
-    parameterset : ParameterSet
-        The set of parameters defining a force field
-    """
+    """ Class providing a parser and writer for a GROMACS topology file """
     #===================================================
 
     @staticmethod
@@ -109,8 +102,11 @@ class GromacsTopologyFile(Structure):
                     if line.startswith('#undef'): continue
                     if line.startswith('#endif'): continue
                     return False
-                if line.strip() == '[ moleculetype ]': return True
-                return False
+                rematch = _sectionre.match(line)
+                if not rematch:
+                    return False
+                sec, = rematch.groups()
+                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype')
             return False
 
     #===================================================
@@ -180,7 +176,7 @@ class GromacsTopologyFile(Structure):
                             atomic_number = -1
                     else:
                         mass = float(words[7])
-                        if attype is not None:
+                        if attype is not None and attype.atomic_number >= 0:
                             atomic_number = attype.atomic_number
                         else:
                             atomic_number = AtomicNum[element_by_mass(mass)]
@@ -356,8 +352,13 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'atomtypes':
                     words = line.split()
                     attype = words[0]
-                    atnum = int(words[1])
+                    try:
+                        atnum = int(words[1])
+                    except ValueError:
+                        atnum = -1
                     mass = float(words[2])
+                    if mass > 0 and atnum == -1:
+                        atnum = AtomicNum[element_by_mass(mass)]
                     chg = float(words[3])
                     ptype = words[4]
                     sig = float(words[5]) * u.nanometers

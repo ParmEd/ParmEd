@@ -33,3 +33,4 @@ if GROMACS_TOPDIR is not None:
 del _testdir, _os, _which
 
 from chemistry.gromacs.gromacstop import GromacsTopologyFile
+from chemistry.gromacs.gromacsgro import GromacsGroFile
