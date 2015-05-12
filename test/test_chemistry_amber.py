@@ -663,6 +663,10 @@ class TestObjectAPIs(unittest.TestCase):
 class TestAmberParmSlice(unittest.TestCase):
     """ Tests fancy slicing """
 
+    def testSplit(self):
+        """ Tests the molecule splitting functionality """
+        parm = readparm.AmberParm(get_fn('solv.prmtop'))
+
     def testSimpleSlice(self):
         parm1 = readparm.AmberParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))

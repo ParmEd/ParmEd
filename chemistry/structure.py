@@ -1252,16 +1252,26 @@ class Structure(object):
                             else:
                                 if a1.type != a2.type: break
                         else:
-                            break
-                else:
-                    is_duplicate = True
+                            is_duplicate = True
                 if not is_duplicate:
-                    structs.append(self[[atom.marked == i+1
-                                         for atom in self.atoms]])
+                    mol = self[[atom.marked == i+1 for atom in self.atoms]]
+                    if isinstance(mol, Atom):
+                        s = type(self)()
+                        s.add_atom(copy(mol), mol.residue.name,
+                                   mol.residue.number, mol.residue.chain,
+                                   mol.residue.insertion_code)
+                        mol = s
+                    structs.append(mol)
             else:
                 # We want all molecules
-                structs.append(self[[atom.marked == i+1
-                                    for atom in self.atoms]])
+                mol = self[[atom.marked == i+1 for atom in self.atoms]]
+                if isinstance(mol, Atom):
+                    s = Structure()
+                    s.add_atom(copy(mol), mol.residue.name,
+                                mol.residue.number, mol.residue.chain,
+                                mol.residue.insertion_code)
+                    mol = s
+                structs.append(mol)
         return structs
 
     #===================================================
