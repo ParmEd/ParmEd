@@ -43,7 +43,7 @@ def tag_molecules(struct):
     """
     # Make sure our recursion limit is large enough, but never shrink it
     from sys import setrecursionlimit, getrecursionlimit
-    setrecursionlimit(max(len(parm.atoms), getrecursionlimit()))
+    setrecursionlimit(max(len(struct.atoms), getrecursionlimit()))
 
     if not struct.bonds:
         for i, atom in enumerate(struct.atoms):
@@ -51,17 +51,19 @@ def tag_molecules(struct):
         return
     # We do have bonds, this is the interesting part
     struct.atoms.unmark()
-    for i, atom in enumerate(struct.atoms):
+    mol_id = 1
+    for atom in struct.atoms:
         if atom.marked: continue
-        atom.marked = i + 1
-        _set_owner(atom, i+1)
+        atom.marked = mol_id
+        _set_owner(atom, mol_id)
+        mol_id += 1
 
 def _set_owner(atm, mol_id):
     """ Recursively sets ownership of given atom and all bonded partners """
     for partner in atm.bond_partners:
         if not partner.marked:
             partner.marked = mol_id
-            _set_owner(parm, partner, mol_id)
+            _set_owner(partner, mol_id)
         elif partner.marked != mol_id:
             raise _MoleculeError('Atom %d in multiple molecules' %
                                  partner.idx)
