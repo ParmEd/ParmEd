@@ -6,6 +6,7 @@ from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
 from chemistry.utils.six.moves import range, zip
 import os
+import random
 import unittest
 from utils import get_fn, has_numpy
 
@@ -658,6 +659,57 @@ class TestObjectAPIs(unittest.TestCase):
         mylist.changed = False
         mylist *= 2
         self.assertTrue(mylist.changed)
+
+class TestAmberParmSlice(unittest.TestCase):
+    """ Tests fancy slicing """
+
+    def testSimpleSlice(self):
+        parm1 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2.strip('!@CA,C,O,N,HA,H')
+        selection = parm1['@CA,C,O,N,HA,H']
+        self.assertEqual(len(parm2.atoms), len(selection.atoms))
+        self.assertEqual(len(parm2.residues), len(selection.residues))
+        self.assertLess(len(parm2.atoms), len(parm1.atoms))
+        def cmp_atoms(a1, a2):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.tree, a2.tree)
+            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.screen, a2.screen)
+            self.assertEqual(a1.join, a2.join)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+            self.assertEqual(a1.nb_idx, a2.nb_idx)
+        for a1, a2 in zip(parm2.atoms, selection.atoms):
+            cmp_atoms(a1, a2)
+        # Now check valence terms
+        self.assertEqual(len(parm2.bonds), len(selection.bonds))
+        self.assertEqual(len(parm2.angles), len(selection.angles))
+        self.assertEqual(len(parm2.dihedrals), len(selection.dihedrals))
+        self.assertGreater(len(parm2.bonds), 0)
+        self.assertGreater(len(parm2.angles), 0)
+        self.assertGreater(len(parm2.dihedrals), 0)
+        for b1, b2 in zip(parm2.bonds, selection.bonds):
+            cmp_atoms(b1.atom1, b2.atom1)
+            cmp_atoms(b1.atom2, b2.atom2)
+            self.assertEqual(b1.type, b2.type)
+        for a1, a2 in zip(parm2.angles, selection.angles):
+            cmp_atoms(a1.atom1, a2.atom1)
+            cmp_atoms(a1.atom2, a2.atom2)
+            cmp_atoms(a1.atom3, a2.atom3)
+            self.assertEqual(a1.type, a2.type)
+        for d1, d2 in zip(parm2.dihedrals, selection.dihedrals):
+            cmp_atoms(d1.atom1, d2.atom1)
+            cmp_atoms(d1.atom2, d2.atom2)
+            cmp_atoms(d1.atom3, d2.atom3)
+            cmp_atoms(d1.atom4, d2.atom4)
+            self.assertEqual(d1.ignore_end, d2.ignore_end)
+            self.assertEqual(d1.improper, d2.improper)
+            self.assertEqual(d1.type, d2.type)
 
 if __name__ == '__main__':
     unittest.main()
