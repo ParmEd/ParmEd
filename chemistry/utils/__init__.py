@@ -1,6 +1,7 @@
 """ Various utilities used by ParmEd that don't really fit elsewhere """
+from chemistry.exceptions import MoleculeError as _MoleculeError
 
-__all__ = ['six', 'io', 'timer', 'which']
+__all__ = ['six', 'io', 'timer', 'which', 'tag_molecules']
 
 def which(prog):
     """ Returns the full path of a program if it exists in PATH
@@ -29,3 +30,38 @@ def which(prog):
         if is_exe(trial):
             return trial
     return None
+
+def tag_molecules(struct):
+    """
+    Sets the ``marked`` attribute of every Atom in struct to the molecule number
+    it is a part of. If no bonds are present, every atom is its own molecule.
+
+    Parameters
+    ----------
+    struct : :class:`chemistry.Structure`
+        Input structure to tag the molecules for
+    """
+    # Make sure our recursion limit is large enough, but never shrink it
+    from sys import setrecursionlimit, getrecursionlimit
+    setrecursionlimit(max(len(parm.atoms), getrecursionlimit()))
+
+    if not struct.bonds:
+        for i, atom in enumerate(struct.atoms):
+            atom.marked = i + 1
+        return
+    # We do have bonds, this is the interesting part
+    struct.atoms.unmark()
+    for i, atom in enumerate(struct.atoms):
+        if atom.marked: continue
+        atom.marked = i + 1
+        _set_owner(atom, i+1)
+
+def _set_owner(atm, mol_id):
+    """ Recursively sets ownership of given atom and all bonded partners """
+    for partner in atm.bond_partners:
+        if not partner.marked:
+            partner.marked = mol_id
+            _set_owner(parm, partner, mol_id)
+        elif partner.marked != mol_id:
+            raise _MoleculeError('Atom %d in multiple molecules' %
+                                 partner.idx)

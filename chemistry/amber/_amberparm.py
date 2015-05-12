@@ -323,6 +323,20 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
    
+    def __getitem__(self, selection):
+        other = super(AmberParm, self).__getitem__(selection)
+        other.pointers = {}
+        other.LJ_types = self.LJ_types.copy()
+        other.LJ_radius = copy.copy(self.LJ_radius)
+        other.LJ_depth = copy.copy(self.LJ_depth)
+        for atom in other.atoms:
+            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        other._add_standard_flags()
+        return other
+
+    #===================================================
+
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each

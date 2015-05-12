@@ -38,6 +38,7 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         AcceptorDonor, Group, Atom, ExtraPoint, TwoParticleExtraPointFrame,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, RBTorsionType)
 from chemistry import unit as u
+from chemistry.utils import tag_molecules
 from chemistry.utils.six import string_types, wraps, integer_types
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
@@ -1096,8 +1097,8 @@ class Structure(object):
                 except IndexError:
                     raise ValueError('Selected atom out of range')
             selection = sel
-        # Now our selection array is a "boolean" array for each atom. Strip the
-        # unselected atoms from a copy of this structure
+        # Make sure we have an integer array of 0s and 1s
+        selection = [int(bool(x)) for x in selection]
         sumsel = sum(selection)
         if sumsel == 0:
             # No atoms selected. Return None
@@ -1105,9 +1106,163 @@ class Structure(object):
         if sumsel == 1:
             # 1 atom selected; return that atom
             return self.atoms[selection.index(1)]
-        other = copy(self)
-        other.strip([not i for i in selection])
-        return other
+        # The cumulative sum of selection will give our index + 1 of each
+        # selected atom into the new structure
+        scan = [selection[0]]
+        for i in range(1, len(selection)):
+            scan.append(scan[i-1] + selection[i])
+        # Zero-out the unselected atoms
+        scan = [x * y for x, y in zip(scan, selection)]
+        # Copy all parameters
+        struct = type(self)()
+        for i, atom in enumerate(self.atoms):
+            if not selection[i]: continue
+            res = atom.residue
+            if res.number == 0:
+                num = res.idx
+            else:
+                num = res.number
+            struct.add_atom(copy(atom), res.name, num, res.chain,
+                            res.insertion_code)
+        def copy_valence_terms(oval, otyp, sval, styp, attrlist):
+            """ Copies the valence terms from one list to another;
+            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
+            styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
+            """
+            otypcp = [copy(typ) for typ in styp]
+            used_types = [False for typ in otypcp]
+            for val in sval:
+                ats = [getattr(val, attr) for attr in attrlist]
+                # Make sure all of our atoms in this valence term is "selected"
+                indices = [scan[at.idx] for at in ats if isinstance(at, Atom)]
+                if not all(indices):
+                    continue
+                # Add the type if applicable
+                kws = dict()
+                if otypcp and val.type is not None:
+                    kws['type'] = otypcp[val.type.idx]
+                    used_types[val.type.idx] = True
+                for i, at in enumerate(ats):
+                    if isinstance(at, Atom):
+                        ats[i] = struct.atoms[scan[at.idx]-1]
+                oval.append(type(val)(*ats, **kws))
+                if hasattr(val, 'funct'):
+                    oval[-1].funct = val.funct
+            # Now tack on the "new" types copied from `other`
+            for used, typ in zip(used_types, otypcp):
+                if used: otyp.append(typ)
+            if hasattr(otyp, 'claim'):
+                otyp.claim()
+        copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
+                           self.bond_types, ['atom1', 'atom2'])
+        copy_valence_terms(struct.angles, struct.angle_types, self.angles,
+                           self.angle_types, ['atom1', 'atom2', 'atom3'])
+        copy_valence_terms(struct.dihedrals, struct.dihedral_types,
+                           self.dihedrals, self.dihedral_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
+                           'ignore_end'])
+        copy_valence_terms(struct.rb_torsions, struct.rb_torsion_types,
+                           self.rb_torsions, self.rb_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
+                           'ignore_end'])
+        copy_valence_terms(struct.urey_bradleys, struct.urey_bradley_types,
+                           self.urey_bradleys, self.urey_bradley_types,
+                           ['atom1', 'atom2'])
+        copy_valence_terms(struct.impropers, struct.improper_types,
+                           self.impropers, self.improper_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(struct.cmaps, struct.cmap_types,
+                           self.cmaps, self.cmap_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        copy_valence_terms(struct.trigonal_angles, struct.trigonal_angle_types,
+                           self.trigonal_angles, self.trigonal_angle_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(struct.out_of_plane_bends,
+                           struct.out_of_plane_bend_types,
+                           self.out_of_plane_bends,
+                           self.out_of_plane_bend_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(struct.pi_torsions, struct.pi_torsion_types,
+                           self.pi_torsions, self.pi_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
+                            'atom6'])
+        copy_valence_terms(struct.stretch_bends, struct.stretch_bend_types,
+                           self.stretch_bends, self.stretch_bend_types,
+                           ['atom1', 'atom2', 'atom3'])
+        copy_valence_terms(struct.torsion_torsions, struct.torsion_torsion_types,
+                           self.torsion_torsions, self.torsion_torsion_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        copy_valence_terms(struct.chiral_frames, [], self.chiral_frames, [],
+                           ['atom1', 'atom2', 'chirality'])
+        copy_valence_terms(struct.multipole_frames, [], self.multipole_frames,
+                           [], ['atom', 'frame_pt_num', 'vectail', 'vechead',
+                           'nvec'])
+        copy_valence_terms(struct.adjusts, struct.adjust_types, self.adjusts,
+                           self.adjust_types, ['atom1', 'atom2'])
+        copy_valence_terms(struct.donors, [], self.donors, [],
+                           ['atom1', 'atom2'])
+        copy_valence_terms(struct.acceptors, [], self.acceptors, [],
+                           ['atom1', 'atom2'])
+        copy_valence_terms(struct.groups, [], self.groups, [],
+                           ['bs', 'type', 'move'])
+        return struct
+
+    #===================================================
+
+    def split(self, uniques=False):
+        """
+        Split the current Structure into separate Structure instances for each
+        molecule. A molecule is defined as all atoms connected by a graph of
+        covalent bonds.
+
+        Parameters
+        ----------
+        uniques : bool, optional
+            If True, only a list of *unique* molecules will be returned. Two
+            molecules are defined as *equal* if they are composed of the same
+            number of atoms with the same atom types (or atom names if the types
+            are not defined) in the same residues. Default is False
+
+        Returns
+        -------
+        structs : list of :class:`Structure`
+            List of all molecules in the order that they appear in the parent
+            structure
+        """
+        tag_molecules(self)
+        mollist = [atom.marked for atom in self.atoms]
+        nmol = max(mollist)
+        structs = []
+        for i in range(nmol):
+            sel = [atom for atom in self.atoms if atom.marked == i + 1]
+            if uniques:
+                is_duplicate = False
+                for struct in structs:
+                    if len(struct.atoms) == len(sel):
+                        for a1, a2 in zip(struct.atoms, sel):
+                            if a1.residue is None:
+                                if a2.residue is not None:
+                                    break
+                            elif a2.residue is None:
+                                break
+                            elif a1.residue.name != a1.residue.name:
+                                break
+                            if not a1.type and not a2.type:
+                                if a1.name != a2.name: break
+                            else:
+                                if a1.type != a2.type: break
+                        else:
+                            break
+                else:
+                    is_duplicate = True
+                if not is_duplicate:
+                    structs.append(self[[atom.marked == i+1
+                                         for atom in self.atoms]])
+            else:
+                # We want all molecules
+                structs.append(self[[atom.marked == i+1
+                                    for atom in self.atoms]])
+        return structs
 
     #===================================================
 
