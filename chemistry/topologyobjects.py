@@ -1299,8 +1299,8 @@ class ThreeParticleExtraPointFrame(object):
                 assert False, "Could not find matching angle"
         if abs(dp1 - dp2) > TINY:
             raise ValueError('Cannot deal with asymmetry in EP frame')
-        # Assume EP bisects
-        return w1 * math.cos(theteq * 0.5) * dp1
+
+        return w1 * 2 * math.cos(theteq * 0.5) * dp1
 
     def get_weights(self):
         """
