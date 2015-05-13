@@ -1217,15 +1217,17 @@ class Structure(object):
 
         Returns
         -------
-        structs : list of :class:`Structure`
+        [structs, counts] : list of (:class:`Structure`, int) tuples
             List of all molecules in the order that they appear first in the
-            parent structure
+            parent structure accompanied by the number of times that molecule
+            appears in the Structure
         """
         tag_molecules(self)
         mollist = [atom.marked for atom in self.atoms]
         nmol = max(mollist)
         structs = []
-        single_residue_molecules = set()
+        counts = []
+        single_residue_molecules = dict()
         # Divvy up the atoms into their separate molecules
         molatoms = [[] for i in range(nmol)]
         for atom in self.atoms:
@@ -1239,11 +1241,12 @@ class Structure(object):
             # (i.e., just about every solvent out there)
             if len(involved_residues) == 1:
                 if sel[0].residue.name in single_residue_molecules:
+                    counts[single_residue_molecules[sel[0].residue.name]] += 1
                     continue
                 else:
-                    single_residue_molecules.add(sel[0].residue.name)
+                    single_residue_molecules[sel[0].residue.name] = len(structs)
             is_duplicate = False
-            for struct in structs:
+            for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
                     for a1, a2 in zip(struct.atoms, sel):
                         if a1.residue is None:
@@ -1258,7 +1261,9 @@ class Structure(object):
                         else:
                             if a1.type != a2.type: break
                     else:
+                        counts[j] += 1
                         is_duplicate = True
+                        break
             if not is_duplicate:
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
                 if isinstance(mol, Atom):
@@ -1268,7 +1273,8 @@ class Structure(object):
                                mol.residue.insertion_code)
                     mol = s
                 structs.append(mol)
-        return structs
+                counts.append(1)
+        return list(zip(structs, counts))
 
     #===================================================
 

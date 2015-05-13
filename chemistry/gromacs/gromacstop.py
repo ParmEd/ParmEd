@@ -486,7 +486,7 @@ class GromacsTopologyFile(Structure):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, include_itps=None):
+    def write(struct, dest, include_itps=None, combine=None):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -498,6 +498,17 @@ class GromacsTopologyFile(Structure):
         include_itps : list of str
             This keyword-only parameter contains a list of ITP files to include
             in the beginning of the generated Gromacs topology file
+        combine : 'all', None, or list of iterables
+            If None, no molecules are combined into a single moleculetype. If
+            'all', all molecules are combined into a single moleculetype.
+            Otherwise, the list of molecule indices will control which atoms are
+            combined into single moleculetype's. Each index can appear *only*
+            once, and start from 0. The same molecule number cannot appear in
+            two lists
+
+        Raises
+        ------
+        ValueError if the same molecule number appears in multiple combine lists
         """
         import chemistry.gromacs as gmx
         from chemistry import __version__
@@ -541,127 +552,141 @@ class GromacsTopologyFile(Structure):
                 else:
                     for include in include_itps:
                         dest.write('#include "%s"\n' % include)
-            # TODO split the molecule and add a separate "moleculetypes" for
-            # each molecule
-
-            if struct.title:
-                title = struct.title.split()[0]
+            if combine is None:
+                molecules = struct.split()
+                sysnum = 1
+                names = []
+                for molecule, num in molecules:
+                    if len(molecule.residues) == 1:
+                        title = molecule.residues[0].name
+                    else:
+                        title = 'system%d' % sysnum
+                        sysnum += 1
+                    names.append(title)
+                    GromacsTopologyFile._write_molecule(molecule, dest, title)
+                # System
+                dest.write('[ system ]\n; Name\n')
+                if struct.title:
+                    dest.write(struct.title)
+                else:
+                    dest.write('Generic title')
+                dest.write('\n\n')
+                # Molecules
+                dest.write('[ molecules ]\n; Compound       #mols\n')
+                for i, (molecule, num) in enumerate(molecules):
+                    dest.write('%-15s %6d\n' % (names[i], num))
+            elif isinstance(combine, string_types) and combine.lower() == 'all':
+                GromacsTopologyFile._write_molecule(struct, dest, 'system')
             else:
-                title = 'Protein'
-            dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
-            dest.write('%s          %d\n\n' % (title, struct.nrexcl))
-            dest.write('[ atoms ]\n')
-            dest.write(';   nr       type  resnr residue  atom   cgnr    '
-                       'charge       mass  typeB    chargeB      massB\n')
-            runchg = 0
-            for residue in struct.residues:
-                dest.write('; residue %4d %s rtp %s q %.1f\n' %
-                           (residue.idx+1, residue.name, residue.name,
-                            sum(a.charge for a in residue)))
-                for atom in residue:
-                    runchg += atom.charge
-                    dest.write('%5d %10s %6d %6s %6s %6d %8.4f %10.3f   ; '
-                               'qtot %.4f\n' % (atom.idx+1, atom.type,
-                                residue.idx+1, residue.name, atom.name,
-                                atom.idx+1, atom.charge, atom.mass, runchg))
-            dest.write('\n')
-            # Do valence terms now
-            if struct.bonds:
-                dest.write('[ bonds ]\n')
-                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                           'funct', 'c0', 'c1', 'c2', 'c3'))
-                for bond in struct.bonds:
-                    dest.write('%7d %6d %5d\n' % (bond.atom1.idx+1,
-                               bond.atom2.idx+1, bond.funct))
-                dest.write('\n')
-            # Do the pair-exceptions
-            if struct.adjusts:
-                dest.write('[ pairs ]\n')
-                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                           'funct', 'c0', 'c1', 'c2', 'c3'))
-                for adjust in struct.adjusts:
-                    dest.write('%7d %6d %5d\n' % (adjust.atom1.idx+1,
-                               adjust.atom2.idx+1, adjust.funct))
-                dest.write('\n')
-            elif struct.dihedrals:
-                dest.write('[ pairs ]\n')
-                dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                           'funct', 'c0', 'c1', 'c2', 'c3'))
-                # Get the 1-4 pairs from the dihedral list
-                for dihed in struct.dihedrals:
-                    if dihed.ignore_end or dihed.improper: continue
-                    a1, a2 = dihed.atom1, dihed.atom4
-                    if a1 in a2.bond_partners or a1 in a2.angle_partners:
-                        continue
-                    dest.write('%7d %6d %5d\n' % (a1.idx+1, a2.idx+1, 1))
-                dest.write('\n')
-            # Angles
-            if struct.angles:
-                dest.write('[ angles ]\n')
-                dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
-                           ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
-                for angle in struct.angles:
-                    dest.write('%7d %6d %6d %5d\n' % (angle.atom1.idx+1,
-                               angle.atom2.idx+1, angle.atom3.idx+1,
-                               angle.funct))
-                dest.write('\n')
-            # Dihedrals
-            if struct.dihedrals:
-                dest.write('[ dihedrals ]\n')
-                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
-                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
-                           'c4', 'c5'))
-                dest.write('\n')
-                for dihed in struct.dihedrals:
-                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
-                               dihed.atom2.idx+1, dihed.atom3.idx+1,
-                               dihed.atom4.idx+1, dihed.funct))
-                dest.write('\n')
-            # RB-torsions
-            if struct.rb_torsions:
-                dest.write('[ dihedrals ]\n')
-                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
-                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
-                           'c4', 'c5'))
-                dest.write('\n')
-                for dihed in struct.rb_torsions:
-                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
-                               dihed.atom2.idx+1, dihed.atom3.idx+1,
-                               dihed.atom4.idx+1, dihed.funct))
-                dest.write('\n')
-            # Impropers
-            if struct.impropers:
-                dest.write('[ dihedrals ]\n')
-                dest.write((';%6s %6s %6s %6s %5s'+' %10s'*4) % ('ai', 'aj',
-                           'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3'))
-                dest.write('\n')
-                for dihed in struct.impropers:
-                    dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
-                               dihed.atom2.idx+1, dihed.atom3.idx+1,
-                               dihed.atom4.idx+1, dihed.funct))
-                dest.write('\n')
-            # Cmaps
-            if struct.cmaps:
-                dest.write('[ cmap ]\n')
-                dest.write(';%6s %6s %6s %6s %6s %5s\n' % ('ai', 'aj', 'ak',
-                           'al', 'am', 'funct'))
-                for cmap in struct.cmaps:
-                    dest.write('%7d %6d %6d %6d %6d %5d\n' % (cmap.atom1.idx+1,
-                               cmap.atom2.idx+1, cmap.atom3.idx+1,
-                               cmap.atom4.idx+1, cmap.atom5.idx+1, cmap.funct))
-            # System
-            dest.write('[ system ]\n; Name\n')
-            if struct.title:
-                dest.write(struct.title)
-            else:
-                dest.write('Generic title')
-            dest.write('\n\n')
-            # Molecules
-            dest.write('[ molecules ]\n; Compound       #mols\n')
-            dest.write('%s     1\n' % title)
+                raise NotImplementedError('Specialized molecule splitting is '
+                                          'not yet supported')
         finally:
             if own_handle:
                 dest.close()
+
+    @staticmethod
+    def _write_molecule(struct, dest, title):
+        dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
+        dest.write('%s          %d\n\n' % (title, struct.nrexcl))
+        dest.write('[ atoms ]\n')
+        dest.write(';   nr       type  resnr residue  atom   cgnr    '
+                   'charge       mass  typeB    chargeB      massB\n')
+        runchg = 0
+        for residue in struct.residues:
+            dest.write('; residue %4d %s rtp %s q %.1f\n' %
+                       (residue.idx+1, residue.name, residue.name,
+                        sum(a.charge for a in residue)))
+            for atom in residue:
+                runchg += atom.charge
+                dest.write('%5d %10s %6d %6s %6s %6d %8.4f %10.3f   ; '
+                           'qtot %.4f\n' % (atom.idx+1, atom.type,
+                            residue.idx+1, residue.name, atom.name,
+                            atom.idx+1, atom.charge, atom.mass, runchg))
+        dest.write('\n')
+        # Do valence terms now
+        if struct.bonds:
+            dest.write('[ bonds ]\n')
+            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                       'funct', 'c0', 'c1', 'c2', 'c3'))
+            for bond in struct.bonds:
+                dest.write('%7d %6d %5d\n' % (bond.atom1.idx+1,
+                           bond.atom2.idx+1, bond.funct))
+            dest.write('\n')
+        # Do the pair-exceptions
+        if struct.adjusts:
+            dest.write('[ pairs ]\n')
+            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                       'funct', 'c0', 'c1', 'c2', 'c3'))
+            for adjust in struct.adjusts:
+                dest.write('%7d %6d %5d\n' % (adjust.atom1.idx+1,
+                           adjust.atom2.idx+1, adjust.funct))
+            dest.write('\n')
+        elif struct.dihedrals:
+            dest.write('[ pairs ]\n')
+            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
+                       'funct', 'c0', 'c1', 'c2', 'c3'))
+            # Get the 1-4 pairs from the dihedral list
+            for dihed in struct.dihedrals:
+                if dihed.ignore_end or dihed.improper: continue
+                a1, a2 = dihed.atom1, dihed.atom4
+                if a1 in a2.bond_partners or a1 in a2.angle_partners:
+                    continue
+                dest.write('%7d %6d %5d\n' % (a1.idx+1, a2.idx+1, 1))
+            dest.write('\n')
+        # Angles
+        if struct.angles:
+            dest.write('[ angles ]\n')
+            dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
+                       ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
+            for angle in struct.angles:
+                dest.write('%7d %6d %6d %5d\n' % (angle.atom1.idx+1,
+                           angle.atom2.idx+1, angle.atom3.idx+1,
+                           angle.funct))
+            dest.write('\n')
+        # Dihedrals
+        if struct.dihedrals:
+            dest.write('[ dihedrals ]\n')
+            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
+                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
+                       'c4', 'c5'))
+            dest.write('\n')
+            for dihed in struct.dihedrals:
+                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                           dihed.atom2.idx+1, dihed.atom3.idx+1,
+                           dihed.atom4.idx+1, dihed.funct))
+            dest.write('\n')
+        # RB-torsions
+        if struct.rb_torsions:
+            dest.write('[ dihedrals ]\n')
+            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
+                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
+                       'c4', 'c5'))
+            dest.write('\n')
+            for dihed in struct.rb_torsions:
+                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                           dihed.atom2.idx+1, dihed.atom3.idx+1,
+                           dihed.atom4.idx+1, dihed.funct))
+            dest.write('\n')
+        # Impropers
+        if struct.impropers:
+            dest.write('[ dihedrals ]\n')
+            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*4) % ('ai', 'aj',
+                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3'))
+            dest.write('\n')
+            for dihed in struct.impropers:
+                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                           dihed.atom2.idx+1, dihed.atom3.idx+1,
+                           dihed.atom4.idx+1, dihed.funct))
+            dest.write('\n')
+        # Cmaps
+        if struct.cmaps:
+            dest.write('[ cmap ]\n')
+            dest.write(';%6s %6s %6s %6s %6s %5s\n' % ('ai', 'aj', 'ak',
+                       'al', 'am', 'funct'))
+            for cmap in struct.cmaps:
+                dest.write('%7d %6d %6d %6d %6d %5d\n' % (cmap.atom1.idx+1,
+                           cmap.atom2.idx+1, cmap.atom3.idx+1,
+                           cmap.atom4.idx+1, cmap.atom5.idx+1, cmap.funct))
 
 def _any_atoms_farther_than(structure, limit=3):
     """

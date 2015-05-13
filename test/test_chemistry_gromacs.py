@@ -1,13 +1,13 @@
 """
 Tests the functionality in the chemistry.gromacs package
 """
-from chemistry import load_file, Structure
+from chemistry import load_file, Structure, ExtraPoint
 from chemistry.exceptions import PreProcessorError, PreProcessorWarning
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn
+from utils import get_fn, diff_files, get_saved_fn
 import warnings
 
 class TestGromacsTop(unittest.TestCase):
@@ -141,6 +141,31 @@ class TestGromacsTop(unittest.TestCase):
                                       return_params=True, return_itps=True)
         self.assertEqual(itp, ['charmm27.ff/forcefield.itp'])
         self._charmm27_checks(top)
+
+    def _check_ff99sbildn(self, top):
+        self.assertEqual(len(top.atoms), 40560)
+        self.assertEqual(len(top.residues), 9779)
+        self.assertEqual(len([a for a in top.atoms if isinstance(a, ExtraPoint)]),
+                         9650)
+        self.assertEqual(len(top.bonds), 40584)
+        self.assertEqual(len(top.angles), 3547)
+        self.assertEqual(len(top.dihedrals), 5613)
+
+    def testReadAmber99SBILDN(self):
+        """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
+        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        self._check_ff99sbildn(top)
+
+    def testWriteAmber99SBILDN(self):
+        """ Tests writing a Gromacs topology with multiple molecules """
+        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        GromacsTopologyFile.write(top,
+                get_fn('1aki.ff99sbildn.top', written=True),
+                combine=None)
+        top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
+        self._check_ff99sbildn(top2)
+        self.assertTrue(diff_files(get_fn('1aki.ff99sbildn.top', written=True),
+                                   get_saved_fn('1aki.ff99sbildn.top')))
 
 class TestGromacsGro(unittest.TestCase):
     """ Tests the Gromacs GRO file parser """
