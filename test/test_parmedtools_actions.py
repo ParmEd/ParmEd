@@ -1084,7 +1084,8 @@ class TestChamberParmActions(utils.TestCaseRelative):
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
                                          get_fn('test.parm7', written=True)))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
-                                         get_fn('test.rst7', written=True)))
+                                         get_fn('test.rst7', written=True),
+                                         absolute_error=0.0001))
 
     def testWriteFrcmod(self):
         """ Check that writeFrcmod fails for ChamberParm """
@@ -1911,7 +1912,8 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
         self.assertTrue(utils.diff_files(get_fn('nma.parm7'),
                                          get_fn('test.parm7', written=True)))
         self.assertTrue(utils.diff_files(get_fn('nma.rst7'),
-                                         get_fn('test.rst7', written=True)))
+                                         get_fn('test.rst7', written=True),
+                                         absolute_error=0.0001))
 
     def testWriteFrcmod(self):
         """ Check that writeFrcmod fails for AmoebaParm """
