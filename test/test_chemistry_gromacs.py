@@ -124,22 +124,20 @@ class TestGromacsTop(unittest.TestCase):
 
     def testCharmm27Top(self):
         """ Tests parsing a Gromacs topology with CHARMM 27 FF """
-        top, itps = GromacsTopologyFile.parse(get_fn('1aki.charmm27.top'),
-                                              return_itps=True)
-        self.assertEqual(itps, ['charmm27.ff/forcefield.itp',
-                                'charmm27.ff/tip3p.itp',
-                                'charmm27.ff/ions.itp'])
+        top = GromacsTopologyFile(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.itps, ['charmm27.ff/forcefield.itp',
+                                    'charmm27.ff/tip3p.itp',
+                                    'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
 
     def testWriteCharmm27Top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
-        top, param = load_file(get_fn('1aki.charmm27.top'), return_params=True)
+        top = load_file(get_fn('1aki.charmm27.top'))
         GromacsTopologyFile.write(top,
                 get_fn('1aki.charmm27.top', written=True),
                 include_itps='charmm27.ff/forcefield.itp')
-        top2, param2, itp = load_file(get_fn('1aki.charmm27.top', written=True),
-                                      return_params=True, return_itps=True)
-        self.assertEqual(itp, ['charmm27.ff/forcefield.itp'])
+        top2 = load_file(get_fn('1aki.charmm27.top', written=True))
+        self.assertEqual(top2.itps, ['charmm27.ff/forcefield.itp'])
         self._charmm27_checks(top)
 
     def _check_ff99sbildn(self, top):

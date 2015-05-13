@@ -71,9 +71,72 @@ import warnings
 
 _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 
+class _Defaults(object):
+    """ Global properties of force fields as implemented in GROMACS """
+    def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='yes',
+                 fudgeLJ=0.5, fudgeQQ=0.83333333):
+        if int(nbfunc) not in (1, 2):
+            raise ValueError('nbfunc must be 1 (L-J) or 2 (Buckingham)')
+        if int(comb_rule) not in (1, 2, 3):
+            raise ValueError('comb_rule must be 1, 2, or 3')
+        if gen_pairs not in ('yes', 'no'):
+            raise ValueError("gen_pairs must be 'yes' or 'no'")
+        if float(fudgeLJ) < 0:
+            raise ValueError('fudgeLJ must be non-negative')
+        if float(fudgeQQ) < 0:
+            raise ValueError('fudgeQQ must be non-negative')
+        self.nbfunc = int(nbfunc)
+        self.comb_rule = int(comb_rule)
+        self.gen_pairs = gen_pairs
+        self.fudgeLJ = float(fudgeLJ)
+        self.fudgeQQ = float(fudgeQQ)
+
+    def __getitem__(self, idx):
+        # Treat it like the array that it is in the topology file
+        if idx < 0: idx += 5
+        if idx == 0: return self.nbfunc
+        if idx == 1: return self.comb_rule
+        if idx == 2: return self.gen_pairs
+        if idx == 3: return self.fudgeLJ
+        if idx == 4: return self.fudgeQQ
+        raise IndexError('Index %d out of range' % idx)
+
+    def __setitem__(self, idx, value):
+        if idx < 0: idx += 5
+        if idx == 0:
+            if int(value) not in (1, 2):
+                raise ValueError('nbfunc must be 1 or 2')
+            self.nbfunc = int(value)
+        elif idx == 1:
+            if int(value) not in (1, 2, 3):
+                raise ValueError('comb_rule must be 1, 2, or 3')
+            self.comb_rule = int(value)
+        elif idx == 2:
+            if value not in ('yes', 'no'):
+                raise ValueError('gen_pairs must be "yes" or "no"')
+            self.gen_pairs = value
+        elif idx == 3:
+            if float(value) < 0:
+                raise ValueError('fudgeLJ must be non-negative')
+            self.fudgeLJ = float(value)
+        elif idx == 4:
+            if float(value) < 0:
+                raise ValueError('fudgeQQ must be non-negative')
+            self.fudgeLJ = value
+
 @add_metaclass(FileFormatType)
 class GromacsTopologyFile(Structure):
-    """ Class providing a parser and writer for a GROMACS topology file """
+    """ Class providing a parser and writer for a GROMACS topology file
+
+    Parameters
+    ----------
+    fname : str
+        The name of the file to read
+    defines : list of str=None
+        If specified, this is the set of defines to use when parsing the
+        topology file
+    """
+
     #===================================================
 
     @staticmethod
@@ -112,36 +175,19 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    @staticmethod
-    def parse(fname, defines=None, return_params=False, return_itps=False):
-        """
-        Reads the GROMACS topology file and returns a Structure (parametrized if
-        the ITP files can be found, and not otherwise)
+    def __init__(self, fname=None, defines=None):
+        super(GromacsTopologyFile, self).__init__()
+        self.parameterset = ParameterSet()
+        if fname is not None:
+            self.read(fname, defines)
+        self.defaults = _Defaults()
 
-        Parameters
-        ----------
-        fname : str
-            The name of the file to read
-        defines : list of str=None
-            If specified, this is the set of defines to use when parsing the
-            topology file
-        return_params : bool, optional
-            If True, the ParameterSet populated from the ITP files will also be
-            returned. Default is False
-        return_itps : bool, optional
-            If True, a list of ITP file names will be returned. Default is False
+    #===================================================
 
-        Returns
-        -------
-        struct[, params[, itplist]] : Structure, ParameterSet, list of str
-            The Structure structance defined by the Gromacs topology file, and
-            depending on the value of ``return_params`` and ``return_itps``, the
-            ParameterSet populated from the ITP files and the list of ITP files
-            parsed while reading the topology file
-        """
+    def read(self, fname, defines=None):
+        """ Reads the topology file into the current instance """
         from chemistry import gromacs as gmx
-        struct = Structure()
-        params = struct.parameterset = ParameterSet()
+        params = self.parameterset
         molecules = dict()
         structure_contents = []
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
@@ -199,7 +245,7 @@ class GromacsTopologyFile(Structure):
                     if funct != 1:
                         warnings.warn('bond funct != 1; unknown functional',
                                       GromacsTopologyWarning)
-                        struct.unknown_functional = True
+                        self.unknown_functional = True
                     molecule.bonds.append(Bond(molecule.atoms[i],
                                                molecule.atoms[j]))
                     molecule.bonds[-1].funct = funct
@@ -211,7 +257,7 @@ class GromacsTopologyFile(Structure):
                         # This is not even supported in Gromacs
                         warnings.warn('pairs funct != 1; unknown functional',
                                       GromacsTopologyWarning)
-                        struct.unknown_functional = True
+                        self.unknown_functional = True
                     molecule.adjusts.append(
                             NonbondedException(molecule.atoms[i],
                                                molecule.atoms[j])
@@ -224,7 +270,7 @@ class GromacsTopologyFile(Structure):
                     if funct not in (1, 5):
                         warnings.warn('angles funct != 1 or 5; unknown '
                                       'functional', GromacsTopologyWarning)
-                        struct.unknown_functional = True
+                        self.unknown_functional = True
                     molecule.angles.append(
                             Angle(molecule.atoms[i], molecule.atoms[j],
                                   molecule.atoms[k])
@@ -267,7 +313,7 @@ class GromacsTopologyFile(Structure):
                     molecule.cmaps.append(cmap)
                     molecule.cmaps[-1].funct = funct
                 elif current_section == 'system':
-                    struct.title = line
+                    self.title = line
                 elif current_section == 'defaults':
                     words = line.split()
                     if len(words) < 4:
@@ -276,17 +322,16 @@ class GromacsTopologyFile(Structure):
                     if words[0] != '1':
                         warnings.warn('Unsupported nonbonded type; unknown '
                                       'functional', GromacsTopologyWarning)
-                        struct.unknown_functional = True
+                        self.unknown_functional = True
                     if words[1] != '2':
                         warnings.warn('Unsupported combining rule',
                                       GromacsTopologyWarning)
-                        struct.unknown_functional = True
+                        self.unknown_functional = True
                     if words[2].lower() == 'no':
                         warnings.warn('gen_pairs=no is not supported',
                                       GromacsTopologyWarning)
-                        struct.unknown_functional = True
-                    fudgeLJ = float(words[3])
-                    fudgeQQ = float(words[4])
+                        self.unknown_functional = True
+                    self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
                     name, num = line.split()
                     num = int(num)
@@ -376,7 +421,7 @@ class GromacsTopologyFile(Structure):
 #                   if words[2] != '1':
 #                       warnings.warn('bondtypes funct != 1; unknown '
 #                                     'functional', GromacsTopologyWarning)
-#                       struct.unknown_functional = True
+#                       self.unknown_functional = True
 #                   ptype = BondType(k, r)
 #                   params.bond_types[(words[0], words[1])] = ptype
 #                   params.bond_types[(words[1], words[0])] = ptype
@@ -388,7 +433,7 @@ class GromacsTopologyFile(Structure):
 #                   if words[2] != '1' and words[2] != '5':
 #                       warnings.warn('angletypes funct != 1; unknown '
 #                                     'functional', GromacsTopologyWarning)
-#                       struct.unknown_functional = True
+#                       self.unknown_functional = True
 #                   if words[2] == '5':
 #                       # Contains the angle with urey-bradley
 #                       ub0 = float(words[6])
@@ -423,7 +468,7 @@ class GromacsTopologyFile(Structure):
 #                   else:
 #                       warnings.warn('dihedraltypes funct not supported',
 #                                     GromacsTopologyWarning)
-#                       struct.unknown_functional = True
+#                       self.unknown_functional = True
 #                   # Do the proper types
 #                   if dtype == 'normal':
 #                       phase = float(words[5]) * u.degrees
@@ -470,31 +515,70 @@ class GromacsTopologyFile(Structure):
                 warnings.warn('Detected addition of 0 %s molecules in topology '
                               'file' % molname, GromacsTopologyWarning)
             if num == 1:
-                struct += molecules[molname][0]
+                self += molecules[molname][0]
             elif num > 1:
-                struct += molecules[molname][0] * num
+                self += molecules[molname][0] * num
             else:
                 raise GromacsTopologyError('Cannot add %d %s molecules' %
                                            (num, molname))
-        retvals = [struct]
-        if return_params:
-            retvals.append(params)
-        if return_itps:
-            retvals.append(itplist)
-        if len(retvals) == 1:
-            return retvals[0]
-        return tuple(retvals)
+        self.itps = itplist
 
     #===================================================
 
-    @staticmethod
-    def write(struct, dest, include_itps=None, combine=None):
+    @classmethod
+    def from_structure(cls, struct, copy=False):
+        """ Instantiates a GromacsTopologyFile instance from a Structure
+
+        Parameters
+        ----------
+        struct : :class:`chemistry.Structure`
+            The input structure to generate from
+        copy : bool, optional
+            If True, assign from a *copy* of ``struct`` (this is a lot slower).
+            Default is False
+
+        Returns
+        -------
+        gmxtop : :class:`GromacsTopologyFile`
+            The topology file defined by the given struct
+        """
+        from copy import copy as _copy
+        gmxtop = cls()
+        if copy:
+            struct = _copy(struct)
+        gmxtop.atoms = struct.atoms
+        gmxtop.bonds = struct.bonds
+        gmxtop.angles = struct.angles
+        gmxtop.dihedrals = struct.dihedrals
+        gmxtop.impropers = struct.impropers
+        gmxtop.cmaps = struct.cmaps
+        gmxtop.rb_torsions = struct.rb_torsions
+        gmxtop.urey_bradleys = struct.urey_bradleys
+        gmxtop.adjusts = struct.adjusts
+        gmxtop.bond_types = struct.bond_types
+        gmxtop.angle_types = struct.angle_types
+        gmxtop.dihedral_types = struct.dihedral_types
+        gmxtop.improper_types = struct.improper_types
+        gmxtop.cmap_types = struct.cmap_types
+        gmxtop.rb_torsion_types = struct.rb_torsion_types
+        if (struct.trigonal_angles or
+                struct.out_of_plane_bends or
+                struct.pi_torsions or
+                struct.stretch_bends or
+                struct.torsion_torsions or
+                struct.chiral_frames or
+                struct.multipole_frames):
+            raise TypeError('GromacsTopologyFile does not support Amoeba '
+                            'potential terms')
+        return gmxtop
+
+    #===================================================
+
+    def write(self, dest, include_itps=None, combine=None):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
         ----------
-        struct : :class:`Structure`
-            The structure to write to a Gromacs topology file
         dest : str or file-like
             The name of a file or a file object to write the Gromacs topology to
         include_itps : list of str
@@ -555,7 +639,7 @@ class GromacsTopologyFile(Structure):
                     for include in include_itps:
                         dest.write('#include "%s"\n' % include)
             if combine is None:
-                molecules = struct.split()
+                molecules = self.split()
                 sysnum = 1
                 names = []
                 for molecule, num in molecules:
@@ -568,8 +652,8 @@ class GromacsTopologyFile(Structure):
                     GromacsTopologyFile._write_molecule(molecule, dest, title)
                 # System
                 dest.write('[ system ]\n; Name\n')
-                if struct.title:
-                    dest.write(struct.title)
+                if self.title:
+                    dest.write(self.title)
                 else:
                     dest.write('Generic title')
                 dest.write('\n\n')
@@ -578,13 +662,15 @@ class GromacsTopologyFile(Structure):
                 for i, (molecule, num) in enumerate(molecules):
                     dest.write('%-15s %6d\n' % (names[i], num))
             elif isinstance(combine, string_types) and combine.lower() == 'all':
-                GromacsTopologyFile._write_molecule(struct, dest, 'system')
+                GromacsTopologyFile._write_molecule(self, dest, 'system')
             else:
                 raise NotImplementedError('Specialized molecule splitting is '
                                           'not yet supported')
         finally:
             if own_handle:
                 dest.close()
+
+    #===================================================
 
     @staticmethod
     def _write_molecule(struct, dest, title):
