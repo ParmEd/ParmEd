@@ -2,7 +2,7 @@
 Tests the functionality in the chemistry.gromacs package
 """
 from chemistry import load_file, Structure, ExtraPoint
-from chemistry.exceptions import PreProcessorError, PreProcessorWarning
+from chemistry.exceptions import GromacsTopologyWarning
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.utils.six.moves import range, zip, StringIO
 import os
@@ -14,6 +14,7 @@ class TestGromacsTop(unittest.TestCase):
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
+        warnings.filterwarnings('error', category=GromacsTopologyWarning)
         try:
             os.makedirs(get_fn('writes'))
         except OSError:

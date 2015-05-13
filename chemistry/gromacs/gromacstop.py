@@ -12,7 +12,7 @@ from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
-            AngleType, DihedralType, DihedralTypeList, ImproperType,
+            AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from chemistry.periodic_table import element_by_mass, AtomicNum
@@ -413,90 +413,105 @@ class GromacsTopologyFile(Structure):
                     typ = AtomType(attype, None, mass, atnum)
                     typ.set_lj_params(eps, sig*2**(1/6))
                     params.atom_types[attype] = typ
-#               elif current_section == 'bondtypes':
-#                   words = line.split()
-#                   r = float(words[3]) * u.nanometers
-#                   k = (float(words[4]) / 2) * (
-#                           u.kilojoules_per_mole / u.nanometers**2)
-#                   if words[2] != '1':
-#                       warnings.warn('bondtypes funct != 1; unknown '
-#                                     'functional', GromacsTopologyWarning)
-#                       self.unknown_functional = True
-#                   ptype = BondType(k, r)
-#                   params.bond_types[(words[0], words[1])] = ptype
-#                   params.bond_types[(words[1], words[0])] = ptype
-#               elif current_section == 'angletypes':
-#                   words = line.split()
-#                   theta = float(words[4]) * u.degrees
-#                   k = (float(words[5]) / 2) * (
-#                           u.kilojoules_per_mole / u.radians**2)
-#                   if words[2] != '1' and words[2] != '5':
-#                       warnings.warn('angletypes funct != 1; unknown '
-#                                     'functional', GromacsTopologyWarning)
-#                       self.unknown_functional = True
-#                   if words[2] == '5':
-#                       # Contains the angle with urey-bradley
-#                       ub0 = float(words[6])
-#                       cub = float(words[7])
-#                       if cub == 0:
-#                           ub = NoUreyBradley
-#                       else:
-#                           ub0 *= u.nanometers
-#                           cub *= u.kilojoules_per_mole / u.nanometers**2
-#                           ub = BondType(cub, ub0)
-#                           params.urey_bradley_types[(words[0], words[2])] = ub
-#                           params.urey_bradley_types[(words[2], words[0])] = ub
-#                   ptype = AngleType(k, theta)
-#                   params.angle_types[(words[0], words[1], words[2])] = ptype
-#                   params.angle_types[(words[2], words[1], words[0])] = ptype
-#               elif current_section == 'dihedraltypes':
-#                   words = line.split()
-#                   replace = False
-#                   dtype = 'normal'
-#                   a1, a2, a3, a4 = words[:4]
-#                   if words[4] == '1':
-#                       pass
-#                   if words[4] == '4':
-#                       replace = True
-#                   elif words[4] == '9':
-#                       pass
-#                   elif words[4] == '2':
-#                       replace = True
-#                       dtype = 'improper'
-#                   elif words[4] == '5':
-#                       dtype = 'rbtorsion'
-#                   else:
-#                       warnings.warn('dihedraltypes funct not supported',
-#                                     GromacsTopologyWarning)
-#                       self.unknown_functional = True
-#                   # Do the proper types
-#                   if dtype == 'normal':
-#                       phase = float(words[5]) * u.degrees
-#                       phi_k = float(words[6]) * u.kilojoules_per_mole
-#                       per = int(words[7])
-#                       dt = DihedralType(phi_k, per, phase)
-#                       key = (words[0], words[1], words[2], words[3])
-#                       rkey = (words[3], words[2], words[1], words[0])
-#                       if replace or not key in params.dihedral_types:
-#                           dtl = DihedralTypeList()
-#                           dtl.append(dt)
-#                           params.dihedral_types[key] = dtl
-#                           params.dihedral_types[rkey] = dtl
-#                       else:
-#                           params.dihedral_types[key].append(dt)
-#                   elif dtype == 'improper':
-#                       theta = float(words[5])*u.degrees
-#                       k = float(words[6])*u.kilojoules_per_mole/u.radians**2
-#                       a1, a2, a3, a4 = words[:4]
-#                       ptype = ImproperType(k, theta)
-#                       params.improper_types[(a1, a2, a3, a4)] = ptype
-#                   elif dtype == 'rbtorsion':
-#                       a1, a2, a3, a4 = words[:4]
-#                       c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
-#                                                   for x in words[5:11]]
-#                       ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
-#                       params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
-#                       params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
+                elif current_section == 'bondtypes':
+                    words = line.split()
+                    r = float(words[3]) * u.nanometers
+                    k = (float(words[4]) / 2) * (
+                            u.kilojoules_per_mole / u.nanometers**2)
+                    if words[2] != '1':
+                        warnings.warn('bondtypes funct != 1; unknown '
+                                      'functional', GromacsTopologyWarning)
+                        self.unknown_functional = True
+                    ptype = BondType(k, r)
+                    params.bond_types[(words[0], words[1])] = ptype
+                    params.bond_types[(words[1], words[0])] = ptype
+                elif current_section == 'angletypes':
+                    words = line.split()
+                    theta = float(words[4]) * u.degrees
+                    k = (float(words[5]) / 2) * (
+                            u.kilojoules_per_mole / u.radians**2)
+                    if words[3] != '1' and words[3] != '5':
+                        warnings.warn('angletypes funct != 1 or 5; unknown '
+                                      'functional', GromacsTopologyWarning)
+                        self.unknown_functional = True
+                    if words[3] == '5':
+                        # Contains the angle with urey-bradley
+                        ub0 = float(words[6])
+                        cub = float(words[7])
+                        if cub == 0:
+                            ub = NoUreyBradley
+                        else:
+                            ub0 *= u.nanometers
+                            cub *= u.kilojoules_per_mole / u.nanometers**2
+                            ub = BondType(cub, ub0)
+                            params.urey_bradley_types[(words[0], words[2])] = ub
+                            params.urey_bradley_types[(words[2], words[0])] = ub
+                    ptype = AngleType(k, theta)
+                    params.angle_types[(words[0], words[1], words[2])] = ptype
+                    params.angle_types[(words[2], words[1], words[0])] = ptype
+                elif current_section == 'dihedraltypes':
+                    words = line.split()
+                    replace = False
+                    dtype = 'normal'
+                    a1, a2, a3, a4 = words[:4]
+                    if words[4] == '1':
+                        pass
+                    if words[4] == '4':
+                        replace = True
+                    elif words[4] == '9':
+                        pass
+                    elif words[4] == '2':
+                        replace = True
+                        dtype = 'improper'
+                    elif words[4] == '5':
+                        dtype = 'rbtorsion'
+                    else:
+                        warnings.warn('dihedraltypes funct not supported',
+                                      GromacsTopologyWarning)
+                        self.unknown_functional = True
+                    # Do the proper types
+                    if dtype == 'normal':
+                        phase = float(words[5]) * u.degrees
+                        phi_k = float(words[6]) * u.kilojoules_per_mole
+                        per = int(words[7])
+                        dt = DihedralType(phi_k, per, phase)
+                        key = (words[0], words[1], words[2], words[3])
+                        rkey = (words[3], words[2], words[1], words[0])
+                        if replace or not key in params.dihedral_types:
+                            dtl = DihedralTypeList()
+                            dtl.append(dt)
+                            params.dihedral_types[key] = dtl
+                            params.dihedral_types[rkey] = dtl
+                        else:
+                            params.dihedral_types[key].append(dt)
+                    elif dtype == 'improper':
+                        theta = float(words[5])*u.degrees
+                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2
+                        a1, a2, a3, a4 = words[:4]
+                        ptype = ImproperType(k, theta)
+                        params.improper_types[(a1, a2, a3, a4)] = ptype
+                    elif dtype == 'rbtorsion':
+                        a1, a2, a3, a4 = words[:4]
+                        c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
+                                                    for x in words[5:11]]
+                        ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
+                        params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
+                        params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
+                elif current_section == 'cmaptypes':
+                    words = line.split()
+                    a1, a2, a3, a4, a5 = words[:5]
+                    funct = int(words[5])
+                    res1, res2 = int(words[6]), int(words[7])
+                    grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
+                    if len(grid) != res1 * res2:
+                        raise GromacsTopologyError('CMAP grid dimensions do '
+                                                   'not match resolution')
+                    if res1 != res2:
+                        raise GromacsTopologyError('Only square CMAPs are '
+                                                   'supported')
+                    cmaptype = CmapType(res1, grid)
+                    params.cmap_types[(a1, a2, a3, a4, a5)] = cmaptype
+                    params.cmap_types[(a5, a4, a3, a2, a1)] = cmaptype
             itplist = f.included_files
 
         # TODO: What should come first? Combining, or parametrization?

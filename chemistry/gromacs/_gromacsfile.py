@@ -53,7 +53,9 @@ class GromacsFile(object):
             except ValueError:
                 # There is no comment...
                 if line.rstrip('\r\n').endswith('\\'):
-                    parts.append(line)
+                    chars = list(reversed(line))
+                    del chars[chars.index('\\')]
+                    parts.append(''.join(reversed(chars)))
                 elif parts:
                     parts.append(line)
                     yield ''.join(parts)
