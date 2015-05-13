@@ -176,11 +176,11 @@ def diff_files(file1, file2, ignore_whitespace=True,
         same = True
         if ignore_whitespace:
             while l1 or l2:
+                while l1 and l1[0] == comment:
+                    l1 = f1.readline()
+                while l2 and l2[0] == comment:
+                    l2 = f2.readline()
                 if l1.strip() != l2.strip():
-                    if 'At date:' in l1 and 'At date:' in l2:
-                        l1 = f1.readline()
-                        l2 = f2.readline()
-                        continue
                     if l1.startswith('%VERSION') and l2.startswith('%VERSION'):
                         l1 = f1.readline()
                         l2 = f2.readline()
