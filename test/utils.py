@@ -249,6 +249,8 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False
+                elif absolute_error is None and relative_error is None:
+                    return False
     return True
 
 def which(prog):

@@ -166,6 +166,7 @@ class TestGromacsTop(unittest.TestCase):
         self._check_ff99sbildn(top2)
         self.assertTrue(diff_files(get_fn('1aki.ff99sbildn.top', written=True),
                                    get_saved_fn('1aki.ff99sbildn.top')))
+        self.assertFalse(True)
 
 class TestGromacsGro(unittest.TestCase):
     """ Tests the Gromacs GRO file parser """
