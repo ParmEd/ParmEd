@@ -13,7 +13,7 @@ from chemistry.structure import Structure
 from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
-            RBTorsionType, ThreeParticleExtraPointFrame, AtomType,
+            RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
@@ -249,6 +249,12 @@ class GromacsTopologyFile(Structure):
                     molecule.bonds.append(Bond(molecule.atoms[i],
                                                molecule.atoms[j]))
                     molecule.bonds[-1].funct = funct
+                    if len(words) == 5 and funct == 1:
+                        req, k = (float(x) for x in words[3:])
+                        bt = BondType(k*u.kilojoule_per_mole/u.nanometer**2,
+                                      req*u.nanometer, list=molecule.bond_types)
+                        molecule.bond_types.append(bt)
+                        molecule.bonds[-1].type= bt
                 elif current_section == 'pairs':
                     words = line.split()
                     i, j = int(words[0])-1, int(words[1])-1
@@ -276,14 +282,38 @@ class GromacsTopologyFile(Structure):
                                   molecule.atoms[k])
                     )
                     molecule.angles[-1].funct = funct
+                    if funct == 1 and len(words) == 6:
+                        theteq, k = (float(x) for x in words[4:])
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                                theteq*u.degree, list=molecule.angle_types)
+                        molecule.angle_types.append(at)
+                        molecule.angles[-1].type = at
+                    elif funct == 5 and len(words) == 8:
+                        theteq, k, ubreq, ubk = (float(x) for x in words[4:])
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                                theteq*u.degree, list=molecule.angle_types)
+                        molecule.angle_types.append(at)
+                        molecule.angles[-1].type = at
+                        if ubreq > 0 and ubk > 0:
+                            ubt = BondType(
+                                    ubk*u.kilojoule_per_mole/u.nanometer**2,
+                                    ubreq*u.nanometer,
+                                    list=molecule.urey_bradley_types)
+                            molecule.urey_bradleys.append(
+                                    UreyBradley(molecule.atoms[i],
+                                                molecule.atoms[k], type=ubt)
+                            )
+                            molecule.urey_bradley_types.append(ubt)
                 elif current_section == 'dihedrals':
                     words = line.split()
                     i, j, k, l = [int(x)-1 for x in words[:4]]
                     funct = int(words[4])
                     if funct in (1, 9, 4):
                         # Normal dihedral
+                        improper = funct == 4
                         dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
-                                       molecule.atoms[k], molecule.atoms[l])
+                                       molecule.atoms[k], molecule.atoms[l],
+                                       improper=improper)
                         molecule.dihedrals.append(dih)
                         molecule.dihedrals[-1].funct = funct
                     elif funct == 2:
@@ -292,17 +322,44 @@ class GromacsTopologyFile(Structure):
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.impropers.append(imp)
                         molecule.impropers[-1].funct = funct
+                    elif funct == 3:
+                        rb = Dihedral(molecule.atoms[i], molecule.atoms[j],
+                                      molecule.atoms[k], molecule.atoms[l])
+                        molecule.rb_torsions.append(rb)
+                        molecule.rb_torsions[-1].funct = funct
                     else:
                         # ??? unknown
-                        warnings.warn('torsions funct != 1, 2, 4, or 9; unknown'
+                        warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
                                       ' functional', GromacsTopologyWarning)
                         dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.dihedrals.append(dih)
                         molecule.dihedrals[-1].funct == funct
+                    if funct in (1, 4, 9) and len(words) == 8:
+                        phase, phi_k, per = (float(x) for x in words[5:])
+                        dt = DihedralType(phi_k*u.kilojoule_per_mole,
+                                          per, phase*u.degrees,
+                                          scee=1/self.defaults.fudgeQQ,
+                                          scnb=1/self.defaults.fudgeLJ,
+                                          list=molecule.dihedral_types)
+                        molecule.dihedrals[-1].type = dt
+                        molecule.dihedral_types.append(dt)
+                    elif funct == 2 and len(words) == 7:
+                        psieq, k = (float(x) for x in words[5:])
+                        dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2,
+                                psieq*u.degree, list=molecule.improper_types)
+                        molecule.impropers[-1].type = dt
+                        molecule.improper_types.append(dt)
+                    elif funct == 3 and len(words) == 11:
+                        c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoule_per_mole
+                                                  for x in words[5:])
+                        dt = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                                           list=molecule.rb_torsion_types)
+                        molecule.rb_torsions[-1].type = dt
+                        molecule.rb_torsion_types.append(dt)
                 elif current_section == 'cmap':
                     words = line.split()
-                    i, j, k, l, m = [int(w)-1 for w in words[:5]]
+                    i, j, k, l, m = (int(w)-1 for w in words[:5])
                     funct = int(words[5])
                     if funct != 1:
                         warnings.warn('cmap funct != 1; unknown functional',
@@ -456,7 +513,7 @@ class GromacsTopologyFile(Structure):
                     a1, a2, a3, a4 = words[:4]
                     if words[4] == '1':
                         pass
-                    if words[4] == '4':
+                    elif words[4] == '4':
                         replace = True
                     elif words[4] == '9':
                         pass

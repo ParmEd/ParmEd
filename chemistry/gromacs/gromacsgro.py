@@ -4,6 +4,7 @@ This module contains functionality relevant to loading and parsing GROMACS GRO
 """
 from __future__ import print_function, division, absolute_import
 
+from chemistry.constants import TINY
 from chemistry.exceptions import ParsingError
 from chemistry.formats.registry import FileFormatType
 from chemistry.geometry import (box_vectors_to_lengths_and_angles,
@@ -175,8 +176,11 @@ class GromacsGroFile(object):
         # Box, in the weird format...
         a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
                         *struct.box))
-        dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10, a[2]/10,
-                                 b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+        if all([abs(x-90) < TINY for x in struct.box[3:]]):
+            dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
+        else:
+            dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
+                       a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
         dest.write('\n')
         if own_handle:
             dest.close()
