@@ -272,6 +272,7 @@ class Structure(object):
     STRETCH_BEND_FORCE_GROUP = 9
     TORSION_TORSION_FORCE_GROUP = 10
     NONBONDED_FORCE_GROUP = 11
+    RB_TORSION_FORCE_GROUP = 12
 
     #===================================================
 
@@ -1560,6 +1561,8 @@ class Structure(object):
         )
         if verbose: print('Adding dihedrals...')
         self._add_force_to_system(system, self.omm_dihedral_force())
+        if verbose: print('Adding Ryckaert-Bellemans torsions...')
+        self._add_force_to_system(system, self.omm_rb_torsion_force())
         if verbose: print('Adding Urey-Bradleys...')
         self._add_force_to_system(system, self.omm_urey_bradley_force())
         if verbose: print('Adding improper torsions...')
@@ -1844,6 +1847,30 @@ class Structure(object):
                 force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase, tor.type.phi_k*frc_conv)
+        return force
+
+    #===================================================
+
+    @needs_openmm
+    def omm_rb_torsion_force(self):
+        """ Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions
+
+        Returns
+        -------
+        RBTorsionForce
+            Or None if no torsions are present in this system
+        """
+        if not self.rb_torsions: return None
+        conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        force = mm.RBTorsionForce()
+        force.setForceGroup(self.RB_TORSION_FORCE_GROUP)
+        for tor in self.rb_torsions:
+            if tor.type is None:
+                raise MissingParameter('Cannot find R-B torsion parameters')
+            force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
+                             tor.atom4.idx, tor.type.c0*conv, tor.type.c1*conv,
+                             tor.type.c2*conv, tor.type.c3*conv,
+                             tor.type.c4*conv, tor.type.c5*conv)
         return force
 
     #===================================================
