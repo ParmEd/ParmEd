@@ -897,12 +897,13 @@ class GromacsTopologyFile(Structure):
                     for include in include_itps:
                         dest.write('#include "%s"\n' % include)
             else:
-                dest.write('[ defaults ]\n')
+                dest.write('\n[ defaults ]\n')
                 dest.write('; nbfunc        comb-rule       gen-pairs       '
                            'fudgeLJ fudgeQQ\n')
-                dest.write('%-15d %-15d %-7g %7g\n\n' % (self.defaults.nbfunc,
-                            self.defaults.comb_rule, self.defaults.gen_pairs,
-                            self.defaults.fudgeLJ, self.defaults.fudgeQQ))
+                dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
+                           (self.defaults.nbfunc, self.defaults.comb_rule,
+                            self.defaults.gen_pairs, self.defaults.fudgeLJ,
+                            self.defaults.fudgeQQ))
             if combine is None:
                 molecules = self.split()
                 sysnum = 1

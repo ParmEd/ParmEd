@@ -15,6 +15,11 @@
 ;   Force field was read from the standard Gromacs share directory
 ;
 
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             1             1
+
+
 [ moleculetype ]
 ; Name            nrexcl
 system1          3
