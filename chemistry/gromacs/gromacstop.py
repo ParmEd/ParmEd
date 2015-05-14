@@ -261,7 +261,7 @@ class GromacsTopologyFile(Structure):
                     molecule.bonds[-1].funct = funct
                     if len(words) >= 5 and funct == 1:
                         req, k = (float(x) for x in words[3:5])
-                        bt = BondType(k*u.kilojoule_per_mole/u.nanometer**2,
+                        bt = BondType(k*u.kilojoule_per_mole/u.nanometer**2/2,
                                       req*u.nanometer, list=molecule.bond_types)
                         molecule.bond_types.append(bt)
                         molecule.bonds[-1].type= bt
@@ -298,19 +298,19 @@ class GromacsTopologyFile(Structure):
                     molecule.angles[-1].funct = funct
                     if funct == 1 and len(words) >= 6:
                         theteq, k = (float(x) for x in words[4:6])
-                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 theteq*u.degree, list=molecule.angle_types)
                         molecule.angle_types.append(at)
                         molecule.angles[-1].type = at
                     elif funct == 5 and len(words) >= 8:
                         theteq, k, ubreq, ubk = (float(x) for x in words[4:8])
-                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 theteq*u.degree, list=molecule.angle_types)
                         molecule.angle_types.append(at)
                         molecule.angles[-1].type = at
                         if ubreq > 0 and ubk > 0:
                             ubt = BondType(
-                                    ubk*u.kilojoule_per_mole/u.nanometer**2,
+                                    ubk*u.kilojoule_per_mole/u.nanometer**2/2,
                                     ubreq*u.nanometer,
                                     list=molecule.urey_bradley_types)
                             molecule.urey_bradley_types.append(ubt)
