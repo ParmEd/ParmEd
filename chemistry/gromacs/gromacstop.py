@@ -18,7 +18,7 @@ from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
-from chemistry.utils.six import add_metaclass, string_types
+from chemistry.utils.six import add_metaclass, string_types, iteritems
 from chemistry.utils.six.moves import range
 from collections import OrderedDict
 from contextlib import closing
