@@ -593,7 +593,7 @@ class GromacsTopologyFile(Structure):
                         phase = float(words[5]) * u.degrees
                         phi_k = float(words[6]) * u.kilojoules_per_mole
                         per = int(words[7])
-                        dt = DihedralType(phi_k, per, phase)
+                        dt = DihedralType(phi_k, per, phase, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
                         key = (words[0], words[1], words[2], words[3])
                         rkey = (words[3], words[2], words[1], words[0])
                         if replace or not key in params.dihedral_types:

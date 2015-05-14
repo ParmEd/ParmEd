@@ -2155,7 +2155,7 @@ class DihedralType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return ('<%s; phi_k=%.3f, per=%d, phase=%.3f, scee=%.3f, scnb=%.3f>' %
-                (type(self).__name__, self.phi_k, self.per, self.phase,
+                (type(self).__name__, self.phi_k, self.per, _strip_units(self.phase, u.degree),
                  self.scee, self.scnb))
 
     def __copy__(self):
