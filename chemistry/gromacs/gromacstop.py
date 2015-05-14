@@ -360,7 +360,7 @@ class GromacsTopologyFile(Structure):
                         molecule.dihedral_types.append(dt)
                     elif funct == 2 and len(words) >= 7:
                         psieq, k = (float(x) for x in words[5:7])
-                        dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2,
+                        dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 psieq*u.degree, list=molecule.improper_types)
                         molecule.impropers[-1].type = dt
                         molecule.improper_types.append(dt)
@@ -557,7 +557,7 @@ class GromacsTopologyFile(Structure):
                     if words[3] == '5':
                         # Contains the angle with urey-bradley
                         ub0 = float(words[6])
-                        cub = float(words[7])
+                        cub = float(words[7]) / 2
                         if cub == 0:
                             ub = NoUreyBradley
                         else:
@@ -606,7 +606,7 @@ class GromacsTopologyFile(Structure):
                             params.dihedral_types[key].append(dt)
                     elif dtype == 'improper':
                         theta = float(words[5])*u.degrees
-                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2
+                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
                         a1, a2, a3, a4 = sorted(words[:4])
                         ptype = ImproperType(k, theta)
                         params.improper_types[(a1, a2, a3, a4)] = ptype
@@ -970,7 +970,7 @@ class GromacsTopologyFile(Structure):
                 pass
         if struct.bonds:
             conv = (u.kilocalorie_per_mole/u.angstrom**2).conversion_factor_to(
-                    u.kilojoule_per_mole/u.nanometer**2)
+                    u.kilojoule_per_mole/u.nanometer**2)*2
             if settle:
                 dest.write('#ifdef FLEXIBLE\n\n')
             dest.write('[ bonds ]\n')
@@ -1011,7 +1011,7 @@ class GromacsTopologyFile(Structure):
         # Angles
         if struct.angles:
             conv = (u.kilocalorie_per_mole/u.radian).conversion_factor_to(
-                        u.kilojoule_per_mole/u.radian)
+                        u.kilojoule_per_mole/u.radian)*2
             dest.write('[ angles ]\n')
             dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
                        ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
