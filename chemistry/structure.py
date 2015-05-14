@@ -1814,7 +1814,7 @@ class Structure(object):
             if angle.type is None:
                 raise MissingParameter('Cannot find angle parameters')
             force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
-                           angle.type.theteq, 2*angle.type.k*frc_conv)
+                           angle.type.theteq*DEG_TO_RAD, 2*angle.type.k*frc_conv)
         if force.getNumAngles() == 0:
             return None
         return force

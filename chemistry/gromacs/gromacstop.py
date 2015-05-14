@@ -261,7 +261,7 @@ class GromacsTopologyFile(Structure):
                     molecule.bonds[-1].funct = funct
                     if len(words) >= 5 and funct == 1:
                         req, k = (float(x) for x in words[3:5])
-                        bt = BondType(k*u.kilojoule_per_mole/u.nanometer**2,
+                        bt = BondType(k*u.kilojoule_per_mole/u.nanometer**2/2,
                                       req*u.nanometer, list=molecule.bond_types)
                         molecule.bond_types.append(bt)
                         molecule.bonds[-1].type= bt
@@ -298,19 +298,19 @@ class GromacsTopologyFile(Structure):
                     molecule.angles[-1].funct = funct
                     if funct == 1 and len(words) >= 6:
                         theteq, k = (float(x) for x in words[4:6])
-                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 theteq*u.degree, list=molecule.angle_types)
                         molecule.angle_types.append(at)
                         molecule.angles[-1].type = at
                     elif funct == 5 and len(words) >= 8:
                         theteq, k, ubreq, ubk = (float(x) for x in words[4:8])
-                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2,
+                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 theteq*u.degree, list=molecule.angle_types)
                         molecule.angle_types.append(at)
                         molecule.angles[-1].type = at
                         if ubreq > 0 and ubk > 0:
                             ubt = BondType(
-                                    ubk*u.kilojoule_per_mole/u.nanometer**2,
+                                    ubk*u.kilojoule_per_mole/u.nanometer**2/2,
                                     ubreq*u.nanometer,
                                     list=molecule.urey_bradley_types)
                             molecule.urey_bradley_types.append(ubt)
@@ -359,7 +359,7 @@ class GromacsTopologyFile(Structure):
                         molecule.dihedral_types.append(dt)
                     elif funct == 2 and len(words) >= 7:
                         psieq, k = (float(x) for x in words[5:7])
-                        dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2,
+                        dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2/2,
                                 psieq*u.degree, list=molecule.improper_types)
                         molecule.impropers[-1].type = dt
                         molecule.improper_types.append(dt)
@@ -530,7 +530,7 @@ class GromacsTopologyFile(Structure):
                     sig = float(words[5]) * u.nanometers
                     eps = float(words[6]) * u.kilojoules_per_mole
                     typ = AtomType(attype, None, mass, atnum)
-                    typ.set_lj_params(eps, sig*2**(1/6))
+                    typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
                 elif current_section == 'bondtypes':
                     words = line.split()
@@ -556,7 +556,7 @@ class GromacsTopologyFile(Structure):
                     if words[3] == '5':
                         # Contains the angle with urey-bradley
                         ub0 = float(words[6])
-                        cub = float(words[7])
+                        cub = float(words[7]) / 2
                         if cub == 0:
                             ub = NoUreyBradley
                         else:
@@ -593,7 +593,7 @@ class GromacsTopologyFile(Structure):
                         phase = float(words[5]) * u.degrees
                         phi_k = float(words[6]) * u.kilojoules_per_mole
                         per = int(words[7])
-                        dt = DihedralType(phi_k, per, phase)
+                        dt = DihedralType(phi_k, per, phase, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
                         key = (words[0], words[1], words[2], words[3])
                         rkey = (words[3], words[2], words[1], words[0])
                         if replace or not key in params.dihedral_types:
@@ -605,7 +605,7 @@ class GromacsTopologyFile(Structure):
                             params.dihedral_types[key].append(dt)
                     elif dtype == 'improper':
                         theta = float(words[5])*u.degrees
-                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2
+                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
                         a1, a2, a3, a4 = sorted(words[:4])
                         ptype = ImproperType(k, theta)
                         params.improper_types[(a1, a2, a3, a4)] = ptype
@@ -679,6 +679,8 @@ class GromacsTopologyFile(Structure):
             types.claim()
         # Assign all of the parameters. If they've already been assigned (i.e.,
         # on the parameter line itself) keep the existing parameters
+        for atom in self.atoms:
+            atom.atom_type = params.atom_types[atom.type]
         for bond in self.bonds:
             if bond.type is not None: continue
             key = (bond.atom1.type, bond.atom2.type)
@@ -969,7 +971,7 @@ class GromacsTopologyFile(Structure):
                 pass
         if struct.bonds:
             conv = (u.kilocalorie_per_mole/u.angstrom**2).conversion_factor_to(
-                    u.kilojoule_per_mole/u.nanometer**2)
+                    u.kilojoule_per_mole/u.nanometer**2)*2
             if settle:
                 dest.write('#ifdef FLEXIBLE\n\n')
             dest.write('[ bonds ]\n')
@@ -1010,7 +1012,7 @@ class GromacsTopologyFile(Structure):
         # Angles
         if struct.angles:
             conv = (u.kilocalorie_per_mole/u.radian).conversion_factor_to(
-                        u.kilojoule_per_mole/u.radian)
+                        u.kilojoule_per_mole/u.radian)*2
             dest.write('[ angles ]\n')
             dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
                        ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
