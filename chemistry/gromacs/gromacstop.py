@@ -669,6 +669,14 @@ class GromacsTopologyFile(Structure):
         if self.parameterset is None:
             raise RuntimeError('parametrize called before read')
         params = copy.copy(self.parameterset)
+        def update_typelist_from(ptypes, types):
+            added_types = set(id(typ) for typ in types)
+            for k, typ in iteritems(ptypes):
+                if not typ.used: continue
+                if id(typ) in added_types: continue
+                added_types.add(id(typ))
+                types.append(typ)
+            types.claim()
         # Assign all of the parameters. If they've already been assigned (i.e.,
         # on the parameter line itself) keep the existing parameters
         for bond in self.bonds:
@@ -677,12 +685,14 @@ class GromacsTopologyFile(Structure):
             if key in params.bond_types:
                 bond.type = params.bond_types[key]
                 bond.type.used = True
+        update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
             if key in params.angle_types:
                 angle.type = params.angle_types[key]
                 angle.type.used = True
+        update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
             key = (ub.atom1.type, ub.atom2.type)
@@ -694,6 +704,7 @@ class GromacsTopologyFile(Structure):
         for i in reversed(range(len(self.urey_bradleys))):
             if self.urey_bradleys[i].type is NoUreyBradley:
                 del self.urey_bradleys[i]
+        update_typelist_from(params.urey_bradley_types, self.urey_bradley_types)
         for t in self.dihedrals:
             if t.type is not None: continue
             key = (t.atom1.type, t.atom2.type, t.atom3.type, t.atom4.type)
@@ -704,6 +715,7 @@ class GromacsTopologyFile(Structure):
             elif wckey in params.dihedral_types:
                 t.type = params.dihedral_types[wckey]
                 t.type.used = True
+        update_typelist_from(params.dihedral_types, self.dihedral_types)
         for t in self.rb_torsions:
             if t.type is not None: continue
             key = (t.atom1.type, t.atom2.type, t.atom3.type, t.atom4.type)
@@ -714,6 +726,7 @@ class GromacsTopologyFile(Structure):
             elif wckey in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[wckey]
                 t.type.used = True
+        update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
         for t in self.impropers:
             if t.type is not None: continue
             key = tuple(sorted([t.atom1.type, t.atom2.type, t.atom3.type,
@@ -731,6 +744,7 @@ class GromacsTopologyFile(Structure):
                 t.type = params.improper_types[wckey]
                 t.type.used = True
                 break
+        update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
             key = (c.atom1.type, c.atom2.type, c.atom3.type,
@@ -738,6 +752,7 @@ class GromacsTopologyFile(Structure):
             if key in params.cmap_types:
                 c.type = params.cmap_types[key]
                 c.type.used = True
+        update_typelist_from(params.cmap_types, self.cmap_types)
 
     #===================================================
 
