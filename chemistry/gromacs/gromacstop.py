@@ -246,7 +246,8 @@ class GromacsTopologyFile(Structure):
                                           charge=charge)
                     else:
                         atom = Atom(atomic_number=atomic_number, name=words[4],
-                                    type=words[1], charge=charge, mass=mass)
+                                    type=words[1], charge=charge, mass=mass, 
+                                    rmin=attype.rmin, epsilon=attype.epsilon)
                     molecule.add_atom(atom, words[3], int(words[2]))
                 elif current_section == 'bonds':
                     words = line.split()
@@ -530,7 +531,7 @@ class GromacsTopologyFile(Structure):
                     sig = float(words[5]) * u.nanometers
                     eps = float(words[6]) * u.kilojoules_per_mole
                     typ = AtomType(attype, None, mass, atnum)
-                    typ.set_lj_params(eps, sig*2**(1/6))
+                    typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
                 elif current_section == 'bondtypes':
                     words = line.split()

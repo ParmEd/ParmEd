@@ -490,7 +490,7 @@ class Atom(_ListItem):
             new.other_locations[key] = copy(item.other_locations[key])
         _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',
                       'type_idx', 'class_idx', 'multipoles', 'polarizability',
-                      'vdw_parent', 'vdw_weight'))
+                      'vdw_parent', 'vdw_weight', 'rmin', 'epsilon', 'rmin14', 'epsilon14'))
         return new
 
     def __copy__(self):
