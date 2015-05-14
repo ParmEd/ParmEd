@@ -932,8 +932,22 @@ class ExtraPoint(Atom):
     with extra functionality specific to these "Extra points" or "virtual
     sites". See the documentation for the :class:`Atom` class for more
     information.
+
+    Parameters
+    ----------
+    weights : list of float, optional, keyword-only
+        This is the list of weights defining its frame.
+
+    See Also
+    --------
+    :class:`Atom` -- The ExtraPoint constructor also takes all `Atom` arguments
+    as well, and shares all of the same properties
     """
     def __init__(self, *args, **kwargs):
+        if 'weights' in kwargs:
+            self.weights = kwargs.pop('weights')
+        else:
+            self.weights = None
         super(ExtraPoint, self).__init__(*args, **kwargs)
         self._frame_type = None
 
@@ -1232,7 +1246,8 @@ class ThreeParticleExtraPointFrame(object):
         return self.ep.parent, oatom1, oatom2
 
     @staticmethod
-    def from_weights(parent, a1, a2, w1, w2):
+    def from_weights(parent, a1, a2, w1, w2,
+                     dp1=None, dp2=None, theteq=None, d12=None):
         """
         This function determines the necessary bond length between an ExtraPoint
         and its parent atom from the weights that are calculated in
@@ -1250,6 +1265,22 @@ class ThreeParticleExtraPointFrame(object):
             The first weight defining the ExtraPoint position wrt ``a1``
         w2 : float
             The second weight defining the ExtraPoint position wrt ``a2``
+        dp1 : float, optional
+            Equilibrium distance between parent and a1. If None, a bond with a
+            bond type must be defined between parent and a1, and the distance
+            will be taken from there. Units must be Angstroms. Default is None
+        dp2 : float, optional
+            Same as dp1 above, but between atoms parent and a2. Either both dp1
+            and dp2 should be None or neither should be. If one is None, the
+            other will be ignored if not None.
+        theteq : float, optional
+            Angle between bonds parent-a1 and parent-a2. If None, d12 (below)
+            will be used to calculate the angle. If both are None, the angle
+            or d12 distance will be calculated from parametrized bonds or
+            angles between a1, parent, and a2. Units of degrees. Default None.
+        d12 : float, optional
+            Distance between a1 and a2 as an alternative way to specify theteq.
+            Default is None.
 
         Returns
         -------
@@ -1276,27 +1307,40 @@ class ThreeParticleExtraPointFrame(object):
         if w1 != w2:
             raise ValueError('Currently only equal weights are supported')
         # distance(OV) = w1 * cos(EP-Parent-a1) * parent-a1 dist
-        dp1 = dp2 = None
-        for bond in parent.bonds:
-            if a1 in bond:
-                dp1 = bond.type.req
-            if a2 in bond:
-                dp2 = bond.type.req
-        assert dp1 is not None and dp2 is not None, \
-                "Could not find bonds with a1 and a2 in them"
-        if a2 not in a1.angle_partners:
-            for bond in a1.bonds:
-                if a2 not in bond: continue
-                d12 = bond.type.req
-            # Get angle from law of cosines
+        if dp1 is None or dp2 is None:
+            for bond in parent.bonds:
+                if a1 in bond:
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    dp1 = bond.type.req
+                if a2 in bond:
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    dp2 = bond.type.req
+        if theteq is None and d12 is None:
+            if a2 not in a1.angle_partners:
+                for bond in a1.bonds:
+                    if a2 not in bond: continue
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    d12 = bond.type.req
+                # Get angle from law of cosines
+                theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
+            else:
+                for angle in a1.angles:
+                    if a2 in angle and a2 is not angle.atom2:
+                        theteq = angle.type.theteq * DEG_TO_RAD
+                        break
+                else:
+                    assert False, "Could not find matching angle"
+        elif theteq is None:
             theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
         else:
-            for angle in a1.angles:
-                if a2 in angle and a2 is not angle.atom2:
-                    theteq = angle.type.theteq * DEG_TO_RAD
-                    break
-            else:
-                assert False, "Could not find matching angle"
+            theteq *= DEG_TO_RAD
+
         if abs(dp1 - dp2) > TINY:
             raise ValueError('Cannot deal with asymmetry in EP frame')
 
@@ -1676,6 +1720,9 @@ class BondType(_ListItem, _ParameterType):
 
     def __copy__(self):
         """ Not bound to any list """
+        # Hack to keep NoUreyBradley as a singleton
+        if self is NoUreyBradley:
+            return self
         return BondType(self.k, self.req)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

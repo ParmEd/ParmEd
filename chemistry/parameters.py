@@ -5,8 +5,13 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 """
+from __future__ import print_function, division
+
+from chemistry.topologyobjects import NoUreyBradley
 from chemistry.utils.six.moves import range
+from chemistry.utils.six import iteritems
 from collections import OrderedDict
+from copy import copy
 
 class ParameterSet(object):
     """
@@ -65,6 +70,49 @@ class ParameterSet(object):
         self.cmap_types = OrderedDict()
         self.nbfix_types = OrderedDict()
         self.parametersets = []
+
+    def __copy__(self):
+        other = type(self)()
+        for key, item in iteritems(self.atom_types):
+            other.atom_types[key] = copy(item)
+        for key, item in iteritems(self.atom_types_int):
+            other.atom_types_int[key] = copy(item)
+        for key, item in iteritems(self.atom_types_tuple):
+            other.atom_types_tuple[key] = copy(item)
+        for key, item in iteritems(self.bond_types):
+            if key in other.bond_types: continue
+            typ = copy(item)
+            other.bond_types[key] = typ
+            other.bond_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.angle_types):
+            if key in other.angle_types: continue
+            typ = copy(item)
+            other.angle_types[key] = typ
+            other.angle_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.dihedral_types):
+            if key in other.dihedral_types: continue
+            typ = copy(item)
+            other.dihedral_types[key] = typ
+            other.dihedral_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.rb_torsion_types):
+            if key in other.rb_torsion_types: continue
+            typ = copy(item)
+            other.rb_torsion_types[key] = typ
+            other.rb_torsion_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.improper_types):
+            other.improper_types[key] = copy(item)
+        for key, item in iteritems(self.urey_bradley_types):
+            if key in other.urey_bradley_types: continue
+            typ = copy(item)
+            other.urey_bradley_types[key] = typ
+            other.urey_bradley_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.cmap_types):
+            if key in other.cmap_types: continue
+            typ = copy(item)
+            other.cmap_types[key] = typ
+            other.cmap_types[tuple(reversed(key))] = typ
+
+        return other
 
     def condense(self, do_dihedrals=True):
         """

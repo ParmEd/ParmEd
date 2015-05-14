@@ -18,6 +18,7 @@ from chemistry.utils.io import genopen
 from chemistry.utils.six import wraps, iteritems
 from chemistry.utils.six.moves import zip, range
 from contextlib import closing
+from copy import copy
 from math import sqrt
 import os
 import re
@@ -391,6 +392,7 @@ class CharmmPsfFile(Structure):
           Dihedral object for each term for types that have a multi-term
           expansion
         """
+        parmset = copy(parmset)
         # First load the atom types
         types_are_int = False
         for atom in self.atoms:
