@@ -246,8 +246,7 @@ class GromacsTopologyFile(Structure):
                                           charge=charge)
                     else:
                         atom = Atom(atomic_number=atomic_number, name=words[4],
-                                    type=words[1], charge=charge, mass=mass, 
-                                    rmin=attype.rmin, epsilon=attype.epsilon)
+                                    type=words[1], charge=charge, mass=mass)
                     molecule.add_atom(atom, words[3], int(words[2]))
                 elif current_section == 'bonds':
                     words = line.split()
@@ -680,6 +679,8 @@ class GromacsTopologyFile(Structure):
             types.claim()
         # Assign all of the parameters. If they've already been assigned (i.e.,
         # on the parameter line itself) keep the existing parameters
+        for atom in self.atoms:
+            atom.atom_type = params.atom_types[atom.type]
         for bond in self.bonds:
             if bond.type is not None: continue
             key = (bond.atom1.type, bond.atom2.type)
