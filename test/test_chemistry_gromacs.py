@@ -146,8 +146,8 @@ class TestGromacsTop(unittest.TestCase):
         self.assertEqual(len(top.residues), 9779)
         self.assertEqual(len([a for a in top.atoms if isinstance(a, ExtraPoint)]),
                          9650)
-        self.assertEqual(len(top.bonds), 40584)
-        self.assertEqual(len(top.angles), 3547)
+        self.assertEqual(len(top.bonds), 30934)
+        self.assertEqual(len(top.angles), 13197)
         self.assertEqual(len(top.dihedrals), 5613)
 
     def testReadAmber99SBILDN(self):

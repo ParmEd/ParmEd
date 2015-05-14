@@ -2,7 +2,7 @@
 ;   File /Users/swails/src/ParmEd/test/files/writes/1aki.ff99sbildn.top was generated
 ;   By user: swails (501)
 ;   On host: Jasons-MBP
-;   At date: Tue. May  2 22:49:23 2015
+;   At date: Thu. May  4 09:56:18 2015
 ;
 ;   This is a standalone topology file
 ;
@@ -18386,9 +18386,25 @@ SOL          3
     3 HW_tip4pew      1    SOL    HW2      3   0.5242      1.008   ; qtot 1.0484
     4         MW      1    SOL     MW      4  -1.0484      0.000   ; qtot 0.0000
 
+#ifdef FLEXIBLE
+
+[ bonds ]
+;    ai     aj funct         c0         c1         c2         c3
+      1      2     1   0.09572 502416.000000 0.09572 502416.000000
+      1      3     1   0.09572 502416.000000 0.09572 502416.000000
+
+[ angles ]
+;    ai     aj     ak funct         c0         c1         c2         c3
+      2      1      3     1   104.52  628.02  104.52  628.02
+
+
+#else
+
 [ settles ]
 ; i	funct	doh	dhh
 1     1   0.09572   0.15139
+
+#endif
 
 [ virtual_sites3 ]
 ; Site  from                   funct
@@ -18396,8 +18412,8 @@ SOL          3
 
 [ exclusions ]
 1 2 3 4
-2 1 3 4
-3 1 2 4
+2 1 4 3
+3 1 4 2
 4 1 2 3
 
 [ system ]

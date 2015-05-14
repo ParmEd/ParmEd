@@ -3619,10 +3619,7 @@ class chamber(Action):
         - -radii      Implicit solvent solvation radii. <radiusset> can be
                       amber6, bondi, mbondi, mbondi2, mbondi3
                       Same effect as the changeRadii command. Default is mbondi.
-        - nocondense  This prevents chamber from condensing the parameter set
-                      before applying it. This might lead to larger prmtop
-                      files, but for large parameter sets will dramatically
-                      shorten the running time of the chamber action
+        - nocondense  This no longer has any effect and is ignored.
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3732,7 +3729,7 @@ class chamber(Action):
         if not self.radii in GB_RADII:
             raise InputError('Illegal radius set %s -- must be one of '
                              '%s' % (self.radii, ', '.join(GB_RADII)))
-        self.condense = not arg_list.has_key('nocondense')
+        arg_list.has_key('nocondense')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3772,8 +3769,6 @@ class chamber(Action):
                 parmset.read_parameter_file(pfile)
             for sfile in self.streamfiles:
                 parmset.read_stream_file(sfile)
-            # All parameters are loaded, now condense the types
-            if self.condense: parmset.condense()
         except ChemError as e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
