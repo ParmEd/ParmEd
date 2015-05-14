@@ -77,7 +77,7 @@ _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 class _Defaults(object):
     """ Global properties of force fields as implemented in GROMACS """
     def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='yes',
-                 fudgeLJ=0.5, fudgeQQ=0.83333333):
+                 fudgeLJ=1.0, fudgeQQ=1.0):
         if int(nbfunc) not in (1, 2):
             raise ValueError('nbfunc must be 1 (L-J) or 2 (Buckingham)')
         if int(comb_rule) not in (1, 2, 3):
@@ -801,6 +801,33 @@ class GromacsTopologyFile(Structure):
                 struct.multipole_frames):
             raise TypeError('GromacsTopologyFile does not support Amoeba '
                             'potential terms')
+        # Now check what the 1-4 scaling factors should be
+        if hasattr(struct, 'defaults') and isinstance(struct.defaults,
+                                                      _Defaults):
+            gmxtop.defaults = struct.defaults
+        elif isinstance(struct, CharmmPsfFile):
+            gmxtop.defaults.fudgeLJ = gmxtop.defaults.fudgeQQ = 1.0
+        else:
+            for dihedral in struct.dihedrals:
+                if dihedral.type is None: continue
+                if isinstance(dihedral.type, DihedralTypeList):
+                    fudgeQQ = fudgeLJ = None
+                    for dt in dihedral.type:
+                        if dt.scee:
+                            fudgeQQ = 1 / dt.scee
+                        if dt.scnb:
+                            fudgeLJ = 1 / dt.scnb
+                        if fudgeLJ and fudgeQQ: break
+                    if fudgeLJ and fudgeQQ:
+                        gmxtop.defaults.fudgeQQ = fudgeQQ
+                        gmxtop.defaults.fudgeLJ = fudgeLJ
+                        break
+                else:
+                    if dt.scee and dt.scnb:
+                        gmxtop.defaults.fudgeQQ = 1 / dt.scee
+                        gmxtop.defaults.fudgeLJ = 1 / dt.scnb
+                        break
+
         return gmxtop
 
     #===================================================
@@ -869,6 +896,13 @@ class GromacsTopologyFile(Structure):
                 else:
                     for include in include_itps:
                         dest.write('#include "%s"\n' % include)
+            else:
+                dest.write('[ defaults ]\n')
+                dest.write('; nbfunc        comb-rule       gen-pairs       '
+                           'fudgeLJ fudgeQQ\n')
+                dest.write('%-15d %-15d %-7g %7g\n\n' % (self.defaults.nbfunc,
+                            self.defaults.comb_rule, self.defaults.gen_pairs,
+                            self.defaults.fudgeLJ, self.defaults.fudgeQQ))
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
