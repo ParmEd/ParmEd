@@ -157,7 +157,7 @@ def callgmx(command, stdin=None, print_to_screen=False, print_command=False, **k
     rm_gmx_baks(os.getcwd())
     # Call a GROMACS program as you would from the command line.
     if GMXVERSION == 5:
-        csplit = ('gmx ' + command).split()
+        csplit = ('gmx ' + command.replace('gmx', '')).split()
     else:
         if not command.startswith('mdrun'):
             csplit = ('g_%s' % command).split()
@@ -261,7 +261,7 @@ def Calculate_GMX(gro_file, top_file, mdp_file):
     # Call grompp to set up calculation.
     callgmx("grompp -f enerfrc.mdp -c %s -p %s -maxwarn 1" % (gro_file, top_file))
     # Run gmxdump to determine which atoms are real.
-    o = callgmx("dump -s topol.tpr -sys", copy_stderr=True)
+    o = callgmx("gmxdump -s topol.tpr -sys", copy_stderr=True)
     AtomMask = []
     for line in o:
         line = line.replace("=", "= ")
