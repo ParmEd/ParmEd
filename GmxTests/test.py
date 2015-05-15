@@ -33,12 +33,16 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # Gromacs settings
-gmxsuffix="_d"
-if which('mdrun'+gmxsuffix) == '':
+gmxsuffix=""
+if which('mdrun'+gmxsuffix) != '':
+    gmxpath = which('mdrun'+gmxsuffix)
+    GMXVERSION = 4
+elif which('gmx'+gmxsuffix) != '':
+    gmxpath = which('gmx'+gmxsuffix)
+    GMXVERSION = 5
+else:
     logger.error("Cannot find the GROMACS executables!\n")
     raise RuntimeError
-else:
-    gmxpath = which('mdrun'+gmxsuffix)
 os.environ["GMX_MAXBACKUP"] = "-1"
 os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
 os.environ["GMX_NO_ALLVSALL"] = "TRUE"
@@ -152,7 +156,13 @@ def callgmx(command, stdin=None, print_to_screen=False, print_command=False, **k
     # Remove backup files.
     rm_gmx_baks(os.getcwd())
     # Call a GROMACS program as you would from the command line.
-    csplit = command.split()
+    if GMXVERSION == 5:
+        csplit = ('gmx ' + command).split()
+    else:
+        if not command.startswith('mdrun'):
+            csplit = ('g_%s' % command).split()
+        else:
+            csplit = command.split()
     prog = os.path.join(gmxpath, csplit[0])
     csplit[0] = prog + gmxsuffix
     return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
@@ -163,7 +173,7 @@ def energy_termnames(edrfile):
         logger.error('Cannot determine energy term names without an .edr file\n')
         raise RuntimeError
     ## Figure out which energy terms need to be printed.
-    o = callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
+    o = callgmx("energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
     parsemode = 0
     energyterms = OrderedDict()
     for line in o:
@@ -251,7 +261,7 @@ def Calculate_GMX(gro_file, top_file, mdp_file):
     # Call grompp to set up calculation.
     callgmx("grompp -f enerfrc.mdp -c %s -p %s -maxwarn 1" % (gro_file, top_file))
     # Run gmxdump to determine which atoms are real.
-    o = callgmx("gmxdump -s topol.tpr -sys", copy_stderr=True)
+    o = callgmx("dump -s topol.tpr -sys", copy_stderr=True)
     AtomMask = []
     for line in o:
         line = line.replace("=", "= ")
@@ -261,16 +271,16 @@ def Calculate_GMX(gro_file, top_file, mdp_file):
             AtomMask.append(ptype=='atom')
     # Get the energy and the forces.
     callgmx("mdrun -nt 1 -rerunvsite -rerun %s" % gro_file)
-    callgmx("g_energy -xvg no -f ener.edr -o energy.xvg", stdin='Potential')
+    callgmx("energy -xvg no -f ener.edr -o energy.xvg", stdin='Potential')
     Efile = open("energy.xvg").readlines()
     GMX_Energy = np.array([float(Eline.split()[1]) for Eline in Efile])
-    callgmx("g_traj -xvg no -s topol.tpr -f traj.trr -of force.xvg -fp", stdin='System')
+    callgmx("traj -xvg no -s topol.tpr -f traj.trr -of force.xvg -fp", stdin='System')
     GMX_Force = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if AtomMask[i/3]] \
                               for line in open("force.xvg").readlines()])
     # Perform energy component analysis and return properties.
     energyterms = energy_termnames("ener.edr")
     ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
-    callgmx("g_energy -f ener.edr -o energy.xvg -xvg no", stdin="\n".join(ekeep))
+    callgmx("energy -f ener.edr -o energy.xvg -xvg no", stdin="\n".join(ekeep))
     ecomp = OrderedDict()
     for line in open("energy.xvg"):
         s = [float(i) for i in line.split()]

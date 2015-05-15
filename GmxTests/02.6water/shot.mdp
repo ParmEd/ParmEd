@@ -21,6 +21,7 @@ rvdw            = 0.0
 rvdw_switch     = 0.0
 constraints     = h-bonds
 pbc             = no
+cutoff-scheme   = group
 
 tcoupl          = v-rescale
 tc_grps         = System

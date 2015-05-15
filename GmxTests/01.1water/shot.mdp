@@ -12,8 +12,9 @@ xtc_grps        = System
 energygrps      = System
 comm_mode       = linear
 
+cutoff-scheme = group
 nstlist		= 0
-ns_type		= simple
+ns-type		= simple
 rlist		= 0.0
 vdwtype		= cut-off
 coulombtype	= cut-off

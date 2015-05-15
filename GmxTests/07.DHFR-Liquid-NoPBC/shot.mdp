@@ -17,4 +17,5 @@ rcoulomb	= 0.0
 rvdw		= 0.0
 constraints	= h-bonds
 pbc		= no
+cutoff-scheme   = group
 
