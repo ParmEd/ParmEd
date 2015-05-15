@@ -29,6 +29,8 @@ if GROMACS_TOPDIR is None:
 if GROMACS_TOPDIR is not None:
     # Regularize the include path
     GROMACS_TOPDIR = _os.path.realpath(GROMACS_TOPDIR)
+else:
+    GROMACS_TOPDIR = '' # So it's a string, but still evaluates to False
 
 try:
     del _testdir, _os, _which
