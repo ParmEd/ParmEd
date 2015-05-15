@@ -47,6 +47,10 @@ class ParameterSet(object):
     improper_types : dict((str,str,str,str):ImproperType)
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the improper torsion to the ImproperType instances
+    improper_periodic_types : dict((str,str,str,str):DihedralType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the improper torsion (modeled as a Fourier series) to
+        the DihedralType instances
     cmap_types : dict((str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances
@@ -66,6 +70,7 @@ class ParameterSet(object):
         self.urey_bradley_types = OrderedDict()
         self.dihedral_types = OrderedDict()
         self.improper_types = OrderedDict()
+        self.improper_periodic_types = OrderedDict()
         self.rb_torsion_types = OrderedDict()
         self.cmap_types = OrderedDict()
         self.nbfix_types = OrderedDict()
@@ -101,6 +106,8 @@ class ParameterSet(object):
             other.rb_torsion_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.improper_types):
             other.improper_types[key] = copy(item)
+        for key, item in iteritems(self.improper_periodic_types):
+            other.improper_periodic_types[key] = copy(item)
         for key, item in iteritems(self.urey_bradley_types):
             if key in other.urey_bradley_types: continue
             typ = copy(item)
@@ -153,6 +160,7 @@ class ParameterSet(object):
             self._condense_types(self.dihedral_types)
             self._condense_types(self.rb_torsion_types)
         self._condense_types(self.improper_types)
+        self._condense_types(self.improper_periodic_types)
         self._condense_types(self.cmap_types)
         return self
 

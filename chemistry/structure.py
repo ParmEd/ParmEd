@@ -1841,12 +1841,13 @@ class Structure(object):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
                                      tor.atom3.idx, tor.atom4.idx,
-                                     int(typ.per), typ.phase,
+                                     int(typ.per), typ.phase*DEG_TO_RAD,
                                      typ.phi_k*frc_conv)
             else:
                 force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                                  tor.atom4.idx, int(tor.type.per),
-                                 tor.type.phase, tor.type.phi_k*frc_conv)
+                                 tor.type.phase*DEG_TO_RAD,
+                                 tor.type.phi_k*frc_conv)
         return force
 
     #===================================================
@@ -1921,7 +1922,7 @@ class Structure(object):
                                        'parameters')
             force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
                              imp.atom4.idx, (imp.type.psi_k*frc_conv,
-                             imp.type.psi_eq))
+                             imp.type.psi_eq*DEG_TO_RAD))
         return force
 
     #===================================================
