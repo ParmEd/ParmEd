@@ -34,12 +34,12 @@ import simtk.openmm.app as app
 
 # Gromacs settings
 gmxsuffix=""
-if which('mdrun'+gmxsuffix) != '':
-    gmxpath = which('mdrun'+gmxsuffix)
-    GMXVERSION = 4
-elif which('gmx'+gmxsuffix) != '':
+if which('gmx'+gmxsuffix) != '':
     gmxpath = which('gmx'+gmxsuffix)
     GMXVERSION = 5
+elif which('mdrun'+gmxsuffix) != '':
+    gmxpath = which('mdrun'+gmxsuffix)
+    GMXVERSION = 4
 else:
     logger.error("Cannot find the GROMACS executables!\n")
     raise RuntimeError
