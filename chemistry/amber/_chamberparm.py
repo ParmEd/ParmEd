@@ -127,6 +127,8 @@ class ChamberParm(AmberParm):
         self._load_urey_brad_info()
         self._load_improper_info()
         self._load_cmap_info()
+        # All of our angles are urey-bradley types
+        for angle in self.angles: angle.funct = 5
         super(ChamberParm, self).unchange()
 
     #===================================================

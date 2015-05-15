@@ -74,36 +74,6 @@ import warnings
 
 _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 
-class GromacsParameterSet(ParameterSet):
-    """
-    Stores a Gromacs parameter set defining a force field
-
-    Attributes
-    ----------
-    improper_periodic_types : dict((str,str,str,str):list(DihedralType))
-        Identical to dihedral_types, a separate list of improper periodic torsions.
-    """
-
-    def __init__(self, *args):
-        super(GromacsParameterSet, self).__init__(*args)
-        # Instantiate the list types
-        self.improper_periodic_types = OrderedDict()
-
-    def __copy__(self):
-        other = super(GromacsParameterSet, self).__copy__()
-        for key, item in iteritems(self.improper_periodic_types):
-            if key in other.improper_periodic_types: continue
-            typ = copy.copy(item)
-            other.improper_periodic_types[key] = typ
-            other.improper_periodic_types[tuple(reversed(key))] = typ
-        return other
-
-    def condense(self, do_dihedrals=True):
-        super(GromacsParameterSet, self).condense(do_dihedrals=do_dihedrals)
-        if do_dihedrals:
-            self._condense_types(self.improper_periodic_types)
-        return self
-
 class _Defaults(object):
     """ Global properties of force fields as implemented in GROMACS """
     def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='yes',
@@ -208,7 +178,11 @@ class GromacsTopologyFile(Structure):
                 if not rematch:
                     return False
                 sec, = rematch.groups()
-                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype')
+                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype',
+                               'system', 'bondtypes', 'angletypes', 'cmaptypes',
+                               'dihedraltypes', 'bonds', 'angles', 'dihedrals',
+                               'cmaps', 'molecules', 'exclusions',
+                               'nonbond_params')
             return False
 
     #===================================================
@@ -225,7 +199,7 @@ class GromacsTopologyFile(Structure):
     def read(self, fname, defines=None, parametrize=True):
         """ Reads the topology file into the current instance """
         from chemistry import gromacs as gmx
-        params = self.parameterset = GromacsParameterSet()
+        params = self.parameterset = ParameterSet()
         molecules = dict()
         structure_contents = []
         if defines is None:
@@ -625,17 +599,16 @@ class GromacsTopologyFile(Structure):
                         phase = float(words[5]) * u.degrees
                         phi_k = float(words[6]) * u.kilojoules_per_mole
                         per = int(words[7])
-                        dt = DihedralType(phi_k, per, phase, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
+                        dt = DihedralType(phi_k, per, phase,
+                                          scee=1/self.defaults.fudgeQQ,
+                                          scnb=1/self.defaults.fudgeLJ)
                         key = (words[0], words[1], words[2], words[3])
                         rkey = (words[3], words[2], words[1], words[0])
                         if improper_periodic:
-                            if replace or not key in params.improper_periodic_types:
-                                dtl = DihedralTypeList()
-                                dtl.append(dt)
-                                params.improper_periodic_types[key] = dtl
-                                params.improper_periodic_types[rkey] = dtl
-                            else:
-                                params.improper_periodic_types[key].append(dt)
+                            # Impropers only ever have 1 term, and therefore
+                            # always replace.
+                            params.improper_periodic_types[key] = dt
+                            params.improper_periodic_types[rkey] = dt
                         else:
                             if replace or not key in params.dihedral_types:
                                 dtl = DihedralTypeList()
@@ -889,7 +862,7 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def write(self, dest, include_itps=None, combine=None):
+    def write(self, dest, include_itps=None, combine=None, parameters='inline'):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -906,6 +879,14 @@ class GromacsTopologyFile(Structure):
             combined into single moleculetype's. Each index can appear *only*
             once, and start from 0. The same molecule number cannot appear in
             two lists
+        parameters : 'inline' or str or file-like object, optional
+            This specifies where parameters should be printed. If 'inline'
+            (default), the parameters are written on the same lines as the
+            valence terms are defined on. Any other string is interpreted as a
+            filename for an ITP that will be written to and then included at the
+            top of `dest`. If it is a file-like object, parameters will be
+            written there.  If parameters is the same as ``dest``, then the
+            parameter types will be written to the same topologyfile.
 
         Raises
         ------
@@ -921,6 +902,8 @@ class GromacsTopologyFile(Structure):
             own_handle = True
         elif not hasattr(dest, 'write'):
             raise TypeError('dest must be a file name or file-like object')
+        if parameters != 'inline':
+            raise ValueError('only parameters == inline is currently supported')
 
         try:
             # Write the header
@@ -961,6 +944,7 @@ class GromacsTopologyFile(Structure):
                            (self.defaults.nbfunc, self.defaults.comb_rule,
                             self.defaults.gen_pairs, self.defaults.fudgeLJ,
                             self.defaults.fudgeQQ))
+            # TODO -- print parameters here
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -972,7 +956,8 @@ class GromacsTopologyFile(Structure):
                         title = 'system%d' % sysnum
                         sysnum += 1
                     names.append(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title)
+                    GromacsTopologyFile._write_molecule(molecule, dest, title,
+                                                        parameters == 'inline')
                 # System
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
@@ -996,7 +981,7 @@ class GromacsTopologyFile(Structure):
     #===================================================
 
     @staticmethod
-    def _write_molecule(struct, dest, title):
+    def _write_molecule(struct, dest, title, writeparams):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write('%s          %d\n\n' % (title, struct.nrexcl))
         dest.write('[ atoms ]\n')
@@ -1041,6 +1026,9 @@ class GromacsTopologyFile(Structure):
                 if settle:
                     dest.write('   %.5f %f %.5f %f' % (bond.type.req/10,
                         bond.type.k*conv, bond.type.req/10, bond.type.k*conv))
+                elif writeparams and bond.type is not None:
+                    dest.write('   %.5f %f' % (bond.type.req/10,
+                                               bond.type.k*conv))
                 dest.write('\n')
             dest.write('\n')
         # Do the pair-exceptions

@@ -398,12 +398,12 @@ Atom 1               Atom 2               R eq       Frc Cnst
 
 PRINT_ANGLESA = """\
 Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
-      2    C (   C)        1  CH3 (   C)        4 H31H (   H)    39.0000  6273.8879
-      2    C (   C)        1  CH3 (   C)        5 H32H (   H)    39.0000  6273.8879
-      2    C (   C)        1  CH3 (   C)        6 H33H (   H)    39.0000  6273.8879
-      4 H31H (   H)        1  CH3 (   C)        5 H32H (   H)    40.0000  6176.4850
-      4 H31H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000  6176.4850
-      5 H32H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000  6176.4850
+      2    C (   C)        1  CH3 (   C)        4 H31H (   H)    39.0000   109.5000
+      2    C (   C)        1  CH3 (   C)        5 H32H (   H)    39.0000   109.5000
+      2    C (   C)        1  CH3 (   C)        6 H33H (   H)    39.0000   109.5000
+      4 H31H (   H)        1  CH3 (   C)        5 H32H (   H)    40.0000   107.8000
+      4 H31H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000   107.8000
+      5 H32H (   H)        1  CH3 (   C)        6 H33H (   H)    40.0000   107.8000
 """
 
 PRINT_DIHEDRALSA = """\

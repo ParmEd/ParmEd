@@ -5,7 +5,7 @@ from __future__ import division, print_function
 
 from chemistry.topologyobjects import BondType, AngleType, DihedralType
 from chemistry.amber.readparm import AmberParm
-from chemistry.constants import RAD_TO_DEG, SMALL
+from chemistry.constants import SMALL
 from chemistry.exceptions import AmberParameterWarning
 from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import range, zip
@@ -54,7 +54,7 @@ class AngleParam(object):
     def __str__(self):
         return '%s-%s-%s   %8.3f  %6.3f' % (self.atype1.ljust(2),
                 self.atype2.ljust(2), self.atype3.ljust(2), self.type.k,
-                self.type.theteq * RAD_TO_DEG)
+                self.type.theteq)
 
     def __eq__(self, other):
         """ Two angles are equal if their atom types and bond type is equal """
@@ -91,16 +91,16 @@ class _DihedralTerm(object):
             return str(self)
         else:
             return '%4i %8.3f %8.3f %5.1f    SCEE=%s SCNB=%s' % (self.idivf,
-                self.type.phi_k * self.idivf, self.type.phase * RAD_TO_DEG,
+                self.type.phi_k * self.idivf, self.type.phase,
                 -self.type.per, self.type.scee, self.type.scnb)
          
     def __str__(self):
         if self.dihtype == 'improper':
-            return '%8.3f %8.3f %5.1f' % (self.type.phi_k, 
-                    self.type.phase * RAD_TO_DEG, self.type.per)
+            return '%8.3f %8.3f %5.1f' % (self.type.phi_k, self.type.phase,
+                                          self.type.per)
         else:
             return '%4i %8.3f %8.3f %5.1f    SCEE=%s SCNB=%s' % (self.idivf,
-                    self.type.phi_k * self.idivf, self.type.phase * RAD_TO_DEG,
+                    self.type.phi_k * self.idivf, self.type.phase,
                     self.type.per, self.type.scee, self.type.scnb)
 
     def __eq__(self, other):

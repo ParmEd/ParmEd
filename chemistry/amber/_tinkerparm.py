@@ -24,7 +24,7 @@ from __future__ import division, print_function, absolute_import
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.constants import NATOM, NRES, IFBOX
+from chemistry.constants import NATOM, NRES, IFBOX, DEG_TO_RAD, RAD_TO_DEG
 from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
                 Dihedral, StretchBend, TorsionTorsion, ChiralFrame,
@@ -511,7 +511,8 @@ class AmoebaParm(AmberParm):
                                  data['AMOEBA_TORSION_PERIODICITY'],
                                  data['AMOEBA_TORSION_PHASE']):
             self.dihedral_types.append(
-                    DihedralType(k, per, phase, list=self.dihedral_types)
+                    DihedralType(k, per, phase*RAD_TO_DEG,
+                                 list=self.dihedral_types)
             )
         it = iter(data['AMOEBA_TORSION_LIST'])
         for i, j, k, l, m in zip(it, it, it, it, it):
@@ -532,7 +533,8 @@ class AmoebaParm(AmberParm):
                                  data['AMOEBA_PI_TORSION_PERIODICITY'],
                                  data['AMOEBA_PI_TORSION_PHASE']):
             self.pi_torsion_types.append(
-                    DihedralType(k, per, phase, list=self.pi_torsion_types)
+                    DihedralType(k, per, phase*RAD_TO_DEG,
+                                 list=self.pi_torsion_types)
             )
         it = iter(data['AMOEBA_PI_TORSION_LIST'])
         for i, j, k, l, m, n, o in zip(it, it, it, it, it, it, it):
