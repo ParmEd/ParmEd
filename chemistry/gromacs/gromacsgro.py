@@ -53,13 +53,20 @@ class GromacsGroFile(object):
                 if not line[5:10].strip(): return False
                 if not line[10:15].strip(): return False
                 int(line[15:20])
-                float(line[20:28])
-                float(line[28:36])
-                float(line[36:44])
-                if line[44:52].strip():
-                    float(line[44:52])
-                    float(line[52:60])
-                    float(line[60:68])
+                pdeci = [i for i, x in enumerate(line) if x == '.']
+                ndeci = pdeci[1] - pdeci[0] - 5
+                for i in range(1, 4):
+                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    float(line[wbeg:wend])
+                i = 4
+                wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                wend = (pdeci[0]-4)+(5+ndeci)*i
+                if line[wbeg:wend].strip():
+                    for i in range(4, 7):
+                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                        wend = (pdeci[0]-4)+(5+ndeci)*i
+                        float(line[wbeg:wend])
             except ValueError:
                 return False
             return True
@@ -103,13 +110,24 @@ class GromacsGroFile(object):
                     atomname = line[10:15].strip()
                     atnum = int(line[15:20])
                     atom = Atom(name=atomname, number=atnum)
-                    atom.xx = float(line[20:28]) * 10
-                    atom.xy = float(line[28:36]) * 10
-                    atom.xz = float(line[36:44]) * 10
-                    if line[44:52].strip():
-                        atom.vx = float(line[44:52]) * 10
-                        atom.vy = float(line[52:60]) * 10
-                        atom.vz = float(line[60:68]) * 10
+                    pdeci = [i for i, x in enumerate(line) if x == '.']
+                    ndeci = pdeci[1] - pdeci[0] - 5
+                    for i in range(1, 4):
+                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                        wend = (pdeci[0]-4)+(5+ndeci)*i
+                        if i == 1: atom.xx = float(line[wbeg:wend]) * 10
+                        elif i == 2: atom.xy = float(line[wbeg:wend]) * 10
+                        elif i == 3: atom.xz = float(line[wbeg:wend]) * 10
+                    i = 4
+                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    if line[wbeg:wend].strip():
+                        for i in range(4, 7):
+                            wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                            wend = (pdeci[0]-4)+(5+ndeci)*i
+                            if i == 4: atom.vx = float(line[wbeg:wend]) * 10
+                            elif i == 5: atom.vy = float(line[wbeg:wend]) * 10
+                            elif i == 5: atom.vz = float(line[wbeg:wend]) * 10
                 except (ValueError, IndexError):
                     raise ParsingError('Could not parse the atom record of '
                                        'GRO file %s' % filename)

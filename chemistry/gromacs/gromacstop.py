@@ -74,6 +74,36 @@ import warnings
 
 _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 
+class GromacsParameterSet(ParameterSet):
+    """
+    Stores a Gromacs parameter set defining a force field
+
+    Attributes
+    ----------
+    improper_periodic_types : dict((str,str,str,str):list(DihedralType))
+        Identical to dihedral_types, a separate list of improper periodic torsions.
+    """
+
+    def __init__(self, *args):
+        super(GromacsParameterSet, self).__init__(*args)
+        # Instantiate the list types
+        self.improper_periodic_types = OrderedDict()
+
+    def __copy__(self):
+        other = super(GromacsParameterSet, self).__copy__()
+        for key, item in iteritems(self.improper_periodic_types):
+            if key in other.improper_periodic_types: continue
+            typ = copy.copy(item)
+            other.improper_periodic_types[key] = typ
+            other.improper_periodic_types[tuple(reversed(key))] = typ
+        return other
+
+    def condense(self, do_dihedrals=True):
+        super(GromacsParameterSet, self).condense(do_dihedrals=do_dihedrals)
+        if do_dihedrals:
+            self._condense_types(self.improper_periodic_types)
+        return self
+
 class _Defaults(object):
     """ Global properties of force fields as implemented in GROMACS """
     def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='yes',
@@ -195,7 +225,7 @@ class GromacsTopologyFile(Structure):
     def read(self, fname, defines=None, parametrize=True):
         """ Reads the topology file into the current instance """
         from chemistry import gromacs as gmx
-        params = self.parameterset = ParameterSet()
+        params = self.parameterset = GromacsParameterSet()
         molecules = dict()
         structure_contents = []
         if defines is None:
@@ -573,10 +603,12 @@ class GromacsTopologyFile(Structure):
                     replace = False
                     dtype = 'normal'
                     a1, a2, a3, a4 = words[:4]
+                    improper_periodic = False
                     if words[4] == '1':
                         pass
                     elif words[4] == '4':
                         replace = True
+                        improper_periodic = True
                     elif words[4] == '9':
                         pass
                     elif words[4] == '2':
@@ -596,13 +628,22 @@ class GromacsTopologyFile(Structure):
                         dt = DihedralType(phi_k, per, phase, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
                         key = (words[0], words[1], words[2], words[3])
                         rkey = (words[3], words[2], words[1], words[0])
-                        if replace or not key in params.dihedral_types:
-                            dtl = DihedralTypeList()
-                            dtl.append(dt)
-                            params.dihedral_types[key] = dtl
-                            params.dihedral_types[rkey] = dtl
+                        if improper_periodic:
+                            if replace or not key in params.improper_periodic_types:
+                                dtl = DihedralTypeList()
+                                dtl.append(dt)
+                                params.improper_periodic_types[key] = dtl
+                                params.improper_periodic_types[rkey] = dtl
+                            else:
+                                params.improper_periodic_types[key].append(dt)
                         else:
-                            params.dihedral_types[key].append(dt)
+                            if replace or not key in params.dihedral_types:
+                                dtl = DihedralTypeList()
+                                dtl.append(dt)
+                                params.dihedral_types[key] = dtl
+                                params.dihedral_types[rkey] = dtl
+                            else:
+                                params.dihedral_types[key].append(dt)
                     elif dtype == 'improper':
                         theta = float(words[5])*u.degrees
                         k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
@@ -710,13 +751,27 @@ class GromacsTopologyFile(Structure):
         for t in self.dihedrals:
             if t.type is not None: continue
             key = (t.atom1.type, t.atom2.type, t.atom3.type, t.atom4.type)
-            wckey = ('X', t.atom2.type, t.atom3.type, 'X')
-            if key in params.dihedral_types:
-                t.type = params.dihedral_types[key]
-                t.type.used = True
-            elif wckey in params.dihedral_types:
-                t.type = params.dihedral_types[wckey]
-                t.type.used = True
+            if not t.improper:
+                wckey = ('X', t.atom2.type, t.atom3.type, 'X')
+                if key in params.dihedral_types:
+                    t.type = params.dihedral_types[key]
+                    t.type.used = True
+                elif wckey in params.dihedral_types:
+                    t.type = params.dihedral_types[wckey]
+                    t.type.used = True
+            else:
+                if key in params.improper_periodic_types:
+                    t.type = params.improper_periodic_types[key]
+                    t.type.used = True
+                else:
+                    for wckey in [(key[0],key[1],key[2],'X'),
+                                  ('X',key[1],key[2],key[3]),
+                                  (key[0],key[1],'X','X'),
+                                  ('X','X',key[2],key[3])]:
+                        if wckey in params.improper_periodic_types:
+                            t.type = params.improper_periodic_types[wckey]
+                            t.type.used = True
+                            break
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         for t in self.rb_torsions:
             if t.type is not None: continue
