@@ -47,6 +47,16 @@ os.environ["GMX_MAXBACKUP"] = "-1"
 os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
 os.environ["GMX_NO_ALLVSALL"] = "TRUE"
 
+gmxprogs = ["anadock", "anaeig", "analyze", "angle", "bar", "bond", "bundle", "chi", 
+            "cluster", "clustsize", "confrms", "covar", "current", "enemat", "energy", 
+            "filter", "gyrate", "h2order", "hbond", "helix", "helixorient", "hydorder", 
+            "kinetics", "lie", "luck", "mdmat", "membed", "mindist", "morph", "msd", 
+            "nmeig", "nmens", "nmtraj", "options", "order", "pme_error", "polystat", 
+            "potential", "principal", "protonate", "rama", "rdf", "rms", "rmsdist", 
+            "rmsf", "rotacf", "rotmat", "saltbr", "sans", "sas", "select", "sgangle", 
+            "sham", "sigeps", "sorient", "spatial", "spol", "tcaf", "traj", "tune_pme", 
+            "vanhove", "velacc", "wham", "wheel", "x2top"]
+
 def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     """
     Read, create or edit a Gromacs MDP file.  The MDP file contains GROMACS run parameters.
@@ -159,7 +169,7 @@ def callgmx(command, stdin=None, print_to_screen=False, print_command=False, **k
     if GMXVERSION == 5:
         csplit = ('gmx ' + command.replace('gmx', '')).split()
     else:
-        if not command.startswith('mdrun'):
+        if command.split()[0] in gmxprogs:
             csplit = ('g_%s' % command).split()
         else:
             csplit = command.split()
