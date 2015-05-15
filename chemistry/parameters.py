@@ -105,9 +105,13 @@ class ParameterSet(object):
             other.rb_torsion_types[key] = typ
             other.rb_torsion_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.improper_types):
+            if key in other.improper_types: continue
             other.improper_types[key] = copy(item)
         for key, item in iteritems(self.improper_periodic_types):
-            other.improper_periodic_types[key] = copy(item)
+            if key in other.improper_periodic_types: continue
+            typ = copy(item)
+            other.improper_periodic_types[key] = typ
+            other.improper_periodic_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.urey_bradley_types):
             if key in other.urey_bradley_types: continue
             typ = copy(item)
@@ -159,8 +163,8 @@ class ParameterSet(object):
         if do_dihedrals:
             self._condense_types(self.dihedral_types)
             self._condense_types(self.rb_torsion_types)
-        self._condense_types(self.improper_types)
         self._condense_types(self.improper_periodic_types)
+        self._condense_types(self.improper_types)
         self._condense_types(self.cmap_types)
         return self
 

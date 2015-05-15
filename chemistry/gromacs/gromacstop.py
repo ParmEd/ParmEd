@@ -601,8 +601,10 @@ class GromacsTopologyFile(Structure):
                         key = (words[0], words[1], words[2], words[3])
                         rkey = (words[3], words[2], words[1], words[0])
                         if improper_periodic:
-                            key = tuple(sorted(key))
+                            # Impropers only ever have 1 term, and therefore
+                            # always replace.
                             params.improper_periodic_types[key] = dt
+                            params.improper_periodic_types[rkey] = dt
                         else:
                             if replace or not key in params.dihedral_types:
                                 dtl = DihedralTypeList()
@@ -616,7 +618,7 @@ class GromacsTopologyFile(Structure):
                         k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
                         a1, a2, a3, a4 = sorted(words[:4])
                         ptype = ImproperType(k, theta)
-                        params.improper_types[tuple(sorted(words[:4]))] = ptype
+                        params.improper_types[(a1, a2, a3, a4)] = ptype
                     elif dtype == 'rbtorsion':
                         a1, a2, a3, a4 = words[:4]
                         c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
