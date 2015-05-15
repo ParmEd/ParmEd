@@ -30,7 +30,10 @@ if GROMACS_TOPDIR is not None:
     # Regularize the include path
     GROMACS_TOPDIR = _os.path.realpath(GROMACS_TOPDIR)
 
-del _testdir, _os, _which
+try:
+    del _testdir, _os, _which
+except NameError: #_testdir is only defined under certain scenarios so it may not be defined here
+    del _os, _which
 
 from chemistry.gromacs.gromacstop import GromacsTopologyFile
 from chemistry.gromacs.gromacsgro import GromacsGroFile
