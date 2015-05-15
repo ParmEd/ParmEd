@@ -7,11 +7,12 @@ Author: Jason M. Swails
 """
 from __future__ import print_function, division
 
-from chemistry.topologyobjects import NoUreyBradley
+from chemistry.topologyobjects import (NoUreyBradley, DihedralTypeList)
 from chemistry.utils.six.moves import range
 from chemistry.utils.six import iteritems
 from collections import OrderedDict
 from copy import copy
+import warnings
 
 class ParameterSet(object):
     """
@@ -124,6 +125,144 @@ class ParameterSet(object):
             other.cmap_types[tuple(reversed(key))] = typ
 
         return other
+
+    @classmethod
+    def from_structure(cls, struct):
+        """ Extracts known parameters from a Structure instance
+
+        Parameters
+        ----------
+        struct : :class:`chemistry.structure.Structure`
+            The parametrized ``Structure`` instance from which to extract
+            parameters into a ParameterSet
+
+        Returns
+        -------
+        params : :class:`ParameterSet`
+            The parameter set with all parameters defined in the Structure
+
+        Notes
+        -----
+        The parameters here are copies of the ones in the Structure, so
+        modifying the generated ParameterSet will have no effect on ``struct``.
+        Furthermore, the *first* occurrence of each parameter will be used. If
+        future ones differ, they will be silently ignored, since this is
+        expected behavior in some instances (like with Gromacs topologies in the
+        ff99sb-ildn force field).
+
+        Dihedrals are a little trickier. They can be multi-term, which can be
+        represented either as a *single* entry in dihedrals with a type of
+        DihedralTypeList or multiple entries in dihedrals with a DihedralType
+        parameter type. In this case, the parameter is constructed from either
+        the first DihedralTypeList found or the first DihedralType of each
+        periodicity found if no matching DihedralTypeList is found.
+        """
+        params = cls()
+        found_dihed_type_list = dict()
+        for bond in struct.bonds:
+            if bond.type is None: continue
+            if (bond.atom1.type, bond.atom2.type) in params.bond_types:
+                continue
+            typ = copy(bond.type)
+            key = (bond.atom1.type, bond.atom2.type)
+            params.bond_types[key] = typ
+            params.bond_types[tuple(reversed(key))] = typ
+        for angle in struct.angles:
+            if angle.type is None: continue
+            if ((angle.atom1.type, angle.atom2.type, angle.atom3.type) in
+                    params.angle_types):
+                continue
+            typ = copy(angle.type)
+            key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
+            params.angle_types[key] = typ
+            params.angle_types[tuple(reversed(key))] = typ
+            if angle.funct == 5:
+                key = (angle.atom1.type, angle.atom3.type)
+                params.urey_bradley_types[key] = NoUreyBradley
+                params.urey_bradley_types[tuple(reversed(key))] = NoUreyBradley
+        for dihedral in struct.dihedrals:
+            if dihedral.type is None: continue
+            key = (dihedral.atom1.type, dihedral.atom2.type,
+                   dihedral.atom3.type, dihedral.atom4.type)
+            if dihedral.improper:
+                if key in params.improper_periodic_types: continue
+                typ = copy(dihedral.type)
+                params.improper_periodic_types[key] = typ
+                params.improper_periodic_types[tuple(reversed(key))] = typ
+            else:
+                # Proper dihedral. Look out for multi-term forms
+                if (key in params.dihedral_types and
+                        found_dihed_type_list[key]):
+                    # Already found a multi-term dihedral type list
+                    continue
+                elif key in params.dihedral_types:
+                    # We have one term of a potentially multi-term dihedral.
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        # This is a full Fourier series list
+                        found_dihed_type_list[key] = True
+                        found_dihed_type_list[tuple(reversed(key))] = True
+                        typ = copy(dihedral.type)
+                        params.dihedral_types[key] = typ
+                        params.dihedral_types[tuple(reversed(key))] = typ
+                    else:
+                        # This *might* be another term. Make sure another term
+                        # with its periodicity does not already exist
+                        for t in params.dihedral_types[key]:
+                            if t.per == dihedral.type.per:
+                                break
+                        else:
+                            # If we got here, we did NOT find this periodicity.
+                            # And since this is mutating a list in-place, it
+                            # automatically propagates to the reversed key
+                            typ = copy(dihedral.type)
+                            params.dihedral_types[key].append(typ)
+                else:
+                    # New parameter. If it's a DihedralTypeList, assign it and
+                    # be done with it. If it's a DihedralType, start a
+                    # DihedralTypeList to be added to later.
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        found_dihed_type_list[key] = True
+                        found_dihed_type_list[tuple(reversed(key))] = True
+                        typ = copy(dihedral.type)
+                        params.dihedral_types[key] = typ
+                        params.dihedral_types[tuple(reversed(key))] = typ
+                    else:
+                        found_dihed_type_list[key] = False
+                        found_dihed_type_list[tuple(reversed(key))] = False
+                        typ = DihedralTypeList()
+                        typ.append(copy(dihedral.type))
+                        params.dihedral_types[key] = typ
+                        params.dihedral_types[tuple(reversed(key))] = typ
+        for improper in struct.impropers:
+            if improper.type is None: continue
+            key = (improper.atom1.type, improper.atom2.type,
+                    improper.atom3.type, improper.atom4.type)
+            if key in params.improper_types: continue
+            params.improper_types[key] = copy(improper.type)
+        for cmap in struct.cmaps:
+            if cmap.type is None: continue
+            key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
+                    cmap.atom4.type, cmap.atom5.type)
+            if key in params.cmap_types: continue
+            typ = copy(cmap.type)
+            params.cmap_types[key] = typ
+            params.cmap_types[tuple(reversed(key))] = typ
+        for urey in struct.urey_bradleys:
+            if urey.type is None or urey.type is NoUreyBradley: continue
+            key = (urey.atom1.type, urey.atom2.type)
+            if key not in params.urey_bradley_types:
+                warnings.warn('Angle corresponding to Urey-Bradley type not '
+                              'found')
+            typ = copy(urey.type)
+            params.urey_bradley_types[key] = typ
+            params.urey_bradley_types[tuple(reversed(key))] = typ
+        # Trap for Amoeba potentials
+        if (struct.trigonal_angles or struct.out_of_plane_bends or
+                struct.torsion_torsions or struct.stretch_bends or
+                struct.trigonal_angles or struct.pi_torsions):
+            raise NotImplementedError('Cannot extract parameters from an '
+                                      'Amoeba-parametrized system yet')
+        return params
 
     def condense(self, do_dihedrals=True):
         """

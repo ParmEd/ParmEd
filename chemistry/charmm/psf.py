@@ -249,6 +249,7 @@ class CharmmPsfFile(Structure):
                 self.angles.append(
                         Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1])
                 )
+                self.angles[-1].funct = 5 # urey-bradley
             # Now get the number of torsions and the torsion list
             nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
             if len(psfsections['NPHI'][1]) != nphi * 4:

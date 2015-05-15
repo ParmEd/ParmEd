@@ -4,6 +4,7 @@ Tests the functionality in the chemistry.amber package
 from array import array
 from chemistry.amber import readparm, asciicrd, mask
 from chemistry import topologyobjects
+from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import range, zip
 import os
 import random
@@ -65,7 +66,11 @@ class TestReadParm(unittest.TestCase):
         parm.remake_parm()
         self.assertEqual(parm.flag_list, parm2.flag_list)
         for flag in parm.flag_list:
-            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+            for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
+                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                    self.assertEqual(x1, x2)
+                else:
+                    self.assertAlmostEqual(x1, x2)
 
     def testRemakeChamberParm(self):
         """ Tests the rebuilding of the ChamberParm raw data structures """
@@ -74,7 +79,11 @@ class TestReadParm(unittest.TestCase):
         parm.remake_parm()
         self.assertEqual(set(parm.flag_list), set(parm2.flag_list))
         for flag in parm.flag_list:
-            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+            for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
+                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                    self.assertEqual(x1, x2)
+                else:
+                    self.assertAlmostEqual(x1, x2)
 
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
@@ -668,6 +677,7 @@ class TestAmberParmSlice(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('solv.prmtop'))
 
     def testSimpleSlice(self):
+        """ Tests simple slicing of AmberParm """
         parm1 = readparm.AmberParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
         parm2.strip('!@CA,C,O,N,HA,H')
