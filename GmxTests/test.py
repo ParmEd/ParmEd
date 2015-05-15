@@ -20,7 +20,7 @@ import numpy as np
 import os, sys, re, subprocess
 
 # ForceBalance convenience functions
-from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint
+from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint, logger
 # Only needed for writing constrained .gro files
 # from molecule import Molecule
 
@@ -33,16 +33,28 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # Gromacs settings
-gmxsuffix=""
+gmxsuffix="_d"
 if which('gmx'+gmxsuffix) != '':
+    logger.info("Using double precision GROMACS version 5\n")
     gmxpath = which('gmx'+gmxsuffix)
     GMXVERSION = 5
 elif which('mdrun'+gmxsuffix) != '':
+    logger.info("Using double precision GROMACS version 4\n")
     gmxpath = which('mdrun'+gmxsuffix)
     GMXVERSION = 4
 else:
-    logger.error("Cannot find the GROMACS executables!\n")
-    raise RuntimeError
+    gmxsuffix=""
+    if which('gmx'+gmxsuffix) != '':
+        logger.info("Using single precision GROMACS version 5\n")
+        gmxpath = which('gmx'+gmxsuffix)
+        GMXVERSION = 5
+    elif which('mdrun'+gmxsuffix) != '':
+        logger.info("Using single precision GROMACS version 4\n")
+        gmxpath = which('mdrun'+gmxsuffix)
+        GMXVERSION = 4
+    else:
+        logger.error("Cannot find the GROMACS executables!\n")
+        raise RuntimeError
 os.environ["GMX_MAXBACKUP"] = "-1"
 os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
 os.environ["GMX_NO_ALLVSALL"] = "TRUE"
@@ -314,7 +326,6 @@ def Calculate_ParmEd(gro_file, top_file, sysargs, defines):
     #===============================#
     #|   OpenMM simulation setup   |#
     #===============================#
-    gro = app.GromacsGroFile(gro_file)
     # ParmEd creates System object
     system = ParmEd_GmxTop.createSystem(**sysargs)
     # Keep a record of which atoms are real (not virtual sites)
@@ -330,7 +341,7 @@ def Calculate_ParmEd(gro_file, top_file, sysargs, defines):
     plat = mm.Platform.getPlatformByName('Reference')
     # Create Simulation object
     simul = app.Simulation(ParmEd_GmxTop.topology, system, integ, plat)
-    simul.context.setPositions(gro.positions)
+    simul.context.setPositions(ParmEd_GmxGro.positions)
     simul.context.applyConstraints(1e-12)
     # Obtain OpenMM potential energy
     state = simul.context.getState(getPositions=True,getEnergy=True,getForces=True)
