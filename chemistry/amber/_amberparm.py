@@ -27,7 +27,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY)
+            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD)
 from chemistry.exceptions import (AmberParmError, ParsingError,
                                   MoleculeError, MoleculeWarning)
 from chemistry.geometry import box_lengths_and_angles_to_vectors
@@ -1377,6 +1377,7 @@ class AmberParm(AmberFormat, Structure):
         del self.angles[:]
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
+            theteq *= RAD_TO_DEG
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
         it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
         for i, j, k, l in zip(it, it, it, it):
@@ -1409,6 +1410,7 @@ class AmberParm(AmberFormat, Structure):
                                     self.parm_data['DIHEDRAL_PERIODICITY'],
                                     self.parm_data['DIHEDRAL_PHASE'],
                                     scee, scnb):
+            ph *= RAD_TO_DEG
             self.dihedral_types.append(
                     DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
@@ -1553,7 +1555,8 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
+                                        for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
@@ -1591,7 +1594,7 @@ class AmberParm(AmberFormat, Structure):
         data['DIHEDRAL_PERIODICITY'] = \
                     [type.per for type in self.dihedral_types]
         data['DIHEDRAL_PHASE'] = \
-                    [type.phase for type in self.dihedral_types]
+                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
             data['SCEE_SCALE_FACTOR'] = \
                     [type.scee for type in self.dihedral_types]

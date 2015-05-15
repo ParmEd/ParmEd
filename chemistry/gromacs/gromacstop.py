@@ -889,7 +889,7 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def write(self, dest, include_itps=None, combine=None):
+    def write(self, dest, include_itps=None, combine=None, parameters='inline'):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -906,6 +906,14 @@ class GromacsTopologyFile(Structure):
             combined into single moleculetype's. Each index can appear *only*
             once, and start from 0. The same molecule number cannot appear in
             two lists
+        parameters : 'inline' or str or file-like object, optional
+            This specifies where parameters should be printed. If 'inline'
+            (default), the parameters are written on the same lines as the
+            valence terms are defined on. Any other string is interpreted as a
+            filename for an ITP that will be written to and then included at the
+            top of `dest`. If it is a file-like object, parameters will be
+            written there.  If parameters is the same as ``dest``, then the
+            parameter types will be written to the same topologyfile.
 
         Raises
         ------
@@ -921,6 +929,8 @@ class GromacsTopologyFile(Structure):
             own_handle = True
         elif not hasattr(dest, 'write'):
             raise TypeError('dest must be a file name or file-like object')
+        if parameters != 'inline':
+            raise ValueError('only parameters == inline is currently supported')
 
         try:
             # Write the header
@@ -961,6 +971,7 @@ class GromacsTopologyFile(Structure):
                            (self.defaults.nbfunc, self.defaults.comb_rule,
                             self.defaults.gen_pairs, self.defaults.fudgeLJ,
                             self.defaults.fudgeQQ))
+            # TODO -- print parameters here
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -972,7 +983,8 @@ class GromacsTopologyFile(Structure):
                         title = 'system%d' % sysnum
                         sysnum += 1
                     names.append(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title)
+                    GromacsTopologyFile._write_molecule(molecule, dest, title,
+                                                        parameters == 'inline')
                 # System
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
@@ -996,7 +1008,7 @@ class GromacsTopologyFile(Structure):
     #===================================================
 
     @staticmethod
-    def _write_molecule(struct, dest, title):
+    def _write_molecule(struct, dest, title, writeparams):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write('%s          %d\n\n' % (title, struct.nrexcl))
         dest.write('[ atoms ]\n')
@@ -1041,6 +1053,9 @@ class GromacsTopologyFile(Structure):
                 if settle:
                     dest.write('   %.5f %f %.5f %f' % (bond.type.req/10,
                         bond.type.k*conv, bond.type.req/10, bond.type.k*conv))
+                elif writeparams and bond.type is not None:
+                    dest.write('   %.5f %f' % (bond.type.req/10,
+                                               bond.type.k*conv))
                 dest.write('\n')
             dest.write('\n')
         # Do the pair-exceptions

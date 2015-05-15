@@ -2140,7 +2140,7 @@ class DihedralType(_ListItem, _ParameterType):
         _ParameterType.__init__(self)
         self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
         self.per = per
-        self.phase = phase
+        self.phase = _strip_units(phase, u.degrees)
         self.scee = scee
         self.scnb = scnb
         self.list = list
@@ -2155,7 +2155,7 @@ class DihedralType(_ListItem, _ParameterType):
 
     def __repr__(self):
         return ('<%s; phi_k=%.3f, per=%d, phase=%.3f, scee=%.3f, scnb=%.3f>' %
-                (type(self).__name__, self.phi_k, self.per, _strip_units(self.phase, u.degree),
+                (type(self).__name__, self.phi_k, self.per, self.phase,
                  self.scee, self.scnb))
 
     def __copy__(self):
@@ -3296,8 +3296,8 @@ class StretchBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k1 = _strip_units(k1, u.kilocalories/u.mole/u.radian)
-        self.k2 = _strip_units(k2, u.kilocalories/u.mole/u.radian)
+        self.k1 = _strip_units(k1, u.kilocalories_per_mole/u.radian)
+        self.k2 = _strip_units(k2, u.kilocalories_per_mole/u.radian)
         self.req1 = _strip_units(req1, u.angstrom)
         self.req2 = _strip_units(req2, u.angstrom)
         self.theteq = _strip_units(theteq, u.degrees)
