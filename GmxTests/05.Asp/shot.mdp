@@ -17,4 +17,4 @@ rcoulomb	= 0.0
 rvdw		= 0.0
 constraints	= none
 pbc		= no
-
+cutoff-scheme   = group
