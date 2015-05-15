@@ -1,0 +1,32 @@
+;
+;	File 'topol.top' was generated
+;	By user: leeping (1000)
+;	On host: leeping
+;	At date: Fri Oct 18 15:36:44 2013
+;
+;	This is a standalone topology file
+;
+;	It was generated using program:
+;	pdb2gmx - VERSION 4.6.3
+;
+;	Command line was:
+;	pdb2gmx -f conf.pdb 
+;
+;	Force field was read from the standard Gromacs share directory.
+;
+
+; Include forcefield parameters
+#include "amber99sb.ff/forcefield.itp"
+
+; Include chain topologies
+#include "AceAlaNme.itp"
+#include "AceGluNme.itp"
+
+[ system ]
+; Name
+Protein
+
+[ molecules ]
+; Compound        #mols
+AceAlaNme     1
+AceGluNme     1

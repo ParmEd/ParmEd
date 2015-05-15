@@ -1,0 +1,29 @@
+[ defaults ]
+1    2    yes   0.5   0.5
+
+[ atomtypes ]
+OW	8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PRM 5 6
+HW	1      1.00800     0.520       A    0.00000e+00  0.00000e+00
+MW	0      0.00000    -1.040       D    0.00000e+00  0.00000e+00
+
+[ moleculetype ]
+SOL          2
+
+[ atoms ]
+1       OW        1       SOL      OW     1       0.0
+2       HW        1       SOL     HW1     1       0.52 ; PRM 6
+3       HW        1       SOL     HW2     1       0.52 ; RPT 6 COUL:SOL-2
+4       MW        1       SOL      MW     1      -1.04 ; EVAL 6 -2*PRM["COUL:SOL-2"]
+
+[ settles ]
+1	1	0.09572	0.15139
+
+[ exclusions ]
+1     2     3     4
+2     1     3     4
+3     1     2     4
+4     1     2     3
+
+[ virtual_sites3 ]
+4     1     2     3     1     0.1280     0.1280 ; RPT 6 VSITE3A:SOL-4 /RPT PRM 5
+

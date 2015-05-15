@@ -178,7 +178,11 @@ class GromacsTopologyFile(Structure):
                 if not rematch:
                     return False
                 sec, = rematch.groups()
-                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype')
+                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype',
+                               'system', 'bondtypes', 'angletypes', 'cmaptypes',
+                               'dihedraltypes', 'bonds', 'angles', 'dihedrals',
+                               'cmaps', 'molecules', 'exclusions',
+                               'nonbond_params')
             return False
 
     #===================================================
