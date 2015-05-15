@@ -7,7 +7,8 @@ Author: Jason M. Swails
 """
 from __future__ import print_function, division
 
-from chemistry.topologyobjects import (NoUreyBradley, DihedralTypeList)
+from chemistry.topologyobjects import (NoUreyBradley, DihedralTypeList,
+                AtomType)
 from chemistry.utils.six.moves import range
 from chemistry.utils.six import iteritems
 from collections import OrderedDict
@@ -159,6 +160,20 @@ class ParameterSet(object):
         """
         params = cls()
         found_dihed_type_list = dict()
+        for atom in struct.atoms:
+            if atom.atom_type is None:
+                atom_type = AtomType(atom.type, None, atom.mass,
+                                     atom.atomic_number)
+                atom_type.set_lj_params(atom.epsilon, atom.rmin,
+                                        atom.epsilon_14, atom.rmin_14)
+                params.atom_types[atom.type] = atom_type
+            else:
+                atom_type = copy(atom.atom_type)
+                params.atom_types[str(atom_type)] = atom_type
+                if atom_type.number is not None:
+                    params.atom_types_int[int(atom_type)] = atom_type
+                    params.atom_types_tuple[(int(atom_type), str(atom_type))] =\
+                            atom_type
         for bond in struct.bonds:
             if bond.type is None: continue
             if (bond.atom1.type, bond.atom2.type) in params.bond_types:
