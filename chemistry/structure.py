@@ -447,11 +447,17 @@ class Structure(object):
             c.angle_types.append(copy(at))
         c.angle_types.claim()
         if split_dihedrals:
-            for dt in self.dihedral_types:
+            ndt = 0
+            mapdt = {}
+            for idt, dt in enumerate(self.dihedral_types):
                 if hasattr(dt, '__iter__'):
                     for t in dt:
                         c.dihedral_types.append(copy(t))
+                        mapdt.setdefault(idt, []).append(ndt)
+                        ndt += 1
                 else:
+                    mapdt.setdefault(idt, []).append(ndt)
+                    ndt += 1
                     c.dihedral_types.append(copy(dt))
         else:
             for dt in self.dihedral_types:
@@ -507,7 +513,7 @@ class Structure(object):
                 if hasattr(d.type, '__iter__'):
                     for i in range(len(d.type)):
                         ie = d.ignore_end or i < len(d.type) - 1
-                        ti = d.type.idx + i
+                        ti = mapdt[d.type.idx][i]
                         c.dihedrals.append(
                                 Dihedral(c.atoms[d.atom1.idx],
                                          c.atoms[d.atom2.idx],
