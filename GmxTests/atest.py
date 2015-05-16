@@ -17,15 +17,16 @@ Author: Lee-Ping Wang
 # General import
 from collections import OrderedDict
 import numpy as np
-import os, sys, re, subprocess
+import os, sys, re, copy
 
 # ForceBalance convenience functions
-from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint, logger
+from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint, isfloat, logger
 # Only needed for writing constrained .gro files
 # from molecule import Molecule
 
 # ParmEd import
-from chemistry import gromacs
+from chemistry import gromacs, amber
+from chemistry.amber.mdin import Mdin
 
 # OpenMM import
 import simtk.unit as u
@@ -271,7 +272,7 @@ def interpret_mdp(mdp_file):
         sysargs['nonbondedMethod'] = app.PME
         sysargs['ewaldErrorTolerance'] = 1e-5
         sysargs['nonbondedCutoff'] = float(mdp_opts['rcoulomb'])*u.nanometer
-    return defines, sysargs
+    return defines, sysargs, mdp_opts
 
 def Calculate_GMX(gro_file, top_file, mdp_file):
     #===============================#
@@ -312,10 +313,10 @@ def Calculate_GMX(gro_file, top_file, mdp_file):
                 ecomp[ekeep[i]].append(val)
             else:
                 ecomp[ekeep[i]] = [val]
-    Ecomps_GMX = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
-    return GMX_Energy, GMX_Force, Ecomps_GMX
+    Ecomps_GMX = OrderedDict([(key, val[0]) for key, val in ecomp.items()])
+    return GMX_Energy[0], GMX_Force, Ecomps_GMX
 
-def Calculate_ParmEd(gro_file, top_file, sysargs, defines):
+def Calculate_ParmEd_OpenMM(gro_file, top_file, sysargs, defines):
     #===============================#
     #|   ParmEd object creation    |#
     #===============================#
@@ -357,7 +358,107 @@ def Calculate_ParmEd(gro_file, top_file, sysargs, defines):
     Ecomps_OMM = energy_components(simul)
     printcool_dictionary(Ecomps_OMM, title="OpenMM energy components via ParmEd")
     parmed_forces = np.array([f for i, f in enumerate(parmed_forces.value_in_unit(u.kilojoule_per_mole/u.nanometer)) if isAtom[i]])
-    return parmed_energy, parmed_forces, Ecomps_OMM
+    return ParmEd_GmxTop, parmed_energy, parmed_forces, Ecomps_OMM
+
+def Calculate_AMBER(Structure, mdp_opts):
+    pbc = mdp_opts["pbc"].lower() == "xyz"
+    # Create AMBER inpcrd file
+    inpcrd = amber.AmberAsciiRestart("inpcrd", mode="w")
+    inpcrd.coordinates = np.array(Structure.positions.value_in_unit(u.angstrom)).reshape(-1,3)
+    inpcrd.box = Structure.box
+    inpcrd.close()
+    natom = len(Structure.atoms)
+    # sander insists on providing a trajectory to iterate over, 
+    # so we feed it the same coordinates again. But we don't use it
+    # because the positions are imprecise.
+    mdcrd = amber.AmberMdcrd("mdcrd", natom=natom, hasbox=pbc, mode="w")
+    mdcrd.add_coordinates(np.array(Structure.positions.value_in_unit(u.angstrom)).reshape(-1,3))
+    if pbc:
+        mdcrd.add_box(Structure.box)
+    mdcrd.close()
+    # Create AMBER prmtop object from ParmEd Structure :)
+    prmtop = amber.AmberParm.load_from_structure(Structure)
+    prmtop.write_parm("prmtop")
+    # Create AMBER mdin file and append some stuff
+    mdin = Mdin()
+    # Single point energies?
+    mdin.change('cntrl','imin','5')
+    # Periodic boundary conditions?
+    if pbc:
+        mdin.change('cntrl','ntb','1')
+    else:
+        mdin.change('cntrl','ntb','0')
+    # Cutoff zero is really infinite
+    if float(mdp_opts['rlist']) == 0.0:
+        mdin.change('cntrl','cut','9999')
+    else:
+        mdin.change('cntrl','cut',str(int(float(mdp_opts['rlist'])*10)))
+    # Take zero MD steps
+    mdin.change('cntrl','nstlim','0')
+    # Don't update nonbond parameters
+    mdin.change('cntrl','nsnb','0')
+    mdin.write("mdin")
+    with open("mdin",'a') as f:
+        print >> f, """&debugf
+do_debugf = 1, dumpfrc = 1
+/"""
+    # Call sander for energy and force
+    _exec("sander -O -y mdcrd", print_command=False)
+    # Parse energy and force
+    ParseMode = 0
+    Energies = []
+    Forces = []
+    Force = []
+    for line in open('forcedump.dat'):
+        line = line.strip()
+        sline = line.split()
+        if ParseMode == 1:
+            if len(sline) == 1 and isfloat(sline[0]):
+                Energies.append(float(sline[0]) * 4.184)
+                ParseMode = 0
+        if ParseMode == 2:
+            if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
+                Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
+            if len(Force) == 3*natom:
+                Forces.append(np.array(Force))
+                Force = []
+                ParseMode = 0
+        if line == '0 START of Energies':
+            ParseMode = 1
+        elif line == '1 Total Force':
+            ParseMode = 2
+    # Obtain energy components
+    ParseMode = 0
+    Ecomps = OrderedDict()
+    for line in open("mdout").readlines():
+        if "NSTEP = " in line:
+            ParseMode = 1
+        if ParseMode == 1:
+            if "=" not in line:
+                ParseMode = 0
+                continue
+            else:
+                ieq = None
+                wkey = None
+                # Assume the line is split-able
+                for i, w in enumerate(line.split()):
+                    if w == '=':
+                        ieq = i
+                    elif i-1 == ieq:
+                        Ecomps.setdefault(wkey, []).append(float(w)*4.184)
+                    else:
+                        wkey = w
+    Ecomps_Sav = OrderedDict()
+    for key in Ecomps:
+        if set(Ecomps[key]) == set([0.0]): continue
+        elif key.lower() in ['eptot', 'etot', 'volume', 'density']: continue
+        else:
+            Ecomps_Sav[key] = Ecomps[key][0]
+    Ecomps_Sav['EPTOT'] = Ecomps['EPtot'][0]
+    # Save just the first frame from the .mdcrd
+    Energies = Energies[0]
+    Forces = Forces[0]
+    return Energies, Forces, Ecomps_Sav
 
 def main():
     # Command line arguments
@@ -366,7 +467,7 @@ def main():
     mdp_file = sys.argv[3]
 
     # Parse the .mdp file to inform ParmEd
-    defines, sysargs = interpret_mdp(mdp_file)
+    defines, sysargs, mdp_opts = interpret_mdp(mdp_file)
 
     # Gromacs calculation
     GMX_Energy, GMX_Force, Ecomps_GMX = Calculate_GMX(gro_file, top_file, mdp_file)
@@ -375,17 +476,42 @@ def main():
     printcool_dictionary(Ecomps_GMX, title="GROMACS energy components")
 
     # ParmEd-OpenMM calculation
-    PED_Energy, PED_Force, Ecomps_PED = Calculate_ParmEd(gro_file, top_file, sysargs, defines)
+    Structure, OMM_Energy, OMM_Force, Ecomps_OMM = Calculate_ParmEd_OpenMM(gro_file, top_file, sysargs, defines)
     
+    AMBER_Energy, AMBER_Force, Ecomps_AMBER = Calculate_AMBER(Structure, mdp_opts)
+    AMBER_Force = AMBER_Force.reshape(-1,3)
+
+    # Print AMBERy- energy components
+    printcool_dictionary(Ecomps_AMBER, title="AMBER energy components")
+
     # Analyze force differences
     GMX_Force = GMX_Force.reshape(-1,3)
-    D_Force = GMX_Force - PED_Force
+    D_Force = GMX_Force - OMM_Force
+
+    # Construct arrays of energy and force differences
+    Names = ['Gromacs', 'OpenMM', 'AMBER']
+    Energies = np.array([GMX_Energy, OMM_Energy.value_in_unit(u.kilojoule_per_mole), AMBER_Energy])
+    Forces = np.array([GMX_Force, OMM_Force, AMBER_Force])
+    D_Energy = []
+    D_FrcRMS = []
+    D_FrcMax = []
+    D_Names = []
+    for i in range(1, 3):
+        for j in range(i):
+            D_Names.append('%7s-%7s' % (Names[j],Names[i]))
+            D_Energy.append(Energies[j]-Energies[i])
+            D_Force = Forces[j]-Forces[i]
+            D_FrcRMS.append(np.sqrt(np.mean([sum(k**2) for k in D_Force])))
+            D_FrcMax.append(np.sqrt(np.max(np.array([sum(k**2) for k in D_Force]))))
 
     # Final printout
     print "Energy Difference (kJ/mol):"
-    print (Ecomps_PED['Potential']-Ecomps_GMX['Potential'])[0]
+    for i in range(len(D_Names)):
+        print "%14s % .6e" % (D_Names[i], D_Energy[i])
+
     print "RMS / Max Force Difference (kJ/mol/nm):"
-    print np.sqrt(np.mean([sum(i**2) for i in D_Force])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force])))
+    for i in range(len(D_Names)):
+        print "%14s % .6e % .6e" % (D_Names[i], D_FrcRMS[i], D_FrcMax[i])
 
 if __name__ == "__main__":
     main()
