@@ -758,6 +758,7 @@ class GromacsTopologyFile(Structure):
                 t.type = params.rb_torsion_types[wckey]
                 t.type.used = True
         update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
+        self.update_dihedral_exclusions()
         for t in self.impropers:
             if t.type is not None: continue
             key = tuple(sorted([t.atom1.type, t.atom2.type, t.atom3.type,
