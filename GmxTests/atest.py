@@ -367,11 +367,10 @@ def Calculate_AMBER(Structure, mdp_opts):
     inpcrd.coordinates = np.array(Structure.positions.value_in_unit(u.angstrom)).reshape(-1,3)
     inpcrd.box = Structure.box
     inpcrd.close()
-    natom = len(Structure.atoms)
     # sander insists on providing a trajectory to iterate over, 
     # so we feed it the same coordinates again. But we don't use it
     # because the positions are imprecise.
-    mdcrd = amber.AmberMdcrd("mdcrd", natom=natom, hasbox=pbc, mode="w")
+    mdcrd = amber.AmberMdcrd("mdcrd", natom=len(Structure.atoms), hasbox=pbc, mode="w")
     mdcrd.add_coordinates(np.array(Structure.positions.value_in_unit(u.angstrom)).reshape(-1,3))
     if pbc:
         mdcrd.add_box(Structure.box)
@@ -409,6 +408,8 @@ do_debugf = 1, dumpfrc = 1
     Energies = []
     Forces = []
     Force = []
+    iatom = 0
+    isAtom = [atom.atomic_number > 0 for atom in Structure.atoms]
     for line in open('forcedump.dat'):
         line = line.strip()
         sline = line.split()
@@ -418,11 +419,14 @@ do_debugf = 1, dumpfrc = 1
                 ParseMode = 0
         if ParseMode == 2:
             if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
-                Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
-            if len(Force) == 3*natom:
+                if isAtom[iatom]:
+                    Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
+                iatom += 1
+            if len(Force) == 3*sum(isAtom):
                 Forces.append(np.array(Force))
                 Force = []
                 ParseMode = 0
+                iatom = 0
         if line == '0 START of Energies':
             ParseMode = 1
         elif line == '1 Total Force':
@@ -504,14 +508,17 @@ def main():
             D_FrcRMS.append(np.sqrt(np.mean([sum(k**2) for k in D_Force])))
             D_FrcMax.append(np.sqrt(np.max(np.array([sum(k**2) for k in D_Force]))))
 
+    # Print the net force on the first three atoms (e.g. water molecule)
+    # print np.sum(GMX_Force[:3], axis=0)
+    # print np.sum(AMBER_Force[:3], axis=0)
     # Final printout
     print "Energy Difference (kJ/mol):"
     for i in range(len(D_Names)):
-        print "%14s % .6e" % (D_Names[i], D_Energy[i])
+        print "%-14s % .6e" % (D_Names[i], D_Energy[i])
 
     print "RMS / Max Force Difference (kJ/mol/nm):"
     for i in range(len(D_Names)):
-        print "%14s % .6e % .6e" % (D_Names[i], D_FrcRMS[i], D_FrcMax[i])
+        print "%-14s % .6e % .6e" % (D_Names[i], D_FrcRMS[i], D_FrcMax[i])
 
 if __name__ == "__main__":
     main()
