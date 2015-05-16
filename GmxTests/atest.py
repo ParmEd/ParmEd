@@ -443,15 +443,16 @@ do_debugf = 1, dumpfrc = 1
                 continue
             else:
                 ieq = None
-                wkey = None
+                wkey = []
                 # Assume the line is split-able
                 for i, w in enumerate(line.split()):
                     if w == '=':
                         ieq = i
                     elif i-1 == ieq:
-                        Ecomps.setdefault(wkey, []).append(float(w)*4.184)
+                        Ecomps.setdefault(' '.join(wkey), []).append(float(w)*4.184)
+                        wkey = []
                     else:
-                        wkey = w
+                        wkey.append(w)
     Ecomps_Sav = OrderedDict()
     for key in Ecomps:
         if set(Ecomps[key]) == set([0.0]): continue
