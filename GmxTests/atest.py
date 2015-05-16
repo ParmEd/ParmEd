@@ -429,7 +429,7 @@ do_debugf = 1, dumpfrc = 1
                 iatom = 0
         if line == '0 START of Energies':
             ParseMode = 1
-        elif line == '1 Total Force':
+        elif line == '1 Total Force' or line == '2 Total Force':
             ParseMode = 2
     # Obtain energy components
     ParseMode = 0
