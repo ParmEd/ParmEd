@@ -930,6 +930,7 @@ class Structure(object):
                 dihedral.ignore_end = True
             else:
                 set14.add((dihedral.atom1.idx, dihedral.atom4.idx))
+                set14.add((dihedral.atom4.idx, dihedral.atom1.idx))
 
     #===================================================
 
