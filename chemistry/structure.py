@@ -524,11 +524,12 @@ class Structure(object):
                         )
                         c.dihedrals[-1]._funct = d._funct
                 else:
+                    ti = mapdt[d.type.idx][0]
                     c.dihedrals.append(
                         Dihedral(c.atoms[d.atom1.idx], c.atoms[d.atom2.idx],
                                  c.atoms[d.atom3.idx], c.atoms[d.atom4.idx],
                                  improper=d.improper, ignore_end=d.ignore_end,
-                                 type=d.type and c.dihedral_types[d.type.idx])
+                                 type=d.type and c.dihedral_types[ti])
                     )
                     c.dihedrals[-1]._funct = d._funct
         else:
