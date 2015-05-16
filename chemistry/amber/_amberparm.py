@@ -266,6 +266,9 @@ class AmberParm(AmberFormat, Structure):
         inst.pointers = {}
         inst.LJ_types = {}
         inst.atoms.assign_nbidx_from_types()
+        # Give virtual sites a name that Amber understands
+        for atom in inst.atoms:
+            if isinstance(atom, ExtraPoint): atom.name = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
