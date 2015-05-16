@@ -498,7 +498,7 @@ def main():
     D_Names = []
     for i in range(1, 3):
         for j in range(i):
-            D_Names.append('%7s-%7s' % (Names[j],Names[i]))
+            D_Names.append('%s-%s' % (Names[j],Names[i]))
             D_Energy.append(Energies[j]-Energies[i])
             D_Force = Forces[j]-Forces[i]
             D_FrcRMS.append(np.sqrt(np.mean([sum(k**2) for k in D_Force])))
