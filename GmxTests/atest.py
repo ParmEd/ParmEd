@@ -373,7 +373,7 @@ def Calculate_AMBER(Structure, mdp_opts):
     mdcrd = amber.AmberMdcrd("mdcrd", natom=len(Structure.atoms), hasbox=pbc, mode="w")
     mdcrd.add_coordinates(np.array(Structure.positions.value_in_unit(u.angstrom)).reshape(-1,3))
     if pbc:
-        mdcrd.add_box(Structure.box)
+        mdcrd.add_box(Structure.box[:3])
     mdcrd.close()
     # Create AMBER prmtop object from ParmEd Structure :)
     prmtop = amber.AmberParm.load_from_structure(Structure)
@@ -396,10 +396,19 @@ def Calculate_AMBER(Structure, mdp_opts):
     mdin.change('cntrl','nstlim','0')
     # Don't update nonbond parameters
     mdin.change('cntrl','nsnb','0')
+    # if mdp_opts['coulombtype'].lower() == 'pme':
+    #     mdin.change('ewald','order',5)
+    #     mdin.change('ewald','skinnb',0)
     mdin.write("mdin")
+    # Nonbonded method
+    if mdp_opts['coulombtype'].lower() == 'pme':
+        with open("mdin",'a') as f:
+            print >> f, """&ewald
+ order=5, skinnb=0
+/"""
     with open("mdin",'a') as f:
         print >> f, """&debugf
-do_debugf = 1, dumpfrc = 1
+do_debugf=1, dumpfrc=1
 /"""
     # Call sander for energy and force
     _exec("sander -O -y mdcrd", print_command=False)

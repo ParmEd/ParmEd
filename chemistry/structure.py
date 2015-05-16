@@ -919,19 +919,17 @@ class Structure(object):
         turns it to `True` if the two end atoms are in the bond or angle
         partners arrays
         """
-        list14 = []
+        set14 = set()
         for dihedral in self.dihedrals:
             if dihedral.ignore_end : continue
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
                 dihedral.atom1 in dihedral.atom4.angle_partners):
-                # print("Excluding 1-4 %i-%i-%i-%i; bond/angle supersedes" % (dihedral.atom1.idx, dihedral.atom2.idx, dihedral.atom3.idx, dihedral.atom4.idx))
                 dihedral.ignore_end = True
-            elif sorted([dihedral.atom1.idx, dihedral.atom4.idx]) in list14:
+            elif (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
                 # Avoid double counting of 1-4 in a six-membered ring
-                # print("Excluding 1-4 %i-%i-%i-%i; avoid double-count" % (dihedral.atom1.idx, dihedral.atom2.idx, dihedral.atom3.idx, dihedral.atom4.idx))
                 dihedral.ignore_end = True
             else:
-                list14.append(sorted([dihedral.atom1.idx, dihedral.atom4.idx]))
+                set14.add((dihedral.atom1.idx, dihedral.atom4.idx))
 
     #===================================================
 
