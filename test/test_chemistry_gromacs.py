@@ -1,7 +1,7 @@
 """
 Tests the functionality in the chemistry.gromacs package
 """
-from chemistry import load_file, Structure, ExtraPoint
+from chemistry import load_file, Structure, ExtraPoint, DihedralTypeList
 from chemistry.exceptions import GromacsTopologyWarning
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.utils.six.moves import range, zip, StringIO
@@ -150,6 +150,58 @@ class TestGromacsTop(unittest.TestCase):
         self.assertEqual(len(top.angles), 13197)
         self.assertEqual(len(top.dihedrals), 5613)
 
+    def _check_equal_structures(self, top1, top2):
+        def cmp_atoms(a1, a2):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.atom_type, a2.atom_type)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+        def cmp_valence(val1, val2, typeattrs=None):
+            self.assertEqual(len(val1), len(val2))
+            for v1, v2 in zip(val1, val2):
+                self.assertIs(type(v1), type(v2))
+                attrs = [attr for attr in dir(v1) if attr.startswith('atom')]
+                atoms1 = [getattr(v1, attr) for attr in attrs]
+                atoms2 = [getattr(v2, attr) for attr in attrs]
+                for a1, a2 in zip(atoms1, atoms2):
+                    cmp_atoms(a1, a2)
+                # Check the type lists
+                if typeattrs is not None:
+                    for attr in typeattrs:
+                        self.assertAlmostEqual(getattr(v1.type, attr),
+                                               getattr(v2.type, attr), places=5)
+                else:
+                    self.assertEqual(v1.type, v2.type)
+        def cmp_dihedrals(dih1, dih2):
+            self.assertEqual(len(dih1), len(dih2))
+            for v1, v2 in zip(dih1, dih2):
+                self.assertIs(type(v1), type(v2))
+                self.assertIs(type(v1.type), type(v2.type))
+                atoms1 = [v1.atom1, v1.atom2, v1.atom3, v1.atom4]
+                atoms2 = [v2.atom1, v2.atom2, v2.atom3, v2.atom4]
+                for a1, a2 in zip(atoms1, atoms2):
+                    cmp_atoms(a1, a2)
+                self.assertEqual(v1.improper, v2.improper)
+                self.assertEqual(v1.ignore_end, v2.ignore_end)
+                if isinstance(v1, DihedralTypeList):
+                    self.assertEqual(len(v1.type), len(v2.type))
+                    for vt1, vt2 in zip(v1.type, v2.type):
+                        self.assertAlmostEqual(v1.type.phi_k, v2.type.phi_k, places=5)
+                        self.assertAlmostEqual(v1.type.per, v2.type.per, places=5)
+                        self.assertAlmostEqual(v1.type.phase, v2.type.phase, places=5)
+
+        self.assertEqual(len(top1.atoms), len(top2.atoms))
+        for a1, a2 in zip(top1.atoms, top2.atoms):
+            cmp_atoms(a1, a2)
+        cmp_valence(top1.bonds, top2.bonds, ['k', 'req'])
+        cmp_valence(top1.angles, top2.angles, ['k', 'theteq'])
+        cmp_dihedrals(top1.dihedrals, top2.dihedrals)
+
     def testReadAmber99SBILDN(self):
         """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
@@ -163,9 +215,10 @@ class TestGromacsTop(unittest.TestCase):
                 combine=None)
         top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
         self._check_ff99sbildn(top2)
-        self.assertTrue(diff_files(get_fn('1aki.ff99sbildn.top', written=True),
-                                   get_saved_fn('1aki.ff99sbildn.top'),
-                                   comment=';'))
+        self._check_equal_structures(top, top2)
+#       self.assertTrue(diff_files(get_fn('1aki.ff99sbildn.top', written=True),
+#                                  get_saved_fn('1aki.ff99sbildn.top'),
+#                                  comment=';'))
 
 class TestGromacsGro(unittest.TestCase):
     """ Tests the Gromacs GRO file parser """

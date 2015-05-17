@@ -94,6 +94,11 @@ class _Defaults(object):
         self.fudgeLJ = float(fudgeLJ)
         self.fudgeQQ = float(fudgeQQ)
 
+    def __repr__(self):
+        return ('<_Defaults: nbfunc=%d, comb-rule=%d, gen-pairs="%s", '
+                'fudgeLJ=%g, fudgeQQ=%g>' % (self.nbfunc, self.comb_rule,
+                    self.gen_pairs, self.fudgeLJ, self.fudgeQQ))
+
     def __getitem__(self, idx):
         # Treat it like the array that it is in the topology file
         if idx < 0: idx += 5
@@ -190,9 +195,9 @@ class GromacsTopologyFile(Structure):
     def __init__(self, fname=None, defines=None, parametrize=True):
         super(GromacsTopologyFile, self).__init__()
         self.parameterset = None
+        self.defaults = _Defaults()
         if fname is not None:
             self.read(fname, defines, parametrize)
-        self.defaults = _Defaults()
 
     #===================================================
 
@@ -1006,7 +1011,7 @@ class GromacsTopologyFile(Structure):
                           'sigma      epsilon\n')
             econv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for key, atom_type in iteritems(params.atom_types):
-                parfile.write('%-7s %5d %8.3f  %8.4f  A %13.6g %13.6g\n' % (
+                parfile.write('%-7s %5d %10.5f  %10.6f  A %13.6g %13.6g\n' % (
                     atom_type, atom_type.atomic_number, atom_type.mass,
                     0, atom_type.sigma/10, atom_type.epsilon*econv))
             parfile.write('\n')
@@ -1174,7 +1179,7 @@ class GromacsTopologyFile(Structure):
                         sum(a.charge for a in residue)))
             for atom in residue:
                 runchg += atom.charge
-                dest.write('%5d %10s %6d %6s %6s %6d %8.4f %10.3f   ; '
+                dest.write('%5d %10s %6d %6s %6s %6d %10.6f %10.4f   ; '
                            'qtot %.4f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
                             atom.idx+1, atom.charge, atom.mass, runchg))
