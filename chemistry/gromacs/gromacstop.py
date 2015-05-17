@@ -204,6 +204,7 @@ class GromacsTopologyFile(Structure):
         structure_contents = []
         if defines is None:
             defines = OrderedDict(FLEXIBLE=1)
+        proper_multiterm_dihedrals = dict()
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
                                  defines=defines)) as f:
             current_section = None
@@ -325,7 +326,7 @@ class GromacsTopologyFile(Structure):
                     words = line.split()
                     i, j, k, l = [int(x)-1 for x in words[:4]]
                     funct = int(words[4])
-                    if funct in (1, 9, 4):
+                    if funct in (1, 4) or (funct == 9 and len(words) < 8):
                         # Normal dihedral
                         improper = funct == 4
                         dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
@@ -333,6 +334,36 @@ class GromacsTopologyFile(Structure):
                                        improper=improper)
                         molecule.dihedrals.append(dih)
                         molecule.dihedrals[-1].funct = funct
+                    elif funct == 9:
+                        atoms = tuple(molecule.atoms[int(x)-1]
+                                      for x in words[:4])
+                        phase, phi_k, per = (float(x) for x in words[5:8])
+                        dt = DihedralType(phi_k*u.kilojoule_per_mole,
+                                          per, phase*u.degrees,
+                                          scee=1/self.defaults.fudgeQQ,
+                                          scnb=1/self.defaults.fudgeLJ)
+                        if atoms in proper_multiterm_dihedrals:
+                            for edt in proper_multiterm_dihedrals[atoms]:
+                                if edt.per == dt.per:
+                                    raise GromacsTopologyError(
+                                        'duplicate periodicity term found '
+                                        'in inline dihedral parameter for '
+                                        'atoms [%s]' % ', '.join(words[:4])
+                                    )
+                            proper_multiterm_dihedrals[atoms].append(dt)
+                        else:
+                            dt = DihedralType(phi_k*u.kilojoule_per_mole,
+                                              per, phase*u.degrees,
+                                              scee=1/self.defaults.fudgeQQ,
+                                              scnb=1/self.defaults.fudgeLJ)
+                            dtl = DihedralTypeList()
+                            dtl.append(dt)
+                            dtl.list = molecule.dihedral_types
+                            molecule.dihedral_types.append(dtl)
+                            dih = Dihedral(*atoms, improper=False, type=dtl)
+                            molecule.dihedrals.append(dih)
+                            proper_multiterm_dihedrals[atoms] = dtl
+                            proper_multiterm_dihedrals[tuple(reversed(atoms))] = dtl
                     elif funct == 2:
                         # Improper
                         imp = Improper(molecule.atoms[i], molecule.atoms[j],
@@ -352,7 +383,7 @@ class GromacsTopologyFile(Structure):
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.dihedrals.append(dih)
                         molecule.dihedrals[-1].funct == funct
-                    if funct in (1, 4, 9) and len(words) >= 8:
+                    if funct in (1, 4) and len(words) >= 8:
                         phase, phi_k, per = (float(x) for x in words[5:8])
                         dt = DihedralType(phi_k*u.kilojoule_per_mole,
                                           per, phase*u.degrees,
