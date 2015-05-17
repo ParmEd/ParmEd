@@ -3,7 +3,8 @@ Provides a class for reading GROMACS-style files. The key component to these
 files is that the ; character is a comment character and everything after ; is
 ignored.
 """
-from chemistry.exceptions import GromacsFileError
+from __future__ import division, print_function, absolute_import
+
 from chemistry.gromacs._cpp import CPreProcessor
 
 class GromacsFile(object):
@@ -43,7 +44,6 @@ class GromacsFile(object):
         for line in self._handle:
             try:
                 idx = line.index(';')
-                end = '\n'
                 if not parts:
                     yield '%s\n' % line[:idx]
                 else:
@@ -68,15 +68,29 @@ class GromacsFile(object):
         return self._handle.included_files
 
     def readline(self):
+        parts = []
         self.line_number += 1
-        line = self._handle.readline()
-        try:
-            idx = line.index(';')
-            end = '\n'
-        except ValueError:
-            idx = None
-            end = ''
-        return '%s%s' % (line[:idx], end)
+        line = True
+        while line:
+            line = self._handle.readline()
+            try:
+                idx = line.index(';')
+                if not parts:
+                    return '%s\n' % line[:idx]
+                else:
+                    parts.append(line)
+                    return '%s\n' % ''.join(parts)
+            except ValueError:
+                # There is no comment...
+                if line.rstrip('\r\n').endswith('\\'):
+                    chars = list(reversed(line))
+                    del chars[chars.index('\\')]
+                    parts.append(''.join(reversed(chars)))
+                elif parts:
+                    parts.append(line)
+                    return ''.join(parts)
+                else:
+                    return line
 
     def readlines(self):
         return [line for line in self]

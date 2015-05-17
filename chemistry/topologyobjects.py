@@ -4,7 +4,7 @@ as atoms, residues, bonds, angles, etc.
 
 by Jason Swails
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
@@ -613,11 +613,11 @@ class Atom(_ListItem):
             if self.atom_type is not None:
                 return self.atom_type.sigma
             return None
-        return self._rmin * 2**(-1/6)
+        return self._rmin * 2**(-1/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self._rmin = value * 2**(1/6)
+        self._rmin = value * 2**(1/6) / 2
 
     @property
     def epsilon(self):
@@ -652,11 +652,15 @@ class Atom(_ListItem):
     @property
     def sigma_14(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
-        return self._rmin14 * 2**(-1/6)
+        if self._rmin14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin_14 is None):
+                return self.sigma
+        return self._rmin14 * 2**(-1/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self._rmin14 = value * 2**(1/6)
+        self._rmin14 = value * 2**(1/6) / 2
 
     @property
     def epsilon_14(self):
@@ -4344,6 +4348,8 @@ class AtomType(object):
     rmin_14 : ``float``
         If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
         1-4 nonbonded interactions
+    sigma : ``float``
+        This is the sigma parameter, which is just equal to Rmin*2^(1/6)
     nbfix : ``dict(str:tuple)``
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
@@ -4352,7 +4358,8 @@ class AtomType(object):
     Notes
     -----
     This object is primarily used to build parameter databases from parameter
-    files
+    files. Also, sigma is related to Rmin, but rmin is Rmin/2, so there is an
+    extra factor of 2 in the sigma for this reason.
 
     Examples
     --------
@@ -4437,20 +4444,20 @@ class AtomType(object):
     @property
     def sigma(self):
         """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin * 2**(-1/6)
+        return self.rmin * 2**(-1/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self.rmin = value * 2**(1/6)
+        self.rmin = value * 2**(1/6) / 2
 
     @property
     def sigma_14(self):
         """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin_14 * 2**(-1/6)
+        return self.rmin_14 * 2**(-1/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self.rmin_14 = value * 2**(1/6)
+        self.rmin_14 = value * 2**(1/6) / 2
 
     def __str__(self):
         return self.name

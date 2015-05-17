@@ -806,6 +806,7 @@ class GromacsTopologyFile(Structure):
             The topology file defined by the given struct
         """
         from copy import copy as _copy
+        from chemistry.charmm import CharmmPsfFile
         gmxtop = cls()
         if copy:
             struct = _copy(struct)
@@ -898,14 +899,34 @@ class GromacsTopologyFile(Structure):
         from chemistry import __version__
         own_handle = False
         fname = ''
+        params = ParameterSet.from_structure(self)
         if isinstance(dest, string_types):
             fname = '%s ' % dest
             dest = genopen(dest, 'w')
             own_handle = True
         elif not hasattr(dest, 'write'):
             raise TypeError('dest must be a file name or file-like object')
-        if parameters != 'inline':
-            raise ValueError('only parameters == inline is currently supported')
+
+        # Determine where to write the parameters
+        own_parfile_handle = False
+        include_parfile = None
+        if parameters == 'inline':
+            parfile = dest
+        elif isinstance(parameters, string_types):
+            if parameters == fname.strip():
+                parfile = dest
+            else:
+                own_parfile_handle = True
+                parfile = genopen(parameters, 'w')
+                include_parfile = parameters
+        elif parameters is dest:
+            # This is also OK -- we'll just write to the same file object
+            pass
+        elif hasattr(parameters, 'write'):
+            parfile = parameters
+        else:
+            raise ValueError('parameters must be "inline", a file name, or '
+                             'a file-like object')
 
         try:
             # Write the header
@@ -946,7 +967,130 @@ class GromacsTopologyFile(Structure):
                            (self.defaults.nbfunc, self.defaults.comb_rule,
                             self.defaults.gen_pairs, self.defaults.fudgeLJ,
                             self.defaults.fudgeQQ))
-            # TODO -- print parameters here
+            if include_parfile is not None:
+                dest.write('#include "%s"\n\n' % include_parfile)
+            # Print all atom types
+            parfile.write('[ atomtypes ]\n')
+            parfile.write('; name      at.num  mass     charge ptype  '
+                          'sigma      epsilon\n')
+            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
+            for key, atom_type in iteritems(params.atom_types):
+                parfile.write('%-7s %5d %8.3f  %8.4f  A %13.6g %13.6g\n' % (
+                    atom_type, atom_type.atomic_number, atom_type.mass,
+                    0, atom_type.sigma/10, atom_type.epsilon*econv))
+            parfile.write('\n')
+            # Print all parameter types unless we asked for inline
+            if parameters != 'inline':
+                if params.bond_types:
+                    parfile.write('[ bondtypes ]\n')
+                    parfile.write('; i    j  func       b0          kb\n')
+                    used_keys = set()
+                    conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
+                                u.kilojoule/u.nanometer**2) * 2
+                    for key, param in iteritems(params.bond_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        parfile.write('%-5s %-5s    1   %.5f   %f\n' % (key[0],
+                                      key[1], param.req/10, param.k*conv))
+                    parfile.write('\n')
+                if params.angle_types:
+                    parfile.write('[ angletypes ]\n')
+                    parfile.write(';  i    j    k  func       th0       cth '
+                                  '   rub         kub\n')
+                    used_keys = set()
+                    conv = (u.kilocalorie/u.radian**2).conversion_factor_to(
+                                u.kilojoule/u.nanometer**2) * 2
+                    bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
+                                u.kilojoule/u.nanometer**2) * 2
+                    for key, param in iteritems(params.angle_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
+                                key[0], key[1], key[2], param.theteq,
+                                param.k*conv)
+                        if (key[0], key[2]) in params.urey_bradley_types:
+                            ub = params.urey_bradley_types[(key[0], key[2])]
+                            parfile.write(part % 5)
+                            parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
+                                          ub.k*bconv))
+                        else:
+                            parfile.write(part % 1)
+                            parfile.write('\n')
+                    parfile.write('\n')
+                if params.dihedral_types:
+                    parfile.write('[ dihedraltypes ]\n')
+                    parfile.write(';i  j   k  l  func      phase      kd      '
+                                  'pn\n')
+                    used_keys = set()
+                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+                    fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
+                    for key, param in iteritems(params.dihedral_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        if isinstance(param, DihedralTypeList):
+                            funct = 9
+                            for dt in param:
+                                parfile.write(fmt % (key[0], key[1], key[2],
+                                              key[3], funct, dt.phase,
+                                              dt.phi_k*conv, int(dt.per)))
+                        else:
+                            funct = 1
+                            parfile.write(fmt % (key[0], key[1], key[2], key[3],
+                                          funct, param.phase, param.phi_k*conv,
+                                          int(param.per)))
+                    parfile.write('\n')
+                if params.improper_periodic_types:
+                    parfile.write('[ dihedraltypes ]\n')
+                    parfile.write(';i  j   k  l  func      phase      kd      '
+                                  'pn\n')
+                    used_keys = set()
+                    conv = u.kilojoules.conversion_factor_to(u.kilocalories)
+                    fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
+                    for key, param in iteritems(params.improper_periodic_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        parfile.write(fmt % (key[0], key[1], key[2], key[3],
+                                      4, param.phase, param.phi_k*conv,
+                                      int(param.per)))
+                    parfile.write('\n')
+                if params.improper_types:
+                    # BUGBUG -- The ordering is borked here because that made it
+                    # simpler for me to work with back when I wrote the CHARMM
+                    # parsers. This needs to be fixed now and handled correctly.
+                    parfile.write('[ dihedraltypes ]\n')
+                    parfile.write('; i  j       k       l       func     q0    '
+                                  'cq\n')
+                    fmt = '%-6s %-6s %-6s %-6s    %d   %.4f   %.4f\n'
+                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
+                    for key, param in iteritems(params.improper_types):
+                        parfile.write(fmt % (key[0], key[1], key[2], key[3],
+                                      2, param.psi_eq, param.psi_k*conv))
+                    parfile.write('\n')
+            # CMAP grids are never printed inline, so if we have them, we need
+            # to write a dedicated section for them
+            if params.cmap_types:
+                    parfile.write('[ cmaptypes ]\n\n')
+                    used_keys = set()
+                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+                    for key, param in iteritems(params.cmap_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        parfile.write('%-6s %-6s %-6s %-6s %-6s   1   '
+                                      '%4d %4d' % (key[0], key[1], key[2],
+                                      key[3], key[4], param.resolution,
+                                      param.resolution))
+                        res2 = param.resolution * param.resolution
+                        for i in range(0, res2, 10):
+                            parfile.write('\\\n')
+                            end = min(i+10, res2)
+                            parfile.write(' '.join(str(param.grid[j]*conv)
+                                          for j in range(i, end)))
+                        parfile.write('\n\n')
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -959,7 +1103,7 @@ class GromacsTopologyFile(Structure):
                         sysnum += 1
                     names.append(title)
                     GromacsTopologyFile._write_molecule(molecule, dest, title,
-                                                        parameters == 'inline')
+                                        params, parameters == 'inline')
                 # System
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
@@ -972,18 +1116,21 @@ class GromacsTopologyFile(Structure):
                 for i, (molecule, num) in enumerate(molecules):
                     dest.write('%-15s %6d\n' % (names[i], num))
             elif isinstance(combine, string_types) and combine.lower() == 'all':
-                GromacsTopologyFile._write_molecule(self, dest, 'system')
+                GromacsTopologyFile._write_molecule(self, dest, 'system',
+                                    params, parameters == 'inline')
             else:
                 raise NotImplementedError('Specialized molecule splitting is '
                                           'not yet supported')
         finally:
             if own_handle:
                 dest.close()
+            if own_parfile_handle:
+                parfile.close()
 
     #===================================================
 
     @staticmethod
-    def _write_molecule(struct, dest, title, writeparams):
+    def _write_molecule(struct, dest, title, params, writeparams):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write('%s          %d\n\n' % (title, struct.nrexcl))
         dest.write('[ atoms ]\n')
@@ -1025,10 +1172,12 @@ class GromacsTopologyFile(Structure):
                     continue
                 dest.write('%7d %6d %5d' % (bond.atom1.idx+1,
                            bond.atom2.idx+1, bond.funct))
-                if settle:
-                    dest.write('   %.5f %f %.5f %f' % (bond.type.req/10,
-                        bond.type.k*conv, bond.type.req/10, bond.type.k*conv))
-                elif writeparams and bond.type is not None:
+                if bond.type is None:
+                    dest.write('\n')
+                    continue
+                key = (bond.atom1.type, bond.atom2.type)
+                if writeparams or key not in params.bond_types or \
+                        bond.type != params.bond_types[key]:
                     dest.write('   %.5f %f' % (bond.type.req/10,
                                                bond.type.k*conv))
                 dest.write('\n')
@@ -1056,8 +1205,8 @@ class GromacsTopologyFile(Structure):
             dest.write('\n')
         # Angles
         if struct.angles:
-            conv = (u.kilocalorie_per_mole/u.radian).conversion_factor_to(
-                        u.kilojoule_per_mole/u.radian)*2
+            conv = (u.kilocalorie_per_mole/u.radian**2).conversion_factor_to(
+                        u.kilojoule_per_mole/u.radian**2)*2
             dest.write('[ angles ]\n')
             dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
                        ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
@@ -1065,10 +1214,14 @@ class GromacsTopologyFile(Structure):
                 dest.write('%7d %6d %6d %5d' % (angle.atom1.idx+1,
                            angle.atom2.idx+1, angle.atom3.idx+1,
                            angle.funct))
-                if settle:
-                    dest.write('   %.2f  %.2f  %.2f  %.2f' % (
-                        angle.type.theteq, angle.type.k*conv, angle.type.theteq,
-                        angle.type.k*conv))
+                if angle.type is None:
+                    dest.write('\n')
+                    continue
+                key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
+                if writeparams or key not in params.angle_types or \
+                        angle.type != params.angle_types[key]:
+                    dest.write('   %.5f %f' % (angle.type.theteq,
+                                               angle.type.k*conv))
                 dest.write('\n')
             dest.write('\n')
         # Dihedrals
@@ -1078,10 +1231,34 @@ class GromacsTopologyFile(Structure):
                        'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
                        'c4', 'c5'))
             dest.write('\n')
+            conv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for dihed in struct.dihedrals:
-                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
                            dihed.atom4.idx+1, dihed.funct))
+                if dihed.type is None:
+                    dest.write('\n')
+                    continue
+                if dihed.improper:
+                    typedict = params.improper_periodic_types
+                else:
+                    typedict = params.dihedral_types
+                key = (dihed.atom1.type, dihed.atom2.type, dihed.atom3.type,
+                        dihed.atom4.type)
+                if writeparams or key not in typedict or \
+                        _diff_diheds(dihed.type, typedict[key]):
+                    if isinstance(dihed.type, DihedralTypeList):
+                        dest.write('  %.5f  %.5f  %d\n' % (dihed.type[0].phase,
+                            dihed.type[0].phi_k*conv, int(dihed.type[0].per)))
+                        for dt in dihed.type[1:]:
+                            dest.write('%7d %6d %6d %6d %5d  %.5f  %.5f  %d\n' %
+                                    (dihed.atom1.idx+1, dihed.atom2.idx+1,
+                                     dihed.atom3.idx+1, dihed.atom4.idx+1,
+                                     dihed.funct, dt.phase, dt.phi_k*conv,
+                                     int(dt.per)))
+                    else:
+                        dest.write('  %.5f  %.5f  %d\n' % (dihed.type.phase,
+                            dihed.type.phi_k*conv, int(dihed.type.per)))
             dest.write('\n')
         # RB-torsions
         if struct.rb_torsions:
@@ -1090,10 +1267,26 @@ class GromacsTopologyFile(Structure):
                        'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
                        'c4', 'c5'))
             dest.write('\n')
+            conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+            paramfmt = '  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f'
             for dihed in struct.rb_torsions:
-                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
                            dihed.atom4.idx+1, dihed.funct))
+                if dihed.type is None:
+                    dest.write('\n')
+                    continue
+                key = (dihed.atom1.type, dihed.atom2.type, dihed.atom3.type,
+                        dihed.atom4.type)
+                if writeparams or key not in params.rb_torsion_types or \
+                        params.rb_torsion_types[key] != dihed.type:
+                    dest.write(paramfmt % (dihed.type.c0*conv,
+                                           dihed.type.c1.conv,
+                                           dihed.type.c2.conv,
+                                           dihed.type.c3.conv,
+                                           dihed.type.c4.conv,
+                                           dihed.type.c5.conv))
+                    dest.write('\n')
             dest.write('\n')
         # Impropers
         if struct.impropers:
@@ -1101,10 +1294,19 @@ class GromacsTopologyFile(Structure):
             dest.write((';%6s %6s %6s %6s %5s'+' %10s'*4) % ('ai', 'aj',
                        'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3'))
             dest.write('\n')
+            conv = u.kilocalories.conversion_factor_to(u.kilojoules) * 2
             for dihed in struct.impropers:
-                dest.write('%7d %6d %6d %6d %5d\n' % (dihed.atom1.idx+1,
+                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
                            dihed.atom4.idx+1, dihed.funct))
+                if dihed.type is None:
+                    dest.write('\n')
+                    continue
+                # BUGBUG: We always write improper types since we don't
+                # currently store the correct ordering of the types in the
+                # improper section
+                dest.write('  %12.5f  %12.5f\n' % (dihed.type.psi_eq,
+                                                   dihed.type.psi_k*conv))
             dest.write('\n')
         # Cmaps
         if struct.cmaps:
@@ -1120,7 +1322,7 @@ class GromacsTopologyFile(Structure):
         if settle:
             dest.write('\n#else\n\n')
             dest.write('[ settles ]\n')
-            dest.write('; i	funct	doh	dhh\n')
+            dest.write('; i     funct   doh     dhh\n')
             for b in oxy.bonds:
                 if hyd1 in b:
                     if b.type is None:
@@ -1238,3 +1440,15 @@ def _mark_graph(atom, num):
     for a in atom.bond_partners:
         if a.marked <= num: continue
         _mark_graph(a, num+1)
+
+def _diff_diheds(dt1, dt2):
+    """ Determine if 2 dihedrals are *really* different. dt1 can either be a
+    DihedralType or a DihedralTypeList or dt1 can be a DihedralType and dt2 can
+    be a DihedralTypeList.  This returns True if dt1 == dt2 *or* dt1 is equal to
+    the only element of dt2
+    """
+    if dt1 == dt2:
+        return False
+    if isinstance(dt2, DihedralTypeList) and isinstance(dt1, DihedralType):
+        if len(dt2) == 1 and dt2[0] == dt1: return False
+    return True
