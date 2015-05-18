@@ -192,13 +192,14 @@ class GromacsGroFile(object):
                            (atom.residue.idx+1, atom.residue.name, atom.name,
                                atom.idx+1, atom.xx/10, atom.xy/10, atom.xz/10))
         # Box, in the weird format...
-        a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
-                        *struct.box))
-        if all([abs(x-90) < TINY for x in struct.box[3:]]):
-            dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
-        else:
-            dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
-                       a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
-        dest.write('\n')
+        if struct.box is not None:
+            a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
+                            *struct.box))
+            if all([abs(x-90) < TINY for x in struct.box[3:]]):
+                dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
+            else:
+                dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
+                           a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+            dest.write('\n')
         if own_handle:
             dest.close()
