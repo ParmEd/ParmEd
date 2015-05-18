@@ -302,6 +302,12 @@ class AmberParm(AmberFormat, Structure):
             raise
         else:
             inst.load_coordinates(coords)
+        # pmemd likes to skip torsions with periodicities of 0, which may be
+        # present as a way to hack entries into the 1-4 pairlist. See
+        # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
+        # here is to simply set that periodicity to 1.
+        for dt in inst.dihedral_types:
+            if dt.phi_k == 0 and dt.per == 0: dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
