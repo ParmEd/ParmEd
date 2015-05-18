@@ -29,7 +29,7 @@ from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
             NNB, TINY, RAD_TO_DEG, DEG_TO_RAD)
 from chemistry.exceptions import (AmberParmError, ParsingError,
-                                  MoleculeError, MoleculeWarning)
+            MoleculeError, MoleculeWarning, AmberParmWarning)
 from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass
 from chemistry.structure import Structure, needs_openmm
@@ -307,7 +307,17 @@ class AmberParm(AmberFormat, Structure):
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
         # here is to simply set that periodicity to 1.
         for dt in inst.dihedral_types:
-            if dt.phi_k == 0 and dt.per == 0: dt.per = 1.0
+            if dt.phi_k == 0 and dt.per == 0:
+                dt.per = 1.0
+            elif dt.per == 0:
+                warnings.warn('Periodicity of 0 detected with non-zero force '
+                              'constant. Changing periodicity to 1 and force '
+                              'constant to 0 to ensure 1-4 nonbonded pairs are '
+                              'properly identified. This might cause a shift '
+                              'in the energy, but will leave forces unaffected',
+                              AmberParmWarning)
+                dt.phi_k = 0.0
+                dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
