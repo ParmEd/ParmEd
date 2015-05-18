@@ -162,7 +162,7 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest):
+    def write(struct, dest, nobox=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -171,6 +171,11 @@ class GromacsGroFile(object):
             The structure to write to a Gromacs GRO file (must have coordinates)
         dest : str or file-like
             The name of a file or a file object to write the Gromacs topology to
+        nobox : bool, optional
+            If the system does not have a periodic box defined, and this option
+            is True, no box will be written. If False, the periodic box will be
+            defined to enclose the solute with 0.5 nm clearance on all sides. If
+            periodic box dimensions *are* defined, this variable has no effect.
         """
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
@@ -200,6 +205,21 @@ class GromacsGroFile(object):
             else:
                 dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
                            a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+            dest.write('\n')
+        elif not nobox and struct.atoms:
+            # Find the extent of the molecule in all dimensions
+            xdim = [struct.atoms[0].xx, struct.atoms[1].xx]
+            ydim = [struct.atoms[0].xy, struct.atoms[1].xy]
+            zdim = [struct.atoms[0].xz, struct.atoms[1].xz]
+            for atom in struct.atoms:
+                xdim[0] = min(xdim[0], atom.xx)
+                xdim[1] = max(xdim[1], atom.xx)
+                ydim[0] = min(ydim[0], atom.xy)
+                ydim[1] = max(ydim[1], atom.xy)
+                zdim[0] = min(zdim[0], atom.xz)
+                zdim[1] = max(zdim[1], atom.xz)
+            dest.write('%10.5f'*3 % (xdim[1]-xdim[0]+5, ydim[1]-ydim[0]+5,
+                                     zdim[1]-zdim[0]+5))
             dest.write('\n')
         if own_handle:
             dest.close()
