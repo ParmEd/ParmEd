@@ -892,9 +892,9 @@ class GromacsTopologyFile(Structure):
                         gmxtop.defaults.fudgeLJ = fudgeLJ
                         break
                 else:
-                    if dt.scee and dt.scnb:
-                        gmxtop.defaults.fudgeQQ = 1 / dt.scee
-                        gmxtop.defaults.fudgeLJ = 1 / dt.scnb
+                    if dihedral.type.scee and dihedral.type.scnb:
+                        gmxtop.defaults.fudgeQQ = 1 / dihedral.type.scee
+                        gmxtop.defaults.fudgeLJ = 1 / dihedral.type.scnb
                         break
 
         return gmxtop
