@@ -1134,6 +1134,12 @@ class GromacsTopologyFile(Structure):
                 for molecule, num in molecules:
                     if len(molecule.residues) == 1:
                         title = molecule.residues[0].name
+                        if title in names:
+                            orig = title
+                            sfx = 2
+                            while title in names:
+                                title = '%s%d' % (orig, sfx)
+                                sfx += 1
                     else:
                         title = 'system%d' % sysnum
                         sysnum += 1
