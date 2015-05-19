@@ -360,6 +360,34 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
+    def __imul__(self, ncopies, other=None):
+        super(AmberParm, self).__imul__(ncopies, other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    def __iadd__(self, other):
+        super(AmberParm, self).__iadd__(other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    #===================================================
+
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each
