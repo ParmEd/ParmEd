@@ -1242,7 +1242,7 @@ class Structure(object):
         nmol = max(mollist)
         structs = []
         counts = []
-        single_residue_molecules = dict()
+        res_molecules = dict()
         # Divvy up the atoms into their separate molecules
         molatoms = [[] for i in range(nmol)]
         for atom in self.atoms:
@@ -1250,16 +1250,19 @@ class Structure(object):
         for i in range(nmol):
             sel = molatoms[i]
             involved_residues = set(atom.residue.idx for atom in sel)
-            # Shortcut -- keep names of single-residue molecules in a set and
-            # use that to see if two molecules are unique -- this gives drastic
-            # speedup for systems with many duplicated single-residue molecules
+            # Shortcut -- keep names of single-residue molecules and the number
+            # of atoms present in those residues in a dict and use that to see
+            # if two molecules are unique -- this gives drastic speedup for
+            # systems with many duplicated single-residue molecules
             # (i.e., just about every solvent out there)
             if len(involved_residues) == 1:
-                if sel[0].residue.name in single_residue_molecules:
-                    counts[single_residue_molecules[sel[0].residue.name]] += 1
+                res = sel[0].residue
+                names = tuple(a.name for a in res)
+                if (res.name, len(res), names) in res_molecules:
+                    counts[res_molecules[(res.name, len(res), names)]] += 1
                     continue
                 else:
-                    single_residue_molecules[sel[0].residue.name] = len(structs)
+                    res_molecules[(res.name, len(res), names)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
