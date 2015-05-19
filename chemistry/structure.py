@@ -1272,7 +1272,7 @@ class Structure(object):
                                 break
                         elif a2.residue is None:
                             break
-                        elif a1.residue.name != a1.residue.name:
+                        elif a1.residue.name != a2.residue.name:
                             break
                         if not a1.type and not a2.type:
                             if a1.name != a2.name: break
