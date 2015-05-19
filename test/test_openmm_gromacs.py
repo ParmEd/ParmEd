@@ -64,8 +64,8 @@ class TestGromacsTop(utils.TestCaseRelative):
         gro = load_file(os.path.join(get_fn('01.1water'), 'conf.gro'))
 
         # create the system and context, then calculate the energy decomposition
-        system = top.createSystem(constraints=None, rigidWater=False)
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        system = top.createSystem(constraints=app.HBonds, rigidWater=True)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -76,7 +76,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         ommfrc = context.getState(getForces=True).getForces().value_in_unit(
                     u.kilojoules_per_mole/u.nanometer)
         max_diff = get_max_diff(gmxfrc, ommfrc)
-        self.assertLess(max_diff, 0.005)
+        self.assertLess(max_diff, 0.01)
 
     def testVerySmall(self):
         """ Test very small Gromacs system nrg and frc (no PBC) """
@@ -87,7 +87,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem(constraints=app.HBonds, rigidWater=True,
                                   flexibleConstraints=True)
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -109,7 +109,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         gro = load_file(os.path.join(get_fn('04.Ala'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -133,7 +133,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         gro = load_file(os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -159,7 +159,7 @@ class TestGromacsTop(utils.TestCaseRelative):
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -190,7 +190,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -220,7 +220,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 

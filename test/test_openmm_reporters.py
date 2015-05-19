@@ -43,7 +43,7 @@ class TestStateDataReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         f = open(get_fn('akma5.dat', written=True), 'w')
         sim.reporters.extend([
@@ -148,7 +148,7 @@ class TestStateDataReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.append(
             ProgressReporter(get_fn('progress_reporter.dat', written=True), 10,
@@ -182,7 +182,7 @@ class TestTrajRestartReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj1.nc', written=True), 10),

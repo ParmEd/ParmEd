@@ -82,7 +82,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=4)
@@ -98,7 +98,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -111,7 +111,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -127,7 +127,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -140,7 +140,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -156,7 +156,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -169,7 +169,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -185,7 +185,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -198,7 +198,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -214,7 +214,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -227,7 +227,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.3351, places=3)
@@ -244,7 +244,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstrom)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -264,7 +264,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -281,7 +281,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
