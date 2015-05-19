@@ -2284,6 +2284,18 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
+    def append(self, other):
+        if not isinstance(other, DihedralType):
+            raise TypeError('Can only add DihedralType to DihedralTypeList')
+        for existing in self:
+            if existing.per == other.per:
+                # Do not add duplicate periodicities
+                if existing == other: return
+                raise DihedralError('Cannot add two DihedralType instances '
+                                    'with the same periodicity to the same '
+                                    'DihedralTypeList')
+        list.append(self, other)
+
     @property
     def penalty(self):
         penalty = None
