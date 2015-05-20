@@ -901,23 +901,20 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def write(self, dest, include_itps=None, combine=None, parameters='inline'):
+    def write(self, dest, combine=None, parameters='inline'):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
         ----------
         dest : str or file-like
             The name of a file or a file object to write the Gromacs topology to
-        include_itps : list of str
-            This keyword-only parameter contains a list of ITP files to include
-            in the beginning of the generated Gromacs topology file
-        combine : 'all', None, or list of iterables
+        combine : 'all', None, or list of iterables, optional
             If None, no molecules are combined into a single moleculetype. If
             'all', all molecules are combined into a single moleculetype.
             Otherwise, the list of molecule indices will control which atoms are
             combined into single moleculetype's. Each index can appear *only*
             once, and start from 0. The same molecule number cannot appear in
-            two lists
+            two lists. Default is None
         parameters : 'inline' or str or file-like object, optional
             This specifies where parameters should be printed. If 'inline'
             (default), the parameters are written on the same lines as the
@@ -988,21 +985,13 @@ class GromacsTopologyFile(Structure):
        now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],
        __version__, os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
        ' '.join(sys.argv)))
-            if include_itps is not None:
-                dest.write('; Include forcefield parameters\n')
-                if isinstance(include_itps, string_types):
-                    dest.write('#include "%s"\n' % include_itps)
-                else:
-                    for include in include_itps:
-                        dest.write('#include "%s"\n' % include)
-            else:
-                dest.write('\n[ defaults ]\n')
-                dest.write('; nbfunc        comb-rule       gen-pairs       '
-                           'fudgeLJ fudgeQQ\n')
-                dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
-                           (self.defaults.nbfunc, self.defaults.comb_rule,
-                            self.defaults.gen_pairs, self.defaults.fudgeLJ,
-                            self.defaults.fudgeQQ))
+            dest.write('\n[ defaults ]\n')
+            dest.write('; nbfunc        comb-rule       gen-pairs       '
+                        'fudgeLJ fudgeQQ\n')
+            dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
+                        (self.defaults.nbfunc, self.defaults.comb_rule,
+                        self.defaults.gen_pairs, self.defaults.fudgeLJ,
+                        self.defaults.fudgeQQ))
             if include_parfile is not None:
                 dest.write('#include "%s"\n\n' % include_parfile)
             # Print all atom types

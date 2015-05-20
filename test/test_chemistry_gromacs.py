@@ -135,10 +135,8 @@ class TestGromacsTop(unittest.TestCase):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
         GromacsTopologyFile.write(top,
-                get_fn('1aki.charmm27.top', written=True),
-                include_itps='charmm27.ff/forcefield.itp')
+                get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
-        self.assertEqual(top2.itps, ['charmm27.ff/forcefield.itp'])
         self._charmm27_checks(top)
 
     def _check_ff99sbildn(self, top):
