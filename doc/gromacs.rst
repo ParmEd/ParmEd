@@ -130,15 +130,7 @@ input files to AMBER format in just a few lines of code::
 
 Furthermore, you may check the correctness of topology loading by using the `GromacsTopologyFile`
 object to calculate an OpenMM potential energy and force, then comparing that result with your own 
-output from Gromacs. 
-
-A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
-and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run 
-this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
-the forces between the software packages are accurate to 1 part in 10,000. The remaining differences 
-are due to how the different software packages treat nonbonded interactions in the cut-off region, use
-of single precision in the computation, and other small factors that are not expected to affect the 
-simulation results.
+output from Gromacs::
 
     >>> import simtk.openmm as mm
     >>> import simtk.openmm.app as app
@@ -150,4 +142,12 @@ simulation results.
     >>> simul.context.applyConstraints(1e-12)
     >>> state = simul.context.getState(getEnergy=True, getForces=True)
     >>> print(state.getPotentialEnergy())
+
+A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
+and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run 
+this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
+the forces between the software packages are accurate to 1 part in 10,000. The remaining differences 
+are due to how the different software packages treat nonbonded interactions in the cut-off region, use
+of single precision in the computation, and other small factors that are not expected to affect the 
+simulation results.
 
