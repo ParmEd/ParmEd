@@ -108,3 +108,46 @@ The corresponding classes are:
 
     GromacsTopologyFile
     GromacsGroFile
+
+Example usage
+-------------
+
+Many exciting possibilities are available with `GromacsTopologyFile` and `GromacsGroFile`.
+For example, ParmEd is the first software package to enable conversion of Gromacs simulation
+input files to AMBER format in just a few lines of code::
+
+    >>> from chemistry import gromacs, amber
+    >>> gmx_top = GromacsTopologyFile('topol.top')
+    >>> gmx_gro = GromacsGroFile('conf.gro')
+    >>> gmx_top.box = gmx_gro.box # Needed because .prmtop contains box info
+    >>> gmx_top.positions = gmx_gro.positions
+    >>> amb_prm = AmberParm.load_from_structure(gmx_top)
+    >>> amb_prm.write("prmtop")
+    >>> amb_inpcrd = amber.AmberAsciiRestart("inpcrd", mode="w")
+    >>> amb_inpcrd.coordinates = np.array(gmx_top.positions.value_in_unit(u.angstrom)).reshape(-1,3)
+    >>> amb_inpcrd.box = gmx_top.box
+    >>> amb_inpcrd.close()
+
+Furthermore, you may check the correctness of topology loading by using the `GromacsTopologyFile`
+object to calculate an OpenMM potential energy and force, then comparing that result with your own 
+output from Gromacs. 
+
+A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
+and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run 
+this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
+the forces between the software packages are accurate to 1 part in 10,000. The remaining differences 
+are due to how the different software packages treat nonbonded interactions in the cut-off region, use
+of single precision in the computation, and other small factors that are not expected to affect the 
+simulation results.
+
+    >>> import simtk.openmm as mm
+    >>> import simtk.openmm.app as app
+    >>> system = gmx_top.createSystem() # OpenMM system creation; make sure to pass keyword arguments consistent with your .mdp file
+    >>> integ = mm.VerletIntegrator(1.0*u.femtosecond)
+    >>> plat = mm.Platform.getPlatformByName('Reference')
+    >>> simul = app.Simulation(gmx_top.topology, system, integ, plat)
+    >>> simul.context.setPositions(gmx_top.positions)
+    >>> simul.context.applyConstraints(1e-12)
+    >>> state = simul.context.getState(getEnergy=True, getForces=True)
+    >>> print(state.getPotentialEnergy())
+
