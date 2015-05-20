@@ -121,9 +121,7 @@ class AmberMask(object):
                     p = self.mask[i]
                     buffer += p
                     flag = 3
-                    try:
-                        self.parm.coords[0]
-                    except AttributeError:
+                    if not all(hasattr(a, 'xx') for a in self.parm.atoms):
                         raise MaskError('<,> operators require coordinates')
                     if not p in [':','@']:
                         raise MaskError('Bad syntax [%s]' % self.mask)
@@ -336,8 +334,6 @@ class AmberMask(object):
             distance = float(pmask1[1:])
         except TypeError:
             raise MaskError('Distance must be a number: %s' % pmask1[1:])
-        if not hasattr(self.parm.atoms[0], 'xx'):
-            raise MaskError('Distance-based masks require loaded coordinates.')
         distance *= distance # Faster to compare square of distance
         # First select all atoms that satisfy the distance. If we ended up
         # choosing residues, then we will go back through afterwards and select
