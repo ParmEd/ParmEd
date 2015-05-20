@@ -8,19 +8,23 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber import AmberParm
-from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
+from chemistry import load_file
+from chemistry.openmm.reporters import NetCDFReporter
 from chemistry import unit as u
 
-# Load the Amber files
-print('Loading AMBER files...')
-ala2_solv = AmberParm('ala2_solv.parm7', 'ala2_solv.rst7')
+# Load the Gromacs files
+print('Loading Gromacs files...')
+top = load_file('dhfr_pme.top')
+gro = load_file('dhfr_pme.gro')
+
+# Transfer the unit cell information from the GRO file to the top object
+top.box = gro.box[:]
 
 # Create the OpenMM system
 print('Creating OpenMM System')
-system = ala2_solv.createSystem(nonbondedMethod=app.PME,
-                                nonbondedCutoff=8.0*u.angstroms,
-                                constraints=app.HBonds,
+system = top.createSystem(nonbondedMethod=app.PME,
+                          nonbondedCutoff=8.0*u.angstroms,
+                          constraints=app.HBonds,
 )
 
 # Create the integrator to do Langevin dynamics
@@ -36,10 +40,10 @@ platform = mm.Platform.getPlatformByName('CUDA')
 prop = dict(CudaPrecision='mixed') # Use mixed single/double precision
 
 # Create the Simulation object
-sim = app.Simulation(ala2_solv.topology, system, integrator, platform, prop)
+sim = app.Simulation(top.topology, system, integrator, platform, prop)
 
 # Set the particle positions
-sim.context.setPositions(ala2_solv.positions)
+sim.context.setPositions(gro.positions)
 
 # Minimize the energy
 print('Minimizing energy')
@@ -47,11 +51,11 @@ sim.minimizeEnergy(maxIterations=500)
 
 # Set up the reporters to report energies and coordinates every 100 steps
 sim.reporters.append(
-        StateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
-                          kineticEnergy=True, temperature=True, volume=True,
-                          density=True)
+        app.StateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
+                              kineticEnergy=True, temperature=True, volume=True,
+                              density=True)
 )
-sim.reporters.append(NetCDFReporter('ala2_solv.nc', 100, crds=True))
+sim.reporters.append(NetCDFReporter('dhfr_pme.nc', 100, crds=True))
 
 # Run dynamics
 print('Running dynamics')
