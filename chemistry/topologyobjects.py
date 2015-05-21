@@ -657,6 +657,7 @@ class Atom(_ListItem):
             if (self.atom_type is _UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.sigma
+            return self.atom_type.rmin_14 * 2**(-1/6) * 2
         return self._rmin14 * 2**(-1/6) * 2
 
     @sigma_14.setter
