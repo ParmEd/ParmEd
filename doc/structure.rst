@@ -234,9 +234,8 @@ if no atoms match the selection.
 **Now let's look at the slightly more complex Amber mask selection. See** `Amber
 mask syntax <amber.html#amber-mask-syntax>`_ **for more details**.
 
-If you pass a single string that is recognized as valid Amber mask syntax, it
-will be interpreted as an Amber mask. The example below continues from the same
-``struct`` we were using above::
+If you pass a single string, it will be interpreted as an Amber mask. The
+example below continues from the same ``struct`` we were using above::
 
     >>> struct['@CA']
     <Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized>
