@@ -39,7 +39,7 @@ from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         OutOfPlaneExtraPointFrame, RBTorsionType)
 from chemistry import unit as u
 from chemistry.utils import tag_molecules
-from chemistry.utils.six import string_types, wraps, integer_types
+from chemistry.utils.six import string_types, wraps, integer_types, iteritems
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
 from copy import copy
@@ -1422,6 +1422,31 @@ class Structure(object):
 
     #===================================================
 
+    def has_NBFIX(self):
+        """
+        Returns whether or not any pairs of atom types have their LJ
+        interactions modified by an NBFIX definition
+
+        Returns
+        -------
+        has_nbfix : bool
+            If True, at least two atom types have NBFIX mod definitions
+        """
+        typemap = dict()
+        for a in self.atoms:
+            if a.atom_type is None: continue
+            typemap[str(a.atom_type)] = a.atom_type
+        # Now we have a map of all atom types that we have defined in our
+        # system. Look through all of the atom types and see if any of their
+        # NBFIX definitions are also keys in typemap
+        for key, type in iteritems(typemap):
+            for key in type.nbfix:
+                if key in typemap:
+                    return True
+        return False
+
+    #===================================================
+
     @property
     def box_vectors(self):
         """
@@ -2168,12 +2193,130 @@ class Structure(object):
             force.addException(pair.atom1.idx, pair.atom2.idx,
                                pair.type.rmin*sigma_scale,
                                pair.type.epsilon*ene_conv, chgprod, True)
+
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
                 switchDistance = switchDistance.value_in_unit(u.nanometers)
             if 0 < switchDistance < nonbondedCutoff:
                 force.setUseSwitchingFunction(True)
                 force.setSwitchingDistance(switchDistance)
+
+        # Now see if we have any NBFIXes that we need to implement via a
+        # CustomNonbondedForce
+        if self.has_NBFIX():
+            return force, self._omm_nbfixed_force(force, nonbondedMethod)
+
+        return force
+
+    #===================================================
+
+    def _omm_nbfixed_force(self, nonbfrc, nonbondedMethod):
+        """ Private method for creating a CustomNonbondedForce with a lookup
+        table. This should not be called by users -- you have been warned.
+
+        Parameters
+        ----------
+        nonbfrc : NonbondedForce
+            NonbondedForce for the "standard" nonbonded interactions. This will
+            be modified (specifically, L-J ixns will be zeroed)
+        nonbondedMethod : Nonbonded Method (e.g., NoCutoff, PME, etc.)
+            The nonbonded method to apply here. Ewald and PME will be
+            interpreted as CutoffPeriodic for the CustomNonbondedForce.
+
+        Returns
+        -------
+        force : CustomNonbondedForce
+            The L-J force with NBFIX implemented as a lookup table
+        """
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        # We need a CustomNonbondedForce to implement the NBFIX functionality.
+        # First derive the type lookup tables
+        lj_idx_list = [0 for atom in self.atoms]
+        lj_radii, lj_depths = [], []
+        num_lj_types = 0
+        lj_type_list = []
+        for i, atom in enumerate(self.atoms):
+            atype = atom.atom_type
+            if lj_idx_list[i]: continue # already assigned
+            num_lj_types += 1
+            lj_idx_list[i] = num_lj_types
+            ljtype = (atype.rmin, abs(atype.epsilon))
+            lj_type_list.append(atype)
+            lj_radii.append(atype.rmin)
+            lj_depths.append(abs(atype.epsilon))
+            for j in range(i+1, len(self.atoms)):
+                atype2 = self.atoms[j].atom_type
+                if lj_idx_list[j] > 0: continue # already assigned
+                if atype2 is atype:
+                    lj_idx_list[j] = num_lj_types
+                elif not atype.nbfix:
+                    # Only non-NBFIXed atom types can be compressed
+                    ljtype2 = (atype2.rmin, abs(atype2.epsilon))
+                    if ljtype == ljtype2:
+                        lj_idx_list[j] = num_lj_types
+        # Now everything is assigned. Create the A- and B-coefficient arrays
+        acoef = [0 for i in range(num_lj_types*num_lj_types)]
+        bcoef = acoef[:]
+        for i in range(num_lj_types):
+            for j in range(num_lj_types):
+                namej = lj_type_list[j].name
+                try:
+                    rij, wdij, rij14, wdij14 = lj_type_list[i].nbfix[namej]
+                except KeyError:
+                    rij = (lj_radii[i] + lj_radii[j]) * length_conv
+                    wdij = math.sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
+                else:
+                    rij *= length_conv
+                    wdij *= ene_conv
+                rij6 = rij**6
+                acoef[i+num_lj_types*j] = math.sqrt(wdij) * rij6
+                bcoef[i+num_lj_types*j] = 2 * wdij * rij6
+        force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2; r2=r^2; '
+                                        'a=acoef(type1, type2); '
+                                        'b=bcoef(type1, type2)')
+        force.addTabulatedFunction('acoef',
+                mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
+        force.addTabulatedFunction('bcoef',
+                mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
+        force.addPerParticleParameter('type')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
+                nonbondedMethod is app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        elif nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        else:
+            raise ValueError('Unrecognized nonbonded method [%s]' %
+                             nonbondedMethod)
+        # Add the particles
+        for i in lj_idx_list:
+            force.addParticle((i-1,))
+        # Now wipe out the L-J parameters in the nonbonded force
+        for i in range(nonbfrc.getNumParticles()):
+            chg, sig, eps = nonbfrc.getParticleParameters(i)
+            nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
+        # Now transfer the exclusions
+        for ii in range(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            force.addExclusion(i, j)
+        # Now transfer the other properties (cutoff, switching function, etc.)
+        force.setUseLongRangeCorrection(True)
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
+        if nonbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
 
         return force
 

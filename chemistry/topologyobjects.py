@@ -4481,8 +4481,27 @@ class AtomType(object):
         """ The integer representation of an AtomType is its index """
         return self.number
 
-    def add_nbfix(self, typename, rmin, epsilon, rmin14, epsilon14):
-        """ Adds a new NBFIX exclusion for this atom """
+    def add_nbfix(self, typename, rmin, epsilon,
+                  rmin14=None, epsilon14=None):
+        """ Adds a new NBFIX exclusion for this atom type
+
+        Parameters
+        ----------
+        typename : str
+            The name of the *other* type with which this NBFIX is defined
+        rmin : float
+            The combined Rmin value for this NBFIXed pair. If no units, assumed
+            to be in Angstroms
+        epsilon : float
+            The combined epsilon value for this NBFIXed pair. If no units,
+            assumed to be in kcal/mol
+        rmin14 : float, optional
+            Same as rmin, but for 1-4 interactions. If None (default), it is
+            given the same value as rmin
+        epsilon14 : float, optional
+            Same as epsilon, but for 1-4 interactions. If None (default), it is
+            given the same value as rmin
+        """
         if rmin14 is None: rmin14 = rmin
         if epsilon14 is None: epsilon14 = epsilon
         self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)

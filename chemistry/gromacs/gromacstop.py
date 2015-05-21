@@ -609,6 +609,17 @@ class GromacsTopologyFile(Structure):
                     typ = AtomType(attype, None, mass, atnum)
                     typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
+                elif current_section == 'nonbond_params':
+                    words = line.split()
+                    a1, a2 = words[:2]
+                    func = int(words[2])
+                    sig, eps = (float(x) for x in words[3:5])
+                    sig *= 10 # Convert to Angstroms
+                    eps *= u.kilojoule.converson_factor_to(u.kilocalorie)
+                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(-1/6))
+                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(-1/6))
+                    params.atom_types[a1].add_nbfix(a2, sig*2**(-1/6), eps)
+                    params.atom_types[a2].add_nbfix(a1, sig*2**(-1/6), eps)
                 elif current_section == 'bondtypes':
                     words = line.split()
                     r = float(words[3]) * u.nanometers
