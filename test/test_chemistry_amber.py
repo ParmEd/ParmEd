@@ -3,7 +3,7 @@ Tests the functionality in the chemistry.amber package
 """
 from array import array
 from chemistry.amber import readparm, asciicrd, mask
-from chemistry import topologyobjects
+from chemistry import topologyobjects, load_file
 from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import range, zip
 import os
@@ -358,6 +358,24 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+    def testDistanceBasedMaskPDB(self):
+        """ Test distance-based mask selections on a PDB file """
+        parm = load_file(get_fn('4lzt.pdb'))
+        # All atoms within 5 A of residue 8
+        mask1 = mask.AmberMask(parm, ':8<@5')
+        sel = mask1.Selection()
+        self.assertGreater(sum(sel), 0)
+        for i, atom in enumerate(parm.atoms):
+            for j, a2 in enumerate(parm.residues[7]):
+                dx = atom.xx - a2.xx
+                dy = atom.xy - a2.xy
+                dz = atom.xz - a2.xz
+                if dx*dx + dy*dy + dz*dz < 25:
+                    self.assertTrue(sel[i])
+                    break
+            else:
+                self.assertFalse(sel[i])
 
     def testDistanceBasedMask(self):
         """ Test distance-based mask selections """
