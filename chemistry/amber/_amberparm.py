@@ -22,7 +22,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.amber.amberformat import AmberFormat
+from chemistry.amber.amberformat import AmberFormat, _deprecated
 from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
@@ -212,7 +212,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     @classmethod
-    def load_from_rawdata(cls, rawdata):
+    def from_rawdata(cls, rawdata):
         """
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
@@ -248,11 +248,16 @@ class AmberParm(AmberFormat, Structure):
         if hasattr(rawdata, 'hasvels'):
             inst.hasvels = rawdata.hasvels or inst.vels is not None
         return inst
-   
+
+    @classmethod
+    @_deprecated('load_from_rawdata', 'from_rawdata')
+    def load_from_rawdata(cls, rawdata):
+        return cls.from_rawdata(rawdata)
+
     #===================================================
 
     @classmethod
-    def load_from_structure(cls, struct):
+    def from_structure(cls, struct):
         """
         Take a Structure instance and initialize an AmberParm instance from that
         data.
@@ -261,11 +266,33 @@ class AmberParm(AmberFormat, Structure):
         ----------
         struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
+
+        Raises
+        ------
+        ValueError
+            If the structure has parameters not supported by the standard Amber
+            force field (i.e., standard bond, angle, and dihedral types), a
+            ValueError will be raised.
         """
+        if struct.unknown_functional:
+            raise ValueError('Cannot instantiate an AmberParm from unknown '
+                             'functional')
+        if (struct.urey_bradleys or struct.impropers or struct.rb_torsions or
+                struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
+                struct.out_of_plane_bends or struct.stretch_bends or
+                struct.torsion_torsions or struct.multipole_frames):
+            if (struct.rb_torsions or struct.trigonal_angles or
+                    struct.pi_torsions or struct.out_of_plane_bends or
+                    struct.torsion_torsions or struct.multipole_frames):
+                raise ValueError('AmberParm does not support all of the '
+                                 'parameters defined in the input Structure')
+            # Maybe it just has CHARMM parameters?
+            raise ValueError('AmberParm does not support all of the parameters '
+                             'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.pointers = {}
         inst.LJ_types = {}
-        inst.atoms.assign_nbidx_from_types()
+        nbfixes = inst.atoms.assign_nbidx_from_types()
         # Give virtual sites a name that Amber understands
         for atom in inst.atoms:
             if isinstance(atom, ExtraPoint): atom.type = 'EP'
@@ -322,6 +349,12 @@ class AmberParm(AmberFormat, Structure):
         inst._set_nonbonded_tables()
 
         return inst
+
+    # For backwards-compatibility
+    @classmethod
+    @_deprecated('load_from_structure', 'from_structure')
+    def load_from_structure(cls, struct):
+        return cls.from_structure(struct)
 
     #===================================================
 
@@ -1002,6 +1035,9 @@ class AmberParm(AmberFormat, Structure):
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
         if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
+
+        # If we have NBFIX, omm_nonbonded_force returned a tuple
+        if hasnbfix: nonbfrc = nonbfrc[0]
 
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
@@ -1736,7 +1772,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _set_nonbonded_tables(self):
+    def _set_nonbonded_tables(self, nbfixes=None):
         """
         Sets the tables of Lennard-Jones nonbonded interaction pairs
         """
@@ -1761,6 +1797,17 @@ class AmberParm(AmberFormat, Structure):
         self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in range(nttyp)]
         self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in range(nttyp)]
         self.recalculate_LJ()
+        # Now make any NBFIX modifications we had
+        if nbfixes is not None:
+            for i, fix in enumerate(nbfixes):
+                for terms in fix:
+                    j, rmin, eps, rmin14, eps14 = terms
+                    i, j = min(i, j-1), max(i, j-1)
+                    eps = abs(eps)
+                    eps14 = abs(eps14)
+                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    self.parm_data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
+                    self.parm_data['LENNARD_JONES_BCOEF'][idx] = 2*eps * rmin**6
 
     #===================================================
 

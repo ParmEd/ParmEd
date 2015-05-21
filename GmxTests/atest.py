@@ -339,6 +339,8 @@ def Calculate_ParmEd_OpenMM(gro_file, top_file, sysargs, defines):
         f.setForceGroup(i)
         if isinstance(f, mm.NonbondedForce):
             f.setUseDispersionCorrection(True)
+        elif isinstance(f, mm.CustomNonbondedForce):
+            f.setUseLongRangeCorrection(True)
     integ = mm.VerletIntegrator(1.0*u.femtosecond)
     plat = mm.Platform.getPlatformByName('Reference')
     # Create Simulation object
@@ -376,7 +378,7 @@ def Calculate_AMBER(Structure, mdp_opts):
         mdcrd.add_box(Structure.box[:3])
     mdcrd.close()
     # Create AMBER prmtop object from ParmEd Structure :)
-    prmtop = amber.AmberParm.load_from_structure(Structure)
+    prmtop = amber.AmberParm.from_structure(Structure)
     prmtop.write_parm("prmtop")
     # Create AMBER mdin file and append some stuff
     mdin = Mdin()

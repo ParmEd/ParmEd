@@ -2247,6 +2247,11 @@ class RBTorsionType(_ListItem, _ParameterType):
         return RBTorsionType(self.c0, self.c1, self.c2,
                              self.c3, self.c4, self.c5)
 
+    def __repr__(self):
+        return ('<RBTorsionType; c0=%.3f; c1=%.3f; c2=%.3f; c3=%.3f; c4=%.3f; '
+                'c5=%.3f>' % (self.c0, self.c1, self.c2, self.c3, self.c4,
+                              self.c5))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralTypeList(list, _ListItem):
