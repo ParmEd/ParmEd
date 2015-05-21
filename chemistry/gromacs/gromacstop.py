@@ -28,6 +28,10 @@ from datetime import datetime
 import math
 import os
 import re
+try:
+    from string import letters
+except ImportError:
+    from string import ascii_letters as letters
 import sys
 import warnings
 
@@ -567,18 +571,41 @@ class GromacsTopologyFile(Structure):
                         atoms[0].exclude(a)
                 elif current_section == 'atomtypes':
                     words = line.split()
+                    # Support the following spec, found in the Gromacs source
+                    # code:
+                    # Field 0 (mandatory) : nonbonded type name (string)
+                    # Field 1 (optional)  : bonded type (string)
+                    # Field 2 (optional)  : atomic number (int)
+                    # Field 3 (mandatory) : mass (float)
+                    # Field 4 (mandatory) : charge (float)
+                    # Field 5 (mandatory) : particle type (single character)
                     attype = words[0]
+                    if len(words[3]) == 1 and words[3] in letters:
+                        atnum = -1
+                        sigidx = 4
+                        ptypeidx = 3
+                        massidx = 1
+                    elif len(words[5]) == 1 and words[5] in letters:
+                        sigidx = 6
+                        ptypeidx = 5
+                        massidx = 3
+                    else:
+                        ptypeidx = 4
+                        massidx = 2
+                        sigidx = 5
                     try:
                         atnum = int(words[1])
                     except ValueError:
+                        # This must be a bonded type string, which we make no
+                        # use of here
                         atnum = -1
-                    mass = float(words[2])
+                    mass = float(words[massidx])
                     if mass > 0 and atnum == -1:
                         atnum = AtomicNum[element_by_mass(mass)]
 #                   chg = float(words[3])
-                    ptype = words[4]
-                    sig = float(words[5]) * u.nanometers
-                    eps = float(words[6]) * u.kilojoules_per_mole
+                    ptype = words[ptypeidx]
+                    sig = float(words[sigidx]) * u.nanometers
+                    eps = float(words[sigidx+1]) * u.kilojoules_per_mole
                     typ = AtomType(attype, None, mass, atnum)
                     typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
