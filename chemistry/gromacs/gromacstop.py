@@ -14,7 +14,8 @@ from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
-            TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+            TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
+            NonbondedExceptionType)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
@@ -289,6 +290,15 @@ class GromacsTopologyFile(Structure):
                                                molecule.atoms[j])
                     )
                     molecule.adjusts[-1].funct = funct
+                    if funct == 1 and len(words) >= 5:
+                        sig = float(words[3]) * 2**(1/6)
+                        eps = float(words[4])
+                        nt = NonbondedExceptionType(sig*u.nanometers,
+                                eps*u.kilojoules_per_mole,
+                                self.defaults.fudgeQQ,
+                                list=molecule.adjust_types)
+                        molecule.adjusts[-1].type = nt
+                        molecule.adjust_types.append(nt)
                 elif current_section == 'angles':
                     words = line.split()
                     i, j, k = [int(w)-1 for w in words[:3]]
@@ -681,6 +691,15 @@ class GromacsTopologyFile(Structure):
                     cmaptype = CmapType(res1, grid)
                     params.cmap_types[(a1, a2, a3, a4, a5)] = cmaptype
                     params.cmap_types[(a5, a4, a3, a2, a1)] = cmaptype
+                elif current_section == 'pairtypes':
+                    words = line.split()
+                    a1, a2 = words[:2]
+                    funct = int(words[2])
+                    cs6, cs12 = (float(x) for x in words[3:5])
+                    cs6 *= u.nanometers * 2**(1/6)
+                    cs12 *= u.kilojoules_per_mole
+                    params.pair_types[(a1, a2)] = (cs6, cs12)
+                    params.pair_types[(a2, a1)] = (cs6, cs12)
             itplist = f.included_files
 
         # Combine first, then parametrize. That way, we don't have to create
@@ -731,6 +750,13 @@ class GromacsTopologyFile(Structure):
         # on the parameter line itself) keep the existing parameters
         for atom in self.atoms:
             atom.atom_type = params.atom_types[atom.type]
+        for pair in self.adjusts:
+            if pair.type is not None: continue
+            key = (pair.atom1.type, pair.atom2.type)
+            if key in params.pair_types:
+                pair.type = params.pair_types[key]
+                pair.type.used = True
+        update_typelist_from(params.pair_types, self.adjust_types)
         for bond in self.bonds:
             if bond.type is not None: continue
             key = (bond.atom1.type, bond.atom2.type)

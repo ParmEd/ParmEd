@@ -28,8 +28,9 @@ from chemistry.constants import NATOM, NRES, IFBOX, DEG_TO_RAD, RAD_TO_DEG
 from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
                 Dihedral, StretchBend, TorsionTorsion, ChiralFrame,
-                MultipoleFrame, NonbondedException, NonbondedExceptionType,
-                StretchBendType, TorsionTorsionType)
+                MultipoleFrame, NonbondedException, StretchBendType,
+                TorsionTorsionType)
+from chemistry import AmoebaNonbondedExceptionType as NonbondedExceptionType
 from chemistry.exceptions import FormatError, AmoebaError
 from chemistry.utils.six.moves import range, zip
 

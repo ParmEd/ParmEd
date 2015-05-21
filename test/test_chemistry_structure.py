@@ -181,7 +181,7 @@ class TestStructureAdd(unittest.TestCase):
             struct.stretch_bend_types.claim()
             struct.torsion_torsion_types.extend([copy(x) for x in tortor_types])
             struct.torsion_torsion_types.claim()
-            struct.adjust_types.extend([NonbondedExceptionType(0.5, 0.5, 0.6, 0.6, 0.7)
+            struct.adjust_types.extend([AmoebaNonbondedExceptionType(0.5, 0.5, 0.6, 0.6, 0.7)
                                         for i in range(random.randint(10, 20))])
             struct.adjust_types.claim()
         # Add valence terms with optional 

@@ -23,9 +23,10 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'StretchBend', 'StretchBendType', 'TorsionTorsion',
            'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
            'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
-           'AcceptorDonor', 'Group', 'AtomType', 'NoUreyBradley', 'ExtraPoint',
-           'TwoParticleExtraPointFrame', 'ThreeParticleExtraPointFrame',
-           'OutOfPlaneExtraPointFrame', 'RBTorsionType']
+           'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
+           'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
+           'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
+           'RBTorsionType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -4284,7 +4285,39 @@ class NonbondedException(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class NonbondedExceptionType(_ListItem):
+class NonbondedExceptionType(_ParameterType, _ListItem):
+    """
+    A parameter describing how the various nonbonded interactions between a
+    particular pair of atoms behaves in a specified nonbonded exception (e.g.,
+    in 1-4 interacting terms)
+
+    Parameters
+    ----------
+    rmin : float
+        The combined Rmin value for this particular pair of atom types
+        (dimension length, default units are Angstroms)
+    epsilon : float
+        The combined well-depth value for this particular pair of atom types
+        (dimension energy, default units are kcal/mol)
+    chgscale : float, optional
+        The scaling factor by which to multiply the product of the charges for
+        this pair. Default is None (so it will use whatever is already stored,
+        e.g., from the dihedral list, or 1.0 if the former can't be found)
+    list : :class:`TrackedList`
+        The list containing this nonbonded exception
+    """
+
+    def __init__(self, rmin, epsilon, chgscale=None, list=None):
+        _ParameterType.__init__(self)
+        self.rmin = _strip_units(rmin, u.angstroms)
+        self.epsilon = _strip_units(epsilon, u.kilocalories_per_mole)
+        self.chgscale = chgscale
+        self._idx = None
+        self.list = list
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class AmoebaNonbondedExceptionType(NonbondedExceptionType):
     """
     A parameter describing how the various nonbonded interactions between a
     particular pair of atoms is scaled in the AMOEBA force field
@@ -4327,8 +4360,9 @@ class NonbondedExceptionType(_ListItem):
                 self.mutual_weight == other.mutual_weight)
 
     def __copy__(self):
-        return NonbondedExceptionType(self.vdw_weight, self.multipole_weight,
-                self.direct_weight, self.polar_weight, self.mutual_weight)
+        return AmoebaNonbondedExceptionType(self.vdw_weight,
+                self.multipole_weight, self.direct_weight, self.polar_weight,
+                self.mutual_weight)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

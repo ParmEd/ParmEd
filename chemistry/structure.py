@@ -32,11 +32,11 @@ from chemistry.residue import WATER_NAMES
 from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
         AngleType, DihedralType, DihedralTypeList, BondType, ImproperType,
         CmapType, OutOfPlaneBendType, StretchBendType, TorsionTorsionType,
-        NonbondedExceptionType, Bond, Angle, Dihedral, UreyBradley, Improper,
-        Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
-        TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
-        AcceptorDonor, Group, Atom, ExtraPoint, TwoParticleExtraPointFrame,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, RBTorsionType)
+        Bond, Angle, Dihedral, UreyBradley, Improper, Cmap, TrigonalAngle,
+        OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion, ChiralFrame,
+        MultipoleFrame, NonbondedException, AcceptorDonor, Group, Atom,
+        ExtraPoint, TwoParticleExtraPointFrame, ThreeParticleExtraPointFrame,
+        OutOfPlaneExtraPointFrame, RBTorsionType)
 from chemistry import unit as u
 from chemistry.utils import tag_molecules
 from chemistry.utils.six import string_types, wraps, integer_types
@@ -225,7 +225,7 @@ class Structure(object):
     multipole_frames : :class:`TrackedList` (:class:`MultipoleFrame`)
         List of all AMOEBA-style multipole frames defined in the structure
     adjusts : :class:`TrackedList` (:class:`NonbondedException`)
-        List of all AMOEBA-style nonbonded pair-exception rules
+        List of all nonbonded pair-exception rules
     acceptors : :class:`TrackedList` (:class:`AcceptorDonor`)
         List of all H-bond acceptors, if that information is present
     donors : :class:`TrackedList` (:class:`AcceptorDonor`)
@@ -2063,6 +2063,7 @@ class Structure(object):
         # If dihedral.ignore_end is False, a 1-4 is added with the appropriate
         # scaling factor
         sigma_scale = 2**(-1/6) * length_conv
+        chgscales = dict()
         for dih in self.dihedrals:
             if dih.ignore_end: continue
             if isinstance(dih.type, DihedralTypeList):
@@ -2092,25 +2093,32 @@ class Structure(object):
             chgprod = dih.atom1.charge * dih.atom4.charge / scee
             force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                sigprod, epsprod, True)
+            chgscales[(dih.atom1, dih.atom4)] = 1 / scee
             for child in dih.atom1.children:
                 epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
                 epsprod = math.sqrt(epsprod) * ene_conv / scnb
                 sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+                chgprod = (child.charge * dih.atom4.charge) / scee
                 force.addException(child.idx, dih.atom4.idx, chgprod, sigprod,
                                    epsprod, True)
+                chgscales[(child, dih.atom4)] = 1 / scee
             for child in dih.atom4.children:
                 epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
                 epsprod = math.sqrt(epsprod) * ene_conv / scnb
                 sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
+                chgprod = child.charge * dih.atom1.charge / scee
                 force.addException(child.idx, dih.atom1.idx, chgprod, sigprod,
                                    epsprod, True)
+                chgscales[(child, dih.atom1)] = 1 / scee
             for c1 in dih.atom1.children:
                 for c2 in dih.atom2.children:
                     epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
+                    chgprod = c1.charge * c2.charge / scee
                     force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                        epsprod, True)
+                    chgscales[(c1, c2)] = 1 / scee
         # Now add the bonds, angles, and exclusions. These will always wipe out
         # existing exceptions and 0 out that exception
         for bond in self.bonds:
@@ -2142,6 +2150,24 @@ class Structure(object):
             for c1 in atom.children:
                 for c2 in a2.children:
                     force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+        # Allow our specific exceptions (in adjusts) to override anything that
+        # came before
+        for pair in self.adjusts:
+            if pair.type is None: continue
+            if pair.type.chgscale is None:
+                if (pair.atom1, pair.atom2) in chgscales:
+                    chgscale = chgscales[(pair.atom1, pair.atom2)]
+                elif (pair.atom2, pair.atom1) in chgscales:
+                    chgscale = chgscales[(pair.atom2, pair.atom1)]
+                else:
+                    raise RuntimeError('Could not find charge scale for atoms '
+                                       '%r -- %r' % (pair.atom1, pair.atom2))
+            else:
+                chgscale = pair.type.chgscale
+            chgprod = pair.atom1.charge * pair.atom2.charge * chgscale
+            force.addException(pair.atom1.idx, pair.atom2.idx,
+                               pair.type.rmin*sigma_scale,
+                               pair.type.epsilon*ene_conv, chgprod, True)
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
                 switchDistance = switchDistance.value_in_unit(u.nanometers)
