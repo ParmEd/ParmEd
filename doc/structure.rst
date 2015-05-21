@@ -231,8 +231,8 @@ Oops!  Our original structure only had 1164 atoms, so selecting the 1165th index
 Python slicing, though, slice and Amber mask selections simply return ``None``
 if no atoms match the selection.
 
-**Now let's look at the slightly more complex Amber mask selection. See `Amber
-mask syntax <amber.html#amber-mask-syntax>`_ for more details**.
+**Now let's look at the slightly more complex Amber mask selection. See** `Amber
+mask syntax <amber.html#amber-mask-syntax>`_ **for more details**.
 
 If you pass a single string that is recognized as valid Amber mask syntax, it
 will be interpreted as an Amber mask. The example below continues from the same
