@@ -4,29 +4,18 @@ dt = 0.002
 
 nstxout = 0   
 nstenergy = 0   
-nstlog = 1000
-nstvout = 500 
+nstlog = 0
+nstvout = 0
 nstxtcout = 0
 
 ns_type = grid
-nstlist = 5
-rlist = .75
-rcoulomb = .75
-rvdw = .75
+nstlist = 1
+rlist = .8
+rcoulomb = .8
+rvdw = .8
 coulombtype = PME
-pme_order = 4
+pme_order = 5
 fourierspacing = 0.16
-
-tcoupl = Nose-Hoover
-tc-grps = Water non-Water
-tau_t = 0.5     0.5
-ref_t = 323.15 323.15 
-
-pcoupl = berendsen        
-pcoupltype = semiisotropic
-tau_p = 2.0
-ref_p = 1.0 1.0    
-compressibility = 4.5e-5 4.5e-5
 
 nstcomm = 1
 comm-mode = linear
@@ -34,17 +23,8 @@ comm-grps = Water non-Water
 
 pbc = xyz
 DispCorr = EnerPres
-gen_vel = yes 
 
 constraint_algorithm = lincs
 constraints = all-bonds
 lincs_iter = 1
 lincs_order = 4
-
-vdwtype = switch
-rvdw_switch  = 0.55
-emtol = 10.0
-nstcalcenergy = 500
-nstfout              = 0
-gen_temp             = 323.15 323.15
-gen_seed             = 930141
