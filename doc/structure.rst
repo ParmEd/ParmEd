@@ -165,8 +165,8 @@ the numbering starts again.
 
 -------
 
-Structure manipulation: slicing, combining, and replicating
------------------------------------------------------------
+Structure manipulation: slicing, combining, replicating, and splitting
+----------------------------------------------------------------------
 
 This section describes a number of simple, yet powerful manipulations you can do
 to :class:`Structure <chemistry.structure.Structure>` instances (and, by
@@ -344,4 +344,136 @@ another one.
 This can naturally be thought of as a *sum* of two ``Structure`` instances, so
 it was implemented via the addition operator.  This can be done both in-place
 (in a way that modifies the first ``Structure``) as well as creating a new copy
-that is the sum of the originals.
+that is the sum of the originals. This is demonstrated below using AMBER
+topology files of two small molecules, phenol and biphenyl, which can be found
+in the ``test/files`` directory of the ParmEd distribution (``phenol.prmtop``
+and ``biphenyl.prmtop``)::
+
+    >>> phenol = load_file('phenol.prmtop')
+    >>> biphenyl = load_file('biphenyl.prmtop')
+    >>> phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> biphenyl
+    <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
+    >>> phenol + biphenyl
+    <AmberParm 35 atoms; 2 residues; 36 bonds; parametrized>
+    >>> # Note that neither phenol or biphenyl have changed
+    ... phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> biphenyl
+    <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
+
+Note that the order of addition controls the order that the atoms are added to
+the resulting :class:`Structure <chemistry.structure.Structure>`, as you would
+probably expect::
+
+    >>> [len(residue) for residue in (phenol + biphenyl).residues]
+    [13, 22]
+    >>> [len(residue) for residue in (biphenyl + phenol).residues]
+    [22, 13]
+
+In-place addition is also supported, which can be noticeably more efficient than
+combining using standard addition, particularly for large systems. Note, if you
+are adding a large and a small structure together, adding the small one to the
+large one in-place is the most efficient way to do that. In-place combination is
+demonstrated below::
+
+    >>> phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> biphenyl
+    <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
+    >>> phenol += biphenyl
+    >>> phenol
+    <AmberParm 35 atoms; 2 residues; 36 bonds; parametrized>
+
+The addition preserves both the valence terms and the parameters from both
+structures.  All of the parameter *type* arrays (e.g., ``bond_types``) will be
+the sum of the type arrays from the two structures (you will see why this is
+important in the next section about *replicating* structures).
+
+One final comment to make is in regards to the type of the resulting
+:class:`Structure <chemistry.structure.Structure>` instance.  You can add any
+two :class:`Structure <chemistry.structure.Structure>` instances together,
+including instances of subclasses (such as :class:`AmberParm
+<chemistry.amber._amberparm.AmberParm>`). The result will take the type of the
+*first* operand.
+
+Structure Replicating
+~~~~~~~~~~~~~~~~~~~~~
+
+There are times when you also want to model several copies of the same
+structure. Like with structure combining (described above), *replicating* is
+implemented by overloading the natural mathematical operator -- the
+multiplication operator (``*``).
+
+The only mode supported here is multiplying a :class:`Structure
+<chemistry.structure.Structure>` instance by an integer, which indicates the
+number of copies of the original structure will be added to the result.  And
+like with combination, replication can be done both in-place and not::
+
+    >>> phenol = load_file('phenol.prmtop')
+    >>> phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> phenol * 2
+    <AmberParm 26 atoms; 2 residues; 26 bonds; parametrized>
+    >>> phenol * 100
+    <AmberParm 1300 atoms; 100 residues; 1300 bonds; parametrized>
+    >>> # phenol still hasn't changed
+    ... phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> # In-place replicate... phenol WILL change now
+    ... phenol *= 10
+    >>> phenol
+    <AmberParm 130 atoms; 10 residues; 130 bonds; parametrized>
+
+A word of caution here -- the multiplication operator for integers is not
+implemented for :class:`Structure <chemistry.structure.Structure>` instances as
+the other operand, so multiplying an integer by the structure will result in a
+``TypeError``::
+
+    >>> 20 * phenol
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for *: 'int' and 'AmberParm'
+
+One comment about the parameter *type* arrays (e.g., ``bond_type``) -- unlike
+structure combination, all replicates have the *same* parameters, so there is no
+reason to enlarge the type arrays. As a result, all valence terms in each
+replicate points to the *same* parameter type as that same valence term in the
+other replicates.
+
+As a result, adding a structure to itself will result in an *equivalent*
+:class:`Structure <chemistry.structure.Structure>` instance (in that it will
+have the same atom and residue order, valence terms and their order, and each
+parameter will have the same type), but combining a structure with itself will
+double the size of its type arrays, while replicating it will not.
+
+Finally, replication is more efficient than combination arising from the simpler
+nature of replicating a structure than combining two different ones.
+
+:class:`Structure <chemistry.structure.Structure> splitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you want to be able to manipulate individual *molecules* inside a
+:class:`Structure <chemistry.structure.Structure>` instance individually. The
+:meth:`Structure.split <chemistry.structure.Structure.split>` method does just
+this.  It uses the bond graph in order to identify which atoms belong to which
+molecules and then return a list of molecules along with how many times that
+molecule occurs in the original :class:`Structure
+<chemistry.structure.Structure>` instance.
+
+It only returns one copy of each molecule due to the cost of splitting off
+potentially thousands of solvent molecules in larger solvated systems.  As a
+result, the return value is a list of ``tuple`` instances where each tuple is
+the :class:`Structure <chemistry.structure.Structure>` (or subclass) instances
+followed by the number of times that structure occurs.  Using our phenol and
+biphenyl examples from earlier::
+
+    >>> phenol = load_file('test/files/phenol.prmtop')
+    >>> biphenyl = load_file('test/files/biphenyl.prmtop')
+    >>> phenol
+    <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
+    >>> biphenyl
+    <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
+    >>> (phenol*10 + biphenyl*10).split()
+    [(<AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>, 10), (<AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>, 10)]
