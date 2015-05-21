@@ -389,7 +389,7 @@ class GromacsTopologyFile(Structure):
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.impropers.append(imp)
                         molecule.impropers[-1].funct = funct
-                    elif funct in (3, 5):
+                    elif funct == 3:
                         rb = Dihedral(molecule.atoms[i], molecule.atoms[j],
                                       molecule.atoms[k], molecule.atoms[l])
                         molecule.rb_torsions.append(rb)
@@ -417,7 +417,7 @@ class GromacsTopologyFile(Structure):
                                 psieq*u.degree, list=molecule.improper_types)
                         molecule.impropers[-1].type = dt
                         molecule.improper_types.append(dt)
-                    elif funct in (3, 5) and len(words) >= 11:
+                    elif funct == 3 and len(words) >= 11:
                         c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoule_per_mole
                                                   for x in words[5:11])
                         dt = RBTorsionType(c0, c1, c2, c3, c4, c5,
@@ -615,7 +615,7 @@ class GromacsTopologyFile(Structure):
                     func = int(words[2])
                     sig, eps = (float(x) for x in words[3:5])
                     sig *= 10 # Convert to Angstroms
-                    eps *= u.kilojoule.converson_factor_to(u.kilocalorie)
+                    eps *= u.kilojoule.conversion_factor_to(u.kilocalorie)
                     params.nbfix_types[(a1, a2)] = (eps, sig*2**(-1/6))
                     params.nbfix_types[(a2, a1)] = (eps, sig*2**(-1/6))
                     params.atom_types[a1].add_nbfix(a2, sig*2**(-1/6), eps)
@@ -672,7 +672,7 @@ class GromacsTopologyFile(Structure):
                     elif words[4] == '2':
                         replace = True
                         dtype = 'improper'
-                    elif words[4] in ('3', '5'):
+                    elif words[4] == '3':
                         dtype = 'rbtorsion'
                     else:
                         warnings.warn('dihedraltypes funct not supported',
