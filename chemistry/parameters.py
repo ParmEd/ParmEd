@@ -76,6 +76,7 @@ class ParameterSet(object):
         self.rb_torsion_types = OrderedDict()
         self.cmap_types = OrderedDict()
         self.nbfix_types = OrderedDict()
+        self.pair_types = OrderedDict()
         self.parametersets = []
 
     def __copy__(self):
