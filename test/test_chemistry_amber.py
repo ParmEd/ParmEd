@@ -675,6 +675,76 @@ class TestAmberParmSlice(unittest.TestCase):
     def testSplit(self):
         """ Tests the molecule splitting functionality """
         parm = readparm.AmberParm(get_fn('solv.prmtop'))
+        parts = parm.split()
+        # Make sure the sum of the parts is equal to the whole
+        natom = sum(len(part[0].atoms)*part[1] for part in parts)
+        self.assertEqual(len(parm.atoms), natom)
+        self.assertEqual(len(parts), 4) # 4 types of molecules
+        self.assertEqual(parts[0][1], 1)
+        self.assertEqual(parts[1][1], 1)
+        self.assertEqual(parts[2][1], 8)
+        self.assertEqual(parts[3][1], 9086)
+
+    def testAdd(self):
+        """ Tests combining AmberParm instances """
+        parm1 = readparm.AmberParm(get_fn('phenol.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('biphenyl.prmtop'))
+        comb = parm1 + parm2
+        self.assertEqual(len(comb.atoms), len(parm1.atoms) + len(parm2.atoms))
+        for a1, a2 in zip(comb.atoms, parm1.atoms + parm2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(comb.residues), len(parm1.residues) + len(parm2.residues))
+        for r1, r2 in zip(comb.residues, parm1.residues + parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+        # In-place now
+        parm1 += parm2
+        self.assertEqual(len(parm1.atoms), len(comb.atoms))
+        for a1, a2 in zip(comb.atoms, parm1.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(parm1.residues), len(comb.residues))
+        for r1, r2 in zip(comb.residues, parm1.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+
+    def testMult(self):
+        """ Tests replicating AmberParm instances """
+        parm = readparm.AmberParm(get_fn('phenol.prmtop'))
+        mult = parm * 5
+        self.assertEqual(len(mult.atoms), 5*len(parm.atoms))
+        self.assertEqual(len(mult.residues), 5*len(parm.residues))
+        for i, a1 in enumerate(mult.atoms):
+            a2 = parm[i%len(parm.atoms)]
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        for i, r1 in enumerate(mult.residues):
+            r2 = parm.residues[i%len(parm.residues)]
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+        # In-place now
+        parm *= 5
+        self.assertEqual(len(parm.atoms), len(mult.atoms))
+        for a1, a2 in zip(mult.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(parm.residues), len(mult.residues))
+        for r1, r2 in zip(mult.residues, parm.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
 
     def testSimpleSlice(self):
         """ Tests simple slicing of AmberParm """
