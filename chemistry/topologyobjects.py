@@ -4,7 +4,7 @@ as atoms, residues, bonds, angles, etc.
 
 by Jason Swails
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from chemistry.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError, MissingParameter)
@@ -613,11 +613,11 @@ class Atom(_ListItem):
             if self.atom_type is not None:
                 return self.atom_type.sigma
             return None
-        return self._rmin * 2**(-1/6)
+        return self._rmin * 2**(-1/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self._rmin = value * 2**(1/6)
+        self._rmin = value * 2**(1/6) / 2
 
     @property
     def epsilon(self):
@@ -652,11 +652,15 @@ class Atom(_ListItem):
     @property
     def sigma_14(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
-        return self._rmin14 * 2**(-1/6)
+        if self._rmin14 is None:
+            if (self.atom_type is _UnassignedAtomType or
+                    self.atom_type.rmin_14 is None):
+                return self.sigma
+        return self._rmin14 * 2**(-1/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self._rmin14 = value * 2**(1/6)
+        self._rmin14 = value * 2**(1/6) / 2
 
     @property
     def epsilon_14(self):
@@ -932,8 +936,22 @@ class ExtraPoint(Atom):
     with extra functionality specific to these "Extra points" or "virtual
     sites". See the documentation for the :class:`Atom` class for more
     information.
+
+    Parameters
+    ----------
+    weights : list of float, optional, keyword-only
+        This is the list of weights defining its frame.
+
+    See Also
+    --------
+    :class:`Atom` -- The ExtraPoint constructor also takes all `Atom` arguments
+    as well, and shares all of the same properties
     """
     def __init__(self, *args, **kwargs):
+        if 'weights' in kwargs:
+            self.weights = kwargs.pop('weights')
+        else:
+            self.weights = None
         super(ExtraPoint, self).__init__(*args, **kwargs)
         self._frame_type = None
 
@@ -1232,7 +1250,8 @@ class ThreeParticleExtraPointFrame(object):
         return self.ep.parent, oatom1, oatom2
 
     @staticmethod
-    def from_weights(parent, a1, a2, w1, w2):
+    def from_weights(parent, a1, a2, w1, w2,
+                     dp1=None, dp2=None, theteq=None, d12=None):
         """
         This function determines the necessary bond length between an ExtraPoint
         and its parent atom from the weights that are calculated in
@@ -1250,6 +1269,22 @@ class ThreeParticleExtraPointFrame(object):
             The first weight defining the ExtraPoint position wrt ``a1``
         w2 : float
             The second weight defining the ExtraPoint position wrt ``a2``
+        dp1 : float, optional
+            Equilibrium distance between parent and a1. If None, a bond with a
+            bond type must be defined between parent and a1, and the distance
+            will be taken from there. Units must be Angstroms. Default is None
+        dp2 : float, optional
+            Same as dp1 above, but between atoms parent and a2. Either both dp1
+            and dp2 should be None or neither should be. If one is None, the
+            other will be ignored if not None.
+        theteq : float, optional
+            Angle between bonds parent-a1 and parent-a2. If None, d12 (below)
+            will be used to calculate the angle. If both are None, the angle
+            or d12 distance will be calculated from parametrized bonds or
+            angles between a1, parent, and a2. Units of degrees. Default None.
+        d12 : float, optional
+            Distance between a1 and a2 as an alternative way to specify theteq.
+            Default is None.
 
         Returns
         -------
@@ -1276,27 +1311,40 @@ class ThreeParticleExtraPointFrame(object):
         if w1 != w2:
             raise ValueError('Currently only equal weights are supported')
         # distance(OV) = w1 * cos(EP-Parent-a1) * parent-a1 dist
-        dp1 = dp2 = None
-        for bond in parent.bonds:
-            if a1 in bond:
-                dp1 = bond.type.req
-            if a2 in bond:
-                dp2 = bond.type.req
-        assert dp1 is not None and dp2 is not None, \
-                "Could not find bonds with a1 and a2 in them"
-        if a2 not in a1.angle_partners:
-            for bond in a1.bonds:
-                if a2 not in bond: continue
-                d12 = bond.type.req
-            # Get angle from law of cosines
+        if dp1 is None or dp2 is None:
+            for bond in parent.bonds:
+                if a1 in bond:
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    dp1 = bond.type.req
+                if a2 in bond:
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    dp2 = bond.type.req
+        if theteq is None and d12 is None:
+            if a2 not in a1.angle_partners:
+                for bond in a1.bonds:
+                    if a2 not in bond: continue
+                    if bond.type is None:
+                        raise MissingParameter('Could not determine virtual '
+                                               'site geometry')
+                    d12 = bond.type.req
+                # Get angle from law of cosines
+                theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
+            else:
+                for angle in a1.angles:
+                    if a2 in angle and a2 is not angle.atom2:
+                        theteq = angle.type.theteq * DEG_TO_RAD
+                        break
+                else:
+                    assert False, "Could not find matching angle"
+        elif theteq is None:
             theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
         else:
-            for angle in a1.angles:
-                if a2 in angle and a2 is not angle.atom2:
-                    theteq = angle.type.theteq * DEG_TO_RAD
-                    break
-            else:
-                assert False, "Could not find matching angle"
+            theteq *= DEG_TO_RAD
+
         if abs(dp1 - dp2) > TINY:
             raise ValueError('Cannot deal with asymmetry in EP frame')
 
@@ -1676,6 +1724,9 @@ class BondType(_ListItem, _ParameterType):
 
     def __copy__(self):
         """ Not bound to any list """
+        # Hack to keep NoUreyBradley as a singleton
+        if self is NoUreyBradley:
+            return self
         return BondType(self.k, self.req)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2093,7 +2144,7 @@ class DihedralType(_ListItem, _ParameterType):
         _ParameterType.__init__(self)
         self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
         self.per = per
-        self.phase = phase
+        self.phase = _strip_units(phase, u.degrees)
         self.scee = scee
         self.scnb = scnb
         self.list = list
@@ -2232,6 +2283,18 @@ class DihedralTypeList(list, _ListItem):
             if not t1 == t2:
                 return False
         return True
+
+    def append(self, other):
+        if not isinstance(other, DihedralType):
+            raise TypeError('Can only add DihedralType to DihedralTypeList')
+        for existing in self:
+            if existing.per == other.per:
+                # Do not add duplicate periodicities
+                if existing == other: return
+                raise DihedralError('Cannot add two DihedralType instances '
+                                    'with the same periodicity to the same '
+                                    'DihedralTypeList')
+        list.append(self, other)
 
     @property
     def penalty(self):
@@ -3249,8 +3312,8 @@ class StretchBendType(_ListItem, _ParameterType):
     """
     def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k1 = _strip_units(k1, u.kilocalories/u.mole/u.radian)
-        self.k2 = _strip_units(k2, u.kilocalories/u.mole/u.radian)
+        self.k1 = _strip_units(k1, u.kilocalories_per_mole/u.radian)
+        self.k2 = _strip_units(k2, u.kilocalories_per_mole/u.radian)
         self.req1 = _strip_units(req1, u.angstrom)
         self.req2 = _strip_units(req2, u.angstrom)
         self.theteq = _strip_units(theteq, u.degrees)
@@ -4297,6 +4360,8 @@ class AtomType(object):
     rmin_14 : ``float``
         If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
         1-4 nonbonded interactions
+    sigma : ``float``
+        This is the sigma parameter, which is just equal to Rmin*2^(1/6)
     nbfix : ``dict(str:tuple)``
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
@@ -4305,7 +4370,8 @@ class AtomType(object):
     Notes
     -----
     This object is primarily used to build parameter databases from parameter
-    files
+    files. Also, sigma is related to Rmin, but rmin is Rmin/2, so there is an
+    extra factor of 2 in the sigma for this reason.
 
     Examples
     --------
@@ -4390,20 +4456,20 @@ class AtomType(object):
     @property
     def sigma(self):
         """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin * 2**(-1/6)
+        return self.rmin * 2**(-1/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self.rmin = value * 2**(1/6)
+        self.rmin = value * 2**(1/6) / 2
 
     @property
     def sigma_14(self):
         """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin_14 * 2**(-1/6)
+        return self.rmin_14 * 2**(-1/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self.rmin_14 = value * 2**(1/6)
+        self.rmin_14 = value * 2**(1/6) / 2
 
     def __str__(self):
         return self.name

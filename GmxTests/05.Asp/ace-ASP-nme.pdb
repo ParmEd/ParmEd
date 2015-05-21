@@ -1,0 +1,35 @@
+CRYST1   20.000   20.000   20.000  90.00  90.00  90.00  P 21 21 21   4          
+ATOM      1  C   ACE 1   1       2.161   2.724  -2.171                          
+ATOM      2  O   ACE 1   1       2.841   1.894  -2.781                          
+ATOM      3  CH3 ACE 1   1       1.141   3.594  -2.891                          
+ATOM      4  H1  ACE 1   1       1.156   3.343  -3.950                          
+ATOM      5  H2  ACE 1   1       0.155   3.385  -2.479                          
+ATOM      6  H3  ACE 1   1       1.396   4.641  -2.747                          
+ATOM      7  N   ASP 1   2       2.311   2.914  -0.861                          
+ATOM      8  H   ASP 1   2       1.681   3.526  -0.374                          
+ATOM      9  CA  ASP 1   2       3.161   2.054  -0.071                          
+ATOM     10  HA  ASP 1   2       4.146   1.979  -0.533                          
+ATOM     11  C   ASP 1   2       2.521   0.674  -0.021                          
+ATOM     12  O   ASP 1   2       1.371   0.564   0.399                          
+ATOM     13  CB  ASP 1   2       3.311   2.624   1.319                          
+ATOM     14  HB2 ASP 1   2       2.362   2.573   1.856                          
+ATOM     15  HB3 ASP 1   2       3.594   3.676   1.236                          
+ATOM     16  CG  ASP 1   2       4.391   1.904   2.119                          
+ATOM     17  OD1 ASP 1   2       4.931   2.484   3.079                          
+ATOM     18  OD2 ASP 1   2       4.701   0.754   1.729                          
+ATOM     19  N   NME 1   3       3.201  -0.356  -0.471                          
+ATOM     20  H   NME 1   3       4.176  -0.240  -0.693                          
+ATOM     21  CH3 NME 1   3       2.581  -1.666  -0.451                          
+ATOM     22  H1  NME 1   3       1.706  -1.669  -1.103                          
+ATOM     23  H2  NME 1   3       2.266  -1.909   0.565                          
+ATOM     24  H3  NME 1   3       3.288  -2.419  -0.797                          
+ENDMDL
+CONECT    1    2    3    7
+CONECT    3    4    5    6
+CONECT    7    9    8
+CONECT    9   10   11   13
+CONECT   11   19   12
+CONECT   13   14   15   16
+CONECT   16   17   18
+CONECT   19   20   21
+CONECT   21   22   23   24

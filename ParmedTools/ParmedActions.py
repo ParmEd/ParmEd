@@ -1560,16 +1560,16 @@ class printAngles(Action):
                     continue
                 if angle.type is not None:
                     retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
-                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                           atom3.name, atom3.type, angle.type.k,
-                           angle.type.theteq*180/math.pi)
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name,
+                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
+                           atom3.idx+1, atom3.name, atom3.type, angle.type.k,
+                           angle.type.theteq)
                     )
                 else:
                     retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name, atom1.type,
-                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                           atom3.name, atom3.type, 'N/A', 'N/A')
+                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name,
+                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
+                           atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
                     )
         else:
             atomsel = set(self.mask.Selected())
@@ -1592,7 +1592,7 @@ class printAngles(Action):
                            '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
                            atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
                            atom3.name, atom3.type, angle.type.k,
-                           angle.type.theteq*180/math.pi)
+                           angle.type.theteq)
                     )
                 else:
                     retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
@@ -1672,7 +1672,7 @@ class printDihedrals(Action):
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
                             dihedral.type.phi_k, dihedral.type.per,
-                            dihedral.type.phase*180/math.pi, scee, scnb)
+                            dihedral.type.phase, scee, scnb)
                 )
         else:
             atomsel = set(self.mask.Selected())
@@ -1722,7 +1722,7 @@ class printDihedrals(Action):
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
                             dihedral.type.phi_k, dihedral.type.per,
-                            dihedral.type.phase*180/math.pi, scee, scnb)
+                            dihedral.type.phase, scee, scnb)
                     )
                 else:
                     retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
@@ -1833,7 +1833,7 @@ class setAngle(Action):
     not_supported = (AmoebaParm,)
     def init(self, arg_list):
         self.k = arg_list.get_next_float()
-        self.theteq = arg_list.get_next_float() * math.pi / 180.0
+        self.theteq = arg_list.get_next_float()
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask3 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1841,7 +1841,7 @@ class setAngle(Action):
     def __str__(self):
         return ('Set an angle between %s, %s and %s with k = %f kcal/(mol '
                 'rad**2) and THETeq = %f degrees') % (self.mask1, self.mask2,
-                self.mask3, self.k, self.theteq * 180/math.pi)
+                self.mask3, self.k, self.theteq)
 
     def execute(self):
         sel1 = self.mask1.Selection()
@@ -1930,7 +1930,7 @@ class addDihedral(Action):
     def init(self, arg_list):
         self.phi_k = arg_list.get_next_float()
         self.per = arg_list.get_next_float()
-        self.phase = arg_list.get_next_float() * math.pi/180.0
+        self.phase = arg_list.get_next_float()
         self.scee = arg_list.get_next_float(optional=True, default=1.2)
         self.scnb = arg_list.get_next_float(optional=True, default=2.0)
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -1952,8 +1952,7 @@ class addDihedral(Action):
                 'kcal/mol periodicity = %f phase = %f degrees scee = %f '
                 'scnb = %f' %
                (self.type, self.mask1, self.mask2, self.mask3, self.mask4,
-                self.phi_k, self.per, self.phase * 180/math.pi, self.scee,
-                self.scnb)
+                self.phi_k, self.per, self.phase, self.scee, self.scnb)
         )
 
     def execute(self):
@@ -3619,10 +3618,7 @@ class chamber(Action):
         - -radii      Implicit solvent solvation radii. <radiusset> can be
                       amber6, bondi, mbondi, mbondi2, mbondi3
                       Same effect as the changeRadii command. Default is mbondi.
-        - nocondense  This prevents chamber from condensing the parameter set
-                      before applying it. This might lead to larger prmtop
-                      files, but for large parameter sets will dramatically
-                      shorten the running time of the chamber action
+        - nocondense  This no longer has any effect and is ignored.
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3732,7 +3728,7 @@ class chamber(Action):
         if not self.radii in GB_RADII:
             raise InputError('Illegal radius set %s -- must be one of '
                              '%s' % (self.radii, ', '.join(GB_RADII)))
-        self.condense = not arg_list.has_key('nocondense')
+        arg_list.has_key('nocondense')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3772,8 +3768,6 @@ class chamber(Action):
                 parmset.read_parameter_file(pfile)
             for sfile in self.streamfiles:
                 parmset.read_stream_file(sfile)
-            # All parameters are loaded, now condense the types
-            if self.condense: parmset.condense()
         except ChemError as e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 

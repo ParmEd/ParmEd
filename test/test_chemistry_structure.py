@@ -84,7 +84,8 @@ class TestStructureAPI(unittest.TestCase):
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
 
-    def _createStructure(self, parametrized, novalence=False):
+    @staticmethod
+    def _createStructure(parametrized, novalence=False):
         """ Create a random Structure with random attributes
 
         Parameters

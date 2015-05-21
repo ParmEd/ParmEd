@@ -279,11 +279,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(atype.rmin, 1.2)
         self.assertEqual(atype.epsilon_14, 1.0)
         self.assertEqual(atype.rmin_14, 1.2)
-        self.assertEqual(atype.sigma, 1.2*2**(-1/6))
+        self.assertEqual(atype.sigma, 1.2*2**(-1/6)*2)
         self.assertEqual(atype.sigma_14, atype.sigma)
         # Now try setting sigma and make sure it also changes rmin
         atype.sigma = 1.2
-        self.assertEqual(atype.rmin, 1.2*2**(1/6))
+        self.assertEqual(atype.rmin, 1.2*2**(1/6)/2)
         atom.atom_type = atype
         self.assertEqual(atom.epsilon, atype.epsilon)
         self.assertEqual(atom.sigma, atype.sigma)

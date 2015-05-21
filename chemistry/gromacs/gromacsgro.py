@@ -4,6 +4,7 @@ This module contains functionality relevant to loading and parsing GROMACS GRO
 """
 from __future__ import print_function, division, absolute_import
 
+from chemistry.constants import TINY
 from chemistry.exceptions import ParsingError
 from chemistry.formats.registry import FileFormatType
 from chemistry.geometry import (box_vectors_to_lengths_and_angles,
@@ -52,13 +53,20 @@ class GromacsGroFile(object):
                 if not line[5:10].strip(): return False
                 if not line[10:15].strip(): return False
                 int(line[15:20])
-                float(line[20:28])
-                float(line[28:36])
-                float(line[36:44])
-                if line[44:52].strip():
-                    float(line[44:52])
-                    float(line[52:60])
-                    float(line[60:68])
+                pdeci = [i for i, x in enumerate(line) if x == '.']
+                ndeci = pdeci[1] - pdeci[0] - 5
+                for i in range(1, 4):
+                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    float(line[wbeg:wend])
+                i = 4
+                wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                wend = (pdeci[0]-4)+(5+ndeci)*i
+                if line[wbeg:wend].strip():
+                    for i in range(4, 7):
+                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                        wend = (pdeci[0]-4)+(5+ndeci)*i
+                        float(line[wbeg:wend])
             except ValueError:
                 return False
             return True
@@ -102,13 +110,24 @@ class GromacsGroFile(object):
                     atomname = line[10:15].strip()
                     atnum = int(line[15:20])
                     atom = Atom(name=atomname, number=atnum)
-                    atom.xx = float(line[20:28]) * 10
-                    atom.xy = float(line[28:36]) * 10
-                    atom.xz = float(line[36:44]) * 10
-                    if line[44:52].strip():
-                        atom.vx = float(line[44:52]) * 10
-                        atom.vy = float(line[52:60]) * 10
-                        atom.vz = float(line[60:68]) * 10
+                    pdeci = [i for i, x in enumerate(line) if x == '.']
+                    ndeci = pdeci[1] - pdeci[0] - 5
+                    for i in range(1, 4):
+                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                        wend = (pdeci[0]-4)+(5+ndeci)*i
+                        if i == 1: atom.xx = float(line[wbeg:wend]) * 10
+                        elif i == 2: atom.xy = float(line[wbeg:wend]) * 10
+                        elif i == 3: atom.xz = float(line[wbeg:wend]) * 10
+                    i = 4
+                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    if line[wbeg:wend].strip():
+                        for i in range(4, 7):
+                            wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
+                            wend = (pdeci[0]-4)+(5+ndeci)*i
+                            if i == 4: atom.vx = float(line[wbeg:wend]) * 10
+                            elif i == 5: atom.vy = float(line[wbeg:wend]) * 10
+                            elif i == 5: atom.vz = float(line[wbeg:wend]) * 10
                 except (ValueError, IndexError):
                     raise ParsingError('Could not parse the atom record of '
                                        'GRO file %s' % filename)
@@ -143,7 +162,7 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest):
+    def write(struct, dest, nobox=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -152,6 +171,11 @@ class GromacsGroFile(object):
             The structure to write to a Gromacs GRO file (must have coordinates)
         dest : str or file-like
             The name of a file or a file object to write the Gromacs topology to
+        nobox : bool, optional
+            If the system does not have a periodic box defined, and this option
+            is True, no box will be written. If False, the periodic box will be
+            defined to enclose the solute with 0.5 nm clearance on all sides. If
+            periodic box dimensions *are* defined, this variable has no effect.
         """
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
@@ -173,10 +197,29 @@ class GromacsGroFile(object):
                            (atom.residue.idx+1, atom.residue.name, atom.name,
                                atom.idx+1, atom.xx/10, atom.xy/10, atom.xz/10))
         # Box, in the weird format...
-        a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
-                        *struct.box))
-        dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10, a[2]/10,
-                                 b[0]/10, b[2]/10, c[0]/10, c[1]/10))
-        dest.write('\n')
+        if struct.box is not None:
+            a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
+                            *struct.box))
+            if all([abs(x-90) < TINY for x in struct.box[3:]]):
+                dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
+            else:
+                dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
+                           a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+            dest.write('\n')
+        elif not nobox and struct.atoms:
+            # Find the extent of the molecule in all dimensions
+            xdim = [struct.atoms[0].xx, struct.atoms[1].xx]
+            ydim = [struct.atoms[0].xy, struct.atoms[1].xy]
+            zdim = [struct.atoms[0].xz, struct.atoms[1].xz]
+            for atom in struct.atoms:
+                xdim[0] = min(xdim[0], atom.xx)
+                xdim[1] = max(xdim[1], atom.xx)
+                ydim[0] = min(ydim[0], atom.xy)
+                ydim[1] = max(ydim[1], atom.xy)
+                zdim[0] = min(zdim[0], atom.xz)
+                zdim[1] = max(zdim[1], atom.xz)
+            dest.write('%10.5f'*3 % (xdim[1]-xdim[0]+5, ydim[1]-ydim[0]+5,
+                                     zdim[1]-zdim[0]+5))
+            dest.write('\n')
         if own_handle:
             dest.close()

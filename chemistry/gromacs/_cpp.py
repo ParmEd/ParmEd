@@ -6,7 +6,6 @@ Written by Jason Swails
 """
 from chemistry.exceptions import PreProcessorError, PreProcessorWarning
 from chemistry.utils.six import string_types, iteritems, wraps
-from chemistry.utils.six.moves import range
 from collections import OrderedDict
 from os import path
 import re

@@ -18,6 +18,7 @@ from chemistry.utils.io import genopen
 from chemistry.utils.six import wraps, iteritems
 from chemistry.utils.six.moves import zip, range
 from contextlib import closing
+from copy import copy
 from math import sqrt
 import os
 import re
@@ -248,6 +249,7 @@ class CharmmPsfFile(Structure):
                 self.angles.append(
                         Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1])
                 )
+                self.angles[-1].funct = 5 # urey-bradley
             # Now get the number of torsions and the torsion list
             nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
             if len(psfsections['NPHI'][1]) != nphi * 4:
@@ -391,6 +393,7 @@ class CharmmPsfFile(Structure):
           Dihedral object for each term for types that have a multi-term
           expansion
         """
+        parmset = copy(parmset)
         # First load the atom types
         types_are_int = False
         for atom in self.atoms:

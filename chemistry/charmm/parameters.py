@@ -8,7 +8,6 @@ Contributors:
 Date: Apr. 13, 2015
 """
 from __future__ import division
-from chemistry.constants import DEG_TO_RAD
 from chemistry import (Atom, AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
@@ -319,7 +318,7 @@ class CharmmParameterSet(ParameterSet):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmFileError('Could not parse angles.')
-                angle_type = AngleType(k, theteq*DEG_TO_RAD)
+                angle_type = AngleType(k, theteq)
                 self.angle_types[(type1, type2, type3)] = angle_type
                 self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
@@ -349,7 +348,7 @@ class CharmmParameterSet(ParameterSet):
                 key = (type1, type2, type3, type4)
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
-                dihedral = DihedralType(k, n, phase*DEG_TO_RAD)
+                dihedral = DihedralType(k, n, phase)
                 dihedral.penalty = penalty
                 if key in self.dihedral_types:
                     # See if the existing dihedral type list has a term with
@@ -404,7 +403,7 @@ class CharmmParameterSet(ParameterSet):
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                improp = ImproperType(k, theteq*DEG_TO_RAD)
+                improp = ImproperType(k, theteq)
                 self.improper_types[key] = improp
                 improp.penalty = penalty
                 continue
