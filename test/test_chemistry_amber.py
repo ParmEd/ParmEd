@@ -703,6 +703,26 @@ class TestAmberParmSlice(unittest.TestCase):
         self.assertEqual(parts[2][1], 8)
         self.assertEqual(parts[3][1], 9086)
 
+    def testSplit2(self):
+        """ Tests splitting distinct single-residue molecules with same name """
+        parm = readparm.AmberParm(get_fn('phenol.prmtop'))
+        self.assertEqual(len(parm.residues), 1)
+        self.assertEqual(parm.residues[0].name, 'MOL')
+        parm2 = readparm.AmberParm(get_fn('biphenyl.prmtop'))
+        self.assertEqual(len(parm2.residues), 1)
+        self.assertEqual(parm2.residues[0].name, 'MOL')
+
+        comb = parm * 20 + parm2 * 30
+
+        self.assertEqual(len(comb.residues), 50)
+
+        parts = comb.split()
+        self.assertEqual(len(parts), 2)
+        self.assertEqual(len(parts[0][0].atoms), len(parm.atoms))
+        self.assertEqual(len(parts[1][0].atoms), len(parm2.atoms))
+        self.assertEqual(parts[0][1], 20)
+        self.assertEqual(parts[1][1], 30)
+
     def testAdd(self):
         """ Tests combining AmberParm instances """
         parm1 = readparm.AmberParm(get_fn('phenol.prmtop'))

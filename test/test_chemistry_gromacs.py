@@ -4,12 +4,14 @@ Tests the functionality in the chemistry.gromacs package
 from chemistry import load_file, Structure, ExtraPoint, DihedralTypeList
 from chemistry.exceptions import GromacsTopologyWarning
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
+from chemistry import gromacs as gmx
 from chemistry.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 from utils import get_fn, diff_files, get_saved_fn
 import warnings
 
+@unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(unittest.TestCase):
     """ Tests the Gromacs topology file parser """
 
@@ -214,9 +216,16 @@ class TestGromacsTop(unittest.TestCase):
         top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
         self._check_ff99sbildn(top2)
         self._check_equal_structures(top, top2)
-#       self.assertTrue(diff_files(get_fn('1aki.ff99sbildn.top', written=True),
-#                                  get_saved_fn('1aki.ff99sbildn.top'),
-#                                  comment=';'))
+
+    def testDuplicateSystemNames(self):
+        """ Tests that Gromacs topologies never have duplicate moleculetypes """
+        parm = load_file(get_fn('phenol.prmtop'))
+        parm = parm * 20 + load_file(get_fn('biphenyl.prmtop')) * 20
+        top = GromacsTopologyFile.from_structure(parm)
+        top.write(get_fn('phenol_biphenyl.top', written=True))
+        top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
+        # This would fail upon reading if the two molecules had the same name.
+        # So just finish here.
 
 class TestGromacsGro(unittest.TestCase):
     """ Tests the Gromacs GRO file parser """
