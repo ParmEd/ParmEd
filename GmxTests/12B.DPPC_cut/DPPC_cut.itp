@@ -16,7 +16,7 @@
     H  1   1.0000    0.000  A  0.00000e+00  0.00000e+00
 
 [ moleculetype ]
-DPPC     2
+DPPC     3
 
 [ atoms ]
      1      C3       1    DPPC      C1       1         0.4000   15.0350
