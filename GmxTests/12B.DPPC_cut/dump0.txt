@@ -1,0 +1,564 @@
+zerotor_excl3_fudge0/topol.tpr:
+inputrec:
+   integrator                     = md
+   tinit                          = 0
+   dt                             = 0.002
+   nsteps                         = 0
+   init-step                      = 0
+   simulation-part                = 1
+   comm-mode                      = Linear
+   nstcomm                        = 1
+   bd-fric                        = 0
+   ld-seed                        = 1516988837
+   emtol                          = 10
+   emstep                         = 0.01
+   niter                          = 20
+   fcstep                         = 0
+   nstcgsteep                     = 1000
+   nbfgscorr                      = 10
+   rtpi                           = 0.05
+   nstxout                        = 0
+   nstvout                        = 0
+   nstfout                        = 1
+   nstlog                         = 0
+   nstcalcenergy                  = 1
+   nstenergy                      = 1
+   nstxout-compressed             = 0
+   compressed-x-precision         = 1000
+   cutoff-scheme                  = Group
+   nstlist                        = 1
+   ns-type                        = Simple
+   pbc                            = no
+   periodic-molecules             = FALSE
+   verlet-buffer-tolerance        = 0.005
+   rlist                          = 0
+   rlistlong                      = 0
+   nstcalclr                      = 0
+   coulombtype                    = Cut-off
+   coulomb-modifier               = None
+   rcoulomb-switch                = 0
+   rcoulomb                       = 0
+   epsilon-r                      = 1
+   epsilon-rf                     = inf
+   vdw-type                       = Cut-off
+   vdw-modifier                   = None
+   rvdw-switch                    = 0
+   rvdw                           = 0
+   DispCorr                       = No
+   table-extension                = 1
+   fourierspacing                 = 0.12
+   fourier-nx                     = 0
+   fourier-ny                     = 0
+   fourier-nz                     = 0
+   pme-order                      = 4
+   ewald-rtol                     = 1e-05
+   ewald-rtol-lj                  = 0.001
+   lj-pme-comb-rule               = Geometric
+   ewald-geometry                 = 0
+   epsilon-surface                = 0
+   implicit-solvent               = No
+   gb-algorithm                   = Still
+   nstgbradii                     = 1
+   rgbradii                       = 1
+   gb-epsilon-solvent             = 80
+   gb-saltconc                    = 0
+   gb-obc-alpha                   = 1
+   gb-obc-beta                    = 0.8
+   gb-obc-gamma                   = 4.85
+   gb-dielectric-offset           = 0.009
+   sa-algorithm                   = Ace-approximation
+   sa-surface-tension             = 2.05016
+   tcoupl                         = No
+   nsttcouple                     = -1
+   nh-chain-length                = 0
+   print-nose-hoover-chain-variables = FALSE
+   pcoupl                         = No
+   pcoupltype                     = Isotropic
+   nstpcouple                     = -1
+   tau-p                          = 1
+   compressibility (3x3):
+      compressibility[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      compressibility[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      compressibility[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   ref-p (3x3):
+      ref-p[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      ref-p[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      ref-p[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   refcoord-scaling               = No
+   posres-com (3):
+      posres-com[0]= 0.00000e+00
+      posres-com[1]= 0.00000e+00
+      posres-com[2]= 0.00000e+00
+   posres-comB (3):
+      posres-comB[0]= 0.00000e+00
+      posres-comB[1]= 0.00000e+00
+      posres-comB[2]= 0.00000e+00
+   QMMM                           = FALSE
+   QMconstraints                  = 0
+   QMMMscheme                     = 0
+   MMChargeScaleFactor            = 1
+qm-opts:
+   ngQM                           = 0
+   constraint-algorithm           = Lincs
+   continuation                   = FALSE
+   Shake-SOR                      = FALSE
+   shake-tol                      = 0.0001
+   lincs-order                    = 4
+   lincs-iter                     = 1
+   lincs-warnangle                = 30
+   nwall                          = 0
+   wall-type                      = 9-3
+   wall-r-linpot                  = -1
+   wall-atomtype[0]               = -1
+   wall-atomtype[1]               = -1
+   wall-density[0]                = 0
+   wall-density[1]                = 0
+   wall-ewald-zfac                = 3
+   pull                           = no
+   rotation                       = FALSE
+   interactiveMD                  = FALSE
+   disre                          = No
+   disre-weighting                = Conservative
+   disre-mixed                    = FALSE
+   dr-fc                          = 1000
+   dr-tau                         = 0
+   nstdisreout                    = 100
+   orire-fc                       = 0
+   orire-tau                      = 0
+   nstorireout                    = 100
+   free-energy                    = no
+   cos-acceleration               = 0
+   deform (3x3):
+      deform[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   simulated-tempering            = FALSE
+   E-x:
+      n = 0
+   E-xt:
+      n = 0
+   E-y:
+      n = 0
+   E-yt:
+      n = 0
+   E-z:
+      n = 0
+   E-zt:
+      n = 0
+   swapcoords                     = no
+   adress                         = FALSE
+   userint1                       = 0
+   userint2                       = 0
+   userint3                       = 0
+   userint4                       = 0
+   userreal1                      = 0
+   userreal2                      = 0
+   userreal3                      = 0
+   userreal4                      = 0
+grpopts:
+   nrdf:          57
+   ref-t:           0
+   tau-t:           0
+annealing:          No
+annealing-npoints:           0
+   acc:	           0           0           0
+   nfreeze:           N           N           N
+   energygrp-flags[  0]: 0
+header:
+   bIr    = present
+   bBox   = present
+   bTop   = present
+   bX     = present
+   bV     = present
+   bF     = not present
+   natoms = 20
+   lambda = 0.000000e+00
+topology:
+   name="DPPC Dimer"
+   atoms:
+      atom (20):
+         atom[     0]={type=  0, typeB=  0, ptype=    Atom, m= 1.50350e+01, q= 4.00000e-01, mB= 1.50350e+01, qB= 4.00000e-01, resind=    0, atomnumber=  6}
+         atom[     1]={type=  0, typeB=  0, ptype=    Atom, m= 1.50350e+01, q= 4.00000e-01, mB= 1.50350e+01, qB= 4.00000e-01, resind=    0, atomnumber=  6}
+         atom[     2]={type=  0, typeB=  0, ptype=    Atom, m= 1.50350e+01, q= 4.00000e-01, mB= 1.50350e+01, qB= 4.00000e-01, resind=    0, atomnumber=  6}
+         atom[     3]={type=  1, typeB=  1, ptype=    Atom, m= 1.40067e+01, q=-5.00000e-01, mB= 1.40067e+01, qB=-5.00000e-01, resind=    0, atomnumber=  7}
+         atom[     4]={type=  2, typeB=  2, ptype=    Atom, m= 1.40270e+01, q= 3.00000e-01, mB= 1.40270e+01, qB= 3.00000e-01, resind=    0, atomnumber=  6}
+         atom[     5]={type=  3, typeB=  3, ptype=    Atom, m= 1.40270e+01, q= 4.00000e-01, mB= 1.40270e+01, qB= 4.00000e-01, resind=    0, atomnumber=  6}
+         atom[     6]={type=  4, typeB=  4, ptype=    Atom, m= 1.59994e+01, q=-8.00000e-01, mB= 1.59994e+01, qB=-8.00000e-01, resind=    0, atomnumber=  8}
+         atom[     7]={type=  5, typeB=  5, ptype=    Atom, m= 3.09738e+01, q= 1.70000e+00, mB= 3.09738e+01, qB= 1.70000e+00, resind=    0, atomnumber= 15}
+         atom[     8]={type=  6, typeB=  6, ptype=    Atom, m= 1.59994e+01, q=-8.00000e-01, mB= 1.59994e+01, qB=-8.00000e-01, resind=    0, atomnumber=  8}
+         atom[     9]={type=  6, typeB=  6, ptype=    Atom, m= 1.59994e+01, q=-8.00000e-01, mB= 1.59994e+01, qB=-8.00000e-01, resind=    0, atomnumber=  8}
+         atom[    10]={type=  4, typeB=  4, ptype=    Atom, m= 1.59994e+01, q=-7.00000e-01, mB= 1.59994e+01, qB=-7.00000e-01, resind=    0, atomnumber=  8}
+         atom[    11]={type=  3, typeB=  3, ptype=    Atom, m= 1.40270e+01, q= 4.00000e-01, mB= 1.40270e+01, qB= 4.00000e-01, resind=    0, atomnumber=  6}
+         atom[    12]={type=  7, typeB=  7, ptype=    Atom, m= 1.30190e+01, q= 3.00000e-01, mB= 1.30190e+01, qB= 3.00000e-01, resind=    0, atomnumber=  6}
+         atom[    13]={type=  4, typeB=  4, ptype=    Atom, m= 1.59994e+01, q=-7.00000e-01, mB= 1.59994e+01, qB=-7.00000e-01, resind=    0, atomnumber=  8}
+         atom[    14]={type=  8, typeB=  8, ptype=    Atom, m= 1.20110e+01, q= 7.00000e-01, mB= 1.20110e+01, qB= 7.00000e-01, resind=    0, atomnumber=  6}
+         atom[    15]={type=  6, typeB=  6, ptype=    Atom, m= 1.59994e+01, q=-7.00000e-01, mB= 1.59994e+01, qB=-7.00000e-01, resind=    0, atomnumber=  8}
+         atom[    16]={type=  3, typeB=  3, ptype=    Atom, m= 1.40270e+01, q= 5.00000e-01, mB= 1.40270e+01, qB= 5.00000e-01, resind=    0, atomnumber=  6}
+         atom[    17]={type=  4, typeB=  4, ptype=    Atom, m= 1.59994e+01, q=-7.00000e-01, mB= 1.59994e+01, qB=-7.00000e-01, resind=    0, atomnumber=  8}
+         atom[    18]={type=  8, typeB=  8, ptype=    Atom, m= 1.20110e+01, q= 8.00000e-01, mB= 1.20110e+01, qB= 8.00000e-01, resind=    0, atomnumber=  6}
+         atom[    19]={type=  6, typeB=  6, ptype=    Atom, m= 1.59994e+01, q=-6.00000e-01, mB= 1.59994e+01, qB=-6.00000e-01, resind=    0, atomnumber=  8}
+      atom (20):
+         atom[0]={name="C1"}
+         atom[1]={name="C2"}
+         atom[2]={name="C3"}
+         atom[3]={name="N4"}
+         atom[4]={name="C5"}
+         atom[5]={name="C6"}
+         atom[6]={name="O7"}
+         atom[7]={name="P8"}
+         atom[8]={name="O9"}
+         atom[9]={name="O10"}
+         atom[10]={name="O11"}
+         atom[11]={name="C12"}
+         atom[12]={name="C13"}
+         atom[13]={name="O14"}
+         atom[14]={name="C15"}
+         atom[15]={name="O16"}
+         atom[16]={name="C17"}
+         atom[17]={name="O18"}
+         atom[18]={name="C19"}
+         atom[19]={name="O20"}
+      type (20):
+         type[0]={name="C3",nameB="C3"}
+         type[1]={name="C3",nameB="C3"}
+         type[2]={name="C3",nameB="C3"}
+         type[3]={name="NL",nameB="NL"}
+         type[4]={name="H2",nameB="H2"}
+         type[5]={name="C2",nameB="C2"}
+         type[6]={name="OS",nameB="OS"}
+         type[7]={name="P",nameB="P"}
+         type[8]={name="OM",nameB="OM"}
+         type[9]={name="OM",nameB="OM"}
+         type[10]={name="OS",nameB="OS"}
+         type[11]={name="C2",nameB="C2"}
+         type[12]={name="H1",nameB="H1"}
+         type[13]={name="OS",nameB="OS"}
+         type[14]={name="C",nameB="C"}
+         type[15]={name="O",nameB="O"}
+         type[16]={name="C2",nameB="C2"}
+         type[17]={name="OS",nameB="OS"}
+         type[18]={name="C",nameB="C"}
+         type[19]={name="O",nameB="O"}
+      residue (1):
+         residue[0]={name="DPPC", nr=1, ic=' '}
+   atomtypes:
+      atomtype[  0]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   6, S_hct=-1.00000e+00)}
+      atomtype[  1]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   7, S_hct=-1.00000e+00)}
+      atomtype[  2]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   6, S_hct=-1.00000e+00)}
+      atomtype[  3]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   6, S_hct=-1.00000e+00)}
+      atomtype[  4]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   8, S_hct=-1.00000e+00)}
+      atomtype[  5]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=  15, S_hct=-1.00000e+00)}
+      atomtype[  6]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   8, S_hct=-1.00000e+00)}
+      atomtype[  7]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   6, S_hct=-1.00000e+00)}
+      atomtype[  8]={radius=-1.00000e+00, volume=-1.00000e+00, gb_radius=-1.00000e+00, surftens=-1.00000e+00, atomnumber=   6, S_hct=-1.00000e+00)}
+   cgs:
+      nr=20
+      cgs[0]={0..0}
+      cgs[1]={1..1}
+      cgs[2]={2..2}
+      cgs[3]={3..3}
+      cgs[4]={4..4}
+      cgs[5]={5..5}
+      cgs[6]={6..6}
+      cgs[7]={7..7}
+      cgs[8]={8..8}
+      cgs[9]={9..9}
+      cgs[10]={10..10}
+      cgs[11]={11..11}
+      cgs[12]={12..12}
+      cgs[13]={13..13}
+      cgs[14]={14..14}
+      cgs[15]={15..15}
+      cgs[16]={16..16}
+      cgs[17]={17..17}
+      cgs[18]={18..18}
+      cgs[19]={19..19}
+   mols:
+      nr=1
+      mols[0]={0..19}
+   excls:
+      nr=20
+      nra=150
+      excls[0][0..5]={0, 1, 2, 3, 4, 5}
+      excls[1][6..11]={0, 1, 2, 3, 4, 5}
+      excls[2][12..17]={0, 1, 2, 3, 4, 5}
+      excls[3][18..24]={0, 1, 2, 3, 4, 5, 6}
+      excls[4][25..32]={0, 1, 2, 3, 4, 5, 6, 7}
+      excls[5][33..43]={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+      excls[6][44..52]={3, 4, 5, 6, 7, 8, 9, 10, 11}
+      excls[7][53..61]={4, 5, 6, 7, 8, 9, 10, 11, 12}
+      excls[8][62..68]={5, 6, 7, 8, 9, 10, 11}
+      excls[9][69..75]={5, 6, 7, 8, 9, 10, 11}
+      excls[10][76..85]={5, 6, 7, 8, 9, 10, 11, 12, 13, 16}
+      excls[11][86..96]={6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17}
+      excls[12][97..106]={7, 10, 11, 12, 13, 14, 15, 16, 17, 18}
+      excls[13][107..114]={10, 11, 12, 13, 14, 15, 16, 17}
+      excls[14][115..120]={11, 12, 13, 14, 15, 16}
+      excls[15][121..124]={12, 13, 14, 15}
+      excls[16][125..133]={10, 11, 12, 13, 14, 16, 17, 18, 19}
+      excls[17][134..140]={11, 12, 13, 16, 17, 18, 19}
+      excls[18][141..145]={12, 16, 17, 18, 19}
+      excls[19][146..149]={16, 17, 18, 19}
+   idef:
+      atnr=9
+      ntypes=108
+         functype[0]=LJ_SR, c6= 9.35699884e-03, c12= 3.60899794e-05
+         functype[1]=LJ_SR, c6= 5.76749584e-03, c12= 1.26605173e-05
+         functype[2]=LJ_SR, c6= 8.09547771e-03, c12= 2.99438670e-05
+         functype[3]=LJ_SR, c6= 7.46921357e-03, c12= 2.54820879e-05
+         functype[4]=LJ_SR, c6= 5.18779363e-03, c12= 9.21429091e-06
+         functype[5]=LJ_SR, c6= 9.28068534e-03, c12= 3.02272438e-05
+         functype[6]=LJ_SR, c6= 5.01064770e-03, c12= 8.59796455e-06
+         functype[7]=LJ_SR, c6= 6.14932738e-03, c12= 2.09849841e-05
+         functype[8]=LJ_SR, c6= 6.77803904e-03, c12= 2.22455747e-05
+         functype[9]=LJ_SR, c6= 5.76749584e-03, c12= 1.26605173e-05
+         functype[10]=LJ_SR, c6= 3.35301831e-03, c12= 3.95104553e-06
+         functype[11]=LJ_SR, c6= 4.96930024e-03, c12= 1.04178180e-05
+         functype[12]=LJ_SR, c6= 4.54796804e-03, c12= 8.72335295e-06
+         functype[13]=LJ_SR, c6= 2.94565526e-03, c12= 2.74298645e-06
+         functype[14]=LJ_SR, c6= 5.62451361e-03, c12= 1.02511312e-05
+         functype[15]=LJ_SR, c6= 2.83390819e-03, c12= 2.53946837e-06
+         functype[16]=LJ_SR, c6= 3.74440080e-03, c12= 7.18424963e-06
+         functype[17]=LJ_SR, c6= 4.11098776e-03, c12= 7.55598649e-06
+         functype[18]=LJ_SR, c6= 8.09547771e-03, c12= 2.99438670e-05
+         functype[19]=LJ_SR, c6= 4.96930024e-03, c12= 1.04178180e-05
+         functype[20]=LJ_SR, c6= 7.00197602e-03, c12= 2.48298184e-05
+         functype[21]=LJ_SR, c6= 6.45659771e-03, c12= 2.11058141e-05
+         functype[22]=LJ_SR, c6= 4.46241349e-03, c12= 7.55693191e-06
+         functype[23]=LJ_SR, c6= 8.01981427e-03, c12= 2.50193807e-05
+         functype[24]=LJ_SR, c6= 4.30884771e-03, c12= 7.04757304e-06
+         functype[25]=LJ_SR, c6= 5.31566190e-03, c12= 1.73811095e-05
+         functype[26]=LJ_SR, c6= 5.85749978e-03, c12= 1.84149030e-05
+         functype[27]=LJ_SR, c6= 7.46921357e-03, c12= 2.54820879e-05
+         functype[28]=LJ_SR, c6= 4.54796804e-03, c12= 8.72335295e-06
+         functype[29]=LJ_SR, c6= 6.45659771e-03, c12= 2.11058141e-05
+         functype[30]=LJ_SR, c6= 5.94703574e-03, c12= 1.79002109e-05
+         functype[31]=LJ_SR, c6= 4.07082681e-03, c12= 6.28685575e-06
+         functype[32]=LJ_SR, c6= 7.38208601e-03, c12= 2.11918286e-05
+         functype[33]=LJ_SR, c6= 3.92861571e-03, c12= 5.85677890e-06
+         functype[34]=LJ_SR, c6= 4.89616254e-03, c12= 1.47413366e-05
+         functype[35]=LJ_SR, c6= 5.39229577e-03, c12= 1.56010792e-05
+         functype[36]=LJ_SR, c6= 5.18779363e-03, c12= 9.21429091e-06
+         functype[37]=LJ_SR, c6= 2.94565526e-03, c12= 2.74298645e-06
+         functype[38]=LJ_SR, c6= 4.46241349e-03, c12= 7.55693191e-06
+         functype[39]=LJ_SR, c6= 4.07082681e-03, c12= 6.28685575e-06
+         functype[40]=LJ_SR, c6= 2.56302278e-03, c12= 1.86803265e-06
+         functype[41]=LJ_SR, c6= 5.02493978e-03, c12= 7.36009088e-06
+         functype[42]=LJ_SR, c6= 2.46183295e-03, c12= 1.72388411e-06
+         functype[43]=LJ_SR, c6= 3.35160200e-03, c12= 5.17775197e-06
+         functype[44]=LJ_SR, c6= 3.67390318e-03, c12= 5.42842508e-06
+         functype[45]=LJ_SR, c6= 9.28068534e-03, c12= 3.02272438e-05
+         functype[46]=LJ_SR, c6= 5.62451361e-03, c12= 1.02511312e-05
+         functype[47]=LJ_SR, c6= 8.01981427e-03, c12= 2.50193807e-05
+         functype[48]=LJ_SR, c6= 7.38208601e-03, c12= 2.11918286e-05
+         functype[49]=LJ_SR, c6= 5.02493978e-03, c12= 7.36009088e-06
+         functype[50]=LJ_SR, c6= 9.15996917e-03, c12= 2.50698340e-05
+         functype[51]=LJ_SR, c6= 4.84787580e-03, c12= 6.85229224e-06
+         functype[52]=LJ_SR, c6= 6.07764535e-03, c12= 1.74521574e-05
+         functype[53]=LJ_SR, c6= 6.69137994e-03, c12= 1.84583059e-05
+         functype[54]=LJ_SR, c6= 5.01064770e-03, c12= 8.59796455e-06
+         functype[55]=LJ_SR, c6= 2.83390819e-03, c12= 2.53946837e-06
+         functype[56]=LJ_SR, c6= 4.30884771e-03, c12= 7.04757304e-06
+         functype[57]=LJ_SR, c6= 3.92861571e-03, c12= 5.85677890e-06
+         functype[58]=LJ_SR, c6= 2.46183295e-03, c12= 1.72388411e-06
+         functype[59]=LJ_SR, c6= 4.84787580e-03, c12= 6.85229224e-06
+         functype[60]=LJ_SR, c6= 2.36400240e-03, c12= 1.59000388e-06
+         functype[61]=LJ_SR, c6= 3.23452265e-03, c12= 4.82356609e-06
+         functype[62]=LJ_SR, c6= 3.54463002e-03, c12= 5.05442404e-06
+         functype[63]=LJ_SR, c6= 6.14932738e-03, c12= 2.09849841e-05
+         functype[64]=LJ_SR, c6= 3.74440080e-03, c12= 7.18424963e-06
+         functype[65]=LJ_SR, c6= 5.31566190e-03, c12= 1.73811095e-05
+         functype[66]=LJ_SR, c6= 4.89616254e-03, c12= 1.47413366e-05
+         functype[67]=LJ_SR, c6= 3.35160200e-03, c12= 5.17775197e-06
+         functype[68]=LJ_SR, c6= 6.07764535e-03, c12= 1.74521574e-05
+         functype[69]=LJ_SR, c6= 3.23452265e-03, c12= 4.82356609e-06
+         functype[70]=LJ_SR, c6= 4.03098436e-03, c12= 1.21399125e-05
+         functype[71]=LJ_SR, c6= 4.43945685e-03, c12= 1.28479851e-05
+         functype[72]=LJ_SR, c6= 6.77803904e-03, c12= 2.22455747e-05
+         functype[73]=LJ_SR, c6= 4.11098776e-03, c12= 7.55598649e-06
+         functype[74]=LJ_SR, c6= 5.85749978e-03, c12= 1.84149030e-05
+         functype[75]=LJ_SR, c6= 5.39229577e-03, c12= 1.56010792e-05
+         functype[76]=LJ_SR, c6= 3.67390318e-03, c12= 5.42842508e-06
+         functype[77]=LJ_SR, c6= 6.69137994e-03, c12= 1.84583059e-05
+         functype[78]=LJ_SR, c6= 3.54463002e-03, c12= 5.05442404e-06
+         functype[79]=LJ_SR, c6= 4.43945685e-03, c12= 1.28479851e-05
+         functype[80]=LJ_SR, c6= 4.88801906e-03, c12= 1.35901182e-05
+         functype[81]=BONDS, b0A= 1.47000e-01, cbA= 3.74500e+05, b0B= 1.47000e-01, cbB= 3.74500e+05
+         functype[82]=BONDS, b0A= 1.47000e-01, cbA= 3.76600e+05, b0B= 1.47000e-01, cbB= 3.76600e+05
+         functype[83]=BONDS, b0A= 1.53000e-01, cbA= 3.34700e+05, b0B= 1.53000e-01, cbB= 3.34700e+05
+         functype[84]=BONDS, b0A= 1.43000e-01, cbA= 2.51000e+05, b0B= 1.43000e-01, cbB= 2.51000e+05
+         functype[85]=BONDS, b0A= 1.61000e-01, cbA= 2.51000e+05, b0B= 1.61000e-01, cbB= 2.51000e+05
+         functype[86]=BONDS, b0A= 1.48000e-01, cbA= 3.76600e+05, b0B= 1.48000e-01, cbB= 3.76600e+05
+         functype[87]=BONDS, b0A= 1.43500e-01, cbA= 2.51000e+05, b0B= 1.43500e-01, cbB= 2.51000e+05
+         functype[88]=BONDS, b0A= 1.36000e-01, cbA= 3.76600e+05, b0B= 1.36000e-01, cbB= 3.76600e+05
+         functype[89]=BONDS, b0A= 1.23000e-01, cbA= 5.02100e+05, b0B= 1.23000e-01, cbB= 5.02100e+05
+         functype[90]=ANGLES, thA= 1.09500e+02, ctA= 3.34700e+02, thB= 1.09500e+02, ctB= 3.34700e+02
+         functype[91]=ANGLES, thA= 1.09500e+02, ctA= 3.76600e+02, thB= 1.09500e+02, ctB= 3.76600e+02
+         functype[92]=ANGLES, thA= 1.09500e+02, ctA= 4.60200e+02, thB= 1.09500e+02, ctB= 4.60200e+02
+         functype[93]=ANGLES, thA= 1.20000e+02, ctA= 3.97500e+02, thB= 1.20000e+02, ctB= 3.97500e+02
+         functype[94]=ANGLES, thA= 1.09600e+02, ctA= 3.97500e+02, thB= 1.09600e+02, ctB= 3.97500e+02
+         functype[95]=ANGLES, thA= 1.03000e+02, ctA= 3.97500e+02, thB= 1.03000e+02, ctB= 3.97500e+02
+         functype[96]=ANGLES, thA= 1.20000e+02, ctA= 5.85800e+02, thB= 1.20000e+02, ctB= 5.85800e+02
+         functype[97]=ANGLES, thA= 1.11000e+02, ctA= 4.60200e+02, thB= 1.11000e+02, ctB= 4.60200e+02
+         functype[98]=ANGLES, thA= 1.20000e+02, ctA= 4.18400e+02, thB= 1.20000e+02, ctB= 4.18400e+02
+         functype[99]=ANGLES, thA= 1.24000e+02, ctA= 5.02100e+02, thB= 1.24000e+02, ctB= 5.02100e+02
+         functype[100]=PDIHS, phiA= 0.00000000e+00, cpA= 3.75999999e+00, phiB= 0.00000000e+00, cpB= 3.75999999e+00, mult=3
+         functype[101]=PDIHS, phiA= 0.00000000e+00, cpA= 5.84999990e+00, phiB= 0.00000000e+00, cpB= 5.84999990e+00, mult=3
+         functype[102]=PDIHS, phiA= 0.00000000e+00, cpA= 1.04999995e+00, phiB= 0.00000000e+00, cpB= 1.04999995e+00, mult=3
+         functype[103]=PDIHS, phiA= 0.00000000e+00, cpA= 3.14000010e+00, phiB= 0.00000000e+00, cpB= 3.14000010e+00, mult=2
+         functype[104]=PDIHS, phiA= 0.00000000e+00, cpA= 2.08999991e+00, phiB= 0.00000000e+00, cpB= 2.08999991e+00, mult=2
+         functype[105]=PDIHS, phiA= 0.00000000e+00, cpA= 4.19999987e-01, phiB= 0.00000000e+00, cpB= 4.19999987e-01, mult=2
+         functype[106]=PDIHS, phiA= 0.00000000e+00, cpA= 3.76999998e+00, phiB= 0.00000000e+00, cpB= 3.76999998e+00, mult=3
+         functype[107]=IDIHS, xiA= 3.52640e+01, cxA= 3.34700e+02, xiB= 3.52640e+01, cxB= 3.34700e+02
+      fudgeQQ                        = 1e-12
+      Bond:
+         nr: 57
+         iatoms:
+            0 type=81 (BONDS) 0 3
+            1 type=81 (BONDS) 1 3
+            2 type=81 (BONDS) 2 3
+            3 type=82 (BONDS) 3 4
+            4 type=83 (BONDS) 4 5
+            5 type=84 (BONDS) 5 6
+            6 type=85 (BONDS) 6 7
+            7 type=86 (BONDS) 7 8
+            8 type=86 (BONDS) 7 9
+            9 type=85 (BONDS) 7 10
+            10 type=84 (BONDS) 10 11
+            11 type=83 (BONDS) 11 12
+            12 type=87 (BONDS) 12 13
+            13 type=83 (BONDS) 12 16
+            14 type=88 (BONDS) 13 14
+            15 type=89 (BONDS) 14 15
+            16 type=84 (BONDS) 16 17
+            17 type=88 (BONDS) 17 18
+            18 type=89 (BONDS) 18 19
+      Angle:
+         nr: 100
+         iatoms:
+            0 type=90 (ANGLES) 0 3 1
+            1 type=90 (ANGLES) 1 3 2
+            2 type=90 (ANGLES) 2 3 0
+            3 type=91 (ANGLES) 0 3 4
+            4 type=91 (ANGLES) 1 3 4
+            5 type=91 (ANGLES) 2 3 4
+            6 type=92 (ANGLES) 3 4 5
+            7 type=92 (ANGLES) 4 5 6
+            8 type=93 (ANGLES) 5 6 7
+            9 type=94 (ANGLES) 6 7 8
+            10 type=94 (ANGLES) 6 7 9
+            11 type=95 (ANGLES) 6 7 10
+            12 type=93 (ANGLES) 7 10 11
+            13 type=96 (ANGLES) 8 7 9
+            14 type=94 (ANGLES) 8 7 10
+            15 type=94 (ANGLES) 9 7 10
+            16 type=97 (ANGLES) 10 11 12
+            17 type=92 (ANGLES) 11 12 13
+            18 type=92 (ANGLES) 11 12 16
+            19 type=98 (ANGLES) 12 13 14
+            20 type=97 (ANGLES) 12 16 17
+            21 type=92 (ANGLES) 13 12 16
+            22 type=99 (ANGLES) 13 14 15
+            23 type=98 (ANGLES) 16 17 18
+            24 type=99 (ANGLES) 17 18 19
+      Proper Dih.:
+         nr: 80
+         iatoms:
+            0 type=100 (PDIHS) 0 3 4 5
+            1 type=101 (PDIHS) 3 4 5 6
+            2 type=100 (PDIHS) 4 5 6 7
+            3 type=102 (PDIHS) 5 6 7 10
+            4 type=103 (PDIHS) 5 6 7 10
+            5 type=102 (PDIHS) 6 7 10 11
+            6 type=103 (PDIHS) 6 7 10 11
+            7 type=100 (PDIHS) 7 10 11 12
+            8 type=104 (PDIHS) 10 11 12 13
+            9 type=101 (PDIHS) 10 11 12 16
+            10 type=105 (PDIHS) 10 11 12 16
+            11 type=101 (PDIHS) 11 12 16 17
+            12 type=105 (PDIHS) 11 12 16 17
+            13 type=106 (PDIHS) 11 12 13 14
+            14 type=100 (PDIHS) 12 16 17 18
+            15 type=100 (PDIHS) 12 16 17 18
+      Improper Dih.:
+         nr: 5
+         iatoms:
+            0 type=107 (IDIHS) 12 13 16 11
+box (3x3):
+   box[    0]={ 1.70945e+00,  0.00000e+00,  0.00000e+00}
+   box[    1]={ 0.00000e+00,  1.70945e+00,  0.00000e+00}
+   box[    2]={ 0.00000e+00,  0.00000e+00,  5.85001e+00}
+box_rel (3x3):
+   box_rel[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   box_rel[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   box_rel[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+boxv (3x3):
+   boxv[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   boxv[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   boxv[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+pres_prev (3x3):
+   pres_prev[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   pres_prev[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   pres_prev[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+svir_prev (3x3):
+   svir_prev[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   svir_prev[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   svir_prev[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+fvir_prev (3x3):
+   fvir_prev[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   fvir_prev[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   fvir_prev[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+nosehoover_xi: not available
+x (20x3):
+   x[    0]={ 6.00983e-01,  7.24007e-01,  1.29100e+00}
+   x[    1]={ 7.76054e-01,  6.95037e-01,  1.13182e+00}
+   x[    2]={ 8.06960e-01,  7.43957e-01,  1.37294e+00}
+   x[    3]={ 7.34999e-01,  6.67292e-01,  1.27021e+00}
+   x[    4]={ 7.37139e-01,  5.21648e-01,  1.29002e+00}
+   x[    5]={ 8.75846e-01,  4.60270e-01,  1.26997e+00}
+   x[    6]={ 8.89175e-01,  3.21768e-01,  1.30296e+00}
+   x[    7]={ 1.02712e+00,  2.80101e-01,  1.23116e+00}
+   x[    8]={ 1.03998e+00,  1.40267e-01,  1.27791e+00}
+   x[    9]={ 1.03000e+00,  3.03979e-01,  1.08513e+00}
+   x[   10]={ 1.12589e+00,  3.84315e-01,  1.30401e+00}
+   x[   11]={ 1.20370e+00,  2.98329e-01,  1.38768e+00}
+   x[   12]={ 1.31381e+00,  3.81213e-01,  1.45413e+00}
+   x[   13]={ 1.41373e+00,  3.14001e-01,  1.53217e+00}
+   x[   14]={ 1.53522e+00,  3.06157e-01,  1.47156e+00}
+   x[   15]={ 1.55998e+00,  3.76948e-01,  1.37407e+00}
+   x[   16]={ 1.22799e+00,  4.78720e-01,  1.53499e+00}
+   x[   17]={ 1.12922e+00,  4.13041e-01,  1.61486e+00}
+   x[   18]={ 1.01782e+00,  4.82187e-01,  1.65097e+00}
+   x[   19]={ 9.81036e-01,  5.81902e-01,  1.58906e+00}
+v (20x3):
+   v[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    3]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    4]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    5]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    6]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    7]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    8]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[    9]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   10]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   11]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   12]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   13]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   14]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   15]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   16]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   17]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   18]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   v[   19]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+Group statistics
+T-Coupling  :      20  (total 20 atoms)
+Energy Mon. :      20  (total 20 atoms)
+Acceleration:      20  (total 20 atoms)
+Freeze      :      20  (total 20 atoms)
+User1       :      20  (total 20 atoms)
+User2       :      20  (total 20 atoms)
+VCM         :      20  (total 20 atoms)
+Compressed X:      20  (total 20 atoms)
+Or. Res. Fit:      20  (total 20 atoms)
+QMMM        :      20  (total 20 atoms)
