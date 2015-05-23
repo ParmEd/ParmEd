@@ -224,8 +224,6 @@ class TestGromacsTop(unittest.TestCase):
         top = GromacsTopologyFile.from_structure(parm)
         top.write(get_fn('phenol_biphenyl.top', written=True))
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
-        # This would fail upon reading if the two molecules had the same name.
-        # So just finish here.
         self.assertEqual(len(top.residues), 40)
 
 class TestGromacsGro(unittest.TestCase):
