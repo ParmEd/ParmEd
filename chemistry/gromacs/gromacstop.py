@@ -911,6 +911,7 @@ class GromacsTopologyFile(Structure):
         if copy:
             struct = _copy(struct)
         gmxtop.atoms = struct.atoms
+        gmxtop.residues = struct.residues
         gmxtop.bonds = struct.bonds
         gmxtop.angles = struct.angles
         gmxtop.dihedrals = struct.dihedrals
@@ -941,25 +942,35 @@ class GromacsTopologyFile(Structure):
         elif isinstance(struct, CharmmPsfFile):
             gmxtop.defaults.fudgeLJ = gmxtop.defaults.fudgeQQ = 1.0
         else:
+            scee_values = set()
+            scnb_values = set()
             for dihedral in struct.dihedrals:
                 if dihedral.type is None: continue
                 if isinstance(dihedral.type, DihedralTypeList):
                     fudgeQQ = fudgeLJ = None
                     for dt in dihedral.type:
                         if dt.scee:
-                            fudgeQQ = 1 / dt.scee
+                            scee_values.add(dt.scee)
                         if dt.scnb:
-                            fudgeLJ = 1 / dt.scnb
-                        if fudgeLJ and fudgeQQ: break
-                    if fudgeLJ and fudgeQQ:
-                        gmxtop.defaults.fudgeQQ = fudgeQQ
-                        gmxtop.defaults.fudgeLJ = fudgeLJ
-                        break
+                            scnb_values.add(dt.scnb)
                 else:
-                    if dihedral.type.scee and dihedral.type.scnb:
-                        gmxtop.defaults.fudgeQQ = 1 / dihedral.type.scee
-                        gmxtop.defaults.fudgeLJ = 1 / dihedral.type.scnb
-                        break
+                    if dihedral.type.scee:
+                        scee_values.add(dihedral.type.scee)
+                    if dihedral.type.scnb:
+                        scnb_values.add(dihedral.type.scnb)
+            if len(scee_values) > 1:
+                raise GromacsTopologyError('Structure has mixed 1-4 '
+                            'scaling which is not supported by Gromacs')
+            scee_values = list(scee_values)
+            scnb_values = list(scnb_values)
+            if len(scee_values) == 1:
+                gmxtop.defaults.fudgeQQ = 1/scee_values[0]
+            else:
+                gmxtop.defaults.fudgeQQ = 1.0
+            if len(scnb_values) == 1:
+                gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
+            else:
+                gmxtop.defaults.fudgeLJ = 1.0
 
         return gmxtop
 

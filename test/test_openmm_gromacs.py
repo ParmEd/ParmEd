@@ -200,7 +200,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 1628.54739, places=3)
         self.assertAlmostEqual(energies['angle'], 3604.58751, places=3)
         self.assertAlmostEqual(energies['dihedral'], 6490.00844, delta=0.002)
-        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, delta=0.002)
         gmxfrc = get_forces_from_xvg(
                 os.path.join(get_fn('09.DHFR-PME'), 'force.xvg'))
         ommfrc = context.getState(getForces=True).getForces().value_in_unit(
@@ -230,7 +230,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 1628.54739, places=3)
         self.assertAlmostEqual(energies['angle'], 3604.58751, places=3)
         self.assertAlmostEqual(energies['dihedral'], 6490.00844, delta=0.002)
-        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=3)
         gmxfrc = get_forces_from_xvg(
                 os.path.join(get_fn('10.DHFR-PME-Switch'), 'force.xvg'))
         ommfrc = context.getState(getForces=True).getForces().value_in_unit(

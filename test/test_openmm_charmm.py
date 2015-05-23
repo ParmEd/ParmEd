@@ -290,7 +290,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 7.81143025, places=4)
         self.assertAlmostEqual(energies['improper'], 0, places=4)
         self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
-        self.assertRelativeEqual(energies['nonbond'], 6514.283116, places=5)
+        self.assertRelativeEqual(energies['nonbond'], 6514.283116, places=4)
 
 def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     """ Gets a decomposed energy for a given system """
