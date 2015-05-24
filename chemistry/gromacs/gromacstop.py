@@ -1082,13 +1082,32 @@ class GromacsTopologyFile(Structure):
                 dest.write('#include "%s"\n\n' % include_parfile)
             # Print all atom types
             parfile.write('[ atomtypes ]\n')
-            parfile.write('; name      at.num  mass     charge ptype  '
-                          'sigma      epsilon\n')
+            if all(typ._bond_type is not None
+                    for key, typ in iteritems(params.atom_types)):
+                print_bond_types = True
+            else:
+                print_bond_types = False
+            if all(typ.atomic_number != -1
+                    for key, typ in iteritems(params.atom_types)):
+                print_atnum = True
+            else:
+                print_atnum = False
+            parfile.write('; name    ')
+            if print_bond_types:
+                parfile.write('bond_type ')
+            if print_atnum:
+                parfile.write('at.num    ')
+            parfile.write('mass    charge ptype  sigma      espilon\n')
             econv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for key, atom_type in iteritems(params.atom_types):
-                parfile.write('%-7s %5d %10.5f  %10.6f  A %13.6g %13.6g\n' % (
-                    atom_type, atom_type.atomic_number, atom_type.mass,
-                    0, atom_type.sigma/10, atom_type.epsilon*econv))
+                parfile.write('%-7s ' % atom_type)
+                if print_bond_types:
+                    parfile.write('%-8s ' % atom_type.bond_type)
+                if print_atnum:
+                    parfile.write('%8d ' % atom_type.atomic_number)
+                parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
+                              0, atom_type.mass, atom_type.sigma/10,
+                              atom_type.epsilon*econv))
             parfile.write('\n')
             # Print all parameter types unless we asked for inline
             if parameters != 'inline':

@@ -4563,7 +4563,8 @@ class AtomType(object):
         return self._member_number < other._member_number or self == other
 
     def __copy__(self):
-        cp = AtomType(self.name, self.number, self.mass, self.atomic_number)
+        cp = AtomType(self.name, self.number, self.mass, self.atomic_number,
+                      bond_type=self._bond_type)
         cp.epsilon = self.epsilon
         cp.rmin = self.rmin
         cp.epsilon_14 = self.epsilon_14

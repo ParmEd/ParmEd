@@ -163,8 +163,9 @@ class ParameterSet(object):
         found_dihed_type_list = dict()
         for atom in struct.atoms:
             if atom.atom_type is None:
+                bond_type = atom.atom_type._bond_type
                 atom_type = AtomType(atom.type, None, atom.mass,
-                                     atom.atomic_number)
+                                     atom.atomic_number, bond_type=bond_type)
                 atom_type.set_lj_params(atom.epsilon, atom.rmin,
                                         atom.epsilon_14, atom.rmin_14)
                 params.atom_types[atom.type] = atom_type
