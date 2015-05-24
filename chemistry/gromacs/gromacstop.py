@@ -524,7 +524,8 @@ class GromacsTopologyFile(Structure):
                                 kws['dp1'] = params[key].req
                         if atoms[2] in bond:
                             if bond.type is None:
-                                key = (bond.atom1.type, bond.atom2.type)
+                                key = (_gettype(bond.atom1),
+                                       _gettype(bond.atom2))
                                 if key not in params.bond_types:
                                     raise GromacsTopologyError(
                                             'Cannot determine geometry of '
@@ -537,8 +538,8 @@ class GromacsTopologyFile(Structure):
                             continue
                         foundt = True
                         if angle.type is None:
-                            key = (angle.atom1.type, angle.atom2.type,
-                                    angle.atom3.type)
+                            key = (_gettype(angle.atom1), _gettype(angle.atom2),
+                                   _gettype(angle.atom3))
                             if key not in params.angle_types:
                                 raise GromacsTopologyError(
                                         'Cannot determine geometry of '
@@ -549,7 +550,8 @@ class GromacsTopologyFile(Structure):
                         for bond in atoms[1].bonds:
                             if atoms[2] in bond:
                                 if bond.type is None:
-                                    key = (bond.atom1.type, bond.atom2.type)
+                                    key = (_gettype(bond.atom1),
+                                           _gettype(bond.atom2))
                                     if key not in params.bond_types:
                                         raise GromacsTopologyError(
                                             'Cannot determine geometry of '
@@ -585,20 +587,24 @@ class GromacsTopologyFile(Structure):
                         sigidx = 4
                         ptypeidx = 3
                         massidx = 1
+                        bond_type = None
                     elif len(words[5]) == 1 and words[5] in letters:
                         sigidx = 6
                         ptypeidx = 5
                         massidx = 3
+                        atnum = int(words[2])
+                        bond_type = words[1]
                     else:
                         ptypeidx = 4
                         massidx = 2
                         sigidx = 5
-                    try:
-                        atnum = int(words[1])
-                    except ValueError:
-                        # This must be a bonded type string, which we make no
-                        # use of here
-                        atnum = -1
+                        try:
+                            atnum = int(words[1])
+                            bond_type = None
+                        except ValueError:
+                            # This must be a bonded type string
+                            bond_type = words[1]
+                            atnum = -1
                     mass = float(words[massidx])
                     if mass > 0 and atnum == -1:
                         atnum = AtomicNum[element_by_mass(mass)]
@@ -606,7 +612,8 @@ class GromacsTopologyFile(Structure):
                     ptype = words[ptypeidx]
                     sig = float(words[sigidx]) * u.nanometers
                     eps = float(words[sigidx+1]) * u.kilojoules_per_mole
-                    typ = AtomType(attype, None, mass, atnum)
+                    typ = AtomType(attype, None, mass, atnum,
+                                   bond_type=bond_type)
                     typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
                 elif current_section == 'nonbond_params':
@@ -790,28 +797,29 @@ class GromacsTopologyFile(Structure):
             atom.atom_type = params.atom_types[atom.type]
         for pair in self.adjusts:
             if pair.type is not None: continue
-            key = (pair.atom1.type, pair.atom2.type)
+            key = (_gettype(pair.atom1), _gettype(pair.atom2))
             if key in params.pair_types:
                 pair.type = params.pair_types[key]
                 pair.type.used = True
         update_typelist_from(params.pair_types, self.adjust_types)
         for bond in self.bonds:
             if bond.type is not None: continue
-            key = (bond.atom1.type, bond.atom2.type)
+            key = (_gettype(bond.atom1), _gettype(bond.atom2))
             if key in params.bond_types:
                 bond.type = params.bond_types[key]
                 bond.type.used = True
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
-            key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
+            key = (_gettype(angle.atom1), _gettype(angle.atom2),
+                   _gettype(angle.atom3))
             if key in params.angle_types:
                 angle.type = params.angle_types[key]
                 angle.type.used = True
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
-            key = (ub.atom1.type, ub.atom2.type)
+            key = (_gettype(ub.atom1), _gettype(ub.atom2))
             if key in params.urey_bradley_types:
                 ub.type = params.urey_bradley_types[key]
                 if ub.type is not NoUreyBradley:
@@ -823,9 +831,10 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.urey_bradley_types, self.urey_bradley_types)
         for t in self.dihedrals:
             if t.type is not None: continue
-            key = (t.atom1.type, t.atom2.type, t.atom3.type, t.atom4.type)
+            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
+                   _gettype(t.atom4))
             if not t.improper:
-                wckey = ('X', t.atom2.type, t.atom3.type, 'X')
+                wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
                 if key in params.dihedral_types:
                     t.type = params.dihedral_types[key]
                     t.type.used = True
@@ -849,8 +858,9 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
             if t.type is not None: continue
-            key = (t.atom1.type, t.atom2.type, t.atom3.type, t.atom4.type)
-            wckey = ('X', t.atom2.type, t.atom3.type, 'X')
+            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
+                   _gettype(t.atom4))
+            wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
             if key in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[key]
                 t.type.used = True
@@ -861,8 +871,8 @@ class GromacsTopologyFile(Structure):
         self.update_dihedral_exclusions()
         for t in self.impropers:
             if t.type is not None: continue
-            key = tuple(sorted([t.atom1.type, t.atom2.type, t.atom3.type,
-                                t.atom4.type]))
+            key = tuple(sorted([_gettype(t.atom1), _gettype(t.atom2),
+                                _gettype(t.atom3), _gettype(t.atom4)]))
             if key in params.improper_types:
                 t.type = params.improper_types[key]
                 t.type.used = True
@@ -870,8 +880,9 @@ class GromacsTopologyFile(Structure):
             # Now we will try to find a compatible wild-card... the first atom
             # is the central atom. So take each of the other three and plug that
             # one in
-            for anchor in (t.atom2.type, t.atom3.type, t.atom4.type):
-                wckey = tuple(sorted([t.atom1.type, anchor, 'X', 'X']))
+            for anchor in (_gettype(t.atom2), _gettype(t.atom3),
+                           _gettype(t.atom4)):
+                wckey = tuple(sorted([_gettype(t.atom1), anchor, 'X', 'X']))
                 if wckey not in params.improper_types: continue
                 t.type = params.improper_types[wckey]
                 t.type.used = True
@@ -879,8 +890,8 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
-            key = (c.atom1.type, c.atom2.type, c.atom3.type,
-                    c.atom4.type, c.atom5.type)
+            key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
+                    _gettype(c.atom4), _gettype(c.atom5))
             if key in params.cmap_types:
                 c.type = params.cmap_types[key]
                 c.type.used = True
@@ -1283,7 +1294,7 @@ class GromacsTopologyFile(Structure):
                 if bond.type is None:
                     dest.write('\n')
                     continue
-                key = (bond.atom1.type, bond.atom2.type)
+                key = (_gettype(bond.atom1), _gettype(bond.atom2))
                 if writeparams or key not in params.bond_types or \
                         bond.type != params.bond_types[key]:
                     dest.write('   %.5f %f' % (bond.type.req/10,
@@ -1325,7 +1336,8 @@ class GromacsTopologyFile(Structure):
                 if angle.type is None:
                     dest.write('\n')
                     continue
-                key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
+                key = (_gettype(angle.atom1), _gettype(angle.atom2),
+                       _gettype(angle.atom3))
                 if writeparams or key not in params.angle_types or \
                         angle.type != params.angle_types[key]:
                     dest.write('   %.5f %f' % (angle.type.theteq,
@@ -1351,8 +1363,8 @@ class GromacsTopologyFile(Structure):
                     typedict = params.improper_periodic_types
                 else:
                     typedict = params.dihedral_types
-                key = (dihed.atom1.type, dihed.atom2.type, dihed.atom3.type,
-                        dihed.atom4.type)
+                key = (_gettype(dihed.atom1), _gettype(dihed.atom2),
+                        _gettype(dihed.atom3), _gettype(dihed.atom4))
                 if writeparams or key not in typedict or \
                         _diff_diheds(dihed.type, typedict[key]):
                     if isinstance(dihed.type, DihedralTypeList):
@@ -1384,8 +1396,8 @@ class GromacsTopologyFile(Structure):
                 if dihed.type is None:
                     dest.write('\n')
                     continue
-                key = (dihed.atom1.type, dihed.atom2.type, dihed.atom3.type,
-                        dihed.atom4.type)
+                key = (_gettype(dihed.atom1), _gettype(dihed.atom2),
+                        _gettype(dihed.atom3), _gettype(dihed.atom4))
                 if writeparams or key not in params.rb_torsion_types or \
                         params.rb_torsion_types[key] != dihed.type:
                     dest.write(paramfmt % (dihed.type.c0*conv,
@@ -1560,3 +1572,8 @@ def _diff_diheds(dt1, dt2):
     if isinstance(dt2, DihedralTypeList) and isinstance(dt1, DihedralType):
         if len(dt2) == 1 and dt2[0] == dt1: return False
     return True
+
+def _gettype(atom):
+    if atom.atom_type is not None:
+        return atom.atom_type.bond_type
+    return atom.type

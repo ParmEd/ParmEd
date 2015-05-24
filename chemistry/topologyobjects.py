@@ -4385,8 +4385,11 @@ class AtomType(object):
         The serial index of the atom type
     mass : ``float``
         The mass of the atom type
-    atomic_number : ``int``
-        The atomic number of the element of the atom type
+    atomic_number : ``int``, optional
+        The atomic number of the element of the atom type. Default -1
+    bond_type : ``str``, optional
+        If defined, this is the type name used to look up bonded parameters.
+        Default is None (which falls back to ``name``)
 
     Other Attributes
     ----------------
@@ -4406,6 +4409,11 @@ class AtomType(object):
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
         (Rmin, epsilon, Rmin14, Epsilon14)
+    _bond_type : str or None
+        If an explicit value was given to bond_type, _bond_type will be set to a
+        value. Otherwise, _bond_type will be None (and bond_type will be the
+        same as ``name``). This can be used to determine if a bond_type was
+        specified by comparing to None.
 
     Notes
     -----
@@ -4425,7 +4433,7 @@ class AtomType(object):
     HA: 1
     """
 
-    def __init__(self, name, number, mass, atomic_number):
+    def __init__(self, name, number, mass, atomic_number, bond_type=None):
         if number is None and name is not None:
             # If we were given an integer, assign it to number. Otherwise,
             # assign it to the name
@@ -4446,6 +4454,7 @@ class AtomType(object):
         # a 2-element tuple that is rmin, epsilon
         self.nbfix = dict()
         self._idx = -1 # needed for some internal bookkeeping
+        self._bond_type = bond_type
 
     def __eq__(self, other):
         """
@@ -4482,6 +4491,16 @@ class AtomType(object):
         self.rmin = rmin
         self.epsilon_14 = eps14
         self.rmin_14 = rmin14
+
+    @property
+    def bond_type(self):
+        if self._bond_type is None:
+            return self.name
+        return self._bond_type
+
+    @bond_type.setter
+    def bond_type(self, value):
+        self._bond_type = value
 
     def __int__(self):
         """ The integer representation of an AtomType is its index """
