@@ -1082,7 +1082,7 @@ class GromacsTopologyFile(Structure):
                 dest.write('#include "%s"\n\n' % include_parfile)
             # Print all atom types
             parfile.write('[ atomtypes ]\n')
-            if all(typ._bond_type is not None
+            if any(typ._bond_type is not None
                     for key, typ in iteritems(params.atom_types)):
                 print_bond_types = True
             else:
