@@ -1,0 +1,9 @@
+#include "DPPC_cut_0tor.itp"
+
+; System specifications
+[ system ]
+DPPC Dimer
+
+[ molecules ]
+; molecule name nr.
+DPPC 1

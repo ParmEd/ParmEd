@@ -118,10 +118,11 @@ fudgeQQ = args.fudgeQQ
 nrexcl = args.nrexcl
 excldict = OrderedDict()
 for i in range(len(atomnames)):
-    for j in range(i):
+    for j in range(i+1, len(atomnames)):
         if len(nx.shortest_path(G, i, j)) == 4:
             lj_prefactor = fudgeLJ
             qq_prefactor = fudgeQQ
+            print " %5i %5i ; 1-4 pair" % (i+1, j+1)
         elif len(nx.shortest_path(G, i, j)) <= (nrexcl+1):
             lj_prefactor = 0.0
             qq_prefactor = 0.0
