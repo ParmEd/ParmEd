@@ -2084,68 +2084,66 @@ class Structure(object):
         for atom in self.atoms:
             force.addParticle(atom.charge, atom.rmin*sigma_scale,
                               abs(atom.epsilon*ene_conv))
-        # Now add the exceptions. First add potential 1-4's from the dihedrals.
-        # If dihedral.ignore_end is False, a 1-4 is added with the appropriate
-        # scaling factor
+        # Add the exceptions from the dihedral list IFF no explicit exceptions
+        # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
+        # 1-4 with the appropriate scaling factor is used as the exception.
+        # These come *before* adding exclusions, since we allow them to be
+        # overwritten with 0's by 1-2 and 1-3 pairs.
         sigma_scale = 2**(-1/6) * length_conv
-        chgscales = dict()
-        for dih in self.dihedrals:
-            if dih.ignore_end: continue
-            if isinstance(dih.type, DihedralTypeList):
-                scee = scnb = 0
-                i = 0
-                while (scee == 0 or scnb == 0) and i < len(dih.type):
-                    scee = dih.type[i].scee
-                    scnb = dih.type[i].scnb
-                    i += 1
-                # Scaling factors of 0 will result in divide-by-zero errors. So
-                # force them to 1.
-                scee = scee or 1.0
-                scnb = scnb or 1.0
-            else:
-                scee = dih.type.scee
-                scnb = dih.type.scnb
-            try:
-                rij, wdij, rij14, wdij14 = dih.atom1.atom_type.nbfix[
-                                                str(dih.atom4.atom_type)]
-            except KeyError:
-                epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
-                epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                sigprod = (dih.atom1.rmin_14 + dih.atom4.rmin_14) * sigma_scale
-            else:
-                epsprod = wdij14 * ene_conv / scnb
-                sigprod = rij * length_conv * sigma_scale
-            chgprod = dih.atom1.charge * dih.atom4.charge / scee
-            force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
-                               sigprod, epsprod, True)
-            chgscales[(dih.atom1, dih.atom4)] = 1 / scee
-            for child in dih.atom1.children:
-                epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
-                epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
-                chgprod = (child.charge * dih.atom4.charge) / scee
-                force.addException(child.idx, dih.atom4.idx, chgprod, sigprod,
-                                   epsprod, True)
-                chgscales[(child, dih.atom4)] = 1 / scee
-            for child in dih.atom4.children:
-                epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
-                epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
-                chgprod = child.charge * dih.atom1.charge / scee
-                force.addException(child.idx, dih.atom1.idx, chgprod, sigprod,
-                                   epsprod, True)
-                chgscales[(child, dih.atom1)] = 1 / scee
-            for c1 in dih.atom1.children:
-                for c2 in dih.atom2.children:
-                    epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
+        if not self.adjusts:
+            for dih in self.dihedrals:
+                if dih.ignore_end: continue
+                if isinstance(dih.type, DihedralTypeList):
+                    scee = scnb = 0
+                    i = 0
+                    while (scee == 0 or scnb == 0) and i < len(dih.type):
+                        scee = dih.type[i].scee
+                        scnb = dih.type[i].scnb
+                        i += 1
+                    # Scaling factors of 0 will result in divide-by-zero errors.
+                    # So force them to 1.
+                    scee = scee or 1.0
+                    scnb = scnb or 1.0
+                else:
+                    scee = dih.type.scee
+                    scnb = dih.type.scnb
+                try:
+                    rij, wdij, rij14, wdij14 = dih.atom1.atom_type.nbfix[
+                                                    str(dih.atom4.atom_type)]
+                except KeyError:
+                    epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
-                    chgprod = c1.charge * c2.charge / scee
-                    force.addException(c1.idx, c2.idx, chgprod, sigprod,
-                                       epsprod, True)
-                    chgscales[(c1, c2)] = 1 / scee
+                    sigprod = (dih.atom1.rmin_14+dih.atom4.rmin_14)*sigma_scale
+                else:
+                    epsprod = wdij14 * ene_conv / scnb
+                    sigprod = rij * length_conv * sigma_scale
+                chgprod = dih.atom1.charge * dih.atom4.charge / scee
+                force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
+                                   sigprod, epsprod, True)
+                for child in dih.atom1.children:
+                    epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
+                    epsprod = math.sqrt(epsprod) * ene_conv / scnb
+                    sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+                    chgprod = (child.charge * dih.atom4.charge) / scee
+                    force.addException(child.idx, dih.atom4.idx, chgprod,
+                                       sigprod, epsprod, True)
+                for child in dih.atom4.children:
+                    epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
+                    epsprod = math.sqrt(epsprod) * ene_conv / scnb
+                    sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
+                    chgprod = child.charge * dih.atom1.charge / scee
+                    force.addException(child.idx, dih.atom1.idx, chgprod,
+                                       sigprod, epsprod, True)
+                for c1 in dih.atom1.children:
+                    for c2 in dih.atom2.children:
+                        epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
+                        epsprod = math.sqrt(epsprod) * ene_conv / scnb
+                        sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
+                        chgprod = c1.charge * c2.charge / scee
+                        force.addException(c1.idx, c2.idx, chgprod, sigprod,
+                                           epsprod, True)
         # Now add the bonds, angles, and exclusions. These will always wipe out
-        # existing exceptions and 0 out that exception
+        # existing exceptions fro mthe dihedrals and 0 out that exception
         for bond in self.bonds:
             force.addException(bond.atom1.idx, bond.atom2.idx,
                                0.0, 0.5, 0.0, True)
@@ -2179,17 +2177,7 @@ class Structure(object):
         # came before
         for pair in self.adjusts:
             if pair.type is None: continue
-            if pair.type.chgscale is None:
-                if (pair.atom1, pair.atom2) in chgscales:
-                    chgscale = chgscales[(pair.atom1, pair.atom2)]
-                elif (pair.atom2, pair.atom1) in chgscales:
-                    chgscale = chgscales[(pair.atom2, pair.atom1)]
-                else:
-                    raise RuntimeError('Could not find charge scale for atoms '
-                                       '%r -- %r' % (pair.atom1, pair.atom2))
-            else:
-                chgscale = pair.type.chgscale
-            chgprod = pair.atom1.charge * pair.atom2.charge * chgscale
+            chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
             force.addException(pair.atom1.idx, pair.atom2.idx,
                                pair.type.rmin*sigma_scale,
                                pair.type.epsilon*ene_conv, chgprod, True)

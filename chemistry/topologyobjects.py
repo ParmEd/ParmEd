@@ -4307,13 +4307,12 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
         (dimension energy, default units are kcal/mol)
     chgscale : float, optional
         The scaling factor by which to multiply the product of the charges for
-        this pair. Default is None (so it will use whatever is already stored,
-        e.g., from the dihedral list, or 1.0 if the former can't be found)
+        this pair. Default is 1.0.
     list : :class:`TrackedList`
         The list containing this nonbonded exception
     """
 
-    def __init__(self, rmin, epsilon, chgscale=None, list=None):
+    def __init__(self, rmin, epsilon, chgscale=1.0, list=None):
         _ParameterType.__init__(self)
         self.rmin = _strip_units(rmin, u.angstroms)
         self.epsilon = _strip_units(epsilon, u.kilocalories_per_mole)
