@@ -5,7 +5,8 @@ and building a Structure from it
 from __future__ import print_function, division, absolute_import
 
 from chemistry.constants import TINY, DEG_TO_RAD
-from chemistry.exceptions import GromacsTopologyError, GromacsTopologyWarning
+from chemistry.exceptions import (GromacsTopologyError, GromacsTopologyWarning,
+            MissingParameterWarning)
 from chemistry.formats.registry import FileFormatType
 from chemistry.parameters import ParameterSet
 from chemistry.gromacs._gromacsfile import GromacsFile
@@ -15,7 +16,7 @@ from chemistry.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-            NonbondedExceptionType)
+            NonbondedExceptionType, lorentz_berthelot, geometric)
 from chemistry.periodic_table import element_by_mass, AtomicNum
 from chemistry import unit as u
 from chemistry.utils.io import genopen
@@ -451,10 +452,6 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('Unsupported combining rule',
                                       GromacsTopologyWarning)
                         self.unknown_functional = True
-                    if words[2].lower() == 'no':
-                        warnings.warn('gen_pairs=no is not supported',
-                                      GromacsTopologyWarning)
-                        self.unknown_functional = True
                     self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
                     name, num = line.split()
@@ -801,6 +798,26 @@ class GromacsTopologyFile(Structure):
             if key in params.pair_types:
                 pair.type = params.pair_types[key]
                 pair.type.used = True
+            elif self.defaults.gen_pairs:
+                if self.defaults.comb_rule in (1, 3):
+                    eps, sig = geometric(
+                                    pair.atom1.epsilon, pair.atom2.epsilon,
+                                    pair.atom1.sigma, pair.atom2.sigma
+                    )
+                elif self.defaults.comb_rule == 2:
+                    eps, sig = lorentz_berthelot(
+                                    pair.atom1.epsilon, pair.atom2.epsilon,
+                                    pair.atom1.sigma, pair.atom2.sigma
+                    )
+                eps *= self.defaults.fudgeLJ
+                pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
+                            self.defaults.fudgeQQ, list=self.adjust_types)
+                self.adjust_types.append(pairtype)
+                pair.type = pairtype
+                pair.type.used = True
+            else:
+                warnings.warn('Not all pair parameters can be found',
+                              MissingParameterWarning)
         update_typelist_from(params.pair_types, self.adjust_types)
         for bond in self.bonds:
             if bond.type is not None: continue
@@ -808,6 +825,9 @@ class GromacsTopologyFile(Structure):
             if key in params.bond_types:
                 bond.type = params.bond_types[key]
                 bond.type.used = True
+            else:
+                warnings.warn('Not all bond parameters found',
+                              MissingParameterWarning)
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
@@ -816,6 +836,9 @@ class GromacsTopologyFile(Structure):
             if key in params.angle_types:
                 angle.type = params.angle_types[key]
                 angle.type.used = True
+            else:
+                warnings.warn('Not all angle parameters found',
+                              MissingParameterWarning)
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
@@ -824,6 +847,9 @@ class GromacsTopologyFile(Structure):
                 ub.type = params.urey_bradley_types[key]
                 if ub.type is not NoUreyBradley:
                     ub.type.used = True
+            else:
+                warnings.warn('Not all urey-bradley parameters found',
+                              MissingParameterWarning)
         # Now strip out all of the Urey-Bradley terms whose parameters are 0
         for i in reversed(range(len(self.urey_bradleys))):
             if self.urey_bradleys[i].type is NoUreyBradley:
@@ -841,6 +867,9 @@ class GromacsTopologyFile(Structure):
                 elif wckey in params.dihedral_types:
                     t.type = params.dihedral_types[wckey]
                     t.type.used = True
+                else:
+                    warnings.warn('Not all torsion parameters found',
+                                  MissingParameterWarning)
             else:
                 if key in params.improper_periodic_types:
                     t.type = params.improper_periodic_types[key]
@@ -854,6 +883,9 @@ class GromacsTopologyFile(Structure):
                             t.type = params.improper_periodic_types[wckey]
                             t.type.used = True
                             break
+                    else:
+                        warnings.warn('Not all improper torsion parameters '
+                                      'found', MissingParameterWarning)
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
@@ -867,6 +899,9 @@ class GromacsTopologyFile(Structure):
             elif wckey in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[wckey]
                 t.type.used = True
+            else:
+                warnings.warn('Not all R-B torsion parameters found',
+                              MissingParameterWarning)
         update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
         self.update_dihedral_exclusions()
         for t in self.impropers:
@@ -887,6 +922,9 @@ class GromacsTopologyFile(Structure):
                 t.type = params.improper_types[wckey]
                 t.type.used = True
                 break
+            else:
+                warnings.warn('Not all quadratic improper parameters found',
+                              MissingParameterWarning)
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
@@ -895,6 +933,9 @@ class GromacsTopologyFile(Structure):
             if key in params.cmap_types:
                 c.type = params.cmap_types[key]
                 c.type.used = True
+            else:
+                warnings.warn('Not all cmap parameters found',
+                              MissingParameterWarning)
         update_typelist_from(params.cmap_types, self.cmap_types)
 
     #===================================================

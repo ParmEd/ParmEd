@@ -26,7 +26,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
            'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
-           'RBTorsionType']
+           'RBTorsionType', 'lorentz_berthelot', 'geometric']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -4289,6 +4289,15 @@ class NonbondedException(object):
     def __contains__(self, thing):
         return thing is self.atom1 or thing is self.atom2
 
+    def __repr__(self):
+        retstr = ['<%s; %r and %r' % (type(self).__name__, self.atom1,
+                                      self.atom2)]
+        if self.type is not None:
+            retstr.append(', type=%r>' % self.type)
+        else:
+            retstr.append('>')
+        return ''.join(retstr)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class NonbondedExceptionType(_ParameterType, _ListItem):
@@ -4319,6 +4328,18 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
         self.chgscale = chgscale
         self._idx = None
         self.list = list
+
+    @property
+    def sigma(self):
+        return self.rmin * 2**(-1/6)
+
+    @sigma.setter
+    def sigma(self, value):
+        self.rmin = value * 2**(1/6)
+
+    def __repr__(self):
+        return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
+                type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4640,7 +4661,95 @@ class Group(object):
 
 NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Various combining rules and their inverses for homogenous pairs (i.e., a pair
+# interacting with itself)
+
+def lorentz_berthelot(eps1, eps2, sig1, sig2):
+    """
+    Uses the Lorentz-Berthelot combining rules to compute Lennard-Jones
+    parameters for a particular atom pair. For flexibility, this function allows
+    you to specify *either* Rmin/2 or sigma values for the radii. You must
+    specify either rmin1 and rmin2 *or* sig1 and sig2, exactly.
+
+    The equation for these combining rules are:
+
+    eps_12 = sqrt(eps1*eps2)
+    rmin_12 = rmin1 + rmin2   or  sig_12 = 0.5*(sig1 + sig2)
+
+    Parameters
+    ----------
+    eps1 : float
+        The epsilon of the first atom. Can have energy units
+    eps2 : float
+        The epsilon of the second atom.
+    sig1 : float
+        The sigma value of the first atom. Can have length units
+    sig2 : float
+        The sigma value of the second atom.
+
+    Returns
+    -------
+    eps12, sig12 : float, float
+        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter
+        in angstroms.
+
+    Raises
+    ------
+    TypeError if the units are incompatible
+    """
+    sigs = (sig1, sig2)
+    eps1 = _strip_units(eps1, u.kilocalories_per_mole)
+    eps2 = _strip_units(eps2, u.kilocalories_per_mole)
+    eps12 = math.sqrt(abs(eps1) * abs(eps2))
+    sig1 = _strip_units(sig1, u.angstroms)
+    sig2 = _strip_units(sig2, u.angstroms)
+    sig12 = (sig1 + sig2) / 2
+    return eps12, sig12
+
+def geometric(eps1, eps2, sig1, sig2):
+    """
+    Uses the geometric combining rules to compute Lennard-Jones parameters for a
+    particular atom pair. For flexibility, this function allows you to specify
+    *either* Rmin/2 or sigma values for the radii. You must specify either rmin1
+    and rmin2 *or* sig1 and sig2, exactly.
+
+    The equation for these combining rules are:
+
+    eps_12 = sqrt(eps1*eps2)
+    sig_12 = sqrt(sig1*sig2)
+
+    Parameters
+    ----------
+    eps1 : float
+        The epsilon of the first atom. Can have energy units
+    eps2 : float
+        The epsilon of the second atom.
+    sig1 : float
+        The sigma value of the first atom. Can have length units
+    sig2 : float
+        The sigma value of the second atom.
+
+    Returns
+    -------
+    eps12, sig12 : float, float
+        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter
+        in angstroms.
+
+    Raises
+    ------
+    TypeError if the units are incompatible
+    """
+    eps1 = _strip_units(eps1, u.kilocalories_per_mole)
+    eps2 = _strip_units(eps2, u.kilocalories_per_mole)
+    eps12 = math.sqrt(abs(eps1) * abs(eps2))
+    sig1 = _strip_units(sig1, u.angstroms)
+    sig2 = _strip_units(sig2, u.angstroms)
+    sig12 = math.sqrt(sig1 * sig2)
+    return eps12, sig12
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 if __name__ == '__main__':
     import doctest

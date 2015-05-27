@@ -2178,9 +2178,9 @@ class Structure(object):
         for pair in self.adjusts:
             if pair.type is None: continue
             chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
-            force.addException(pair.atom1.idx, pair.atom2.idx,
+            force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
                                pair.type.rmin*sigma_scale,
-                               pair.type.epsilon*ene_conv, chgprod, True)
+                               pair.type.epsilon*ene_conv, True)
 
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
