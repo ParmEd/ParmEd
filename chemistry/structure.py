@@ -2049,8 +2049,18 @@ class Structure(object):
 
         Notes
         -----
+        This method calls update_dihedral_exclusions, which might alter the
+        ``ignore_end`` attribute of some
+        :class:`chemistry.topologyobjects.Dihedral` instances based on any
+        changes that might have been made to the bonds and angles since the last
+        time it was called.
+
         Subclasses of Structure for which this nonbonded treatment is inadequate
-        should override this method to implement what is needed
+        should override this method to implement what is needed.
+
+        If nrexcl is set to 3 and no exception parameters are stored in the
+        adjusts list, the 1-4 interactions are determined from the list of
+        dihedrals
         """
         if not self.atoms: return None
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -2084,6 +2094,28 @@ class Structure(object):
         for atom in self.atoms:
             force.addParticle(atom.charge, atom.rmin*sigma_scale,
                               abs(atom.epsilon*ene_conv))
+        # Add exclusions from the bond graph out to nrexcl-1 bonds away (atoms
+        # nrexcl bonds away will be exceptions defined later)
+        def exclude_to(origin, atom, level, end):
+            if level >= end: return
+            for partner in atom.bond_partners:
+                if isinstance(partner, ExtraPoint): continue # Handled later
+                force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
+                exclude_to(origin, partner, level+1, end)
+                # Exclude EP children, too
+                for child in origin.children:
+                    force.addException(origin.idx, child.idx, 0.0, 0.5, 0.0,
+                                       True)
+                for child in partner.children:
+                    force.addException(child.idx, partner.idx, 0.0, 0.5, 0.0,
+                                       True)
+                for child in origin.children:
+                    for child2 in partner.children:
+                        force.addException(child.idx, child2.idx, 0.0, 0.5,
+                                           0.0, True)
+        for atom in self.atoms:
+            if isinstance(atom, ExtraPoint): continue # Handled separately
+            exclude_to(atom, atom, 0, self.nrexcl)
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
@@ -2142,28 +2174,26 @@ class Structure(object):
                         chgprod = c1.charge * c2.charge / scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                            epsprod, True)
-        # Now add the bonds, angles, and exclusions. These will always wipe out
-        # existing exceptions fro mthe dihedrals and 0 out that exception
-        for bond in self.bonds:
-            force.addException(bond.atom1.idx, bond.atom2.idx,
-                               0.0, 0.5, 0.0, True)
-            for c1 in bond.atom1.children:
-                force.addException(c1.idx, bond.atom2.idx, 0.0, 0.5, 0.0, True)
-            for c2 in bond.atom2.children:
-                force.addException(bond.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in bond.atom1.children:
-                for c2 in bond.atom2.children:
-                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-        for angle in self.angles:
-            force.addException(angle.atom1.idx, angle.atom3.idx,
-                               0.0, 0.5, 0.0, True)
-            for c1 in angle.atom1.children:
-                force.addException(c1.idx, angle.atom3.idx, 0.0, 0.5, 0.0, True)
-            for c2 in angle.atom3.children:
-                force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in angle.atom1.children:
-                for c2 in angle.atom3.children:
-                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+#       for bond in self.bonds:
+#           force.addException(bond.atom1.idx, bond.atom2.idx,
+#                              0.0, 0.5, 0.0, True)
+#           for c1 in bond.atom1.children:
+#               force.addException(c1.idx, bond.atom2.idx, 0.0, 0.5, 0.0, True)
+#           for c2 in bond.atom2.children:
+#               force.addException(bond.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+#           for c1 in bond.atom1.children:
+#               for c2 in bond.atom2.children:
+#                   force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+#       for angle in self.angles:
+#           force.addException(angle.atom1.idx, angle.atom3.idx,
+#                              0.0, 0.5, 0.0, True)
+#           for c1 in angle.atom1.children:
+#               force.addException(c1.idx, angle.atom3.idx, 0.0, 0.5, 0.0, True)
+#           for c2 in angle.atom3.children:
+#               force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+#           for c1 in angle.atom1.children:
+#               for c2 in angle.atom3.children:
+#                   force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
         for a2 in atom.exclusion_partners:
             force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
             for c1 in atom.children:
