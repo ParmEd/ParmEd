@@ -2100,27 +2100,26 @@ class Structure(object):
             if level >= end: return
             for partner in atom.bond_partners:
                 if isinstance(partner, ExtraPoint): continue # Handled later
+                if partner is origin: continue
                 force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
-                exclude_to(origin, partner, level+1, end)
                 # Exclude EP children, too
                 for child in origin.children:
-                    force.addException(origin.idx, child.idx, 0.0, 0.5, 0.0,
+                    force.addException(partner.idx, child.idx, 0.0, 0.5, 0.0,
                                        True)
                 for child in partner.children:
-                    force.addException(child.idx, partner.idx, 0.0, 0.5, 0.0,
+                    force.addException(child.idx, origin.idx, 0.0, 0.5, 0.0,
                                        True)
                 for child in origin.children:
                     for child2 in partner.children:
                         force.addException(child.idx, child2.idx, 0.0, 0.5,
                                            0.0, True)
+                exclude_to(origin, partner, level+1, end)
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue # Handled separately
             exclude_to(atom, atom, 0, self.nrexcl)
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
-        # These come *before* adding exclusions, since we allow them to be
-        # overwritten with 0's by 1-2 and 1-3 pairs.
         sigma_scale = 2**(-1/6) * length_conv
         if not self.adjusts:
             for dih in self.dihedrals:
@@ -2132,10 +2131,9 @@ class Structure(object):
                         scee = dih.type[i].scee
                         scnb = dih.type[i].scnb
                         i += 1
-                    # Scaling factors of 0 will result in divide-by-zero errors.
-                    # So force them to 1.
-                    scee = scee or 1.0
-                    scnb = scnb or 1.0
+                    if scee == 0 or scnb == 0:
+                        raise ValueError('Detected scaling constants of 0 for '
+                                         'dihedral containing 1-4 info!')
                 else:
                     scee = dih.type.scee
                     scnb = dih.type.scnb
@@ -2174,26 +2172,16 @@ class Structure(object):
                         chgprod = c1.charge * c2.charge / scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                            epsprod, True)
-#       for bond in self.bonds:
-#           force.addException(bond.atom1.idx, bond.atom2.idx,
-#                              0.0, 0.5, 0.0, True)
-#           for c1 in bond.atom1.children:
-#               force.addException(c1.idx, bond.atom2.idx, 0.0, 0.5, 0.0, True)
-#           for c2 in bond.atom2.children:
-#               force.addException(bond.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-#           for c1 in bond.atom1.children:
-#               for c2 in bond.atom2.children:
-#                   force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-#       for angle in self.angles:
-#           force.addException(angle.atom1.idx, angle.atom3.idx,
-#                              0.0, 0.5, 0.0, True)
-#           for c1 in angle.atom1.children:
-#               force.addException(c1.idx, angle.atom3.idx, 0.0, 0.5, 0.0, True)
-#           for c2 in angle.atom3.children:
-#               force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-#           for c1 in angle.atom1.children:
-#               for c2 in angle.atom3.children:
-#                   force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+        # Allow our specific exceptions (in adjusts) to override anything that
+        # came before
+        for pair in self.adjusts:
+            chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
+            force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
+                               pair.type.rmin*sigma_scale,
+                               pair.type.epsilon*ene_conv, True)
+
+        # Any exclusion partners we already added will zero-out existing
+        # exclusions/exceptions
         for a2 in atom.exclusion_partners:
             force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
             for c1 in atom.children:
@@ -2203,14 +2191,6 @@ class Structure(object):
             for c1 in atom.children:
                 for c2 in a2.children:
                     force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
-        # Allow our specific exceptions (in adjusts) to override anything that
-        # came before
-        for pair in self.adjusts:
-            if pair.type is None: continue
-            chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
-            force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
-                               pair.type.rmin*sigma_scale,
-                               pair.type.epsilon*ene_conv, True)
 
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
