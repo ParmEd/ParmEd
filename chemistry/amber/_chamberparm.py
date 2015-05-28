@@ -127,12 +127,14 @@ class ChamberParm(AmberParm):
         self._load_urey_brad_info()
         self._load_improper_info()
         self._load_cmap_info()
+        # All of our angles are urey-bradley types
+        for angle in self.angles: angle.funct = 5
         super(ChamberParm, self).unchange()
 
     #===================================================
 
     @classmethod
-    def load_from_structure(cls, struct):
+    def from_structure(cls, struct):
         """
         Take a Structure instance and initialize a ChamberParm instance from
         that data.
@@ -142,6 +144,11 @@ class ChamberParm(AmberParm):
         struct : Structure
             The input structure from which to construct a ChamberParm instance
         """
+        if (struct.rb_torsions or struct.trigonal_angles or struct.pi_torsions
+                or struct.out_of_plane_bends or struct.stretch_bends
+                or struct.torsion_torsions or struct.multipole_frames):
+            raise ValueError('ChamberParm does not support all potential terms '
+                             'defined in the input Structure')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.pointers = {}
         inst.LJ_types = {}
@@ -183,6 +190,22 @@ class ChamberParm(AmberParm):
             raise
         else:
             inst.load_coordinates(coords)
+        # pmemd likes to skip torsions with periodicities of 0, which may be
+        # present as a way to hack entries into the 1-4 pairlist. See
+        # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
+        # here is to simply set that periodicity to 1.
+        for dt in inst.dihedral_types:
+            if dt.phi_k == 0 and dt.per == 0:
+                dt.per = 1.0
+            elif dt.per == 0:
+                warnings.warn('Periodicity of 0 detected with non-zero force '
+                              'constant. Changing periodicity to 1 and force '
+                              'constant to 0 to ensure 1-4 nonbonded pairs are '
+                              'properly identified. This might cause a shift '
+                              'in the energy, but will leave forces unaffected',
+                              AmberParmWarning)
+                dt.phi_k = 0.0
+                dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
 
@@ -640,7 +663,7 @@ def ConvertFromPSF(struct, params, title=''):
     if int_starting:
         for atom in struct.atoms:
             atom.type = str(atom.atom_type)
-    parm = ChamberParm.load_from_structure(struct)
+    parm = ChamberParm.from_structure(struct)
     parm.parm_data['FORCE_FIELD_TYPE'] = fftype = []
     for pset in params.parametersets:
         if 'CHARMM' not in pset: # needed to trigger "charmm_active"...

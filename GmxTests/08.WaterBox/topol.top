@@ -1,0 +1,7 @@
+#include "tip3p.itp"
+
+[ system ]
+Water Box
+
+[ molecules ]
+SOL 216

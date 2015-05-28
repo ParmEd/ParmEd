@@ -1,0 +1,154 @@
+This folder documents some of the strangeness we've been seeing in
+getting GROMACS and OpenMM-via-ParmEd and Amber-via-ParmEd to agree.
+
+In each subfolder, run command.sh to execute the test.
+
+(1) nozerotor_excl3_fudge0 contains DPPC_cut.itp with nrexcl=3, 
+fudgeLJ=1e-12, fudgeQQ=1e-12. Gromacs disagrees with OpenMM and
+AMBER in the nonbonded terms, but OpenMM and AMBER agree with
+each other.
+
+Namely:
+#========================================================#
+#|              GROMACS energy components               |#
+#========================================================#
+LJ-(SR)                   -25.537532 
+Coulomb-(SR)              -865.386236 
+Potential                 -788.412183 
+#========================================================#
+#|         OpenMM energy components via ParmEd          |#
+#========================================================#
+NonbondedForce            -1002.73715879 
+Potential                 -900.225573294 
+#========================================================#
+#|               AMBER energy components                |#
+#========================================================#
+VDWAALS                   207.7100776 
+EELEC                     -1210.4052592 
+EPTOT                     -900.2097752 
+
+(2) zerotor_excl3_fudge0 contains DPPC_cut_0tor.itp which is 
+the same as DPPC_cut.itp in (1), except it adds trivial dihedral 
+parameters for all triplets of consecutive bonds that didn't
+have dihedral parameters from before.  In this calculation,
+Gromacs stays the same as (1), but now OpenMM and AMBER agree
+with Gromacs much better (except for the harmonic improper torsion 
+which appears to be missing from AMBER.)
+
+#========================================================#
+#|              GROMACS energy components               |#
+#========================================================#
+LJ-(SR)                   -25.537532 
+Coulomb-(SR)              -865.386236 
+Potential                 -788.412183 
+#========================================================#
+#|         OpenMM energy components via ParmEd          |#
+#========================================================#
+NonbondedForce            -890.92381083 
+Potential                 -788.412225332 
+#========================================================#
+#|               AMBER energy components                |#
+#========================================================#
+VDWAALS                   -25.5374624 
+EELEC                     -865.3562184 
+EPTOT                     -788.4086928 
+
+(3) zerotor_excl3_fudge1 contains DPPC_cut_05or.itp which
+is the same as in (2), except fudgeQQ=1 and fudgeLJ=1.  In
+this calculation, the Gromacs energy and components stay 
+exactly the same, but OpenMM and AMBER are different.
+
+#========================================================#
+#|              GROMACS energy components               |#
+#========================================================#
+LJ-(SR)                   -25.537532 
+Coulomb-(SR)              -865.386236 
+Potential                 -788.412183 
+#========================================================#
+#|         OpenMM energy components via ParmEd          |#
+#========================================================#
+NonbondedForce            -530.518786231 
+Potential                 -428.007200734 
+#========================================================#
+#|               AMBER energy components                |#
+#========================================================#
+1-4 NB                    352.2220904 
+1-4 EEL                   8.1826488 
+VDWAALS                   -25.5374624 
+EELEC                     -865.3562184 
+EPTOT                     -428.0039536 
+
+Additionally, what I'm calculating "by hand" using calc.py
+matches what OpenMM and AMBER are getting:
+
+The Coulomb energy is -857.203293953 kJ/mol
+The Lennard-Jones energy is 326.684503793 kJ/mol
+
+
+=====
+Additionally, gmx check reveals only the fudgeLJ and fudgeQQ differences 
+in the .tpr files and no difference in the .edr files:
+=====
+GROMACS:      gmx check, VERSION 5.0.5
+Executable:   /home/leeping/opt/gromacs/bin/gmx
+Library dir:  /home/leeping/opt/gromacs/share/gromacs/top
+Command line:
+  gmx check -s1 zerotor_excl3_fudge0/topol.tpr -s2 zerotor_excl3_fudge1/topol.tpr
+
+Reading file zerotor_excl3_fudge0/topol.tpr, VERSION 5.0.5 (double precision)
+Reading file zerotor_excl3_fudge1/topol.tpr, VERSION 5.0.5 (double precision)
+comparing inputrec
+inputrec->ld_seed (1516988837 - 3034019340)
+comparing top
+comparing idef
+fudgeQQ (1.000000e-12 - 1.000000e+00)
+comparing ilist BONDS
+... (no more differences)
+=====
+GROMACS:      gmx check, VERSION 5.0.5
+Executable:   /home/leeping/opt/gromacs/bin/gmx
+Library dir:  /home/leeping/opt/gromacs/share/gromacs/top
+Command line:
+  gmx check -e zerotor_excl3_fudge0/ener.edr -e2 zerotor_excl3_fudge1/ener.edr
+
+comparing energy file zerotor_excl3_fudge0/ener.edr and zerotor_excl3_fudge1/ener.edr
+
+Opened zerotor_excl3_fudge0/ener.edr as double precision energy file
+Opened zerotor_excl3_fudge1/ener.edr as double precision energy file
+There are 31 terms in the energy files
+
+There are 31 terms to compare in the energy files
+
+Last energy frame read 0 time    0.000            
+Files read successfully
+
+gcq#220: "These are Ideas, They are Not Lies" (Magnapop)
+=====
+
+=====
+There is similarly no difference in the gmxdump files except for the value
+of fudgeQQ.  There is no output related to 1-4 interactions or pairs.  
+Here is the list of nonbonded exclusions:
+=====
+      excls[0][0..5]={0, 1, 2, 3, 4, 5}
+      excls[1][6..11]={0, 1, 2, 3, 4, 5}
+      excls[2][12..17]={0, 1, 2, 3, 4, 5}
+      excls[3][18..24]={0, 1, 2, 3, 4, 5, 6}
+      excls[4][25..32]={0, 1, 2, 3, 4, 5, 6, 7}
+      excls[5][33..43]={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+      excls[6][44..52]={3, 4, 5, 6, 7, 8, 9, 10, 11}
+      excls[7][53..61]={4, 5, 6, 7, 8, 9, 10, 11, 12}
+      excls[8][62..68]={5, 6, 7, 8, 9, 10, 11}
+      excls[9][69..75]={5, 6, 7, 8, 9, 10, 11}
+      excls[10][76..85]={5, 6, 7, 8, 9, 10, 11, 12, 13, 16}
+      excls[11][86..96]={6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17}
+      excls[12][97..106]={7, 10, 11, 12, 13, 14, 15, 16, 17, 18}
+      excls[13][107..114]={10, 11, 12, 13, 14, 15, 16, 17}
+      excls[14][115..120]={11, 12, 13, 14, 15, 16}
+      excls[15][121..124]={12, 13, 14, 15}
+      excls[16][125..133]={10, 11, 12, 13, 14, 16, 17, 18, 19}
+      excls[17][134..140]={11, 12, 13, 16, 17, 18, 19}
+      excls[18][141..145]={12, 16, 17, 18, 19}
+      excls[19][146..149]={16, 17, 18, 19}
+=====
+

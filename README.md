@@ -59,3 +59,19 @@ rapid prototyping.
 The API also provides bindings to the [OpenMM](https://simtk.org/home/openmm)
 library, permitting you to carry out full molecular dynamics investigations
 using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
+
+Authors and Contributors
+========================
+
+The following people have contributed directly to the coding and validation
+efforts in ParmEd. The primary developer is listed first, followed by the other
+contributors in alphabetical order. And a special thanks to all of you who
+helped improve this project either by providing feedback, bug reports, or other
+general comments!
+
+* Jason Swails | jason.swails@gmail.com
+
+* Carlos Hernandez
+* David L. Mobley
+* Lee-Ping Wang
+* Pawel Janowski

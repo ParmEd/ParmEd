@@ -8,16 +8,15 @@ Contributors:
 Date: Apr. 13, 2015
 """
 from __future__ import division
-from chemistry.constants import DEG_TO_RAD
 from chemistry import (Atom, AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from chemistry.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from chemistry.exceptions import CharmmFileError
 from chemistry.modeller import ResidueTemplate, PatchTemplate
+from chemistry.parameters import ParameterSet
 from chemistry.periodic_table import AtomicNum, element_by_mass
 from chemistry.utils.six import iteritems
-from chemistry.utils.six.moves import range, zip
-from collections import OrderedDict
+from chemistry.utils.six.moves import zip
 import os
 import re
 import warnings
@@ -32,7 +31,7 @@ class _EmptyStringIterator(object):
     def __getitem__(self, idx):
         return ''
 
-class CharmmParameterSet(object):
+class CharmmParameterSet(ParameterSet):
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
@@ -52,13 +51,15 @@ class CharmmParameterSet(object):
 
     Attributes
     ----------
-    atom_types_str : dict(str:AtomType)
+    atom_types : dict(str:AtomType)
         Dictionary mapping the names of the atom types to the corresponding
         AtomType instances
+    atom_types_str : dict(str:AtomType)
+        alias for atom_types
     atom_types_int : dict(int:AtomType)
         Dictionary mapping the serial indexes of the atom types to the
         corresponding AtomType instances
-    atom_types_double : dict((str,int):AtomType)
+    atom_types_tuple : dict((str,int):AtomType)
         Dictionary mapping the (name,number) tuple of the atom types to the
         corresponding AtomType instances
     bond_types : dict((str,str):AtomType)
@@ -102,16 +103,7 @@ class CharmmParameterSet(object):
 
     def __init__(self, *args):
         # Instantiate the list types
-        self.atom_types_str = OrderedDict()
-        self.atom_types_int = OrderedDict()
-        self.atom_types_tuple = OrderedDict()
-        self.bond_types = OrderedDict()
-        self.angle_types = OrderedDict()
-        self.urey_bradley_types = OrderedDict()
-        self.dihedral_types = OrderedDict()
-        self.improper_types = OrderedDict()
-        self.cmap_types = OrderedDict()
-        self.nbfix_types = OrderedDict()
+        super(CharmmParameterSet, self).__init__(self)
         self.parametersets = []
         self.residues = dict()
         self.patches = dict()
@@ -326,7 +318,7 @@ class CharmmParameterSet(object):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmFileError('Could not parse angles.')
-                angle_type = AngleType(k, theteq*DEG_TO_RAD)
+                angle_type = AngleType(k, theteq)
                 self.angle_types[(type1, type2, type3)] = angle_type
                 self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
@@ -356,7 +348,7 @@ class CharmmParameterSet(object):
                 key = (type1, type2, type3, type4)
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
-                dihedral = DihedralType(k, n, phase*DEG_TO_RAD)
+                dihedral = DihedralType(k, n, phase)
                 dihedral.penalty = penalty
                 if key in self.dihedral_types:
                     # See if the existing dihedral type list has a term with
@@ -411,7 +403,7 @@ class CharmmParameterSet(object):
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                improp = ImproperType(k, theteq*DEG_TO_RAD)
+                improp = ImproperType(k, theteq)
                 self.improper_types[key] = improp
                 improp.penalty = penalty
                 continue
@@ -739,64 +731,6 @@ class CharmmParameterSet(object):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
-
-    def condense(self, do_dihedrals=True):
-        """
-        This function goes through each of the parameter type dicts and
-        eliminates duplicate types. After calling this function, every unique
-        bond, angle, dihedral, improper, or cmap type will pair with EVERY key
-        in the type mapping dictionaries that points to the equivalent type
-
-        Parameters
-        ----------
-        do_dihedrals : bool=True
-            Dihedrals can take the longest time to compress since testing their
-            equality takes the longest (this is complicated by the existence of
-            multi-term torsions). This flag will allow you to *skip* condensing
-            the dihedral parameter types (for large parameter sets, this can cut
-            the compression time in half)
-
-        Returns
-        -------
-        self
-            The instance that is being condensed
-
-        Notes
-        -----
-        The return value allows you to condense the types at construction time.
-
-        Example
-        -------
-        >>> params = CharmmParameterSet('charmm.prm').condense()
-        >>> params
-        <chemistry.charmm.parameters.CharmmParameterSet at 0x7f88757de090>
-        """
-        # First scan through all of the bond types
-        self._condense_types(self.bond_types)
-        self._condense_types(self.angle_types)
-        self._condense_types(self.urey_bradley_types)
-        if do_dihedrals: self._condense_types(self.dihedral_types)
-        self._condense_types(self.improper_types)
-        self._condense_types(self.cmap_types)
-        return self
-
-    @staticmethod
-    def _condense_types(typedict):
-        """
-        Loops through the given dict and condenses all types.
-
-        Parameter
-        ---------
-        typedict : dict
-            Type dictionary to condense
-        """
-        keylist = list(typedict.keys())
-        for i in range(len(keylist) - 1):
-            key1 = keylist[i]
-            for j in range(i+1, len(keylist)):
-                key2 = keylist[j]
-                if typedict[key1] == typedict[key2]:
-                    typedict[key2] = typedict[key1]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

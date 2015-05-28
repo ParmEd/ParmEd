@@ -115,7 +115,8 @@ def has_numpy():
     return numpy is not None
 
 def diff_files(file1, file2, ignore_whitespace=True,
-               absolute_error=None, relative_error=None):
+               absolute_error=None, relative_error=None,
+               comment=None):
     """
     Compares 2 files line-by-line
 
@@ -133,6 +134,8 @@ def diff_files(file1, file2, ignore_whitespace=True,
     relative_error : float=None
         If set, only relative differences greater than the relative error will
         trigger failures. Cannot be used with absolute_error
+    comment : str or None
+        The character to identify comments in this file
 
     Returns
     -------
@@ -173,6 +176,10 @@ def diff_files(file1, file2, ignore_whitespace=True,
         same = True
         if ignore_whitespace:
             while l1 or l2:
+                while l1 and l1[0] == comment:
+                    l1 = f1.readline()
+                while l2 and l2[0] == comment:
+                    l2 = f2.readline()
                 if l1.strip() != l2.strip():
                     if l1.startswith('%VERSION') and l2.startswith('%VERSION'):
                         l1 = f1.readline()
@@ -187,6 +194,10 @@ def diff_files(file1, file2, ignore_whitespace=True,
         else:
             while l1 and l2:
                 if l1 != l2:
+                    if 'At date:' in l1 and 'At date:' in l2:
+                        l1 = f1.readline()
+                        l2 = f2.readline()
+                        continue
                     if l1.startswith('%VERSION') and l2.startswith('%VERSION'):
                         l1 = f1.readline()
                         l2 = f2.readline()
@@ -238,6 +249,8 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False
+                elif absolute_error is None and relative_error is None:
+                    return False
     return True
 
 def which(prog):

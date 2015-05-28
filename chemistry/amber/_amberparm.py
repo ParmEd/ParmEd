@@ -22,14 +22,14 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.amber.amberformat import AmberFormat
+from chemistry.amber.amberformat import AmberFormat, _deprecated
 from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY)
+            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD)
 from chemistry.exceptions import (AmberParmError, ParsingError,
-                                  MoleculeError, MoleculeWarning)
+            MoleculeError, MoleculeWarning, AmberParmWarning)
 from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass
 from chemistry.structure import Structure, needs_openmm
@@ -212,7 +212,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     @classmethod
-    def load_from_rawdata(cls, rawdata):
+    def from_rawdata(cls, rawdata):
         """
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
@@ -248,11 +248,16 @@ class AmberParm(AmberFormat, Structure):
         if hasattr(rawdata, 'hasvels'):
             inst.hasvels = rawdata.hasvels or inst.vels is not None
         return inst
-   
+
+    @classmethod
+    @_deprecated('load_from_rawdata', 'from_rawdata')
+    def load_from_rawdata(cls, rawdata):
+        return cls.from_rawdata(rawdata)
+
     #===================================================
 
     @classmethod
-    def load_from_structure(cls, struct):
+    def from_structure(cls, struct):
         """
         Take a Structure instance and initialize an AmberParm instance from that
         data.
@@ -261,11 +266,36 @@ class AmberParm(AmberFormat, Structure):
         ----------
         struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
+
+        Raises
+        ------
+        ValueError
+            If the structure has parameters not supported by the standard Amber
+            force field (i.e., standard bond, angle, and dihedral types), a
+            ValueError will be raised.
         """
+        if struct.unknown_functional:
+            raise ValueError('Cannot instantiate an AmberParm from unknown '
+                             'functional')
+        if (struct.urey_bradleys or struct.impropers or struct.rb_torsions or
+                struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
+                struct.out_of_plane_bends or struct.stretch_bends or
+                struct.torsion_torsions or struct.multipole_frames):
+            if (struct.rb_torsions or struct.trigonal_angles or
+                    struct.pi_torsions or struct.out_of_plane_bends or
+                    struct.torsion_torsions or struct.multipole_frames):
+                raise ValueError('AmberParm does not support all of the '
+                                 'parameters defined in the input Structure')
+            # Maybe it just has CHARMM parameters?
+            raise ValueError('AmberParm does not support all of the parameters '
+                             'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.pointers = {}
         inst.LJ_types = {}
-        inst.atoms.assign_nbidx_from_types()
+        nbfixes = inst.atoms.assign_nbidx_from_types()
+        # Give virtual sites a name that Amber understands
+        for atom in inst.atoms:
+            if isinstance(atom, ExtraPoint): atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -299,10 +329,32 @@ class AmberParm(AmberFormat, Structure):
             raise
         else:
             inst.load_coordinates(coords)
+        # pmemd likes to skip torsions with periodicities of 0, which may be
+        # present as a way to hack entries into the 1-4 pairlist. See
+        # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
+        # here is to simply set that periodicity to 1.
+        for dt in inst.dihedral_types:
+            if dt.phi_k == 0 and dt.per == 0:
+                dt.per = 1.0
+            elif dt.per == 0:
+                warnings.warn('Periodicity of 0 detected with non-zero force '
+                              'constant. Changing periodicity to 1 and force '
+                              'constant to 0 to ensure 1-4 nonbonded pairs are '
+                              'properly identified. This might cause a shift '
+                              'in the energy, but will leave forces unaffected',
+                              AmberParmWarning)
+                dt.phi_k = 0.0
+                dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
         return inst
+
+    # For backwards-compatibility
+    @classmethod
+    @_deprecated('load_from_structure', 'from_structure')
+    def load_from_structure(cls, struct):
+        return cls.from_structure(struct)
 
     #===================================================
 
@@ -323,6 +375,52 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
    
+    def __getitem__(self, selection):
+        other = super(AmberParm, self).__getitem__(selection)
+        if other is None:
+            return None
+        elif isinstance(other, Atom):
+            return other
+        other.pointers = {}
+        other.LJ_types = self.LJ_types.copy()
+        other.LJ_radius = copy.copy(self.LJ_radius)
+        other.LJ_depth = copy.copy(self.LJ_depth)
+        for atom in other.atoms:
+            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        other._add_standard_flags()
+        return other
+
+    #===================================================
+
+    def __imul__(self, ncopies, other=None):
+        super(AmberParm, self).__imul__(ncopies, other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    def __iadd__(self, other):
+        super(AmberParm, self).__iadd__(other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    #===================================================
+
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each
@@ -938,6 +1036,9 @@ class AmberParm(AmberFormat, Structure):
         if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
 
+        # If we have NBFIX, omm_nonbonded_force returned a tuple
+        if hasnbfix: nonbfrc = nonbfrc[0]
+
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
             if has1012:
@@ -1359,6 +1460,7 @@ class AmberParm(AmberFormat, Structure):
         del self.angles[:]
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
+            theteq *= RAD_TO_DEG
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
         it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
         for i, j, k, l in zip(it, it, it, it):
@@ -1391,6 +1493,7 @@ class AmberParm(AmberFormat, Structure):
                                     self.parm_data['DIHEDRAL_PERIODICITY'],
                                     self.parm_data['DIHEDRAL_PHASE'],
                                     scee, scnb):
+            ph *= RAD_TO_DEG
             self.dihedral_types.append(
                     DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
@@ -1535,7 +1638,8 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
+                                        for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
@@ -1573,7 +1677,7 @@ class AmberParm(AmberFormat, Structure):
         data['DIHEDRAL_PERIODICITY'] = \
                     [type.per for type in self.dihedral_types]
         data['DIHEDRAL_PHASE'] = \
-                    [type.phase for type in self.dihedral_types]
+                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
             data['SCEE_SCALE_FACTOR'] = \
                     [type.scee for type in self.dihedral_types]
@@ -1668,7 +1772,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _set_nonbonded_tables(self):
+    def _set_nonbonded_tables(self, nbfixes=None):
         """
         Sets the tables of Lennard-Jones nonbonded interaction pairs
         """
@@ -1693,6 +1797,17 @@ class AmberParm(AmberFormat, Structure):
         self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in range(nttyp)]
         self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in range(nttyp)]
         self.recalculate_LJ()
+        # Now make any NBFIX modifications we had
+        if nbfixes is not None:
+            for i, fix in enumerate(nbfixes):
+                for terms in fix:
+                    j, rmin, eps, rmin14, eps14 = terms
+                    i, j = min(i, j-1), max(i, j-1)
+                    eps = abs(eps)
+                    eps14 = abs(eps14)
+                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    self.parm_data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
+                    self.parm_data['LENNARD_JONES_BCOEF'][idx] = 2*eps * rmin**6
 
     #===================================================
 

@@ -612,6 +612,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                              'natom*3')
 
         # If we can, write the coordinates
+        i = 0
+        j = -1
         for i in range(self._full_lines_per_frame):
             i10 = i * 10
             for j in range(10):

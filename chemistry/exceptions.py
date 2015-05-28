@@ -117,6 +117,15 @@ class CharmmPsfEOF(ChemError):
 class MissingParameter(ChemError):
     """ If a parameter is missing from a database """
 
+class GromacsFileError(ChemError):
+    """ If there is a problem parsing GROMACS files """
+
+class GromacsTopologyError(ChemError):
+    """ If there is a problem parsing GROMACS topology files """
+
+class GromacsTopologyWarning(ChemWarning):
+    " If we are uncertain about something regarding the GROMACS topology file "
+
 class AnisouWarning(ChemWarning):
     """ If there was a problem parsing an ANISOU record """
 
@@ -159,3 +168,9 @@ class FormatNotFound(ChemError):
 
 class RosettaError(ChemError):
     """ If there is a problem loading a Rosetta pose object """
+
+class PreProcessorError(ChemError):
+    """ If there is a problem running the C-like preprocessor """
+
+class PreProcessorWarning(ChemWarning):
+    """ If there is something we should warn about in preprocessing """

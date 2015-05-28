@@ -25,6 +25,7 @@ from __future__ import division
 
 from chemistry import unit as u
 from chemistry.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+from chemistry.vec3 import Vec3
 from math import pi, cos, sin, sqrt, acos
 try:
     import numpy as np
@@ -138,6 +139,49 @@ def box_vectors_to_lengths_and_angles(a, b, c):
     gamma *= RAD_TO_DEG
 
     return (la, lb, lc) * u.angstroms, (alpha, beta, gamma) * u.degrees
+
+def reduce_box_vectors(a, b, c):
+    """
+    This function puts three unit cell vectors in a reduced form where a is
+    "mostly" in x, b is "mostly" in y, and c is "mostly" in z. This form is
+    necessary for some programs (notably OpenMM and Gromacs)
+
+    Parameters
+    ----------
+    a : 3-element collection of float
+        First unit cell vector
+    b : 3-element collection of float
+        Second unit cell vector
+    c : 3-element collection of float
+        Third unit cell vector
+
+    Returns
+    -------
+    red_a, red_b, red_c : Vec3, Vec3, Vec3
+        The reduced unit cell vectors in units of angstroms
+
+    Notes
+    -----
+    The implementation here is taken from the OpenMM Python application layer
+    written by Peter Eastman
+    """
+    if u.is_quantity(a):
+        a = a.value_in_unit(u.angstroms)
+    if u.is_quantity(b):
+        b = b.value_in_unit(u.angstroms)
+    if u.is_quantity(c):
+        c = c.value_in_unit(u.angstroms)
+
+    a = Vec3(*a)
+    b = Vec3(*b)
+    c = Vec3(*c)
+
+    c = c - b*round(c[1]/b[1])
+    c = c - a*round(c[0]/a[0])
+    b = b - a*round(b[0]/a[0])
+
+    return a, b, c
+
 
 def center_of_mass(coordinates, masses):
     """ Compute the center of mass of a group of coordinates.

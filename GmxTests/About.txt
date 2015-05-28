@@ -1,0 +1,14 @@
+To run a test, do the following:
+1) Go into the folder
+2) ../test.py [gro] [top] [mdp] or run "command.sh"
+
+Notes: Gromacs and OpenMM apply constraints differently.  
+So if you have rigid water molecules or constraints, run
+it once, and then run it again on the generated "constrained.gro".
+Otherwise there will be energy and force differences.
+
+Also: OpenMM auto-sets the PME Fourier grid.  I had to
+modify ReferenceKernels.cpp to print the grid out, then
+I set the corresponding fourier_n[xyz] in the .mdp file
+to make things more consistent between the two codes.
+

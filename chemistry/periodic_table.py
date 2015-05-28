@@ -236,7 +236,7 @@ def element_by_mass(mass):
 
     Returns
     -------
-    str
+    element: str
         The returned string is the name of the element whose atomic mass is
         closest to the input mass
     """
