@@ -371,6 +371,7 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping long tests")
     def testEwald(self):
         """ Compare Amber and OpenMM Ewald energies """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
