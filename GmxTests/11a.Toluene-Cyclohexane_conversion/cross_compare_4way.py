@@ -113,8 +113,8 @@ def main():
 
     # ParmEd-OpenMM calculation with GROMACS inputs
     PED_Energy_GTGP, PED_Force_GTGP, Ecomps_PED_GTGP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], True, True)
-    PED_Energy_GTAP, PED_Force_GTAP, Ecomps_PED_GTAP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], True, False)
-    PED_Energy_ATGP, PED_Force_ATGP, Ecomps_PED_ATGP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], False, True)
+    PED_Energy_ATGP, PED_Force_ATGP, Ecomps_PED_ATGP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], True, False)
+    PED_Energy_GTAP, PED_Force_GTAP, Ecomps_PED_GTAP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], False, True)
     PED_Energy_ATAP, PED_Force_ATAP, Ecomps_PED_ATAP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], False, False)
     print "Finished evaluating energies" 
 
@@ -125,11 +125,11 @@ def main():
     print "Energy Difference of GROMACS/AMBER topologies using GROMACS positions (kJ/mol):", 
     print PED_Energy_GTGP - PED_Energy_ATGP
     print "RMS / Max Force Difference (kJ/mol/nm):",
-    print np.sqrt(np.mean([sum(i**2) for i in D_Force])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_GP])))
+    print np.sqrt(np.mean([sum(i**2) for i in D_Force_GP])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_GP])))
     print "Energy Difference of GROMACS/AMBER topologies using AMBER positions (kJ/mol):", 
     print PED_Energy_GTAP - PED_Energy_ATAP
     print "RMS / Max Force Difference (kJ/mol/nm):",
-    print np.sqrt(np.mean([sum(i**2) for i in D_Force])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_AP])))
+    print np.sqrt(np.mean([sum(i**2) for i in D_Force_AP])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_AP])))
 
 if __name__ == "__main__":
     main()
