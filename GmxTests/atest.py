@@ -4,12 +4,13 @@
 Test ParmEd's ability to process a Gromacs position/topology file
 by comparing Gromacs energy/force to OpenMM-via-ParmEd energy/force.
 
-This script uses ForceBalance to obtain the Gromacs energy/force
+This script contains bits of ForceBalance to obtain the Gromacs energy/force
 and also reads parts of the Gromacs .mdp file to set up the system.
 
 There are also some OpenMM imports for calculating the OpenMM energy/force..
 
-To run this script, provide a gro, top and mdp file.
+To run this script, provide a gro, top and mdp file.  The difference from
+test.py is that this script also runs AMBER.
 
 Author: Lee-Ping Wang
 """
@@ -76,7 +77,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     If the input file exists, it is parsed and options are replaced where "options" overrides them.
     If the "options" dictionary contains more options, they are added at the end.
     If the "defaults" dictionary contains more options, they are added at the end.
-    Keys and values are standardized to lower-case strings where all dashes are replaced by underscores.
+    Keys are standardized to lower-case strings where all dashes are replaced by underscores.
     The output file contains the same comments and "dressing" as the input.
     Also returns a dictionary with the final key/value pairs.
 
@@ -131,7 +132,8 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
                 val = options[key]
                 val0 = valf.strip()
                 if key in clashes and val != val0:
-                    raise RuntimeError("edit_mdp tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                    logger.error("edit_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
+                    raise RuntimeError
                 # Passing None as the value causes the option to be deleted
                 if val is None: continue
                 if len(val) < len(valf):
@@ -497,7 +499,7 @@ def main():
     AMBER_Energy, AMBER_Force, Ecomps_AMBER = Calculate_AMBER(Structure, mdp_opts)
     AMBER_Force = AMBER_Force.reshape(-1,3)
 
-    # Print AMBERy- energy components
+    # Print AMBER energy components
     printcool_dictionary(Ecomps_AMBER, title="AMBER energy components")
 
     # Analyze force differences
