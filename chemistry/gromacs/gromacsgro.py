@@ -162,7 +162,7 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, nobox=False):
+    def write(struct, dest, precision=3, nobox=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -171,6 +171,8 @@ class GromacsGroFile(object):
             The structure to write to a Gromacs GRO file (must have coordinates)
         dest : str or file-like
             The name of a file or a file object to write the Gromacs topology to
+        precision : int, optional
+            The number of decimal places to print in the coordinates. Default 3
         nobox : bool, optional
             If the system does not have a periodic box defined, and this option
             is True, no box will be written. If False, the periodic box will be
@@ -186,16 +188,20 @@ class GromacsGroFile(object):
         dest.write('GROningen MAchine for Chemical Simulation\n')
         dest.write('%5d\n' % len(struct.atoms))
         has_vels = all(hasattr(a, 'vx') for a in struct.atoms)
+        varwidth = 5 + precision
+        crdfmt = '%%%d.%df' % (varwidth, precision)
+        velfmt = '%%%d.%df' % (varwidth, precision+1)
         for atom in struct.atoms:
+            dest.write('%5d%-5s%5s%5d' % (atom.residue.idx+1, atom.residue.name,
+                                          atom.name, atom.idx+1))
+            dest.write((crdfmt % (atom.xx/10))[:varwidth])
+            dest.write((crdfmt % (atom.xy/10))[:varwidth])
+            dest.write((crdfmt % (atom.xz/10))[:varwidth])
             if has_vels:
-                dest.write('%5d%-5s%5s%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n' %
-                           (atom.residue.idx+1, atom.residue.name, atom.name,
-                               atom.idx+1, atom.xx/10, atom.xy/10, atom.xz/10,
-                               atom.vx/10, atom.vy/10, atom.vz/10))
-            else:
-                dest.write('%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n' %
-                           (atom.residue.idx+1, atom.residue.name, atom.name,
-                               atom.idx+1, atom.xx/10, atom.xy/10, atom.xz/10))
+                dest.write((velfmt % (atom.vx/10))[:varwidth])
+                dest.write((velfmt % (atom.vy/10))[:varwidth])
+                dest.write((velfmt % (atom.vz/10))[:varwidth])
+            dest.write('\n')
         # Box, in the weird format...
         if struct.box is not None:
             a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(

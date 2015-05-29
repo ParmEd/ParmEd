@@ -403,6 +403,7 @@ class GromacsTopologyFile(Structure):
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.dihedrals.append(dih)
                         molecule.dihedrals[-1].funct == funct
+                        self.unknown_functional = True
                     if funct in (1, 4) and len(words) >= 8:
                         phase, phi_k, per = (float(x) for x in words[5:8])
                         dt = DihedralType(phi_k*u.kilojoule_per_mole,
@@ -432,6 +433,7 @@ class GromacsTopologyFile(Structure):
                     if funct != 1:
                         warnings.warn('cmap funct != 1; unknown functional',
                                       GromacsTopologyWarning)
+                        self.unknown_functional = True
                     cmap = Cmap(molecule.atoms[i], molecule.atoms[j],
                                 molecule.atoms[k], molecule.atoms[l],
                                 molecule.atoms[m])
@@ -655,8 +657,8 @@ class GromacsTopologyFile(Structure):
                             ub0 *= u.nanometers
                             cub *= u.kilojoules_per_mole / u.nanometers**2
                             ub = BondType(cub, ub0)
-                            params.urey_bradley_types[(words[0], words[2])] = ub
-                            params.urey_bradley_types[(words[2], words[0])] = ub
+                        params.urey_bradley_types[(words[0], words[2])] = ub
+                        params.urey_bradley_types[(words[2], words[0])] = ub
                     ptype = AngleType(k, theta)
                     params.angle_types[(words[0], words[1], words[2])] = ptype
                     params.angle_types[(words[2], words[1], words[0])] = ptype
@@ -1386,6 +1388,8 @@ class GromacsTopologyFile(Structure):
         if struct.angles:
             conv = (u.kilocalorie_per_mole/u.radian**2).conversion_factor_to(
                         u.kilojoule_per_mole/u.radian**2)*2
+            conv2 = (u.kilocalorie_per_mole/u.angstrom**2).conversion_factor_to(
+                    u.kilojoule_per_mole/u.nanometer**2)*2
             dest.write('[ angles ]\n')
             dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
                        ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
@@ -1398,10 +1402,25 @@ class GromacsTopologyFile(Structure):
                     continue
                 key = (_gettype(angle.atom1), _gettype(angle.atom2),
                        _gettype(angle.atom3))
-                if writeparams or key not in params.angle_types or \
-                        angle.type != params.angle_types[key]:
+                param_equal = (key in params.angle_types and
+                                    params.angle_types[key] == angle.type)
+                if angle.funct == 5:
+                    # Find the Urey-Bradley term, if it exists
+                    for ub in struct.urey_bradleys:
+                        if angle.atom1 in ub and angle.atom3 in ub:
+                            ubtype = ub.type
+                            break
+                    else:
+                        ubtype = NoUreyBradley
+                    ubkey = (key[0], key[2])
+                    param_equal = param_equal and (
+                            ubkey in params.urey_bradley_types and
+                            ubtype == params.urey_bradley_types[ubkey])
+                if writeparams or not param_equal:
                     dest.write('   %.5f %f' % (angle.type.theteq,
                                                angle.type.k*conv))
+                    if angle.funct == 5:
+                        dest.write(' %.5f %f' % (ubtype.req/10, ubtype.k*conv2))
                 dest.write('\n')
             dest.write('\n')
         # Dihedrals
