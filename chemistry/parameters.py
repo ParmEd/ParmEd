@@ -92,6 +92,11 @@ class ParameterSet(object):
             typ = copy(item)
             other.bond_types[key] = typ
             other.bond_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.pair_types):
+            if key in other.pair_types: continue
+            typ = copy(item)
+            other.pair_types[key] = typ
+            other.pair_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.angle_types):
             if key in other.angle_types: continue
             typ = copy(item)

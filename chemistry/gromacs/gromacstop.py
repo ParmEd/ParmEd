@@ -742,8 +742,11 @@ class GromacsTopologyFile(Structure):
                     cs6, cs12 = (float(x) for x in words[3:5])
                     cs6 *= u.nanometers * 2**(1/6)
                     cs12 *= u.kilojoules_per_mole
-                    params.pair_types[(a1, a2)] = (cs6, cs12)
-                    params.pair_types[(a2, a1)] = (cs6, cs12)
+                    pairtype = NonbondedExceptionType(cs6, cs12,
+                                                      self.defaults.fudgeQQ, list=self.adjust_types)
+                    self.adjust_types.append(pairtype)
+                    params.pair_types[(a1, a2)] = pairtype
+                    params.pair_types[(a2, a1)] = pairtype
             itplist = f.included_files
 
         # Combine first, then parametrize. That way, we don't have to create
