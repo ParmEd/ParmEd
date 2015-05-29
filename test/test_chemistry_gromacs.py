@@ -283,3 +283,27 @@ class TestGromacsGro(unittest.TestCase):
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
 
+    def testReadWriteHighPrecisionGroFile(self):
+        """ Tests reading/writing high-precision GRO files """
+        gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
+        GromacsGroFile.write(gro, get_fn('1aki.ff99sbildn_highprec.gro',
+                                         written=True),
+                             precision=6)
+        self.assertTrue(diff_files(get_saved_fn('1aki.ff99sbildn_highprec.gro'),
+                                   get_fn('1aki.ff99sbildn_highprec.gro',
+                                          written=True)
+                                   )
+        )
+        gro2 = GromacsGroFile.parse(get_fn('1aki.ff99sbildn_highprec.gro',
+                                           written=True))
+        gro3 = load_file(get_fn('1aki.ff99sbildn_highprec.gro', written=True))
+        self.assertIsInstance(gro3, Structure)
+        for a1, a2, a3 in zip(gro.atoms, gro2.atoms, gro3.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a3.name, a2.name)
+            self.assertEqual(a1.xx, a2.xx)
+            self.assertEqual(a3.xx, a2.xx)
+            self.assertEqual(a1.xy, a2.xy)
+            self.assertEqual(a3.xy, a2.xy)
+            self.assertEqual(a1.xz, a2.xz)
+            self.assertEqual(a3.xz, a2.xz)
