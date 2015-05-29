@@ -14,12 +14,14 @@ except ImportError:
 from chemistry import load_file, ExtraPoint
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.openmm.utils import energy_decomposition
+from chemistry.exceptions import GromacsTopologyWarning
 import chemistry.unit as u
 from chemistry.utils.six.moves import range, zip
 from chemistry.vec3 import Vec3
 import os
 import unittest
 import utils
+import warnings
 
 get_fn = utils.get_fn
 
@@ -57,6 +59,9 @@ def zero_ep_frc(frc, struct):
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestGromacsTop(utils.TestCaseRelative):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
+
+    def setUp(self):
+        warnings.filterwarnings('always', category=GromacsTopologyWarning)
 
     def testTiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
@@ -233,6 +238,32 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=3)
         gmxfrc = get_forces_from_xvg(
                 os.path.join(get_fn('10.DHFR-PME-Switch'), 'force.xvg'))
+        ommfrc = context.getState(getForces=True).getForces().value_in_unit(
+                    u.kilojoules_per_mole/u.nanometer)
+        zero_ep_frc(ommfrc, top)
+        max_diff = get_max_diff(gmxfrc, ommfrc)
+        self.assertLess(max_diff, 5)
+
+    def testDPPC(self):
+        """ Tests non-standard Gromacs force fields and nonbonded exceptions """
+        # We know what we're doing
+        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
+        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
+        top.box = gro.box[:]
+
+        # Create the system and context, then calculate the energy decomposition
+        system = top.createSystem()
+        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context.setPositions(gro.positions)
+        energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
+
+        # Compare with Lee-Ping's answers.
+        self.assertAlmostEqual(energies['bond'], 0)
+        self.assertAlmostEqual(energies['angle'], 1405.7354199, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 236.932663255, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -16432.8092955, places=4)
+        gmxfrc = get_forces_from_xvg(os.path.join(get_fn('12.DPPC'), 'force.xvg'))
         ommfrc = context.getState(getForces=True).getForces().value_in_unit(
                     u.kilojoules_per_mole/u.nanometer)
         zero_ep_frc(ommfrc, top)
