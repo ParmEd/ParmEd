@@ -122,7 +122,7 @@ for i in range(len(atomnames)):
         if len(nx.shortest_path(G, i, j)) == 4:
             lj_prefactor = fudgeLJ
             qq_prefactor = fudgeQQ
-            print " %5i %5i ; 1-4 pair" % (i+1, j+1)
+            # print " %5i %5i ; 1-4 pair" % (i+1, j+1)
         elif len(nx.shortest_path(G, i, j)) <= (nrexcl+1):
             lj_prefactor = 0.0
             qq_prefactor = 0.0
@@ -162,7 +162,7 @@ for k, v in excldict.items():
 
 nra = 0
 for k, v in excldict.items():
-    print "      excls[%i][%i..%i]={%s}" % (k, nra, nra+len(v)-1, ', '.join(['%i' % i for i in v]))
+    # print "      excls[%i][%i..%i]={%s}" % (k, nra, nra+len(v)-1, ', '.join(['%i' % i for i in v]))
     nra += len(v)
             
 print "The Coulomb energy is", coulomb_energy, "kJ/mol"
