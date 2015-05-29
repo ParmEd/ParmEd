@@ -51,65 +51,19 @@ def energy_components(Sim, verbose=False):
     EnergyTerms['Potential'] = Sim.context.getState(getEnergy=True).getPotentialEnergy() / u.kilojoules_per_mole
     return EnergyTerms
 
-def Calculate_ParmEd(gro_file, top_file, sysargs, defines):
+def Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, defines, gmx_pos = True, gmx_top = True):
     #===============================#
     #|   ParmEd object creation    |#
     #===============================#
     # Make sure the proper defines from the .mdp file are passed into the GromacsTopologyFile() :)
-    ParmEd_GmxTop = gromacs.GromacsTopologyFile(top_file )
+    ParmEd_GmxTop = gromacs.GromacsTopologyFile(top_file)
     ParmEd_GmxGro = gromacs.GromacsGroFile.parse(gro_file)
-    ParmEd_GmxTop.box = ParmEd_GmxGro.box
-    ParmEd_GmxTop.positions = ParmEd_GmxGro.positions
-    #===============================#
-    #|   OpenMM simulation setup   |#
-    #===============================#
-    # ParmEd creates System object
-    system = ParmEd_GmxTop.createSystem(**sysargs)
-    # Keep a record of which atoms are real (not virtual sites)
-    isAtom = []
-    for i in range(system.getNumParticles()):
-        isAtom.append(system.getParticleMass(i).value_in_unit(u.dalton) > 0.0)
-    # Setting force groups enables energy components analysis
-    for i, f in enumerate(system.getForces()):
-        f.setForceGroup(i)
-        if isinstance(f, mm.NonbondedForce):
-            f.setUseDispersionCorrection(True)
-    integ = mm.VerletIntegrator(1.0*u.femtosecond)
-    plat = mm.Platform.getPlatformByName('Reference')
-    # Create Simulation object
-    simul = app.Simulation(ParmEd_GmxTop.topology, system, integ, plat)
-    simul.context.setPositions(ParmEd_GmxGro.positions)
-    simul.context.applyConstraints(1e-12)
-    # Obtain OpenMM potential energy
-    state = simul.context.getState(getPositions=True,getEnergy=True,getForces=True)
-    parmed_energy = state.getPotentialEnergy()
-    parmed_forces = state.getForces()
-    pos = np.array(state.getPositions().value_in_unit(u.angstrom)).reshape(-1,3)
-    # Obtain and save constrained positions
-    # M = Molecule(gro_file)
-    # M.xyzs[0] = pos
-    # M.write('constrained.gro')
-    # Print OpenMM-via-ParmEd energy components
-    Ecomps_OMM = energy_components(simul)
-    printcool_dictionary(Ecomps_OMM, title="GROMACS topology, GROMACS positions")
-    parmed_forces = np.array([f for i, f in enumerate(parmed_forces.value_in_unit(u.kilojoule_per_mole/u.nanometer)) if isAtom[i]])
-    return parmed_energy, parmed_forces, Ecomps_OMM
-
-def Calculate_ParmEd_Gtop_Apos(gro_file, top_file, crd_file, prmtop_file, sysargs, defines):
-    #===============================#
-    #|   ParmEd object creation    |#
-    #===============================#
-    # Make sure the proper defines from the .mdp file are passed into the GromacsTopologyFile() :)
     ParmEd_ambertop = amber.AmberParm(prmtop_file, crd_file)    
-    ParmEd_GmxTop = gromacs.GromacsTopologyFile(top_file )
-    ParmEd_GmxGro = gromacs.GromacsGroFile.parse(gro_file)
-    ParmEd_GmxTop.box = ParmEd_GmxGro.box
-    ParmEd_GmxTop.positions = ParmEd_ambertop.positions
     #===============================#
     #|   OpenMM simulation setup   |#
     #===============================#
     # ParmEd creates System object
-    system = ParmEd_GmxTop.createSystem(**sysargs)
+    system = ParmEd_GmxTop.createSystem(**sysargs) if gmx_top else ParmEd_ambertop.createSystem(**sysargs)
     # Keep a record of which atoms are real (not virtual sites)
     isAtom = []
     for i in range(system.getNumParticles()):
@@ -122,8 +76,8 @@ def Calculate_ParmEd_Gtop_Apos(gro_file, top_file, crd_file, prmtop_file, sysarg
     integ = mm.VerletIntegrator(1.0*u.femtosecond)
     plat = mm.Platform.getPlatformByName('Reference')
     # Create Simulation object
-    simul = app.Simulation(ParmEd_GmxTop.topology, system, integ, plat)
-    simul.context.setPositions(ParmEd_ambertop.positions)
+    simul = app.Simulation(ParmEd_GmxTop.topology, system, integ, plat) if gmx_top else app.Simulation(ParmEd_ambertop.topology, system, integ, plat)
+    simul.context.setPositions(ParmEd_GmxGro.positions if gmx_pos else ParmEd_ambertop.positions)
     simul.context.applyConstraints(1e-12)
     # Obtain OpenMM potential energy
     state = simul.context.getState(getPositions=True,getEnergy=True,getForces=True)
@@ -136,91 +90,7 @@ def Calculate_ParmEd_Gtop_Apos(gro_file, top_file, crd_file, prmtop_file, sysarg
     # M.write('constrained.gro')
     # Print OpenMM-via-ParmEd energy components
     Ecomps_OMM = energy_components(simul)
-    printcool_dictionary(Ecomps_OMM, title="GROMACS topology, AMBER positions")
-    parmed_forces = np.array([f for i, f in enumerate(parmed_forces.value_in_unit(u.kilojoule_per_mole/u.nanometer)) if isAtom[i]])
-    return parmed_energy, parmed_forces, Ecomps_OMM
-
-def Calculate_ParmEd_Atop_Gpos(gro_file, top_file, crd_file, prmtop_file, sysargs):
-    #===============================#
-    #|   ParmEd object creation    |#
-    #===============================#
-    ParmEd_ambertop = amber.AmberParm( prmtop_file, crd_file)    
-    ParmEd_GmxGro = gromacs.GromacsGroFile.parse(gro_file)
-
-    system = ParmEd_ambertop.createSystem(**sysargs)
-
-    #===============================#
-    #|   OpenMM simulation setup   |#
-    #===============================#
-    # Keep a record of which atoms are real (not virtual sites)
-    isAtom = []
-    for i in range(system.getNumParticles()):
-        isAtom.append(system.getParticleMass(i).value_in_unit(u.dalton) > 0.0)
-    # Setting force groups enables energy components analysis
-    for i, f in enumerate(system.getForces()):
-        f.setForceGroup(i)
-        if isinstance(f, mm.NonbondedForce):
-            f.setUseDispersionCorrection(True)
-    integ = mm.VerletIntegrator(1.0*u.femtosecond)
-    plat = mm.Platform.getPlatformByName('Reference')
-    # Create Simulation object
-    simul = app.Simulation(ParmEd_ambertop.topology, system, integ, plat)
-    # simul.context.setPositions(ParmEd_ambertop.positions)
-    simul.context.setPositions(ParmEd_GmxGro.positions)
-    simul.context.applyConstraints(1e-12)
-    # Obtain OpenMM potential energy
-    state = simul.context.getState(getPositions=True,getEnergy=True,getForces=True)
-    parmed_energy = state.getPotentialEnergy()
-    parmed_forces = state.getForces()
-    pos = np.array(state.getPositions().value_in_unit(u.angstrom)).reshape(-1,3)
-    # Obtain and save constrained positions
-    # M = Molecule(gro_file)
-    # M.xyzs[0] = pos
-    # M.write('constrained.gro')
-    # Print OpenMM-via-ParmEd energy components
-    Ecomps_OMM = energy_components(simul)
-    printcool_dictionary(Ecomps_OMM, title="AMBER topology, GROMACS positions")
-    parmed_forces = np.array([f for i, f in enumerate(parmed_forces.value_in_unit(u.kilojoule_per_mole/u.nanometer)) if isAtom[i]])
-    return parmed_energy, parmed_forces, Ecomps_OMM
-
-def Calculate_ParmEd_Amber(crd_file, prmtop_file, sysargs):
-    #===============================#
-    #|   ParmEd object creation    |#
-    #===============================#
-    ParmEd_ambertop = amber.AmberParm( prmtop_file, crd_file)    
-
-    system = ParmEd_ambertop.createSystem(**sysargs)
-
-    #===============================#
-    #|   OpenMM simulation setup   |#
-    #===============================#
-    # Keep a record of which atoms are real (not virtual sites)
-    isAtom = []
-    for i in range(system.getNumParticles()):
-        isAtom.append(system.getParticleMass(i).value_in_unit(u.dalton) > 0.0)
-    # Setting force groups enables energy components analysis
-    for i, f in enumerate(system.getForces()):
-        f.setForceGroup(i)
-        if isinstance(f, mm.NonbondedForce):
-            f.setUseDispersionCorrection(True)
-    integ = mm.VerletIntegrator(1.0*u.femtosecond)
-    plat = mm.Platform.getPlatformByName('Reference')
-    # Create Simulation object
-    simul = app.Simulation(ParmEd_ambertop.topology, system, integ, plat)
-    simul.context.setPositions(ParmEd_ambertop.positions)
-    simul.context.applyConstraints(1e-12)
-    # Obtain OpenMM potential energy
-    state = simul.context.getState(getPositions=True,getEnergy=True,getForces=True)
-    parmed_energy = state.getPotentialEnergy()
-    parmed_forces = state.getForces()
-    pos = np.array(state.getPositions().value_in_unit(u.angstrom)).reshape(-1,3)
-    # Obtain and save constrained positions
-    # M = Molecule(gro_file)
-    # M.xyzs[0] = pos
-    # M.write('constrained.gro')
-    # Print OpenMM-via-ParmEd energy components
-    Ecomps_OMM = energy_components(simul)
-    printcool_dictionary(Ecomps_OMM, title="AMBER topology, AMBER positions")
+    printcool_dictionary(Ecomps_OMM, title="%s topology, %s positions" % ("GROMACS" if gmx_top else "AMBER", "GROMACS" if gmx_pos else "AMBER"))
     parmed_forces = np.array([f for i, f in enumerate(parmed_forces.value_in_unit(u.kilojoule_per_mole/u.nanometer)) if isAtom[i]])
     return parmed_energy, parmed_forces, Ecomps_OMM
 
@@ -242,29 +112,24 @@ def main():
     #sysargs['nonbondedCutoff'] = 0.9 * u.nanometer
 
     # ParmEd-OpenMM calculation with GROMACS inputs
-    print "Evaluating energy from GROMACS positions and GROMACS topology"
-    PED_Energy, PED_Force, Ecomps_PED = Calculate_ParmEd(gro_file, top_file, sysargs, defines = [])
-    print "Evaluating energy from GROMACS positions and AMBER topology"
-    PED_Energy_Atop_Gpos, PED_Force_Atop_Gpos, Ecomps_PED_Atop_Gpos = Calculate_ParmEd_Atop_Gpos(gro_file, top_file, crd_file, prmtop_file, sysargs)
-    # ParmEd-OpenMM calculation with AMBER inputs
-    print "Evaluating energy from AMBER positions and AMBER topology"
-    PED_Energy_Amber, PED_Force_Amber, Ecomps_PED_Amber = Calculate_ParmEd_Amber(crd_file, prmtop_file, sysargs)
-    # ParmEd-OpenMM calculation with AMBER inputs
-    print "Evaluating energy from AMBER positions and GROMACS topology"
-    PED_Energy_Gtop_Apos, PED_Force_Gtop_Apos, Ecomps_PED_Gtop_Apos = Calculate_ParmEd_Gtop_Apos(gro_file, top_file, crd_file, prmtop_file, sysargs, defines = [])
+    PED_Energy_GTGP, PED_Force_GTGP, Ecomps_PED_GTGP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], True, True)
+    PED_Energy_ATGP, PED_Force_ATGP, Ecomps_PED_ATGP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], True, False)
+    PED_Energy_GTAP, PED_Force_GTAP, Ecomps_PED_GTAP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], False, True)
+    PED_Energy_ATAP, PED_Force_ATAP, Ecomps_PED_ATAP = Calculate_ParmEd(gro_file, top_file, crd_file, prmtop_file, sysargs, [], False, False)
     print "Finished evaluating energies" 
 
     # Analyze force differences
-    D_Force = PED_Force - PED_Force_Amber
-
+    D_Force_GP = PED_Force_GTGP - PED_Force_ATGP
+    D_Force_AP = PED_Force_GTAP - PED_Force_ATAP
     # Final printout
-    print "Energy Difference (kJ/mol):"
-    #print Ecomps_PED, Ecomps_PED_Amber
-    #print Ecomps_PED['Potential'], Ecomps_PED_Amber['Potential']
-    #print Ecomps_PED['Potential']-Ecomps_PED_Amber['Potential']
-    print (Ecomps_PED['Potential']-Ecomps_PED_Amber['Potential'])
-    print "RMS / Max Force Difference (kJ/mol/nm):"
-    print np.sqrt(np.mean([sum(i**2) for i in D_Force])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force])))
+    print "Energy Difference of GROMACS/AMBER topologies using GROMACS positions (kJ/mol):", 
+    print PED_Energy_GTGP - PED_Energy_ATGP
+    print "RMS / Max Force Difference (kJ/mol/nm):",
+    print np.sqrt(np.mean([sum(i**2) for i in D_Force_GP])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_GP])))
+    print "Energy Difference of GROMACS/AMBER topologies using AMBER positions (kJ/mol):", 
+    print PED_Energy_GTAP - PED_Energy_ATAP
+    print "RMS / Max Force Difference (kJ/mol/nm):",
+    print np.sqrt(np.mean([sum(i**2) for i in D_Force_AP])), np.sqrt(np.max(np.array([sum(i**2) for i in D_Force_AP])))
 
 if __name__ == "__main__":
     main()

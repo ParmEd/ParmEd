@@ -15,7 +15,7 @@ rcoulomb = .8
 rvdw = .8
 coulombtype = PME
 pme_order = 5
-fourierspacing = 0.16
+fourierspacing = 0.05
 
 nstcomm = 1
 comm-mode = linear
