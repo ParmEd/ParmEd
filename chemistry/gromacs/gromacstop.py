@@ -840,8 +840,10 @@ class GromacsTopologyFile(Structure):
         for bond in self.bonds:
             for bpi in bond.atom1.bond_partners:
                 for bpj in bond.atom2.bond_partners:
-                    if len(set([bpi, bond.atom1, bond.atom2, bpj])) < 4: continue
-                    if bpi in bpj.bond_partners or bpi in bpj.angle_partners: continue
+                    if len(set([bpi, bond.atom1, bond.atom2, bpj])) < 4:
+                        continue
+                    if bpi in bpj.bond_partners or bpi in bpj.angle_partners:
+                        continue
                     if bpi > bpj:
                         true_14.add((bpj, bpi))
                     else:
@@ -855,15 +857,22 @@ class GromacsTopologyFile(Structure):
                 warnings.warn('Not all bond parameters found',
                               MissingParameterWarning)
         if len(true_14 - gmx_pair) > 0:
-            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0, list=self.adjust_types)
+            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0,
+                                                   list=self.adjust_types)
             self.adjust_types.append(zero_pairtype)
             num_zero_14 = 0
-            for zero_14 in (true_14 - gmx_pair):
-                self.adjusts.append(NonbondedException(zero_14[0], zero_14[1], zero_pairtype))
+            for a1, a2 in (true_14 - gmx_pair):
+                self.adjusts.append(NonbondedException(a1, a2, zero_pairtype))
                 num_zero_14 += 1
-            warnings.warn('%i 1-4 pairs were missing from the [ pairs ] section and were set to zero; make sure you know what you\'re doing!' % num_zero_14)
+            warnings.warn('%i 1-4 pairs were missing from the [ pairs ] '
+                          'section and were set to zero; make sure you '
+                          'know what you\'re doing!' % num_zero_14,
+                          GromacsTopologyWarning)
         if len(gmx_pair - true_14) > 0:
-            warnings.warn('The [ pairs ] section contains %i exceptions that aren\'t 1-4 pairs; make sure you know what you\'re doing!' % (len(gmx_pair - true_14)))
+            warnings.warn('The [ pairs ] section contains %i exceptions that '
+                          'aren\'t 1-4 pairs; make sure you know what '
+                          'you\'re doing!' % (len(gmx_pair - true_14)),
+                          GromacsTopologyWarning)
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
@@ -1075,9 +1084,7 @@ class GromacsTopologyFile(Structure):
             If None, no molecules are combined into a single moleculetype. If
             'all', all molecules are combined into a single moleculetype.
             Otherwise, the list of molecule indices will control which atoms are
-            combined into single moleculetype's. Each index can appear *only*
-            once, and start from 0. The same molecule number cannot appear in
-            two lists. Default is None
+            combined into single moleculetype's. Default is None
         parameters : 'inline' or str or file-like object, optional
             This specifies where parameters should be printed. If 'inline'
             (default), the parameters are written on the same lines as the
