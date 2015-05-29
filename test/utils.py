@@ -5,7 +5,6 @@ from chemistry.utils.six.moves import zip
 import os
 from os.path import join, split, abspath
 import random
-import sys
 import unittest
 try:
     import numpy
@@ -303,7 +302,13 @@ def create_random_structure(parametrized, novalence=False):
         If True, no valence terms will be added. Default is False. This is
         set to False if parametrized is True
     """
-    from chemistry.topologyobjects import *
+    from chemistry.topologyobjects import (Atom, Bond, AtomType, BondType,
+            AngleType, DihedralType, ImproperType, CmapType, OutOfPlaneBendType,
+            StretchBendType, TorsionTorsionType, AmoebaNonbondedExceptionType,
+            Angle, UreyBradley, Dihedral, Improper, Cmap, TrigonalAngle,
+            OutOfPlaneBend, StretchBend, PiTorsion, TorsionTorsion,
+            AcceptorDonor, Group, ChiralFrame, MultipoleFrame,
+            NonbondedException, RBTorsionType)
     from chemistry import structure
     from copy import copy
     if parametrized: novalence = False
@@ -357,7 +362,7 @@ def create_random_structure(parametrized, novalence=False):
             screen = random.random() * 2
             atom = Atom(atomic_number=atomic_number, type=type,
                         charge=charge, mass=mass, radii=radii,
-                        screen=screen)
+                        screen=screen, name=name)
             if parametrized:
                 atom.atom_type = typ
             struct.add_atom(atom, resname, resid)
