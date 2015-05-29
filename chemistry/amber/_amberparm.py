@@ -1904,19 +1904,10 @@ class AmberParm(AmberFormat, Structure):
         n13 = n14 = 0
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue
-
             for batom in atom.bond_partners:
                 if isinstance(batom, ExtraPoint): continue
-
                 for aatom in batom.bond_partners:
-                    if isinstance(aatom, ExtraPoint): continue
-                    if (aatom in atom.angle_partners + atom.bond_partners or
-                            aatom is atom):
-                        continue
-                    # Add the missing angle
-                    self.angles.append(Angle(atom, batom, aatom, zero_angle))
-                    n13 += 1
-
+                    if isinstance(aatom, ExtraPoint) or aatom is atom: continue
                     for datom in aatom.bond_partners:
                         if isinstance(datom, ExtraPoint): continue
                         if (datom in atom.angle_partners + atom.bond_partners +
@@ -1928,6 +1919,11 @@ class AmberParm(AmberFormat, Structure):
                                             improper=False, type=zero_torsion)
                         self.dihedrals.append(dihedral)
                         n14 += 1
+                    if aatom in atom.angle_partners + atom.bond_partners:
+                        continue
+                    # Add the missing angle
+                    self.angles.append(Angle(atom, batom, aatom, zero_angle))
+                    n13 += 1
 
         if n13:
             self.angle_types.append(zero_angle)

@@ -541,9 +541,11 @@ class Atom(_ListItem):
         """ List of all angle partners that are NOT bond partners """
         bp = set(self._bond_partners)
         ap = set(self._angle_partners) - bp
+        toadd = set()
         for p in ap:
             for c in p.children:
-                ap.add(c)
+                toadd.add(c)
+        ap |= toadd
         return sorted(list(ap))
 
     @property
@@ -552,9 +554,11 @@ class Atom(_ListItem):
         bp = set(self._bond_partners)
         ap = set(self._angle_partners)
         dp = set(self._dihedral_partners) - ap - bp
+        toadd = set()
         for p in dp:
             for c in p.children:
-                dp.add(c)
+                toadd.add(c)
+        dp |= toadd
         return sorted(list(dp))
 
     @property
@@ -567,9 +571,11 @@ class Atom(_ListItem):
         ap = set(self._angle_partners)
         dp = set(self._dihedral_partners)
         tp = set(self._tortor_partners) - dp - ap - bp
+        toadd = set()
         for p in tp:
             for c in p.children:
-                tp.add(c)
+                toadd.add(c)
+        tp |= toadd
         return sorted(list(tp))
 
     @property
@@ -582,9 +588,11 @@ class Atom(_ListItem):
         dp = set(self._dihedral_partners)
         tp = set(self._tortor_partners)
         ep = set(self._exclusion_partners) - tp - dp - ap - bp
+        toadd = set()
         for p in ep:
             for c in p.children:
-                ep.add(c)
+                toadd.add(c)
+        ep |= toadd
         return sorted(list(ep))
 
     #===================================================
