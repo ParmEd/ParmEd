@@ -794,7 +794,14 @@ class GromacsTopologyFile(Structure):
         # on the parameter line itself) keep the existing parameters
         for atom in self.atoms:
             atom.atom_type = params.atom_types[atom.type]
+        # The list of ordered 2-tuples of atoms explicitly specified in [ pairs ].
+        # Under most circumstances, this is the list of 1-4 pairs.
+        gmx_pair = set()
         for pair in self.adjusts:
+            if pair.atom1 > pair.atom2:
+                gmx_pair.add((pair.atom2, pair.atom1))
+            else:
+                gmx_pair.add((pair.atom1, pair.atom2))
             if pair.type is not None: continue
             key = (_gettype(pair.atom1), _gettype(pair.atom2))
             if key in params.pair_types:
@@ -821,7 +828,22 @@ class GromacsTopologyFile(Structure):
                 warnings.warn('Not all pair parameters can be found',
                               MissingParameterWarning)
         update_typelist_from(params.pair_types, self.adjust_types)
+        # This is the list of 1-4 pairs determined from the bond graph.
+        # If this is different from what's in [ pairs ], we print a warning
+        # and make some adjustments (specifically, other programs assume
+        # the 1-4 list is complete, so we zero out the parameters for
+        # 1-4 pairs that aren't in [ pairs ].
+        true_14 = set()
         for bond in self.bonds:
+            for bpi in bond.atom1.bond_partners:
+                for bpj in bond.atom2.bond_partners:
+                    if bpi == bond.atom2: continue
+                    if bpj == bond.atom1: continue
+                    if bpi == bpj: continue
+                    if bpi > bpj:
+                        true_14.add((bpj, bpi))
+                    else:
+                        true_14.add((bpi, bpj))
             if bond.type is not None: continue
             key = (_gettype(bond.atom1), _gettype(bond.atom2))
             if key in params.bond_types:
@@ -830,6 +852,16 @@ class GromacsTopologyFile(Structure):
             else:
                 warnings.warn('Not all bond parameters found',
                               MissingParameterWarning)
+        if len(true_14 - gmx_pair) > 0:
+            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0, list=self.adjust_types)
+            self.adjust_types.append(zero_pairtype)
+            num_zero_14 = 0
+            for zero_14 in (true_14 - gmx_pair):
+                self.adjusts.append(NonbondedException(zero_14[0], zero_14[1], zero_pairtype))
+                num_zero_14 += 1
+            warnings.warn('%i 1-4 pairs were missing from the [ pairs ] section and were set to zero; make sure you know what you\'re doing!' % num_zero_14)
+        if len(gmx_pair - true_14) > 0:
+            warnings.warn('The [ pairs ] section contains %i exceptions that aren\'t 1-4 pairs; make sure you know what you\'re doing!' % (len(gmx_pair - true_14)))
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
