@@ -9,32 +9,6 @@ Build Status
 
 [![Linux Build Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
 
-License
-=======
-
-```
-                    LESSER GPL LICENSE INFO
-
-Copyright (C) 2010 - 2014 Jason Swails
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-   
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
-
-The `fortranformat` package is released under the MIT license, Copyright (C)
-Brendan Arnold. See `fortranformat/__init__.py` for more information.
-```
-
 Description
 ===========
 
@@ -64,14 +38,39 @@ Authors and Contributors
 ========================
 
 The following people have contributed directly to the coding and validation
-efforts in ParmEd. The primary developer is listed first, followed by the other
-contributors in alphabetical order. And a special thanks to all of you who
-helped improve this project either by providing feedback, bug reports, or other
-general comments!
+efforts in ParmEd (in alphabetical order).  And a special thanks to all of you
+who helped improve this project either by providing feedback, bug reports, or
+other general comments!
 
-* Jason Swails | jason.swails@gmail.com
+* Jason Swails (principal developer) | jason.swails@gmail.com
 
 * Carlos Hernandez
 * David L. Mobley
 * Lee-Ping Wang
 * Pawel Janowski
+
+License
+=======
+
+```
+                    LESSER GPL LICENSE INFO
+
+Copyright (C) 2010 - 2014 Jason Swails
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+   
+You should have received a copy of the GNU Lesser General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.
+
+The `fortranformat` package is released under the MIT license, Copyright (C)
+Brendan Arnold. See `fortranformat/__init__.py` for more information.
+```
