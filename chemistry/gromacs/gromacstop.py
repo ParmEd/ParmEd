@@ -840,9 +840,8 @@ class GromacsTopologyFile(Structure):
         for bond in self.bonds:
             for bpi in bond.atom1.bond_partners:
                 for bpj in bond.atom2.bond_partners:
-                    if bpi == bond.atom2: continue
-                    if bpj == bond.atom1: continue
-                    if bpi == bpj: continue
+                    if len(set([bpi, bond.atom1, bond.atom2, bpj])) < 4: continue
+                    if bpi in bpj.bond_partners or bpi in bpj.angle_partners: continue
                     if bpi > bpj:
                         true_14.add((bpj, bpi))
                     else:
