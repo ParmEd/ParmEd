@@ -622,10 +622,10 @@ class GromacsTopologyFile(Structure):
                     sig, eps = (float(x) for x in words[3:5])
                     sig *= 10 # Convert to Angstroms
                     eps *= u.kilojoule.conversion_factor_to(u.kilocalorie)
-                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(-1/6))
-                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(-1/6))
-                    params.atom_types[a1].add_nbfix(a2, sig*2**(-1/6), eps)
-                    params.atom_types[a2].add_nbfix(a1, sig*2**(-1/6), eps)
+                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(1/6))
+                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(1/6))
+                    params.atom_types[a1].add_nbfix(a2, sig*2**(1/6), eps)
+                    params.atom_types[a2].add_nbfix(a1, sig*2**(1/6), eps)
                 elif current_section == 'bondtypes':
                     words = line.split()
                     r = float(words[3]) * u.nanometers

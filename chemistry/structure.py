@@ -2201,7 +2201,6 @@ class Structure(object):
 
         # Now see if we have any NBFIXes that we need to implement via a
         # CustomNonbondedForce
-        print("NBFIX?", self.has_NBFIX())
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
 
