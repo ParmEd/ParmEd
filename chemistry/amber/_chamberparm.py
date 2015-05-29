@@ -150,6 +150,8 @@ class ChamberParm(AmberParm):
             raise ValueError('ChamberParm does not support all potential terms '
                              'defined in the input Structure')
         inst = struct.copy(cls, split_dihedrals=True)
+        inst.update_dihedral_exclusions()
+        inst._add_missing_13_14()
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()

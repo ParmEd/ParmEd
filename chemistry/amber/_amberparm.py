@@ -36,8 +36,10 @@ from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
+from collections import defaultdict
 import copy
 try:
     import numpy as np
@@ -269,14 +271,13 @@ class AmberParm(AmberFormat, Structure):
 
         Raises
         ------
-        ValueError
+        TypeError
             If the structure has parameters not supported by the standard Amber
-            force field (i.e., standard bond, angle, and dihedral types), a
-            ValueError will be raised.
+            force field (i.e., standard bond, angle, and dihedral types)
         """
         if struct.unknown_functional:
-            raise ValueError('Cannot instantiate an AmberParm from unknown '
-                             'functional')
+            raise TypeError('Cannot instantiate an AmberParm from unknown '
+                            'functional')
         if (struct.urey_bradleys or struct.impropers or struct.rb_torsions or
                 struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
                 struct.out_of_plane_bends or struct.stretch_bends or
@@ -284,12 +285,14 @@ class AmberParm(AmberFormat, Structure):
             if (struct.rb_torsions or struct.trigonal_angles or
                     struct.pi_torsions or struct.out_of_plane_bends or
                     struct.torsion_torsions or struct.multipole_frames):
-                raise ValueError('AmberParm does not support all of the '
-                                 'parameters defined in the input Structure')
+                raise TypeError('AmberParm does not support all of the '
+                                'parameters defined in the input Structure')
             # Maybe it just has CHARMM parameters?
-            raise ValueError('AmberParm does not support all of the parameters '
-                             'defined in the input Structure. Try ChamberParm')
+            raise TypeError('AmberParm does not support all of the parameters '
+                            'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
+        inst.update_dihedral_exclusions()
+        inst._add_missing_13_14()
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()
@@ -1864,6 +1867,79 @@ class AmberParm(AmberFormat, Structure):
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)
+
+    #===================================================
+
+    def _add_missing_13_14(self):
+        """
+        Uses the bond graph to fill in zero-parameter angles and dihedrals. The
+        reason this is necessary is that Amber assumes that the list of angles
+        and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
+        bond graph, respectively. As a result, Amber programs use the angle and
+        dihedral lists to set nonbonded exclusions and exceptions.
+
+        Returns
+        -------
+        n13, n14 : int, int
+            The number of 1-3 and 1-4 pairs that needed to be added,
+            respectively. Purely diagnostic
+        """
+        # We need to figure out what 1-4 scaling term to use
+        scalings = defaultdict(int)
+        for dih in self.dihedrals:
+            if dih.ignore_end or dih.improper: continue
+            scalings[(dih.type.scee, dih.type.scnb)] += 1
+        if len(scalings) > 0:
+            maxkey, maxval = next(iteritems(scalings))
+            for key, val in iteritems(scalings):
+                if maxval < val:
+                    maxkey, maxval = key, val
+            scee, scnb = maxkey
+        else:
+            scee = scnb = 0
+
+        zero_angle = AngleType(0, 0)
+        zero_torsion = DihedralType(0, 1, 0, scee, scnb)
+
+        n13 = n14 = 0
+        for atom in self.atoms:
+            if isinstance(atom, ExtraPoint): continue
+
+            for batom in atom.bond_partners:
+                if isinstance(batom, ExtraPoint): continue
+
+                for aatom in batom.bond_partners:
+                    if isinstance(aatom, ExtraPoint): continue
+                    if (aatom in atom.angle_partners + atom.bond_partners or
+                            aatom is atom):
+                        continue
+                    # Add the missing angle
+                    self.angles.append(Angle(atom, batom, aatom, zero_angle))
+                    n13 += 1
+
+                    for datom in aatom.bond_partners:
+                        if isinstance(datom, ExtraPoint): continue
+                        if (datom in atom.angle_partners + atom.bond_partners +
+                                atom.dihedral_partners or datom is atom):
+                            continue
+                        # Add the missing dihedral
+                        dihedral = Dihedral(atom, batom, aatom, datom,
+                                            ignore_end=not scee==scnb==0,
+                                            improper=False, type=zero_torsion)
+                        self.dihedrals.append(dihedral)
+                        n14 += 1
+
+        if n13:
+            self.angle_types.append(zero_angle)
+            zero_angle.list = self.angle_types
+        if n14:
+            if len(scalings) > 1:
+                warnings.warn('Multiple 1-4 scaling factors detected. Using '
+                              'the most-used values scee=%f scnb=%f' %
+                              (scee, scnb), AmberParmWarning)
+            zero_torsion.list = self.dihedral_types
+            self.dihedral_types.append(zero_torsion)
+        return n13, n14
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
