@@ -1,1 +1,1 @@
-../test.py conf.gro topol.top shot.mdp
+../atest.py conf.gro topol.top shot.mdp
