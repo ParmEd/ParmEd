@@ -292,7 +292,7 @@ class AmberParm(AmberFormat, Structure):
                             'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
-        inst._add_missing_13_14(struct.adjusts)
+        inst._add_missing_13_14(inst.adjusts)
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()
@@ -1936,7 +1936,6 @@ class AmberParm(AmberFormat, Structure):
                         else:
                             # Figure out what the scale factors must be
                             key = tuple(sorted([atom, datom]))
-                            import code; code.interact(local=dict(globals(), **locals()))
                             if key not in adjust_dict:
                                 if ignored_torsion is None:
                                     ignored_torsion = DihedralType(0, 1, 0, 0,
@@ -1944,11 +1943,9 @@ class AmberParm(AmberFormat, Structure):
                                     self.dihedral_types.append(ignored_torsion)
                                 tortype = ignored_torsion
                                 ignore_end = True
-                                print('Ignoring added torsion 1')
                             elif 0 in (adjust_dict[key].type.epsilon,
                                        adjust_dict[key].type.rmin) and \
                                     adjust_dict[key].type.chgscale == 0:
-                                print('Ignoring added torsion 2')
                                 if ignored_torsion is None:
                                     ignored_torsion = DihedralType(0, 1, 0, 0,
                                                 0, list=self.dihedral_types)
@@ -1956,7 +1953,6 @@ class AmberParm(AmberFormat, Structure):
                                 tortype = ignored_torsion
                                 ignore_end = True
                             else:
-                                print('Adding custom exception')
                                 pair = adjust_dict[key]
                                 epsilon = pair.type.epsilon
                                 rmin = pair.type.rmin
