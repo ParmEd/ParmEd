@@ -420,6 +420,7 @@ def Calculate_AMBER(Structure, mdp_opts):
 do_debugf=1, dumpfrc=1
 /"""
     # Call sander for energy and force
+    os.system('rm -f forcedump.dat')
     _exec("sander -O -y mdcrd", print_command=False)
     # Parse energy and force
     ParseMode = 0

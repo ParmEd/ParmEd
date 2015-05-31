@@ -1367,7 +1367,7 @@ class AmberParm(AmberFormat, Structure):
         try:
             atnums = self.parm_data['ATOMIC_NUMBER']
         except KeyError:
-            atnums = [1 for i in range(natom)]
+            atnums = None
         try:
             res_icd = self.parm_data['RESIDUE_ICODE']
         except KeyError:
@@ -1380,13 +1380,15 @@ class AmberParm(AmberFormat, Structure):
             resstart = res_ptr[i] - 1
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
-                if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
-                    atom = ExtraPoint()
-                else:
-                    if atnums[j] == 0:
+                if atnums is None:
+                    if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
                         atom = ExtraPoint()
                     else:
                         atom = Atom()
+                elif atnums[j] == 0:
+                    atom = ExtraPoint()
+                else:
+                    atom = Atom()
                 self.add_atom(atom, resname, i, res_chn[i], res_icd[i])
 
     #===================================================
@@ -1959,7 +1961,7 @@ class AmberParm(AmberFormat, Structure):
                                 rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
                                 if abs(rmin - rref) > SMALL:
                                     raise TypeError('Cannot translate exceptions')
-                                scnb = epsilon / eref
+                                scnb = eref / epsilon
                                 if pair.type.chgscale == 0:
                                     scee = 1e10
                                 else:
