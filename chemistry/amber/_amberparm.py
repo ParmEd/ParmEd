@@ -1910,6 +1910,35 @@ class AmberParm(AmberFormat, Structure):
                 adjust_dict[tuple(sorted([pair.atom1, pair.atom2]))] = pair
             ignored_torsion = None
             zero_torsion = None
+            # Scan through existing dihedrals to make sure the exceptions match
+            # the dihedral list
+            for dihedral in self.dihedrals:
+                if dihedral.ignore_end: continue
+                key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
+                eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
+                rref = dihedral.atom1.rmin_14 + dihedral.atom4.rmin_14
+                if pair.type.epsilon == 0:
+                    scnb = 1e10
+                else:
+                    scnb = eref / pair.type.epsilon
+                if pair.type.chgscale == 0:
+                    scee = 1e10
+                else:
+                    scee = 1 / pair.type.chgscale
+                if key in adjust_dict:
+                    pair = adjust_dict[key]
+                    if (abs(rref - pair.type.rmin) > SMALL and
+                            pair.type.epsilon != 0):
+                        raise TypeError('Cannot translate exceptions')
+                    if (abs(scnb - dihedral.type.scnb) < SMALL and
+                            abs(scee - dihedral.type.scee) < SMALL):
+                        continue
+                    newtype = copy.copy(dihedral.type)
+                    newtype.scee = scee
+                    newtype.scnb = scnb
+                    dihedral.type = newtype
+                    newtype.list = self.dihedral_types
+                    self.dihedral_types.append(newtype)
 
         zero_angle = AngleType(0, 0)
 
@@ -1961,7 +1990,10 @@ class AmberParm(AmberFormat, Structure):
                                 rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
                                 if abs(rmin - rref) > SMALL:
                                     raise TypeError('Cannot translate exceptions')
-                                scnb = eref / epsilon
+                                if pair.type.epsilon == 0:
+                                    scnb = 1e10
+                                else:
+                                    scnb = eref / epsilon
                                 if pair.type.chgscale == 0:
                                     scee = 1e10
                                 else:
