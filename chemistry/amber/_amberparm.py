@@ -292,7 +292,8 @@ class AmberParm(AmberFormat, Structure):
                             'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
-        inst._add_missing_13_14(inst.adjusts)
+        inst._add_missing_13_14()
+        del inst.adjusts[:]
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()
@@ -1870,18 +1871,13 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _add_missing_13_14(self, adjusts):
+    def _add_missing_13_14(self):
         """
         Uses the bond graph to fill in zero-parameter angles and dihedrals. The
         reason this is necessary is that Amber assumes that the list of angles
         and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
         bond graph, respectively. As a result, Amber programs use the angle and
         dihedral lists to set nonbonded exclusions and exceptions.
-
-        Parameters
-        ----------
-        adjusts : list of :class:`NonbondedException`
-            List of 1-4 exceptions to match the new dihedrals to
 
         Returns
         -------
@@ -1891,7 +1887,7 @@ class AmberParm(AmberFormat, Structure):
         """
         # We need to figure out what 1-4 scaling term to use if we don't have
         # explicit exceptions
-        if not adjusts:
+        if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
                 if dih.ignore_end or dih.improper: continue
@@ -1903,14 +1899,15 @@ class AmberParm(AmberFormat, Structure):
                         maxkey, maxval = key, val
                 scee, scnb = maxkey
             else:
-                scee = scnb = 0
+                scee = scnb = 1e10
             zero_torsion = DihedralType(0, 1, 0, scee, scnb)
         else:
             # Turn list of exceptions into a dict so we can look it up quickly
             adjust_dict = dict()
-            for pair in adjusts:
+            for pair in self.adjusts:
                 adjust_dict[tuple(sorted([pair.atom1, pair.atom2]))] = pair
             ignored_torsion = None
+            zero_torsion = None
 
         zero_angle = AngleType(0, 0)
 
@@ -1927,31 +1924,30 @@ class AmberParm(AmberFormat, Structure):
                                 atom.dihedral_partners or datom is atom):
                             continue
                         # Add the missing dihedral
-                        if not adjusts:
+                        if not self.adjusts:
                             tortype = zero_torsion
                             if n14 == 0:
                                 tortype.list = self.dihedral_types
                                 self.dihedral_types.append(tortype)
-                            ignore_end = not scee == scnb == 0
                         else:
                             # Figure out what the scale factors must be
                             key = tuple(sorted([atom, datom]))
                             if key not in adjust_dict:
                                 if ignored_torsion is None:
-                                    ignored_torsion = DihedralType(0, 1, 0, 0,
-                                                0, list=self.dihedral_types)
+                                    ignored_torsion = DihedralType(0, 1, 0,
+                                                                   1e10, 1e10)
                                     self.dihedral_types.append(ignored_torsion)
+                                    ignored_torsion.list = self.dihedral_types
                                 tortype = ignored_torsion
-                                ignore_end = True
                             elif 0 in (adjust_dict[key].type.epsilon,
                                        adjust_dict[key].type.rmin) and \
                                     adjust_dict[key].type.chgscale == 0:
                                 if ignored_torsion is None:
-                                    ignored_torsion = DihedralType(0, 1, 0, 0,
-                                                0, list=self.dihedral_types)
+                                    ignored_torsion = \
+                                            DihedralType(0, 1, 0, 1e10, 1e10,
+                                                    list=self.dihedral_types)
                                     self.dihedral_types.append(ignored_torsion)
                                 tortype = ignored_torsion
-                                ignore_end = True
                             else:
                                 pair = adjust_dict[key]
                                 epsilon = pair.type.epsilon
@@ -1964,16 +1960,16 @@ class AmberParm(AmberFormat, Structure):
                                 if abs(rmin - rref) > SMALL:
                                     raise TypeError('Cannot translate exceptions')
                                 scnb = epsilon / eref
-                                # Don't let SCEE be infinite -- avogadro's
-                                # number is close enough :)
-                                scee = min(1/pair.type.chgscale, 6.02e23)
+                                if pair.type.chgscale == 0:
+                                    scee = 1e10
+                                else:
+                                    scee = 1 / pair.type.chgscale
                                 tortype = DihedralType(0, 1, 0, scee, scnb,
                                                        list=self.dihedral_types)
                                 self.dihedral_types.append(tortype)
-                                ignore_end = False
                         dihedral = Dihedral(atom, batom, aatom, datom,
-                                            ignore_end=ignore_end,
-                                            improper=False, type=tortype)
+                                            ignore_end=False, improper=False,
+                                            type=tortype)
                         self.dihedrals.append(dihedral)
                         n14 += 1
                     if aatom in atom.angle_partners + atom.bond_partners:
@@ -1986,7 +1982,7 @@ class AmberParm(AmberFormat, Structure):
             self.angle_types.append(zero_angle)
             zero_angle.list = self.angle_types
         if n14: # See if there is some ambiguity here
-            if not adjusts and len(scalings) > 1:
+            if not self.adjusts and len(scalings) > 1:
                 warnings.warn('Multiple 1-4 scaling factors detected. Using '
                               'the most-used values scee=%f scnb=%f' %
                               (scee, scnb), AmberParmWarning)
