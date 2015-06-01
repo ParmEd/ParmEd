@@ -19,7 +19,7 @@ import warnings
 
 class TestCase(TestCaseRelative):
     def setUp(self):
-        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
+        warnings.filterwarnings('default', category=GromacsTopologyWarning)
         try:
             os.makedirs(get_fn('writes'))
         except OSError:
