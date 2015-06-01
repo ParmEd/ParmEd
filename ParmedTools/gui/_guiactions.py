@@ -98,7 +98,7 @@ def changeljpair(root, amber_prmtop, messages):
         action = ParmedActions.changeLJPair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
@@ -171,7 +171,7 @@ def changelj14pair(root, amber_prmtop, messages):
         action=ParmedActions.changeLJ14Pair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
@@ -220,7 +220,7 @@ def change(root, amber_prmtop, messages):
     var_list = [v.get() for v in var_list]
     try:
         action = ParmedActions.change(amber_prmtop, ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
@@ -296,7 +296,7 @@ def addljtype(root, amber_prmtop, messages):
         kw_var_list.extend(['epsilon_14', var_list[4]])
     try:
         action = ParmedActions.addLJType(amber_prmtop,ArgumentList(kw_var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
@@ -397,7 +397,7 @@ def strip(root, amber_prmtop, messages):
     if not var.get(): return
     try:
         action = ParmedActions.strip(amber_prmtop, ArgumentList(var.get()))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('%s\n' % action)
@@ -427,7 +427,7 @@ def addexclusions(root, amber_prmtop, messages):
     var_list = [v.get() for v in var_list]
     try:
         act = ParmedActions.addExclusions(amber_prmtop, ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     act.execute()
@@ -453,7 +453,7 @@ def changeprotstate(root, amber_prmtop, messages):
     try:
         action = ParmedActions.changeProtState(amber_prmtop, 
                                                ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
@@ -478,7 +478,7 @@ def scee(root, amber_prmtop, messages):
 
     try:
         action = ParmedActions.scee(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('%s\n' % action)
@@ -503,7 +503,7 @@ def scnb(root, amber_prmtop, messages):
 
     try:
         action = ParmedActions.scnb(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('%s\n' % action)
@@ -531,7 +531,7 @@ def printljtypes(root, amber_prmtop, messages):
     # Instantiate our action
     try:
         action = ParmedActions.printLJTypes(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -570,7 +570,7 @@ def changeljsingletype(root, amber_prmtop, messages):
     try:
         action = ParmedActions.changeLJSingleType(amber_prmtop,
                                                   ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('%s\n' % action)
@@ -596,7 +596,7 @@ def addcoarsegrain(root, amber_prmtop, messages):
         action = ParmedActions.addCoarseGrain(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
    
@@ -621,7 +621,7 @@ def definesolvent(root, amber_prmtop, messages):
         action = ParmedActions.defineSolvent(amber_prmtop, ArgumentList(var))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -643,7 +643,7 @@ def printbonds(root, amber_prmtop, messages):
     if not var: return
     try:
         action = ParmedActions.printBonds(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('Printed BONDs for %s\n' % var)
@@ -675,7 +675,7 @@ def printangles(root, amber_prmtop, messages):
     if not var: return
     try:
         action = ParmedActions.printAngles(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('Printed ANGLEs for %s\n' % var)
@@ -708,7 +708,7 @@ def printdihedrals(root, amber_prmtop, messages):
     if not var: return
     try:
         action = ParmedActions.printDihedrals(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     messages.write('Printed DIHEDRALs for %s\n' % var)
@@ -751,7 +751,7 @@ def setbond(root, amber_prmtop, messages):
         action = ParmedActions.setBond(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -785,7 +785,7 @@ def setangle(root, amber_prmtop, messages):
         action = ParmedActions.setAngle(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -832,7 +832,7 @@ def adddihedral(root, amber_prmtop, messages):
         action = ParmedActions.addDihedral(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     
@@ -878,7 +878,7 @@ def deletedihedral(root, amber_prmtop, messages):
                                               ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -901,7 +901,7 @@ def printljmatrix(root, amber_prmtop, messages):
     if not var: return
     try:
         action = ParmedActions.printLJMatrix(amber_prmtop, ArgumentList(var))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -953,7 +953,7 @@ def timerge(root, amber_prmtop, messages):
         action = ParmedActions.tiMerge(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -991,7 +991,7 @@ def addpdb(root, amber_prmtop, messages):
         action = ParmedActions.addPDB(amber_prmtop, ArgumentList(newvars))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
 
@@ -1043,7 +1043,7 @@ def scale(root, amber_prmtop, messages):
     var_list = [v.get() for v in var_list]
     try:
         action = ParmedActions.scale(amber_prmtop, ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
@@ -1089,7 +1089,7 @@ def hmassrepartition(root, amber_prmtop, messages):
     try:
         action = ParmedActions.HMassRepartition(amber_prmtop,
                                                 ArgumentList(var_list))
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
     action.execute()
@@ -1139,5 +1139,5 @@ def add12_6_4(root, amber_prmtop, messages):
         action = ParmedActions.add12_6_4(amber_prmtop, ArgumentList(args))
         messages.write('%s\n' % action)
         action.execute()
-    except Exception, err:
+    except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
