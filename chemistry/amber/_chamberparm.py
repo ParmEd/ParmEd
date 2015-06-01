@@ -152,9 +152,13 @@ class ChamberParm(AmberParm):
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
         inst._add_missing_13_14()
+        del inst.adjusts[:]
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()
+        # Give virtual sites a name that Amber understands
+        for atom in inst.atoms:
+            if isinstance(atom, ExtraPoint): atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
