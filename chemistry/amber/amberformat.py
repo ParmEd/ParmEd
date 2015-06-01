@@ -332,7 +332,7 @@ class AmberFormat(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, *args, **kwargs):
         """
         Meant for use with the automatic file loader, this will automatically
         return a subclass of AmberFormat corresponding to what the information
@@ -341,9 +341,9 @@ class AmberFormat(object):
         """
         from chemistry.amber import LoadParm
         try:
-            return LoadParm(filename)
+            return LoadParm(filename, *args, **kwargs)
         except IndexError:
-            return AmberFormat(filename)
+            return AmberFormat(filename, *args, **kwargs)
 
     #===================================================
 

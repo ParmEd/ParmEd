@@ -1149,7 +1149,6 @@ class GromacsTopologyFile(Structure):
 ;   Library dir:  %s
 ;   Command line:
 ;     %s
-;   Force field was read from the standard Gromacs share directory
 ;
 ''' % (fname, os.getlogin(), os.getuid(), os.uname()[1],
        now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],

@@ -52,7 +52,7 @@ class FileFormatType(type):
                 PARSER_ARGUMENTS[name] = ()
         super(FileFormatType, cls).__init__(name, bases, dct)
 
-def load_file(filename, **kwargs):
+def load_file(filename, *args, **kwargs):
     """
     Identifies the file format of the specified file and returns its parsed
     contents.
@@ -61,6 +61,8 @@ def load_file(filename, **kwargs):
     ----------
     filename : str
         The name of the file to try to parse
+    *args : other positional arguments
+        Some formats accept positional arguments. These will be passed along
     **kwargs : other options
         Some formats can only be instantiated with other options besides just a
         file name.
@@ -118,5 +120,9 @@ def load_file(filename, **kwargs):
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
     if hasattr(cls, 'parse'):
-        return cls.parse(filename, **kwargs)
-    return cls(filename, **kwargs)
+        return cls.parse(filename, *args, **kwargs)
+    elif hasattr(cls, 'open_old'):
+        return cls.open_old(filename, *args, **kwargs)
+    elif hasattr(cls, 'open'):
+        return cls.open(filename, *args, **kwargs)
+    return cls(filename, *args, **kwargs)
