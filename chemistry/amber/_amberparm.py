@@ -1917,28 +1917,30 @@ class AmberParm(AmberFormat, Structure):
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
                 eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
                 rref = dihedral.atom1.rmin_14 + dihedral.atom4.rmin_14
-                if pair.type.epsilon == 0:
-                    scnb = 1e10
-                else:
-                    scnb = eref / pair.type.epsilon
-                if pair.type.chgscale == 0:
-                    scee = 1e10
-                else:
-                    scee = 1 / pair.type.chgscale
                 if key in adjust_dict:
                     pair = adjust_dict[key]
+                    if pair.type.epsilon == 0:
+                        scnb = 1e10
+                    else:
+                        scnb = eref / pair.type.epsilon
+                    if pair.type.chgscale == 0:
+                        scee = 1e10
+                    else:
+                        scee = 1 / pair.type.chgscale
                     if (abs(rref - pair.type.rmin) > SMALL and
                             pair.type.epsilon != 0):
                         raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
                         continue
-                    newtype = copy.copy(dihedral.type)
-                    newtype.scee = scee
-                    newtype.scnb = scnb
-                    dihedral.type = newtype
-                    newtype.list = self.dihedral_types
-                    self.dihedral_types.append(newtype)
+                else:
+                    scee = scnb = 1e10
+                newtype = copy.copy(dihedral.type)
+                newtype.scee = scee
+                newtype.scnb = scnb
+                dihedral.type = newtype
+                newtype.list = self.dihedral_types
+                self.dihedral_types.append(newtype)
 
         zero_angle = AngleType(0, 0)
 
