@@ -26,7 +26,7 @@ from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
 from chemistry.exceptions import AmberParmError
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
-                                       ImproperType, CmapType)
+                                       ImproperType, CmapType, ExtraPoint)
 from chemistry.utils.six.moves import zip, range
 from math import sqrt
 
