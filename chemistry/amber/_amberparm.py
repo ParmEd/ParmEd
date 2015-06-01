@@ -330,7 +330,7 @@ class AmberParm(AmberFormat, Structure):
             for atom in struct.atoms:
                 coords.extend([atom.xx, atom.xy, atom.xz])
         except AttributeError:
-            raise
+            pass
         else:
             inst.load_coordinates(coords)
         # pmemd likes to skip torsions with periodicities of 0, which may be
