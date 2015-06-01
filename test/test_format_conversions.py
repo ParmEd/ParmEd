@@ -2,6 +2,7 @@
 from __future__ import print_function, division, absolute_import
 
 import chemistry as chem
+from chemistry.exceptions import GromacsTopologyWarning
 from chemistry.gromacs._gromacsfile import GromacsFile
 from chemistry import unit as u
 import os
@@ -14,9 +15,11 @@ except ImportError:
     has_openmm = False
 import unittest
 from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
+import warnings
 
 class TestCase(TestCaseRelative):
     def setUp(self):
+        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
         try:
             os.makedirs(get_fn('writes'))
         except OSError:
