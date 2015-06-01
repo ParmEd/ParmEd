@@ -1,6 +1,7 @@
 """
 Useful functions for the test cases
 """
+from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import zip
 import os
 from os.path import join, split, abspath
@@ -156,7 +157,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
         raise ValueError('Cannot specify absolute_error AND relative_error')
     if absolute_error is not None: absolute_error = float(absolute_error)
     if relative_error is not None: relative_error = float(relative_error)
-    if isinstance(file1, str):
+    if isinstance(file1, string_types):
         try:
             f1 = open(file1, 'r')
         except IOError:
@@ -165,7 +166,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
     else:
         f1 = file1
         file1 = str(file1)
-    if isinstance(file2, str):
+    if isinstance(file2, string_types):
         try:
             f2 = open(file2, 'r')
         except IOError:

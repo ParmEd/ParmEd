@@ -147,7 +147,10 @@ class CPreProcessor(object):
             self._fileobj.close()
 
     def readline(self):
-        return next(iter(self))
+        try:
+            return next(iter(self))
+        except StopIteration:
+            return ''
 
     def readlines(self):
         return [line for line in self]
