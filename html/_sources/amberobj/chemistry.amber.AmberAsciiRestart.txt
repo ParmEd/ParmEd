@@ -15,7 +15,6 @@ chemistry.amber.AmberAsciiRestart
    
       ~AmberAsciiRestart.__init__
       ~AmberAsciiRestart.close
-      ~AmberAsciiRestart.id_format
    
    
 

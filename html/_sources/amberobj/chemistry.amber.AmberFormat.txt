@@ -18,8 +18,6 @@ chemistry.amber.AmberFormat
       ~AmberFormat.add_flag
       ~AmberFormat.deleteFlag
       ~AmberFormat.delete_flag
-      ~AmberFormat.id_format
-      ~AmberFormat.parse
       ~AmberFormat.rdparm
       ~AmberFormat.rdparm_old
       ~AmberFormat.rdparm_slow

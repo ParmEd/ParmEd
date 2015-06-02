@@ -36,12 +36,10 @@ chemistry.structure.Structure
       ~Structure.omm_urey_bradley_force
       ~Structure.prune_empty_terms
       ~Structure.strip
-      ~Structure.to_dataframe
       ~Structure.unchange
       ~Structure.update_dihedral_exclusions
       ~Structure.write_cif
       ~Structure.write_pdb
-      ~Structure.write_psf
    
    
 

@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for chemistry.tinker.system</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -54,9 +54,7 @@
 <span class="sd">   TinkerAnalout - Reads the output from the &quot;analyze&quot; command</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">TinkerAnaloutError</span>
 <span class="kn">from</span> <span class="nn">chemistry.tinker.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AtomList</span><span class="p">,</span> <span class="n">BondList</span><span class="p">,</span> <span class="n">AngleList</span><span class="p">,</span>
       <span class="n">StretchBendList</span><span class="p">,</span> <span class="n">UreyBradleyList</span><span class="p">,</span> <span class="n">OutOfPlaneBendList</span><span class="p">,</span> <span class="n">OutOfPlaneDistList</span><span class="p">,</span>
@@ -174,7 +172,7 @@
         <span class="c"># Eat 3 lines, then begin</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;natom&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;natom&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
@@ -197,7 +195,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;natom&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;natom&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span>
@@ -218,7 +216,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nbond&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nbond&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -235,7 +233,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nangle&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nangle&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -254,7 +252,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nstrbnd&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nstrbnd&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -275,7 +273,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nurey&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nurey&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -300,7 +298,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nopbend&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nopbend&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -321,7 +319,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nopdist&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;nopdist&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -342,7 +340,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;ntors&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;ntors&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -365,7 +363,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npitors&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npitors&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -382,7 +380,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;ntortor&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;ntortor&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -403,7 +401,7 @@
             <span class="c"># need to eat the next dim1*dim2 lines</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="n">gridvals</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim1</span><span class="o">*</span><span class="n">dim2</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">dim1</span><span class="o">*</span><span class="n">dim2</span><span class="p">):</span>
                     <span class="n">gridvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()]))</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tortor_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">TorsionTorsionGrid</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">gridvals</span><span class="p">)</span>
@@ -414,7 +412,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npole&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npole&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -443,7 +441,7 @@
         <span class="c"># Eat the next 3 lines</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">();</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npole&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;npole&#39;</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
                 <span class="n">at</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -473,7 +471,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pair12_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair12&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair12&#39;</span><span class="p">]):</span>
             <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair12_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at2</span><span class="p">])</span> <span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -483,7 +481,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pair13_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair13&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair13&#39;</span><span class="p">]):</span>
             <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair13_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at2</span><span class="p">])</span> <span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -493,7 +491,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pair14_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair14&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair14&#39;</span><span class="p">]):</span>
             <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair14_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at2</span><span class="p">])</span> <span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -503,7 +501,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pair15_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair15&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;pair15&#39;</span><span class="p">]):</span>
             <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair15_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="p">[</span><span class="n">at2</span><span class="p">])</span> <span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -549,9 +547,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -568,7 +566,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -577,13 +575,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

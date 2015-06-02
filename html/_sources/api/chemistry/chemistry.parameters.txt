@@ -1,0 +1,7 @@
+chemistry.parameters module
+===========================
+
+.. automodule:: chemistry.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

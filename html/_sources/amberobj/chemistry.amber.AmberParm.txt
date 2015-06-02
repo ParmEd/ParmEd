@@ -23,10 +23,9 @@ chemistry.amber.AmberParm
       ~AmberParm.createSystem
       ~AmberParm.deleteFlag
       ~AmberParm.delete_flag
+      ~AmberParm.delete_mask
       ~AmberParm.fill_LJ
-      ~AmberParm.has_1012
       ~AmberParm.has_NBFIX
-      ~AmberParm.id_format
       ~AmberParm.initialize_topology
       ~AmberParm.is_changed
       ~AmberParm.load_atom_info
@@ -52,7 +51,6 @@ chemistry.amber.AmberParm
       ~AmberParm.omm_torsion_torsion_force
       ~AmberParm.omm_trigonal_angle_force
       ~AmberParm.omm_urey_bradley_force
-      ~AmberParm.parse
       ~AmberParm.prune_empty_terms
       ~AmberParm.ptr
       ~AmberParm.rdparm
@@ -63,15 +61,14 @@ chemistry.amber.AmberParm
       ~AmberParm.remake_parm
       ~AmberParm.set_version
       ~AmberParm.strip
-      ~AmberParm.to_dataframe
       ~AmberParm.unchange
       ~AmberParm.update_dihedral_exclusions
       ~AmberParm.view
+      ~AmberParm.writeOFF
       ~AmberParm.writeParm
       ~AmberParm.write_cif
       ~AmberParm.write_parm
       ~AmberParm.write_pdb
-      ~AmberParm.write_psf
       ~AmberParm.write_rst7
    
    

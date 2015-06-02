@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,55 +37,55 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="chemistry-topologyobjects-dihedral">
 <h1>chemistry.topologyobjects.Dihedral<a class="headerlink" href="#chemistry-topologyobjects-dihedral" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.Dihedral">
-<em class="property">class </em><code class="descclassname">chemistry.topologyobjects.</code><code class="descname">Dihedral</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Dihedral</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral" title="Permalink to this definition">¶</a></dt>
 <dd><p>A valence dihedral between 4 atoms separated by three covalent bonds.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom on one end of the valence dihedral bonded to atom 2</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the valence dihedral bonded to atom1 and atom3</p>
 </div></blockquote>
-<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the valence dihedral bonded to atom2 and atom4</p>
 </div></blockquote>
-<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom on the other end of the valence dihedral bonded to atom 3</p>
 </div></blockquote>
-<p><strong>improper</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<p><strong>improper</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
 <blockquote>
 <div><p>If True, this is an Amber-style improper torsion, where atom3 is the
 &#8220;central&#8221; atom bonded to atoms 1, 2, and 4 (atoms 1, 2, and 4 are <em>only</em>
 bonded to atom 3 in this instance)</p>
 </div></blockquote>
-<p><strong>ignore_end</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<p><strong>ignore_end</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
 <blockquote>
 <div><p>If True, the end-group interactions for this torsion are ignored, either
 because it is involved in a ring where the end-group atoms are excluded
 or because it is one term in a multi-term dihedral expansion</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="chemistry.topologyobjects.DihedralType.html#chemistry.topologyobjects.DihedralType" title="chemistry.topologyobjects.DihedralType"><code class="xref py py-class docutils literal"><span class="pre">DihedralType</span></code></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="chemistry.topologyobjects.DihedralType.html#chemistry.topologyobjects.DihedralType" title="chemistry.topologyobjects.DihedralType"><tt class="xref py py-class docutils literal"><span class="pre">DihedralType</span></tt></a></p>
 <blockquote class="last">
 <div><p>The DihedralType object containing the parameters for this dihedral</p>
 </div></blockquote>
@@ -125,7 +125,7 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Dihedral.dihed_type" title="chemistry.topologyobjects.Dihedral.dihed_type"><code class="xref py py-obj docutils literal"><span class="pre">dihed_type</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Dihedral.dihed_type" title="chemistry.topologyobjects.Dihedral.dihed_type"><tt class="xref py py-obj docutils literal"><span class="pre">dihed_type</span></tt></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -137,17 +137,17 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.delete" title="chemistry.topologyobjects.Dihedral.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.delete" title="chemistry.topologyobjects.Dihedral.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
 <td>Deletes this dihedral from the atoms that make it up.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="chemistry.topologyobjects.Dihedral.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="chemistry.topologyobjects.Dihedral.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
 <td>Determines if this dihedral has the same atoms (or atom indexes) as</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Dihedral.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>improper=False</em>, <em>ignore_end=False</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -157,13 +157,13 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.__init__" title="chemistry.topologyobjects.Dihedral.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4[,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.__init__" title="chemistry.topologyobjects.Dihedral.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4[,&nbsp;...])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.delete" title="chemistry.topologyobjects.Dihedral.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.delete" title="chemistry.topologyobjects.Dihedral.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
 <td>Deletes this dihedral from the atoms that make it up.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="chemistry.topologyobjects.Dihedral.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="chemistry.topologyobjects.Dihedral.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
 <td>Determines if this dihedral has the same atoms (or atom indexes) as</td>
 </tr>
 </tbody>
@@ -175,14 +175,14 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Dihedral.dihed_type" title="chemistry.topologyobjects.Dihedral.dihed_type"><code class="xref py py-obj docutils literal"><span class="pre">dihed_type</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Dihedral.dihed_type" title="chemistry.topologyobjects.Dihedral.dihed_type"><tt class="xref py py-obj docutils literal"><span class="pre">dihed_type</span></tt></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Dihedral.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this dihedral from the atoms that make it up. This method
 removes this dihedral from the <cite>dihedrals</cite> list for atom1, atom2, atom3,
 and atom4 as well as removing each atom form each others&#8217; dihedral
@@ -191,23 +191,23 @@ partner lists</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Dihedral.same_atoms">
-<code class="descname">same_atoms</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Dihedral.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Dihedral.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if this dihedral has the same atoms (or atom indexes) as
 another object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : <a class="reference internal" href="#chemistry.topologyobjects.Dihedral" title="chemistry.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">Dihedral</span></code></a> or other <code class="docutils literal"><span class="pre">iterable</span></code></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>thing</strong> : <a class="reference internal" href="#chemistry.topologyobjects.Dihedral" title="chemistry.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt></a> or other <tt class="docutils literal"><span class="pre">iterable</span></tt></p>
 <blockquote>
 <div><p>A Dihedral or an iterable with 4 indexes that will be used to
 identify whether this torsion has the same atoms</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_same</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_same</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
 <blockquote class="last">
-<div><p>True if <code class="docutils literal"><span class="pre">thing</span></code> and <code class="docutils literal"><span class="pre">self</span></code> have the same atoms. <code class="docutils literal"><span class="pre">False</span></code>
+<div><p>True if <tt class="docutils literal"><span class="pre">thing</span></tt> and <tt class="docutils literal"><span class="pre">self</span></tt> have the same atoms. <tt class="docutils literal"><span class="pre">False</span></tt>
 otherwise</p>
 </div></blockquote>
 </td>
@@ -215,7 +215,7 @@ otherwise</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>This raises a <code class="docutils literal"><span class="pre">TypeError</span></code> if thing is not a Dihedral and is not
+<p>This raises a <tt class="docutils literal"><span class="pre">TypeError</span></tt> if thing is not a Dihedral and is not
 iterable</p>
 </dd></dl>
 
@@ -227,16 +227,14 @@ iterable</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/topobj/chemistry.topologyobjects.Dihedral.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/chemistry.topologyobjects.Dihedral.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -253,7 +251,7 @@ iterable</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -262,13 +260,13 @@ iterable</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

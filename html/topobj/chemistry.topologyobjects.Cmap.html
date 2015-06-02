@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="chemistry-topologyobjects-cmap">
 <h1>chemistry.topologyobjects.Cmap<a class="headerlink" href="#chemistry-topologyobjects-cmap" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="chemistry.topologyobjects.Cmap">
-<em class="property">class </em><code class="descclassname">chemistry.topologyobjects.</code><code class="descname">Cmap</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">chemistry.topologyobjects.</tt><tt class="descname">Cmap</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>A coupled-torsion correction map term defined between 5 atoms connected by
 four covalent bonds. This is a coupled-torsion potential in which the
 torsions are consecutive.</p>
@@ -59,27 +59,27 @@ torsions are consecutive.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom on one end of the valence coupled-torsion bonded to atom2</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the CMAP bonded to atoms 1 and 3</p>
 </div></blockquote>
-<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the CMAP bonded to atoms 2 and 4</p>
 </div></blockquote>
-<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the CMAP bonded to atoms 3 and 5</p>
 </div></blockquote>
-<p><strong>atom5</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom5</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>An atom in the middle of the CMAP bonded to atom 4</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.CmapType" title="chemistry.topologyobjects.CmapType"><code class="xref py py-class docutils literal"><span class="pre">CmapType</span></code></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.CmapType" title="chemistry.topologyobjects.CmapType"><tt class="xref py py-class docutils literal"><span class="pre">CmapType</span></tt></a></p>
 <blockquote class="last">
 <div><p>The CmapType object containing the parameter map for this term</p>
 </div></blockquote>
@@ -107,7 +107,7 @@ atoms 4 and 5.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Cmap.cmap_type" title="chemistry.topologyobjects.Cmap.cmap_type"><code class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Cmap.cmap_type" title="chemistry.topologyobjects.Cmap.cmap_type"><tt class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></tt></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -119,20 +119,20 @@ atoms 4 and 5.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.delete" title="chemistry.topologyobjects.Cmap.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.delete" title="chemistry.topologyobjects.Cmap.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
 <td>Deletes this Cmap from the atoms that make it up.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.extended" title="chemistry.topologyobjects.Cmap.extended"><code class="xref py py-obj docutils literal"><span class="pre">extended</span></code></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.extended" title="chemistry.topologyobjects.Cmap.extended"><tt class="xref py py-obj docutils literal"><span class="pre">extended</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
 <td>Alternative constructor for correction maps defined with 8 atoms (each torsion being separately specified).</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.same_atoms" title="chemistry.topologyobjects.Cmap.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.same_atoms" title="chemistry.topologyobjects.Cmap.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
 <td>A coupled-torsion is equivalent if the 5 atoms are in the same or</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Cmap.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -142,16 +142,16 @@ atoms 4 and 5.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.__init__" title="chemistry.topologyobjects.Cmap.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.__init__" title="chemistry.topologyobjects.Cmap.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.delete" title="chemistry.topologyobjects.Cmap.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.delete" title="chemistry.topologyobjects.Cmap.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
 <td>Deletes this Cmap from the atoms that make it up.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.extended" title="chemistry.topologyobjects.Cmap.extended"><code class="xref py py-obj docutils literal"><span class="pre">extended</span></code></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.extended" title="chemistry.topologyobjects.Cmap.extended"><tt class="xref py py-obj docutils literal"><span class="pre">extended</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
 <td>Alternative constructor for correction maps defined with 8 atoms (each torsion being separately specified).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.same_atoms" title="chemistry.topologyobjects.Cmap.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.topologyobjects.Cmap.same_atoms" title="chemistry.topologyobjects.Cmap.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
 <td>A coupled-torsion is equivalent if the 5 atoms are in the same or</td>
 </tr>
 </tbody>
@@ -163,21 +163,21 @@ atoms 4 and 5.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Cmap.cmap_type" title="chemistry.topologyobjects.Cmap.cmap_type"><code class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.Cmap.cmap_type" title="chemistry.topologyobjects.Cmap.cmap_type"><tt class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></tt></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.topologyobjects.Cmap.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Cmap from the atoms that make it up. This method removes
 the Cmap from the <cite>cmaps</cite> list for atom1, atom2, atom3, atom4, and atom5</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="chemistry.topologyobjects.Cmap.extended">
-<em class="property">classmethod </em><code class="descname">extended</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.extended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.extended" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.extended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.extended" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alternative constructor for correction maps defined with 8 atoms (each
 torsion being separately specified). Correction maps are, to the best of
 my knowledge, used to parametrized &#8220;consecutive&#8221; torsions (i.e., atoms
@@ -189,39 +189,39 @@ not the same as atoms 5, 6, and 7), NotImplementedError is raised.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The first atom of the first torsion</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The second atom of the first torsion</p>
 </div></blockquote>
-<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom3</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The third atom of the first torsion</p>
 </div></blockquote>
-<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom4</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The fourth atom of the first torsion</p>
 </div></blockquote>
-<p><strong>atom5</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom5</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The first atom of the second torsion</p>
 </div></blockquote>
-<p><strong>atom6</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom6</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The second atom of the second torsion</p>
 </div></blockquote>
-<p><strong>atom7</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom7</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The third atom of the second torsion</p>
 </div></blockquote>
-<p><strong>atom8</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
+<p><strong>atom8</strong> : <a class="reference internal" href="chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
 <blockquote>
 <div><p>The fourth atom of the second torsion</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.CmapType" title="chemistry.topologyobjects.CmapType"><code class="xref py py-class docutils literal"><span class="pre">CmapType</span></code></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="../api/chemistry/chemistry.topologyobjects.html#chemistry.topologyobjects.CmapType" title="chemistry.topologyobjects.CmapType"><tt class="xref py py-class docutils literal"><span class="pre">CmapType</span></tt></a></p>
 <blockquote class="last">
 <div><p>The CmapType object containing the parameter map for this term</p>
 </div></blockquote>
@@ -233,7 +233,7 @@ not the same as atoms 5, 6, and 7), NotImplementedError is raised.</p>
 
 <dl class="method">
 <dt id="chemistry.topologyobjects.Cmap.same_atoms">
-<code class="descname">same_atoms</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.same_atoms" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../_modules/chemistry/topologyobjects.html#Cmap.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.topologyobjects.Cmap.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>A coupled-torsion is equivalent if the 5 atoms are in the same or
 reverse order Allow comparison with another type of cmap or with a
 sequence of 5 indexes</p>
@@ -247,16 +247,14 @@ sequence of 5 indexes</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/topobj/chemistry.topologyobjects.Cmap.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/chemistry.topologyobjects.Cmap.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -273,7 +271,7 @@ sequence of 5 indexes</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -282,13 +280,13 @@ sequence of 5 indexes</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

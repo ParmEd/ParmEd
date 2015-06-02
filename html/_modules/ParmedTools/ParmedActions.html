@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for ParmedTools.ParmedActions</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">All of the prmtop actions used in PARMED. Each class is a separate action.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
         <span class="n">Structure</span><span class="p">,</span> <span class="n">load_file</span><span class="p">)</span>
@@ -62,9 +62,13 @@
 <span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">CIFFile</span><span class="p">,</span> <span class="n">Mol2File</span>
 <span class="kn">from</span> <span class="nn">chemistry.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span><span class="p">,</span> <span class="n">AmberOFFLibrary</span>
 <span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">any</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span> <span class="k">as</span> <span class="nb">zip</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c"># Must be Python 3, zip already is izip</span>
+    <span class="k">pass</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -125,7 +129,6 @@
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
-<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">ActionType</span><span class="p">)</span>
 <div class="viewcode-block" id="Action"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.Action">[docs]</a><span class="k">class</span> <span class="nc">Action</span><span class="p">(</span><span class="n">lawsuit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The base class for all ParmEd actions. The metaclass for Action adds the</span>
@@ -154,6 +157,7 @@
 <span class="sd">    not_supported : tuple</span>
 <span class="sd">        These classes are *not* supported (supplements supported_subclasses)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">ActionType</span>
     <span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
     <span class="c"># Does this action need a populated parm_list? If yes, bail out if it&#39;s</span>
     <span class="c"># unpopulated</span>
@@ -169,6 +173,7 @@
     <span class="n">strictly_supported</span> <span class="o">=</span> <span class="p">()</span>
     <span class="n">not_supported</span> <span class="o">=</span> <span class="p">()</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_parm</span><span class="p">,</span> <span class="n">arg_list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor &quot;&quot;&quot;</span>
         <span class="c"># Is this action &#39;valid&#39; (i.e., can we run &#39;execute&#39;)?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="c"># Accept both an AmberParm or ParmList instance to simplify the API</span>
@@ -193,7 +198,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">arg_list</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="n">arg_list</span>
             <span class="n">arg_list</span> <span class="o">+=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
                 <span class="n">arg_list</span> <span class="o">+=</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">arg_list</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">arg_list</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
@@ -203,7 +208,7 @@
             <span class="n">arg_list</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
             <span class="n">arg_list</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_list</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_list</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">arg_list</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">arg_list</span> <span class="o">=</span> <span class="n">ArgumentList</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">arg_list</span><span class="p">))</span>
@@ -217,7 +222,7 @@
                 <span class="n">parm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">parm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Using parm </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="s">&#39;Using parm </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">parm</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">[</span><span class="n">parm</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Cannot find parm </span><span class="si">%s</span><span class="s">. Skipping this action&#39;</span>
@@ -225,7 +230,7 @@
                     <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">parm</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parm</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">):</span>
-                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Using parm </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">[</span><span class="n">parm</span><span class="p">])</span>
+                    <span class="k">print</span> <span class="s">&#39;Using parm </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">[</span><span class="n">parm</span><span class="p">]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_list</span><span class="p">[</span><span class="n">parm</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Cannot find parm </span><span class="si">%s</span><span class="s">. Skipping this action&#39;</span>
@@ -996,7 +1001,7 @@
                     <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">begin</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="n">begin</span><span class="p">:</span> 
                         <span class="k">raise</span> <span class="n">ParmError</span><span class="p">(</span><span class="s">&#39;printLJTypes: Bad atom type range&#39;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">type_list</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">type_list</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">field</span><span class="p">))</span>
 </div>
@@ -1046,11 +1051,11 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;SCEE_SCALE_FACTOR&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s">&#39;SCEE_SCALE_FACTOR&#39;</span><span class="p">,</span> <span class="s">&#39;5E16.8&#39;</span><span class="p">,</span>
                                    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scee_value</span>
-                                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
+                                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCEE_SCALE_FACTOR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scee_value</span> 
-                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
+                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div></div>
@@ -1073,10 +1078,10 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">AmberParm</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;SCNB_SCALE_FACTOR&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s">&#39;SCNB_SCALE_FACTOR&#39;</span><span class="p">,</span><span class="s">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scnb_value</span>
-                                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))])</span>
+                                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;SCNB_SCALE_FACTOR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scnb_value</span> 
-                                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
+                                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;nptra&#39;</span><span class="p">))]</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div></div>
@@ -1139,7 +1144,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">LJ_radius</span><span class="p">[</span><span class="n">attype</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">LJ_depth</span><span class="p">[</span><span class="n">attype</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span>
         <span class="n">ntypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;NTYPES&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntypes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">ntypes</span><span class="p">):</span>
             <span class="n">lj_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span>
                                     <span class="n">ntypes</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">attype</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">rij</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">LJ_radius</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
@@ -1841,7 +1846,7 @@
 
         <span class="n">atnum1</span><span class="p">,</span> <span class="n">atnum2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
         <span class="c"># Loop through all of the selected atoms</span>
-        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
             <span class="c"># Collect the atoms involved</span>
             <span class="n">atnum1</span> <span class="o">=</span> <span class="n">sel1</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">atnum2</span> <span class="o">=</span> <span class="n">sel2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -1922,7 +1927,7 @@
         <span class="n">atnum1</span><span class="p">,</span> <span class="n">atnum2</span><span class="p">,</span> <span class="n">atnum3</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="c"># Loop through all of the selections</span>
-        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
             <span class="c"># Collect the atoms involved</span>
             <span class="n">atnum1</span> <span class="o">=</span> <span class="n">sel1</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">atnum2</span> <span class="o">=</span> <span class="n">sel2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -2037,7 +2042,7 @@
         <span class="c"># Loop through all of the atoms</span>
         <span class="n">atnum1</span><span class="p">,</span> <span class="n">atnum2</span><span class="p">,</span> <span class="n">atnum3</span><span class="p">,</span> <span class="n">atnum4</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
             <span class="c"># Collect the atoms involved</span>
             <span class="n">atnum1</span> <span class="o">=</span> <span class="n">sel1</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">atnum2</span> <span class="o">=</span> <span class="n">sel2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -2132,7 +2137,7 @@
         <span class="c"># Now, loop through the atoms and see if any dihedrals match that spec</span>
         <span class="n">atnum1</span> <span class="o">=</span> <span class="n">atnum2</span> <span class="o">=</span> <span class="n">atnum3</span> <span class="o">=</span> <span class="n">atnum4</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">total_diheds</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">sel1</span><span class="p">)):</span>
             <span class="c"># Collect the atoms involved</span>
             <span class="n">atnum1</span> <span class="o">=</span> <span class="n">sel1</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">atnum2</span> <span class="o">=</span> <span class="n">sel2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">atnum2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -2200,7 +2205,7 @@
         <span class="c"># If we selected no atoms, bail out</span>
         <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="s">&#39;No atom types selected&#39;</span>
         <span class="c"># Figure out which types correspond to which names</span>
-        <span class="n">typenames</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;NTYPES&#39;</span><span class="p">))]</span>
+        <span class="n">typenames</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;NTYPES&#39;</span><span class="p">))]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
             <span class="n">typenames</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="c"># Otherwise, collect our list of atom types that we selected</span>
@@ -2220,7 +2225,7 @@
                     <span class="s">&#39;B coefficient&#39;</span><span class="p">,</span> <span class="s">&#39;R i,j&#39;</span><span class="p">,</span> <span class="s">&#39;Eps i,j&#39;</span><span class="p">)</span>
         <span class="n">ret_str</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="s">&#39;-&#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ret_str</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
         <span class="k">for</span> <span class="n">ty</span> <span class="ow">in</span> <span class="n">sel_types</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">ty2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ntypes</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ty2</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ntypes</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
                 <span class="n">type1</span><span class="p">,</span> <span class="n">type2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ty</span><span class="p">,</span> <span class="n">ty2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">ty</span><span class="p">,</span> <span class="n">ty2</span><span class="p">)</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span>
                             <span class="n">ntypes</span><span class="o">*</span><span class="p">(</span><span class="n">type1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">type2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -2264,7 +2269,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">usage</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&lt;mol1mask&gt; &lt;mol2mask&gt; &lt;scmask1&gt; &lt;scmask2&gt; [&lt;scmask1N&gt;] &#39;</span>
              <span class="s">&#39;[&lt;scmask2N&gt;] [tol &lt;tol&gt;]&#39;</span><span class="p">)</span>
-    <span class="n">strictly_supported</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">)</span>
+    <span class="n">strictly_supported</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
 <div class="viewcode-block" id="tiMerge.init"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.tiMerge.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
@@ -2306,14 +2311,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molmask1N</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">molsel1N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">molmask1N</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">molsel1N</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
+            <span class="n">molsel1N</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molmask2N</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">molsel2N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">molmask2N</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">molsel2N</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
+            <span class="n">molsel2N</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">sel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">molsel1</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">TiMergeError</span><span class="p">(</span><span class="s">&#39;scmask1 must be a subset of mol1mask.&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">molsel2</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
@@ -2335,11 +2340,11 @@
         <span class="c"># molsel2 has no overlap (dihedrals, angles, bonds) with sel2 then we</span>
         <span class="c"># can just delete it (it is redundant).</span>
 
-        <span class="n">keep_mask</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
+        <span class="n">keep_mask</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">molsel2</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">sel2</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
                         <span class="n">atm1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                         <span class="n">atm2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
@@ -2355,10 +2360,10 @@
         <span class="c"># not introduce extra maintenance issues</span>
         <span class="n">remove_mask</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c"># remove_map[old_atm_idx] = new_atm_idx</span>
-        <span class="n">remove_map</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span> 
+        <span class="n">remove_map</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">)]</span> 
 
         <span class="n">new_atm_idx</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">molsel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">remove_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -2373,11 +2378,11 @@
         <span class="n">mol1common</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">mol2common</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">molsel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>                  
                 <span class="n">mol1common</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">molsel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>                  
                 <span class="n">mol2common</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
@@ -2387,12 +2392,12 @@
 
         <span class="n">mol2common_sort</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c"># reorder mol2common so that it matches mol1common</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol1common</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol1common</span><span class="p">)):</span>
             <span class="n">atm_i</span> <span class="o">=</span> <span class="n">mol1common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol2common</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol2common</span><span class="p">)):</span>
                 <span class="n">atm_j</span> <span class="o">=</span> <span class="n">mol2common</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">diff_count</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
                     <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">atm_i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> 
                             <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">atm_j</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span>
                     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
@@ -2410,24 +2415,24 @@
                                <span class="s">&#39;masks. If these look correct try using a &#39;</span>
                                <span class="s">&#39;larger tolerance.&#39;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol1common</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol1common</span><span class="p">)):</span>
             <span class="n">atm_i</span> <span class="o">=</span> <span class="n">mol1common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">atm_j</span> <span class="o">=</span> <span class="n">mol2common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>               
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
                 <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">atm_i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> 
                         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">atm_j</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span>
                 <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">TiMergeError</span><span class="p">(</span><span class="s">&#39;Common (nonsoftcore) atoms must have &#39;</span>
                                        <span class="s">&#39;the same coordinates.&#39;</span><span class="p">)</span>
       
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">keep_mask</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sel2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">atm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="n">mol1common</span><span class="p">[</span><span class="n">mol2common</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span>
                 <span class="n">atm_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
                 <span class="c"># What is happening here???</span>
-                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">sel2</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
                         <span class="n">atm2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                         <span class="c"># update partners -- the exclusion list will be updated </span>
@@ -2484,52 +2489,7 @@
                             <span class="k">elif</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="p">(</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
                                         <span class="ow">or</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atm_new</span>
-
-                        <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">imp</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atm_new</span>
-
-                        <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atm_new</span>
-                            <span class="k">elif</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span>
-                                        <span class="ow">or</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">k</span><span class="p">):</span>
-                                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span> <span class="o">=</span> <span class="n">atm_new</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atm_new</span>               
 
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
 
@@ -2540,7 +2500,7 @@
         <span class="n">new_sc_atm2</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_sc_atm1_int</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_sc_atm2_int</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natom</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">sel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">or</span> <span class="n">molsel1N</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="n">new_sc_atm1_int</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">remove_map</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="n">new_sc_atm1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">remove_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
@@ -2898,12 +2858,12 @@
         <span class="n">chg2</span> <span class="o">=</span> <span class="n">NumberArray</span><span class="p">(</span><span class="n">parm2</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">])</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="n">chg2</span> <span class="o">-</span> <span class="n">chg1</span>
         <span class="n">diff</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nparm</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nparm</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nparm</span><span class="p">):</span>
             <span class="n">new_chg</span> <span class="o">=</span> <span class="n">chg1</span> <span class="o">+</span> <span class="n">diff</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">parm1</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">new_chg</span><span class="p">]</span>
             <span class="n">parm1</span><span class="o">.</span><span class="n">load_atom_info</span><span class="p">()</span>
             <span class="n">newname</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">startnum</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Printing </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">newname</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Printing </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">newname</span>
             <span class="n">parm1</span><span class="o">.</span><span class="n">write_parm</span><span class="p">(</span><span class="n">newname</span><span class="p">)</span>
         <span class="c"># Restore the original charges</span>
         <span class="n">parm1</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">orig_chg1</span>
@@ -3009,7 +2969,7 @@
 
 <div class="viewcode-block" id="scale.execute"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.scale.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">])):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">])):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s">&#39;Cannot scale data in </span><span class="si">%%</span><span class="s">FLAG </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span>
@@ -3245,7 +3205,7 @@
 <span class="sd">    [2] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,</span>
 <span class="sd">        119, 883-895</span>
 <span class="sd">    [3] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,</span>
-<span class="sd">        Accepted.</span>
+<span class="sd">        2015, 11, 1645-1657.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">usage</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;[&lt;divalent ion mask&gt;] [c4file &lt;C4 Param. File&gt; | watermodel &#39;</span>
             <span class="s">&#39;&lt;water model&gt;] [polfile &lt;Pol. Param File&gt; [tunfactor &lt;tunfactor&gt;]&#39;</span><span class="p">)</span>
@@ -3824,13 +3784,13 @@
                 <span class="n">parmset</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">sfile</span><span class="p">)</span>
             <span class="c"># All parameters are loaded, now condense the types</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">condense</span><span class="p">:</span> <span class="n">parmset</span><span class="o">.</span><span class="n">condense</span><span class="p">()</span>
-        <span class="k">except</span> <span class="n">ChemError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">ChemError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ChamberError</span><span class="p">(</span><span class="s">&#39;Problem reading CHARMM parameter sets: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
 
         <span class="c"># Now read the PSF</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">psf</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psf</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">ChemError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">ChemError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ChamberError</span><span class="p">(</span><span class="s">&#39;Problem reading CHARMM PSF: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
 
         <span class="c"># Read the PDB and set the box information</span>
@@ -3883,7 +3843,7 @@
                 <span class="c"># Define the bounding box</span>
                 <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">zmin</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
                 <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">zmin</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
                     <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
                     <span class="n">xmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">i3</span>  <span class="p">])</span>
                     <span class="n">xmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">i3</span>  <span class="p">])</span>
@@ -3927,7 +3887,7 @@
         <span class="c"># Now load the parameters</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">psf</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">parmset</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">ChemError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">ChemError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ChamberError</span><span class="p">(</span><span class="s">&#39;Problem assigning parameters to PSF: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
         <span class="n">parm</span> <span class="o">=</span> <span class="n">ConvertFromPSF</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">parmset</span><span class="p">)</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf</span>
@@ -4156,9 +4116,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -4175,7 +4135,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -4184,13 +4144,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

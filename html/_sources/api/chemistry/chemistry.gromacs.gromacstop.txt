@@ -1,0 +1,7 @@
+chemistry.gromacs.gromacstop module
+===================================
+
+.. automodule:: chemistry.gromacs.gromacstop
+    :members:
+    :undoc-members:
+    :show-inheritance:

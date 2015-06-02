@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The chemistry.gromacs package &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-chemistry-gromacs-package">
+<h1>The <tt class="xref py py-mod docutils literal"><span class="pre">chemistry.gromacs</span></tt> package<a class="headerlink" href="#the-chemistry-gromacs-package" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">gromacs</span></tt> package contains classes that can parse the Gromacs topology
+and coordinate files. Like <cite>grompp</cite>, ParmEd pre-processes the the topology file,
+automatically finding and parsing the include topology files (ITP) referenced by
+your topology file.  It also recognizes <tt class="docutils literal"><span class="pre">#define</span></tt> tokens, which can be used in
+ParmEd the same way you can with Gromacs.</p>
+<p>Note, like with the standard C and Gromacs preprocessors, include files will
+<em>first</em> be looked for in the directory in which the processed file resides. If
+it is not found there, ParmEd will look in the Gromacs installation directory.</p>
+<div class="section" id="setting-up-gromacs">
+<h2>Setting up Gromacs<a class="headerlink" href="#setting-up-gromacs" title="Permalink to this headline">¶</a></h2>
+<p>Most Gromacs topology files (particularly those <em>written</em> by Gromacs) include
+so-called &#8220;include topology files&#8221; which are located in the
+<tt class="docutils literal"><span class="pre">share/gromacs/top</span></tt> directory of the Gromacs installation. As a result, you
+need to have <a class="reference external" href="http://www.gromacs.org">Gromacs</a> installed and visible to
+ParmEd in many cases.</p>
+<p>ParmEd will look for Gromacs in the following places (in this order):</p>
+<ol class="arabic simple">
+<li>The <tt class="docutils literal"><span class="pre">GMXDATA</span></tt> environment variable, which should point to <tt class="docutils literal"><span class="pre">share/gromacs</span></tt>
+in the installation directory.</li>
+<li>The <tt class="docutils literal"><span class="pre">GMXBIN</span></tt> environment variable, which should point to the location where
+the Gromacs program(s) are installed.</li>
+<li>It will look for the <tt class="docutils literal"><span class="pre">share/gromacs</span></tt> directory in the following locations:
+<tt class="docutils literal"><span class="pre">/usr/local</span></tt>, <tt class="docutils literal"><span class="pre">/usr</span></tt>, <tt class="docutils literal"><span class="pre">/opt/local</span></tt>, and <tt class="docutils literal"><span class="pre">/opt</span></tt>.</li>
+<li>It will look for the <tt class="docutils literal"><span class="pre">gmx</span></tt> program (the main program for Gromacs versions 5
+and higher), and assume that it is installed in the <tt class="docutils literal"><span class="pre">bin</span></tt> directory of
+the Gromacs install location.</li>
+<li>If none of the above work, the default install location of
+<tt class="docutils literal"><span class="pre">/usr/local/gromacs/share/gromacs</span></tt> is used.</li>
+</ol>
+<p>If you wish to specify the location, you can do so by modifying the
+<tt class="docutils literal"><span class="pre">GROMACS_TOPDIR</span></tt> variable in the <tt class="docutils literal"><span class="pre">chemistry.gromacs</span></tt> package in the
+following way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">gromacs</span>
+<span class="n">gromacs</span><span class="o">.</span><span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
+</pre></div>
+</div>
+<p>Note, because strings are immutable in Python, the following will <em>not</em> work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry.gromacs</span> <span class="kn">import</span> <span class="n">GROMACS_TOPDIR</span>
+<span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
+</pre></div>
+</div>
+<p>In the above example, <tt class="docutils literal"><span class="pre">chemistry.gromacs.GROMACS_TOPDIR</span></tt> will remain
+unchanged.</p>
+</div>
+<div class="section" id="the-topology-file">
+<h2>The topology file<a class="headerlink" href="#the-topology-file" title="Permalink to this headline">¶</a></h2>
+<p>The primary file in Gromacs defining the system topology and the parameters
+defining the force field for that system is called the <em>topology</em> file, whose
+format is detailed in the Gromacs User&#8217;s manual.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="the-gromacstopologyfile-class">
+<h3>The <tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt> class<a class="headerlink" href="#the-gromacstopologyfile-class" title="Permalink to this headline">¶</a></h3>
+<p>This class inherits from the base class <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, adding the attributes <tt class="docutils literal"><span class="pre">parameterset</span></tt> (a
+<tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt> object with all
+parameters parsed from the include topology files) and <tt class="docutils literal"><span class="pre">itps</span></tt> (a list of all
+include topology files that were included and parsed while processing the
+topology file).</p>
+<p>An example using this class on <a class="reference external" href="https://github.com/swails/ParmEd/blob/master/test/files/1aki.charmm27.top">one of the test files in the ParmEd repostory</a>
+is shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s">&#39;1aki.charmm27.top&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top</span>
+<span class="go">&lt;GromacsTopologyFile 1960 atoms; 129 residues; 1984 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>You can manipulate the <tt class="docutils literal"><span class="pre">top</span></tt> instance any way you can a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+</div>
+</div>
+<div class="section" id="the-gro-coordinate">
+<h2>The GRO coordinate<a class="headerlink" href="#the-gro-coordinate" title="Permalink to this headline">¶</a></h2>
+<p>ParmEd also supplies classes for parsing the various variants of the GROMACS GRO
+file. Because the GRO file resembles a PDB file, the <tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt> has a <tt class="docutils literal"><span class="pre">parse</span></tt> method that will parse a GRO
+file and instantiate a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</p>
+<p>The coordinates can be extracted from the <tt class="docutils literal"><span class="pre">xx</span></tt>, <tt class="docutils literal"><span class="pre">xy</span></tt>, and <tt class="docutils literal"><span class="pre">xz</span></tt> attributes
+on each <a class="reference internal" href="topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance in the
+Structure.</p>
+<p>The GRO file is automatically detected by <tt class="xref py py-meth docutils literal"><span class="pre">chemistry.load_file()</span></tt>, and this
+is the recommended way to parse these files.</p>
+<p>The corresponding classes are:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example-usage">
+<h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>Many exciting possibilities are available with <cite>GromacsTopologyFile</cite> and <cite>GromacsGroFile</cite>.
+For example, ParmEd is the first software package to enable conversion of Gromacs simulation
+input files to AMBER format in just a few lines of code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s">&#39;topol.top&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_gro</span> <span class="o">=</span> <span class="n">GromacsGroFile</span><span class="p">(</span><span class="s">&#39;conf.gro&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">box</span> <span class="c"># Needed because .prmtop contains box info</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">positions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_prm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="o">.</span><span class="n">load_from_structure</span><span class="p">(</span><span class="n">gmx_top</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;prmtop&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span> <span class="o">=</span> <span class="n">amber</span><span class="o">.</span><span class="n">AmberAsciiRestart</span><span class="p">(</span><span class="s">&quot;inpcrd&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Furthermore, you may check the correctness of topology loading by using the <cite>GromacsTopologyFile</cite>
+object to calculate an OpenMM potential energy and force, then comparing that result with your own
+output from Gromacs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">createSystem</span><span class="p">()</span> <span class="c"># OpenMM system creation; make sure to pass keyword arguments consistent with your .mdp file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integ</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plat</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integ</span><span class="p">,</span> <span class="n">plat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">applyConstraints</span><span class="p">(</span><span class="mf">1e-12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">getForces</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
+and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run
+this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
+the forces between the software packages are accurate to 1 part in 10,000. The remaining differences
+are due to how the different software packages treat nonbonded interactions in the cut-off region, use
+of single precision in the computation, and other small factors that are not expected to affect the
+simulation results.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">chemistry.gromacs</span></tt> package</a><ul>
+<li><a class="reference internal" href="#setting-up-gromacs">Setting up Gromacs</a></li>
+<li><a class="reference internal" href="#the-topology-file">The topology file</a><ul>
+<li><a class="reference internal" href="#the-gromacstopologyfile-class">The <tt class="docutils literal"><span class="pre">GromacsTopologyFile</span></tt> class</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-gro-coordinate">The GRO coordinate</a></li>
+<li><a class="reference internal" href="#example-usage">Example usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/gromacs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

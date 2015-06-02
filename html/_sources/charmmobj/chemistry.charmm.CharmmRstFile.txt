@@ -14,7 +14,6 @@ chemistry.charmm.CharmmRstFile
    .. autosummary::
    
       ~CharmmRstFile.__init__
-      ~CharmmRstFile.id_format
       ~CharmmRstFile.printcoords
       ~CharmmRstFile.scan
    
@@ -26,7 +25,6 @@ chemistry.charmm.CharmmRstFile
 
    .. autosummary::
    
-      ~CharmmRstFile.coordinates
       ~CharmmRstFile.positions
       ~CharmmRstFile.positionsold
       ~CharmmRstFile.velocities

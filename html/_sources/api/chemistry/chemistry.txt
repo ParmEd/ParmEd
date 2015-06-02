@@ -9,6 +9,7 @@ Subpackages
     chemistry.amber
     chemistry.charmm
     chemistry.formats
+    chemistry.gromacs
     chemistry.modeller
     chemistry.openmm
     chemistry.rosetta
@@ -24,10 +25,12 @@ Submodules
    chemistry.constants
    chemistry.exceptions
    chemistry.geometry
+   chemistry.parameters
    chemistry.periodic_table
    chemistry.residue
    chemistry.structure
    chemistry.topologyobjects
+   chemistry.vec3
 
 Module contents
 ---------------

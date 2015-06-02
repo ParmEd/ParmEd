@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="module-chemistry.amber.titratable_residues">
 <span id="chemistry-amber-titratable-residues-module"></span><h1>chemistry.amber.titratable_residues module<a class="headerlink" href="#module-chemistry.amber.titratable_residues" title="Permalink to this headline">¶</a></h1>
@@ -52,8 +52,8 @@ including reference energies, model compound pKas, and charge vectors for every
 titratable residue treated.</p>
 <dl class="class">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue">
-<em class="property">class </em><code class="descclassname">chemistry.amber.titratable_residues.</code><code class="descname">TitratableResidue</code><span class="sig-paren">(</span><em>resname</em>, <em>atom_list</em>, <em>pka</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><tt class="descclassname">chemistry.amber.titratable_residues.</tt><tt class="descname">TitratableResidue</tt><big>(</big><em>resname</em>, <em>atom_list</em>, <em>pka</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A residue with different protonation states defined for Amber for use in
 the Constant pH MD method implemented in sander</p>
 <p class="rubric">Methods</p>
@@ -63,68 +63,68 @@ the Constant pH MD method implemented in sander</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.add_state" title="chemistry.amber.titratable_residues.TitratableResidue.add_state"><code class="xref py py-obj docutils literal"><span class="pre">add_state</span></code></a>(protcnt,&nbsp;charges,&nbsp;refene)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.add_state" title="chemistry.amber.titratable_residues.TitratableResidue.add_state"><tt class="xref py py-obj docutils literal"><span class="pre">add_state</span></tt></a>(protcnt,&nbsp;charges,&nbsp;refene)</td>
 <td>Add a single titratable state for this titratable residue</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.add_states" title="chemistry.amber.titratable_residues.TitratableResidue.add_states"><code class="xref py py-obj docutils literal"><span class="pre">add_states</span></code></a>(protcnts,&nbsp;charges,&nbsp;refenes)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.add_states" title="chemistry.amber.titratable_residues.TitratableResidue.add_states"><tt class="xref py py-obj docutils literal"><span class="pre">add_states</span></tt></a>(protcnts,&nbsp;charges,&nbsp;refenes)</td>
 <td>Add multiple titratable states for this titratable residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.check" title="chemistry.amber.titratable_residues.TitratableResidue.check"><code class="xref py py-obj docutils literal"><span class="pre">check</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.check" title="chemistry.amber.titratable_residues.TitratableResidue.check"><tt class="xref py py-obj docutils literal"><span class="pre">check</span></tt></a>()</td>
 <td>Checks that the charges are consistent w/ the protonation states</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers" title="chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers"><code class="xref py py-obj docutils literal"><span class="pre">cpin_pointers</span></code></a>(first_atom)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers" title="chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers"><tt class="xref py py-obj docutils literal"><span class="pre">cpin_pointers</span></tt></a>(first_atom)</td>
 <td>Sets and returns the cpin info</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.reset" title="chemistry.amber.titratable_residues.TitratableResidue.reset"><code class="xref py py-obj docutils literal"><span class="pre">reset</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.reset" title="chemistry.amber.titratable_residues.TitratableResidue.reset"><tt class="xref py py-obj docutils literal"><span class="pre">reset</span></tt></a>()</td>
 <td>Resets the pointers</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_charge" title="chemistry.amber.titratable_residues.TitratableResidue.set_first_charge"><code class="xref py py-obj docutils literal"><span class="pre">set_first_charge</span></code></a>(index)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_charge" title="chemistry.amber.titratable_residues.TitratableResidue.set_first_charge"><tt class="xref py py-obj docutils literal"><span class="pre">set_first_charge</span></tt></a>(index)</td>
 <td>Sets the first charge index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_state" title="chemistry.amber.titratable_residues.TitratableResidue.set_first_state"><code class="xref py py-obj docutils literal"><span class="pre">set_first_state</span></code></a>(index)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_state" title="chemistry.amber.titratable_residues.TitratableResidue.set_first_state"><tt class="xref py py-obj docutils literal"><span class="pre">set_first_state</span></tt></a>(index)</td>
 <td>Sets the first state index</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.add_state">
-<code class="descname">add_state</code><span class="sig-paren">(</span><em>protcnt</em>, <em>charges</em>, <em>refene</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.add_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.add_state" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_state</tt><big>(</big><em>protcnt</em>, <em>charges</em>, <em>refene</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.add_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.add_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a single titratable state for this titratable residue</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.add_states">
-<code class="descname">add_states</code><span class="sig-paren">(</span><em>protcnts</em>, <em>charges</em>, <em>refenes</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.add_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.add_states" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_states</tt><big>(</big><em>protcnts</em>, <em>charges</em>, <em>refenes</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.add_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.add_states" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add multiple titratable states for this titratable residue</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.check">
-<code class="descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.check" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">check</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that the charges are consistent w/ the protonation states</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers">
-<code class="descname">cpin_pointers</code><span class="sig-paren">(</span><em>first_atom</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.cpin_pointers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">cpin_pointers</tt><big>(</big><em>first_atom</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.cpin_pointers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.cpin_pointers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets and returns the cpin info</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.reset" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets the pointers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.set_first_charge">
-<code class="descname">set_first_charge</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.set_first_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_charge" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_first_charge</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.set_first_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_charge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the first charge index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidue.set_first_state">
-<code class="descname">set_first_state</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.set_first_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_state" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_first_state</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidue.set_first_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidue.set_first_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the first state index</p>
 </dd></dl>
 
@@ -132,8 +132,8 @@ the Constant pH MD method implemented in sander</p>
 
 <dl class="class">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList">
-<em class="property">class </em><code class="descclassname">chemistry.amber.titratable_residues.</code><code class="descname">TitratableResidueList</code><span class="sig-paren">(</span><em>system_name='Unknown'</em>, <em>solvated=False</em>, <em>first_solvent=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<em class="property">class </em><tt class="descclassname">chemistry.amber.titratable_residues.</tt><tt class="descname">TitratableResidueList</tt><big>(</big><em>system_name='Unknown'</em>, <em>solvated=False</em>, <em>first_solvent=0</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
 <p>List of all titratable residues</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -142,114 +142,114 @@ the Constant pH MD method implemented in sander</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.add_residue" title="chemistry.amber.titratable_residues.TitratableResidueList.add_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_residue</span></code></a>(residue,&nbsp;resnum,&nbsp;first_atom[,&nbsp;state])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.add_residue" title="chemistry.amber.titratable_residues.TitratableResidueList.add_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_residue</span></tt></a>(residue,&nbsp;resnum,&nbsp;first_atom[,&nbsp;state])</td>
 <td>Adds a residue to the list</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.append" title="chemistry.amber.titratable_residues.TitratableResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.append" title="chemistry.amber.titratable_residues.TitratableResidueList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
 <td>L.append(object) &#8211; append object to end</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.count" title="chemistry.amber.titratable_residues.TitratableResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.count" title="chemistry.amber.titratable_residues.TitratableResidueList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.extend" title="chemistry.amber.titratable_residues.TitratableResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.extend" title="chemistry.amber.titratable_residues.TitratableResidueList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
 <td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.index" title="chemistry.amber.titratable_residues.TitratableResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.index" title="chemistry.amber.titratable_residues.TitratableResidueList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.insert" title="chemistry.amber.titratable_residues.TitratableResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.insert" title="chemistry.amber.titratable_residues.TitratableResidueList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.pop" title="chemistry.amber.titratable_residues.TitratableResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.pop" title="chemistry.amber.titratable_residues.TitratableResidueList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.remove" title="chemistry.amber.titratable_residues.TitratableResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.remove" title="chemistry.amber.titratable_residues.TitratableResidueList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
 <td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.reverse" title="chemistry.amber.titratable_residues.TitratableResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.reverse" title="chemistry.amber.titratable_residues.TitratableResidueList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.set_states" title="chemistry.amber.titratable_residues.TitratableResidueList.set_states"><code class="xref py py-obj docutils literal"><span class="pre">set_states</span></code></a>(statelist)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.set_states" title="chemistry.amber.titratable_residues.TitratableResidueList.set_states"><tt class="xref py py-obj docutils literal"><span class="pre">set_states</span></tt></a>(statelist)</td>
 <td>Sets the initial protonation states from a list &#8211; make sure there are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.sort" title="chemistry.amber.titratable_residues.TitratableResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.sort" title="chemistry.amber.titratable_residues.TitratableResidueList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>()</td>
 <td>Sorts by residue number</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.write_cpin" title="chemistry.amber.titratable_residues.TitratableResidueList.write_cpin"><code class="xref py py-obj docutils literal"><span class="pre">write_cpin</span></code></a>(output[,&nbsp;igb,&nbsp;intdiel,&nbsp;coions])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.titratable_residues.TitratableResidueList.write_cpin" title="chemistry.amber.titratable_residues.TitratableResidueList.write_cpin"><tt class="xref py py-obj docutils literal"><span class="pre">write_cpin</span></tt></a>(output[,&nbsp;igb,&nbsp;intdiel,&nbsp;coions])</td>
 <td>Writes the CPIN file based on the titrated residues</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.add_residue">
-<code class="descname">add_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>resnum</em>, <em>first_atom</em>, <em>state=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.add_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.add_residue" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_residue</tt><big>(</big><em>residue</em>, <em>resnum</em>, <em>first_atom</em>, <em>state=0</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.add_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.add_residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a residue to the list</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.append">
-<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.append" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.append(object) &#8211; append object to end</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.count">
-<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.count" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.extend" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.index" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.insert" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.insert(index, object) &#8211; insert object before index</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.pop">
-<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises IndexError if list is empty or index is out of range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.remove" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.remove(value) &#8211; remove first occurrence of value.
 Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.reverse">
-<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.reverse" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.set_states">
-<code class="descname">set_states</code><span class="sig-paren">(</span><em>statelist</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.set_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.set_states" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_states</tt><big>(</big><em>statelist</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.set_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.set_states" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the initial protonation states from a list &#8211; make sure there are
 enough states in the list to set every residue, or emit a warning</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.sort" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sorts by residue number</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chemistry.amber.titratable_residues.TitratableResidueList.write_cpin">
-<code class="descname">write_cpin</code><span class="sig-paren">(</span><em>output</em>, <em>igb=2</em>, <em>intdiel=1.0</em>, <em>coions=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.write_cpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.write_cpin" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cpin</tt><big>(</big><em>output</em>, <em>igb=2</em>, <em>intdiel=1.0</em>, <em>coions=False</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/titratable_residues.html#TitratableResidueList.write_cpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.titratable_residues.TitratableResidueList.write_cpin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the CPIN file based on the titrated residues</p>
 </dd></dl>
 
@@ -261,16 +261,14 @@ enough states in the list to set every residue, or emit a warning</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/chemistry/chemistry.amber.titratable_residues.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/chemistry/chemistry.amber.titratable_residues.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -287,7 +285,7 @@ enough states in the list to set every residue, or emit a warning</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -296,12 +294,12 @@ enough states in the list to set every residue, or emit a warning</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

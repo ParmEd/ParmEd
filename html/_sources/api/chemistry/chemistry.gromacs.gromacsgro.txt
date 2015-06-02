@@ -1,0 +1,7 @@
+chemistry.gromacs.gromacsgro module
+===================================
+
+.. automodule:: chemistry.gromacs.gromacsgro
+    :members:
+    :undoc-members:
+    :show-inheritance:

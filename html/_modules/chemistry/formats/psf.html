@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="up" title="chemistry.formats" href="../formats.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,16 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" accesskey="U">chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for chemistry.formats.psf</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -55,13 +56,10 @@
 <span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span>
 <span class="c"># TODO -- move this functionality to a more centralized location</span>
 <span class="kn">from</span> <span class="nn">chemistry.charmm.psf</span> <span class="kn">import</span> <span class="n">set_molecules</span>
+<span class="kn">from</span> <span class="nn">chemistry.formats.io</span> <span class="kn">import</span> <span class="n">genopen</span><span class="p">,</span> <span class="n">TextToBinaryFile</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 
-<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="PSFFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.amber.PSFFile">[docs]</a><span class="k">class</span> <span class="nc">PSFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PSFFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile">[docs]</a><span class="k">class</span> <span class="nc">PSFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    CHARMM- or XPLOR-style PSF file parser and writer. This class is</span>
 <span class="sd">    specifically a holder for the writing functionality and a vessel for</span>
@@ -69,10 +67,12 @@
 <span class="sd">    directly, use :class:`chemistry.charmm.CharmmPsfFile` or the</span>
 <span class="sd">    :func:`chemistry.formats.load_file` function instead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
+
     <span class="c">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PSFFile.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.amber.PSFFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="PSFFile.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identifies the file type as a CHARMM PSF file</span>
 
 <span class="sd">        Parameters</span>
@@ -86,14 +86,14 @@
 <span class="sd">            True if it is a CHARMM or Xplor-style PSF file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;PSF&#39;</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PSFFile.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.amber.PSFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="PSFFile.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a CHARMM- or XPLOR-style PSF file</span>
 
 <span class="sd">        Parameters</span>
@@ -111,7 +111,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PSFFile.write"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.amber.PSFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PSFFile.write"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.psf.html#chemistry.formats.psf.PSFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a PSF file from the stored molecule</span>
 
@@ -142,7 +142,7 @@
         <span class="c"># Index the atoms and residues</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
 
         <span class="c"># Assign the formats we need to write with</span>
         <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
@@ -252,7 +252,7 @@
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="c"># NNB section ??</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span> <span class="o">+</span> <span class="s">&#39; !NNB</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span> <span class="c"># Write 8 0&#39;s per line</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -293,15 +293,17 @@
         <span class="c"># Done!</span>
         <span class="c"># If we opened our own handle, close it</span>
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c">#===================================================</span></div></div>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -318,7 +320,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -327,13 +329,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" >chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

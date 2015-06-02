@@ -28,7 +28,6 @@ chemistry.amber.NetCDFTraj
       ~NetCDFTraj.coordinates
       ~NetCDFTraj.flush
       ~NetCDFTraj.forces
-      ~NetCDFTraj.id_format
       ~NetCDFTraj.open_new
       ~NetCDFTraj.open_old
       ~NetCDFTraj.remd_indices

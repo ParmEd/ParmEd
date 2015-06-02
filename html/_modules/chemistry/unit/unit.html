@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="up" title="chemistry.unit" href="../unit.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,16 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" accesskey="U">chemistry.unit</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for chemistry.unit.unit</h1><div class="highlight"><pre>
 <span class="c">#!/bin/env python</span>
@@ -81,9 +82,8 @@
 <span class="sd">OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE</span>
 <span class="sd">USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iterkeys</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.5&quot;</span>
@@ -91,10 +91,10 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">.mymatrix</span> <span class="kn">import</span> <span class="n">MyMatrix</span><span class="p">,</span> <span class="n">zeros</span>
-<span class="kn">from</span> <span class="nn">.basedimension</span> <span class="kn">import</span> <span class="n">BaseDimension</span>
-<span class="kn">from</span> <span class="nn">.baseunit</span> <span class="kn">import</span> <span class="n">BaseUnit</span>
-<span class="kn">from</span> <span class="nn">.standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mymatrix</span> <span class="kn">import</span> <span class="n">MyMatrix</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span> <span class="nn">basedimension</span> <span class="kn">import</span> <span class="n">BaseDimension</span>
+<span class="kn">from</span> <span class="nn">baseunit</span> <span class="kn">import</span> <span class="n">BaseUnit</span>
+<span class="kn">from</span> <span class="nn">standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
 
 <div class="viewcode-block" id="Unit"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit.html#chemistry.unit.unit.Unit">[docs]</a><span class="k">class</span> <span class="nc">Unit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -151,10 +151,10 @@
         <span class="c"># TODO - also handle non-simple units, i.e. units with multiple BaseUnits/ScaledUnits</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scaled_units</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="n">dimension</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">))</span>
+        <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
         <span class="n">base_unit_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_unit_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="n">parent_base_unit</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterkeys</span><span class="p">(</span><span class="n">base_unit_dict</span><span class="p">))</span>
+        <span class="n">parent_base_unit</span> <span class="o">=</span> <span class="n">base_unit_dict</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
         <span class="n">parent_exponent</span> <span class="o">=</span> <span class="n">base_unit_dict</span><span class="p">[</span><span class="n">parent_base_unit</span><span class="p">]</span>
         <span class="n">new_base_unit</span> <span class="o">=</span> <span class="n">BaseUnit</span><span class="p">(</span><span class="n">parent_base_unit</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
         <span class="c"># BaseUnit scale might be different depending on exponent</span>
@@ -170,9 +170,9 @@
 <span class="sd">        Yields (BaseDimension, exponent) tuples comprising this unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># There might be two units with the same dimension? No.</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
             <span class="n">exponent</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
                 <span class="n">exponent</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
@@ -184,8 +184,8 @@
 
 <span class="sd">        There might be multiple BaseUnits with the same dimension.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">base_unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
                 <span class="n">exponent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">base_unit</span><span class="p">]</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">base_unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
 </div>
@@ -193,8 +193,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
                 <span class="n">exponent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_base_units</span><span class="p">[</span><span class="n">dimension</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span>
 </div>
@@ -565,7 +565,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span>
 
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ScaledUnit.iter_base_units"><a class="viewcode-back" href="../../../api/chemistry/chemistry.unit.unit.html#chemistry.unit.unit.ScaledUnit.iter_base_units">[docs]</a>    <span class="k">def</span> <span class="nf">iter_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -649,7 +649,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_units</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&quot;UnitSystem must have same number of units as base dimensions&quot;</span><span class="p">)</span>
         <span class="c"># self.dimensions is a dict of {BaseDimension: index}</span>
-        <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="n">base_units</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="n">dimensions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)):</span>
@@ -663,7 +663,7 @@
                 <span class="n">to_base_units</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">power</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">from_base_units</span> <span class="o">=</span> <span class="o">~</span><span class="n">to_base_units</span>
-        <span class="k">except</span> <span class="ne">ArithmeticError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">ArithmeticError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ArithmeticError</span><span class="p">(</span><span class="s">&quot;UnitSystem is not a valid basis set.  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -742,9 +742,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -761,7 +761,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -770,13 +770,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../unit.html" >chemistry.unit</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

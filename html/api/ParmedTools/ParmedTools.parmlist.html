@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="module-ParmedTools.parmlist">
 <span id="parmedtools-parmlist-module"></span><h1>ParmedTools.parmlist module<a class="headerlink" href="#module-ParmedTools.parmlist" title="Permalink to this headline">¶</a></h1>
@@ -52,8 +52,8 @@ via either the name of the topology file or by the order in which they were
 loaded.</p>
 <dl class="class">
 <dt id="ParmedTools.parmlist.ParmList">
-<em class="property">class </em><code class="descclassname">ParmedTools.parmlist.</code><code class="descname">ParmList</code><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><tt class="descclassname">ParmedTools.parmlist.</tt><tt class="descname">ParmList</tt><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>List of Structure objects index-able via either file name or file index
 (based on order added)</p>
 <p class="rubric">Methods</p>
@@ -63,41 +63,41 @@ loaded.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.add_parm" title="ParmedTools.parmlist.ParmList.add_parm"><code class="xref py py-obj docutils literal"><span class="pre">add_parm</span></code></a>(parm)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.add_parm" title="ParmedTools.parmlist.ParmList.add_parm"><tt class="xref py py-obj docutils literal"><span class="pre">add_parm</span></tt></a>(parm)</td>
 <td>Add a parm to the list</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.empty" title="ParmedTools.parmlist.ParmList.empty"><code class="xref py py-obj docutils literal"><span class="pre">empty</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.empty" title="ParmedTools.parmlist.ParmList.empty"><tt class="xref py py-obj docutils literal"><span class="pre">empty</span></tt></a>()</td>
 <td>Returns True if the list is empty; False otherwise</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.index" title="ParmedTools.parmlist.ParmList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>(idx)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.index" title="ParmedTools.parmlist.ParmList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>(idx)</td>
 <td>See what the index of the requested parm is (can be int or str)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.set_new_active" title="ParmedTools.parmlist.ParmList.set_new_active"><code class="xref py py-obj docutils literal"><span class="pre">set_new_active</span></code></a>(idx)</td>
+<tr class="row-even"><td><a class="reference internal" href="#ParmedTools.parmlist.ParmList.set_new_active" title="ParmedTools.parmlist.ParmList.set_new_active"><tt class="xref py py-obj docutils literal"><span class="pre">set_new_active</span></tt></a>(idx)</td>
 <td>Sets a new active parm</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="ParmedTools.parmlist.ParmList.add_parm">
-<code class="descname">add_parm</code><span class="sig-paren">(</span><em>parm</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.add_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.add_parm" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_parm</tt><big>(</big><em>parm</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.add_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.add_parm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a parm to the list</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ParmedTools.parmlist.ParmList.empty">
-<code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.empty" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">empty</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if the list is empty; False otherwise</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ParmedTools.parmlist.ParmList.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.index" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">index</tt><big>(</big><em>idx</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>See what the index of the requested parm is (can be int or str)</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ParmedTools.parmlist.ParmList.set_new_active">
-<code class="descname">set_new_active</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.set_new_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.set_new_active" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_new_active</tt><big>(</big><em>idx</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/parmlist.html#ParmList.set_new_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.parmlist.ParmList.set_new_active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets a new active parm</p>
 </dd></dl>
 
@@ -109,16 +109,14 @@ loaded.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/ParmedTools/ParmedTools.parmlist.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/ParmedTools/ParmedTools.parmlist.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -135,7 +133,7 @@ loaded.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -144,12 +142,12 @@ loaded.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

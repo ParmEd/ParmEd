@@ -58,7 +58,7 @@ All defaults come from Ref. ``[1]`` ``[2]`` and ``[3]``
 ``[2]`` Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
     119, 883-895
 ``[3]`` Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
-    Accepted.
+    2015, 11, 1645-1657.
 
 addAtomicNumber
 ~~~~~~~~~~~~~~~

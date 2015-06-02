@@ -1,0 +1,6 @@
+chemistry.structure.read_PDB
+============================
+
+.. currentmodule:: chemistry.structure
+
+.. autofunction:: read_PDB

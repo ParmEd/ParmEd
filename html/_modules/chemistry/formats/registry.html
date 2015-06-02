@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="up" title="chemistry.formats" href="../formats.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,16 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" accesskey="U">chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for chemistry.formats.registry</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -66,15 +67,13 @@
 <span class="sd">simply inherited from a base class (unless that base class is not a metaclass of</span>
 <span class="sd">FileFormatType)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">FormatNotFound</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="n">PARSER_REGISTRY</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">PARSER_ARGUMENTS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-<div class="viewcode-block" id="FileFormatType"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.registry.html#chemistry.formats.FileFormatType">[docs]</a><span class="k">class</span> <span class="nc">FileFormatType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<div class="viewcode-block" id="FileFormatType"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.registry.html#chemistry.formats.registry.FileFormatType">[docs]</a><span class="k">class</span> <span class="nc">FileFormatType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Metaclass for registering parsers for different formats of different types</span>
 <span class="sd">    of files.</span>
@@ -102,7 +101,7 @@
                 <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.registry.html#chemistry.formats.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identifies the file format of the specified file and returns its parsed</span>
 <span class="sd">    contents.</span>
@@ -149,13 +148,12 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not have read permissions set&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">PARSER_REGISTRY</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;id_format&#39;</span><span class="p">):</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">PARSER_REGISTRY</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;id_format&#39;</span><span class="p">):</span> <span class="k">continue</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
                 <span class="k">break</span>
-        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
             <span class="k">continue</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># We found no file format</span>
@@ -178,9 +176,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -197,7 +195,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -206,13 +204,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../formats.html" >chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -1,0 +1,18 @@
+chemistry.gromacs package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+
+   chemistry.gromacs.gromacsgro
+   chemistry.gromacs.gromacstop
+
+Module contents
+---------------
+
+.. automodule:: chemistry.gromacs
+    :members:
+    :undoc-members:
+    :show-inheritance:

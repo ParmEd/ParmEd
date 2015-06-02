@@ -23,12 +23,12 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="next" title="chemistry.structure.Structure" href="structobj/chemistry.structure.Structure.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -40,67 +40,76 @@
         <li class="right" >
           <a href="structobj/chemistry.structure.Structure.html" title="chemistry.structure.Structure"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="the-structure-module">
-<h1>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module contains the core class defining systems of
-particles &#8211; the <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class. The API documentation makes this
-class look intimidating, but its core features are the <code class="docutils literal"><span class="pre">atoms</span></code> attribute
-(which is an <code class="xref py py-class docutils literal"><span class="pre">AtomList</span></code>) and its <code class="docutils literal"><span class="pre">residues</span></code> attribute (which is a
-<code class="xref py py-class docutils literal"><span class="pre">ResidueList</span></code>). These two attributes are enough to write numerous files
+<h1>The <tt class="xref py py-mod docutils literal"><span class="pre">structure</span></tt> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">structure</span></tt> module contains the core class defining systems of
+particles &#8211; the <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> class. The API documentation makes this
+class look intimidating, but its core features are the <tt class="docutils literal"><span class="pre">atoms</span></tt> attribute
+(which is an <tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt>) and its <tt class="docutils literal"><span class="pre">residues</span></tt> attribute (which is a
+<tt class="xref py py-class docutils literal"><span class="pre">ResidueList</span></tt>). These two attributes are enough to write numerous files
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.</p>
 <div class="section" id="structure-class">
-<h2><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
+<h2><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-obj docutils literal"><span class="pre">Structure</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-obj docutils literal"><span class="pre">Structure</span></tt></a>()</td>
 <td>A chemical structure composed of atoms, bonds, angles, torsions, and other</td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class may be instantiated directly, but is more often
-created by one of the parsers (see below for <code class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></code> and
-<code class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></code> which both return a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance) or extended to
+<p>The <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class may be instantiated directly, but is more often
+created by one of the parsers (see below for <a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
 support the structure files of various computational chemistry programs.</p>
 </div>
-<div class="section" id="read-pdb-and-read-cif-functions">
-<h2><code class="xref py py-func docutils literal"><span class="pre">read_PDB()</span></code> and <code class="xref py py-func docutils literal"><span class="pre">read_CIF()</span></code> functions<a class="headerlink" href="#read-pdb-and-read-cif-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="load-file">
+<h2><a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">read_PDB</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">read_CIF</span></code></td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;**kwargs)</td>
+<td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
 </table>
-<p>PDB files and mmCIF files downloaded from the RCSB Protein Data Bank or the
-world wide Protein Data Bank often contain a large amount of metadata describing
-the structure, such as the citation information, experimental method (e.g.,
-X-ray crystallography or NMR spectroscopy), authors, and related database
-entries (such as BMRB entries for NMR-solved structures). This information is
-extracted from both PDB and PDBx/mmCIF files when available, along with
-anisotropic B-factors.</p>
+<p>The <a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
+whose name is passed as an argument. The following formats are currently
+recognized and result in the instantiation of either a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. or one of its subclasses:</p>
+<ol class="arabic simple">
+<li>PDB</li>
+<li>PDBx/mmCIF</li>
+<li>Gromacs GRO</li>
+<li>Gromacs topology file</li>
+<li>Amber topology file</li>
+<li>CHARMM PSF file</li>
+<li>Mol2 file</li>
+</ol>
+<p>Here, we will focus on instantiating a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from PDB and
+mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
+Bank or the world wide Protein Data Bank often contain a large amount of
+metadata describing the structure, such as the citation information,
+experimental method (e.g., X-ray crystallography or NMR spectroscopy), authors,
+and related database entries (such as BMRB entries for NMR-solved structures).
+This information is extracted from both PDB and PDBx/mmCIF files when available,
+along with anisotropic B-factors.</p>
 <p>The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance.</p>
+file to a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -109,21 +118,21 @@ PDB file and a CIF file. These structures are both used in the ParmEd unittest
 suite, so you can get the files from there, or <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT">download them from here.</a></p>
 <hr class="docutils" />
 <p>The first example demonstrates reading the PDB file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">read_PDB</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">read_PDB</span><span class="p">(</span><span class="s">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
 <span class="go">274</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">experimental</span> <span class="c"># See the experimental method</span>
-<span class="go">u&#39;X-RAY DIFFRACTION&#39;</span>
+<span class="go">&#39;X-RAY DIFFRACTION&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># See how many chains we have</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">chain_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span>
-<span class="go">set([u&#39;A&#39;])</span>
+<span class="go">set([&#39;A&#39;])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># Only one chain. Now see how many atoms have alternate conformations</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">atoms_with_altconf</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span>
 <span class="gp">... </span>                          <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">]</span>
@@ -141,8 +150,8 @@ suite, so you can get the files from there, or <a class="reference external" hre
 </pre></div>
 </div>
 <p>The second example demonstrates reading the CIF file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">read_CIF</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">read_CIF</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
@@ -176,27 +185,316 @@ suite, so you can get the files from there, or <a class="reference external" hre
 <hr class="docutils" />
 <div class="section" id="converting-pdbx-mmcif-files-to-pdb-files">
 <h2>Converting PDBx/mmCIF files to PDB files<a class="headerlink" href="#converting-pdbx-mmcif-files-to-pdb-files" title="Permalink to this headline">¶</a></h2>
-<p>If you noticed the <code class="docutils literal"><span class="pre">write_cif</span></code> and <code class="docutils literal"><span class="pre">write_pdb</span></code> methods attached to the
-<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class, you may have deduced that you can very simply convert
-a PDBx/mmCIF file to a PDB file.</p>
+<p>If you noticed the <tt class="docutils literal"><span class="pre">write_cif</span></tt> and <tt class="docutils literal"><span class="pre">write_pdb</span></tt> methods attached to the
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class, you may have deduced
+that you can very simply convert a PDBx/mmCIF file to a PDB file.</p>
 <p>This is likely to be increasingly popular, since the PDB is moving to the mmCIF
 format, but many programs in the field of computational chemistry and physics
 has decades worth of legacy code built around PDB files. Not to worry!  A quick
 1-liner will seamlessly convert PDBx to PDB:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">read_CIF</span>
-<span class="n">read_CIF</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                               <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this case, the metadata is <em>not</em> copied (i.e., the <code class="docutils literal"><span class="pre">EXPTL</span></code>, <code class="docutils literal"><span class="pre">JRNL</span></code>,
-and <code class="docutils literal"><span class="pre">AUTHOR</span></code> records, to name a few). Only the coordinates, unit cell
-(<code class="docutils literal"><span class="pre">CYRST1</span></code> record), and optionally anisotropic B-factor lines are translated.</p>
-<p>The <code class="docutils literal"><span class="pre">renumber</span></code> argument tells <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> to use the original PDB
-numbers, rather than its internal number scheme that numbers sequentially from 1
-to N, where N is the number of residues.</p>
+<p>In this case, the metadata is <em>not</em> copied (i.e., the <tt class="docutils literal"><span class="pre">EXPTL</span></tt>, <tt class="docutils literal"><span class="pre">JRNL</span></tt>,
+and <tt class="docutils literal"><span class="pre">AUTHOR</span></tt> records, to name a few). Only the coordinates, unit cell
+(<tt class="docutils literal"><span class="pre">CYRST1</span></tt> record), and optionally anisotropic B-factor lines are translated.</p>
+<p>The <tt class="docutils literal"><span class="pre">renumber</span></tt> argument tells <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> to use the original PDB numbers, rather than
+its internal number scheme that numbers sequentially from 1 to N, where N is
+the number of residues.</p>
 <p>If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
 numbering cycles back, such that the atom serial number after 99,999 is 0, and
 the numbering starts again.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="structure-manipulation-slicing-combining-replicating-and-splitting">
+<h2>Structure manipulation: slicing, combining, replicating, and splitting<a class="headerlink" href="#structure-manipulation-slicing-combining-replicating-and-splitting" title="Permalink to this headline">¶</a></h2>
+<p>This section describes a number of simple, yet powerful manipulations you can do
+to <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances (and, by
+extension, instances of their subclasses).  In order, these are <em>slicing</em>,
+<em>combining</em> (or <em>merging</em>), and <em>replicating</em>.</p>
+<div class="section" id="structure-slicing-and-selections">
+<h3><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> Slicing and Selections<a class="headerlink" href="#structure-slicing-and-selections" title="Permalink to this headline">¶</a></h3>
+<p>One of the things that ParmEd tries to make easy to do is to select a subset of
+a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance as a new
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> (complete with all
+remaining atoms, residues, and parameters) by using the common Python idiom of
+<a class="reference external" href="http://www.pythoncentral.io/how-to-slice-listsarrays-and-tuples-in-python/">slicing</a>.
+The <em>slice</em>, or <em>selection</em> syntax of <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> is designed to be flexible, expressive, and
+intuitive (although accomplishing all of these is a challenge!).</p>
+<p>There are three many ways to select from a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance:</p>
+<ol class="arabic simple">
+<li>By atom index</li>
+<li>By Amber selection mask (see <a class="reference internal" href="amberobj/chemistry.amber.AmberMask.html#chemistry.amber.AmberMask" title="chemistry.amber.AmberMask"><tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt></a>)</li>
+<li>By selection arrays, mask arrays, or slices of chains, residues, and/or
+atoms.</li>
+</ol>
+<p>When selecting from a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+instance, the return value can be one of three things:</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">None</span></tt> if no atoms match the selection criteria</li>
+<li><a class="reference internal" href="topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance if the selection
+matches only a single atom. This instance is a reference to the original
+atom, it is <em>not</em> a copy.</li>
+<li><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> with all of the selected
+atoms and all parameters that were present between the selected atoms. In
+this case, a copy is made of all selected atoms.</li>
+</ol>
+<p><strong>Let&#8217;s look at the simplest form of the selection syntax &#8211; by atom index</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span> <span class="c"># use the 4LZT.cif file in test/files/</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;Atom N [0]; In LYS 0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">&lt;Atom CA [10]; In VAL 1&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">1163</span><span class="p">]</span>
+<span class="go">&lt;Atom O [1163]; In HOH 273&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c"># Negative indices also work!</span>
+<span class="go">&lt;Atom O [1163]; In HOH 273&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">1164</span><span class="p">]</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;/.../structure.py&quot;</span>, line <span class="m">1021</span>, in <span class="n">__getitem__</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
+  File <span class="nb">&quot;/.../topologyobjects.py&quot;</span>, line <span class="m">3932</span>, in <span class="n">__getitem__</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+<span class="gr">IndexError</span>: <span class="n">list index out of range</span>
+</pre></div>
+</div>
+<p>Oops!  Our original structure only had 1164 atoms, so selecting the 1165th index
+(remember, Python indices start from 0) results in an <tt class="docutils literal"><span class="pre">IndexError</span></tt>. As with
+Python slicing, though, slice and Amber mask selections simply return <tt class="docutils literal"><span class="pre">None</span></tt>
+if no atoms match the selection.</p>
+<p><strong>Now let&#8217;s look at the slightly more complex Amber mask selection. See</strong> <a class="reference external" href="amber.html#amber-mask-syntax">Amber
+mask syntax</a> <strong>for more details</strong>.</p>
+<p>If you pass a single string, it will be interpreted as an Amber mask. The
+example below continues from the same <tt class="docutils literal"><span class="pre">struct</span></tt> we were using above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;@CA&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;:1-10&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 75 atoms; 10 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;:1-10@CA,CB&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 19 atoms; 10 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;:10&lt;@5&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 49 atoms; 13 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;:10&lt;:5&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 88 atoms; 13 residues; 0 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p><strong>Now let&#8217;s look at mask arrays</strong>.</p>
+<p>I&#8217;ll define my terminology.  A <em>mask array</em> is a boolean array (or it is
+interpreted as a boolean array) with a Truthy-value (e.g., <tt class="docutils literal"><span class="pre">True</span></tt>, <tt class="docutils literal"><span class="pre">1</span></tt>,
+etc.) for atoms you want to select and a Falsey-value (e.g., <tt class="docutils literal"><span class="pre">False</span></tt>, <tt class="docutils literal"><span class="pre">0</span></tt>,
+etc.) for atoms you do <em>not</em> want to select.  A <em>selection array</em>, described in
+more detail below, is an array of atom indices (first index is 0) of the atoms
+you want to select. These arrays can be any subscriptable iterable (e.g.,
+<tt class="docutils literal"><span class="pre">tuple</span></tt>, <tt class="docutils literal"><span class="pre">list</span></tt>, <tt class="docutils literal"><span class="pre">numpy.ndarray</span></tt>, etc.).</p>
+<p>A <em>mask array</em> must have the same number of elements as your system has atoms.
+So if an array has the same number of elements as you have atoms, it is
+interpreted as a mask array.  A common use-case for a mask array is to convert a
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> to a Pandas <tt class="docutils literal"><span class="pre">DataFrame</span></tt>
+(see <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe" title="chemistry.structure.Structure.to_dataframe"><tt class="xref py py-func docutils literal"><span class="pre">Structure.to_dataframe</span></tt></a>
+for more information), and using Pandas/numpy to generate the mask array. An
+example of this is shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;CA&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;CA&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">resid</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)]</span>
+<span class="go">&lt;Structure 10 atoms; 10 residues; 0 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>A mask array cannot be used alongside a residue or chain selection. In fact,
+ParmEd will simply interpret that array as a selection array, which may lead to
+unexpected results, as seen below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,:,</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;CA&#39;</span><span class="p">]</span>
+<span class="go">&lt;Structure 409 atoms; 274 residues; 0 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>While you might expect this to select only the <tt class="docutils literal"><span class="pre">CA</span></tt> atoms (since all residues
+are in chain A), the key is that <tt class="docutils literal"><span class="pre">df.name</span> <span class="pre">==</span> <span class="pre">'CA'</span></tt> is interpreted as a
+selection array, and it contains 0s and 1s. So it selects the first two atoms of
+every residue (not all residues have more than 1 atom, though, which is why the
+number of atoms is not double the number of residues).</p>
+<p><strong>Now let&#8217;s look at selection arrays and slices of chains, residues, and/or
+atoms</strong></p>
+<p><a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances can take between 1
+and 3 &#8220;slots&#8221; in their indexing scheme, corresponding to atom, residue, and
+chain selections.  If one slot is used, that selection applies to the list of
+atoms.  If two slots are used, the first slot applies to the list of residues
+while the second slot refers to the list of atoms <em>within the selected
+residues</em>. Note the difference between the atom selections when a residue
+selection is given compared to when one is not. If all three slots are used, the
+first is interpreted as a chain selection, the second as a selection of residues
+<em>within each selected chain</em> and the third as a selection of each atom <em>within
+those residues</em>.</p>
+<p>Slots can be assigned either an index, string, slice, or selection array. Each
+is defined below:</p>
+<ul class="simple">
+<li>An <em>index</em> is a number between 0 and the number of elements in either the
+residue or atom list (depending on which slot is found in).</li>
+<li>A <em>string</em> is interpreted as a single name that must match every chain,
+residue, or atom name (as determined by the slot it is found in).</li>
+<li>A <em>slice</em> is a standard Python slice (e.g., <tt class="docutils literal"><span class="pre">iterable[10:20:2]</span></tt>) and can be
+used for either the residue or atom selections. A raw <tt class="docutils literal"><span class="pre">:</span></tt> in any slot means
+a &#8220;full slice&#8221; that selects everything according to its slot.</li>
+<li>A <em>selection array</em> is an array of indexes or strings (interpreted as names),
+and can have as many elements as you want (including negative numbers to count
+from the <em>end</em> of the atom list). but no atom index can be outside the range
+of the atom list (or you will get an <tt class="docutils literal"><span class="pre">IndexError</span></tt>). So practically speaking,
+there is no use-case for a selection array to have the same length as a mask
+array, since that would either include duplicates <em>or</em> select every atom.</li>
+</ul>
+<p>Let&#8217;s have a look at some examples, again continuing with the <tt class="docutils literal"><span class="pre">struct</span></tt> object
+we defined above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">&lt;Structure 5 atoms; 2 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="c"># note, this is the 10th to 20th atom of the 1st residue!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="c"># First atom of every residue</span>
+<span class="go">&lt;Structure 274 atoms; 274 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,:,:]</span> <span class="c"># All atoms in chain A</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[:,</span><span class="s">&#39;CA&#39;</span><span class="p">]</span> <span class="c"># All atoms named CA in all residues</span>
+<span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>There is so much flexiblity in the Atom selection here that we can&#8217;t possibly
+cover everything. You are encouraged to try things out!</p>
+</div>
+<div class="section" id="structure-combining">
+<h3>Structure Combining<a class="headerlink" href="#structure-combining" title="Permalink to this headline">¶</a></h3>
+<p>Two structures can be <em>combined</em> in the sense that a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance can be created by taking the atoms,
+residues, and parameters of one <tt class="docutils literal"><span class="pre">Structure</span></tt> and tacking it on to the end of
+another one.</p>
+<p>This can naturally be thought of as a <em>sum</em> of two <tt class="docutils literal"><span class="pre">Structure</span></tt> instances, so
+it was implemented via the addition operator.  This can be done both in-place
+(in a way that modifies the first <tt class="docutils literal"><span class="pre">Structure</span></tt>) as well as creating a new copy
+that is the sum of the originals. This is demonstrated below using AMBER
+topology files of two small molecules, phenol and biphenyl, which can be found
+in the <tt class="docutils literal"><span class="pre">test/files</span></tt> directory of the ParmEd distribution (<tt class="docutils literal"><span class="pre">phenol.prmtop</span></tt>
+and <tt class="docutils literal"><span class="pre">biphenyl.prmtop</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;biphenyl.prmtop&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
+<span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span>
+<span class="go">&lt;AmberParm 35 atoms; 2 residues; 36 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Note that neither phenol or biphenyl have changed</span>
+<span class="gp">... </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
+<span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Note that the order of addition controls the order that the atoms are added to
+the resulting <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, as you would
+probably expect:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
+<span class="go">[13, 22]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">biphenyl</span> <span class="o">+</span> <span class="n">phenol</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
+<span class="go">[22, 13]</span>
+</pre></div>
+</div>
+<p>In-place addition is also supported, which can be noticeably more efficient than
+combining using standard addition, particularly for large systems. Note, if you
+are adding a large and a small structure together, adding the small one to the
+large one in-place is the most efficient way to do that. In-place combination is
+demonstrated below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
+<span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">+=</span> <span class="n">biphenyl</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 35 atoms; 2 residues; 36 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>The addition preserves both the valence terms and the parameters from both
+structures.  All of the parameter <em>type</em> arrays (e.g., <tt class="docutils literal"><span class="pre">bond_types</span></tt>) will be
+the sum of the type arrays from the two structures (you will see why this is
+important in the next section about <em>replicating</em> structures).</p>
+<p>One final comment to make is in regards to the type of the resulting
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.  You can add any
+two <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances together,
+including instances of subclasses (such as <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt>). The result will take the type of the
+<em>first</em> operand.</p>
+</div>
+<div class="section" id="structure-replicating">
+<h3>Structure Replicating<a class="headerlink" href="#structure-replicating" title="Permalink to this headline">¶</a></h3>
+<p>There are times when you also want to model several copies of the same
+structure. Like with structure combining (described above), <em>replicating</em> is
+implemented by overloading the natural mathematical operator &#8211; the
+multiplication operator (<tt class="docutils literal"><span class="pre">*</span></tt>).</p>
+<p>The only mode supported here is multiplying a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance by an integer, which indicates the
+number of copies of the original structure will be added to the result.  And
+like with combination, replication can be done both in-place and not:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="go">&lt;AmberParm 26 atoms; 2 residues; 26 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="go">&lt;AmberParm 1300 atoms; 100 residues; 1300 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># phenol still hasn&#39;t changed</span>
+<span class="gp">... </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># In-place replicate... phenol WILL change now</span>
+<span class="gp">... </span><span class="n">phenol</span> <span class="o">*=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 130 atoms; 10 residues; 130 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>A word of caution here &#8211; the multiplication operator for integers is not
+implemented for <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances as
+the other operand, so multiplying an integer by the structure will result in a
+<tt class="docutils literal"><span class="pre">TypeError</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">20</span> <span class="o">*</span> <span class="n">phenol</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">TypeError</span>: <span class="n">unsupported operand type(s) for *: &#39;int&#39; and &#39;AmberParm&#39;</span>
+</pre></div>
+</div>
+<p>One comment about the parameter <em>type</em> arrays (e.g., <tt class="docutils literal"><span class="pre">bond_type</span></tt>) &#8211; unlike
+structure combination, all replicates have the <em>same</em> parameters, so there is no
+reason to enlarge the type arrays. As a result, all valence terms in each
+replicate points to the <em>same</em> parameter type as that same valence term in the
+other replicates.</p>
+<p>As a result, adding a structure to itself will result in an <em>equivalent</em>
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance (in that it will
+have the same atom and residue order, valence terms and their order, and each
+parameter will have the same type), but combining a structure with itself will
+double the size of its type arrays, while replicating it will not.</p>
+<p>Finally, replication is more efficient than combination arising from the simpler
+nature of replicating a structure than combining two different ones.</p>
+</div>
+<div class="section" id="class-structure-chemistry-structure-structure-splitting">
+<h3>:class:<a href="#id2"><span class="problematic" id="id3">`</span></a>Structure &lt;chemistry.structure.Structure&gt; splitting<a class="headerlink" href="#class-structure-chemistry-structure-structure-splitting" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes you want to be able to manipulate individual <em>molecules</em> inside a
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance individually. The
+<tt class="xref py py-meth docutils literal"><span class="pre">Structure.split</span></tt> method does just
+this.  It uses the bond graph in order to identify which atoms belong to which
+molecules and then return a list of molecules along with how many times that
+molecule occurs in the original <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+<p>It only returns one copy of each molecule due to the cost of splitting off
+potentially thousands of solvent molecules in larger solvated systems.  As a
+result, the return value is a list of <tt class="docutils literal"><span class="pre">tuple</span></tt> instances where each tuple is
+the <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> (or subclass) instances
+followed by the number of times that structure occurs.  Using our phenol and
+biphenyl examples from earlier:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;test/files/phenol.prmtop&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;test/files/biphenyl.prmtop&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
+<span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">phenol</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="go">[(&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;, 10), (&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;, 10)]</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -204,27 +502,32 @@ the numbering starts again.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The <code class="docutils literal"><span class="pre">structure</span></code> module</a><ul>
-<li><a class="reference internal" href="#structure-class"><code class="docutils literal"><span class="pre">Structure</span></code> class</a></li>
-<li><a class="reference internal" href="#read-pdb-and-read-cif-functions"><code class="docutils literal"><span class="pre">read_PDB()</span></code> and <code class="docutils literal"><span class="pre">read_CIF()</span></code> functions</a></li>
+<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a><ul>
+<li><a class="reference internal" href="#structure-class"><tt class="docutils literal"><span class="pre">Structure</span></tt> class</a></li>
+<li><a class="reference internal" href="#load-file"><tt class="docutils literal"><span class="pre">load_file</span></tt></a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 <li><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
+<li><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>
+<li><a class="reference internal" href="#structure-slicing-and-selections"><tt class="docutils literal"><span class="pre">Structure</span></tt> Slicing and Selections</a></li>
+<li><a class="reference internal" href="#structure-combining">Structure Combining</a></li>
+<li><a class="reference internal" href="#structure-replicating">Structure Replicating</a></li>
+<li><a class="reference internal" href="#class-structure-chemistry-structure-structure-splitting">:class:`Structure &lt;chemistry.structure.Structure&gt; splitting</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/structure.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/structure.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -241,7 +544,7 @@ the numbering starts again.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -253,12 +556,12 @@ the numbering starts again.</p>
         <li class="right" >
           <a href="structobj/chemistry.structure.Structure.html" title="chemistry.structure.Structure"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

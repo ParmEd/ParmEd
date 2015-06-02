@@ -23,10 +23,9 @@ chemistry.amber.ChamberParm
       ~ChamberParm.createSystem
       ~ChamberParm.deleteFlag
       ~ChamberParm.delete_flag
+      ~ChamberParm.delete_mask
       ~ChamberParm.fill_LJ
-      ~ChamberParm.has_1012
       ~ChamberParm.has_NBFIX
-      ~ChamberParm.id_format
       ~ChamberParm.initialize_topology
       ~ChamberParm.is_changed
       ~ChamberParm.load_atom_info
@@ -52,7 +51,6 @@ chemistry.amber.ChamberParm
       ~ChamberParm.omm_torsion_torsion_force
       ~ChamberParm.omm_trigonal_angle_force
       ~ChamberParm.omm_urey_bradley_force
-      ~ChamberParm.parse
       ~ChamberParm.prune_empty_terms
       ~ChamberParm.ptr
       ~ChamberParm.rdparm
@@ -63,15 +61,14 @@ chemistry.amber.ChamberParm
       ~ChamberParm.remake_parm
       ~ChamberParm.set_version
       ~ChamberParm.strip
-      ~ChamberParm.to_dataframe
       ~ChamberParm.unchange
       ~ChamberParm.update_dihedral_exclusions
       ~ChamberParm.view
+      ~ChamberParm.writeOFF
       ~ChamberParm.writeParm
       ~ChamberParm.write_cif
       ~ChamberParm.write_parm
       ~ChamberParm.write_pdb
-      ~ChamberParm.write_psf
       ~ChamberParm.write_rst7
    
    
