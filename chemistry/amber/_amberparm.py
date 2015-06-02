@@ -22,22 +22,24 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from chemistry.amber.amberformat import AmberFormat
+from chemistry.amber.amberformat import AmberFormat, _deprecated
 from chemistry.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY)
+            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
 from chemistry.exceptions import (AmberParmError, ParsingError,
-                                  MoleculeError, MoleculeWarning)
+            MoleculeError, MoleculeWarning, AmberParmWarning)
 from chemistry.geometry import box_lengths_and_angles_to_vectors
 from chemistry.periodic_table import AtomicNum, element_by_mass
 from chemistry.structure import Structure, needs_openmm
 from chemistry.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from chemistry import unit as u
+from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
+from collections import defaultdict
 import copy
 try:
     import numpy as np
@@ -212,7 +214,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     @classmethod
-    def load_from_rawdata(cls, rawdata):
+    def from_rawdata(cls, rawdata):
         """
         Take the raw data from a AmberFormat object and initialize an AmberParm
         from that data.
@@ -248,11 +250,16 @@ class AmberParm(AmberFormat, Structure):
         if hasattr(rawdata, 'hasvels'):
             inst.hasvels = rawdata.hasvels or inst.vels is not None
         return inst
-   
+
+    @classmethod
+    @_deprecated('load_from_rawdata', 'from_rawdata')
+    def load_from_rawdata(cls, rawdata):
+        return cls.from_rawdata(rawdata)
+
     #===================================================
 
     @classmethod
-    def load_from_structure(cls, struct):
+    def from_structure(cls, struct):
         """
         Take a Structure instance and initialize an AmberParm instance from that
         data.
@@ -261,11 +268,38 @@ class AmberParm(AmberFormat, Structure):
         ----------
         struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
+
+        Raises
+        ------
+        TypeError
+            If the structure has parameters not supported by the standard Amber
+            force field (i.e., standard bond, angle, and dihedral types)
         """
+        if struct.unknown_functional:
+            raise TypeError('Cannot instantiate an AmberParm from unknown '
+                            'functional')
+        if (struct.urey_bradleys or struct.impropers or struct.rb_torsions or
+                struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
+                struct.out_of_plane_bends or struct.stretch_bends or
+                struct.torsion_torsions or struct.multipole_frames):
+            if (struct.rb_torsions or struct.trigonal_angles or
+                    struct.pi_torsions or struct.out_of_plane_bends or
+                    struct.torsion_torsions or struct.multipole_frames):
+                raise TypeError('AmberParm does not support all of the '
+                                'parameters defined in the input Structure')
+            # Maybe it just has CHARMM parameters?
+            raise TypeError('AmberParm does not support all of the parameters '
+                            'defined in the input Structure. Try ChamberParm')
         inst = struct.copy(cls, split_dihedrals=True)
+        inst.update_dihedral_exclusions()
+        inst._add_missing_13_14()
+        del inst.adjusts[:]
         inst.pointers = {}
         inst.LJ_types = {}
-        inst.atoms.assign_nbidx_from_types()
+        nbfixes = inst.atoms.assign_nbidx_from_types()
+        # Give virtual sites a name that Amber understands
+        for atom in inst.atoms:
+            if isinstance(atom, ExtraPoint): atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -296,13 +330,35 @@ class AmberParm(AmberFormat, Structure):
             for atom in struct.atoms:
                 coords.extend([atom.xx, atom.xy, atom.xz])
         except AttributeError:
-            raise
+            pass
         else:
             inst.load_coordinates(coords)
+        # pmemd likes to skip torsions with periodicities of 0, which may be
+        # present as a way to hack entries into the 1-4 pairlist. See
+        # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
+        # here is to simply set that periodicity to 1.
+        for dt in inst.dihedral_types:
+            if dt.phi_k == 0 and dt.per == 0:
+                dt.per = 1.0
+            elif dt.per == 0:
+                warnings.warn('Periodicity of 0 detected with non-zero force '
+                              'constant. Changing periodicity to 1 and force '
+                              'constant to 0 to ensure 1-4 nonbonded pairs are '
+                              'properly identified. This might cause a shift '
+                              'in the energy, but will leave forces unaffected',
+                              AmberParmWarning)
+                dt.phi_k = 0.0
+                dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables()
 
         return inst
+
+    # For backwards-compatibility
+    @classmethod
+    @_deprecated('load_from_structure', 'from_structure')
+    def load_from_structure(cls, struct):
+        return cls.from_structure(struct)
 
     #===================================================
 
@@ -323,6 +379,52 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
    
+    def __getitem__(self, selection):
+        other = super(AmberParm, self).__getitem__(selection)
+        if other is None:
+            return None
+        elif isinstance(other, Atom):
+            return other
+        other.pointers = {}
+        other.LJ_types = self.LJ_types.copy()
+        other.LJ_radius = copy.copy(self.LJ_radius)
+        other.LJ_depth = copy.copy(self.LJ_depth)
+        for atom in other.atoms:
+            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        other._add_standard_flags()
+        return other
+
+    #===================================================
+
+    def __imul__(self, ncopies, other=None):
+        super(AmberParm, self).__imul__(ncopies, other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    def __iadd__(self, other):
+        super(AmberParm, self).__iadd__(other)
+        self.remake_parm()
+        if all(hasattr(atom, 'xx') for atom in self.atoms):
+            self.coords = []
+            for atom in self.atoms:
+                self.coords.extend([atom.xx, atom.xy, atom.xz])
+        if all(hasattr(atom, 'vx') for atom in self.atoms):
+            self.vels = []
+            for atom in self.atoms:
+                self.vels.extend([atom.xx, atom.xy, atom.xz])
+        return self
+
+    #===================================================
+
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each
@@ -938,6 +1040,9 @@ class AmberParm(AmberFormat, Structure):
         if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
 
+        # If we have NBFIX, omm_nonbonded_force returned a tuple
+        if hasnbfix: nonbfrc = nonbfrc[0]
+
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
             if has1012:
@@ -1262,7 +1367,7 @@ class AmberParm(AmberFormat, Structure):
         try:
             atnums = self.parm_data['ATOMIC_NUMBER']
         except KeyError:
-            atnums = [1 for i in range(natom)]
+            atnums = None
         try:
             res_icd = self.parm_data['RESIDUE_ICODE']
         except KeyError:
@@ -1275,13 +1380,15 @@ class AmberParm(AmberFormat, Structure):
             resstart = res_ptr[i] - 1
             resend = res_ptr[i+1] - 1
             for j in range(resstart, resend):
-                if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
-                    atom = ExtraPoint()
-                else:
-                    if atnums[j] == 0:
+                if atnums is None:
+                    if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
                         atom = ExtraPoint()
                     else:
                         atom = Atom()
+                elif atnums[j] == 0:
+                    atom = ExtraPoint()
+                else:
+                    atom = Atom()
                 self.add_atom(atom, resname, i, res_chn[i], res_icd[i])
 
     #===================================================
@@ -1359,6 +1466,7 @@ class AmberParm(AmberFormat, Structure):
         del self.angles[:]
         for k, theteq in zip(self.parm_data['ANGLE_FORCE_CONSTANT'],
                              self.parm_data['ANGLE_EQUIL_VALUE']):
+            theteq *= RAD_TO_DEG
             self.angle_types.append(AngleType(k, theteq, self.angle_types))
         it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
         for i, j, k, l in zip(it, it, it, it):
@@ -1391,6 +1499,7 @@ class AmberParm(AmberFormat, Structure):
                                     self.parm_data['DIHEDRAL_PERIODICITY'],
                                     self.parm_data['DIHEDRAL_PHASE'],
                                     scee, scnb):
+            ph *= RAD_TO_DEG
             self.dihedral_types.append(
                     DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
@@ -1535,7 +1644,8 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
+                                        for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
@@ -1573,7 +1683,7 @@ class AmberParm(AmberFormat, Structure):
         data['DIHEDRAL_PERIODICITY'] = \
                     [type.per for type in self.dihedral_types]
         data['DIHEDRAL_PHASE'] = \
-                    [type.phase for type in self.dihedral_types]
+                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
             data['SCEE_SCALE_FACTOR'] = \
                     [type.scee for type in self.dihedral_types]
@@ -1668,7 +1778,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _set_nonbonded_tables(self):
+    def _set_nonbonded_tables(self, nbfixes=None):
         """
         Sets the tables of Lennard-Jones nonbonded interaction pairs
         """
@@ -1693,6 +1803,17 @@ class AmberParm(AmberFormat, Structure):
         self.parm_data['LENNARD_JONES_ACOEF'] = [0 for i in range(nttyp)]
         self.parm_data['LENNARD_JONES_BCOEF'] = [0 for i in range(nttyp)]
         self.recalculate_LJ()
+        # Now make any NBFIX modifications we had
+        if nbfixes is not None:
+            for i, fix in enumerate(nbfixes):
+                for terms in fix:
+                    j, rmin, eps, rmin14, eps14 = terms
+                    i, j = min(i, j-1), max(i, j-1)
+                    eps = abs(eps)
+                    eps14 = abs(eps14)
+                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    self.parm_data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
+                    self.parm_data['LENNARD_JONES_BCOEF'][idx] = 2*eps * rmin**6
 
     #===================================================
 
@@ -1749,6 +1870,159 @@ class AmberParm(AmberFormat, Structure):
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
             customforce.addExclusion(i, j)
+
+    #===================================================
+
+    def _add_missing_13_14(self):
+        """
+        Uses the bond graph to fill in zero-parameter angles and dihedrals. The
+        reason this is necessary is that Amber assumes that the list of angles
+        and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
+        bond graph, respectively. As a result, Amber programs use the angle and
+        dihedral lists to set nonbonded exclusions and exceptions.
+
+        Returns
+        -------
+        n13, n14 : int, int
+            The number of 1-3 and 1-4 pairs that needed to be added,
+            respectively. Purely diagnostic
+        """
+        # We need to figure out what 1-4 scaling term to use if we don't have
+        # explicit exceptions
+        if not self.adjusts:
+            scalings = defaultdict(int)
+            for dih in self.dihedrals:
+                if dih.ignore_end or dih.improper: continue
+                scalings[(dih.type.scee, dih.type.scnb)] += 1
+            if len(scalings) > 0:
+                maxkey, maxval = next(iteritems(scalings))
+                for key, val in iteritems(scalings):
+                    if maxval < val:
+                        maxkey, maxval = key, val
+                scee, scnb = maxkey
+            else:
+                scee = scnb = 1e10
+            zero_torsion = DihedralType(0, 1, 0, scee, scnb)
+        else:
+            # Turn list of exceptions into a dict so we can look it up quickly
+            adjust_dict = dict()
+            for pair in self.adjusts:
+                adjust_dict[tuple(sorted([pair.atom1, pair.atom2]))] = pair
+            ignored_torsion = None
+            zero_torsion = None
+            # Scan through existing dihedrals to make sure the exceptions match
+            # the dihedral list
+            for dihedral in self.dihedrals:
+                if dihedral.ignore_end: continue
+                key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
+                eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
+                rref = dihedral.atom1.rmin_14 + dihedral.atom4.rmin_14
+                if key in adjust_dict:
+                    pair = adjust_dict[key]
+                    if pair.type.epsilon == 0:
+                        scnb = 1e10
+                    else:
+                        scnb = eref / pair.type.epsilon
+                    if pair.type.chgscale == 0:
+                        scee = 1e10
+                    else:
+                        scee = 1 / pair.type.chgscale
+                    if (abs(rref - pair.type.rmin) > SMALL and
+                            pair.type.epsilon != 0):
+                        raise TypeError('Cannot translate exceptions')
+                    if (abs(scnb - dihedral.type.scnb) < SMALL and
+                            abs(scee - dihedral.type.scee) < SMALL):
+                        continue
+                else:
+                    scee = scnb = 1e10
+                newtype = copy.copy(dihedral.type)
+                newtype.scee = scee
+                newtype.scnb = scnb
+                dihedral.type = newtype
+                newtype.list = self.dihedral_types
+                self.dihedral_types.append(newtype)
+
+        zero_angle = AngleType(0, 0)
+
+        n13 = n14 = 0
+        for atom in self.atoms:
+            if isinstance(atom, ExtraPoint): continue
+            for batom in atom.bond_partners:
+                if isinstance(batom, ExtraPoint): continue
+                for aatom in batom.bond_partners:
+                    if isinstance(aatom, ExtraPoint) or aatom is atom: continue
+                    for datom in aatom.bond_partners:
+                        if isinstance(datom, ExtraPoint): continue
+                        if (datom in atom.angle_partners + atom.bond_partners +
+                                atom.dihedral_partners or datom is atom):
+                            continue
+                        # Add the missing dihedral
+                        if not self.adjusts:
+                            tortype = zero_torsion
+                            if n14 == 0:
+                                tortype.list = self.dihedral_types
+                                self.dihedral_types.append(tortype)
+                        else:
+                            # Figure out what the scale factors must be
+                            key = tuple(sorted([atom, datom]))
+                            if key not in adjust_dict:
+                                if ignored_torsion is None:
+                                    ignored_torsion = DihedralType(0, 1, 0,
+                                                                   1e10, 1e10)
+                                    self.dihedral_types.append(ignored_torsion)
+                                    ignored_torsion.list = self.dihedral_types
+                                tortype = ignored_torsion
+                            elif 0 in (adjust_dict[key].type.epsilon,
+                                       adjust_dict[key].type.rmin) and \
+                                    adjust_dict[key].type.chgscale == 0:
+                                if ignored_torsion is None:
+                                    ignored_torsion = \
+                                            DihedralType(0, 1, 0, 1e10, 1e10,
+                                                    list=self.dihedral_types)
+                                    self.dihedral_types.append(ignored_torsion)
+                                tortype = ignored_torsion
+                            else:
+                                pair = adjust_dict[key]
+                                epsilon = pair.type.epsilon
+                                rmin = pair.type.rmin
+                                # Compare it to the 1-4 parameters that are
+                                # already present
+                                eref = sqrt(pair.atom1.epsilon_14*
+                                            pair.atom2.epsilon_14)
+                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
+                                if abs(rmin - rref) > SMALL:
+                                    raise TypeError('Cannot translate exceptions')
+                                if pair.type.epsilon == 0:
+                                    scnb = 1e10
+                                else:
+                                    scnb = eref / epsilon
+                                if pair.type.chgscale == 0:
+                                    scee = 1e10
+                                else:
+                                    scee = 1 / pair.type.chgscale
+                                tortype = DihedralType(0, 1, 0, scee, scnb,
+                                                       list=self.dihedral_types)
+                                self.dihedral_types.append(tortype)
+                        dihedral = Dihedral(atom, batom, aatom, datom,
+                                            ignore_end=False, improper=False,
+                                            type=tortype)
+                        self.dihedrals.append(dihedral)
+                        n14 += 1
+                    if aatom in atom.angle_partners + atom.bond_partners:
+                        continue
+                    # Add the missing angle
+                    self.angles.append(Angle(atom, batom, aatom, zero_angle))
+                    n13 += 1
+
+        if n13:
+            self.angle_types.append(zero_angle)
+            zero_angle.list = self.angle_types
+        if n14: # See if there is some ambiguity here
+            if not self.adjusts and len(scalings) > 1:
+                warnings.warn('Multiple 1-4 scaling factors detected. Using '
+                              'the most-used values scee=%f scnb=%f' %
+                              (scee, scnb), AmberParmWarning)
+        return n13, n14
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

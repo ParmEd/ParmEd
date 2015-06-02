@@ -1,0 +1,10 @@
+#include "DPPC_1.itp"
+
+; System specifications
+[ system ]
+DPPC Bilayer
+
+[ molecules ]
+; molecule name nr.
+DPPC 8
+SOL	244

@@ -26,8 +26,8 @@ def _deprecated(oldname, newname):
     def wrapper(func):
         @wraps(func)
         def new_func(self, *args, **kwargs):
-            warn('%s has been deprecated, use %s instead' % (oldname, newname),
-                 DeprecationWarning)
+            warn('%s has been deprecated and will be removed in the future, '
+                 'use %s instead' % (oldname, newname), DeprecationWarning)
             return func(self, *args, **kwargs)
         return new_func
     return wrapper
@@ -332,7 +332,7 @@ class AmberFormat(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, *args, **kwargs):
         """
         Meant for use with the automatic file loader, this will automatically
         return a subclass of AmberFormat corresponding to what the information
@@ -341,9 +341,9 @@ class AmberFormat(object):
         """
         from chemistry.amber import LoadParm
         try:
-            return LoadParm(filename)
+            return LoadParm(filename, *args, **kwargs)
         except IndexError:
-            return AmberFormat(filename)
+            return AmberFormat(filename, *args, **kwargs)
 
     #===================================================
 
@@ -405,7 +405,7 @@ class AmberFormat(object):
         # since there's nothing to do. Classes are singletons, so use "is"
         if type(self) is cls:
             return self
-        return cls.load_from_rawdata(self)
+        return cls.from_rawdata(self)
 
     #===================================================
 

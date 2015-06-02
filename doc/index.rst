@@ -113,6 +113,7 @@ Program and API Reference
    Working with units <dimensional_analysis>
    The Amber file classes <amber>
    The CHARMM file classes <charmm>
+   The GROMACS file classes <gromacs>
    PyRosetta Integration <rosetta>
    Using the ParmEd programs (``parmed.py`` and ``xparmed.py``) <parmed>
    The ParmEd API <parmed_api>

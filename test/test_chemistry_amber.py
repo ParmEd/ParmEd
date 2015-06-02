@@ -3,9 +3,11 @@ Tests the functionality in the chemistry.amber package
 """
 from array import array
 from chemistry.amber import readparm, asciicrd, mask
-from chemistry import topologyobjects
+from chemistry import topologyobjects, load_file
+from chemistry.utils.six import string_types
 from chemistry.utils.six.moves import range, zip
 import os
+import random
 import unittest
 from utils import get_fn, has_numpy
 
@@ -64,7 +66,11 @@ class TestReadParm(unittest.TestCase):
         parm.remake_parm()
         self.assertEqual(parm.flag_list, parm2.flag_list)
         for flag in parm.flag_list:
-            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+            for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
+                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                    self.assertEqual(x1, x2)
+                else:
+                    self.assertAlmostEqual(x1, x2)
 
     def testRemakeChamberParm(self):
         """ Tests the rebuilding of the ChamberParm raw data structures """
@@ -73,7 +79,11 @@ class TestReadParm(unittest.TestCase):
         parm.remake_parm()
         self.assertEqual(set(parm.flag_list), set(parm2.flag_list))
         for flag in parm.flag_list:
-            self.assertEqual(parm.parm_data[flag], parm2.parm_data[flag])
+            for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
+                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                    self.assertEqual(x1, x2)
+                else:
+                    self.assertAlmostEqual(x1, x2)
 
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
@@ -348,6 +358,24 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+    def testDistanceBasedMaskPDB(self):
+        """ Test distance-based mask selections on a PDB file """
+        parm = load_file(get_fn('4lzt.pdb'))
+        # All atoms within 5 A of residue 8
+        mask1 = mask.AmberMask(parm, ':8<@5')
+        sel = mask1.Selection()
+        self.assertGreater(sum(sel), 0)
+        for i, atom in enumerate(parm.atoms):
+            for j, a2 in enumerate(parm.residues[7]):
+                dx = atom.xx - a2.xx
+                dy = atom.xy - a2.xy
+                dz = atom.xz - a2.xz
+                if dx*dx + dy*dy + dz*dz < 25:
+                    self.assertTrue(sel[i])
+                    break
+            else:
+                self.assertFalse(sel[i])
 
     def testDistanceBasedMask(self):
         """ Test distance-based mask selections """
@@ -658,6 +686,155 @@ class TestObjectAPIs(unittest.TestCase):
         mylist.changed = False
         mylist *= 2
         self.assertTrue(mylist.changed)
+
+class TestAmberParmSlice(unittest.TestCase):
+    """ Tests fancy slicing """
+
+    def testSplit(self):
+        """ Tests the molecule splitting functionality """
+        parm = readparm.AmberParm(get_fn('solv.prmtop'))
+        parts = parm.split()
+        # Make sure the sum of the parts is equal to the whole
+        natom = sum(len(part[0].atoms)*part[1] for part in parts)
+        self.assertEqual(len(parm.atoms), natom)
+        self.assertEqual(len(parts), 4) # 4 types of molecules
+        self.assertEqual(parts[0][1], 1)
+        self.assertEqual(parts[1][1], 1)
+        self.assertEqual(parts[2][1], 8)
+        self.assertEqual(parts[3][1], 9086)
+
+    def testSplit2(self):
+        """ Tests splitting distinct single-residue molecules with same name """
+        parm = readparm.AmberParm(get_fn('phenol.prmtop'))
+        self.assertEqual(len(parm.residues), 1)
+        self.assertEqual(parm.residues[0].name, 'MOL')
+        parm2 = readparm.AmberParm(get_fn('biphenyl.prmtop'))
+        self.assertEqual(len(parm2.residues), 1)
+        self.assertEqual(parm2.residues[0].name, 'MOL')
+
+        comb = parm * 20 + parm2 * 30
+
+        self.assertEqual(len(comb.residues), 50)
+
+        parts = comb.split()
+        self.assertEqual(len(parts), 2)
+        self.assertEqual(len(parts[0][0].atoms), len(parm.atoms))
+        self.assertEqual(len(parts[1][0].atoms), len(parm2.atoms))
+        self.assertEqual(parts[0][1], 20)
+        self.assertEqual(parts[1][1], 30)
+
+    def testAdd(self):
+        """ Tests combining AmberParm instances """
+        parm1 = readparm.AmberParm(get_fn('phenol.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('biphenyl.prmtop'))
+        comb = parm1 + parm2
+        self.assertEqual(len(comb.atoms), len(parm1.atoms) + len(parm2.atoms))
+        for a1, a2 in zip(comb.atoms, parm1.atoms + parm2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(comb.residues), len(parm1.residues) + len(parm2.residues))
+        for r1, r2 in zip(comb.residues, parm1.residues + parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+        # In-place now
+        parm1 += parm2
+        self.assertEqual(len(parm1.atoms), len(comb.atoms))
+        for a1, a2 in zip(comb.atoms, parm1.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(parm1.residues), len(comb.residues))
+        for r1, r2 in zip(comb.residues, parm1.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+
+    def testMult(self):
+        """ Tests replicating AmberParm instances """
+        parm = readparm.AmberParm(get_fn('phenol.prmtop'))
+        mult = parm * 5
+        self.assertEqual(len(mult.atoms), 5*len(parm.atoms))
+        self.assertEqual(len(mult.residues), 5*len(parm.residues))
+        for i, a1 in enumerate(mult.atoms):
+            a2 = parm[i%len(parm.atoms)]
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        for i, r1 in enumerate(mult.residues):
+            r2 = parm.residues[i%len(parm.residues)]
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+        # In-place now
+        parm *= 5
+        self.assertEqual(len(parm.atoms), len(mult.atoms))
+        for a1, a2 in zip(mult.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.radii, a2.radii)
+        self.assertEqual(len(parm.residues), len(mult.residues))
+        for r1, r2 in zip(mult.residues, parm.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            self.assertEqual(r1.chain, r2.chain)
+
+    def testSimpleSlice(self):
+        """ Tests simple slicing of AmberParm """
+        parm1 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm2.strip('!@CA,C,O,N,HA,H')
+        selection = parm1['@CA,C,O,N,HA,H']
+        self.assertIs(type(parm1), readparm.AmberParm)
+        self.assertIs(type(parm2), readparm.AmberParm)
+        self.assertIs(type(selection), readparm.AmberParm)
+        self.assertEqual(len(parm2.atoms), len(selection.atoms))
+        self.assertEqual(len(parm2.residues), len(selection.residues))
+        self.assertLess(len(parm2.atoms), len(parm1.atoms))
+        def cmp_atoms(a1, a2):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.tree, a2.tree)
+            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.screen, a2.screen)
+            self.assertEqual(a1.join, a2.join)
+            self.assertEqual(a1.mass, a2.mass)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+            self.assertEqual(a1.nb_idx, a2.nb_idx)
+        for a1, a2 in zip(parm2.atoms, selection.atoms):
+            cmp_atoms(a1, a2)
+        # Now check valence terms
+        self.assertEqual(len(parm2.bonds), len(selection.bonds))
+        self.assertEqual(len(parm2.angles), len(selection.angles))
+        self.assertEqual(len(parm2.dihedrals), len(selection.dihedrals))
+        self.assertGreater(len(parm2.bonds), 0)
+        self.assertGreater(len(parm2.angles), 0)
+        self.assertGreater(len(parm2.dihedrals), 0)
+        for b1, b2 in zip(parm2.bonds, selection.bonds):
+            cmp_atoms(b1.atom1, b2.atom1)
+            cmp_atoms(b1.atom2, b2.atom2)
+            self.assertEqual(b1.type, b2.type)
+        for a1, a2 in zip(parm2.angles, selection.angles):
+            cmp_atoms(a1.atom1, a2.atom1)
+            cmp_atoms(a1.atom2, a2.atom2)
+            cmp_atoms(a1.atom3, a2.atom3)
+            self.assertEqual(a1.type, a2.type)
+        for d1, d2 in zip(parm2.dihedrals, selection.dihedrals):
+            cmp_atoms(d1.atom1, d2.atom1)
+            cmp_atoms(d1.atom2, d2.atom2)
+            cmp_atoms(d1.atom3, d2.atom3)
+            cmp_atoms(d1.atom4, d2.atom4)
+            self.assertEqual(d1.ignore_end, d2.ignore_end)
+            self.assertEqual(d1.improper, d2.improper)
+            self.assertEqual(d1.type, d2.type)
 
 if __name__ == '__main__':
     unittest.main()

@@ -135,3 +135,4 @@ the annotated and explained example):
 
     Starting from AMBER prmtop and inpcrd files <omm_amber>
     Starting from CHARMM PSF and coordinate files <omm_charmm>
+    Starting from Gromacs TOP and GRO files <omm_gromacs>
