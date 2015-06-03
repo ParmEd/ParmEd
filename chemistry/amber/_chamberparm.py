@@ -214,6 +214,8 @@ class ChamberParm(AmberParm):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
+        inst.parm_data['FORCE_FIELD_TYPE'] = fftype = []
+        fftype.extend([1, 'CHARMM force field: No FF information parsed...'])
 
         return inst
 
@@ -675,8 +677,6 @@ def ConvertFromPSF(struct, params, title=''):
         if 'CHARMM' not in pset: # needed to trigger "charmm_active"...
             pset = 'CHARMM: %s' % pset
         fftype.extend([len(params.parametersets), pset])
-    if not fftype:
-        fftype.extend([1, 'CHARMM force field: No FF information parsed...'])
 
     # Convert atom types back to integers if that's how they started
     if int_starting:

@@ -25,6 +25,9 @@ if GROMACS_TOPDIR is None:
     if _which('gmx') is not None:
         GROMACS_TOPDIR = _os.path.join(_os.path.split(_which('gmx'))[0],
                                        '..', 'share', 'gromacs', 'top')
+    elif _which('pdb2gmx') is not None:
+        GROMACS_TOPDIR = _os.path.join(_os.path.split(_which('pdb2gmx'))[0],
+                                       '..', 'share', 'gromacs', 'top')
 
 if GROMACS_TOPDIR is not None:
     # Regularize the include path

@@ -4,16 +4,19 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 from __future__ import division, print_function
 
 from chemistry import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
-        Structure, load_file)
+        Structure, load_file, gromacs)
 from chemistry.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
-        HAS_NETCDF, NetCDFTraj, NetCDFRestart)
-from chemistry.charmm import CharmmPsfFile
-from chemistry.exceptions import ChemError, CharmmFileError
+        HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
+from chemistry.amber._chamberparm import ConvertFromPSF
+from chemistry.charmm import CharmmPsfFile, CharmmParameterSet
+from chemistry.exceptions import ChemError, CharmmFileError, FormatNotFound
 from chemistry.formats import PDBFile, CIFFile, Mol2File
 from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from chemistry.periodic_table import Element as _Element
 from chemistry.utils.six import iteritems, string_types, add_metaclass
 from chemistry.utils.six.moves import zip, range
+from chemistry import unit as u
+from collections import OrderedDict
 import copy
 import math
 try:
@@ -443,7 +446,7 @@ class writeCoordinates(Action):
     usage = ('<filename> [netcdftraj | netcdf | pdb | cif | restart | mdcrd | '
              'mol2]')
     def init(self, arg_list):
-        self.filename = arg_list.get_next_string()
+        self.filename = filename = arg_list.get_next_string()
         self.filetype = arg_list.get_next_string(optional=True, default=None)
         if self.filetype is None:
             if filename.endswith('.nc'):
@@ -493,7 +496,7 @@ class writeCoordinates(Action):
         return 'Writing coordinates to %s as type %s' % (self.filename,
                 self.filetype)
 
-    def execute():
+    def execute(self):
         coordinates = []
         velocities = []
         for atom in self.parm.atoms:
@@ -531,8 +534,8 @@ class writeCoordinates(Action):
             if self.parm.box is not None: traj.add_box(self.parm.box)
             traj.close()
         elif self.filetype == 'RESTART':
-            rst = AmberRestart(self.filename, natom=len(self.parm.atoms),
-                               mode='w', hasbox=self.parm.box is not None)
+            rst = AmberAsciiRestart(self.filename, natom=len(self.parm.atoms),
+                                    mode='w', hasbox=self.parm.box is not None)
             rst.coordinates = coordinates
             if velocities: rst.velocities = velocities
             if self.parm.box is not None: rst.box = self.parm.box
@@ -3756,9 +3759,7 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        from chemistry.amber._chamberparm import ConvertFromPSF
         from chemistry.charmm import CharmmPsfFile, CharmmParameterSet
-        from chemistry import load_file
         # We're not using chamber, do the conversion in-house
         try:
             parmset = CharmmParameterSet()
@@ -4071,6 +4072,132 @@ class outCIF(Action):
     def execute(self):
         self.parm.write_cif(self.filename, renumber=self.renumber,
                             write_anisou=self.anisou)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class gromber(Action):
+    """
+    Load a Gromacs topology file with parameters as an Amber-formatted system.
+    Note, if your Gromacs topology file requires any include topology files, you
+    will need to have Gromacs installed for this to work.
+
+        - <top_file>: The Gromacs topology file to load
+        - <coord_file>: The coordinate file to load into the system. Can be any
+                        recognized format (GRO, PDB, mmCIF, inpcrd, etc.)
+        - define <DEFINE[=VAR]>: Preprocessor defines that control the
+                        processing of the Gromacs topology file.
+        - topdir <directory>: The directory containing all Gromacs include
+                        topology files. This is only necessary if Gromacs is not
+                        installed in a location that ParmEd can find.
+
+    Gromacs topology files do not store the unit cell information. Therefore, in
+    order to make sure that unit cell information is properly assigned to the
+    resulting system, the provided ``<coord_file>`` should contain unit cell
+    information (e.g., GRO, PDB, PDBx/mmCIF, and inpcrd files can all store box
+    information).
+
+    ParmEd will try to locate the Gromacs topology directory using either the
+    GMXDATA or GMXBIN environment variables (which should point to the
+    $PREFIX/share/gromacs or $PREFIX/bin directories, respectively, where
+    $PREFIX is the install prefix). If neither is set, the topology directory is
+    located relative to the location of the ``gmx`` (Gromacs 5+) or ``pdb2gmx``
+    (Gromacs 4 or older) in the user's PATH. If none of the above is true, the
+    default installation location (/usr/local/gromacs/share/gromacs/top) is
+    used. Any provided ``topdir`` will override default choices (but only for
+    this particular command -- future ``gromber`` actions will use the default
+    location again).
+
+    You can provide as many defines as you wish, and the ordering you specify
+    them is preserved. The default value assigned to each define is "1". To
+    provide multiple defines, use the ``define`` keyword multiple times, for
+    example:
+
+    define MYVAR=something define MYVAR2=something_else ...
+    """
+    usage = ("<top_file> [<coord_file>] [define <DEFINE[=VAR]>] "
+             "[topdir <directory>] ")
+
+    def init(self, arg_list):
+        self.topfile = arg_list.get_next_string()
+        defines = OrderedDict()
+        current_define = arg_list.get_key_string('define', None)
+        while current_define is not None:
+            if '=' in current_define:
+                parts = current_define.split('=')
+                if len(parts) != 2:
+                    raise InputError('Illegal define: %s' % current_define)
+                key, val = parts
+                defines[key] = val
+            else:
+                defines[current_define] = '1'
+            current_define = arg_list.get_key_string('define', None)
+        self.defines = defines or None
+        self.orig_topdir = gromacs.GROMACS_TOPDIR
+        topdir = arg_list.get_key_string('topdir', gromacs.GROMACS_TOPDIR)
+        gromacs.GROMACS_TOPDIR = topdir
+        self.coordinate_file = arg_list.get_next_string(optional=True)
+
+    def __str__(self):
+        retstr = ['Converting Gromacs topology %s to Amber. ' % self.topfile]
+        if self.defines:
+            retstr.append('Using the following defines:\n')
+            for key, val in iteritems(self.defines):
+                retstr.append('\t%s=%s\n' % (key, val))
+        retstr.append('Using topology directory [%s]. ' % self.topdir)
+        if self.coordinate_file is None:
+            retstr.append('No coordinates provided.')
+        else:
+            retstr.append('Getting coordinates (and box) from %s.' %
+                          self.coordinate_file)
+        return ''.join(retstr)
+
+    def execute(self):
+        top = gromacs.GromacsTopologyFile(self.topfile, defines=self.defines)
+        if self.coordinate_file is not None:
+            crd = load_file(self.coordinate_file)
+            if isinstance(crd, Structure):
+                if len(top.atoms) != len(crd.atoms):
+                    raise InputError('Coordinate/topology file size mismatch')
+                for a1, a2 in zip(top.atoms, crd.atoms):
+                    try:
+                        a1.xx = a2.xx
+                        a1.xy = a2.xy
+                        a1.xz = a2.xz
+                    except AttributeError:
+                        raise InputError('%s does not contain coordinates' %
+                                         self.coordinate_file)
+                    try:
+                        a1.vx = a2.vx
+                        a1.vy = a2.vy
+                        a1.vz = a2.vz
+                    except AttributeError:
+                        pass
+            elif hasattr(crd, 'coordinates') and not callable(crd.coordinates):
+                it = iter(crd.coordinates)
+                for a, x, y, z in zip(top.atoms, it, it, it):
+                    a.xx, a.xy, a.xz = x, y, z
+            elif hasattr(crd, 'coordinates') and callable(crd.coordinates):
+                it = iter(crd.coordinates(0)) # first frame
+                for a, x, y, z in zip(top.atoms, it, it, it):
+                    a.xx, a.xy, a.xz = x, y, z
+            elif hasattr(crd, 'positions'):
+                pos = crd.positions.value_in_unit(u.angstroms)
+                for a, xyz in zip(top.atoms, pos):
+                    a.xx, a.xy, a.xz = pos
+            else:
+                raise InputError('Cannot find coordinates in %s' %
+                                 self.coordinate_file)
+            if hasattr(crd, 'box') and callable(crd.box):
+                top.box = copy.copy(crd.box(0))
+            else:
+                top.box = copy.copy(crd.box)
+        try:
+            if top.impropers or top.urey_bradleys or top.cmaps:
+                self.parm = ChamberParm.from_structure(top)
+            else:
+                self.parm = AmberParm.from_structure(top)
+        except TypeError as err:
+            raise InputError(str(err))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
