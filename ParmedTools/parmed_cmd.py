@@ -4,6 +4,7 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 
 # Load some system modules that may be useful for various users in shell mode
 from chemistry.amber.readparm import AmberParm
+from chemistry.exceptions import ChemError
 from chemistry.utils.six import iteritems
 from chemistry.utils.six.moves import range
 import cmd
@@ -150,11 +151,11 @@ class ParmedCmd(cmd.Cmd):
             if action.valid:
                 self.stdout.write('%s\n' % action)
                 action.execute()
-        except ParmError as err:
+        except (ParmError, ChemError) as err:
             self.stdout.write('Action %s failed\n\t' % actionname)
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
-                raise err
+                raise
 
     @classmethod
     def populate_actions(cls):

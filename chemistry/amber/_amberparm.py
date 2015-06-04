@@ -153,7 +153,7 @@ class AmberParm(AmberFormat, Structure):
     """
     #===================================================
 
-    solvent_residues = ('WAT', 'HOH')
+    solvent_residues = ('WAT', 'HOH', 'SOL')
 
     def __init__(self, prm_name=None, rst7_name=None):
         """
@@ -313,6 +313,7 @@ class AmberParm(AmberFormat, Structure):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        inst.box = copy.copy(struct.box)
         if struct.box is None:
             inst.parm_data['POINTERS'][IFBOX] = 0
             inst.pointers['IFBOX'] = 0
@@ -1771,7 +1772,7 @@ class AmberParm(AmberFormat, Structure):
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
             self.add_flag('BOX_DIMENSIONS', '5E16.8', num_items=4)
-        self.add_flag('RADIUS_SET', '1a80', num_items=0)
+        self.add_flag('RADIUS_SET', '1a80', num_items=1)
         self.add_flag('RADII', '5E16.8', num_items=0)
         self.add_flag('SCREEN', '5E16.8', num_items=0)
         self.add_flag('IPOL', '1I8', num_items=1)
