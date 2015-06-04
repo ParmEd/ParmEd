@@ -112,7 +112,7 @@ class Action(lawsuit):
     # unpopulated
     needs_parm = True
     # Do we allow any action to overwrite existing files? Static variable.
-    overwrite = True
+    overwrite = False
     # We do one of two kinds of filtering for each action. Each action can
     # support either a strict subset of classes, in which case the type *must*
     # be an exact member (not a subclass) of one of that list. If that list is
@@ -4089,6 +4089,8 @@ class gromber(Action):
         - topdir <directory>: The directory containing all Gromacs include
                         topology files. This is only necessary if Gromacs is not
                         installed in a location that ParmEd can find.
+        - radii <radiusset>: The GB radius set to use. Can be 'mbondi', 'bondi',
+                        'mbondi2', or 'amber6'. Default is mbondi
 
     Gromacs topology files do not store the unit cell information. Therefore, in
     order to make sure that unit cell information is properly assigned to the
@@ -4115,7 +4117,8 @@ class gromber(Action):
     define MYVAR=something define MYVAR2=something_else ...
     """
     usage = ("<top_file> [<coord_file>] [define <DEFINE[=VAR]>] "
-             "[topdir <directory>] ")
+             "[topdir <directory>] [radii <radiusset>]")
+    needs_parm = False
 
     def init(self, arg_list):
         self.topfile = arg_list.get_next_string()
@@ -4136,6 +4139,7 @@ class gromber(Action):
         topdir = arg_list.get_key_string('topdir', gromacs.GROMACS_TOPDIR)
         gromacs.GROMACS_TOPDIR = topdir
         self.coordinate_file = arg_list.get_next_string(optional=True)
+        self.radii = arg_list.get_key_string('radii', 'mbondi')
 
     def __str__(self):
         retstr = ['Converting Gromacs topology %s to Amber. ' % self.topfile]
@@ -4143,7 +4147,8 @@ class gromber(Action):
             retstr.append('Using the following defines:\n')
             for key, val in iteritems(self.defines):
                 retstr.append('\t%s=%s\n' % (key, val))
-        retstr.append('Using topology directory [%s]. ' % self.topdir)
+        retstr.append('Using topology directory [%s]. ' %
+                      gromacs.GROMACS_TOPDIR)
         if self.coordinate_file is None:
             retstr.append('No coordinates provided.')
         else:
@@ -4152,7 +4157,10 @@ class gromber(Action):
         return ''.join(retstr)
 
     def execute(self):
-        top = gromacs.GromacsTopologyFile(self.topfile, defines=self.defines)
+        try:
+            top = gromacs.GromacsTopologyFile(self.topfile,defines=self.defines)
+        finally:
+            gromacs.GROMACS_TOPDIR = self.orig_topdir
         if self.coordinate_file is not None:
             crd = load_file(self.coordinate_file)
             if isinstance(crd, Structure):
@@ -4198,6 +4206,9 @@ class gromber(Action):
                 self.parm = AmberParm.from_structure(top)
         except TypeError as err:
             raise InputError(str(err))
+        self.parm.name = self.topfile
+        changeRadii(self.parm, self.radii).execute()
+        self.parm_list.add_parm(self.parm)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

@@ -28,6 +28,7 @@ from chemistry.exceptions import AmberParmError
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType, ExtraPoint)
 from chemistry.utils.six.moves import zip, range
+import copy
 from math import sqrt
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -82,7 +83,8 @@ class ChamberParm(AmberParm):
         True if CMAP parameters are present in this system; False otherwise
     """
 
-    solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
+    solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC',
+                        'SOL')
 
     #===================================================
 
@@ -176,6 +178,7 @@ class ChamberParm(AmberParm):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        inst.box = copy.copy(struct.box)
         if struct.box is None:
             inst.parm_data['POINTERS'][IFBOX] = 0
             inst.pointers['IFBOX'] = 0
