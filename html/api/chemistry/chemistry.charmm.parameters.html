@@ -52,11 +52,11 @@ topology, and stream files. It only extracts atom properties from the
 topology files and extracts all parameters from the parameter files</p>
 <p>Author: Jason M. Swails
 Contributors:
-Date: Sep. 17, 2014</p>
+Date: Apr. 13, 2015</p>
 <dl class="class">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet">
 <em class="property">class </em><tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">CharmmParameterSet</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <a class="reference internal" href="chemistry.parameters.html#chemistry.parameters.ParameterSet" title="chemistry.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.parameters.ParameterSet</span></tt></a></p>
 <p>Stores a parameter set defined by CHARMM files. It stores the equivalent of
 the information found in the MASS section of the CHARMM topology file
 (TOP/RTF) and all of the information in the parameter files (PAR)</p>
@@ -90,34 +90,37 @@ Otherwise, ValueError is raised.</p>
 <col width="95%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td>atom_types_str</td>
+<tr class="row-odd"><td>atom_types</td>
 <td>(dict(str:AtomType)) Dictionary mapping the names of the atom types to the corresponding AtomType instances</td>
 </tr>
-<tr class="row-even"><td>atom_types_int</td>
+<tr class="row-even"><td>atom_types_str</td>
+<td>(dict(str:AtomType)) alias for atom_types</td>
+</tr>
+<tr class="row-odd"><td>atom_types_int</td>
 <td>(dict(int:AtomType)) Dictionary mapping the serial indexes of the atom types to the corresponding AtomType instances</td>
 </tr>
-<tr class="row-odd"><td>atom_types_double</td>
+<tr class="row-even"><td>atom_types_tuple</td>
 <td>(dict((str,int):AtomType)) Dictionary mapping the (name,number) tuple of the atom types to the corresponding AtomType instances</td>
 </tr>
-<tr class="row-even"><td>bond_types</td>
+<tr class="row-odd"><td>bond_types</td>
 <td>(dict((str,str):AtomType)) Dictionary mapping the 2-element tuple of the names of the two atom types involved in the bond to the BondType instances</td>
 </tr>
-<tr class="row-odd"><td>angle_types</td>
+<tr class="row-even"><td>angle_types</td>
 <td>(dict((str,str,str):AngleType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the AngleType instances</td>
 </tr>
-<tr class="row-even"><td>urey_bradley_types</td>
+<tr class="row-odd"><td>urey_bradley_types</td>
 <td>(dict((str,str,str):BondType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the BondType instances of the Urey-Bradley terms</td>
 </tr>
-<tr class="row-odd"><td>dihedral_types</td>
+<tr class="row-even"><td>dihedral_types</td>
 <td>(dict((str,str,str,str):list(DihedralType))) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the dihedral to the DihedralType instances. Since each torsion term can be a multiterm expansion, each item corresponding to a key in this dict is a list of <a href="#id1"><span class="problematic" id="id2">`</span></a>DihedralType`s for each term in the expansion</td>
 </tr>
-<tr class="row-even"><td>improper_types</td>
+<tr class="row-odd"><td>improper_types</td>
 <td>(dict((str,str,str,str):ImproperType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion to the ImproperType instances</td>
 </tr>
-<tr class="row-odd"><td>cmap_types</td>
+<tr class="row-even"><td>cmap_types</td>
 <td>(dict((str,str,str,str,str):CmapType)) Dictionary mapping the 5-element tuple of the names of the five atom types involved in the correction map to the CmapType instances</td>
 </tr>
-<tr class="row-even"><td>nbfix_types</td>
+<tr class="row-odd"><td>nbfix_types</td>
 <td>(dict((str,str):(float,float))) Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term</td>
 </tr>
 </tbody>
@@ -132,23 +135,26 @@ Otherwise, ValueError is raised.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.condense" title="chemistry.charmm.parameters.CharmmParameterSet.condense"><tt class="xref py py-obj docutils literal"><span class="pre">condense</span></tt></a>([do_dihedrals])</td>
 <td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.load_set" title="chemistry.charmm.parameters.CharmmParameterSet.load_set"><tt class="xref py py-obj docutils literal"><span class="pre">load_set</span></tt></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.from_structure" title="chemistry.charmm.parameters.CharmmParameterSet.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<td>Extracts known parameters from a Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.load_set" title="chemistry.charmm.parameters.CharmmParameterSet.load_set"><tt class="xref py py-obj docutils literal"><span class="pre">load_set</span></tt></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
 <td>Instantiates a CharmmParameterSet from a Topology file and a Parameter</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></tt></a>(pfile)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></tt></a>(pfile[,&nbsp;comments])</td>
 <td>Reads all of the parameters from a parameter file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_stream_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></tt></a>(sfile)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_stream_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></tt></a>(sfile)</td>
 <td>Reads RTF and PAR sections from a stream file and dispatches the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_topology_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></tt></a>(tfile)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.parameters.CharmmParameterSet.read_topology_file" title="chemistry.charmm.parameters.CharmmParameterSet.read_topology_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></tt></a>(tfile)</td>
 <td>Reads _only_ the atom type definitions from a topology file.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.condense">
-<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.condense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function goes through each of the parameter type dicts and
 eliminates duplicate types. After calling this function, every unique
 bond, angle, dihedral, improper, or cmap type will pair with EVERY key
@@ -177,6 +183,44 @@ the compression time in half)</p>
 </table>
 <p class="rubric">Notes</p>
 <p>The return value allows you to condense the types at construction time.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.charmm.parameters.CharmmParameterSet.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em><big>)</big><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts known parameters from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The parametrized <tt class="docutils literal"><span class="pre">Structure</span></tt> instance from which to extract
+parameters into a ParameterSet</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></p>
+<blockquote class="last">
+<div><p>The parameter set with all parameters defined in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The parameters here are copies of the ones in the Structure, so
+modifying the generated ParameterSet will have no effect on <tt class="docutils literal"><span class="pre">struct</span></tt>.
+Furthermore, the <em>first</em> occurrence of each parameter will be used. If
+future ones differ, they will be silently ignored, since this is
+expected behavior in some instances (like with Gromacs topologies in the
+ff99sb-ildn force field).</p>
+<p>Dihedrals are a little trickier. They can be multi-term, which can be
+represented either as a <em>single</em> entry in dihedrals with a type of
+DihedralTypeList or multiple entries in dihedrals with a DihedralType
+parameter type. In this case, the parameter is constructed from either
+the first DihedralTypeList found or the first DihedralType of each
+periodicity found if no matching DihedralTypeList is found.</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -217,7 +261,7 @@ simply append to the existing set if they are different)</p>
 
 <dl class="method">
 <dt id="chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">
-<tt class="descname">read_parameter_file</tt><big>(</big><em>pfile</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_parameter_file</tt><big>(</big><em>pfile</em>, <em>comments=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#CharmmParameterSet.read_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads all of the parameters from a parameter file. Versions 36 and
 later of the CHARMM force field files have an ATOMS section defining
 all of the atom types.  Older versions need to load this information
@@ -226,9 +270,15 @@ from the RTF/TOP files.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pfile</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pfile</strong> : str or list of lines</p>
+<blockquote>
+<div><p>Name of the CHARMM parameter file to read or list of lines to parse
+as a file</p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str, optional</p>
 <blockquote class="last">
-<div><p>Name of the CHARMM parameter file to read</p>
+<div><p>List of comments on each of the pfile lines (if pfile is a list of
+lines)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -278,12 +328,6 @@ unnecessary for versions 36 and later of the CHARMM force field.</p>
 </table>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="function">
-<dt id="chemistry.charmm.parameters.element_by_mass">
-<tt class="descclassname">chemistry.charmm.parameters.</tt><tt class="descname">element_by_mass</tt><big>(</big><em>mass</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/charmm/parameters.html#element_by_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.charmm.parameters.element_by_mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines what element the given atom is based on its mass</p>
 </dd></dl>
 
 </div>

@@ -131,7 +131,7 @@ from the data in this file</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.id_format" title="chemistry.amber.AmberFormat.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.parse" title="chemistry.amber.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.parse" title="chemistry.amber.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm" title="chemistry.amber.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
@@ -184,6 +184,12 @@ from the data in this file</p>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.delete_flag" title="chemistry.amber.AmberFormat.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.id_format" title="chemistry.amber.AmberFormat.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.parse" title="chemistry.amber.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberFormat.rdparm" title="chemistry.amber.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
@@ -337,7 +343,7 @@ old-style topology file.</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.amber.AmberFormat.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meant for use with the automatic file loader, this will automatically
 return a subclass of AmberFormat corresponding to what the information
 in the prmtop file contains (i.e., either an AmberParm, ChamberParm,

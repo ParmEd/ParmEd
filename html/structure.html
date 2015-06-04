@@ -83,7 +83,7 @@ support the structure files of various computational chemistry programs.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/chemistry.formats.registry.load_file.html#chemistry.formats.registry.load_file" title="chemistry.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
@@ -474,7 +474,7 @@ nature of replicating a structure than combining two different ones.</p>
 <h3>:class:<a href="#id2"><span class="problematic" id="id3">`</span></a>Structure &lt;chemistry.structure.Structure&gt; splitting<a class="headerlink" href="#class-structure-chemistry-structure-structure-splitting" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes you want to be able to manipulate individual <em>molecules</em> inside a
 <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance individually. The
-<tt class="xref py py-meth docutils literal"><span class="pre">Structure.split</span></tt> method does just
+<a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.split" title="chemistry.structure.Structure.split"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.split</span></tt></a> method does just
 this.  It uses the bond graph in order to identify which atoms belong to which
 molecules and then return a list of molecules along with how many times that
 molecule occurs in the original <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>

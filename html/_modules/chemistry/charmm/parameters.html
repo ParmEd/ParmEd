@@ -39,6 +39,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../charmm.html" accesskey="U">chemistry.charmm</a> &raquo;</li> 
       </ul>
     </div>  
@@ -56,20 +57,33 @@
 
 <span class="sd">Author: Jason M. Swails</span>
 <span class="sd">Contributors:</span>
-<span class="sd">Date: Sep. 17, 2014</span>
+<span class="sd">Date: Apr. 13, 2015</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="n">DEG_TO_RAD</span>
-<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AtomType</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
                        <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">chemistry.charmm._charmmfile</span> <span class="kn">import</span> <span class="n">CharmmFile</span><span class="p">,</span> <span class="n">CharmmStreamFile</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">CharmmFileError</span>
-<span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span>
-<span class="kn">import</span> <span class="nn">compat24</span> <span class="c"># needs to be before collections</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">chemistry.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplate</span><span class="p">,</span> <span class="n">PatchTemplate</span>
+<span class="kn">from</span> <span class="nn">chemistry.parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
+<span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="n">_penaltyre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;penalty\s*=\s*([\d\.]+)&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">_EmptyStringIterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Always yields an empty string &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+
+<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="n">ParameterSet</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores a parameter set defined by CHARMM files. It stores the equivalent of</span>
 <span class="sd">    the information found in the MASS section of the CHARMM topology file</span>
@@ -89,13 +103,15 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    atom_types_str : dict(str:AtomType)</span>
+<span class="sd">    atom_types : dict(str:AtomType)</span>
 <span class="sd">        Dictionary mapping the names of the atom types to the corresponding</span>
 <span class="sd">        AtomType instances</span>
+<span class="sd">    atom_types_str : dict(str:AtomType)</span>
+<span class="sd">        alias for atom_types</span>
 <span class="sd">    atom_types_int : dict(int:AtomType)</span>
 <span class="sd">        Dictionary mapping the serial indexes of the atom types to the</span>
 <span class="sd">        corresponding AtomType instances</span>
-<span class="sd">    atom_types_double : dict((str,int):AtomType)</span>
+<span class="sd">    atom_types_tuple : dict((str,int):AtomType)</span>
 <span class="sd">        Dictionary mapping the (name,number) tuple of the atom types to the</span>
 <span class="sd">        corresponding AtomType instances</span>
 <span class="sd">    bond_types : dict((str,str):AtomType)</span>
@@ -139,17 +155,10 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="c"># Instantiate the list types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CharmmParameterSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parametersets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="c"># Load all of the files</span>
         <span class="n">tops</span><span class="p">,</span> <span class="n">pars</span><span class="p">,</span> <span class="n">strs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
@@ -217,7 +226,7 @@
                 <span class="n">inst</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">sfile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span>
 </div>
-<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads all of the parameters from a parameter file. Versions 36 and</span>
 <span class="sd">        later of the CHARMM force field files have an ATOMS section defining</span>
@@ -226,8 +235,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        pfile : str</span>
-<span class="sd">            Name of the CHARMM parameter file to read</span>
+<span class="sd">        pfile : str or list of lines</span>
+<span class="sd">            Name of the CHARMM parameter file to read or list of lines to parse</span>
+<span class="sd">            as a file</span>
+<span class="sd">        comments : list of str, optional</span>
+<span class="sd">            List of comments on each of the pfile lines (if pfile is a list of</span>
+<span class="sd">            lines)</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -242,6 +255,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">pfile</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">CharmmFile</span><span class="p">)</span> <span class="ow">and</span> <span class="n">comments</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">comments</span> <span class="o">=</span> <span class="n">_EmptyStringIterator</span><span class="p">()</span>
         <span class="c"># What section are we parsing?</span>
         <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="c"># The current cmap we are building (these span multiple lines)</span>
@@ -252,8 +267,12 @@
         <span class="n">nonbonded_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="c"># Holder</span>
         <span class="n">parameterset</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">read_first_nonbonded</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">comment</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">comment</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">comment</span> <span class="o">=</span> <span class="n">comments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
                 <span class="c"># This is a blank line</span>
                 <span class="k">continue</span>
@@ -295,6 +314,12 @@
                 <span class="k">continue</span>
             <span class="c"># If we have no section, skip</span>
             <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="c"># See if our comments define a penalty for this line</span>
+            <span class="n">pens</span> <span class="o">=</span> <span class="n">_penaltyre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">penalty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">penalty</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="c"># Now handle each section specifically</span>
             <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;ATOMS&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;MASS&#39;</span><span class="p">):</span> <span class="k">continue</span> <span class="c"># Should this happen?</span>
@@ -333,6 +358,7 @@
                 <span class="n">bond_type</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">req</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">bond_type</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[(</span><span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">bond_type</span>
+                <span class="n">bond_type</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;ANGLES&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -344,7 +370,7 @@
                     <span class="n">theteq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;angle equilibrium value&#39;</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Could not parse angles.&#39;</span><span class="p">)</span>
-                <span class="n">angle_type</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="o">*</span><span class="n">DEG_TO_RAD</span><span class="p">)</span>
+                <span class="n">angle_type</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">)]</span> <span class="o">=</span> <span class="n">angle_type</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="n">type3</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">angle_type</span>
                 <span class="c"># See if we have a urey-bradley</span>
@@ -352,10 +378,12 @@
                     <span class="n">ubk</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;Urey-Bradley force constant&#39;</span><span class="p">)</span>
                     <span class="n">ubeq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;Urey-Bradley equil. value&#39;</span><span class="p">)</span>
                     <span class="n">ubtype</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="n">ubk</span><span class="p">,</span> <span class="n">ubeq</span><span class="p">)</span>
+                    <span class="n">ubtype</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="n">ubtype</span> <span class="o">=</span> <span class="n">NoUreyBradley</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ubtype</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[(</span><span class="n">type3</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ubtype</span>
+                <span class="n">angle_type</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;DIHEDRALS&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -372,7 +400,8 @@
                 <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">)</span>
                 <span class="c"># See if this is a second (or more) term of the dihedral group</span>
                 <span class="c"># that&#39;s already present.</span>
-                <span class="n">dihedral</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">phase</span><span class="o">*</span><span class="n">DEG_TO_RAD</span><span class="p">)</span>
+                <span class="n">dihedral</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+                <span class="n">dihedral</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
                     <span class="c"># See if the existing dihedral type list has a term with</span>
                     <span class="c"># the same periodicity -- If so, replace it</span>
@@ -426,7 +455,9 @@
                 <span class="c"># the first place, so just have the key a fully sorted list. We</span>
                 <span class="c"># still depend on the PSF having properly ordered improper atoms</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="o">*</span><span class="n">DEG_TO_RAD</span><span class="p">)</span>
+                <span class="n">improp</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">improp</span>
+                <span class="n">improp</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;CMAP&#39;</span><span class="p">:</span>
                 <span class="c"># This is the most complicated part, since cmap parameters span</span>
@@ -477,7 +508,7 @@
                     <span class="c"># soldier on</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">read_first_nonbonded</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Could not parse nonbonded terms.&#39;</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">CharmmFileError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">CharmmFileError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">read_first_nonbonded</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -552,35 +583,179 @@
         <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="o">.</span><span class="n">_convert</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tfile</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">CharmmFile</span><span class="p">(</span><span class="n">tfile</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">CharmmFile</span><span class="p">(</span><span class="n">tfile</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">tfile</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;MASS&#39;</span><span class="p">:</span> <span class="k">continue</span>
-            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;atom type&#39;</span><span class="p">)</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;atom mass&#39;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Could not parse MASS section of </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
-                                      <span class="n">tfile</span><span class="p">)</span>
-            <span class="c"># The parameter file might or might not have an element name</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">elem</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="n">elem</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
-                <span class="c"># Figure it out from the mass</span>
-                <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">)]</span>
-            <span class="n">atype</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
-                             <span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[(</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atype</span>
+        <span class="n">hpatch</span> <span class="o">=</span> <span class="n">tpatch</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># default Head and Tail patches</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">patches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">hpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">tpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;MASS&#39;</span><span class="p">:</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&#39;atom type&#39;</span><span class="p">)</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;atom mass&#39;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Could not parse MASS section of &#39;</span>
+                                              <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">tfile</span><span class="p">)</span>
+                    <span class="c"># The parameter file might or might not have an element name</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="n">elem</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                        <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                        <span class="c"># Figure it out from the mass</span>
+                        <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">)]</span>
+                    <span class="n">atype</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
+                                     <span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[(</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atype</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;DECL&#39;</span><span class="p">:</span>
+                    <span class="k">pass</span> <span class="c"># Not really sure what this means</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;DEFA&#39;</span><span class="p">:</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;DEFA line has </span><span class="si">%d</span><span class="s"> tokens; expected 5&#39;</span> <span class="o">%</span>
+                                      <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">tok</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;NONE&#39;</span><span class="p">:</span>
+                                <span class="n">val</span> <span class="o">=</span> <span class="bp">None</span>
+                            <span class="k">if</span> <span class="n">tok</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;FIRS&#39;</span><span class="p">):</span>
+                                <span class="n">hpatch</span> <span class="o">=</span> <span class="n">val</span>
+                            <span class="k">elif</span> <span class="n">tok</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;LAST&#39;</span><span class="p">:</span>
+                                <span class="n">tpatch</span> <span class="o">=</span> <span class="n">val</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;DEFA patch </span><span class="si">%s</span><span class="s"> unknown&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;RESI&#39;</span><span class="p">,</span> <span class="s">&#39;PRES&#39;</span><span class="p">):</span>
+                    <span class="n">restype</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                    <span class="c"># Get the residue definition</span>
+                    <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c"># Assign default patches</span>
+                    <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">hpatch</span>
+                    <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tpatch</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">charge</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;No charge for </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s">&#39;RESI&#39;</span><span class="p">:</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">ResidueTemplate</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s">&#39;PRES&#39;</span><span class="p">:</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">PatchTemplate</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;restype != RESI or PRES&#39;</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">ictable</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;GROUP&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">group</span><span class="p">:</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+                            <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;ATOM&#39;</span><span class="p">:</span>
+                            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                            <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+                            <span class="n">charge</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+                            <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">)</span>
+                            <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                            <span class="n">res</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> \
+                                <span class="p">(</span><span class="s">&#39;BOND&#39;</span><span class="p">,</span> <span class="s">&#39;DOUBLE&#39;</span><span class="p">):</span>
+                            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+                            <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">a1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">):</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a2</span><span class="p">]</span>
+                                    <span class="k">continue</span>
+                                <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">):</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span>
+                                    <span class="k">continue</span>
+                                <span class="k">if</span> <span class="n">a1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">):</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a2</span><span class="p">]</span>
+                                    <span class="k">continue</span>
+                                <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">):</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span>
+                                    <span class="k">continue</span>
+                                <span class="c"># Apparently PRES objects do not need to put +</span>
+                                <span class="c"># or - in front of atoms that belong to adjacent</span>
+                                <span class="c"># residues</span>
+                                <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s">&#39;PRES&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span> <span class="ow">or</span>
+                                                          <span class="n">a2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">):</span>
+                                    <span class="k">continue</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;CMAP&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;DONOR&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;ACCEPT&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;IC&#39;</span><span class="p">:</span>
+                            <span class="n">w</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+                            <span class="n">ictable</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">w</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span><span class="p">[</span><span class="mi">4</span><span class="p">:]]))</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;END&#39;</span><span class="p">:</span>
+                            <span class="k">break</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;PATCH&#39;</span><span class="p">:</span>
+                            <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span>
+                            <span class="k">for</span> <span class="n">tok</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;NONE&#39;</span><span class="p">:</span> <span class="n">val</span> <span class="o">=</span> <span class="bp">None</span>
+                                <span class="k">if</span> <span class="n">tok</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;FIRS&#39;</span><span class="p">):</span>
+                                    <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                                <span class="k">elif</span> <span class="n">tok</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;LAST&#39;</span><span class="p">):</span>
+                                    <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;DELETE&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;IMPR&#39;</span><span class="p">:</span>
+                            <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span>
+                            <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span> <span class="ow">or</span> <span class="n">a3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span> <span class="ow">or</span> <span class="n">a4</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;RESI&#39;</span><span class="p">,</span> <span class="s">&#39;PRES&#39;</span><span class="p">,</span> <span class="s">&#39;MASS&#39;</span><span class="p">):</span>
+                            <span class="c"># Back up a line and bail</span>
+                            <span class="k">break</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">group</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+                    <span class="n">_fit_IC_table</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ictable</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s">&#39;RESI&#39;</span><span class="p">:</span>
+                        <span class="n">residues</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                    <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s">&#39;PRES&#39;</span><span class="p">:</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;restype != RESI or PRES&#39;</span>
+                    <span class="c"># We parsed a line we need to look at. So don&#39;t update the</span>
+                    <span class="c"># iterator</span>
+                    <span class="k">continue</span>
+                <span class="c"># Get the next line and cycle through</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c"># Go through the patches and add the appropriate one</span>
+        <span class="k">for</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Patch </span><span class="si">%s</span><span class="s"> not found&#39;</span> <span class="o">%</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Patch </span><span class="si">%s</span><span class="s"> not found&#39;</span> <span class="o">%</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
+        <span class="c"># Now update the residues and patches with the ones we parsed here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="CharmmParameterSet.read_stream_file"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.read_stream_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_stream_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sfile</span><span class="p">):</span>
@@ -598,90 +773,42 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">CharmmStreamFile</span><span class="p">(</span><span class="n">sfile</span><span class="p">)</span>
 
-        <span class="n">title</span><span class="p">,</span> <span class="n">section</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
+        <span class="n">title</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">words</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;rtf&#39;</span><span class="p">:</span>
                 <span class="c"># This is a Residue Topology File section.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_topology_file</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_topology_file</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">section</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;para&#39;</span><span class="p">):</span>
                 <span class="c"># This is a Parameter file section</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
-            <span class="n">title</span><span class="p">,</span> <span class="n">section</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
-</div>
-<div class="viewcode-block" id="CharmmParameterSet.condense"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.CharmmParameterSet.condense">[docs]</a>    <span class="k">def</span> <span class="nf">condense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_dihedrals</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function goes through each of the parameter type dicts and</span>
-<span class="sd">        eliminates duplicate types. After calling this function, every unique</span>
-<span class="sd">        bond, angle, dihedral, improper, or cmap type will pair with EVERY key</span>
-<span class="sd">        in the type mapping dictionaries that points to the equivalent type</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        do_dihedrals : bool=True</span>
-<span class="sd">            Dihedrals can take the longest time to compress since testing their</span>
-<span class="sd">            equality takes the longest (this is complicated by the existence of</span>
-<span class="sd">            multi-term torsions). This flag will allow you to *skip* condensing</span>
-<span class="sd">            the dihedral parameter types (for large parameter sets, this can cut</span>
-<span class="sd">            the compression time in half)</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        self</span>
-<span class="sd">            The instance that is being condensed</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The return value allows you to condense the types at construction time.</span>
-
-<span class="sd">        Example</span>
-<span class="sd">        -------</span>
-<span class="sd">        &gt;&gt;&gt; params = CharmmParameterSet(&#39;charmm.prm&#39;).condense()</span>
-<span class="sd">        &gt;&gt;&gt; params</span>
-<span class="sd">        &lt;chemistry.charmm.parameters.CharmmParameterSet at 0x7f88757de090&gt;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># First scan through all of the bond types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">do_dihedrals</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span>
-</div>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_condense_types</span><span class="p">(</span><span class="n">typedict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loops through the given dict and condenses all types.</span>
-
-<span class="sd">        Parameter</span>
-<span class="sd">        ---------</span>
-<span class="sd">        typedict : dict</span>
-<span class="sd">            Type dictionary to condense</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">keylist</span> <span class="o">=</span> <span class="n">typedict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">key1</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">)):</span>
-                <span class="n">key2</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">==</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]:</span>
-                    <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
+            <span class="n">title</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
-</div>
-<div class="viewcode-block" id="element_by_mass"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.parameters.html#chemistry.charmm.parameters.element_by_mass">[docs]</a><span class="k">def</span> <span class="nf">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Determines what element the given atom is based on its mass &quot;&quot;&quot;</span>
+</div></div>
+<span class="k">def</span> <span class="nf">_fit_IC_table</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ictable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines cartesian coordinates from an internal coordinate table stored in</span>
+<span class="sd">    CHARMM residue topology files</span>
 
-    <span class="n">diff</span> <span class="o">=</span> <span class="n">mass</span>
-    <span class="n">best_guess</span> <span class="o">=</span> <span class="s">&#39;EP&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : ResidueTemplate</span>
+<span class="sd">        The residue template for which coordinates are being determined</span>
+<span class="sd">    ictable : list[tuple(atoms, measurements)]</span>
+<span class="sd">        The internal coordinate table</span>
 
-    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">Element</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">mass</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">diff</span><span class="p">:</span>
-            <span class="n">best_guess</span> <span class="o">=</span> <span class="n">element</span>
-            <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">mass</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">best_guess</span>
-</pre></div></div>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This method assigns an xx, xy, and xz attribute to ``res``. For the time</span>
+<span class="sd">    being, this is just a placeholder, as its functionality has not yet been</span>
+<span class="sd">    implemented (CHARMM does not use a &#39;traditional&#39; Z-matrix, and I don&#39;t know</span>
+<span class="sd">    of any existing code that will compute the proper cartesian coordinates from</span>
+<span class="sd">    the form used by CHARMM)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="mf">0.0</span>
+</pre></div>
 
           </div>
         </div>
@@ -716,6 +843,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../charmm.html" >chemistry.charmm</a> &raquo;</li> 
       </ul>
     </div>

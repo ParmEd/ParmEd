@@ -53,6 +53,9 @@
 <span class="sd">via either the name of the topology file or by the order in which they were</span>
 <span class="sd">loaded.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">FormatNotFound</span>
 <span class="kn">from</span> <span class="nn">ParmedTools.exceptions</span> <span class="kn">import</span> <span class="n">DuplicateParm</span><span class="p">,</span> <span class="n">ParmIndexError</span><span class="p">,</span> <span class="n">ParmError</span>
@@ -77,7 +80,7 @@
 <div class="viewcode-block" id="ParmList.add_parm"><a class="viewcode-back" href="../../api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList.add_parm">[docs]</a>    <span class="k">def</span> <span class="nf">add_parm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a parm to the list &quot;&quot;&quot;</span>
         <span class="c"># Make sure this parm is not part of the list already</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">parm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DuplicateParm</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> already in ParmList&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>

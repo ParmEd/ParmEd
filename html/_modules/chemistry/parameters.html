@@ -1,0 +1,443 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chemistry.parameters &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="chemistry" href="../chemistry.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../chemistry.html" accesskey="U">chemistry</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chemistry.parameters</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for parsing and processing CHARMM parameter,</span>
+<span class="sd">topology, and stream files. It only extracts atom properties from the</span>
+<span class="sd">topology files and extracts all parameters from the parameter files</span>
+
+<span class="sd">Author: Jason M. Swails</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">chemistry.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">,</span>
+                <span class="n">AtomType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<div class="viewcode-block" id="ParameterSet"><a class="viewcode-back" href="../../api/chemistry/chemistry.parameters.html#chemistry.parameters.ParameterSet">[docs]</a><span class="k">class</span> <span class="nc">ParameterSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores a parameter set defining a force field</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom_types : dict(str:AtomType)</span>
+<span class="sd">        Dictionary mapping the names of the atom types to the corresponding</span>
+<span class="sd">        AtomType instances</span>
+<span class="sd">    atom_types_int : dict(int:AtomType)</span>
+<span class="sd">        Dictionary mapping the serial indexes of the atom types to the</span>
+<span class="sd">        corresponding AtomType instances</span>
+<span class="sd">    atom_types_tuple : dict((str,int):AtomType)</span>
+<span class="sd">        Dictionary mapping the (name,number) tuple of the atom types to the</span>
+<span class="sd">        corresponding AtomType instances</span>
+<span class="sd">    bond_types : dict((str,str):AtomType)</span>
+<span class="sd">        Dictionary mapping the 2-element tuple of the names of the two atom</span>
+<span class="sd">        types involved in the bond to the BondType instances</span>
+<span class="sd">    angle_types : dict((str,str,str):AngleType)</span>
+<span class="sd">        Dictionary mapping the 3-element tuple of the names of the three atom</span>
+<span class="sd">        types involved in the angle to the AngleType instances</span>
+<span class="sd">    urey_bradley_types : dict((str,str,str):BondType)</span>
+<span class="sd">        Dictionary mapping the 3-element tuple of the names of the three atom</span>
+<span class="sd">        types involved in the angle to the BondType instances of the</span>
+<span class="sd">        Urey-Bradley terms</span>
+<span class="sd">    dihedral_types : dict((str,str,str,str):list(DihedralType))</span>
+<span class="sd">        Dictionary mapping the 4-element tuple of the names of the four atom</span>
+<span class="sd">        types involved in the dihedral to the DihedralType instances. Since each</span>
+<span class="sd">        torsion term can be a multiterm expansion, each item corresponding to a</span>
+<span class="sd">        key in this dict is a list of `DihedralType`s for each term in the</span>
+<span class="sd">        expansion</span>
+<span class="sd">    improper_types : dict((str,str,str,str):ImproperType)</span>
+<span class="sd">        Dictionary mapping the 4-element tuple of the names of the four atom</span>
+<span class="sd">        types involved in the improper torsion to the ImproperType instances</span>
+<span class="sd">    improper_periodic_types : dict((str,str,str,str):DihedralType)</span>
+<span class="sd">        Dictionary mapping the 4-element tuple of the names of the four atom</span>
+<span class="sd">        types involved in the improper torsion (modeled as a Fourier series) to</span>
+<span class="sd">        the DihedralType instances</span>
+<span class="sd">    cmap_types : dict((str,str,str,str,str):CmapType)</span>
+<span class="sd">        Dictionary mapping the 5-element tuple of the names of the five atom</span>
+<span class="sd">        types involved in the correction map to the CmapType instances</span>
+<span class="sd">    nbfix_types : dict((str,str):(float,float))</span>
+<span class="sd">        Dictionary mapping the 2-element tuple of the names of the two atom</span>
+<span class="sd">        types whose LJ terms are modified to the tuple of the (epsilon,rmin)</span>
+<span class="sd">        terms for that off-diagonal term</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c"># Instantiate the list types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rb_torsion_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pair_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parametersets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">):</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">):</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">bond_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pair_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">pair_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">pair_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">pair_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">angle_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ParameterSet.from_structure"><a class="viewcode-back" href="../../api/chemistry/chemistry.parameters.html#chemistry.parameters.ParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extracts known parameters from a Structure instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`chemistry.structure.Structure`</span>
+<span class="sd">            The parametrized ``Structure`` instance from which to extract</span>
+<span class="sd">            parameters into a ParameterSet</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : :class:`ParameterSet`</span>
+<span class="sd">            The parameter set with all parameters defined in the Structure</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The parameters here are copies of the ones in the Structure, so</span>
+<span class="sd">        modifying the generated ParameterSet will have no effect on ``struct``.</span>
+<span class="sd">        Furthermore, the *first* occurrence of each parameter will be used. If</span>
+<span class="sd">        future ones differ, they will be silently ignored, since this is</span>
+<span class="sd">        expected behavior in some instances (like with Gromacs topologies in the</span>
+<span class="sd">        ff99sb-ildn force field).</span>
+
+<span class="sd">        Dihedrals are a little trickier. They can be multi-term, which can be</span>
+<span class="sd">        represented either as a *single* entry in dihedrals with a type of</span>
+<span class="sd">        DihedralTypeList or multiple entries in dihedrals with a DihedralType</span>
+<span class="sd">        parameter type. In this case, the parameter is constructed from either</span>
+<span class="sd">        the first DihedralTypeList found or the first DihedralType of each</span>
+<span class="sd">        periodicity found if no matching DihedralTypeList is found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">found_dihed_type_list</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">bond_type</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">_bond_type</span>
+                <span class="n">atom_type</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                     <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">bond_type</span><span class="o">=</span><span class="n">bond_type</span><span class="p">)</span>
+                <span class="n">atom_type</span><span class="o">.</span><span class="n">set_lj_params</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">rmin</span><span class="p">,</span>
+                                        <span class="n">atom</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">rmin_14</span><span class="p">)</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_type</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">atom_type</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="p">)</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">atom_type</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atom_type</span>
+                <span class="k">if</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">atom_type</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atom_type</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">atom_type</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom_type</span><span class="p">))]</span> <span class="o">=</span>\
+                            <span class="n">atom_type</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">angle</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="k">if</span> <span class="n">angle</span><span class="o">.</span><span class="n">funct</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">NoUreyBradley</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">NoUreyBradley</span>
+        <span class="k">for</span> <span class="n">dihedral</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="n">dihedral</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">improper</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Proper dihedral. Look out for multi-term forms</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span> <span class="ow">and</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                    <span class="c"># Already found a multi-term dihedral type list</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
+                    <span class="c"># We have one term of a potentially multi-term dihedral.</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                        <span class="c"># This is a full Fourier series list</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># This *might* be another term. Make sure another term</span>
+                        <span class="c"># with its periodicity does not already exist</span>
+                        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">per</span> <span class="o">==</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">per</span><span class="p">:</span>
+                                <span class="k">break</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c"># If we got here, we did NOT find this periodicity.</span>
+                            <span class="c"># And since this is mutating a list in-place, it</span>
+                            <span class="c"># automatically propagates to the reversed key</span>
+                            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                            <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># New parameter. If it&#39;s a DihedralTypeList, assign it and</span>
+                    <span class="c"># be done with it. If it&#39;s a DihedralType, start a</span>
+                    <span class="c"># DihedralTypeList to be added to later.</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">typ</span> <span class="o">=</span> <span class="n">DihedralTypeList</span><span class="p">()</span>
+                        <span class="n">typ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">improper</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">improper</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">improper</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="n">improper</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">improper</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cmap</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="k">for</span> <span class="n">urey</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">urey</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">urey</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="n">NoUreyBradley</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">urey</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">urey</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Angle corresponding to Urey-Bradley type not &#39;</span>
+                              <span class="s">&#39;found&#39;</span><span class="p">)</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">urey</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="c"># Trap for Amoeba potentials</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;Cannot extract parameters from an &#39;</span>
+                                      <span class="s">&#39;Amoeba-parametrized system yet&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span>
+</div>
+<div class="viewcode-block" id="ParameterSet.condense"><a class="viewcode-back" href="../../api/chemistry/chemistry.parameters.html#chemistry.parameters.ParameterSet.condense">[docs]</a>    <span class="k">def</span> <span class="nf">condense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_dihedrals</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function goes through each of the parameter type dicts and</span>
+<span class="sd">        eliminates duplicate types. After calling this function, every unique</span>
+<span class="sd">        bond, angle, dihedral, improper, or cmap type will pair with EVERY key</span>
+<span class="sd">        in the type mapping dictionaries that points to the equivalent type</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        do_dihedrals : bool=True</span>
+<span class="sd">            Dihedrals can take the longest time to compress since testing their</span>
+<span class="sd">            equality takes the longest (this is complicated by the existence of</span>
+<span class="sd">            multi-term torsions). This flag will allow you to *skip* condensing</span>
+<span class="sd">            the dihedral parameter types (for large parameter sets, this can cut</span>
+<span class="sd">            the compression time in half)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self</span>
+<span class="sd">            The instance that is being condensed</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The return value allows you to condense the types at construction time.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; params = ParameterSet().condense()</span>
+<span class="sd">        &gt;&gt;&gt; params</span>
+<span class="sd">        &lt;chemistry.parameters.ParameterSet at 0x7f88757de090&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># First scan through all of the bond types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">do_dihedrals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condense_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</div>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_condense_types</span><span class="p">(</span><span class="n">typedict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loops through the given dict and condenses all types.</span>
+
+<span class="sd">        Parameter</span>
+<span class="sd">        ---------</span>
+<span class="sd">        typedict : dict</span>
+<span class="sd">            Type dictionary to condense</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keylist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">typedict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">key1</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">)):</span>
+                <span class="n">key2</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">==</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]:</span>
+                    <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../chemistry.html" >chemistry</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

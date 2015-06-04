@@ -21,4 +21,11 @@ chemistry.topologyobjects.AtomType
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AtomType.sigma
+      ~AtomType.sigma_14
+   
    

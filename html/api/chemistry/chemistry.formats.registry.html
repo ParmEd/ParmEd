@@ -118,7 +118,7 @@ of files.</p>
 
 <dl class="function">
 <dt id="chemistry.formats.registry.load_file">
-<tt class="descclassname">chemistry.formats.registry.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.registry.load_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">chemistry.formats.registry.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.formats.registry.load_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file format of the specified file and returns its parsed
 contents.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -128,6 +128,10 @@ contents.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
 <blockquote>
 <div><p>The name of the file to try to parse</p>
+</div></blockquote>
+<p><strong>*args</strong> : other positional arguments</p>
+<blockquote>
+<div><p>Some formats accept positional arguments. These will be passed along</p>
 </div></blockquote>
 <p><strong>**kwargs</strong> : other options</p>
 <blockquote>

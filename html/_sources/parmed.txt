@@ -58,7 +58,7 @@ All defaults come from Ref. ``[1]`` ``[2]`` and ``[3]``
 ``[2]`` Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
     119, 883-895
 ``[3]`` Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
-    2015, 11, 1645-1657.
+    Accepted.
 
 addAtomicNumber
 ~~~~~~~~~~~~~~~
@@ -169,7 +169,7 @@ Options
     - -nocmap Do not use any CMAP parameters
     - -box Box dimensions. If no angles are defined, they are assumed to be 90 degrees (orthorhombic box). Alternatively, you can use the word 'bounding' to define a box that encloses the centers of all atoms.
     - -radii Implicit solvent solvation radii. ``<radiusset>`` can be amber6, bondi, mbondi, mbondi2, mbondi3 Same effect as the changeRadii_ command. Default is mbondi.
-    - nocondense This prevents chamber from condensing the parameter set before applying it. This might lead to larger prmtop files, but for large parameter sets will dramatically shorten the running time of the chamber action
+    - nocondense This no longer has any effect and is ignored.
 
 If the PDB file has a CRYST1 record, the box information will be set from there. Any box info given on the command-line will override the box found in the crd file.
 
@@ -331,6 +331,30 @@ OpenMM-specific options
     - precision <precision model> : Precision model to use. Options are single, double, and mixed. Reference platform is always double and CPU platform is always single. Mixed (default) uses single precision for calculations and double for accumulation (only used if 'omm' is provided)
     - decompose : Print bond, angle, dihedral, and nonbonded energies separately
     - applayer : Use OpenMM's class to compute the energy
+
+gromber
+~~~~~~~
+
+.. code-block:: none
+
+    gromber <top_file> [<coord_file>] [define <DEFINE[=VAR]>] [topdir <directory>] [radii <radiusset>]
+
+Load a Gromacs topology file with parameters as an Amber-formatted system. Note, if your Gromacs topology file requires any include topology files, you will need to have Gromacs installed for this to work.
+
+
+    - <top_file>: The Gromacs topology file to load
+    - <coord_file>: The coordinate file to load into the system. Can be any recognized format (GRO, PDB, mmCIF, inpcrd, etc.)
+    - define <DEFINE[=VAR]>: Preprocessor defines that control the processing of the Gromacs topology file.
+    - topdir <directory>: The directory containing all Gromacs include topology files. This is only necessary if Gromacs is not installed in a location that ParmEd can find.
+    - radii <radiusset>: The GB radius set to use. Can be 'mbondi', 'bondi', 'mbondi2', or 'amber6'. Default is mbondi
+
+Gromacs topology files do not store the unit cell information. Therefore, in order to make sure that unit cell information is properly assigned to the resulting system, the provided ``<coord_file>`` should contain unit cell information (e.g., GRO, PDB, PDBx/mmCIF, and inpcrd files can all store box information).
+
+ParmEd will try to locate the Gromacs topology directory using either the GMXDATA or GMXBIN environment variables (which should point to the ``$PREFIX/share/gromacs`` or ``$PREFIX/bin`` directories, respectively, where $PREFIX is the install prefix). If neither is set, the topology directory is located relative to the location of the ``gmx`` (Gromacs 5+) or ``pdb2gmx`` (Gromacs 4 or older) in the user's PATH. If none of the above is true, the default installation location (/usr/local/gromacs/share/gromacs/top) is used. Any provided ``topdir`` will override default choices (but only for this particular command -- future ``gromber`` actions will use the default location again).
+
+You can provide as many defines as you wish, and the ordering you specify them is preserved. The default value assigned to each define is "1". To provide multiple defines, use the ``define`` keyword multiple times, for example:
+
+define MYVAR=something define MYVAR2=something_else ...
 
 HMassRepartition
 ~~~~~~~~~~~~~~~~

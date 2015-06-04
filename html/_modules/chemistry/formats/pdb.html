@@ -39,6 +39,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../formats.html" accesskey="U">chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,13 +54,17 @@
 <span class="sd">This package contains classes responsible for reading and writing both PDB and</span>
 <span class="sd">PDBx/mmCIF files.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">AnisouWarning</span><span class="p">,</span> <span class="n">PDBWarning</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.pdbx</span> <span class="kn">import</span> <span class="n">PdbxReader</span><span class="p">,</span> <span class="n">PdbxWriter</span><span class="p">,</span> <span class="n">containers</span>
-<span class="kn">from</span> <span class="nn">chemistry.formats.io</span> <span class="kn">import</span> <span class="n">genopen</span><span class="p">,</span> <span class="n">TextToBinaryFile</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span>
 <span class="kn">from</span> <span class="nn">chemistry.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">chemistry.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -102,10 +107,9 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="PDBFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.pdb.html#chemistry.formats.pdb.PDBFile">[docs]</a><span class="k">class</span> <span class="nc">PDBFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Standard PDB file format parser and writer &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
-
     <span class="c">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
@@ -123,7 +127,7 @@
 <span class="sd">            True if it is a PDB file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
@@ -200,7 +204,7 @@
 <span class="sd">        of the coordinates for all of the frames in the PDB file as a list of</span>
 <span class="sd">        NATOM*3 lists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -231,11 +235,6 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                    <span class="c"># Assume this is a string in Py3 which doesn&#39;t have &#39;decode&#39;</span>
-                    <span class="k">pass</span>
                 <span class="n">rec</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">rec</span> <span class="o">==</span> <span class="s">&#39;ATOM  &#39;</span> <span class="ow">or</span> <span class="n">rec</span> <span class="o">==</span> <span class="s">&#39;HETATM&#39;</span><span class="p">:</span>
                     <span class="n">atomno</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -293,11 +292,11 @@
                         <span class="k">if</span> <span class="n">res_hex</span><span class="p">:</span>
                             <span class="k">try</span><span class="p">:</span>
                                 <span class="n">resid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
-                            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="n">resid</span> <span class="o">==</span> <span class="s">&#39;****&#39;</span><span class="p">:</span>
                                     <span class="n">resid</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Figure out by unique atoms</span>
                                 <span class="k">else</span><span class="p">:</span>
-                                    <span class="k">raise</span> <span class="n">e</span>
+                                    <span class="k">raise</span>
                         <span class="k">elif</span> <span class="n">resid</span> <span class="o">==</span> <span class="s">&#39;1000&#39;</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
                             <span class="n">resend</span> <span class="o">+=</span> <span class="mi">1</span>
                             <span class="n">resid</span> <span class="o">=</span> <span class="mi">10000</span>
@@ -582,7 +581,7 @@
                              <span class="s">&quot;&#39;first&#39;, or &#39;occupancy&#39;&quot;</span> <span class="o">%</span> <span class="n">altlocs</span><span class="p">)</span>
         <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">if</span> <span class="n">charmm</span><span class="p">:</span>
             <span class="n">atomrec</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;ATOM  </span><span class="si">%5d</span><span class="s"> </span><span class="si">%-4s%1s%-4s%1s%4d%1s</span><span class="s">   </span><span class="si">%8.3f%8.3f%8.3f%6.2f</span><span class="s">&#39;</span>
@@ -638,7 +637,7 @@
             <span class="k">def</span> <span class="nf">print_atoms</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
                 <span class="n">occ</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span>
                 <span class="n">a</span> <span class="o">=</span> <span class="n">atom</span>
-                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">&gt;</span> <span class="n">occ</span><span class="p">:</span>
                         <span class="n">occ</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">occupancy</span>
                         <span class="n">a</span> <span class="o">=</span> <span class="n">item</span>
@@ -731,10 +730,9 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div></div>
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="CIFFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.formats.pdb.html#chemistry.formats.pdb.CIFFile">[docs]</a><span class="k">class</span> <span class="nc">CIFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Standard PDBx/mmCIF file format parser and writer &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
-
     <span class="c">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
@@ -754,7 +752,6 @@
         <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;data_&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">True</span>
@@ -825,9 +822,9 @@
 <span class="sd">        of the coordinates for all of the frames in the PDB file as a list of</span>
 <span class="sd">        NATOM*3 lists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
@@ -859,7 +856,7 @@
                 <span class="n">nameidx</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">nameidx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">journal_authors</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">cite</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cite</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
                         <span class="n">a</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getRow</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="n">nameidx</span><span class="p">]</span>
                         <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">journal_authors</span><span class="p">:</span>
                             <span class="n">journal_authors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -931,7 +928,7 @@
             <span class="n">xyz</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">atommap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">last_atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
                 <span class="n">row</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">getRow</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
                 <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">atnumid</span><span class="p">])</span>
                 <span class="n">elem</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">elemid</span><span class="p">]</span>
@@ -1058,7 +1055,7 @@
                                   <span class="s">&#39;section. Skipping&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">anisou</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">anisou</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
                             <span class="n">row</span> <span class="o">=</span> <span class="n">anisou</span><span class="o">.</span><span class="n">getRow</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
                             <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">atnumid</span><span class="p">])</span>
                             <span class="n">atname</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">atnameid</span><span class="p">]</span>
@@ -1082,13 +1079,12 @@
                             <span class="p">)</span>
                     <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
                         <span class="c"># If at least one went wrong, set them all to None</span>
-                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atommap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">atommap</span><span class="p">):</span>
                             <span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="bp">None</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Problem processing anisotropic &#39;</span>
                                       <span class="s">&#39;B-factors. Skipping&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">xyz</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">xyz</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Corrupt CIF; all models must have the &#39;</span>
                                      <span class="s">&#39;same atoms&#39;</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -1157,7 +1153,7 @@
                              <span class="s">&quot;&#39;first&#39;, or &#39;occupancy&#39;&quot;</span> <span class="o">%</span> <span class="n">altlocs</span><span class="p">)</span>
         <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">TextToBinaryFile</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="c"># Make the main container</span>
         <span class="n">cont</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">DataContainer</span><span class="p">(</span><span class="s">&#39;cell&#39;</span><span class="p">)</span>
@@ -1208,7 +1204,7 @@
             <span class="k">def</span> <span class="nf">print_atoms</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
                 <span class="n">occ</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span>
                 <span class="n">a</span> <span class="o">=</span> <span class="n">atom</span>
-                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">&gt;</span> <span class="n">occ</span><span class="p">:</span>
                         <span class="n">occ</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">occupancy</span>
                         <span class="n">a</span> <span class="o">=</span> <span class="n">item</span>
@@ -1353,6 +1349,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../formats.html" >chemistry.formats</a> &raquo;</li> 
       </ul>
     </div>

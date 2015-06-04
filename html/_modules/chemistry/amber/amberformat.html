@@ -39,6 +39,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../amber.html" accesskey="U">chemistry.amber</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,33 +54,32 @@
 <span class="sd">This is a generalization of the readparm.AmberParm class to handle similar</span>
 <span class="sd">Amber-style files with %FLAG/%FORMAT tags</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">chemistry.constants</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NATOM</span><span class="p">,</span> <span class="n">NTYPES</span><span class="p">,</span> <span class="n">NBONH</span><span class="p">,</span> <span class="n">NTHETH</span><span class="p">,</span> <span class="n">NPHIH</span><span class="p">,</span>
             <span class="n">NEXT</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">NBONA</span><span class="p">,</span> <span class="n">NTHETA</span><span class="p">,</span> <span class="n">NPHIA</span><span class="p">,</span> <span class="n">NUMBND</span><span class="p">,</span> <span class="n">NUMANG</span><span class="p">,</span> <span class="n">NPTRA</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span>
             <span class="n">NPHB</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">IFCAP</span><span class="p">,</span> <span class="n">AMBER_ELECTROSTATIC</span><span class="p">,</span> <span class="n">CHARMM_ELECTROSTATIC</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">FlagError</span>
-<span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">fortranformat</span> <span class="kn">import</span> <span class="n">FortranRecordReader</span><span class="p">,</span> <span class="n">FortranRecordWriter</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">wraps</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">fortranformat</span> <span class="kn">import</span> <span class="n">FortranRecordReader</span><span class="p">,</span> <span class="n">FortranRecordWriter</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span><span class="p">,</span> <span class="n">filterwarnings</span>
 
 <span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;always&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
 
-<span class="c"># Some Py3 compatibility tweaks</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;basestring&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">__builtins__</span><span class="p">):</span> <span class="nb">basestring</span> <span class="o">=</span> <span class="nb">str</span>
-
 <span class="k">def</span> <span class="nf">_deprecated</span><span class="p">(</span><span class="n">oldname</span><span class="p">,</span> <span class="n">newname</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">new_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> has been deprecated, use </span><span class="si">%s</span><span class="s"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">oldname</span><span class="p">,</span> <span class="n">newname</span><span class="p">),</span>
-                 <span class="ne">DeprecationWarning</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> has been deprecated and will be removed in the future, &#39;</span>
+                 <span class="s">&#39;use </span><span class="si">%s</span><span class="s"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">oldname</span><span class="p">,</span> <span class="n">newname</span><span class="p">),</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_func</span>
     <span class="k">return</span> <span class="n">wrapper</span>
@@ -230,7 +230,7 @@
 <span class="sd">        provided for this format, but the call signatures and behavior are the</span>
 <span class="sd">        same for each of those functions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nitems</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
@@ -246,7 +246,7 @@
 </div>
     <span class="k">def</span> <span class="nf">_write_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes a list/tuple of strings &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nitems</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span><span class="p">))</span>
@@ -267,9 +267,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="n">nitems</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span><span class="p">))</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nitems</span><span class="p">)]</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitems</span><span class="p">)]</span>
         <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nitems</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitems</span><span class="p">):</span>
             <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]))</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
             <span class="n">end</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span>
@@ -281,9 +281,9 @@
         <span class="sd">&quot;&quot;&quot; Reads the line and returns the converted data &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
         <span class="n">nitems</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span><span class="p">))</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nitems</span><span class="p">)]</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitems</span><span class="p">)]</span>
         <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nitems</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitems</span><span class="p">):</span>
             <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]))</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
             <span class="n">end</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemlen</span>
@@ -302,6 +302,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="AmberFormat"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat">[docs]</a><span class="k">class</span> <span class="nc">AmberFormat</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    A class that can parse and print files stored in the Amber topology or MDL</span>
@@ -351,8 +352,6 @@
 <span class="sd">    name : str</span>
 <span class="sd">        The file name of the originally parsed file (set to the fname parameter)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
-   
     <span class="c">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
@@ -371,9 +370,8 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber-style format, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;%VERSION&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">True</span>
@@ -386,7 +384,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AmberFormat.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberFormat.parse"><a class="viewcode-back" href="../../../api/chemistry/chemistry.amber.amberformat.html#chemistry.amber.amberformat.AmberFormat.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Meant for use with the automatic file loader, this will automatically</span>
 <span class="sd">        return a subclass of AmberFormat corresponding to what the information</span>
@@ -395,9 +393,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">LoadParm</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">LoadParm</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">LoadParm</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -459,7 +457,7 @@
         <span class="c"># since there&#39;s nothing to do. Classes are singletons, so use &quot;is&quot;</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="n">cls</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">load_from_rawdata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">from_rawdata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -487,7 +485,8 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="n">_rdparm</span><span class="o">.</span><span class="n">rdparm</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="c"># This is raised if VERSION is not found</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_old</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+            <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_old</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># Unpack returned contents</span>
             <span class="n">parm_data</span><span class="p">,</span> <span class="n">parm_comments</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">unkflg</span><span class="p">,</span> <span class="n">flag_list</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="n">ret</span>
@@ -505,12 +504,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rawdata</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
-
             <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
                 <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">CHARMM_ELECTROSTATIC</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">AMBER_ELECTROSTATIC</span>
-
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">chg</span> <span class="o">/</span> <span class="n">CHARGE_SCALE</span>
@@ -529,31 +526,30 @@
         <span class="n">fmtre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;</span><span class="si">%F</span><span class="s">ORMAT *\((.+)\)&#39;</span><span class="p">)</span>
 
         <span class="c"># Open up the file and read the data into memory</span>
-        <span class="n">prm</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">prm</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%VERSION&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="k">continue</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="si">%F</span><span class="s">LAG&#39;</span><span class="p">:</span>
-                    <span class="n">current_flag</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_flag</span><span class="p">)</span>
-                    <span class="k">continue</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%COMMENT&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-                    <span class="k">continue</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="si">%F</span><span class="s">ORMAT&#39;</span><span class="p">:</span>
-                    <span class="n">fmt</span> <span class="o">=</span> <span class="n">FortranFormat</span><span class="p">(</span><span class="n">fmtre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="c"># RESIDUE_ICODE can have a lot of blank data...</span>
-                    <span class="k">if</span> <span class="n">current_flag</span> <span class="o">==</span> <span class="s">&#39;RESIDUE_ICODE&#39;</span><span class="p">:</span>
-                        <span class="n">fmt</span><span class="o">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">_read_nostrip</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span>
-                    <span class="k">continue</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">prm</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">prm</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%VERSION&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="k">continue</span>
+                    <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="si">%F</span><span class="s">LAG&#39;</span><span class="p">:</span>
+                        <span class="n">current_flag</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_flag</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;%COMMENT&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                        <span class="k">continue</span>
+                    <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="si">%F</span><span class="s">ORMAT&#39;</span><span class="p">:</span>
+                        <span class="n">fmt</span> <span class="o">=</span> <span class="n">FortranFormat</span><span class="p">(</span><span class="n">fmtre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="c"># RESIDUE_ICODE can have a lot of blank data...</span>
+                        <span class="k">if</span> <span class="n">current_flag</span> <span class="o">==</span> <span class="s">&#39;RESIDUE_ICODE&#39;</span><span class="p">:</span>
+                            <span class="n">fmt</span><span class="o">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">_read_nostrip</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span>
+                        <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">current_flag</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
 
         <span class="c"># convert charges to fraction-electrons</span>
         <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
@@ -565,13 +561,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">chg</span> <span class="o">/</span> <span class="n">CHARGE_SCALE</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
-
-        <span class="n">prm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
         <span class="c"># If we don&#39;t have a version, then read in an old-file topology</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_old</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
-
+            <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_old</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
         <span class="k">return</span>
 
     <span class="c">#===================================================</span>
@@ -850,41 +843,38 @@
 <span class="sd">            Name of the file to write the topology file to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># now that we know we will write the new prmtop file, open the new file</span>
-        <span class="n">new_prm</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">new_prm</span><span class="p">:</span>
+            <span class="c"># get current time to put into new prmtop file if we had a %VERSION</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_version</span><span class="p">()</span>
+            <span class="c"># convert charges back to amber charges...</span>
+            <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
+                <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">CHARMM_ELECTROSTATIC</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">AMBER_ELECTROSTATIC</span>
 
-        <span class="c"># get current time to put into new prmtop file if we had a %VERSION</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_version</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">])):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">CHARGE_SCALE</span>
+            <span class="c"># write version to top of prmtop file</span>
+            <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
-        <span class="c"># convert charges back to amber charges...</span>
-        <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
-            <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">CHARMM_ELECTROSTATIC</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">AMBER_ELECTROSTATIC</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">])):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">CHARGE_SCALE</span>
-
-        <span class="c"># write version to top of prmtop file</span>
-        <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
-
-        <span class="c"># write data to prmtop file, inserting blank line if it&#39;s an empty field</span>
-        <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-            <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">FLAG </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">flag</span><span class="p">)</span>
-            <span class="c"># Insert any comments before the %FORMAT specifier</span>
-            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">flag</span><span class="p">]:</span>
-                <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">COMMENT </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">comment</span><span class="p">)</span>
-            <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">FORMAT(</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># empty field...</span>
-                <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-                <span class="k">continue</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">],</span> <span class="n">new_prm</span><span class="p">)</span>
+            <span class="c"># write data to prmtop file, inserting blank line if it&#39;s an empty field</span>
+            <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
+                <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">FLAG </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">flag</span><span class="p">)</span>
+                <span class="c"># Insert any comments before the %FORMAT specifier</span>
+                <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="n">flag</span><span class="p">]:</span>
+                    <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">COMMENT </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">comment</span><span class="p">)</span>
+                <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%%</span><span class="s">FORMAT(</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># empty field...</span>
+                    <span class="n">new_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag</span><span class="p">],</span> <span class="n">new_prm</span><span class="p">)</span>
 
         <span class="n">new_prm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="c"># close new prmtop</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="c"># Convert charges back to electron-units</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">])):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">])):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">/=</span> <span class="n">CHARGE_SCALE</span>
 
     <span class="c">#===================================================</span>
@@ -937,9 +927,9 @@
             <span class="k">if</span> <span class="n">num_items</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">FlagError</span><span class="p">(</span><span class="s">&quot;If you do not supply prmtop data, num_items &quot;</span>
                                 <span class="s">&quot;must be non-negative!&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_items</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_items</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">comments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comments</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comments</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
                 <span class="n">comments</span> <span class="o">=</span> <span class="p">[</span><span class="n">comments</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">comments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">comments</span><span class="p">)</span>
@@ -1004,6 +994,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../amber.html" >chemistry.amber</a> &raquo;</li> 
       </ul>
     </div>

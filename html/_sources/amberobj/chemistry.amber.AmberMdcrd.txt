@@ -19,6 +19,7 @@ chemistry.amber.AmberMdcrd
       ~AmberMdcrd.box
       ~AmberMdcrd.close
       ~AmberMdcrd.coordinates
+      ~AmberMdcrd.id_format
    
    
 
@@ -30,5 +31,6 @@ chemistry.amber.AmberMdcrd
    
       ~AmberMdcrd.CRDS_PER_LINE
       ~AmberMdcrd.DEFAULT_TITLE
+      ~AmberMdcrd.extra_args
    
    

@@ -45,8 +45,46 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="chemistry-openmm-utils-module">
-<h1>chemistry.openmm.utils module<a class="headerlink" href="#chemistry-openmm-utils-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-chemistry.openmm.utils">
+<span id="chemistry-openmm-utils-module"></span><h1>chemistry.openmm.utils module<a class="headerlink" href="#module-chemistry.openmm.utils" title="Permalink to this headline">¶</a></h1>
+<p>This package contains some useful functionality for common tasks in OpenMM</p>
+<dl class="function">
+<dt id="chemistry.openmm.utils.energy_decomposition">
+<tt class="descclassname">chemistry.openmm.utils.</tt><tt class="descname">energy_decomposition</tt><big>(</big><em>structure</em>, <em>context</em>, <em>nrg=None</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.openmm.utils.energy_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>This computes the energy of every force group in the given structure and
+computes the energy for each force group for the given Context.  Note, the
+context must have positions already assigned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure</strong> : Structure</p>
+<blockquote>
+<div><p>This should be the Structure object from which the System object in the
+Context was created</p>
+</div></blockquote>
+<p><strong>context</strong> : mm.Context</p>
+<blockquote>
+<div><p>The OpenMM context set up for computing forces and energies</p>
+</div></blockquote>
+<p><strong>nrg</strong> : energy unit, optional</p>
+<blockquote>
+<div><p>The unit to convert all energies into. Default is kcal/mol</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict {str:float}</p>
+<blockquote class="last">
+<div><p>A dictionary mapping the name of the force group (taken from the
+attribute names of the format XXX_FORCE_GROUP in the structure object)
+with the energy of that group in</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 

@@ -70,14 +70,23 @@ Boston, MA 02111-1307, USA.</p>
 <p>A chemical structure composed of atoms, bonds, angles, torsions, and other
 topological features</p>
 <p class="rubric">Notes</p>
+<p>This class also has a handful of type lists for each of the attributes above
+(excluding <cite>atoms</cite>, <cite>residues</cite>, <cite>chiral_frames</cite>, and <cite>multipole_frames</cite>).
+They are all TrackedList instances that are designed to hold the relevant
+parameter type. The list is:</p>
+<blockquote>
+<div>bond_types, angle_types, dihedral_types, urey_bradley_types,
+improper_types, cmap_types, trigonal_angle_types,
+out_of_plane_bend_types, pi_torsion_types, stretch_bend_types,
+torsion_torsion_types, adjust_types</div></blockquote>
 <p>dihedral_types _may_ be a list of <tt class="xref py py-class docutils literal"><span class="pre">DihedralType</span></tt> instances, since
 torsion profiles are often represented by a Fourier series with multiple
 terms</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="27%" />
-<col width="73%" />
+<col width="8%" />
+<col width="92%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>atoms</td>
@@ -126,7 +135,7 @@ terms</p>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></tt>)) List of all AMOEBA-style multipole frames defined in the structure</td>
 </tr>
 <tr class="row-even"><td>adjusts</td>
-<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></tt>)) List of all AMOEBA-style nonbonded pair-exception rules</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></tt>)) List of all nonbonded pair-exception rules</td>
 </tr>
 <tr class="row-odd"><td>acceptors</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">AcceptorDonor</span></tt>)) List of all H-bond acceptors, if that information is present</td>
@@ -143,17 +152,11 @@ terms</p>
 <tr class="row-odd"><td>space_group</td>
 <td>(<tt class="docutils literal"><span class="pre">str</span></tt>) The space group of the structure (default is &#8220;P 1&#8221;)</td>
 </tr>
-<tr class="row-even"><td>This class also has a handful of type lists for each of the attributes above</td>
-<td>&nbsp;</td>
+<tr class="row-even"><td>nrexcl</td>
+<td>(<tt class="docutils literal"><span class="pre">int</span></tt>) The number of bonds away that an atom can be in order to be excluded from the direct nonbonded summation</td>
 </tr>
-<tr class="row-odd"><td>(excluding <cite>atoms</cite>, <cite>residues</cite>, <cite>chiral_frames</cite>, and <cite>multipole_frames</cite>).</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td>They are all TrackedList instances that are designed to hold the relevant</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td>parameter type. The list is:</td>
-<td>bond_types, angle_types, dihedral_types, urey_bradley_types, improper_types, cmap_types, trigonal_angle_types, out_of_plane_bend_types, pi_torsion_types, stretch_bend_types, torsion_torsion_types, adjust_types</td>
+<tr class="row-odd"><td>title</td>
+<td>(<tt class="docutils literal"><span class="pre">str</span></tt>) Cosmetic only, it is an arbitrary title assigned to the system. Default value is an empty string</td>
 </tr>
 </tbody>
 </table>
@@ -176,38 +179,44 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.createSystem" title="chemistry.structure.Structure.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.is_changed" title="chemistry.structure.Structure.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.has_NBFIX" title="chemistry.structure.Structure.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<td>Returns whether or not any pairs of atom types have their LJ</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.is_changed" title="chemistry.structure.Structure.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
 <td>Determines if any of the topology has changed for this structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_add_constraints" title="chemistry.structure.Structure.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_add_constraints" title="chemistry.structure.Structure.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_angle_force" title="chemistry.structure.Structure.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_angle_force" title="chemistry.structure.Structure.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_bond_force" title="chemistry.structure.Structure.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_bond_force" title="chemistry.structure.Structure.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_cmap_force" title="chemistry.structure.Structure.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_cmap_force" title="chemistry.structure.Structure.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_dihedral_force" title="chemistry.structure.Structure.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_dihedral_force" title="chemistry.structure.Structure.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_gbsa_force" title="chemistry.structure.Structure.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_gbsa_force" title="chemistry.structure.Structure.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_improper_force" title="chemistry.structure.Structure.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_improper_force" title="chemistry.structure.Structure.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_nonbonded_force" title="chemistry.structure.Structure.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_nonbonded_force" title="chemistry.structure.Structure.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_out_of_plane_bend_force" title="chemistry.structure.Structure.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_out_of_plane_bend_force" title="chemistry.structure.Structure.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_pi_torsion_force" title="chemistry.structure.Structure.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_pi_torsion_force" title="chemistry.structure.Structure.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba pi-torsion force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_rb_torsion_force" title="chemistry.structure.Structure.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.omm_set_virtual_sites" title="chemistry.structure.Structure.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
@@ -227,25 +236,28 @@ terms</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.prune_empty_terms" title="chemistry.structure.Structure.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.strip" title="chemistry.structure.Structure.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.split" title="chemistry.structure.Structure.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
+<td>Split the current Structure into separate Structure instances for each unique molecule.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.strip" title="chemistry.structure.Structure.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe" title="chemistry.structure.Structure.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.to_dataframe" title="chemistry.structure.Structure.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
 <td>Creates a pandas.DataFrame object from the current Structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange" title="chemistry.structure.Structure.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.unchange" title="chemistry.structure.Structure.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions" title="chemistry.structure.Structure.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.update_dihedral_exclusions" title="chemistry.structure.Structure.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_cif" title="chemistry.structure.Structure.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_pdb" title="chemistry.structure.Structure.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_psf" title="chemistry.structure.Structure.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure.write_psf" title="chemistry.structure.Structure.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -288,6 +300,11 @@ terms</p>
 <dl class="attribute">
 <dt id="chemistry.structure.Structure.PI_TORSION_FORCE_GROUP">
 <tt class="descname">PI_TORSION_FORCE_GROUP</tt><em class="property"> = 8</em><a class="headerlink" href="#chemistry.structure.Structure.PI_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.structure.Structure.RB_TORSION_FORCE_GROUP">
+<tt class="descname">RB_TORSION_FORCE_GROUP</tt><em class="property"> = 12</em><a class="headerlink" href="#chemistry.structure.Structure.RB_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -513,6 +530,27 @@ of freedom will <em>still</em> be constrained).</p>
 <p><strong>verbose</strong> : bool=False</p>
 <blockquote class="last">
 <div><p>If True, the progress of this subroutine will be printed to stdout</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function calls prune_empty_terms if any Topology lists have changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.structure.Structure.has_NBFIX">
+<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.has_NBFIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether or not any pairs of atom types have their LJ
+interactions modified by an NBFIX definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>has_nbfix</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, at least two atom types have NBFIX mod definitions</p>
 </div></blockquote>
 </td>
 </tr>
@@ -784,8 +822,16 @@ Lorentz-Berthelot combining rules.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
+<p>This method calls update_dihedral_exclusions, which might alter the
+<tt class="docutils literal"><span class="pre">ignore_end</span></tt> attribute of some
+<a class="reference internal" href="../../topobj/chemistry.topologyobjects.Dihedral.html#chemistry.topologyobjects.Dihedral" title="chemistry.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.topologyobjects.Dihedral</span></tt></a> instances based on any
+changes that might have been made to the bonds and angles since the last
+time it was called.</p>
 <p>Subclasses of Structure for which this nonbonded treatment is inadequate
-should override this method to implement what is needed</p>
+should override this method to implement what is needed.</p>
+<p>If nrexcl is set to 3 and no exception parameters are stored in the
+adjusts list, the 1-4 interactions are determined from the list of
+dihedrals</p>
 </dd></dl>
 
 <dl class="method">
@@ -817,6 +863,24 @@ should override this method to implement what is needed</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaPiTorsionForce</p>
 <blockquote class="last">
 <div><p>The pi-torsion force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.structure.Structure.omm_rb_torsion_force">
+<tt class="descname">omm_rb_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.omm_rb_torsion_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">RBTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
 </div></blockquote>
 </td>
 </tr>
@@ -935,6 +999,28 @@ to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list
 </dd></dl>
 
 <dl class="method">
+<dt id="chemistry.structure.Structure.split">
+<tt class="descname">split</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the current Structure into separate Structure instances for each
+unique molecule. A molecule is defined as all atoms connected by a graph
+of covalent bonds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, int) tuples</p>
+<blockquote class="last">
+<div><p>List of all molecules in the order that they appear first in the
+parent structure accompanied by the number of times that molecule
+appears in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="chemistry.structure.Structure.strip">
 <tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.strip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
@@ -1042,6 +1128,9 @@ the original file defining the structure:</p>
 <tt class="descname">topology</tt><a class="reference internal" href="../../_modules/chemistry/structure.html#Structure.topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.structure.Structure.topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
 Structure instance results in the topology being deleted and rebuilt</p>
+<p class="rubric">Notes</p>
+<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+changed.</p>
 </dd></dl>
 
 <dl class="method">

@@ -45,8 +45,36 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="parmedtools-simulations-openmm-module">
-<h1>ParmedTools.simulations.openmm module<a class="headerlink" href="#parmedtools-simulations-openmm-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ParmedTools.simulations.openmm">
+<span id="parmedtools-simulations-openmm-module"></span><h1>ParmedTools.simulations.openmm module<a class="headerlink" href="#module-ParmedTools.simulations.openmm" title="Permalink to this headline">¶</a></h1>
+<p>This module contains functionality for running simulations with OpenMM using
+parameters defined in an input file for sander and pmemd.</p>
+<dl class="function">
+<dt id="ParmedTools.simulations.openmm.energy">
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">energy</tt><big>(</big><em>parm</em>, <em>args</em>, <em>output=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes a single-point energy using OpenMM and prints the result to the
+desired output destination (defaults to stdout)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ParmedTools.simulations.openmm.minimize">
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">minimize</tt><big>(</big><em>parm</em>, <em>igb</em>, <em>saltcon</em>, <em>cutoff</em>, <em>restraintmask</em>, <em>weight</em>, <em>script</em>, <em>platform</em>, <em>precision</em>, <em>norun</em>, <em>tol</em>, <em>maxcyc</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimizes a snapshot. Use the existing System if it exists</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ParmedTools.simulations.openmm.positional_restraints">
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">positional_restraints</tt><big>(</big><em>mask</em>, <em>weights</em>, <em>refc</em>, <em>scriptfile=None</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#positional_restraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.positional_restraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a positional restraint force from CustomExternalForce using the
+coordinates given in the refc restart file for the atoms specified in &#8216;mask&#8217;</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ParmedTools.simulations.openmm.simulate">
+<tt class="descclassname">ParmedTools.simulations.openmm.</tt><tt class="descname">simulate</tt><big>(</big><em>parm</em>, <em>args</em><big>)</big><a class="reference internal" href="../../_modules/ParmedTools/simulations/openmm.html#simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ParmedTools.simulations.openmm.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a simulation using OpenMM</p>
+</dd></dl>
+
 </div>
 
 

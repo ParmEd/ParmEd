@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="up" title="chemistry.openmm" href="../openmm.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,15 +37,17 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
+          <li><a href="../openmm.html" accesskey="U">chemistry.openmm</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <h1>Source code for chemistry.openmm.utils</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -54,7 +56,7 @@
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 
-<div class="viewcode-block" id="energy_decomposition"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.utils.html#chemistry.openmm.utils.energy_decomposition">[docs]</a><span class="k">def</span> <span class="nf">energy_decomposition</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="viewcode-block" id="energy_decomposition"><a class="viewcode-back" href="../../../api/chemistry/chemistry.openmm.utils.html#chemistry.openmm.utils.energy_decomposition">[docs]</a><span class="k">def</span> <span class="nf">energy_decomposition</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">nrg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This computes the energy of every force group in the given structure and</span>
 <span class="sd">    computes the energy for each force group for the given Context.  Note, the</span>
@@ -67,18 +69,21 @@
 <span class="sd">        Context was created</span>
 <span class="sd">    context : mm.Context</span>
 <span class="sd">        The OpenMM context set up for computing forces and energies</span>
+<span class="sd">    nrg : energy unit, optional</span>
+<span class="sd">        The unit to convert all energies into. Default is kcal/mol</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict {str:float}</span>
 <span class="sd">        A dictionary mapping the name of the force group (taken from the</span>
 <span class="sd">        attribute names of the format XXX_FORCE_GROUP in the structure object)</span>
-<span class="sd">        with the energy of that group in kcal/mol</span>
+<span class="sd">        with the energy of that group in </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">all_names</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">force_group_names</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">energy_components</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">kcal</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span>
+    <span class="k">if</span> <span class="n">nrg</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">nrg</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span>
 
     <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_FORCE_GROUP&#39;</span><span class="p">):</span>
@@ -91,10 +96,10 @@
 
     <span class="k">for</span> <span class="n">grp</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">force_group_names</span><span class="p">):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">grp</span><span class="p">)</span>
-        <span class="n">energy_components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">kcal</span><span class="p">)</span>
+        <span class="n">energy_components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">nrg</span><span class="p">)</span>
 
     <span class="n">e</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span>
-    <span class="n">energy_components</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">kcal</span><span class="p">)</span>
+    <span class="n">energy_components</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">nrg</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">energy_components</span></div>
 </pre></div>
@@ -102,9 +107,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -121,7 +126,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -130,13 +135,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
+          <li><a href="../openmm.html" >chemistry.openmm</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

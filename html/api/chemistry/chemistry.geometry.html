@@ -181,6 +181,43 @@ AttributeError&#8217;s will ensue if this is not the case. Also, coordinates mus
 be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="chemistry.geometry.reduce_box_vectors">
+<tt class="descclassname">chemistry.geometry.</tt><tt class="descname">reduce_box_vectors</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/geometry.html#reduce_box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.geometry.reduce_box_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function puts three unit cell vectors in a reduced form where a is
+&#8220;mostly&#8221; in x, b is &#8220;mostly&#8221; in y, and c is &#8220;mostly&#8221; in z. This form is
+necessary for some programs (notably OpenMM and Gromacs)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>First unit cell vector</p>
+</div></blockquote>
+<p><strong>b</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>Second unit cell vector</p>
+</div></blockquote>
+<p><strong>c</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>Third unit cell vector</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>red_a, red_b, red_c</strong> : Vec3, Vec3, Vec3</p>
+<blockquote class="last">
+<div><p>The reduced unit cell vectors in units of angstroms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The implementation here is taken from the OpenMM Python application layer
+written by Peter Eastman</p>
+</dd></dl>
+
 </div>
 
 

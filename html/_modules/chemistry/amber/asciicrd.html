@@ -39,6 +39,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../amber.html" accesskey="U">chemistry.amber</a> &raquo;</li> 
       </ul>
     </div>  
@@ -57,67 +58,50 @@
 <span class="sd">encouraged, but these are provided for more complete compatibility and for</span>
 <span class="sd">instances where the prequisites may not be installed.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">ParsingError</span>
-<span class="kn">from</span> <span class="nn">compat24</span> <span class="kn">import</span> <span class="nb">property</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="kn">from</span> <span class="nn">array</span> <span class="kn">import</span> <span class="n">array</span>
+
 <span class="kn">import</span> <span class="nn">warnings</span> <span class="kn">as</span> <span class="nn">_warnings</span>
 
 <span class="n">VELSCALE</span> <span class="o">=</span> <span class="mf">20.455</span>
 <span class="n">ONEVELSCALE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">VELSCALE</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">bz2</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">bz2</span> <span class="o">=</span> <span class="bp">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">gzip</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">gzip</span> <span class="o">=</span> <span class="bp">None</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c"># If we do not have numpy, use Python-optimized array class instead.</span>
-    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="kn">from</span> <span class="nn">array</span> <span class="kn">import</span> <span class="n">array</span>
-
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">_AmberAsciiCoordinateFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Abstract base class for interacting with ASCII coordinate files &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for interacting with ASCII coordinate files.</span>
+<span class="sd">    Opens a new ASCII coordinate file and either parses it (loading</span>
+<span class="sd">    everything into memory) or sets it up for writing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        File name to open</span>
+<span class="sd">    natom : int</span>
+<span class="sd">        Number of atoms in the system</span>
+<span class="sd">    hasbox : bool</span>
+<span class="sd">        Does the system have PBCs?</span>
+<span class="sd">    mode : str={&#39;r&#39;, &#39;w&#39;}</span>
+<span class="sd">        Whether to open this file for &#39;r&#39;eading or &#39;w&#39;riting</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Title to write to a new trajectory (when mode=&#39;w&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_TITLE</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">CRDS_PER_LINE</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">natom</span><span class="p">,</span> <span class="n">hasbox</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Opens a new Mdcrd file and either parses it (loading everything into</span>
-<span class="sd">        memory) or sets it up for writing.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        fname : str</span>
-<span class="sd">            File name to open</span>
-<span class="sd">        natom : int</span>
-<span class="sd">            Number of atoms in the system</span>
-<span class="sd">        hasbox : bool</span>
-<span class="sd">            Does the system have PBCs?</span>
-<span class="sd">        mode : str={&#39;r&#39;, &#39;w&#39;}</span>
-<span class="sd">            Whether to open this file for &#39;r&#39;eading or &#39;w&#39;riting</span>
-<span class="sd">        title : str, optional</span>
-<span class="sd">            Title to write to a new trajectory (when mode=&#39;w&#39;)</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        This module automatically handles compressed files using either gzip or</span>
-<span class="sd">        bzip2, and compression is determined automatically by filename extension</span>
-<span class="sd">        (.gz for gzip and .bz2 for bzip2 files).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;r&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s">&#39;old&#39;</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;w&#39;</span><span class="p">:</span>
@@ -128,18 +112,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_writebox</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> mode must be &#39;r&#39; or &#39;w&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.gz&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">gzip</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Python could not import the gzip library. &#39;</span>
-                                  <span class="s">&#39;Cannot open compressed trajectory files&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.bz2&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">bz2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Python could not import the bz2 library. &#39;</span>
-                                  <span class="s">&#39;Cannot open compressed trajectory files&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">=</span> <span class="n">natom</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="n">hasbox</span>
@@ -208,8 +181,8 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber restart/inpcrd file. False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="c"># Look for natom</span>
         <span class="k">try</span><span class="p">:</span>
@@ -218,9 +191,9 @@
             <span class="k">return</span> <span class="bp">False</span>
         <span class="c"># Next 3 lines, make sure we have %12.7f format</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
                     <span class="n">j12</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">12</span>
                     <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
                     <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="p">:</span><span class="n">j12</span><span class="o">+</span><span class="mi">12</span><span class="p">])</span>
@@ -296,7 +269,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)])</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[:]</span> <span class="c"># copy for efficiency</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
@@ -306,7 +279,7 @@
         <span class="n">startline</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">endline</span> <span class="o">=</span> <span class="n">startline</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">startline</span><span class="p">,</span> <span class="n">endline</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">startline</span><span class="p">,</span> <span class="n">endline</span><span class="p">):</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>
             <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
@@ -325,7 +298,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
             <span class="n">endline</span> <span class="o">=</span> <span class="n">startline</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">startline</span><span class="p">,</span> <span class="n">endline</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">startline</span><span class="p">,</span> <span class="n">endline</span><span class="p">):</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                 <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
@@ -381,7 +354,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%5d%15.7e</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
         <span class="n">numwrit</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]))</span>
             <span class="n">numwrit</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -418,7 +391,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">stuff</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span>
         <span class="n">numwrit</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span>  <span class="p">]</span> <span class="o">*</span> <span class="n">ONEVELSCALE</span><span class="p">,</span>
                                     <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ONEVELSCALE</span><span class="p">,</span>
@@ -525,14 +498,14 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber mdcrd file. False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="c"># Next 4 lines, make sure we have %8.3f format</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
                     <span class="n">j8</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">8</span>
                     <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j8</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
                     <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j8</span><span class="p">:</span><span class="n">j8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span>
@@ -563,7 +536,7 @@
         <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">natom3iter</span> <span class="o">=</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">natom3iter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
             <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
@@ -577,7 +550,7 @@
                 <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">()</span>
                     <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> 
                                                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">mainiter</span><span class="p">])</span>
@@ -691,9 +664,12 @@
                              <span class="s">&#39;natom*3&#39;</span><span class="p">)</span>
 
         <span class="c"># If we can, write the coordinates</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%8.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
+            <span class="n">i10</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">10</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%8.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i10</span><span class="o">+</span><span class="n">j</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">:</span>
             <span class="n">extra</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
@@ -770,6 +746,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../amber.html" >chemistry.amber</a> &raquo;</li> 
       </ul>
     </div>

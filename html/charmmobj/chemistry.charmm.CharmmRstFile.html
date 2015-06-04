@@ -114,7 +114,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 </td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">chm</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </td>
@@ -135,7 +135,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 </td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> crds; </span><span class="si">%d</span><span class="s"> old crds; </span><span class="si">%d</span><span class="s"> vels&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">nco</span><span class="p">,</span> <span class="n">nv</span><span class="p">)</span>
+<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> crds; </span><span class="si">%d</span><span class="s"> old crds; </span><span class="si">%d</span><span class="s"> vels&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">nco</span><span class="p">,</span> <span class="n">nv</span><span class="p">))</span>
 </pre></div>
 </div>
 </td>
@@ -179,10 +179,13 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.__init__" title="chemistry.charmm.CharmmRstFile.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt>(crds)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.id_format" title="chemistry.charmm.CharmmRstFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a CHARMM restart file</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt>(crds)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt>(handle,&nbsp;str[,&nbsp;r])</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt>(handle,&nbsp;str[,&nbsp;r])</td>
 <td></td>
 </tr>
 </tbody>
@@ -194,13 +197,16 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.positions" title="chemistry.charmm.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.positions" title="chemistry.charmm.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
 <td>Atomic positions with units</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.positionsold" title="chemistry.charmm.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.positionsold" title="chemistry.charmm.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
 <td>Old atomic positions with units</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.velocities" title="chemistry.charmm.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.charmm.CharmmRstFile.velocities" title="chemistry.charmm.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
 <td>Atomic velocities with units</td>
 </tr>
 </tbody>

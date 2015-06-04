@@ -23,9 +23,10 @@ chemistry.amber.AmoebaParm
       ~AmoebaParm.createSystem
       ~AmoebaParm.deleteFlag
       ~AmoebaParm.delete_flag
-      ~AmoebaParm.delete_mask
       ~AmoebaParm.fill_LJ
+      ~AmoebaParm.has_1012
       ~AmoebaParm.has_NBFIX
+      ~AmoebaParm.id_format
       ~AmoebaParm.initialize_topology
       ~AmoebaParm.is_changed
       ~AmoebaParm.load_atom_info
@@ -52,6 +53,7 @@ chemistry.amber.AmoebaParm
       ~AmoebaParm.omm_torsion_torsion_force
       ~AmoebaParm.omm_trigonal_angle_force
       ~AmoebaParm.omm_urey_bradley_force
+      ~AmoebaParm.parse
       ~AmoebaParm.prune_empty_terms
       ~AmoebaParm.ptr
       ~AmoebaParm.rdparm
@@ -62,14 +64,15 @@ chemistry.amber.AmoebaParm
       ~AmoebaParm.remake_parm
       ~AmoebaParm.set_version
       ~AmoebaParm.strip
+      ~AmoebaParm.to_dataframe
       ~AmoebaParm.unchange
       ~AmoebaParm.update_dihedral_exclusions
       ~AmoebaParm.view
-      ~AmoebaParm.writeOFF
       ~AmoebaParm.writeParm
       ~AmoebaParm.write_cif
       ~AmoebaParm.write_parm
       ~AmoebaParm.write_pdb
+      ~AmoebaParm.write_psf
       ~AmoebaParm.write_rst7
    
    

@@ -89,41 +89,7 @@ like C or C++). For large trajectories, this may be significant.</p>
 <dl class="method">
 <dt id="chemistry.amber.AmberMdcrd.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="headerlink" href="#chemistry.amber.AmberMdcrd.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Opens a new Mdcrd file and either parses it (loading everything into
-memory) or sets it up for writing.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
-<blockquote>
-<div><p>File name to open</p>
-</div></blockquote>
-<p><strong>natom</strong> : int</p>
-<blockquote>
-<div><p>Number of atoms in the system</p>
-</div></blockquote>
-<p><strong>hasbox</strong> : bool</p>
-<blockquote>
-<div><p>Does the system have PBCs?</p>
-</div></blockquote>
-<p><strong>mode</strong> : str={&#8216;r&#8217;, &#8216;w&#8217;}</p>
-<blockquote>
-<div><p>Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
-</div></blockquote>
-<p><strong>title</strong> : str, optional</p>
-<blockquote class="last">
-<div><p>Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>This module automatically handles compressed files using either gzip or
-bzip2, and compression is determined automatically by filename extension
-(.gz for gzip and .bz2 for bzip2 files).</p>
-</dd></dl>
+<dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -133,7 +99,7 @@ bzip2, and compression is determined automatically by filename extension
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.__init__" title="chemistry.amber.AmberMdcrd.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname,&nbsp;natom,&nbsp;hasbox[,&nbsp;mode,&nbsp;title])</td>
-<td>Opens a new Mdcrd file and either parses it (loading everything into memory) or sets it up for writing.</td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.add_box" title="chemistry.amber.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
@@ -150,6 +116,9 @@ bzip2, and compression is determined automatically by filename extension
 <tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.coordinates" title="chemistry.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
 <td>Returns the requested coordinates</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.AmberMdcrd.id_format" title="chemistry.amber.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as an Amber mdcrd file</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
@@ -163,6 +132,9 @@ bzip2, and compression is determined automatically by filename extension
 <td></td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">extra_args</span></tt></td>
 <td></td>
 </tr>
 </tbody>

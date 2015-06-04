@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
+    <link rel="up" title="chemistry" href="../chemistry.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,8 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../chemistry.html" accesskey="U">chemistry</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -167,6 +168,15 @@
 <div class="viewcode-block" id="MissingParameter"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.MissingParameter">[docs]</a><span class="k">class</span> <span class="nc">MissingParameter</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If a parameter is missing from a database &quot;&quot;&quot;</span>
 </div>
+<div class="viewcode-block" id="GromacsFileError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.GromacsFileError">[docs]</a><span class="k">class</span> <span class="nc">GromacsFileError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is a problem parsing GROMACS files &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="GromacsTopologyError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.GromacsTopologyError">[docs]</a><span class="k">class</span> <span class="nc">GromacsTopologyError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is a problem parsing GROMACS topology files &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="GromacsTopologyWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.GromacsTopologyWarning">[docs]</a><span class="k">class</span> <span class="nc">GromacsTopologyWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="s">&quot; If we are uncertain about something regarding the GROMACS topology file &quot;</span>
+</div>
 <div class="viewcode-block" id="AnisouWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.AnisouWarning">[docs]</a><span class="k">class</span> <span class="nc">AnisouWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If there was a problem parsing an ANISOU record &quot;&quot;&quot;</span>
 </div>
@@ -205,7 +215,16 @@
     <span class="sd">&quot;&quot;&quot; If the user provides bad input &quot;&quot;&quot;</span>
 </div>
 <div class="viewcode-block" id="FormatNotFound"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.FormatNotFound">[docs]</a><span class="k">class</span> <span class="nc">FormatNotFound</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If the file format does not have a registered parser with it &quot;&quot;&quot;</span></div>
+    <span class="sd">&quot;&quot;&quot; If the file format does not have a registered parser with it &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="RosettaError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.RosettaError">[docs]</a><span class="k">class</span> <span class="nc">RosettaError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is a problem loading a Rosetta pose object &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="PreProcessorError"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PreProcessorError">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorError</span><span class="p">(</span><span class="n">ChemError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is a problem running the C-like preprocessor &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="PreProcessorWarning"><a class="viewcode-back" href="../../api/chemistry/chemistry.exceptions.html#chemistry.exceptions.PreProcessorWarning">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorWarning</span><span class="p">(</span><span class="n">ChemWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is something we should warn about in preprocessing &quot;&quot;&quot;</span></div>
 </pre></div>
 
           </div>
@@ -240,7 +259,8 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../chemistry.html" >chemistry</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

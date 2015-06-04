@@ -24,7 +24,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="OpenMM Functionality" href="../openmm.html" />
+    <link rel="prev" title="Running OpenMM Simulation with GROMACS Files" href="../omm_gromacs.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,7 +38,11 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="../omm_gromacs.html" title="Running OpenMM Simulation with GROMACS Files"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,6 +53,199 @@
             
   <div class="section" id="chemistry-openmm-statedatareporter">
 <h1>chemistry.openmm.StateDataReporter<a class="headerlink" href="#chemistry-openmm-statedatareporter" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.openmm.StateDataReporter">
+<em class="property">class </em><tt class="descclassname">chemistry.openmm.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class acts as a state data reporter for OpenMM simulations, but it is a
+little more generalized. Notable differences are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>It allows the units of the output to be specified, with defaults being
+those used in Amber (e.g., kcal/mol, angstroms^3, etc.)</li>
+<li>It will write to any object containing a &#8216;write&#8217; method; not just
+files. This allows, for instance, writing to a GUI window that
+implements the desired &#8216;write&#8217; attribute.</li>
+</ul>
+</div></blockquote>
+<p>Most of this code is copied from the OpenMM StateDataReporter class, with
+the above-mentioned changes made.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f</strong> : str or file-like</p>
+<blockquote>
+<div><p>Destination to write the state data (file name or file object)</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>Number of steps between state data reports</p>
+</div></blockquote>
+<p><strong>step</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the step number (Default True)</p>
+</div></blockquote>
+<p><strong>time</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the simulation time (Defaults True)</p>
+</div></blockquote>
+<p><strong>potentialEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the potential energy of the structure (Default True)</p>
+</div></blockquote>
+<p><strong>kineticEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the kinetic energy of the structure (Default True)</p>
+</div></blockquote>
+<p><strong>totalEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the total energy of the system (Default True)</p>
+</div></blockquote>
+<p><strong>temperature</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the temperature of the system (Default True)</p>
+</div></blockquote>
+<p><strong>volume</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the volume of the unit cell. If the system is not periodic,
+the value is meaningless (Default False)</p>
+</div></blockquote>
+<p><strong>density</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the density of the unit cell. If the system is not periodic,
+the value is meaningless (Default False)</p>
+</div></blockquote>
+<p><strong>separator</strong> : str, optional</p>
+<blockquote>
+<div><p>The string to separate data fields (Default &#8216;,&#8217;)</p>
+</div></blockquote>
+<p><strong>systemMass</strong> : float, optional</p>
+<blockquote>
+<div><p>If not None, the density will be computed from this mass, since setting
+a mass to 0 is used to constrain the position of that particle. (Default
+None)</p>
+</div></blockquote>
+<p><strong>energyUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units to print energies in (default unit.kilocalories_per_mole)</p>
+</div></blockquote>
+<p><strong>timeUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units to print time in (default unit.picoseconds)</p>
+</div></blockquote>
+<p><strong>volumeUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units print volume in (default unit.angstroms**3)</p>
+</div></blockquote>
+<p><strong>densityUnit</strong> : unit, optional</p>
+<blockquote class="last">
+<div><p>The units to print density in (default
+unit.grams/unit.item/unit.milliliter)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.describeNextReport" title="chemistry.openmm.StateDataReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.finalize" title="chemistry.openmm.StateDataReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.report" title="chemistry.openmm.StateDataReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.StateDataReporter.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.StateDataReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.__init__" title="chemistry.openmm.StateDataReporter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.describeNextReport" title="chemistry.openmm.StateDataReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.finalize" title="chemistry.openmm.StateDataReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.StateDataReporter.report" title="chemistry.openmm.StateDataReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.StateDataReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="headerlink" href="#chemistry.openmm.StateDataReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.StateDataReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.openmm.StateDataReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.StateDataReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="headerlink" href="#chemistry.openmm.StateDataReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+<p><strong>state</strong> : <tt class="xref py py-class docutils literal"><span class="pre">mm.State</span></tt></p>
+<blockquote class="last">
+<div><p>The current state of the simulation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -86,7 +285,11 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="../omm_gromacs.html" title="Running OpenMM Simulation with GROMACS Files"
+             >previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" >OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

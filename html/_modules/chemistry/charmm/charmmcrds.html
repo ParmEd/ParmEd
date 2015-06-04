@@ -39,6 +39,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../charmm.html" accesskey="U">chemistry.charmm</a> &raquo;</li> 
       </ul>
     </div>  
@@ -58,16 +59,23 @@
 <span class="sd">Contributors: Jason Swails</span>
 <span class="sd">Date: Feb. 24, 2015</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">chemistry.formats</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils</span> <span class="kn">import</span> <span class="n">io</span>
 <span class="kn">from</span> <span class="nn">chemistry.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">chemistry.exceptions</span> <span class="kn">import</span> <span class="n">CharmmFileError</span>
 <span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">chemistry.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">chemistry.vec3</span> <span class="kn">import</span> <span class="n">Vec3</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="n">charmlen</span> <span class="o">=</span> <span class="mi">22</span>
 <span class="n">TIMESCALE</span> <span class="o">=</span> <span class="mf">4.888821E-14</span> <span class="o">*</span> <span class="mf">1e12</span> <span class="c"># AKMA time units to picoseconds</span>
 <span class="n">ONE_TIMESCALE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">TIMESCALE</span>
 
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="CharmmCrdFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmCrdFile">[docs]</a><span class="k">class</span> <span class="nc">CharmmCrdFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads and parses a CHARMM coordinate file (.crd) into its components,</span>
@@ -92,10 +100,9 @@
 
 <span class="sd">    Example:</span>
 <span class="sd">    &gt;&gt;&gt; chm = CharmmCrdFile(&#39;testfiles/1tnm.crd&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; print &#39;%d atoms; %d coords&#39; % (chm.natom, len(chm.coords))</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;%d atoms; %d coords&#39; % (chm.natom, len(chm.coords)))</span>
 <span class="sd">    1414 atoms; 4242 coords</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="CharmmCrdFile.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmCrdFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -111,17 +118,15 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is a CHARMM coordinate file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>   <span class="c"># Skip whitespace, as a precaution</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="n">intitle</span> <span class="o">=</span> <span class="bp">True</span>
 
             <span class="k">while</span> <span class="n">intitle</span><span class="p">:</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">intitle</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
@@ -130,13 +135,13 @@
                     <span class="n">intitle</span> <span class="o">=</span> <span class="bp">True</span>
 
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>      <span class="c"># Skip whitespace</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">natom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 
-                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
-                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
@@ -148,9 +153,6 @@
                 <span class="k">return</span> <span class="bp">False</span>
 
             <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
 </div>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atomno</span> <span class="o">=</span> <span class="p">[]</span>                   <span class="c"># Atom number</span>
@@ -171,7 +173,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Atomic coordinates with units attached to them with the shape (natom, 3)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
+        <span class="k">return</span> <span class="p">([</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
                         <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
@@ -180,8 +182,7 @@
 </div>
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 
-        <span class="n">crdfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">crdfile</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">crdfile</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>   <span class="c"># Skip whitespace, as a precaution</span>
@@ -205,7 +206,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
                 
-                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="n">crdfile</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atomno</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">resno</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -227,9 +228,8 @@
 
             <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">CharmmFileError</span><span class="p">(</span><span class="s">&#39;Error parsing CHARMM coordinate file&#39;</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">crdfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div>
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="CharmmRstFile"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile">[docs]</a><span class="k">class</span> <span class="nc">CharmmRstFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads and parses data, velocities and coordinates from a CHARMM restart</span>
@@ -264,14 +264,13 @@
 
 <span class="sd">    Example:</span>
 <span class="sd">    &gt;&gt;&gt; chm = CharmmRstFile(&#39;testfiles/sample-charmm.rst&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; print chm.header[0]</span>
+<span class="sd">    &gt;&gt;&gt; print(chm.header[0])</span>
 <span class="sd">    REST    37     1</span>
 <span class="sd">    &gt;&gt;&gt; natom, nc, nco = chm.natom, len(chm.coords), len(chm.coordsold)</span>
 <span class="sd">    &gt;&gt;&gt; nv = len(chm.vels)</span>
-<span class="sd">    &gt;&gt;&gt; print &#39;%d atoms; %d crds; %d old crds; %d vels&#39; % (natom, nc, nco, nv)</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;%d atoms; %d crds; %d old crds; %d vels&#39; % (natom, nc, nco, nv))</span>
 <span class="sd">    256 atoms; 768 crds; 768 old crds; 768 vels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">FileFormatType</span>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="CharmmRstFile.id_format"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -288,7 +287,7 @@
 <span class="sd">            True if it is a CHARMM restart file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;REST&#39;</span><span class="p">)</span>
 </div>
@@ -317,25 +316,24 @@
     <span class="nd">@property</span>
 <div class="viewcode-block" id="CharmmRstFile.positions"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Atomic positions with units &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
+        <span class="k">return</span> <span class="p">([</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
                         <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="CharmmRstFile.positionsold"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.positionsold">[docs]</a>    <span class="k">def</span> <span class="nf">positionsold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Old atomic positions with units &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">coordsold</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
-                        <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">([</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coordsold</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)]</span>
+                        <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
 </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="CharmmRstFile.velocities"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Atomic velocities with units &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
+        <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span> <span class="o">*</span>
                         <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 
-        <span class="n">crdfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">crdfile</span><span class="p">:</span>
             <span class="n">readingHeader</span> <span class="o">=</span> <span class="bp">True</span> 
 
             <span class="k">while</span> <span class="n">readingHeader</span><span class="p">:</span>
@@ -352,7 +350,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;NATOM&#39;</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!NATOM&#39;</span><span class="p">:</span>
@@ -380,8 +378,6 @@
 
             <span class="c"># Convert velocities to angstroms/ps</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vels</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">ONE_TIMESCALE</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">]</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">crdfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <div class="viewcode-block" id="CharmmRstFile.scan"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.scan">[docs]</a>    <span class="k">def</span> <span class="nf">scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span> <span class="c"># read lines in file till &#39;str&#39; is found</span>
         <span class="n">scanning</span> <span class="o">=</span> <span class="bp">True</span>
@@ -396,10 +392,9 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">)]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
                     <span class="n">scanning</span> <span class="o">=</span> <span class="bp">False</span>
-
 </div>
     <span class="k">def</span> <span class="nf">_get_formatted_crds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crdfile</span><span class="p">,</span> <span class="n">crds</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">crdfile</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
@@ -413,17 +408,15 @@
             <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">,</span><span class="s">&#39;E&#39;</span><span class="p">)</span>     <span class="c"># CHARMM uses &#39;D&#39; for exponentials</span>
 
             <span class="c"># CHARMM uses fixed format (len = charmlen = 22) for crds in .rst&#39;s</span>
-
             <span class="n">crds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">charmlen</span><span class="p">]))</span>  
             <span class="n">crds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">charmlen</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">charmlen</span><span class="p">]))</span>
             <span class="n">crds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">charmlen</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">charmlen</span><span class="p">]))</span>
 
-
 <div class="viewcode-block" id="CharmmRstFile.printcoords"><a class="viewcode-back" href="../../../api/chemistry/chemistry.charmm.charmmcrds.html#chemistry.charmm.charmmcrds.CharmmRstFile.printcoords">[docs]</a>    <span class="k">def</span> <span class="nf">printcoords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crds</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">crd</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)):</span>
-            <span class="k">print</span> <span class="n">crds</span><span class="p">[</span><span class="n">crd</span><span class="p">],</span>
+        <span class="k">for</span> <span class="n">crd</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">crds</span><span class="p">[</span><span class="n">crd</span><span class="p">])</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">crd</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 </div></div>
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">doctest</span>
@@ -463,6 +456,7 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../chemistry.html" >chemistry</a> &raquo;</li>
           <li><a href="../charmm.html" >chemistry.charmm</a> &raquo;</li> 
       </ul>
     </div>

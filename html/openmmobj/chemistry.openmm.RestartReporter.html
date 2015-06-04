@@ -24,7 +24,8 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" /> 
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="OpenMM Functionality" href="../openmm.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,7 +37,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,6 +49,141 @@
             
   <div class="section" id="chemistry-openmm-restartreporter">
 <h1>chemistry.openmm.RestartReporter<a class="headerlink" href="#chemistry-openmm-restartreporter" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="chemistry.openmm.RestartReporter">
+<em class="property">class </em><tt class="descclassname">chemistry.openmm.</tt><tt class="descname">RestartReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.RestartReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a reporter to handle writing restarts at specified intervals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to write the restart to.</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>Number of steps between writing restart files</p>
+</div></blockquote>
+<p><strong>write_multiple</strong> : bool=False</p>
+<blockquote>
+<div><p>Either write a separate restart each time (appending the step number in
+the format .# to the file name given above) if True, or overwrite the
+same file each time if False</p>
+</div></blockquote>
+<p><strong>netcdf</strong> : bool=False</p>
+<blockquote>
+<div><p>Use the Amber NetCDF restart file format</p>
+</div></blockquote>
+<p><strong>write_velocities</strong> : bool=True</p>
+<blockquote class="last">
+<div><p>Write velocities to the restart file. You can turn this off for passing
+in, for instance, a minimized structure.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.describeNextReport" title="chemistry.openmm.RestartReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.finalize" title="chemistry.openmm.RestartReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>No-op here</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.report" title="chemistry.openmm.RestartReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(sim,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.RestartReporter.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.openmm.RestartReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.__init__" title="chemistry.openmm.RestartReporter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.describeNextReport" title="chemistry.openmm.RestartReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.finalize" title="chemistry.openmm.RestartReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>No-op here</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.openmm.RestartReporter.report" title="chemistry.openmm.RestartReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(sim,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.openmm.RestartReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="headerlink" href="#chemistry.openmm.RestartReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.RestartReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#chemistry.openmm.RestartReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>No-op here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.openmm.RestartReporter.report">
+<tt class="descname">report</tt><big>(</big><em>sim</em>, <em>state</em><big>)</big><a class="headerlink" href="#chemistry.openmm.RestartReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sim</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+<p><strong>state</strong> : <tt class="xref py py-class docutils literal"><span class="pre">mm.State</span></tt></p>
+<blockquote class="last">
+<div><p>The current state of the simulation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -86,7 +223,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" >OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

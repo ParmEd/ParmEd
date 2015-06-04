@@ -19,6 +19,7 @@ chemistry.topologyobjects.AtomList
       ~AtomList.claim
       ~AtomList.count
       ~AtomList.extend
+      ~AtomList.find_original_index
       ~AtomList.index
       ~AtomList.index_members
       ~AtomList.insert

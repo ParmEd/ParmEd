@@ -132,7 +132,7 @@ from the data in this file</p>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.amberformat.AmberFormat.id_format" title="chemistry.amber.amberformat.AmberFormat.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.amberformat.AmberFormat.parse" title="chemistry.amber.amberformat.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.amber.amberformat.AmberFormat.parse" title="chemistry.amber.amberformat.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#chemistry.amber.amberformat.AmberFormat.rdparm" title="chemistry.amber.amberformat.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
@@ -287,7 +287,7 @@ old-style topology file.</p>
 
 <dl class="staticmethod">
 <dt id="chemistry.amber.amberformat.AmberFormat.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/amber/amberformat.html#AmberFormat.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.amber.amberformat.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meant for use with the automatic file loader, this will automatically
 return a subclass of AmberFormat corresponding to what the information
 in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
@@ -444,17 +444,17 @@ replaced by any number) are optimized:</p>
 </table>
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.floatre">
-<tt class="descname">floatre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7f916b5046e8&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">floatre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x1064a0438&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.floatre2">
-<tt class="descname">floatre2</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7f91656f0468&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">floatre2</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x1062e7e40&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.intre">
-<tt class="descname">intre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7f9165656240&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">intre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x1064fc450&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -465,7 +465,7 @@ replaced by any number) are optimized:</p>
 
 <dl class="attribute">
 <dt id="chemistry.amber.amberformat.FortranFormat.strre">
-<tt class="descname">strre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x7f9165656138&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">strre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x1064fc348&gt;</em><a class="headerlink" href="#chemistry.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

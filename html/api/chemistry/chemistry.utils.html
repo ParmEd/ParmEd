@@ -52,13 +52,61 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="chemistry.utils.io.html">chemistry.utils.io module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.six.html">chemistry.utils.six module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.timer.html">chemistry.utils.timer module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.six.html">chemistry.utils.six module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chemistry.utils.timer.html">chemistry.utils.timer module</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </div>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-chemistry.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistry.utils" title="Permalink to this headline">¶</a></h2>
+<p>Various utilities used by ParmEd that don&#8217;t really fit elsewhere</p>
+<dl class="function">
+<dt id="chemistry.utils.which">
+<tt class="descclassname">chemistry.utils.</tt><tt class="descname">which</tt><big>(</big><em>prog</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/utils.html#which"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.which" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full path of a program if it exists in PATH</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prog</strong> : str</p>
+<blockquote>
+<div><p>The name of a program to try and locate in PATH</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>path</strong> : str or None</p>
+<blockquote class="last">
+<div><p>The full path of the program. If it cannot be found, None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.utils.tag_molecules">
+<tt class="descclassname">chemistry.utils.</tt><tt class="descname">tag_molecules</tt><big>(</big><em>struct</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/utils.html#tag_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.utils.tag_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the <tt class="docutils literal"><span class="pre">marked</span></tt> attribute of every Atom in struct to the molecule number
+it is a part of. If no bonds are present, every atom is its own molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">chemistry.Structure</span></tt></p>
+<blockquote class="last">
+<div><p>Input structure to tag the molecules for</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -72,7 +120,7 @@
   <ul>
 <li><a class="reference internal" href="#">chemistry.utils package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-chemistry.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>

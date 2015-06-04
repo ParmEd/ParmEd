@@ -43,6 +43,8 @@ chemistry.topologyobjects.Atom
       ~Atom.idx
       ~Atom.rmin
       ~Atom.rmin_14
+      ~Atom.sigma
+      ~Atom.sigma_14
       ~Atom.starting_index
       ~Atom.tortor_partners
    

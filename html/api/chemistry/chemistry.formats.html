@@ -95,7 +95,7 @@
 formats</p>
 <dl class="function">
 <dt id="chemistry.formats.load_file">
-<tt class="descclassname">chemistry.formats.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.formats.load_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">chemistry.formats.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#chemistry.formats.load_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file format of the specified file and returns its parsed
 contents.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -105,6 +105,10 @@ contents.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
 <blockquote>
 <div><p>The name of the file to try to parse</p>
+</div></blockquote>
+<p><strong>*args</strong> : other positional arguments</p>
+<blockquote>
+<div><p>Some formats accept positional arguments. These will be passed along</p>
 </div></blockquote>
 <p><strong>**kwargs</strong> : other options</p>
 <blockquote>
@@ -439,6 +443,239 @@ False, ANISOU records are not written</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.formats.Mol2File">
+<em class="property">class </em><tt class="descclassname">chemistry.formats.</tt><tt class="descname">Mol2File</tt><a class="headerlink" href="#chemistry.formats.Mol2File" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class to read and write TRIPOS Mol2 files</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.Mol2File.id_format" title="chemistry.formats.Mol2File.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identify the file as a Mol2 (or Mol3) file format or not</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.Mol2File.parse" title="chemistry.formats.Mol2File.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename[,&nbsp;structure])</td>
+<td>Parses a mol2 file (or mol3) file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.Mol2File.write" title="chemistry.formats.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3])</td>
+<td>Writes a mol2 file from a structure or residue template</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="chemistry.formats.Mol2File.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify the file as a Mol2 (or Mol3) file format or not</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to test whether or not it is a mol2 file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a mol2 (or mol3) file, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.formats.Mol2File.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>structure=False</em><big>)</big><a class="headerlink" href="#chemistry.formats.Mol2File.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a mol2 file (or mol3) file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to parse</p>
+</div></blockquote>
+<p><strong>structure</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, the return value is a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance. If
+False, it is either a <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or
+<tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainter</span></tt> instance, depending on whether
+there is one or more than one residue defined in it. Default is
+False</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>molecule</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt>, or</p>
+<blockquote>
+<div><blockquote>
+<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+</div></blockquote>
+<p>The molecule defined by this mol2 file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>Mol2Error</strong></p>
+<blockquote class="last">
+<div><p>If the file format is not recognized or non-numeric values are
+present where integers or floating point numbers are expected</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.formats.Mol2File.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em><big>)</big><a class="headerlink" href="#chemistry.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a mol2 file from a structure or residue template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or</p>
+<blockquote>
+<div><blockquote>
+<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+</div></blockquote>
+<p>The input structure to write the mol2 file from</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like obj</p>
+<blockquote>
+<div><p>Name of the file to write or open file handle to write to</p>
+</div></blockquote>
+<p><strong>mol3</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplate or container, write
+HEAD/TAIL sections. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.formats.PSFFile">
+<em class="property">class </em><tt class="descclassname">chemistry.formats.</tt><tt class="descname">PSFFile</tt><a class="headerlink" href="#chemistry.formats.PSFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>CHARMM- or XPLOR-style PSF file parser and writer. This class is
+specifically a holder for the writing functionality and a vessel for
+automatic file type detection. If you wish to instantiate a PSF file
+directly, use <a class="reference internal" href="../../charmmobj/chemistry.charmm.CharmmPsfFile.html#chemistry.charmm.CharmmPsfFile" title="chemistry.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.charmm.CharmmPsfFile</span></tt></a> or the
+<a class="reference internal" href="#chemistry.formats.load_file" title="chemistry.formats.load_file"><tt class="xref py py-func docutils literal"><span class="pre">chemistry.formats.load_file()</span></tt></a> function instead.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.PSFFile.id_format" title="chemistry.formats.PSFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a CHARMM PSF file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.formats.PSFFile.parse" title="chemistry.formats.PSFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<td>Read a CHARMM- or XPLOR-style PSF file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.formats.PSFFile.write" title="chemistry.formats.PSFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="chemistry.formats.PSFFile.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.PSFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as a CHARMM PSF file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CHARMM or Xplor-style PSF file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.formats.PSFFile.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#chemistry.formats.PSFFile.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a CHARMM- or XPLOR-style PSF file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to parse</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>psf_file</strong> : <tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></p>
+<blockquote class="last">
+<div><p>The PSF file instance with all information loaded</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="chemistry.formats.PSFFile.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#chemistry.formats.PSFFile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>

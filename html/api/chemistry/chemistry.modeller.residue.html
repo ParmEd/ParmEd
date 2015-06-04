@@ -82,8 +82,8 @@ atoms.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="93%" />
+<col width="6%" />
+<col width="94%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>atoms</td>
@@ -100,6 +100,15 @@ atoms.</p>
 </tr>
 <tr class="row-odd"><td>tail</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or None) The atom that is connected to the <em>next</em> residue after this one</td>
+</tr>
+<tr class="row-even"><td>first_patch</td>
+<td>(<a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> or None) If it is not None, this is the patch whose tail is added to the head atom of this residue when this residue is the first in a chain</td>
+</tr>
+<tr class="row-odd"><td>last_patch</td>
+<td>(<a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> or None) If it is not None, this is the patch whose head is added to the tail atom of this residue when this residue is the last in a chain</td>
+</tr>
+<tr class="row-even"><td>groups</td>
+<td>(list of list(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt>)) If set, each group is a list of Atom instances making up each group</td>
 </tr>
 </tbody>
 </table>
@@ -151,13 +160,13 @@ atoms.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
 <blockquote>
 <div><p>One of the atoms in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of
 this ResidueTemplate. It can also be the atom index (index from 0)
 of the atom in the bond.</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int</p>
+<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
 <blockquote>
 <div><p>The other atom in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of this
 ResidueTemplate. It can also be the atom index (index from 0) of the
@@ -174,7 +183,9 @@ atom in the bond.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>If atom1 and atom2 are already bonded, this routine does nothing</p>
+<p>If atom1 and atom2 are already bonded, this routine does nothing. If
+atom1 or atom2 are strings, then they will match the first instance of
+the atom name that is the same as the atom name passed.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -290,7 +301,7 @@ with residues</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.structure.Structure</span></tt></a></p>
 <blockquote>
 <div><p>The structure from which to generate the ResidueTemplateContainer
 from</p>
@@ -367,6 +378,147 @@ taken</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residues</strong> : dict {str</p>
 <blockquote class="last">
 <div><p>The residue library with all residues from this residue collection</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chemistry.modeller.residue.PatchTemplate">
+<em class="property">class </em><tt class="descclassname">chemistry.modeller.residue.</tt><tt class="descname">PatchTemplate</tt><big>(</big><em>name=''</em><big>)</big><a class="reference internal" href="../../_modules/chemistry/modeller/residue.html#PatchTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chemistry.modeller.residue.PatchTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">chemistry.modeller.residue.ResidueTemplate</span></tt></a></p>
+<p>A residue patch (typically used for CHARMM) that is used to modify existing
+residues in some way (e.g., terminal patches, disulfide bridges, etc.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>If provided, this is the name of the residue</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#chemistry.modeller.residue.ResidueTemplate" title="chemistry.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>This class basically just provides an additional list of atoms that need to
+be deleted when applying this patch &#8211; something that does not apply to
+standard Residues</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>delete</td>
+<td>(list of str) List of atoms that need to be deleted in applying the patch</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.PatchTemplate.add_atom" title="chemistry.modeller.residue.PatchTemplate.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom)</td>
+<td>Adds an atom to this residue template</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#chemistry.modeller.residue.PatchTemplate.add_bond" title="chemistry.modeller.residue.PatchTemplate.add_bond"><tt class="xref py py-obj docutils literal"><span class="pre">add_bond</span></tt></a>(atom1,&nbsp;atom2)</td>
+<td>Adds a bond between the two provided atoms in the residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#chemistry.modeller.residue.PatchTemplate.from_residue" title="chemistry.modeller.residue.PatchTemplate.from_residue"><tt class="xref py py-obj docutils literal"><span class="pre">from_residue</span></tt></a>(residue)</td>
+<td>This constructor creates a ResidueTemplate from a particular Residue</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="chemistry.modeller.residue.PatchTemplate.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.PatchTemplate.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an atom to this residue template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if ``atom`` has the same name as another atom in this</strong></p>
+<p class="last"><strong>residue already</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chemistry.modeller.residue.PatchTemplate.add_bond">
+<tt class="descname">add_bond</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.PatchTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a bond between the two provided atoms in the residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>One of the atoms in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of
+this ResidueTemplate. It can also be the atom index (index from 0)
+of the atom in the bond.</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>The other atom in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of this
+ResidueTemplate. It can also be the atom index (index from 0) of the
+atom in the bond.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError if atom1 or atom2 are integers that are out of range of the</strong></p>
+<p><strong>number of atoms already in this template</strong></p>
+<p><strong>RuntimeError if atom1 or atom2 are :class:`Atom` instances but they are</strong></p>
+<p class="last"><strong>*not* in the atoms list of this ResidueTemplate</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If atom1 and atom2 are already bonded, this routine does nothing. If
+atom1 or atom2 are strings, then they will match the first instance of
+the atom name that is the same as the atom name passed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chemistry.modeller.residue.PatchTemplate.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#chemistry.modeller.residue.PatchTemplate.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic coordinates, in Angstroms, of all atoms in the template</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chemistry.modeller.residue.PatchTemplate.from_residue">
+<em class="property">classmethod </em><tt class="descname">from_residue</tt><big>(</big><em>residue</em><big>)</big><a class="headerlink" href="#chemistry.modeller.residue.PatchTemplate.from_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constructor creates a ResidueTemplate from a particular Residue
+object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue from which to create a template</p>
 </div></blockquote>
 </td>
 </tr>

@@ -25,7 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="The ParmEd API" href="parmed_api.html" /> 
+    <link rel="next" title="The ParmEd API" href="parmed_api.html" />
+    <link rel="prev" title="chemistry.load_rosetta" href="rosettaobj/chemistry.load_rosetta.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,6 +41,9 @@
         <li class="right" >
           <a href="parmed_api.html" title="The ParmEd API"
              accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rosettaobj/chemistry.load_rosetta.html" title="chemistry.load_rosetta"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -96,7 +100,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <dt><tt class="docutils literal"><span class="pre">[2]</span></tt> Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,</dt>
 <dd>119, 883-895</dd>
 <dt><tt class="docutils literal"><span class="pre">[3]</span></tt> Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,</dt>
-<dd>2015, 11, 1645-1657.</dd>
+<dd>Accepted.</dd>
 </dl>
 </div>
 <div class="section" id="addatomicnumber">
@@ -196,7 +200,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>-nocmap Do not use any CMAP parameters</li>
 <li>-box Box dimensions. If no angles are defined, they are assumed to be 90 degrees (orthorhombic box). Alternatively, you can use the word &#8216;bounding&#8217; to define a box that encloses the centers of all atoms.</li>
 <li>-radii Implicit solvent solvation radii. <tt class="docutils literal"><span class="pre">&lt;radiusset&gt;</span></tt> can be amber6, bondi, mbondi, mbondi2, mbondi3 Same effect as the <a class="reference internal" href="#changeradii">changeRadii</a> command. Default is mbondi.</li>
-<li>nocondense This prevents chamber from condensing the parameter set before applying it. This might lead to larger prmtop files, but for large parameter sets will dramatically shorten the running time of the chamber action</li>
+<li>nocondense This no longer has any effect and is ignored.</li>
 </ul>
 </div></blockquote>
 <p>If the PDB file has a CRYST1 record, the box information will be set from there. Any box info given on the command-line will override the box found in the crd file.</p>
@@ -334,6 +338,26 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>applayer : Use OpenMM&#8217;s class to compute the energy</li>
 </ul>
 </div></blockquote>
+</div>
+<div class="section" id="gromber">
+<h3>gromber<a class="headerlink" href="#gromber" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-none"><div class="highlight"><pre>gromber &lt;top_file&gt; [&lt;coord_file&gt;] [define &lt;DEFINE[=VAR]&gt;] [topdir &lt;directory&gt;] [radii &lt;radiusset&gt;]
+</pre></div>
+</div>
+<p>Load a Gromacs topology file with parameters as an Amber-formatted system. Note, if your Gromacs topology file requires any include topology files, you will need to have Gromacs installed for this to work.</p>
+<blockquote>
+<div><ul class="simple">
+<li>&lt;top_file&gt;: The Gromacs topology file to load</li>
+<li>&lt;coord_file&gt;: The coordinate file to load into the system. Can be any recognized format (GRO, PDB, mmCIF, inpcrd, etc.)</li>
+<li>define &lt;DEFINE[=VAR]&gt;: Preprocessor defines that control the processing of the Gromacs topology file.</li>
+<li>topdir &lt;directory&gt;: The directory containing all Gromacs include topology files. This is only necessary if Gromacs is not installed in a location that ParmEd can find.</li>
+<li>radii &lt;radiusset&gt;: The GB radius set to use. Can be &#8216;mbondi&#8217;, &#8216;bondi&#8217;, &#8216;mbondi2&#8217;, or &#8216;amber6&#8217;. Default is mbondi</li>
+</ul>
+</div></blockquote>
+<p>Gromacs topology files do not store the unit cell information. Therefore, in order to make sure that unit cell information is properly assigned to the resulting system, the provided <tt class="docutils literal"><span class="pre">&lt;coord_file&gt;</span></tt> should contain unit cell information (e.g., GRO, PDB, PDBx/mmCIF, and inpcrd files can all store box information).</p>
+<p>ParmEd will try to locate the Gromacs topology directory using either the GMXDATA or GMXBIN environment variables (which should point to the <tt class="docutils literal"><span class="pre">$PREFIX/share/gromacs</span></tt> or <tt class="docutils literal"><span class="pre">$PREFIX/bin</span></tt> directories, respectively, where $PREFIX is the install prefix). If neither is set, the topology directory is located relative to the location of the <tt class="docutils literal"><span class="pre">gmx</span></tt> (Gromacs 5+) or <tt class="docutils literal"><span class="pre">pdb2gmx</span></tt> (Gromacs 4 or older) in the user&#8217;s PATH. If none of the above is true, the default installation location (/usr/local/gromacs/share/gromacs/top) is used. Any provided <tt class="docutils literal"><span class="pre">topdir</span></tt> will override default choices (but only for this particular command &#8211; future <tt class="docutils literal"><span class="pre">gromber</span></tt> actions will use the default location again).</p>
+<p>You can provide as many defines as you wish, and the ordering you specify them is preserved. The default value assigned to each define is &#8220;1&#8221;. To provide multiple defines, use the <tt class="docutils literal"><span class="pre">define</span></tt> keyword multiple times, for example:</p>
+<p>define MYVAR=something define MYVAR2=something_else ...</p>
 </div>
 <div class="section" id="hmassrepartition">
 <h3>HMassRepartition<a class="headerlink" href="#hmassrepartition" title="Permalink to this headline">¶</a></h3>
@@ -967,6 +991,7 @@ that action.</p>
 <li><a class="reference internal" href="#deletedihedral">deleteDihedral</a></li>
 <li><a class="reference internal" href="#deletepdb">deletePDB</a></li>
 <li><a class="reference internal" href="#energy">energy</a></li>
+<li><a class="reference internal" href="#gromber">gromber</a></li>
 <li><a class="reference internal" href="#hmassrepartition">HMassRepartition</a></li>
 <li><a class="reference internal" href="#interpolate">interpolate</a></li>
 <li><a class="reference internal" href="#listparms">listParms</a></li>
@@ -1058,6 +1083,9 @@ that action.</p>
         <li class="right" >
           <a href="parmed_api.html" title="The ParmEd API"
              >next</a> |</li>
+        <li class="right" >
+          <a href="rosettaobj/chemistry.load_rosetta.html" title="chemistry.load_rosetta"
+             >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>

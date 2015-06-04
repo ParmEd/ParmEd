@@ -39,6 +39,7 @@ chemistry.charmm.CharmmPsfFile
       ~CharmmPsfFile.omm_urey_bradley_force
       ~CharmmPsfFile.prune_empty_terms
       ~CharmmPsfFile.strip
+      ~CharmmPsfFile.to_dataframe
       ~CharmmPsfFile.unchange
       ~CharmmPsfFile.update_dihedral_exclusions
       ~CharmmPsfFile.write_cif
