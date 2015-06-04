@@ -112,7 +112,7 @@ class Action(lawsuit):
     # unpopulated
     needs_parm = True
     # Do we allow any action to overwrite existing files? Static variable.
-    overwrite = False
+    overwrite = True # Default for API. parmed.py sets this every time
     # We do one of two kinds of filtering for each action. Each action can
     # support either a strict subset of classes, in which case the type *must*
     # be an exact member (not a subclass) of one of that list. If that list is
