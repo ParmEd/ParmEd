@@ -103,8 +103,15 @@ range of file formats. In particular, it supports the following file formats:
     * Amber Chamber-style topology file*
     * Amber AMOEBA-style topology file*
     * CHARMM PSF file
+    * Gromacs topology file
 
 The *-marked options are *not* available in the OpenMM Python application layer.
+While the OpenMM Python application layer *does* support standard Amber topology
+files, it does not support either old-style topology files or those that define
+a 10-12 nonbonded potentials between certain pairs of atoms. ParmEd supports
+both of these. With Gromacs topology files, the OpenMM Python application layer
+does not correctly handle virtual sites, while the Gromacs topology file parser
+in ParmEd does.
 
 In addition to these file formats, ParmEd also supports several new reporter
 classes in addition to the small number provided by ParmEd:
@@ -136,3 +143,50 @@ the annotated and explained example):
     Starting from AMBER prmtop and inpcrd files <omm_amber>
     Starting from CHARMM PSF and coordinate files <omm_charmm>
     Starting from Gromacs TOP and GRO files <omm_gromacs>
+
+Taking OpenMM ``Topology`` and ``System`` to a ParmEd ``Structure``
+-------------------------------------------------------------------
+
+While the above sections described how you would generate an OpenMM ``System``
+and ``Topology`` instance from any of a number of file formats (e.g., Amber
+topology file, Gromacs topology file, or CHARMM PSF file), it is also possible
+to go in the reverse direction. That is, to start with ``Topology`` and
+``System`` instances and convert those to a :class:`Structure
+<chemistry.structure.Structure>` instance.
+
+The function for this is :func:`load_openmm
+<chemistry.openmm.topsystem.load_openmm>`, and takes a mandatory ``Topology``
+instance, along with either an optional ``System`` instance or name of a
+serialized ``System`` XML file defining an OpenMM ``System``, and returns a
+populated :class:`Structure <chemistry.structure.Structure>` from it. This is
+particularly useful when you parametrize a system using the OpenMM modelling
+capabilities, but want to use that parametrized system in another program, like
+Amber or Gromacs.
+
+An example is shown below, using the OpenMM functionality to parametrize a PDB
+file with the ff99SB force field::
+
+    import chemistry as chem
+    import chemistry.unit as u
+
+    from simtk.openmm import app
+    from simtk import openmm as mm
+
+    pdb = app.PDBFile('input.pdb')
+    forcefield = app.ForceField('amber99sb.xml', 'tip3p.xml')
+    system = forcefield.createSystem(pdb.topology, nonbondedMethod=app.PME,
+                                     nonbondedCutoff=1*u.nanometer)
+
+    struct = chem.openmm.load_topology(pdb.topology, system)
+
+There are some limitations to this functionality, itemized below:
+
+- ParmEd does not recognize all of the different OpenMM Systems it can generate,
+  such as any of those features implemented using a ``CustomNonbondedForce``
+  (e.g., NBFIX, 10-12 potential, 12-6-4 potential, etc.).
+- You should make sure to create the ``System`` with no constraints, since
+  OpenMM may be missing bond or angle terms associated with the constrained
+  degrees of freedom.
+- With the exception of certain ``CustomTorsionForce`` which are recognized as
+  quadratic improper torsions, the presence of any ``CustomForce`` instances
+  prevents ParmEd from recognizing the potential.
