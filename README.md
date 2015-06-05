@@ -34,6 +34,13 @@ The API also provides bindings to the [OpenMM](https://simtk.org/home/openmm)
 library, permitting you to carry out full molecular dynamics investigations
 using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
 
+Documentation
+=============
+
+Want to learn more?  Visit the ParmEd documentation page at
+https://parmed.github.io/ParmEd for examples, descriptions, and API
+documentation.
+
 Authors and Contributors
 ========================
 
