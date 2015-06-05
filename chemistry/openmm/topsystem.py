@@ -243,7 +243,12 @@ def _process_rbtorsion(struct, force):
         i, j, k, l, c0, c1, c2, c3, c4, c5 = force.getTorsionParameters(ii)
         ai, aj = struct.atoms[i], struct.atoms[j]
         ak, al = struct.atoms[k], struct.atoms[l]
-        key = (c0._value, c1._value, c2._value, c3._value, c4._value, c5._value)
+        # TODO -- Fix this when OpenMM is fixed
+        try:
+            key = (c0._value, c1._value, c2._value,
+                   c3._value, c4._value, c5._value)
+        except AttributeError:
+            key = (c0, c1, c2, c3, c4, c5)
         if key in typemap:
             dihed_type = typemap[key]
         else:
@@ -366,8 +371,14 @@ def _process_nonbonded(struct, force):
             explicit_exceptions[ai].add(aj)
             explicit_exceptions[aj].add(ai)
             continue
-        nbtype = NonbondedExceptionType(sig*2**(1/6), eps,
-                                        q/(ai.charge*aj.charge))
+        try:
+            chgscale = q / (ai.charge * aj.charge)
+        except ZeroDivisionError:
+            if q != 0:
+                raise TypeError('Cannot scale charge product of 0 to match '
+                                '%s' % q)
+            chgscale = 1
+        nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
         struct.adjust_types.append(nbtype)
     struct.adjust_types.claim()
