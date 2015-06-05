@@ -60,11 +60,7 @@ except ImportError:
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
-    try:
-        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-    except ImportError:
-        # OpenMM version is too old... only orthorhombic cells supported
-        reducePeriodicBoxVectors = None
+    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     app = mm = None
 
@@ -1338,14 +1334,11 @@ class Structure(object):
             top.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
         # Set the unit cell dimensions
         if self.box is not None:
-            if reducePeriodicBoxVectors is None:
-                top.setUnitCellDimensions(self.box[:3]*u.angstroms)
-            else:
-                top.setPeriodicBoxVectors(
-                        reducePeriodicBoxVectors(
-                            box_lengths_and_angles_to_vectors(*self.box)
-                        )
-                )
+            top.setPeriodicBoxVectors(
+                    reducePeriodicBoxVectors(
+                        box_lengths_and_angles_to_vectors(*self.box)
+                    )
+            )
         return top
 
     #===================================================
@@ -1634,16 +1627,9 @@ class Structure(object):
         if removeCMMotion:
             system.addForce(mm.CMMotionRemover())
         if self.box is not None:
-            if reducePeriodicBoxVectors is None:
-                # This version of OpenMM does *not* support triclinics
-                if self.box[3] != 90 or self.box[4] != 90 or self.box[5] != 90:
-                    raise ValueError('OpenMM version %s only supports '
-                                     'orthorhombic unit cells' % mm.__version__)
-                system.setDefaultPeriodicBoxVectors(*self.box_vectors)
-            else:
-                system.setDefaultPeriodicBoxVectors(
-                        *reducePeriodicBoxVectors(self.box_vectors)
-                )
+            system.setDefaultPeriodicBoxVectors(
+                    *reducePeriodicBoxVectors(self.box_vectors)
+            )
         self.omm_set_virtual_sites(system)
         return system
 

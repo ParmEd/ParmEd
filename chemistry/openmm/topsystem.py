@@ -82,17 +82,12 @@ def load_topology(topology, system=None):
     for a1, a2 in topology.bonds():
         struct.bonds.append(Bond(atommap[a1], atommap[a2]))
 
-    if hasattr(topology, 'getPeriodicBoxVectors'):
-        vectors = topology.getPeriodicBoxVectors()
-        if vectors is not None:
-            leng, ang = box_vectors_to_lengths_and_angles(*vectors)
-            leng = leng.value_in_unit(u.angstroms)
-            ang = ang.value_in_unit(u.degrees)
-            struct.box = [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
-    else:
-        lengths = topology.getUnitCellDimensions()
-        if lengths is not None:
-            struct.box = [lengths[0], lengths[1], lengths[2], 90.0, 90.0, 90.0]
+    vectors = topology.getPeriodicBoxVectors()
+    if vectors is not None:
+        leng, ang = box_vectors_to_lengths_and_angles(*vectors)
+        leng = leng.value_in_unit(u.angstroms)
+        ang = ang.value_in_unit(u.degrees)
+        struct.box = [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
 
     if struct.box is not None:
         struct.box = create_array(struct.box)
@@ -111,12 +106,7 @@ def load_topology(topology, system=None):
                       mm.MonteCarloMembraneBarostat, mm.CustomExternalForce,
                       mm.GBSAOBCForce, mm.CustomGBForce)
 
-    if hasattr(system, 'usesPeriodicBoundaryConditions'):
-        get_vectors = system.usesPeriodicBoundaryConditions()
-    else:
-        get_vectors = struct.box is not None
-
-    if get_vectors:
+    if system.usesPeriodicBoundaryConditions():
         vectors = system.getDefaultPeriodicBoxVectors()
         leng, ang = box_vectors_to_lengths_and_angles(*vectors)
         leng = leng.value_in_unit(u.angstroms)
