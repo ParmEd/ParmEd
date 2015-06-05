@@ -5,26 +5,14 @@ from chemistry.geometry import box_vectors_to_lengths_and_angles
 from chemistry.amber.netcdffiles import NetCDFTraj
 from chemistry.amber.readparm import Rst7
 from chemistry import unit as u
-from chemistry.utils.six import wraps
+from chemistry.utils.decorators import needs_openmm
 from chemistry.utils.six.moves import range
 from math import isnan, isinf
 try:
-    import simtk.openmm as mm
-    HAS_OPENMM = True
+    from simtk import openmm as mm
 except ImportError:
-    HAS_OPENMM = False
-from time import time as timeofday
-
-def needs_openmm(fcn):
-    global HAS_OPENMM
-    @wraps(fcn)
-    def new_fcn(*args, **kwargs):
-        if not HAS_OPENMM:
-            raise ImportError('Could not find or import OpenMM')
-        return fcn(*args, **kwargs)
-
-    return new_fcn
-
+    pass
+from time import time
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
 
@@ -727,8 +715,8 @@ class ProgressReporter(StateDataReporter):
         """
         if self._startTime is None:
             # First time this is called, initialize the timers
-            self._startTime = timeofday()
-            self._lastReportTime = timeofday()
+            self._startTime = time()
+            self._lastReportTime = time()
             self._timeStep = simulation.integrator.getStepSize()
             self._timeStep = self._timeStep.value_in_unit(u.nanosecond)
             self._firstStep = simulation.currentStep
@@ -751,7 +739,7 @@ class ProgressReporter(StateDataReporter):
         # Query for the values
         values = self._constructReportValues(simulation, state)
 
-        now = timeofday()
+        now = time()
 
         total_time = now - self._startTime
         partial_time = now - self._lastReportTime

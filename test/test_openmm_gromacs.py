@@ -7,14 +7,15 @@ try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
     has_openmm = True
+    CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
     from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from chemistry import load_file, ExtraPoint
+from chemistry import load_file, ExtraPoint, openmm
 from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
 from chemistry.openmm.utils import energy_decomposition
-from chemistry.exceptions import GromacsTopologyWarning
+from chemistry.exceptions import GromacsTopologyWarning, ChemError, OpenMMWarning
 import chemistry.unit as u
 from chemistry.utils.six.moves import range, zip
 from chemistry.vec3 import Vec3
@@ -71,7 +72,7 @@ class TestGromacsTop(utils.TestCaseRelative):
 
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem(constraints=app.HBonds, rigidWater=True)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -93,7 +94,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem(constraints=app.HBonds, rigidWater=True,
                                   flexibleConstraints=True)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -115,7 +116,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         gro = load_file(os.path.join(get_fn('04.Ala'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -139,7 +140,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         gro = load_file(os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -165,7 +166,7 @@ class TestGromacsTop(utils.TestCaseRelative):
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -196,7 +197,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -226,7 +227,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -254,7 +255,7 @@ class TestGromacsTop(utils.TestCaseRelative):
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001), mm.Platform.getPlatformByName('CPU'))
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -262,6 +263,8 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 0)
         self.assertAlmostEqual(energies['angle'], 1405.7354199, places=4)
         self.assertAlmostEqual(energies['dihedral'], 236.932663255, places=4)
+        self.assertAlmostEqual(energies['improper'], 33.201541811, places=4)
+        self.assertAlmostEqual(energies['rb_torsion'], 428.0550599, places=4)
         self.assertRelativeEqual(energies['nonbonded'], -16432.8092955, places=4)
         gmxfrc = get_forces_from_xvg(os.path.join(get_fn('12.DPPC'), 'force.xvg'))
         ommfrc = context.getState(getForces=True).getForces().value_in_unit(
@@ -269,3 +272,39 @@ class TestGromacsTop(utils.TestCaseRelative):
         zero_ep_frc(ommfrc, top)
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
+
+    def testRoundTrip(self):
+        """ Test ParmEd -> OpenMM round trip with Gromacs system """
+        # Use DPPC to get RB-torsions tested. Also check that it initially fails
+        # with the CustomNonbondedForce
+        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
+        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
+        top.box = gro.box[:]
+
+        system = top.createSystem()
+        def bad_system():
+            return openmm.load_topology(top.topology, system).createSystem()
+        warnings.filterwarnings('error', category=OpenMMWarning)
+        self.assertRaises(OpenMMWarning, lambda:
+                openmm.load_topology(top.topology, system)
+        )
+        warnings.filterwarnings('ignore', category=OpenMMWarning)
+        self.assertRaises(ChemError, bad_system)
+        for i in range(len(system.getForces())):
+            if isinstance(system.getForce(i), mm.CustomNonbondedForce):
+                system.removeForce(i)
+                break
+        system2 = openmm.load_topology(top.topology, system).createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(gro.positions)
+        con2.setPositions(gro.positions)
+        ene1 = energy_decomposition(top, con1)
+        ene2 = energy_decomposition(top, con2)
+        self.assertAlmostEqual(ene1['bond'], ene2['bond'])
+        self.assertAlmostEqual(ene1['angle'], ene2['angle'])
+        self.assertAlmostEqual(ene1['dihedral'], ene2['dihedral'])
+        self.assertAlmostEqual(ene1['improper'], ene2['improper'])
+        self.assertAlmostEqual(ene1['rb_torsion'], ene2['rb_torsion'])
+        self.assertAlmostEqual(ene1['nonbonded'], ene2['nonbonded'])

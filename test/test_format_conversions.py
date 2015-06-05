@@ -9,7 +9,7 @@ import os
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    cpu = mm.Platform.getPlatformByName('CPU')
+    CPU = mm.Platform.getPlatformByName('CPU')
     has_openmm = True
 except ImportError:
     has_openmm = False
@@ -99,8 +99,8 @@ class TestGromacsToAmber(TestCase):
         sysg = top.createSystem()
         sysa = parm.createSystem()
 
-        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), cpu)
-        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), cpu)
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
 
         cong.setPositions(gro.positions)
         cona.setPositions(gro.positions)
@@ -119,8 +119,8 @@ class TestGromacsToAmber(TestCase):
         sysg = top.createSystem()
         sysa = parm.createSystem()
 
-        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), cpu)
-        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), cpu)
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
 
         cong.setPositions(gro.positions)
         cona.setPositions(gro.positions)
@@ -141,3 +141,76 @@ class TestGromacsToAmber(TestCase):
                 self.assertAlmostEqual(ene1[term], 0)
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
+
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+class TestOpenMMToAmber(TestCase):
+    """
+    Tests that OpenMM system/topology combo can be translated to other formats
+    """
+
+    def testSimple(self):
+        """ Test OpenMM System/Topology -> Amber prmtop conversion """
+        parm = chem.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        system = parm.createSystem()
+        chem.amber.AmberParm.from_structure(
+                chem.openmm.load_topology(parm.topology, system)
+        ).write_parm(get_fn('ash_from_omm.parm7', written=True))
+        parm2 = chem.load_file(get_fn('ash_from_omm.parm7', written=True))
+        system2 = parm2.createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+
+        self._check_energies(parm, con1, parm2, con2)
+
+    def _check_energies(self, parm1, con1, parm2, con2):
+        ene1 = chem.openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = chem.openmm.utils.energy_decomposition(parm2, con2)
+
+        all_terms = set(ene1.keys()) | set(ene2.keys())
+
+        for term in all_terms:
+            if term not in ene1:
+                self.assertAlmostEqual(ene2[term], 0)
+            elif term not in ene2:
+                self.assertAlmostEqual(ene1[term], 0)
+            else:
+                self.assertRelativeEqual(ene2[term], ene1[term], places=5)
+
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+class TestOpenMMToGromacs(TestCase):
+    """
+    Tests that OpenMM system/topology combo can be translated to other formats
+    """
+
+    def testSimple(self):
+        """ Test OpenMM System/Topology -> Gromacs topology conversion """
+        parm = chem.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        system = parm.createSystem()
+        chem.gromacs.GromacsTopologyFile.from_structure(
+                chem.openmm.load_topology(parm.topology, system)
+        ).write(get_fn('ash_from_omm.top', written=True))
+        parm2 = chem.gromacs.GromacsTopologyFile(get_fn('ash_from_omm.top', written=True))
+        system2 = parm2.createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+
+        self._check_energies(parm, con1, parm2, con2)
+
+    def _check_energies(self, parm1, con1, parm2, con2):
+        ene1 = chem.openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = chem.openmm.utils.energy_decomposition(parm2, con2)
+
+        all_terms = set(ene1.keys()) | set(ene2.keys())
+
+        for term in all_terms:
+            if term not in ene1:
+                self.assertAlmostEqual(ene2[term], 0)
+            elif term not in ene2:
+                self.assertAlmostEqual(ene1[term], 0)
+            else:
+                self.assertRelativeEqual(ene2[term], ene1[term], places=5)
+

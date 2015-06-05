@@ -174,3 +174,6 @@ class PreProcessorError(ChemError):
 
 class PreProcessorWarning(ChemWarning):
     """ If there is something we should warn about in preprocessing """
+
+class OpenMMWarning(ChemWarning):
+    """ If there is something we should warn when processing OpenMM objects """

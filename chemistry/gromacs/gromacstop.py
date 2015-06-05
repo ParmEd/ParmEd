@@ -618,7 +618,7 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'nonbond_params':
                     words = line.split()
                     a1, a2 = words[:2]
-                    func = int(words[2])
+#                   func = int(words[2])
                     sig, eps = (float(x) for x in words[3:5])
                     sig *= 10 # Convert to Angstroms
                     eps *= u.kilojoule.conversion_factor_to(u.kilocalorie)
@@ -1044,7 +1044,6 @@ class GromacsTopologyFile(Structure):
             for dihedral in struct.dihedrals:
                 if dihedral.type is None: continue
                 if isinstance(dihedral.type, DihedralTypeList):
-                    fudgeQQ = fudgeLJ = None
                     for dt in dihedral.type:
                         if dt.scee:
                             scee_values.add(dt.scee)

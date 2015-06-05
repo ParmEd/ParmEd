@@ -24,12 +24,13 @@ from __future__ import division, print_function
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
-from chemistry.exceptions import AmberParmError
+from chemistry.exceptions import AmberParmError, AmberParmWarning
 from chemistry.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                        ImproperType, CmapType, ExtraPoint)
 from chemistry.utils.six.moves import zip, range
 import copy
 from math import sqrt
+import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

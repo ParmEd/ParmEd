@@ -12,14 +12,12 @@ from chemistry import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                        Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
 from chemistry.exceptions import (CharmmPSFError, MoleculeError,
                 CharmmPSFWarning, MissingParameter, CharmmPsfEOF)
-from chemistry.structure import needs_openmm, app, mm
-from chemistry import unit as u
+from chemistry.structure import needs_openmm
 from chemistry.utils.io import genopen
 from chemistry.utils.six import wraps
 from chemistry.utils.six.moves import zip, range
 from contextlib import closing
 from copy import copy
-from math import sqrt
 import os
 import re
 import warnings

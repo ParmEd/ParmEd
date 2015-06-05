@@ -7,3 +7,5 @@ from chemistry.openmm.reporters import (
         ProgressReporter, EnergyMinimizerReporter,
 )
 from chemistry.openmm import utils
+from chemistry.openmm.topsystem import load_topology
+
