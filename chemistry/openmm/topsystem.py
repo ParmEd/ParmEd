@@ -280,7 +280,7 @@ def _process_improper(struct, force):
         i, j, k, l, (psi_k, psi_eq) = force.getTorsionParameters(ii)
         ai, aj = struct.atoms[i], struct.atoms[j]
         ak, al = struct.atoms[k], struct.atoms[l]
-        key = (psi_k._value, psi_eq._value)
+        key = (psi_k, psi_eq)
         if key in typemap:
             imp_type = typemap[key]
         else:
