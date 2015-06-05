@@ -17,6 +17,7 @@ import chemistry.unit as u
 from chemistry.utils.six.moves import range, zip
 from copy import copy
 from math import sqrt
+import os
 import ParmedTools as PT
 import unittest
 import utils
@@ -72,6 +73,20 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     return energies
 
 class TestAmberParm(utils.TestCaseRelative):
+
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
 
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
@@ -224,6 +239,25 @@ class TestAmberParm(utils.TestCaseRelative):
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem()
         system2 = load_topology(parm.topology, system).createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+        e1 = decomposed_energy(con1, parm)
+        e2 = decomposed_energy(con2, parm)
+        self.assertAlmostEqual(e1['bond'], e2['bond'])
+        self.assertAlmostEqual(e1['angle'], e2['angle'])
+        self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
+        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'])
+
+    def testRoundTripXML(self):
+        """ Test ParmEd -> OpenMM round trip with Amber gas phase via XML """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        system = parm.createSystem()
+        fname = get_fn('ash.xml', written=True)
+        with open(fname, 'w') as f:
+            f.write(mm.XmlSerializer.serialize(system))
+        system2 = load_topology(parm.topology, fname).createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con1.setPositions(parm.positions)

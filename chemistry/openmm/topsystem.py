@@ -16,7 +16,7 @@ from chemistry.topologyobjects import (Atom, Bond, BondType, Angle, AngleType,
         RBTorsionType)
 from chemistry import unit as u
 from chemistry.utils.decorators import needs_openmm
-from chemistry.utils.six import iteritems
+from chemistry.utils.six import iteritems, string_types
 from chemistry.utils.six.moves import range
 from collections import defaultdict
 try:
@@ -27,6 +27,7 @@ except ImportError:
     np = None
     def create_array(array):
         return array
+import os
 try:
     import simtk.openmm as mm
 except ImportError:
@@ -43,14 +44,26 @@ def load_topology(topology, system=None):
     ----------
     topology : :class:`simtk.openmm.app.Topology`
         The Topology instance with the list of atoms and bonds for this system
-    system : :class:`simtk.openmm.System`, optional
+    system : :class:`simtk.openmm.System` or str, optional
         If provided, parameters from this System will be applied to the
-        Structure
+        Structure. If a string is given, it will be interpreted as the file name
+        of an XML-serialized System, and it will be deserialized into a System
+        before used to supply parameters
 
     Returns
     -------
     struct : :class:`Structure <chemistry.structure.Structure>`
         The structure from the provided topology
+
+    Raises
+    ------
+    OpenMMWarning if parameters are found that cannot be interpreted or
+    processed by ParmEd
+
+    TypeError if there are any mismatches between the provided topology and
+    system (e.g., they have different numbers of atoms)
+
+    IOError if system is a string and it is not an existing file
 
     Notes
     -----
@@ -94,6 +107,10 @@ def load_topology(topology, system=None):
 
     if system is None:
         return struct
+
+    if isinstance(system, string_types):
+        with open(system, 'r') as f:
+            system = mm.XmlSerializer.deserialize(f.read())
 
     # We have a system, try to extract parameters from it
     if len(struct.atoms) != system.getNumParticles():
