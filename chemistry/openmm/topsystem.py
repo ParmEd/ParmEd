@@ -193,7 +193,7 @@ def _process_dihedral(struct, force):
         i, j, k, l, per, phase, phi_k = force.getTorsionParameters(ii)
         ai, aj = struct.atoms[i], struct.atoms[j]
         ak, al = struct.atoms[k], struct.atoms[l]
-        key = (per, phase._value, k._value)
+        key = (per, phase._value, phi_k._value)
         if key in typemap:
             dihed_type = typemap[key]
         else:
@@ -311,7 +311,7 @@ def _process_nonbonded(struct, force):
             atom_type = AtomType(atype_name, None, atom.mass,
                                  atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
-        rmin = sig.value_in_unit(u.angstroms) * 2**(-1/6) / 2 # to rmin/2
+        rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
         atom_type.set_lj_params(eps, rmin)
         atom.atom_type = atom_type
