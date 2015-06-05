@@ -123,17 +123,39 @@ class TestAmberParm(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    constraints=app.HBonds,
                                    rigidWater=True,
-                                   flexibleConstraints=False)
+                                   flexibleConstraints=True)
         system2 = load_topology(parm.topology, system).createSystem(
                                     nonbondedMethod=app.PME,
                                     nonbondedCutoff=8*u.angstroms,
                                     constraints=app.HBonds,
                                     rigidWater=True,
-                                    flexibleConstraints=False)
+                                    flexibleConstraints=True)
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
         e1 = decomposed_energy(con1, parm)
         e2 = decomposed_energy(con2, parm)
+        self.assertAlmostEqual(e1['bond'], e2['bond'])
+        self.assertAlmostEqual(e1['angle'], e2['angle'])
+        self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
+        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'], places=5)
+        # Check that we have the correct number of virtual sites
+        nvirt1 = nvirt2 = 0
+        for i in range(system.getNumParticles()):
+            nvirt1 += system.isVirtualSite(i)
+            nvirt2 += system2.isVirtualSite(i)
+        self.assertEqual(nvirt1, nvirt2)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        state1 = con1.getState(getForces=True)
+        state2 = con2.getState(getForces=True)
+        f1 = state1.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        f2 = state2.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        for p, s in zip(f1, f2):
+            for x1, x2 in zip(p, s):
+                self.assertAlmostEqual(x1, x2, places=3)
 
     def testEPEnergy2(self):
         """ Tests AmberParm handling of extra points in TIP5P water """
