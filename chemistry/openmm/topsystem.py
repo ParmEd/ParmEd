@@ -264,12 +264,14 @@ def _process_rbtorsion(struct, force):
         try:
             key = (c0._value, c1._value, c2._value,
                    c3._value, c4._value, c5._value)
+            f = 1
         except AttributeError:
             key = (c0, c1, c2, c3, c4, c5)
+            f = u.kilojoules_per_mole
         if key in typemap:
             dihed_type = typemap[key]
         else:
-            dihed_type = RBTorsionType(c0, c1, c2, c3, c4, c5)
+            dihed_type = RBTorsionType(c0*f, c1*f, c2*f, c3*f, c4*f, c5*f)
             typemap[key] = dihed_type
             struct.rb_torsion_types.append(dihed_type)
         struct.rb_torsions.append(Dihedral(ai, aj, ak, al, type=dihed_type))
