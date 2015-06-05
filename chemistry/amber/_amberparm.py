@@ -342,16 +342,15 @@ class AmberParm(AmberFormat, Structure):
             if dt.phi_k == 0 and dt.per == 0:
                 dt.per = 1.0
             elif dt.per == 0:
-                warnings.warn('Periodicity of 0 detected with non-zero force '
-                              'constant. Changing periodicity to 1 and force '
-                              'constant to 0 to ensure 1-4 nonbonded pairs are '
-                              'properly identified. This might cause a shift '
-                              'in the energy, but will leave forces unaffected',
-                              AmberParmWarning)
+                warn('Periodicity of 0 detected with non-zero force constant. '
+                     'Changing periodicity to 1 and force constant to 0 to '
+                     'ensure 1-4 nonbonded pairs are properly identified. This '
+                     'might cause a shift in the energy, but will leave forces '
+                     'unaffected', AmberParmWarning)
                 dt.phi_k = 0.0
                 dt.per = 1.0
         inst.remake_parm()
-        inst._set_nonbonded_tables()
+        inst._set_nonbonded_tables(nbfixes)
 
         return inst
 
@@ -1812,7 +1811,7 @@ class AmberParm(AmberFormat, Structure):
                     i, j = min(i, j-1), max(i, j-1)
                     eps = abs(eps)
                     eps14 = abs(eps14)
-                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    idx = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                     self.parm_data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
                     self.parm_data['LENNARD_JONES_BCOEF'][idx] = 2*eps * rmin**6
 
@@ -2020,9 +2019,9 @@ class AmberParm(AmberFormat, Structure):
             zero_angle.list = self.angle_types
         if n14: # See if there is some ambiguity here
             if not self.adjusts and len(scalings) > 1:
-                warnings.warn('Multiple 1-4 scaling factors detected. Using '
-                              'the most-used values scee=%f scnb=%f' %
-                              (scee, scnb), AmberParmWarning)
+                warn('Multiple 1-4 scaling factors detected. Using the '
+                     'most-used values scee=%f scnb=%f' % (scee, scnb),
+                     AmberParmWarning)
         return n13, n14
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

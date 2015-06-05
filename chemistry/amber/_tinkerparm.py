@@ -24,7 +24,7 @@ from __future__ import division, print_function, absolute_import
 
 from chemistry.amber._amberparm import AmberParm
 from chemistry.amber.amberformat import AmberFormat
-from chemistry.constants import NATOM, NRES, IFBOX, DEG_TO_RAD, RAD_TO_DEG
+from chemistry.constants import NATOM, NRES, IFBOX, RAD_TO_DEG
 from chemistry import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
                 Dihedral, StretchBend, TorsionTorsion, ChiralFrame,

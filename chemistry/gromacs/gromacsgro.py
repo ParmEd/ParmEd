@@ -224,8 +224,9 @@ class GromacsGroFile(object):
                 ydim[1] = max(ydim[1], atom.xy)
                 zdim[0] = min(zdim[0], atom.xz)
                 zdim[1] = max(zdim[1], atom.xz)
-            dest.write('%10.5f'*3 % (xdim[1]-xdim[0]+5, ydim[1]-ydim[0]+5,
-                                     zdim[1]-zdim[0]+5))
+            dest.write('%10.5f'*3 % ((xdim[1]-xdim[0]+5)/10,
+                                     (ydim[1]-ydim[0]+5)/10,
+                                     (zdim[1]-zdim[0]+5)/10))
             dest.write('\n')
         if own_handle:
             dest.close()

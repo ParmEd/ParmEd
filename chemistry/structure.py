@@ -30,16 +30,15 @@ from chemistry.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
 from chemistry.residue import WATER_NAMES
 from chemistry.topologyobjects import (AtomList, ResidueList, TrackedList,
-        AngleType, DihedralType, DihedralTypeList, BondType, ImproperType,
-        CmapType, OutOfPlaneBendType, StretchBendType, TorsionTorsionType,
-        Bond, Angle, Dihedral, UreyBradley, Improper, Cmap, TrigonalAngle,
-        OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion, ChiralFrame,
-        MultipoleFrame, NonbondedException, AcceptorDonor, Group, Atom,
-        ExtraPoint, TwoParticleExtraPointFrame, ThreeParticleExtraPointFrame,
-        OutOfPlaneExtraPointFrame, RBTorsionType)
+        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
+        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
+        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
+        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame,
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from chemistry import unit as u
 from chemistry.utils import tag_molecules
-from chemistry.utils.six import string_types, wraps, integer_types, iteritems
+from chemistry.utils.decorators import needs_openmm
+from chemistry.utils.six import string_types, integer_types, iteritems
 from chemistry.utils.six.moves import zip, range
 from chemistry.vec3 import Vec3
 from copy import copy
@@ -68,14 +67,6 @@ try:
         reducePeriodicBoxVectors = None
 except ImportError:
     app = mm = None
-
-def needs_openmm(func):
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        if app is None or mm is None:
-            raise ImportError('Could not find OpenMM Python bindings')
-        return func(*args, **kwargs)
-    return wrapped
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2187,7 +2178,7 @@ class Structure(object):
             for c1 in atom.children:
                 force.addException(c1.idx, a2.idx, 0.0, 0.5, 0.0, True)
             for c2 in a2.children:
-                force.addException(angle.atom1.idx, c2.idx, 0.0, 0.5, 0.0, True)
+                force.addException(atom.idx, c2.idx, 0.0, 0.5, 0.0, True)
             for c1 in atom.children:
                 for c2 in a2.children:
                     force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
