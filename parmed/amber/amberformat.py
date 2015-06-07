@@ -15,7 +15,7 @@ from parmed.utils.six.moves import range
 from contextlib import closing
 from copy import copy
 import datetime
-from fortranformat import FortranRecordReader, FortranRecordWriter
+from parmed.utils.fortranformat import FortranRecordReader, FortranRecordWriter
 from math import ceil
 import re
 from warnings import warn, filterwarnings

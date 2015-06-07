@@ -1,17 +1,9 @@
 import math
 import itertools
-import sys
-IS_PYTHON3 = sys.version_info[0] >= 3
 
-if IS_PYTHON3:
-    exec('from ._edit_descriptors import *')
-    exec('from ._misc import expand_edit_descriptors, has_next_iterator')
-    exec('from . import config')
-else:
-    exec('from _edit_descriptors import *')
-    exec('from _misc import expand_edit_descriptors, has_next_iterator')
-    exec('import fortranformat.config as config')
-
+from ._edit_descriptors import *
+from ._misc import expand_edit_descriptors, has_next_iterator
+from . import config
 
 PROC_SIGN_ZERO = config.PROC_SIGN_ZERO
 PROC_MIN_FIELD_WIDTH = config.PROC_MIN_FIELD_WIDTH
@@ -57,10 +49,7 @@ def output(eds, reversion_eds, values):
             break
         # take a edit descriptor off the queue if there is any
         if get_ed.has_next():
-            if IS_PYTHON3:
-                ed = next(get_ed)
-            else:
-                ed = get_ed.next()
+            ed = next(get_ed)
         else:
             if reversion_contains_output_ed == True:
                 # take from reversion edit descriptors if there is a value
@@ -84,10 +73,7 @@ def output(eds, reversion_eds, values):
         # check if edit descriptor requires a value
         if isinstance(ed, OUTPUT_EDS):
             if get_value.has_next():
-                if IS_PYTHON3:
-                    val = next(get_value)
-                else:
-                    val = get_value.next()
+                val = next(get_value)
             else:
                 # is a edit descriptor that requires a value but no value
                 # todo: does it stop gracefully or raise error?
