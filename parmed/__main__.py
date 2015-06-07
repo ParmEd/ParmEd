@@ -15,13 +15,13 @@ def main():
     import warnings
     
     # Load custom modules
-    from ParmedTools.logos import Logo
-    from ParmedTools.exceptions import (ParmError, SeriousParmWarning,
+    from parmed.tools.logos import Logo
+    from parmed.tools.exceptions import (ParmError, SeriousParmWarning,
                                         InterpreterError)
-    from ParmedTools.parmed_cmd import ParmedCmd
-    from ParmedTools.ParmedActions import Action
-    from ParmedTools.parmlist import ParmList
-    from ParmedTools import __version__
+    from parmed.tools.parmed_cmd import ParmedCmd
+    from parmed.tools.ParmedActions import Action
+    from parmed.tools.parmlist import ParmList
+    from parmed import __version__
     
     # Set up new excepthook to clean up fatal exception printouts
     def interrupted(*args, **kwargs):

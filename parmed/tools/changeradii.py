@@ -1,4 +1,4 @@
-from ParmedTools.exceptions import ChangeRadiiError
+from parmed.tools.exceptions import ChangeRadiiError
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

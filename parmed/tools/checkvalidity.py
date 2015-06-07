@@ -3,10 +3,9 @@ Contains the (very long) routine that does in-depth sanity checks on the
 topology file
 """
 
-from ParmedTools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
-                                    FixableParmWarning, NonfatalWarning,
-                                    NonUniversalWarning, MissingDisulfide,
-                                    LongBondWarning)
+from parmed.tools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
+        FixableParmWarning, NonfatalWarning, NonUniversalWarning,
+        MissingDisulfide, LongBondWarning)
 from parmed.constants import TINY
 from parmed.amber.mask import AmberMask
 from parmed.exceptions import MoleculeError

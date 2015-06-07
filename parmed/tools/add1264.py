@@ -5,7 +5,7 @@ topology file given a list of atomic polarizabilities
 from __future__ import division, print_function
 
 from parmed.utils.six.moves import range
-from ParmedTools.exceptions import LJ12_6_4Error, DuplicateParamWarning
+from parmed.tools.exceptions import LJ12_6_4Error, DuplicateParamWarning
 import warnings
 
 WATER_POL = 1.444 # Polarizability of water

@@ -8,7 +8,7 @@ from __future__ import print_function, division, absolute_import
 from parmed.utils.six import string_types
 from parmed import load_file, Structure
 from parmed.exceptions import FormatNotFound
-from ParmedTools.exceptions import DuplicateParm, ParmIndexError, ParmError
+from parmed.tools.exceptions import DuplicateParm, ParmIndexError, ParmError
 
 class ParmList(object):
     """

@@ -24,8 +24,8 @@ try:
 except ImportError:
     np = None
 import os
-from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
+from parmed.tools.argumentlist import ArgumentList
+from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               ChangeStateError, ChangeLJPairError, ParmedChangeError,
               SetParamError, DeleteDihedralError, NoArgument, NonexistentParm,
               AmbiguousParmError, IncompatibleParmsError, ArgumentError,
@@ -35,7 +35,7 @@ from ParmedTools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               FileDoesNotExist, InputError, TiMergeError,
 #             CoarseGrainError,
 )
-from ParmedTools.parmlist import ParmList
+from parmed.tools.parmlist import ParmList
 import sys
 import warnings
 
@@ -583,7 +583,7 @@ class changeRadii(Action):
         return 'Changing PB/GB radii to %s' % self.radii
 
     def execute(self):
-        from ParmedTools.changeradii import ChRad
+        from parmed.tools.changeradii import ChRad
         # Add RADIUS_SET to prmtop if it's not there already, and a blank 
         # description, since it's about to be set here
         if isinstance(self.parm, AmberParm):
@@ -721,8 +721,8 @@ class checkValidity(Action):
         return 'Determining validity of prmtop'
 
     def execute(self):
-        from ParmedTools.checkvalidity import check_validity
-        from ParmedTools.exceptions import WarningList
+        from parmed.tools.checkvalidity import check_validity
+        from parmed.tools.exceptions import WarningList
         # Clear our warnings and start logging them, since check_validity
         # reports concerns about the prmtop through the warning system.
         warning_log = WarningList(empty_msg=('%s looks OK to me!' % self.parm))
@@ -875,7 +875,7 @@ class addLJType(Action):
         return 'Making atoms %s into a new LJ atom type' % self.mask
 
     def execute(self):
-        from ParmedTools.addljtype import AddLJType
+        from parmed.tools.addljtype import AddLJType
         # Find the first atom that's selected in this selection. We've
         # already made sure that at least one atom was selected
         sel_atms = self.mask.Selection()
@@ -1072,7 +1072,7 @@ class changeLJSingleType(Action):
 
     def execute(self):
         from math import sqrt
-        from ParmedTools.exceptions import LJ_TypeError
+        from parmed.tools.exceptions import LJ_TypeError
         # If this is an empty mask do nothing
         if self.orig_radius is None: return
         # Make sure we've only selected a single atom type with our mask
@@ -1292,7 +1292,7 @@ class setMolecules(Action):
 #                "file " + self.cg_param_file)
 #
 #    def execute(self):
-#        from ParmedTools.coarsegrain import addCoarseGrain as addCG
+#        from parmed.tools.coarsegrain import addCoarseGrain as addCG
 #        if 'ANGLE_COEF_A' in self.parm.flag_list: return
 #        addCG(self.parm, self.cg_param_file)
 #
@@ -2839,7 +2839,7 @@ class interpolate(Action):
 
     def execute(self):
         """ Interpolates the prmtops """
-        from ParmedTools.arraytools import NumberArray
+        from parmed.tools.arraytools import NumberArray
         if self.diff_vdw and not self.eleconly:
             raise NotImplemented('No support for scaling vdW parameters yet!')
 
@@ -3244,7 +3244,7 @@ class add12_6_4(Action):
         return retstr
 
     def execute(self):
-        from ParmedTools.add1264 import params1264 as params
+        from parmed.tools.add1264 import params1264 as params
         if 'LENNARD_JONES_CCOEF' in self.parm.flag_list:
             self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
@@ -3363,7 +3363,7 @@ class OpenMM(Action):
 
     def execute(self):
         """ Runs the OpenMM simulation """
-        from ParmedTools.simulations.openmm import simulate, HAS_OPENMM
+        from parmed.tools.simulations.openmm import simulate, HAS_OPENMM
         if not HAS_OPENMM:
             raise SimulationError('OpenMM could not be imported. Skipping.')
         # First try to load a restart file if it was supplied
@@ -3445,13 +3445,13 @@ class energy(Action):
 
     def execute(self):
         if self.use_openmm:
-            from ParmedTools.simulations.openmm import energy, HAS_OPENMM
+            from parmed.tools.simulations.openmm import energy, HAS_OPENMM
             if not HAS_OPENMM:
                 raise SimulationError('OpenMM could not be imported. Skipping.')
 
             energy(self.parm, self.arg_list, self.output)
         else:
-            from ParmedTools.simulations.sanderapi import energy, HAS_SANDER
+            from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
                 raise SimulationError('sander could not be imported. Skipping.')
             # Consume the OMM-specific arguments so we don't have any apparently
@@ -3991,7 +3991,7 @@ class minimize(Action):
         return retstr.strip()
 
     def execute(self):
-        from ParmedTools.simulations.openmm import minimize, HAS_OPENMM
+        from parmed.tools.simulations.openmm import minimize, HAS_OPENMM
         if not HAS_OPENMM:
             raise SimulationError('OpenMM could not be imported. Skipping.')
 

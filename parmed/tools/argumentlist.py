@@ -2,7 +2,7 @@
 This stores a list of arguments, tokenizing a string into a list of arguments.
 """
 import warnings
-from ParmedTools.exceptions import NoArgument, InputError
+from parmed.tools.exceptions import NoArgument, InputError
 
 class Argument(object):
     """ Is an argument """

@@ -10,9 +10,9 @@ from parmed.utils.six.moves import range
 import cmd
 from glob import glob
 import os
-from ParmedTools.ParmedActions import COMMANDMAP, Usages
-from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.exceptions import InterpreterError, ParmError
+from parmed.tools.actions import COMMANDMAP, Usages
+from parmed.tools.argumentlist import ArgumentList
+from parmed.tools.exceptions import InterpreterError, ParmError
 try:
     import readline
 except ImportError:
@@ -265,7 +265,7 @@ class ParmedCmd(cmd.Cmd):
 
     def _python_shell(self):
         """ Drop into a limited interpreter and read until we see !! """
-        from ParmedTools import ParmedActions
+        from parmed.tools import actions
         python_interpreter = PythonCmd(stdin=self.stdin, stdout=self.stdout)
         python_interpreter.use_rawinput = self.use_rawinput
         python_interpreter.setlog(self._logfile)
@@ -278,7 +278,7 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
     def do_help(self, arg):
-        " Modify the original do_help to pull docstrings from ParmedActions "
+        " Modify the original do_help to pull docstrings from actions "
         if arg:
             # XXX check arg syntax
             try:
