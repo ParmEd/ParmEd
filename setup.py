@@ -4,15 +4,13 @@ from distutils.core import setup, Extension
 import os
 import sys
 
-# First the ParmedTools packages:
-packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
-
-# Next the main parmed packages
+# parmed package and all its subpackages
 packages += ['parmed', 'parmed.amber', 'parmed.modeller',
              'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
              'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
-             'parmed.formats', 'fortranformat', 'parmed.openmm',
-             'parmed.utils', 'parmed.gromacs']
+             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
+             'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Scripts
 scripts = ['xparmed.py']
