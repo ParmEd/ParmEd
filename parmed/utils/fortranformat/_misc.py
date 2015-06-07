@@ -10,7 +10,8 @@ class has_next_iterator(object):
     def __init__(self, it):
         self.it = iter(it)
         self._has_next = None
-    def __iter__(self): return self
+    def __iter__(self):
+        return self
     def __next__(self):
         if self._has_next:
             result = self._the_next
@@ -27,10 +28,12 @@ class has_next_iterator(object):
         return result
     def has_next(self):
         if self._has_next is None:
-        try: 
-            self._the_next = next(self.it)
-        except StopIteration: self._has_next = False
-        else: self._has_next = True
+            try: 
+                self._the_next = next(self.it)
+            except StopIteration:
+                self._has_next = False
+            else:
+                self._has_next = True
         return self._has_next
 
 
