@@ -3,7 +3,7 @@ Tests the ParmList class
 """
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
-from ParmedTools import ParmList
+from parmed.tools import ParmList
 import unittest
 from utils import get_fn
 

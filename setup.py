@@ -5,12 +5,12 @@ import os
 import sys
 
 # parmed package and all its subpackages
-packages += ['parmed', 'parmed.amber', 'parmed.modeller',
-             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
-             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
-             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
-             'parmed.utils', 'parmed.gromacs', 'parmed.tools',
-             'parmed.tools.gui', 'parmed.tools.simulations']
+packages = ['parmed', 'parmed.amber', 'parmed.modeller',
+            'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
+            'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
+            'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
+            'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+            'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Scripts
 scripts = ['xparmed.py']
@@ -27,6 +27,7 @@ if __name__ == '__main__':
     from distutils.command.build_py import build_py
     from distutils.command.build_scripts import build_scripts
     import shutil
+    import parmed
 
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
@@ -62,7 +63,7 @@ if __name__ == '__main__':
                       'ParmEd' % pmdtools, file=sys.stderr)
 
     setup(name='ParmEd',
-          version='15.0b',
+          version=parmed.__version__,
           description='Amber parameter file editor',
           author='Jason Swails',
           author_email='jason.swails -at- gmail.com',

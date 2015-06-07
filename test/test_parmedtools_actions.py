@@ -11,9 +11,9 @@ from parmed.formats import PDBFile, CIFFile
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import os
-from ParmedTools import exceptions as exc
-from ParmedTools import ParmedActions as PT
-from ParmedTools import parmlist
+import parmed.tools as PT
+from parmed.tools import exceptions as exc
+from parmed.tools import parmlist
 import saved_outputs as saved
 import sys
 import unittest
