@@ -1,8 +1,8 @@
 " This command adds a new Lennard Jones atom type from the selected atoms. "
 
 from math import sqrt
-from chemistry.constants import NTYPES
-from chemistry.utils.six.moves import range
+from parmed.constants import NTYPES
+from parmed.utils.six.moves import range
 
 def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     """ Adds a new Lennard Jones type to a topology file """

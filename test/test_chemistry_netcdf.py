@@ -2,7 +2,7 @@
 Tests the NetCDF file parsing capabilities with the different backends
 """
 
-from chemistry.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip
 import unittest
 import utils
 
@@ -13,10 +13,10 @@ class TestNetCDF(unittest.TestCase):
     
     def testScipy(self):
         """ Test scipy NetCDF parsing """
-        import chemistry.amber as amber
+        import parmed.amber as amber
         if utils.has_scipy():
             amber.use('scipy')
-            from chemistry.amber.netcdffiles import NetCDFTraj, NetCDFRestart
+            from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
             traj = NetCDFTraj.open_old(get_fn('tz2.truncoct.nc'))
             self._check_traj(traj)
             rst = NetCDFRestart.open_old(get_fn('ncinpcrd.rst7'))
@@ -26,10 +26,10 @@ class TestNetCDF(unittest.TestCase):
 
     def testNetcdf4(self):
         """ Test netCDF4 parsing """
-        import chemistry.amber as amber
+        import parmed.amber as amber
         if utils.has_netcdf4():
             amber.use('netCDF4')
-            from chemistry.amber.netcdffiles import NetCDFTraj, NetCDFRestart
+            from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
             traj = NetCDFTraj.open_old(get_fn('tz2.truncoct.nc'))
             self._check_traj(traj)
             rst = NetCDFRestart.open_old(get_fn('ncinpcrd.rst7'))
@@ -39,10 +39,10 @@ class TestNetCDF(unittest.TestCase):
 
     def testScientificPython(self):
         """ Test ScientificPython parsing """
-        import chemistry.amber as amber
+        import parmed.amber as amber
         if utils.has_scientific():
             amber.use('Scientific')
-            from chemistry.amber.netcdffiles import NetCDFTraj, NetCDFRestart
+            from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
             traj = NetCDFTraj.open_old(get_fn('tz2.truncoct.nc'))
             self._check_traj(traj)
             rst = NetCDFRestart.open_old(get_fn('ncinpcrd.rst7'))

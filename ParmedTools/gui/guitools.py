@@ -2,10 +2,10 @@
 The GUI components of xparmed.py
 """
 from __future__ import division
-from chemistry.utils.six import iteritems
-from chemistry.utils.six.moves import range
-from chemistry.utils.six.moves.tkinter import *
-import chemistry.utils.six.moves.tkinter_messagebox as tkMessageBox
+from parmed.utils.six import iteritems
+from parmed.utils.six.moves import range
+from parmed.utils.six.moves.tkinter import *
+import parmed.utils.six.moves.tkinter_messagebox as tkMessageBox
 from ParmedTools.gui.guiactions import gui_action_dispatcher
 from ParmedTools.gui._guiwidgets import MessageWindow
 

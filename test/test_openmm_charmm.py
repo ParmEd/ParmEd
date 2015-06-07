@@ -28,12 +28,12 @@ except ImportError:
     def PDBFile(*args, **kwargs): return None
     has_openmm = False
 
-from chemistry.amber.readparm import Rst7
-from chemistry.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+from parmed.amber.readparm import Rst7
+from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
                               CharmmParameterSet)
-from chemistry.exceptions import CharmmPSFWarning
-from chemistry import unit as u, openmm
-from chemistry.utils.six.moves import range
+from parmed.exceptions import CharmmPSFWarning
+from parmed import unit as u, openmm
+from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest

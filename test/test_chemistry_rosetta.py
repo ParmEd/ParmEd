@@ -1,5 +1,5 @@
-from chemistry import read_PDB, load_rosetta
-from chemistry.utils.six.moves import range
+from parmed import read_PDB, load_rosetta
+from parmed.utils.six.moves import range
 from itertools import chain
 from utils import get_fn
 import unittest

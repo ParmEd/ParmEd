@@ -3,10 +3,10 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 """
 
 # Load some system modules that may be useful for various users in shell mode
-from chemistry.amber.readparm import AmberParm
-from chemistry.exceptions import ChemError
-from chemistry.utils.six import iteritems
-from chemistry.utils.six.moves import range
+from parmed.amber.readparm import AmberParm
+from parmed.exceptions import ChemError
+from parmed.utils.six import iteritems
+from parmed.utils.six.moves import range
 import cmd
 from glob import glob
 import os

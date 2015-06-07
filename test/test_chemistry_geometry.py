@@ -1,11 +1,11 @@
 """
-Tests the routines in the chemistry.geometry module
+Tests the routines in the parmed.geometry module
 """
 from __future__ import division
 
-from chemistry import geometry as geo
-from chemistry import unit as u
-from chemistry.utils.six.moves import zip
+from parmed import geometry as geo
+from parmed import unit as u
+from parmed.utils.six.moves import zip
 import math
 import utils
 import unittest

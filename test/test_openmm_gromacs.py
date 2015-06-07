@@ -9,16 +9,16 @@ try:
     has_openmm = True
     CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
-    from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
+    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from chemistry import load_file, ExtraPoint, openmm
-from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
-from chemistry.openmm.utils import energy_decomposition
-from chemistry.exceptions import GromacsTopologyWarning, ChemError, OpenMMWarning
-import chemistry.unit as u
-from chemistry.utils.six.moves import range, zip
-from chemistry.vec3 import Vec3
+from parmed import load_file, ExtraPoint, openmm
+from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
+from parmed.openmm.utils import energy_decomposition
+from parmed.exceptions import GromacsTopologyWarning, ChemError, OpenMMWarning
+import parmed.unit as u
+from parmed.utils.six.moves import range, zip
+from parmed.vec3 import Vec3
 import os
 import unittest
 import utils

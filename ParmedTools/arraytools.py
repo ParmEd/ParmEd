@@ -1,7 +1,7 @@
 """
 Some support classes for easy array manipulation
 """
-from chemistry.utils.six.moves import zip, range
+from parmed.utils.six.moves import zip, range
 
 def _same_len(operation):
     """ Make sure all arrays are the same length """

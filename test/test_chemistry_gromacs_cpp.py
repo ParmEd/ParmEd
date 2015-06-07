@@ -1,9 +1,9 @@
 """
-Tests the functionality in the chemistry.gromacs package
+Tests the functionality in the parmed.gromacs package
 """
-from chemistry.exceptions import PreProcessorError, PreProcessorWarning
-from chemistry.gromacs._cpp import CPreProcessor
-from chemistry.utils.six.moves import range, zip, StringIO
+from parmed.exceptions import PreProcessorError, PreProcessorWarning
+from parmed.gromacs._cpp import CPreProcessor
+from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 from utils import get_fn, has_numpy

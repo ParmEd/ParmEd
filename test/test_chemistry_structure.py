@@ -1,12 +1,12 @@
 """
-Tests the chemistry/structure module
+Tests the parmed/structure module
 """
 from __future__ import division
 
-import chemistry.structure as structure
-from chemistry.topologyobjects import *
-from chemistry.utils.six import integer_types
-from chemistry.utils.six.moves import range, zip
+import parmed.structure as structure
+from parmed.topologyobjects import *
+from parmed.utils.six import integer_types
+from parmed.utils.six.moves import range, zip
 from copy import copy
 import random
 import string

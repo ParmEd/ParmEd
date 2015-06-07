@@ -1,11 +1,11 @@
 """
-Tests the functionality in the chemistry.amber package
+Tests the functionality in the parmed.amber package
 """
 from array import array
-from chemistry.amber import readparm, asciicrd, mask
-from chemistry import topologyobjects, load_file
-from chemistry.utils.six import string_types
-from chemistry.utils.six.moves import range, zip
+from parmed.amber import readparm, asciicrd, mask
+from parmed import topologyobjects, load_file
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import range, zip
 import os
 import random
 import unittest
@@ -16,7 +16,7 @@ class TestReadParm(unittest.TestCase):
     
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
-        from chemistry.amber import _rdparm
+        from parmed.amber import _rdparm
 
     def testLoadParm(self):
         """ Test the arbitrary parm loader """

@@ -1,11 +1,11 @@
 """
-Tests the functionality in the chemistry.unit package.
+Tests the functionality in the parmed.unit package.
 """
 from __future__ import division
 
-from chemistry import unit as u
-from chemistry.utils.six import string_types
-from chemistry.utils.six.moves import zip
+from parmed import unit as u
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 import copy
 import math
 import unittest

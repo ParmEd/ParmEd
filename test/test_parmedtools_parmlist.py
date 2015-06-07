@@ -1,8 +1,8 @@
 """
 Tests the ParmList class
 """
-from chemistry.amber import AmberParm, ChamberParm, AmoebaParm
-from chemistry.charmm import CharmmPsfFile
+from parmed.amber import AmberParm, ChamberParm, AmoebaParm
+from parmed.charmm import CharmmPsfFile
 from ParmedTools import ParmList
 import unittest
 from utils import get_fn

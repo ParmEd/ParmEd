@@ -1,8 +1,8 @@
 """
 Tests the fancy indexing and slicing capabilities of Structure
 """
-import chemistry as chem
-from chemistry.utils.six.moves import range, zip
+import parmed as chem
+from parmed.utils.six.moves import range, zip
 import random
 import unittest
 import utils

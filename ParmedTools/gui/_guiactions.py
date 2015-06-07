@@ -10,9 +10,9 @@ method that you want accessible through the GUI must have an action method put
 here with the same name as the class found in ParmedActions.
 """
 
-from chemistry.utils.six.moves import range
-from chemistry.utils.six.moves.tkinter import *
-from chemistry.utils.six.moves.tkinter_messagebox import (
+from parmed.utils.six.moves import range
+from parmed.utils.six.moves.tkinter import *
+from parmed.utils.six.moves.tkinter_messagebox import (
         askyesno, showinfo, showerror)
 from ParmedTools import ParmedActions
 from ParmedTools.argumentlist import ArgumentList

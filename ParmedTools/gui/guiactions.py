@@ -3,7 +3,7 @@ Dispatcher for GUI Action buttons. It calls all of the functions from the
 _guiactions, so that's where all of the class-specific methods should be put
 """
 
-from chemistry.utils.six.moves.tkinter_messagebox import showerror
+from parmed.utils.six.moves.tkinter_messagebox import showerror
 from ParmedTools.gui import _guiactions
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~

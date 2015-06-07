@@ -1,11 +1,11 @@
 """
-Tests the functionality in the chemistry.gromacs package
+Tests the functionality in the parmed.gromacs package
 """
-from chemistry import load_file, Structure, ExtraPoint, DihedralTypeList
-from chemistry.exceptions import GromacsTopologyWarning
-from chemistry.gromacs import GromacsTopologyFile, GromacsGroFile
-from chemistry import gromacs as gmx
-from chemistry.utils.six.moves import range, zip, StringIO
+from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
+from parmed.exceptions import GromacsTopologyWarning
+from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
+from parmed import gromacs as gmx
+from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 from utils import get_fn, diff_files, get_saved_fn

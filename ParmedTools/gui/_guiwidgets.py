@@ -4,8 +4,8 @@ use
 """
 # Pull in all of Tkinter into our top-level namespace. This is common practice
 # for Tkinter
-from chemistry.utils.six.moves.tkinter import *
-from chemistry.utils.six.moves.tkinter_messagebox import showerror, showinfo
+from parmed.utils.six.moves.tkinter import *
+from parmed.utils.six.moves.tkinter_messagebox import showerror, showinfo
 from ParmedTools.argumentlist import ArgumentList
 from ParmedTools.gui.guifiletools import file_chooser
 
@@ -124,7 +124,7 @@ class MaskEntry(Frame):
     def evaluate_me(self):
         """ Evaluates the mask and dumps the contents into a Text box """
         from ParmedTools.ParmedActions import printDetails
-        from chemistry.exceptions import MaskError
+        from parmed.exceptions import MaskError
         mask = self.var.get().strip()
         if not mask: return
         # Clear out the text

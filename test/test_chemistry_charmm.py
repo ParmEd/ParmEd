@@ -1,10 +1,10 @@
 """
-Tests for the chemistry/charmm subpackage
+Tests for the parmed/charmm subpackage
 """
-from chemistry.utils.six import iteritems
-from chemistry.charmm import charmmcrds, parameters, psf
-from chemistry import topologyobjects as to
-from chemistry import exceptions
+from parmed.utils.six import iteritems
+from parmed.charmm import charmmcrds, parameters, psf
+from parmed import topologyobjects as to
+from parmed import exceptions
 import os
 import unittest
 import utils

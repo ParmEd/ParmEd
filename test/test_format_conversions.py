@@ -1,10 +1,10 @@
 """ Test various topology format conversions """
 from __future__ import print_function, division, absolute_import
 
-import chemistry as chem
-from chemistry.exceptions import GromacsTopologyWarning
-from chemistry.gromacs._gromacsfile import GromacsFile
-from chemistry import unit as u
+import parmed as chem
+from parmed.exceptions import GromacsTopologyWarning
+from parmed.gromacs._gromacsfile import GromacsFile
+from parmed import unit as u
 import os
 try:
     import simtk.openmm as mm

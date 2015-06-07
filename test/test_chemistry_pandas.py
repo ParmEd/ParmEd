@@ -1,12 +1,12 @@
 """
-Tests the pandas functionality of the chemistry/structure module
+Tests the pandas functionality of the parmed/structure module
 """
 from __future__ import division
 
-import chemistry.structure as structure
-from chemistry import load_file
-from chemistry.topologyobjects import Atom
-from chemistry.utils.six.moves import zip
+import parmed.structure as structure
+from parmed import load_file
+from parmed.topologyobjects import Atom
+from parmed.utils.six.moves import zip
 import os
 import unittest
 from utils import get_fn
@@ -18,7 +18,7 @@ except ImportError:
 
 @unittest.skipIf(pd is None or np is None, "Cannot test without pandas")
 class TestStructureDataFrame(unittest.TestCase):
-    """ Tests the conversion of chemistry.Structure to a pd.DataFrame """
+    """ Tests the conversion of parmed.Structure to a pd.DataFrame """
 
     def testPDBPandas(self):
         """ Test 4lzt.pdb conversion to DataFrame (w/ anisou and positions) """

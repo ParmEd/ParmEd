@@ -1,14 +1,14 @@
 """
-Tests the functionality in chemistry.modeller
+Tests the functionality in parmed.modeller
 """
-from chemistry import Atom, read_PDB
-from chemistry.exceptions import AmberOFFWarning
-from chemistry.modeller import (ResidueTemplate, ResidueTemplateContainer,
+from parmed import Atom, read_PDB
+from parmed.exceptions import AmberOFFWarning
+from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
                                 PROTEIN, SOLVENT, AmberOFFLibrary)
-from chemistry.amber import AmberParm
-from chemistry.exceptions import BondError
-from chemistry.utils.six import iteritems
-from chemistry.utils.six.moves import zip, range, StringIO
+from parmed.amber import AmberParm
+from parmed.exceptions import BondError
+from parmed.utils.six import iteritems
+from parmed.utils.six.moves import zip, range, StringIO
 import os
 from ParmedTools import changeRadii
 import random

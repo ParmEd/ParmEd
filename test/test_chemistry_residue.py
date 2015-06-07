@@ -1,8 +1,8 @@
 """
-Tests the functionality in chemistry.residue
+Tests the functionality in parmed.residue
 """
 
-from chemistry import residue
+from parmed import residue
 import unittest
 import utils
 

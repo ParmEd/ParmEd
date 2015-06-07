@@ -3,19 +3,19 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division, print_function
 
-from chemistry import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
+from parmed import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
         Structure, load_file, gromacs)
-from chemistry.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
+from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
-from chemistry.amber._chamberparm import ConvertFromPSF
-from chemistry.charmm import CharmmPsfFile, CharmmParameterSet
-from chemistry.exceptions import ChemError, CharmmFileError, FormatNotFound
-from chemistry.formats import PDBFile, CIFFile, Mol2File
-from chemistry.modeller import ResidueTemplateContainer, AmberOFFLibrary
-from chemistry.periodic_table import Element as _Element
-from chemistry.utils.six import iteritems, string_types, add_metaclass
-from chemistry.utils.six.moves import zip, range
-from chemistry import unit as u
+from parmed.amber._chamberparm import ConvertFromPSF
+from parmed.charmm import CharmmPsfFile, CharmmParameterSet
+from parmed.exceptions import ChemError, CharmmFileError, FormatNotFound
+from parmed.formats import PDBFile, CIFFile, Mol2File
+from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
+from parmed.periodic_table import Element as _Element
+from parmed.utils.six import iteritems, string_types, add_metaclass
+from parmed.utils.six.moves import zip, range
+from parmed import unit as u
 from collections import OrderedDict
 import copy
 import math
@@ -321,7 +321,7 @@ class writeFrcmod(Action):
 
     def execute(self):
         """ Writes the frcmod file """
-        from chemistry.amber.parameters import ParameterSet
+        from parmed.amber.parameters import ParameterSet
         if not Action.overwrite and os.path.exists(self.frcmod_name):
             raise FileExists('%s exists; not overwriting' % self.frcmod_name)
         parmset = ParameterSet()
@@ -1360,7 +1360,7 @@ class changeProtState(Action):
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
     def execute(self):
-        from chemistry.amber import titratable_residues as residues
+        from parmed.amber import titratable_residues as residues
         changeProtState._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
@@ -3049,7 +3049,7 @@ class addPDB(Action):
         return retstr
 
     def execute(self):
-        from chemistry import read_PDB
+        from parmed import read_PDB
         if self.pdbpresent: return
         pdb = read_PDB(self.pdbfile)
         resnums = [0 for res in self.parm.residues]
@@ -3759,7 +3759,7 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        from chemistry.charmm import CharmmPsfFile, CharmmParameterSet
+        from parmed.charmm import CharmmPsfFile, CharmmParameterSet
         # We're not using chamber, do the conversion in-house
         try:
             parmset = CharmmParameterSet()

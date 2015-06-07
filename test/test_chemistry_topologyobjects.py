@@ -1,17 +1,17 @@
 """
-Unittests for the classes and interfaces defined in chemistry.topologyobjects
+Unittests for the classes and interfaces defined in parmed.topologyobjects
 
 By Jason Swails
 """
 from __future__ import division
 
-from chemistry.exceptions import (BondError, DihedralError, CmapError,
+from parmed.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError)
-import chemistry.topologyobjects as topologyobjects
-from chemistry.topologyobjects import _ListItem, _FourAtomTerm
-from chemistry.topologyobjects import *
-from chemistry.amber.readparm import AmberFormat
-from chemistry.utils.six.moves import range, zip
+import parmed.topologyobjects as topologyobjects
+from parmed.topologyobjects import _ListItem, _FourAtomTerm
+from parmed.topologyobjects import *
+from parmed.amber.readparm import AmberFormat
+from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
 from utils import get_fn
@@ -20,7 +20,7 @@ import random
 class TestTopologyObjects(unittest.TestCase):
     """
     This test set is responsible for testing the classes in
-    chemistry.topologyobjects
+    parmed.topologyobjects
     """
 
     #=============================================

@@ -4,13 +4,13 @@ parameters defined in an input file for sander and pmemd.
 """
 from __future__ import division, print_function
 
-from chemistry.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7, AmberParm
-from chemistry.amber.mdin import mdin as Mdin
-from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
+from parmed.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7, AmberParm
+from parmed.amber.mdin import mdin as Mdin
+from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
-from chemistry.utils.timer import Timer
-from chemistry import unit as u
-from chemistry.utils.six.moves import range
+from parmed.utils.timer import Timer
+from parmed import unit as u
+from parmed.utils.six.moves import range
 from math import sqrt
 import os
 from ParmedTools.exceptions import (SimulationError, SimulationWarning,
@@ -37,11 +37,11 @@ from simtk.openmm.app import *
 from simtk.openmm import *
 
 # Import the Amber/OpenMM modules
-from chemistry.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
-from chemistry.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
+from parmed.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
+from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
-from chemistry import unit as u
-from chemistry.utils.six.moves import range
+from parmed import unit as u
+from parmed.utils.six.moves import range
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')

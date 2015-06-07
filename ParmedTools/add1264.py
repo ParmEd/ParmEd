@@ -4,7 +4,7 @@ topology file given a list of atomic polarizabilities
 """
 from __future__ import division, print_function
 
-from chemistry.utils.six.moves import range
+from parmed.utils.six.moves import range
 from ParmedTools.exceptions import LJ12_6_4Error, DuplicateParamWarning
 import warnings
 
@@ -54,7 +54,7 @@ DEFAULT_C4_PARAMS = {
 
 def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
    
-    from chemistry import periodic_table as pt
+    from parmed import periodic_table as pt
 
     global DEFAULT_C4_PARAMS, WATER_POL
 

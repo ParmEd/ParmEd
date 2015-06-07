@@ -7,10 +7,10 @@ from ParmedTools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
                                     FixableParmWarning, NonfatalWarning,
                                     NonUniversalWarning, MissingDisulfide,
                                     LongBondWarning)
-from chemistry.constants import TINY
-from chemistry.amber.mask import AmberMask
-from chemistry.exceptions import MoleculeError
-from chemistry.utils.six.moves import range
+from parmed.constants import TINY
+from parmed.amber.mask import AmberMask
+from parmed.exceptions import MoleculeError
+from parmed.utils.six.moves import range
 from math import sqrt
 
 def check_validity(parm, warnings):

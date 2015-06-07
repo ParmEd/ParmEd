@@ -1,15 +1,15 @@
 """
-Tests chemistry.formats package
+Tests parmed.formats package
 """
 from __future__ import division
 
-from chemistry import amber
-from chemistry import charmm
-from chemistry import exceptions
-from chemistry import formats
-from chemistry import Structure, read_PDB, write_PDB, read_CIF
-from chemistry.modeller import ResidueTemplate, ResidueTemplateContainer
-from chemistry.utils.six import iteritems
+from parmed import amber
+from parmed import charmm
+from parmed import exceptions
+from parmed import formats
+from parmed import Structure, read_PDB, write_PDB, read_CIF
+from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
+from parmed.utils.six import iteritems
 try:
     import cStringIO as StringIO
     from itertools import izip as zip
@@ -125,7 +125,7 @@ class TestFileLoader(unittest.TestCase):
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
         self.assertRaises(exceptions.FormatNotFound, lambda:
-                formats.load_file(get_fn('../test_chemistry_formats.py')))
+                formats.load_file(get_fn('../test_parmed_formats.py')))
         self.assertRaises(IOError, lambda: formats.load_file('no_file'))
 
 class TestChemistryPDBStructure(unittest.TestCase):
@@ -163,8 +163,8 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testPositions(self):
         """ Tests that positions are Vec3's with units """
-        from chemistry import unit as u
-        from chemistry import Vec3
+        from parmed import unit as u
+        from parmed import Vec3
         pdbfile = read_PDB(open(self.models))
         self.assertIsInstance(pdbfile.positions[0], u.Quantity)
         self.assertIsInstance(pdbfile.positions[0].value_in_unit(u.angstroms), Vec3)

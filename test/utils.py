@@ -1,8 +1,8 @@
 """
 Useful functions for the test cases
 """
-from chemistry.utils.six import string_types
-from chemistry.utils.six.moves import zip
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 import os
 from os.path import join, split, abspath
 import random
@@ -303,14 +303,14 @@ def create_random_structure(parametrized, novalence=False):
         If True, no valence terms will be added. Default is False. This is
         set to False if parametrized is True
     """
-    from chemistry.topologyobjects import (Atom, Bond, AtomType, BondType,
+    from parmed.topologyobjects import (Atom, Bond, AtomType, BondType,
             AngleType, DihedralType, ImproperType, CmapType, OutOfPlaneBendType,
             StretchBendType, TorsionTorsionType, AmoebaNonbondedExceptionType,
             Angle, UreyBradley, Dihedral, Improper, Cmap, TrigonalAngle,
             OutOfPlaneBend, StretchBend, PiTorsion, TorsionTorsion,
             AcceptorDonor, Group, ChiralFrame, MultipoleFrame,
             NonbondedException, RBTorsionType)
-    from chemistry import structure
+    from parmed import structure
     from copy import copy
     if parametrized: novalence = False
     # Generate random atom and parameter types

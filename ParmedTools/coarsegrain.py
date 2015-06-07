@@ -19,7 +19,7 @@ This module sets up ANGLE and DIHEDRAL classes to make printing them easier,
 then parses the parameter file, then sets the respective sections of the prmtop
 file.
 """
-from chemistry.utils.six.moves import range
+from parmed.utils.six.moves import range
 import warnings
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
