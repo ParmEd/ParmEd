@@ -1,6 +1,8 @@
 """
 This module tests the various reporters included in the parmed package
 """
+from __future__ import division, print_function
+import utils
 
 try:
     import simtk.openmm as mm
@@ -16,7 +18,6 @@ from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 EnergyMinimizerReporter)
 from parmed.utils.six.moves import range, zip
 import os
-import utils
 import unittest
 
 get_fn = utils.get_fn

@@ -1,11 +1,11 @@
 """
 Tests the fancy indexing and slicing capabilities of Structure
 """
+import utils
 import parmed as chem
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
-import utils
 
 parm = chem.load_file(utils.get_fn('trx.prmtop'))
 pdb1 = chem.load_file(utils.get_fn('4lzt.pdb'))

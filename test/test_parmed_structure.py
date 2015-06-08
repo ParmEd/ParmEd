@@ -3,6 +3,7 @@ Tests the parmed/structure module
 """
 from __future__ import division
 
+from utils import create_random_structure
 import parmed.structure as structure
 from parmed.topologyobjects import *
 from parmed.utils.six import integer_types
@@ -12,7 +13,6 @@ import random
 import string
 import unittest
 import os
-from utils import create_random_structure
 
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """

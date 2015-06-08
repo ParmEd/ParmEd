@@ -16,7 +16,8 @@ in the Amber restart file. The energies are very close, but have been
 recalculated using ParmEd for comparison here to improve the precision. The
 implementation these energies were computed by has already been validated.
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
@@ -38,7 +39,6 @@ from copy import copy
 from math import sqrt
 import unittest
 import warnings
-import utils
     
 get_fn = utils.get_fn
 

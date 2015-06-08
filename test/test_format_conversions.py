@@ -1,17 +1,6 @@
 """ Test various topology format conversions """
 from __future__ import print_function, division, absolute_import
-
-# nose seems to have the very annoying habit of modifying sys.path to add the
-# script directory, which breaks the parmed imports. Go through and *remove* it
-import os
-import sys
-while True:
-    for i, folder in enumerate(sys.path):
-        if os.path.exists(os.path.join(folder, 'parmed.py')):
-            break
-    else:
-        break
-    sys.path.pop(i)
+import utils
 
 from parmed import load_file, gromacs, amber, openmm
 from parmed.exceptions import GromacsTopologyWarning

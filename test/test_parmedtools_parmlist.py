@@ -1,11 +1,11 @@
 """
 Tests the ParmList class
 """
+from utils import get_fn
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
 from parmed.tools import ParmList
 import unittest
-from utils import get_fn
 
 class TestParmList(unittest.TestCase):
 

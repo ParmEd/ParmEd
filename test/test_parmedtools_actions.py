@@ -3,6 +3,7 @@ Tests for the various actions in ParmEd
 """
 from __future__ import division, print_function
 
+import utils
 from parmed import periodic_table
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
@@ -17,7 +18,6 @@ from parmed.tools import parmlist
 import saved_outputs as saved
 import sys
 import unittest
-import utils
 import warnings
 
 get_fn = utils.get_fn

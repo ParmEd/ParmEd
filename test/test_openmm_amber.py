@@ -1,7 +1,8 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
@@ -20,7 +21,6 @@ from math import sqrt
 import os
 import parmed.tools as PT
 import unittest
-import utils
 
 get_fn = utils.get_fn
 

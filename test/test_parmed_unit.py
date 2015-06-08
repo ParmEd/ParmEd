@@ -3,14 +3,14 @@ Tests the functionality in the parmed.unit package.
 """
 from __future__ import division
 
+import utils
+from utils import has_numpy, numpy as np
 from parmed import unit as u
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
 import copy
 import math
 import unittest
-import utils
-from utils import has_numpy, numpy as np
 
 class QuantityTestCase(unittest.TestCase):
 

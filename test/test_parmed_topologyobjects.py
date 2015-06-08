@@ -5,6 +5,7 @@ By Jason Swails
 """
 from __future__ import division
 
+from utils import get_fn
 from parmed.exceptions import (BondError, DihedralError, CmapError,
                                   AmoebaError)
 import parmed.topologyobjects as topologyobjects
@@ -14,7 +15,6 @@ from parmed.amber.readparm import AmberFormat
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
-from utils import get_fn
 import random
 
 class TestTopologyObjects(unittest.TestCase):

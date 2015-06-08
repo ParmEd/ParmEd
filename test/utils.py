@@ -1,6 +1,19 @@
 """
 Useful functions for the test cases
 """
+
+# nose seems to have the very annoying habit of modifying sys.path to add the
+# script directory, which breaks the parmed imports. Go through and *remove* it
+import os
+import sys
+while True:
+    for i, folder in enumerate(sys.path):
+        if os.path.exists(os.path.join(folder, 'parmed.py')):
+            break
+    else:
+        break
+    sys.path.pop(i)
+
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
 import os

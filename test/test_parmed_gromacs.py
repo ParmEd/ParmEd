@@ -1,6 +1,7 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
+import utils
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsTopologyWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile

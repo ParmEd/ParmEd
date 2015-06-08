@@ -1,3 +1,4 @@
+import utils
 from parmed import read_PDB, load_rosetta
 from parmed.utils.six.moves import range
 from itertools import chain

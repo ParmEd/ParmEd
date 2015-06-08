@@ -1,6 +1,8 @@
 """
 Tests the functionality in the parmed.amber package
 """
+from __future__ import print_function, division
+from utils import get_fn, has_numpy
 from array import array
 from parmed.amber import readparm, asciicrd, mask
 from parmed import topologyobjects, load_file
@@ -9,7 +11,6 @@ from parmed.utils.six.moves import range, zip
 import os
 import random
 import unittest
-from utils import get_fn, has_numpy
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """

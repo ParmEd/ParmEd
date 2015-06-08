@@ -1,10 +1,10 @@
 """
 Tests the NetCDF file parsing capabilities with the different backends
 """
+import utils
 
 from parmed.utils.six.moves import range, zip
 import unittest
-import utils
 
 get_fn = utils.get_fn
 

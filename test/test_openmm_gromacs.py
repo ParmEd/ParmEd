@@ -2,6 +2,7 @@
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
 from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
@@ -21,7 +22,6 @@ from parmed.utils.six.moves import range, zip
 from parmed.vec3 import Vec3
 import os
 import unittest
-import utils
 import warnings
 
 get_fn = utils.get_fn

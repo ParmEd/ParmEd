@@ -15,6 +15,7 @@
 Test cases for reading PDBx/mmCIF data files PdbxReader class -
 
 """
+from __future__ import print_function, division
 import sys, unittest, traceback, os
 from utils import get_fn, get_saved_fn, diff_files
 

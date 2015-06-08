@@ -2,9 +2,9 @@
 Tests the functionality in parmed.residue
 """
 
+import utils
 from parmed import residue
 import unittest
-import utils
 
 class TestChemistryResidue(unittest.TestCase):
 

@@ -2,6 +2,7 @@
 Tests parmed.formats package
 """
 from __future__ import division
+import utils
 
 from parmed import amber
 from parmed import charmm

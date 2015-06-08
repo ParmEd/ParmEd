@@ -1,6 +1,7 @@
 """
 Tests the functionality in parmed.modeller
 """
+import utils
 from parmed import Atom, read_PDB
 from parmed.exceptions import AmberOFFWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
@@ -14,7 +15,6 @@ from parmed.tools import changeRadii
 import random
 import sys
 import unittest
-import utils
 import warnings
 get_fn = utils.get_fn
 

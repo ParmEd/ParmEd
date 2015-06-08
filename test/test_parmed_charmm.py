@@ -1,13 +1,15 @@
 """
 Tests for the parmed/charmm subpackage
 """
+from __future__ import division, print_function
+
+import utils
 from parmed.utils.six import iteritems
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed import topologyobjects as to
 from parmed import exceptions
 import os
 import unittest
-import utils
 
 get_fn = utils.get_fn
 
