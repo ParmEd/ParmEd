@@ -1,7 +1,8 @@
 """ Test various topology format conversions """
 from __future__ import print_function, division, absolute_import
-import utils
+from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
 
+import os
 from parmed import load_file, gromacs, amber, openmm
 from parmed.exceptions import GromacsTopologyWarning
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -14,7 +15,6 @@ try:
 except ImportError:
     has_openmm = False
 import unittest
-from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
 import warnings
 
 class TestCase(TestCaseRelative):
