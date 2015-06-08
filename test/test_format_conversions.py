@@ -1,7 +1,7 @@
 """ Test various topology format conversions """
 from __future__ import print_function, division, absolute_import
 
-import parmed as chem
+from parmed import load_file, gromacs, amber, openmm
 from parmed.exceptions import GromacsTopologyWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import unit as u
@@ -38,12 +38,12 @@ class TestAmberToGromacs(TestCase):
 
     def testBenzeneCyclohexane(self):
         """ Test converting binary liquid from Amber prmtop to Gromacs top """
-        parm = chem.load_file(get_fn('benzene_cyclohexane_10_500.prmtop'),
+        parm = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'),
                               get_fn('benzene_cyclohexane_10_500.inpcrd'))
-        top = chem.gromacs.GromacsTopologyFile.from_structure(parm)
+        top = gromacs.GromacsTopologyFile.from_structure(parm)
         groname = get_fn('benzene_cyclohexane_10_500.gro', written=True)
-        chem.gromacs.GromacsGroFile.write(parm, groname, precision=8)
-        gro = chem.gromacs.GromacsGroFile.parse(groname)
+        gromacs.GromacsGroFile.write(parm, groname, precision=8)
+        gro = gromacs.GromacsGroFile.parse(groname)
         self.assertEqual(len(gro.atoms), len(parm.atoms))
         for a1, a2 in zip(gro.atoms, parm.atoms):
             self.assertEqual(a1.residue.name, a2.residue.name)
@@ -62,11 +62,11 @@ class TestGromacsToAmber(TestCase):
 
     def testSimple(self):
         """ Tests converting standard Gromacs system into Amber prmtop """
-        top = chem.load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
-        parm = chem.amber.AmberParm.from_structure(top)
+        top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
+        parm = amber.AmberParm.from_structure(top)
         parm.write_parm(get_fn('ala_glu.parm7', written=True))
-        parm = chem.load_file(get_fn('ala_glu.parm7', written=True))
-        self.assertIsInstance(parm, chem.amber.AmberParm)
+        parm = load_file(get_fn('ala_glu.parm7', written=True))
+        self.assertIsInstance(parm, amber.AmberParm)
         self.assertEqual(len(top.atoms), len(parm.atoms))
         self.assertEqual(len(top.bonds), len(parm.bonds))
         self.assertEqual(len(top.angles), len(parm.angles))
@@ -90,11 +90,11 @@ class TestGromacsToAmber(TestCase):
     @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
     def testEnergySimple(self):
         """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
-        top = chem.load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
-        gro = chem.load_file(get_fn(os.path.join('03.AlaGlu', 'conf.gro')))
-        parm = chem.amber.AmberParm.from_structure(top)
+        top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
+        gro = load_file(get_fn(os.path.join('03.AlaGlu', 'conf.gro')))
+        parm = amber.AmberParm.from_structure(top)
         parm.write_parm(get_fn('ala_glu.parm7', written=True))
-        parm = chem.load_file(get_fn('ala_glu.parm7', written=True))
+        parm = load_file(get_fn('ala_glu.parm7', written=True))
 
         sysg = top.createSystem()
         sysa = parm.createSystem()
@@ -110,11 +110,11 @@ class TestGromacsToAmber(TestCase):
     @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
     def testEnergyComplicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
-        top = chem.load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
-        gro = chem.load_file(get_fn(os.path.join('12.DPPC', 'conf.gro')))
-        parm = chem.amber.AmberParm.from_structure(top)
+        top = load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
+        gro = load_file(get_fn(os.path.join('12.DPPC', 'conf.gro')))
+        parm = amber.AmberParm.from_structure(top)
         parm.write_parm(get_fn('dppc.parm7', written=True))
-        parm = chem.load_file(get_fn('dppc.parm7', written=True))
+        parm = load_file(get_fn('dppc.parm7', written=True))
 
         sysg = top.createSystem()
         sysa = parm.createSystem()
@@ -129,8 +129,8 @@ class TestGromacsToAmber(TestCase):
 
 
     def _check_energies(self, parm1, con1, parm2, con2):
-        ene1 = chem.openmm.utils.energy_decomposition(parm1, con1)
-        ene2 = chem.openmm.utils.energy_decomposition(parm2, con2)
+        ene1 = openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = openmm.utils.energy_decomposition(parm2, con2)
 
         all_terms = set(ene1.keys()) | set(ene2.keys())
 
@@ -150,12 +150,12 @@ class TestOpenMMToAmber(TestCase):
 
     def testSimple(self):
         """ Test OpenMM System/Topology -> Amber prmtop conversion """
-        parm = chem.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem()
-        chem.amber.AmberParm.from_structure(
-                chem.openmm.load_topology(parm.topology, system)
+        amber.AmberParm.from_structure(
+                openmm.load_topology(parm.topology, system)
         ).write_parm(get_fn('ash_from_omm.parm7', written=True))
-        parm2 = chem.load_file(get_fn('ash_from_omm.parm7', written=True))
+        parm2 = load_file(get_fn('ash_from_omm.parm7', written=True))
         system2 = parm2.createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
@@ -165,8 +165,8 @@ class TestOpenMMToAmber(TestCase):
         self._check_energies(parm, con1, parm2, con2)
 
     def _check_energies(self, parm1, con1, parm2, con2):
-        ene1 = chem.openmm.utils.energy_decomposition(parm1, con1)
-        ene2 = chem.openmm.utils.energy_decomposition(parm2, con2)
+        ene1 = openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = openmm.utils.energy_decomposition(parm2, con2)
 
         all_terms = set(ene1.keys()) | set(ene2.keys())
 
@@ -186,12 +186,12 @@ class TestOpenMMToGromacs(TestCase):
 
     def testSimple(self):
         """ Test OpenMM System/Topology -> Gromacs topology conversion """
-        parm = chem.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem()
-        chem.gromacs.GromacsTopologyFile.from_structure(
-                chem.openmm.load_topology(parm.topology, system)
+        gromacs.GromacsTopologyFile.from_structure(
+                openmm.load_topology(parm.topology, system)
         ).write(get_fn('ash_from_omm.top', written=True))
-        parm2 = chem.gromacs.GromacsTopologyFile(get_fn('ash_from_omm.top', written=True))
+        parm2 = gromacs.GromacsTopologyFile(get_fn('ash_from_omm.top', written=True))
         system2 = parm2.createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
@@ -201,8 +201,8 @@ class TestOpenMMToGromacs(TestCase):
         self._check_energies(parm, con1, parm2, con2)
 
     def _check_energies(self, parm1, con1, parm2, con2):
-        ene1 = chem.openmm.utils.energy_decomposition(parm1, con1)
-        ene2 = chem.openmm.utils.energy_decomposition(parm2, con2)
+        ene1 = openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = openmm.utils.energy_decomposition(parm2, con2)
 
         all_terms = set(ene1.keys()) | set(ene2.keys())
 
