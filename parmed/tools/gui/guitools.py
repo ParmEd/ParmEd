@@ -6,8 +6,8 @@ from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range
 from parmed.utils.six.moves.tkinter import *
 import parmed.utils.six.moves.tkinter_messagebox as tkMessageBox
-from ParmedTools.gui.guiactions import gui_action_dispatcher
-from ParmedTools.gui._guiwidgets import MessageWindow
+from parmed.tools.gui.guiactions import gui_action_dispatcher
+from parmed.tools.gui._guiwidgets import MessageWindow
 
 BPR = 3 # Buttons Per Row
 
@@ -20,7 +20,7 @@ class ParmedApp(Frame):
     def __init__(self, master, amber_prmtop):
         """ Instantiates the window """
         import math
-        from ParmedTools.ParmedActions import COMMANDMAP
+        from parmed.tools.actions import COMMANDMAP
         global BPR
         Frame.__init__(self, master)
         self.parm = amber_prmtop

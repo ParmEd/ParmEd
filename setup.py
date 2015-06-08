@@ -12,9 +12,6 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.utils', 'parmed.gromacs', 'parmed.tools',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
-# Scripts
-scripts = ['xparmed.py']
-
 # Optimized readparm
 extensions = [Extension('parmed.amber._rdparm',
                         sources=['src/_rdparm.cpp', 'src/readparm.cpp'],
@@ -71,5 +68,6 @@ if __name__ == '__main__':
           license='GPL v2 or later',
           packages=packages,
           ext_modules=extensions,
-          cmdclass={'build_py':build_py, 'build_scripts':build_scripts},
-          scripts=scripts)
+          cmdclass={'build_py' : build_py},
+          scripts=['parmed.py', 'xparmed.py'],
+    )

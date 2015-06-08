@@ -1,23 +1,23 @@
 """
-This module contains all of the methods to invoke specific ParmedActions listed
+This module contains all of the methods to invoke specific ParmEd actions listed
 in that module. Each method will establish the necessary variables (StringVar),
 create whatever window it needs to get information from the user (or give
 information to the user), wait for that window to close, then dispatch that
-Action to the class in ParmedActions. 
+Action to the class in ParmEd actions.
 
 Follow the general trend if you wish to add your method to the GUI. Note, any
 method that you want accessible through the GUI must have an action method put
-here with the same name as the class found in ParmedActions.
+here with the same name as the class found in ParmEd actions.
 """
 
 from parmed.utils.six.moves import range
 from parmed.utils.six.moves.tkinter import *
 from parmed.utils.six.moves.tkinter_messagebox import (
         askyesno, showinfo, showerror)
-from ParmedTools import ParmedActions
-from ParmedTools.argumentlist import ArgumentList
-from ParmedTools.gui.guifiletools import file_chooser, save_file_chooser
-from ParmedTools.gui import _guiwidgets
+from parmed.tools import actions
+from parmed.tools.argumentlist import ArgumentList
+from parmed.tools.gui.guifiletools import file_chooser, save_file_chooser
+from parmed.tools.gui import _guiwidgets
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 
@@ -25,7 +25,7 @@ def writefrcmod(root, amber_prmtop, messages):
     """ Dumps an frcmod file to a given filename """
     fname = save_file_chooser('frcmod', '.frcmod')
     if fname: 
-        action = ParmedActions.writeFrcmod(amber_prmtop, fname)
+        action = actions.writeFrcmod(amber_prmtop, fname)
         action.execute()
         messages.write('%s\n' % action)
 
@@ -38,7 +38,7 @@ def loadrestrt(root, amber_prmtop, messages):
                  ('All Files', '*')]
     fname = file_chooser('Amber Coordinate File', type_list)
     if fname: 
-        action = ParmedActions.loadRestrt(amber_prmtop, ArgumentList(fname))
+        action = actions.loadRestrt(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -48,7 +48,7 @@ def writeoff(root, amber_prmtop, messages):
     """ Dumps an OFF library to a given filename """
     fname = save_file_chooser('OFF library', '.lib')
     if fname: 
-        action = ParmedActions.writeOFF(amber_prmtop, ArgumentList(fname))
+        action = actions.writeOFF(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -69,7 +69,7 @@ def changeradii(root, amber_prmtop, messages):
     cmd_window.wait_window()
     sel = str(radius_selection.get())
     if sel:
-        action = ParmedActions.changeRadii(amber_prmtop, ArgumentList(sel))
+        action = actions.changeRadii(amber_prmtop, ArgumentList(sel))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -85,7 +85,7 @@ def changeljpair(root, amber_prmtop, messages):
     # Variable list -- we need 2 masks and 2 floats
     var_list = [StringVar(), StringVar(), StringVar(), StringVar()]
     # description
-    description = ' '.join(ParmedActions.changeLJPair.__doc__.split())
+    description = ' '.join(actions.changeLJPair.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('changeLJPair', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -95,7 +95,7 @@ def changeljpair(root, amber_prmtop, messages):
     # Now that we did something, do it
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.changeLJPair(amber_prmtop,ArgumentList(var_list))
+        action = actions.changeLJPair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -109,7 +109,7 @@ def outparm(root, amber_prmtop, messages):
     if amber_prmtop.parm.coords is not None and fname[0]:
         fname.append(save_file_chooser('inpcrd', '.inpcrd'))
     if fname[0]:
-        action = ParmedActions.outparm(amber_prmtop, ArgumentList(fname))
+        action = actions.outparm(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
 
@@ -123,7 +123,7 @@ def printflags(root, amber_prmtop, messages):
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=80, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printFlags(amber_prmtop, ArgumentList(''))
+    action = actions.printFlags(amber_prmtop, ArgumentList(''))
     text.write(action)
     window.wait_window()
 
@@ -137,7 +137,7 @@ def printpointers(root, amber_prmtop, messages):
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=80, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printPointers(amber_prmtop, ArgumentList(''))
+    action = actions.printPointers(amber_prmtop, ArgumentList(''))
     text.write(action)
     window.wait_window()
 
@@ -158,7 +158,7 @@ def changelj14pair(root, amber_prmtop, messages):
     # Variable list -- we need 2 masks and 2 floats
     var_list = [StringVar(), StringVar(), StringVar(), StringVar()]
     # description
-    description = ' '.join(ParmedActions.changeLJ14Pair.__doc__.split())
+    description = ' '.join(actions.changeLJ14Pair.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('changeLJ14Pair', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -168,7 +168,7 @@ def changelj14pair(root, amber_prmtop, messages):
     # Now that we did something, do it
     var_list = [v.get() for v in var_list]
     try:
-        action=ParmedActions.changeLJ14Pair(amber_prmtop,ArgumentList(var_list))
+        action=actions.changeLJ14Pair(amber_prmtop,ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -186,9 +186,9 @@ def checkvalidity(root, amber_prmtop, messages):
                                          pady=5, width=81, height=30)
     text.pack(fill=BOTH, expand=1)
     # Set this text to catch the output of our action
-    ParmedActions.checkValidity.output = text
+    actions.checkValidity.output = text
     # Initialize our action
-    action = ParmedActions.checkValidity(amber_prmtop, ArgumentList(''))
+    action = actions.checkValidity(amber_prmtop, ArgumentList(''))
     messages.write('%s\n' % action)
     action.execute()
     text.write(action)
@@ -219,7 +219,7 @@ def change(root, amber_prmtop, messages):
     # If we did, store them and pass it to the class
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.change(amber_prmtop, ArgumentList(var_list))
+        action = actions.change(amber_prmtop, ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -236,7 +236,7 @@ def printinfo(root, amber_prmtop, messages):
     # Variable list -- we need a single string
     var_list = [StringVar()]
     # description
-    description = ' '.join(ParmedActions.printInfo.__doc__.split())
+    description = ' '.join(actions.printInfo.__doc__.split())
     cmd_window = _guiwidgets.ActionWindow('printInfo', amber_prmtop,
                                 widget_list, var_list, description)
     cmd_window.wait_window()
@@ -244,7 +244,7 @@ def printinfo(root, amber_prmtop, messages):
     var = var_list[0].get()
     if not var: return
     # Now that we did something, do it
-    action = ParmedActions.printInfo(amber_prmtop, ArgumentList(var))
+    action = actions.printInfo(amber_prmtop, ArgumentList(var))
     if not action.found:
         showerror('Not Found!', '%%FLAG %s not found!' % var.upper())
         return
@@ -295,7 +295,7 @@ def addljtype(root, amber_prmtop, messages):
     if amber_prmtop.parm.chamber and var_list[4]:
         kw_var_list.extend(['epsilon_14', var_list[4]])
     try:
-        action = ParmedActions.addLJType(amber_prmtop,ArgumentList(kw_var_list))
+        action = actions.addLJType(amber_prmtop,ArgumentList(kw_var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -324,7 +324,7 @@ def setmolecules(root, amber_prmtop, messages):
         sel = 'True'
     else:
         sel = 'False'
-    action = ParmedActions.setMolecules(amber_prmtop, 
+    action = actions.setMolecules(amber_prmtop, 
                                         ArgumentList('solute_ions '+sel))
     messages.write('%s\n' % action)
     action.execute()
@@ -352,7 +352,7 @@ def printdetails(root, amber_prmtop, messages):
     text = _guiwidgets.ExitingScrollText(window, None, spacing3=5, padx=5,
                                          pady=5, width=100, height=20)
     text.pack(fill=BOTH, expand=1)
-    action = ParmedActions.printDetails(amber_prmtop, mask.get())
+    action = actions.printDetails(amber_prmtop, mask.get())
     text.write(action)
     messages.write('Printed Amber Mask details on [%s]\n' % mask.get())
     window.wait_window()
@@ -371,7 +371,7 @@ def netcharge(root, amber_prmtop, messages):
     button.grid(row=1, column=0, sticky=N+E+S+W)
     cmd_window.wait_window()
     if not mask.get(): return
-    action = ParmedActions.netCharge(amber_prmtop, ArgumentList(mask.get()))
+    action = actions.netCharge(amber_prmtop, ArgumentList(mask.get()))
     chg = action.execute()
     showinfo('Net Charge', 'The net charge of [%s] is %.4f' % (mask.get(), chg))
 
@@ -396,7 +396,7 @@ def strip(root, amber_prmtop, messages):
     var = var_list[0]
     if not var.get(): return
     try:
-        action = ParmedActions.strip(amber_prmtop, ArgumentList(var.get()))
+        action = actions.strip(amber_prmtop, ArgumentList(var.get()))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -426,7 +426,7 @@ def addexclusions(root, amber_prmtop, messages):
    
     var_list = [v.get() for v in var_list]
     try:
-        act = ParmedActions.addExclusions(amber_prmtop, ArgumentList(var_list))
+        act = actions.addExclusions(amber_prmtop, ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -451,7 +451,7 @@ def changeprotstate(root, amber_prmtop, messages):
    
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.changeProtState(amber_prmtop, 
+        action = actions.changeProtState(amber_prmtop, 
                                                ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
@@ -477,7 +477,7 @@ def scee(root, amber_prmtop, messages):
     if not var: return
 
     try:
-        action = ParmedActions.scee(amber_prmtop, ArgumentList(var))
+        action = actions.scee(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -502,7 +502,7 @@ def scnb(root, amber_prmtop, messages):
     if not var: return
 
     try:
-        action = ParmedActions.scnb(amber_prmtop, ArgumentList(var))
+        action = actions.scnb(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -530,7 +530,7 @@ def printljtypes(root, amber_prmtop, messages):
    
     # Instantiate our action
     try:
-        action = ParmedActions.printLJTypes(amber_prmtop, ArgumentList(var))
+        action = actions.printLJTypes(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -568,7 +568,7 @@ def changeljsingletype(root, amber_prmtop, messages):
         if not v: var_list[i] = None
     # If we did, store them and pass it to the class
     try:
-        action = ParmedActions.changeLJSingleType(amber_prmtop,
+        action = actions.changeLJSingleType(amber_prmtop,
                                                   ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
@@ -593,7 +593,7 @@ def addcoarsegrain(root, amber_prmtop, messages):
     if not fname: return
 
     try:
-        action = ParmedActions.addCoarseGrain(amber_prmtop, ArgumentList(fname))
+        action = actions.addCoarseGrain(amber_prmtop, ArgumentList(fname))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -618,7 +618,7 @@ def definesolvent(root, amber_prmtop, messages):
     if not var: return
     # addljtype expects any _non_specified variables to be None
     try:
-        action = ParmedActions.defineSolvent(amber_prmtop, ArgumentList(var))
+        action = actions.defineSolvent(amber_prmtop, ArgumentList(var))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -642,7 +642,7 @@ def printbonds(root, amber_prmtop, messages):
     var = ' '.join([x.get() for x in var_list]).strip()
     if not var: return
     try:
-        action = ParmedActions.printBonds(amber_prmtop, ArgumentList(var))
+        action = actions.printBonds(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -674,7 +674,7 @@ def printangles(root, amber_prmtop, messages):
     var = ' '.join([x.get() for x in var_list]).strip()
     if not var: return
     try:
-        action = ParmedActions.printAngles(amber_prmtop, ArgumentList(var))
+        action = actions.printAngles(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -707,7 +707,7 @@ def printdihedrals(root, amber_prmtop, messages):
     var = ' '.join([x.get() for x in var_list]).strip()
     if not var: return
     try:
-        action = ParmedActions.printDihedrals(amber_prmtop, ArgumentList(var))
+        action = actions.printDihedrals(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -748,7 +748,7 @@ def setbond(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.setBond(amber_prmtop, ArgumentList(var_list))
+        action = actions.setBond(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -782,7 +782,7 @@ def setangle(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.setAngle(amber_prmtop, ArgumentList(var_list))
+        action = actions.setAngle(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -829,7 +829,7 @@ def adddihedral(root, amber_prmtop, messages):
     # The last argument is a keyword, so append that, then swap the last 2 args
     var_list.insert(9, 'type')
     try:
-        action = ParmedActions.addDihedral(amber_prmtop, ArgumentList(var_list))
+        action = actions.addDihedral(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -844,7 +844,7 @@ def addatomicnumber(root, amber_prmtop, messages):
                         'Do you want to add the ATOMIC_NUMBER section to %s?' % 
                         amber_prmtop.parm)
     if response:
-        action = ParmedActions.addAtomicNumber(amber_prmtop, ArgumentList(''))
+        action = actions.addAtomicNumber(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -874,7 +874,7 @@ def deletedihedral(root, amber_prmtop, messages):
     # If we did, pass them through
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.deleteDihedral(amber_prmtop,
+        action = actions.deleteDihedral(amber_prmtop,
                                               ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
@@ -900,7 +900,7 @@ def printljmatrix(root, amber_prmtop, messages):
     var = var_list[0].get()
     if not var: return
     try:
-        action = ParmedActions.printLJMatrix(amber_prmtop, ArgumentList(var))
+        action = actions.printLJMatrix(amber_prmtop, ArgumentList(var))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -948,9 +948,9 @@ def timerge(root, amber_prmtop, messages):
     if not var_list[6].strip():
         var_list[6] = '0.0001'
     var_list.insert(6, 'tol')
-    ParmedActions.tiMerge.output = messages
+    actions.tiMerge.output = messages
     try:
-        action = ParmedActions.tiMerge(amber_prmtop, ArgumentList(var_list))
+        action = actions.tiMerge(amber_prmtop, ArgumentList(var_list))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -988,7 +988,7 @@ def addpdb(root, amber_prmtop, messages):
     if var_list[1] == 'yes': newvars.append('elem')
     if var_list[1] == 'yes': newvars.append('allicodes')
     try:
-        action = ParmedActions.addPDB(amber_prmtop, ArgumentList(newvars))
+        action = actions.addPDB(amber_prmtop, ArgumentList(newvars))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
@@ -1003,7 +1003,7 @@ def deletepdb(root, amber_prmtop, messages):
                         'Do you want to delete the addPDB flags from %s?' %
                         amber_prmtop.parm)
     if response:
-        action = ParmedActions.deletePDB(amber_prmtop, ArgumentList(''))
+        action = actions.deletePDB(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -1014,7 +1014,7 @@ def lmod(root, amber_prmtop, messages):
     response = askyesno('lmod', 'Do you want to adjust LJ A-coefficients for '
                                 'use with lmod?')
     if response:
-        action = ParmedActions.lmod(amber_prmtop, ArgumentList(''))
+        action = actions.lmod(amber_prmtop, ArgumentList(''))
         action.execute()
         messages.write('%s\n' % action)
 
@@ -1042,7 +1042,7 @@ def scale(root, amber_prmtop, messages):
     # If we did, store them and pass it to the class
     var_list = [v.get() for v in var_list]
     try:
-        action = ParmedActions.scale(amber_prmtop, ArgumentList(var_list))
+        action = actions.scale(amber_prmtop, ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
         return
@@ -1053,7 +1053,7 @@ def scale(root, amber_prmtop, messages):
 
 def summary(root, amber_prmtop, messages):
     """ Prints a summary of the topology file to the messages """
-    summary = ParmedActions.summary(amber_prmtop, ArgumentList(''))
+    summary = actions.summary(amber_prmtop, ArgumentList(''))
     messages.write('%s\n' % summary)
 
 #~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
@@ -1087,7 +1087,7 @@ def hmassrepartition(root, amber_prmtop, messages):
     else:
         var_list[1] = ''
     try:
-        action = ParmedActions.HMassRepartition(amber_prmtop,
+        action = actions.HMassRepartition(amber_prmtop,
                                                 ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
@@ -1136,7 +1136,7 @@ def add12_6_4(root, amber_prmtop, messages):
     if var_list[3]: args.extend(['polfile', var_list[3]])
     if var_list[4]: args.extend(['tunfactor', var_list[4]])
     try:
-        action = ParmedActions.add12_6_4(amber_prmtop, ArgumentList(args))
+        action = actions.add12_6_4(amber_prmtop, ArgumentList(args))
         messages.write('%s\n' % action)
         action.execute()
     except Exception as err:
