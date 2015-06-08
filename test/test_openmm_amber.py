@@ -18,7 +18,7 @@ from parmed.utils.six.moves import range, zip
 from copy import copy
 from math import sqrt
 import os
-import ParmedTools as PT
+import parmed.tools as PT
 import unittest
 import utils
 

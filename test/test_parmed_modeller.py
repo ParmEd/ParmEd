@@ -10,7 +10,7 @@ from parmed.exceptions import BondError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
 import os
-from ParmedTools import changeRadii
+from parmed.tools import changeRadii
 import random
 import sys
 import unittest
