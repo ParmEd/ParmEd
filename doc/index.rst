@@ -40,7 +40,7 @@ system topology so you don't have to worry about it).
 What can it do?
 ---------------
 
-The core ``chemistry`` package provided as part of ParmEd is intended to provide
+The core ``parmed`` package provided as part of ParmEd is intended to provide
 a powerful, but simple, API for carrying out tasks common in the field of
 biomolecular simulations.  For example, some of its features include:
 

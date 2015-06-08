@@ -38,7 +38,7 @@ Load Pose into ParmEd
 The next step is to use ParmEd's :func:`load_rosetta` function
 to convert our mutant into a :class:`Structure`::
 
-    from chemistry import load_rosetta
+    from parmed import load_rosetta
 
     struct = load_rosetta(mutant)
 
