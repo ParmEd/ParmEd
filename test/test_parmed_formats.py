@@ -18,7 +18,7 @@ except ImportError:
     import io as StringIO
 import os
 import unittest
-from utils import get_fn, has_numpy, diff_files, get_saved_fn
+from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -177,6 +177,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test Bzipped-PDB file parsing """
         self._check4lyt(read_PDB(self.pdbbz2))
 
+    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def testVmdOverflow(self):
         """ Test PDB file where atom and residue numbers overflow """
         pdbfile = read_PDB(self.overflow)
@@ -184,6 +185,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.assertEqual(len(pdbfile.residues), 35697)
         self.assertEqual(pdbfile.box, [0, 0, 0, 90, 90, 90])
 
+    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def testRegularOverflow(self):
         """ Test PDB file where atom number goes to ***** after 99999 """
         pdbfile = read_PDB(self.overflow2)
@@ -345,6 +347,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
+    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def testSegidHandling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
         pdbfile = read_PDB(self.overflow2)
