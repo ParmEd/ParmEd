@@ -5,8 +5,7 @@ and building a Structure from it
 from __future__ import print_function, division, absolute_import
 
 from parmed.constants import TINY, DEG_TO_RAD
-from parmed.exceptions import (GromacsTopologyError, GromacsTopologyWarning,
-            MissingParameterWarning)
+from parmed.exceptions import GromacsError, GromacsWarning, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -229,8 +228,8 @@ class GromacsTopologyFile(Structure):
                     molname, nrexcl = line.split()
                     nrexcl = int(nrexcl)
                     if molname in molecules:
-                        raise GromacsTopologyError('Duplicate definition of '
-                                                   'molecule %s' % molname)
+                        raise GromacsError('Duplicate definition of molecule %s'
+                                           % molname)
                     molecule = Structure()
                     molecules[molname] = (molecule, nrexcl)
                     molecule.nrexcl = nrexcl
@@ -270,7 +269,7 @@ class GromacsTopologyFile(Structure):
                     funct = int(words[2])
                     if funct != 1:
                         warnings.warn('bond funct != 1; unknown functional',
-                                      GromacsTopologyWarning)
+                                      GromacsWarning)
                         self.unknown_functional = True
                     molecule.bonds.append(Bond(molecule.atoms[i],
                                                molecule.atoms[j]))
@@ -288,7 +287,7 @@ class GromacsTopologyFile(Structure):
                     if funct != 1:
                         # This is not even supported in Gromacs
                         warnings.warn('pairs funct != 1; unknown functional',
-                                      GromacsTopologyWarning)
+                                      GromacsWarning)
                         self.unknown_functional = True
                     molecule.adjusts.append(
                             NonbondedException(molecule.atoms[i],
@@ -310,7 +309,7 @@ class GromacsTopologyFile(Structure):
                     funct = int(words[3])
                     if funct not in (1, 5):
                         warnings.warn('angles funct != 1 or 5; unknown '
-                                      'functional', GromacsTopologyWarning)
+                                      'functional', GromacsWarning)
                         self.unknown_functional = True
                     molecule.angles.append(
                             Angle(molecule.atoms[i], molecule.atoms[j],
@@ -365,7 +364,7 @@ class GromacsTopologyFile(Structure):
                         if atoms in proper_multiterm_dihedrals:
                             for edt in proper_multiterm_dihedrals[atoms]:
                                 if edt.per == dt.per:
-                                    raise GromacsTopologyError(
+                                    raise GromacsError(
                                         'duplicate periodicity term found '
                                         'in inline dihedral parameter for '
                                         'atoms [%s]' % ', '.join(words[:4])
@@ -398,7 +397,7 @@ class GromacsTopologyFile(Structure):
                     else:
                         # ??? unknown
                         warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
-                                      ' functional', GromacsTopologyWarning)
+                                      ' functional', GromacsWarning)
                         dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
                                        molecule.atoms[k], molecule.atoms[l])
                         molecule.dihedrals.append(dih)
@@ -432,7 +431,7 @@ class GromacsTopologyFile(Structure):
                     funct = int(words[5])
                     if funct != 1:
                         warnings.warn('cmap funct != 1; unknown functional',
-                                      GromacsTopologyWarning)
+                                      GromacsWarning)
                         self.unknown_functional = True
                     cmap = Cmap(molecule.atoms[i], molecule.atoms[j],
                                 molecule.atoms[k], molecule.atoms[l],
@@ -444,15 +443,14 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'defaults':
                     words = line.split()
                     if len(words) < 4:
-                        raise GromacsTopologyError('Too few fields in '
-                                                   '[ defaults ]')
+                        raise GromacsError('Too few fields in [ defaults ]')
                     if words[0] != '1':
                         warnings.warn('Unsupported nonbonded type; unknown '
-                                      'functional', GromacsTopologyWarning)
+                                      'functional', GromacsWarning)
                         self.unknown_functional = True
                     if words[1] != '2':
                         warnings.warn('Unsupported combining rule',
-                                      GromacsTopologyWarning)
+                                      GromacsWarning)
                         self.unknown_functional = True
                     self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
@@ -467,23 +465,23 @@ class GromacsTopologyFile(Structure):
                     natoms = len([a for a in molecule.atoms
                                     if not isinstance(a, ExtraPoint)])
                     if natoms != 3:
-                        raise GromacsTopologyError("Cannot SETTLE a %d-atom "
-                                                   "molecule" % natoms)
+                        raise GromacsError("Cannot SETTLE a %d-atom molecule" %
+                                           natoms)
                     try:
                         oxy, = [atom for atom in molecule.atoms
                                     if atom.atomic_number == 8]
                         hyd1, hyd2 = [atom for atom in molecule.atoms
                                         if atom.atomic_number == 1]
                     except ValueError:
-                        raise GromacsTopologyError("Can only SETTLE water; "
-                                    "Could not detect 2 hydrogens and 1 oxygen")
+                        raise GromacsError('Can only SETTLE water; Could not '
+                                           'detect 2 hydrogens and 1 oxygen')
                     #TODO see if there's a bond_type entry in the parameter set
                     #     that we can fill in
                     try:
                         i, funct, doh, dhh = line.split()
                         doh, dhh = float(doh), float(dhh)
                     except ValueError:
-                        raise GromacsTopologyError('Bad [ settles ] line')
+                        raise GromacsError('Bad [ settles ] line')
                     bt_oh = BondType(5e5*u.kilojoules_per_mole/u.nanometers**2,
                                      doh*u.nanometers, list=molecule.bond_types)
                     bt_hh = BondType(5e5*u.kilojoules_per_mole/u.nanometers**2,
@@ -500,11 +498,11 @@ class GromacsTopologyFile(Structure):
                     if funct == 1:
                         a, b = float(words[5]), float(words[6])
                         if abs(a - b) > TINY:
-                            raise GromacsTopologyError('Cannot handle virtual '
-                                    'site frames with different weights')
+                            raise GromacsError('Cannot handle virtual site '
+                                               'frames with different weights')
                     else:
-                        raise GromacsTopologyError('Only 3-point virtual site '
-                                                   'type "1" is supported')
+                        raise GromacsError('Only 3-point virtual site type "1" '
+                                           'is supported')
                     # We need to know the geometry of the frame in order to
                     # determine the bond length between the virtual site and its
                     # parent atom
@@ -516,7 +514,7 @@ class GromacsTopologyFile(Structure):
                             if bond.type is None:
                                 key = (parent.type, atoms[1].type)
                                 if key not in params.bond_types:
-                                    raise GromacsTopologyError(
+                                    raise GromacsError(
                                             'Cannot determine geometry of '
                                             'virtual site without bond types'
                                     )
@@ -526,7 +524,7 @@ class GromacsTopologyFile(Structure):
                                 key = (_gettype(bond.atom1),
                                        _gettype(bond.atom2))
                                 if key not in params.bond_types:
-                                    raise GromacsTopologyError(
+                                    raise GromacsError(
                                             'Cannot determine geometry of '
                                             'virtual site without bond types'
                                     )
@@ -540,7 +538,7 @@ class GromacsTopologyFile(Structure):
                             key = (_gettype(angle.atom1), _gettype(angle.atom2),
                                    _gettype(angle.atom3))
                             if key not in params.angle_types:
-                                raise GromacsTopologyError(
+                                raise GromacsError(
                                         'Cannot determine geometry of '
                                         'virtual site without bond types'
                                 )
@@ -552,7 +550,7 @@ class GromacsTopologyFile(Structure):
                                     key = (_gettype(bond.atom1),
                                            _gettype(bond.atom2))
                                     if key not in params.bond_types:
-                                        raise GromacsTopologyError(
+                                        raise GromacsError(
                                             'Cannot determine geometry of '
                                             'virtual site without bond types'
                                         )
@@ -562,8 +560,8 @@ class GromacsTopologyFile(Structure):
                     bt_vs = BondType(0, bondlen*u.angstroms,
                                      list=molecule.bond_types)
                     if vsite in parent.bond_partners:
-                        raise GromacsTopologyError('Unexpected bond b/w '
-                                    'virtual site and its parent')
+                        raise GromacsError('Unexpected bond b/w virtual site '
+                                           'and its parent')
                     molecule.bonds.append(Bond(vsite, parent, bt_vs))
                     molecule.bond_types.append(bt_vs)
                 elif current_section == 'exclusions':
@@ -633,7 +631,7 @@ class GromacsTopologyFile(Structure):
                             u.kilojoules_per_mole / u.nanometers**2)
                     if words[2] != '1':
                         warnings.warn('bondtypes funct != 1; unknown '
-                                      'functional', GromacsTopologyWarning)
+                                      'functional', GromacsWarning)
                         self.unknown_functional = True
                     ptype = BondType(k, r)
                     params.bond_types[(words[0], words[1])] = ptype
@@ -645,7 +643,7 @@ class GromacsTopologyFile(Structure):
                             u.kilojoules_per_mole / u.radians**2)
                     if words[3] != '1' and words[3] != '5':
                         warnings.warn('angletypes funct != 1 or 5; unknown '
-                                      'functional', GromacsTopologyWarning)
+                                      'functional', GromacsWarning)
                         self.unknown_functional = True
                     if words[3] == '5':
                         # Contains the angle with urey-bradley
@@ -682,7 +680,7 @@ class GromacsTopologyFile(Structure):
                         dtype = 'rbtorsion'
                     else:
                         warnings.warn('dihedraltypes funct not supported',
-                                      GromacsTopologyWarning)
+                                      GromacsWarning)
                         self.unknown_functional = True
                     # Do the proper types
                     if dtype == 'normal':
@@ -727,11 +725,10 @@ class GromacsTopologyFile(Structure):
                     res1, res2 = int(words[6]), int(words[7])
                     grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
                     if len(grid) != res1 * res2:
-                        raise GromacsTopologyError('CMAP grid dimensions do '
-                                                   'not match resolution')
+                        raise GromacsError('CMAP grid dimensions do not match '
+                                           'resolution')
                     if res1 != res2:
-                        raise GromacsTopologyError('Only square CMAPs are '
-                                                   'supported')
+                        raise GromacsError('Only square CMAPs are supported')
                     cmaptype = CmapType(res1, grid)
                     params.cmap_types[(a1, a2, a3, a4, a5)] = cmaptype
                     params.cmap_types[(a5, a4, a3, a2, a1)] = cmaptype
@@ -743,7 +740,7 @@ class GromacsTopologyFile(Structure):
                     cs6 *= u.nanometers * 2**(1/6)
                     cs12 *= u.kilojoules_per_mole
                     pairtype = NonbondedExceptionType(cs6, cs12,
-                                                      self.defaults.fudgeQQ, list=self.adjust_types)
+                                self.defaults.fudgeQQ, list=self.adjust_types)
                     self.adjust_types.append(pairtype)
                     params.pair_types[(a1, a2)] = pairtype
                     params.pair_types[(a2, a1)] = pairtype
@@ -753,25 +750,24 @@ class GromacsTopologyFile(Structure):
         # copies of the ParameterType instances in self.parameterset
         for molname, num in structure_contents:
             if molname not in molecules:
-                raise GromacsTopologyError('Structure contains %s molecules, '
-                                           'but no template defined' % molname)
+                raise GromacsError('Structure contains %s molecules, but no '
+                                   'template defined' % molname)
             molecule, nrexcl = molecules[molname]
             if nrexcl < 3 and _any_atoms_farther_than(molecule, nrexcl):
                 warnings.warn('nrexcl %d not currently supported' % nrexcl,
-                              GromacsTopologyWarning)
+                              GromacsWarning)
             elif nrexcl > 3 and _any_atoms_farther_than(molecule, 3):
                 warnings.warn('nrexcl %d not currently supported' % nrexcl,
-                              GromacsTopologyWarning)
+                              GromacsWarning)
             if num == 0:
                 warnings.warn('Detected addition of 0 %s molecules in topology '
-                              'file' % molname, GromacsTopologyWarning)
+                              'file' % molname, GromacsWarning)
             if num == 1:
                 self += molecules[molname][0]
             elif num > 1:
                 self += molecules[molname][0] * num
             else:
-                raise GromacsTopologyError('Cannot add %d %s molecules' %
-                                           (num, molname))
+                raise GromacsError("Can't add %d %s molecules" % (num, molname))
         self.itps = itplist
         self.parametrize()
 
@@ -829,7 +825,7 @@ class GromacsTopologyFile(Structure):
                 pair.type.used = True
             else:
                 warnings.warn('Not all pair parameters can be found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         update_typelist_from(params.pair_types, self.adjust_types)
         # This is the list of 1-4 pairs determined from the bond graph.
         # If this is different from what's in [ pairs ], we print a warning
@@ -855,7 +851,7 @@ class GromacsTopologyFile(Structure):
                 bond.type.used = True
             else:
                 warnings.warn('Not all bond parameters found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         if len(true_14 - gmx_pair) > 0:
             zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0,
                                                    list=self.adjust_types)
@@ -867,12 +863,12 @@ class GromacsTopologyFile(Structure):
             warnings.warn('%i 1-4 pairs were missing from the [ pairs ] '
                           'section and were set to zero; make sure you '
                           'know what you\'re doing!' % num_zero_14,
-                          GromacsTopologyWarning)
+                          GromacsWarning)
         if len(gmx_pair - true_14) > 0:
             warnings.warn('The [ pairs ] section contains %i exceptions that '
                           'aren\'t 1-4 pairs; make sure you know what '
                           'you\'re doing!' % (len(gmx_pair - true_14)),
-                          GromacsTopologyWarning)
+                          GromacsWarning)
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
@@ -883,7 +879,7 @@ class GromacsTopologyFile(Structure):
                 angle.type.used = True
             else:
                 warnings.warn('Not all angle parameters found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
@@ -894,7 +890,7 @@ class GromacsTopologyFile(Structure):
                     ub.type.used = True
             else:
                 warnings.warn('Not all urey-bradley parameters found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         # Now strip out all of the Urey-Bradley terms whose parameters are 0
         for i in reversed(range(len(self.urey_bradleys))):
             if self.urey_bradleys[i].type is NoUreyBradley:
@@ -914,7 +910,7 @@ class GromacsTopologyFile(Structure):
                     t.type.used = True
                 else:
                     warnings.warn('Not all torsion parameters found',
-                                  MissingParameterWarning)
+                                  ParameterWarning)
             else:
                 if key in params.improper_periodic_types:
                     t.type = params.improper_periodic_types[key]
@@ -930,7 +926,7 @@ class GromacsTopologyFile(Structure):
                             break
                     else:
                         warnings.warn('Not all improper torsion parameters '
-                                      'found', MissingParameterWarning)
+                                      'found', ParameterWarning)
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
@@ -946,7 +942,7 @@ class GromacsTopologyFile(Structure):
                 t.type.used = True
             else:
                 warnings.warn('Not all R-B torsion parameters found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
         self.update_dihedral_exclusions()
         for t in self.impropers:
@@ -969,7 +965,7 @@ class GromacsTopologyFile(Structure):
                 break
             else:
                 warnings.warn('Not all quadratic improper parameters found',
-                              MissingParameterWarning)
+                              ParameterWarning)
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
@@ -979,8 +975,7 @@ class GromacsTopologyFile(Structure):
                 c.type = params.cmap_types[key]
                 c.type.used = True
             else:
-                warnings.warn('Not all cmap parameters found',
-                              MissingParameterWarning)
+                warnings.warn('Not all cmap parameters found', ParameterWarning)
         update_typelist_from(params.cmap_types, self.cmap_types)
 
     #===================================================
@@ -1055,8 +1050,8 @@ class GromacsTopologyFile(Structure):
                     if dihedral.type.scnb:
                         scnb_values.add(dihedral.type.scnb)
             if len(scee_values) > 1:
-                raise GromacsTopologyError('Structure has mixed 1-4 '
-                            'scaling which is not supported by Gromacs')
+                raise GromacsError('Structure has mixed 1-4 scaling which is '
+                                   'not supported by Gromacs')
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
             if len(scee_values) == 1:
@@ -1584,8 +1579,7 @@ class GromacsTopologyFile(Structure):
                         dhh = math.sqrt(2*doh*doh - 2*doh*doh*math.cos(theteq))
                         break
                 else:
-                    raise GromacsTopologyError('Cannot determine SETTLE '
-                                               'geometry')
+                    raise GromacsError('Cannot determine SETTLE geometry')
             dest.write('1     1   %.5f   %.5f\n\n#endif\n\n' % (doh, dhh))
         # Virtual sites
         if EPs:

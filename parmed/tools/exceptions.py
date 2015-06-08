@@ -1,14 +1,15 @@
-""" Exceptions used in Parmed """
+""" Exceptions used in parmed.py """
 from sys import stderr
+from parmed.exceptions import ParmedError, ParmedWarning
 
-class ParmError(Exception):
+class ParmError(ParmedError):
     """ Base parmed error """
     def __init__(self, msg='parmed error'):
         self.msg = msg
     def __str__(self):
         return self.msg
 
-class ParmWarning(Warning, ParmError):
+class ParmWarning(ParmedWarning):
     """ Base parmed warning """
     def __init__(self, msg='parmed warning'):
         self.msg = msg

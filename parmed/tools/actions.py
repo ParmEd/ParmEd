@@ -9,7 +9,7 @@ from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
-from parmed.exceptions import ChemError, CharmmFileError, FormatNotFound
+from parmed.exceptions import ParmedError, FormatNotFound
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
@@ -3769,13 +3769,13 @@ class chamber(Action):
                 parmset.read_parameter_file(pfile)
             for sfile in self.streamfiles:
                 parmset.read_stream_file(sfile)
-        except ChemError as e:
+        except ParmedError as e:
             raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
         # Now read the PSF
         try:
             psf = CharmmPsfFile(self.psf)
-        except ChemError as e:
+        except ParmedError as e:
             raise ChamberError('Problem reading CHARMM PSF: %s' % e)
 
         # Read the PDB and set the box information
@@ -3872,7 +3872,7 @@ class chamber(Action):
         # Now load the parameters
         try:
             psf.load_parameters(parmset)
-        except ChemError as e:
+        except ParmedError as e:
             raise ChamberError('Problem assigning parameters to PSF: %s' % e)
         parm = ConvertFromPSF(psf, parmset)
         parm.name = self.psf

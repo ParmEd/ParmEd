@@ -31,8 +31,8 @@ except ImportError:
 
 from parmed.amber.readparm import Rst7
 from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
-                              CharmmParameterSet)
-from parmed.exceptions import CharmmPSFWarning
+                           CharmmParameterSet)
+from parmed.exceptions import CharmmWarning
 from parmed import unit as u, openmm
 from parmed.utils.six.moves import range
 from copy import copy
@@ -43,7 +43,7 @@ import warnings
 get_fn = utils.get_fn
 
 # Suppress warning output from bad psf file... sigh.
-warnings.filterwarnings('ignore', category=CharmmPSFWarning)
+warnings.filterwarnings('ignore', category=CharmmWarning)
 
 if has_openmm:
     # System

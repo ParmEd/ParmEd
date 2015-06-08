@@ -7,7 +7,7 @@ import utils
 from parmed import periodic_table
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
-from parmed.exceptions import MoleculeWarning, CharmmPSFWarning
+from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils.six.moves import range, zip
 from copy import copy
@@ -59,7 +59,7 @@ class TestNonParmActions(unittest.TestCase):
     def testChamber(self):
         """ Test the chamber action with a basic protein """
         # To keep stderr clean
-        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+        warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
                        '-top %s' % get_fn('top_all22_prot.inp'),
@@ -75,7 +75,7 @@ class TestNonParmActions(unittest.TestCase):
 
     def testChamberGlobbing(self):
         """ Test globbing in the chamber action """
-        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+        warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
                        '-toppar', get_fn('*_all22_prot.inp'),
@@ -90,7 +90,7 @@ class TestNonParmActions(unittest.TestCase):
 
     def testChamberNbfix(self):
         """ Test the chamber action with a complex system using NBFIX """
-        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+        warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
                        '-param %s' % get_fn('par_all36_prot.prm'),
@@ -125,7 +125,7 @@ class TestNonParmActions(unittest.TestCase):
 
     def testChamberBug2(self):
         """ Test that chamber sets the box angles for triclinics correctly """
-        warnings.filterwarnings('ignore', category=CharmmPSFWarning,
+        warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
         a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
                        '-param %s' % get_fn('par_all36_prot.prm'),
@@ -766,7 +766,7 @@ class TestAmberParmActions(utils.TestCaseRelative):
         self.assertEqual(parm.ptr('NSPM'), 718)
         self.assertEqual(parm.ptr('NSPSOL'), 23)
         # To keep the output clean
-        warnings.filterwarnings('ignore', category=MoleculeWarning)
+        warnings.filterwarnings('ignore', category=AmberWarning)
         PT.setMolecules(parm).execute()
         self.assertFalse(all([x is y for x,y in zip(parm.atoms,atoms)]))
         # Now check that setMolecules can apply another time. solute_ions seems

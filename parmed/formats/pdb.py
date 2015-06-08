@@ -10,7 +10,7 @@ try:
     create_array = lambda x: np.array(x, dtype=np.float64)
 except ImportError:
     create_array = lambda x: [float(v) for v in x]
-from parmed.exceptions import PDBError, AnisouWarning, PDBWarning
+from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element
@@ -342,7 +342,7 @@ class PDBFile(object):
                         atnum = int(line[6:11])
                     except ValueError:
                         warnings.warn('Problem parsing atom number from ANISOU '
-                                      'record', AnisouWarning)
+                                      'record', PDBWarning)
                         continue # Skip the rest of this record
                     aname = line[12:16].strip()
                     altloc = line[16].strip()
@@ -352,7 +352,7 @@ class PDBFile(object):
                         resid = int(line[22:26])
                     except ValueError:
                         warnings.warn('Problem parsing residue number from '
-                                      'ANISOU record', AnisouWarning)
+                                      'ANISOU record', PDBWarning)
                         continue # Skip the rest of this record
                     icode = line[27].strip()
                     try:
@@ -364,11 +364,11 @@ class PDBFile(object):
                         u23 = int(line[63:70])
                     except ValueError:
                         warnings.warn('Problem parsing anisotropic factors '
-                                      'from ANISOU record', AnisouWarning)
+                                      'from ANISOU record', PDBWarning)
                         continue
                     if last_atom_added is None:
                         warnings.warn('Orphaned ANISOU record. Poorly '
-                                      'formatted PDB file', AnisouWarning)
+                                      'formatted PDB file', PDBWarning)
                         continue
                     la = last_atom_added
                     if (la.name != aname or la.number != atnum or
@@ -376,7 +376,7 @@ class PDBFile(object):
                             la.residue.chain != chain or
                             la.residue.insertion_code != icode):
                         warnings.warn('ANISOU record does not match previous '
-                                      'atom', AnisouWarning)
+                                      'atom', PDBWarning)
                         continue
                     la.anisou = create_array([u11/1e4, u22/1e4, u33/1e4,
                                               u12/1e4, u13/1e4, u23/1e4])

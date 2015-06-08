@@ -4,7 +4,7 @@ This sets up the command interpreter for textual ParmEd (parmed.py).
 
 # Load some system modules that may be useful for various users in shell mode
 from parmed.amber.readparm import AmberParm
-from parmed.exceptions import ChemError
+from parmed.exceptions import ParmedError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range
 import cmd
@@ -12,7 +12,7 @@ from glob import glob
 import os
 from parmed.tools.actions import COMMANDMAP, Usages
 from parmed.tools.argumentlist import ArgumentList
-from parmed.tools.exceptions import InterpreterError, ParmError
+from parmed.tools.exceptions import InterpreterError
 try:
     import readline
 except ImportError:
@@ -137,7 +137,7 @@ class ParmedCmd(cmd.Cmd):
         # Store this action for later use. This action is unique
         try:
             self.parmout = COMMANDMAP['parmout'](self.parm, line)
-        except ParmError as err:
+        except ParmedError as err:
             self.stdout.write('Action parmout failed.\n\t')
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -151,7 +151,7 @@ class ParmedCmd(cmd.Cmd):
             if action.valid:
                 self.stdout.write('%s\n' % action)
                 action.execute()
-        except (ParmError, ChemError) as err:
+        except ParmedError as err:
             self.stdout.write('Action %s failed\n\t' % actionname)
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -181,7 +181,7 @@ class ParmedCmd(cmd.Cmd):
         _cmd.interpreter = self.interpreter
         _cmd.use_rawinput = 0
         # If we exit on error, call cmdloop without try protection. Otherwise,
-        # we need to protect cmdloop to catch any ParmError's that are passed
+        # we need to protect cmdloop to catch any ParmedError's that are passed
         # through to avoid exiting the top-level interpreter
         if self._exit_on_fatal:
             _cmd.cmdloop()
@@ -191,7 +191,7 @@ class ParmedCmd(cmd.Cmd):
             # command from the user.
             try:
                 _cmd.cmdloop()
-            except ParmError:
+            except ParmedError:
                 pass
       
     def do_go(self, line):
@@ -203,7 +203,7 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s\n' % self.parmout)
             try:
                 self.parmout.execute()
-            except ParmError as err:
+            except ParmedError as err:
                 self.stdout.write('%s: %s\n' % (type(err).__name__, err))
                 if self._exit_on_fatal:
                     raise err

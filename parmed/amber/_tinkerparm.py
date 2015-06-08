@@ -31,7 +31,7 @@ from parmed import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 MultipoleFrame, NonbondedException, StretchBendType,
                 TorsionTorsionType)
 from parmed import AmoebaNonbondedExceptionType as NonbondedExceptionType
-from parmed.exceptions import FormatError, AmoebaError
+from parmed.exceptions import AmberError
 from parmed.utils.six.moves import range, zip
 
 class AmoebaParm(AmberParm):
@@ -156,14 +156,17 @@ class AmoebaParm(AmberParm):
     def initialize_topology(self, rst7_name=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
-        etc., after the topology file has been read. The following methods are
-        called:
+        etc., after the topology file has been read.
+
+        Raises
+        ------
+        AmberError if it is not an Amoeba-styled topology file
         """
         try:
             if self.parm_data['AMOEBA_FORCEFIELD'][0] != 1:
-                raise FormatError('Bad AMOEBA-format topology')
+                raise AmberError('Bad AMOEBA-format topology')
         except KeyError:
-            raise FormatError('Bad AMOEBA-format topology')
+            raise AmberError('Bad AMOEBA-format topology')
 
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
@@ -384,9 +387,9 @@ class AmoebaParm(AmberParm):
         self.bond_types.degree = data['AMOEBA_REGULAR_BOND_FTAB_DEGREE'][0]
         self.bond_types.coeffs = data['AMOEBA_REGULAR_BOND_FTAB_COEFFS'][:]
         if len(self.bond_types.coeffs) != self.bond_types.degree + 1:
-            raise AmoebaError('Bond degree (%d) does not make sense with %d '
-                              'coefficients' % (self.bond_types.degree,
-                              len(self.bond_types.coeffs)))
+            raise AmberError('Bond degree (%d) does not make sense with %d '
+                             'coefficients' % (self.bond_types.degree,
+                             len(self.bond_types.coeffs)))
         it = iter(self.parm_data['AMOEBA_REGULAR_BOND_LIST'])
         for i, j, k in zip(it, it, it):
             self.bonds.append(
@@ -408,7 +411,7 @@ class AmoebaParm(AmberParm):
         self.angle_types.degree = data['AMOEBA_REGULAR_ANGLE_FTAB_DEGREE'][0]
         self.angle_types.coeffs = data['AMOEBA_REGULAR_ANGLE_FTAB_COEFFS'][:]
         if len(self.angle_types.coeffs) != self.angle_types.degree + 1:
-            raise AmoebaError('Angle degree (%d) does not make sense with %d '
+            raise AmberError('Angle degree (%d) does not make sense with %d '
                               'coefficients' % (self.angle_types.degree,
                               len(self.angle_types.coeffs)))
         it = iter(data['AMOEBA_REGULAR_ANGLE_LIST'])
@@ -436,7 +439,7 @@ class AmoebaParm(AmberParm):
         self.urey_bradley_types.coeffs = coeffs = \
                 data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][:]
         if len(coeffs) != degree + 1:
-            raise AmoebaError('Urey-Bradley degree (%d) does not make sense '
+            raise AmberError('Urey-Bradley degree (%d) does not make sense '
                               'with %d coefficients' % (degree, len(coeffs)))
         it = iter(data['AMOEBA_UREY_BRADLEY_LIST'])
         for i, j, k in zip(it, it, it):
@@ -463,7 +466,7 @@ class AmoebaParm(AmberParm):
         self.trigonal_angle_types.coeffs = coeffs = \
                 data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'][:]
         if len(coeffs) != degree + 1:
-            raise AmoebaError('Trigonal Angle degree (%d) does not make sense '
+            raise AmberError('Trigonal Angle degree (%d) does not make sense '
                               'with %d coefficients' % (degree, len(coeffs)))
         it = iter(data['AMOEBA_TRIGONAL_ANGLE_LIST'])
         for i, j, k, l, m in zip(it, it, it, it, it):
@@ -490,7 +493,7 @@ class AmoebaParm(AmberParm):
         self.out_of_plane_bend_types.coeffs = coeffs = \
                 data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'][:]
         if len(coeffs) != degree + 1:
-            raise AmoebaError('OOP-bend angle degree (%d) does not make sense '
+            raise AmberError('OOP-bend angle degree (%d) does not make sense '
                               'with %d coefficients.' % (degree, len(coeffs)))
         it = iter(data['AMOEBA_OPBEND_ANGLE_LIST'])
         for i, j, k, l, m in zip(it, it, it, it, it):

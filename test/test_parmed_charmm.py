@@ -77,7 +77,7 @@ class TestCharmmPsf(unittest.TestCase):
                 self.assertEqual(atom.residue.idx, 0)
             self.assertTrue(atom.type in [3, 70, 54])
         # Check some atom properties
-        self.assertRaises(exceptions.MissingParameter, lambda: str(a.atom_type))
+        self.assertRaises(exceptions.ParameterError, lambda: str(a.atom_type))
         self.assertTrue(all([isinstance(b, to.Bond) for b in a.bonds]))
         self.assertTrue(all([isinstance(an, to.Angle) for an in a.angles]))
         self.assertTrue(all([isinstance(d, to.Dihedral) for d in a.dihedrals]))
@@ -154,7 +154,7 @@ class TestCharmmPsf(unittest.TestCase):
                 self.assertEqual(atom.residue.idx, 0)
             self.assertTrue(atom.type in ['HA', 'O', 'NH1'])
         # Check some atom properties
-        self.assertRaises(exceptions.MissingParameter, lambda: int(a.atom_type))
+        self.assertRaises(exceptions.ParameterError, lambda: int(a.atom_type))
         self.assertTrue(all([isinstance(b, to.Bond) for b in a.bonds]))
         self.assertTrue(all([isinstance(an, to.Angle) for an in a.angles]))
         self.assertTrue(all([isinstance(d, to.Dihedral) for d in a.dihedrals]))
@@ -247,7 +247,7 @@ class TestCharmmPsf(unittest.TestCase):
                 self.assertEqual(atom.residue.idx, 0)
             self.assertTrue(atom.type in ['HA', 'O', 'NH1'])
         # Check some atom properties
-        self.assertRaises(exceptions.MissingParameter, lambda: int(a.atom_type))
+        self.assertRaises(exceptions.ParameterError, lambda: int(a.atom_type))
         self.assertTrue(all([isinstance(b, to.Bond) for b in a.bonds]))
         self.assertTrue(all([isinstance(an, to.Angle) for an in a.angles]))
         self.assertTrue(all([isinstance(d, to.Dihedral) for d in a.dihedrals]))

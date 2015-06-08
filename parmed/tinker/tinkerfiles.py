@@ -1,7 +1,7 @@
 """
 This module contains classes for reading various TINKER-style files
 """
-from parmed.exceptions import TinkerKeyFileError, TinkerDynFileError
+from parmed.exceptions import TinkerError
 from parmed.utils.six.moves import range
 
 class KeywordControlFile(object):
@@ -29,10 +29,9 @@ class KeywordControlFile(object):
             except KeyError:
                 pass # All non-keyword lines are ignored comments
             except ValueError:
-                raise TinkerKeyFileError(
-                        'Malformed keyword control file! Could not convert the '
-                        'value of %s into type %s' % (key, self._datatypes[key])
-                )
+                raise TinkerError('Malformed keyword control file! Could not '
+                                  'convert the value of %s into type %s' %
+                                  (key, self._datatypes[key]))
 
 class XyzFile(object):
     """ Reads and processes a Tinker XYZ file """
@@ -95,12 +94,12 @@ class DynFile(object):
         f = open(fname, 'r')
         try:
             if f.readline().strip() != 'Number of Atoms and Title :':
-                raise TinkerDynFileError('%s is not a recognized TINKER '
-                                         '.dyn file' % fname)
+                raise TinkerError('%s is not a recognized TINKER .dyn file' %
+                                  fname)
             line = f.readline()
             self.natom, self.title = int(line[0:8].strip()), line[8:].strip()
             if f.readline().strip() != 'Periodic Box Dimensions :':
-                raise TinkerDynFileError('No periodic box dimension line')
+                raise TinkerError('No periodic box dimension line')
             self.box = [0.0 for i in range(6)]
             words = f.readline().upper().split()
             self.box[0] = float(words[0].replace('D', 'E'))
@@ -111,7 +110,7 @@ class DynFile(object):
             self.box[4] = float(words[1].replace('D', 'E'))
             self.box[5] = float(words[2].replace('D', 'E'))
             if f.readline().strip() != 'Current Atomic Positions :':
-                raise TinkerDynFileError('No atomic positions in .dyn file')
+                raise TinkerError('No atomic positions in .dyn file')
             self.positions = [[0.0, 0.0, 0.0] for i in range(self.natom)]
             DynFile._read_section(f, self.positions, self.natom)
             line = f.readline().strip()
@@ -122,14 +121,14 @@ class DynFile(object):
                 DynFile._read_section(f, self.translational_velocities,
                                       self.natom)
                 if f.readline().strip() != 'Current Angular Velocities :':
-                    raise TinkerDynFileError('Could not find Angular velocity '
-                            'section in .dyn file')
+                    raise TinkerError('Could not find Angular velocity '
+                                      'section in .dyn file')
                 self.angular_velocities = [[0.0, 0.0, 0.0]
                                             for i in range(self.natom)]
                 DynFile._read_section(f, self.angular_velocities, self.natom)
                 if f.readline().strip() != 'Current Angular Momenta :':
-                    raise TinkerDynFileError('Could not find angular momenta '
-                                             'section in .dyn file')
+                    raise TinkerError('Could not find angular momenta section '
+                                      'in .dyn file')
                 self.angular_momenta = [[0.0, 0.0, 0.0]
                                         for i in range(self.natom)]
                 DynFile._read_section(f, self.angular_momenta, self.natom)
@@ -138,19 +137,19 @@ class DynFile(object):
                 self.velocities = [[0.0, 0.0, 0.0] for i in range(self.natom)]
                 DynFile._read_section(f, self.velocities, self.natom)
                 if f.readline().strip() != 'Current Atomic Accelerations :':
-                    raise TinkerDynFileError('Could not find accelerations '
-                                             'in %s ' % fname)
+                    raise TinkerError('Could not find accelerations in %s ' % 
+                                      fname)
                 self.accelerations = [[0.0, 0.0, 0.0]
                                       for i in range(self.natom)]
                 DynFile._read_section(f, self.accelerations, self.natom)
                 if f.readline().strip() != 'Alternate Atomic Accelerations :':
-                    raise TinkerDynFileError('Could not find old '
-                                             'accelerations in %s' % fname)
+                    raise TinkerError('Could not find old accelerations in %s' %
+                                      fname)
                 self.old_accelerations = [[0.0, 0.0, 0.0] 
                                           for i in range(self.natom)]
                 DynFile._read_section(f, self.old_accelerations, self.natom)
             else:
-                raise TinkerDynFileError('No velocities in %s' % fname)
+                raise TinkerError('No velocities in %s' % fname)
         finally:
             f.close()
 
@@ -167,7 +166,7 @@ class DynFile(object):
                 container[i][1] = float(words[1].replace('D', 'E'))
                 container[i][2] = float(words[2].replace('D', 'E'))
             except (IndexError, ValueError):
-                raise TinkerDynFileError('Could not parse values from dyn file')
+                raise TinkerError('Could not parse values from dyn file')
 
 def is_float(thing):
     try:

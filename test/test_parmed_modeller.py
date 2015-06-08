@@ -3,11 +3,11 @@ Tests the functionality in parmed.modeller
 """
 import utils
 from parmed import Atom, read_PDB
-from parmed.exceptions import AmberOFFWarning
+from parmed.exceptions import AmberWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                                PROTEIN, SOLVENT, AmberOFFLibrary)
+                             PROTEIN, SOLVENT, AmberOFFLibrary)
 from parmed.amber import AmberParm
-from parmed.exceptions import BondError
+from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
 import os
@@ -56,7 +56,7 @@ class TestResidueTemplate(unittest.TestCase):
         templ.add_bond(a2, a5)
         templ.add_bond(a5, a6)
         self.assertRaises(RuntimeError, lambda: templ.add_bond(a1, a7))
-        self.assertRaises(BondError, lambda: templ.add_bond(a1, a1))
+        self.assertRaises(MoleculeError, lambda: templ.add_bond(a1, a1))
         self.assertIn(a1, a2.bond_partners)
         self.assertIn(a2, a1.bond_partners)
         self.assertIn(a3, a2.bond_partners)
@@ -78,7 +78,7 @@ class TestResidueTemplate(unittest.TestCase):
         templ.add_bond(a2, a5)
         templ.add_bond(a5, a6)
         self.assertRaises(RuntimeError, lambda: templ.add_bond(a1, a7))
-        self.assertRaises(BondError, lambda: templ.add_bond(a1, a1))
+        self.assertRaises(MoleculeError, lambda: templ.add_bond(a1, a1))
         a1, a2, a3, a4, a5, a6 = templ.atoms
         self.assertIn(a1, a2.bond_partners)
         self.assertIn(a2, a1.bond_partners)
@@ -314,7 +314,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
     def testReadSolvents(self):
         """ Test reading solvent Amber OFF lib (multi-res units) """
         # Turn off warnings... the solvents.lib file is SO broken.
-        warnings.filterwarnings('ignore', module='.', category=AmberOFFWarning)
+        warnings.filterwarnings('ignore', module='.', category=AmberWarning)
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
         for name, res in iteritems(offlib):

@@ -9,7 +9,6 @@ instances where the prequisites may not be installed.
 from __future__ import division, print_function, absolute_import
 
 from parmed.formats.registry import FileFormatType
-from parmed.exceptions import ParsingError
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
@@ -24,6 +23,9 @@ import warnings as _warnings
 
 VELSCALE = 20.455
 ONEVELSCALE = 1 / VELSCALE
+
+class _FileEOF(Exception):
+    """ For control flow """
 
 @add_metaclass(FileFormatType)
 class _AmberAsciiCoordinateFile(object):
@@ -490,7 +492,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             while rawline:
                 if np is not None:
                     frame = np.zeros(self.natom*3)
-                    if not rawline: raise ParsingError()
+                    if not rawline: raise _FileEOF()
                     cell = np.zeros(3)
                 else:
                     frame = array('f', [0 for i in natom3iter])
@@ -499,7 +501,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 rawline = self._file.readline()
                 if not rawline: raise StopIteration()
                 for i in range(self._full_lines_per_frame):
-                    if not rawline: raise ParsingError()
+                    if not rawline: raise _FileEOF()
                     frame[idx:idx+10] = converter([float(rawline[j:j+8]) 
                                                    for j in mainiter])
                     idx += 10
@@ -512,7 +514,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
                 if self.hasbox:
                     rawline = self._file.readline()
-                    if not rawline: raise ParsingError()
+                    if not rawline: raise _FileEOF()
                     cell[0] = float(rawline[:8])
                     cell[1] = float(rawline[8:16])
                     cell[2] = float(rawline[16:24])
@@ -521,7 +523,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 self.cell_lengths.append(cell)
                 self.frame += 1
 
-        except ParsingError:
+        except _FileEOF:
             _warnings.warn('Unexpected EOF in parsing mdcrd. natom and/or '
                            'hasbox are likely wrong', RuntimeWarning)
         except StopIteration:

@@ -30,8 +30,7 @@ from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
             NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
-from parmed.exceptions import (AmberParmError, ParsingError,
-            MoleculeError, MoleculeWarning, AmberParmWarning)
+from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
 from parmed.structure import Structure, needs_openmm
@@ -348,7 +347,7 @@ class AmberParm(AmberFormat, Structure):
                      'Changing periodicity to 1 and force constant to 0 to '
                      'ensure 1-4 nonbonded pairs are properly identified. This '
                      'might cause a shift in the energy, but will leave forces '
-                     'unaffected', AmberParmWarning)
+                     'unaffected', AmberWarning)
                 dt.phi_k = 0.0
                 dt.per = 1.0
         inst.remake_parm()
@@ -757,7 +756,7 @@ class AmberParm(AmberFormat, Structure):
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
         else: # this else belongs to 'for', not 'if'
-            warn('Could not find first solvent atom. Set to 0', MoleculeWarning)
+            warn('Could not find first solvent atom. Set to 0', AmberWarning)
             self.parm_data['SOLVENT_POINTERS'][2] = 0
 
         # Now set up ATOMS_PER_MOLECULE and catch any errors
@@ -776,7 +775,7 @@ class AmberParm(AmberFormat, Structure):
                 raise MoleculeError('Molecule atoms are not contiguous!')
             # Non-contiguous molecules detected... time to fix (ugh!)
             warn('Molecule atoms are not contiguous! I am attempting to '
-                 'reorder the atoms to fix this.', MoleculeWarning)
+                 'reorder the atoms to fix this.', AmberWarning)
             # Make sure that no residues are split up by this
             for res in self.residues:
                 molid = res.atoms[0].marked
@@ -785,7 +784,7 @@ class AmberParm(AmberFormat, Structure):
                         warn('Residues cannot be part of 2 molecules! Molecule '
                              'section will not be correctly set. [Offending '
                              'residue is %d: %r]' % (res.idx, res),
-                             MoleculeWarning)
+                             AmberWarning)
                         return None
             new_atoms = AtomList()
             for mol in owner:
@@ -1299,12 +1298,14 @@ class AmberParm(AmberFormat, Structure):
         Checks that all of the raw sections have the appropriate length as
         specified by the POINTER section.
 
-        If any of the lengths are incorrect, AmberParmError is raised
+        Raises
+        ------
+        AmberError if any of the lengths are incorrect
         """
         def check_length(key, length, required=True):
             if not required and key not in self.parm_data: return
             if len(self.parm_data[key]) != length:
-                raise AmberParmError('FLAG %s has %d elements; expected %d' %
+                raise AmberError('FLAG %s has %d elements; expected %d' %
                                      (key, len(self.parm_data[key]), length))
         natom = self.ptr('NATOM')
         check_length('ATOM_NAME', natom)
@@ -2023,7 +2024,7 @@ class AmberParm(AmberFormat, Structure):
             if not self.adjusts and len(scalings) > 1:
                 warn('Multiple 1-4 scaling factors detected. Using the '
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
-                     AmberParmWarning)
+                     AmberWarning)
         return n13, n14
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2092,12 +2093,12 @@ class Rst7(object):
                 f = NetCDFRestart.open_old(filename)
                 self.natom = f.atom
             except ImportError:
-                raise ParsingError('Could not parse %s as an ASCII restart and '
-                                   'could not find any NetCDF-Python packages '
-                                   'to attempt to parse as a NetCDF Restart.'
-                                   % filename)
+                raise AmberError('Could not parse %s as an ASCII restart and '
+                                 'could not find any NetCDF-Python packages '
+                                 'to attempt to parse as a NetCDF Restart.'
+                                 % filename)
             except RuntimeError:
-                raise ParsingError('Could not parse restart file %s' % filename)
+                raise AmberError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
         if f.hasvels:

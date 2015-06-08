@@ -4,7 +4,7 @@ files is that the ! character is a comment character and everything after ! is
 ignored.
 """
 from parmed.utils.io import genopen
-from parmed.exceptions import CharmmFileError
+from parmed.exceptions import CharmmError
 
 class CharmmFile(object):
     """
@@ -27,7 +27,7 @@ class CharmmFile(object):
         try:
             self._handle = genopen(fname, mode)
         except IOError as e:
-            raise CharmmFileError(str(e))
+            raise CharmmError(str(e))
         self.closed = False
         self.line_number = 0
         self.comment = ''

@@ -6,8 +6,7 @@ By Jason Swails
 from __future__ import division
 
 from utils import get_fn
-from parmed.exceptions import (BondError, DihedralError, CmapError,
-                                  AmoebaError)
+from parmed.exceptions import MoleculeError, ParameterError
 import parmed.topologyobjects as topologyobjects
 from parmed.topologyobjects import _ListItem, _FourAtomTerm
 from parmed.topologyobjects import *
@@ -626,7 +625,7 @@ class TestTopologyObjects(unittest.TestCase):
         cmap3 = Cmap(atoms[5], atoms[6], atoms[7], atoms[8], atoms[9],
                      cmap_types[2])
         # Check illegal CmapType assignment
-        self.assertRaises(CmapError, lambda: CmapType(5, cg1))
+        self.assertRaises(TypeError, lambda: CmapType(5, cg1))
         # Check container functionality
         for i, atom in enumerate(atoms):
             if 0 <= i < 5:
@@ -697,8 +696,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
         self.assertNotIn(bonds[3], t1)
-        self.assertRaises(BondError, lambda: TrigonalAngle(atoms[0], atoms[1],
-                                                           atoms[2], atoms[1]))
+        self.assertRaises(MoleculeError, lambda:
+                          TrigonalAngle(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(t1.type.theteq, 90.0)
 
@@ -723,8 +722,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
         self.assertNotIn(bonds[3], t1)
-        self.assertRaises(BondError, lambda: TrigonalAngle(atoms[0], atoms[1],
-                                                           atoms[2], atoms[1]))
+        self.assertRaises(MoleculeError, lambda:
+                          OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(t1.type.theteq, 90.0)
 

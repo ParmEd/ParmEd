@@ -3,7 +3,7 @@ Tests the functionality in the parmed.gromacs package
 """
 import utils
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
-from parmed.exceptions import GromacsTopologyWarning
+from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
@@ -17,7 +17,7 @@ class TestGromacsTop(unittest.TestCase):
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
-        warnings.filterwarnings('error', category=GromacsTopologyWarning)
+        warnings.filterwarnings('error', category=GromacsWarning)
         try:
             os.makedirs(get_fn('writes'))
         except OSError:

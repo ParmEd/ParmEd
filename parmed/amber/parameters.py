@@ -6,7 +6,7 @@ from __future__ import division, print_function
 from parmed.topologyobjects import BondType, AngleType, DihedralType
 from parmed.amber.readparm import AmberParm
 from parmed.constants import SMALL
-from parmed.exceptions import AmberParameterWarning
+from parmed.exceptions import AmberWarning
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import range, zip
 import warnings
@@ -293,7 +293,7 @@ class DihedralParamList(ParamList):
     def __init__(self, unique_only=True):
         if not unique_only:
             warnings.warn('DihedralParamList can only store unique dihedrals',
-                          AmberParameterWarning)
+                          AmberWarning)
         self.unique_only = True
 
     def add_param(self, atype1, atype2, atype3, atype4, param):

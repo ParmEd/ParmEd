@@ -8,15 +8,13 @@ from __future__ import print_function, division
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
                        'DG', 'DT', 'AP', 'CP', 'G', 'U']
 
-from parmed.exceptions import (CpinChargeWarning, CpinRefEneWarning,
-        CpinResidueError, CpinInputError, CpinInputWarning)
+from parmed.exceptions import AmberWarning, AmberError
 from parmed.utils.six.moves import range
 from math import log
 import warnings
 
-# Print all CpinChargeWarning's
-warnings.filterwarnings('always', category=CpinChargeWarning)
-warnings.filterwarnings('always', category=CpinRefEneWarning)
+# Print all AmberWarning's
+warnings.filterwarnings('always', category=AmberWarning)
 
 class _State(object):
     """ A protonation state """
@@ -207,13 +205,13 @@ class TitratableResidue(object):
         """ Add a single titratable state for this titratable residue """
         new_state = _State(protcnt, charges, refene)
         if len(new_state.charges) != len(self.atom_list):
-            raise CpinResidueError('Wrong number of charges for new state')
+            raise AmberError('Wrong number of charges for new state')
         self.states.append(new_state)
 
     def add_states(self, protcnts, charges, refenes):
         """ Add multiple titratable states for this titratable residue """
         if len(protcnts) != len(charges) and len(protcnts) != len(refenes):
-            raise CpinResidueError('Inconsistent list of parameters for '
+            raise AmberError('Inconsistent list of parameters for '
                                    'TitratableResidue.add_states')
         for i in range(len(protcnts)):
             self.add_state(protcnts[i], charges[i], refenes[i])
@@ -221,7 +219,7 @@ class TitratableResidue(object):
     def cpin_pointers(self, first_atom):
         """ Sets and returns the cpin info """
         if self.first_state == -1 or self.first_charge == -1:
-            raise CpinResidueError('Must set residue pointers before writing '
+            raise AmberError('Must set residue pointers before writing '
                                     'cpin info!')
         return {'FIRST_ATOM' : first_atom,
                 'FIRST_CHARGE' : self.first_charge,
@@ -259,7 +257,7 @@ class TitratableResidue(object):
             prot_diff = protcnts[i] - protcnts[0]
             if abs(charge_diff - prot_diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
-                              'in %s' % self.resname, CpinChargeWarning)
+                              'in %s' % self.resname, AmberWarning)
         # Check all of the reference energies to make sure that the pKa was set
         # for all but one of them
         notset = 0
@@ -302,7 +300,7 @@ class TitratableResidueList(list):
         self.first_atoms.append(first_atom)
         self.residue_nums.append(resnum)
         if state < 0 or state >= len(residue.states):
-            raise CpinInputError('Residue %s only has states 0-%d (%d chosen)' %
+            raise AmberError('Residue %s only has states 0-%d (%d chosen)' %
                         (residue.resname, len(residue.states)-1, state))
         self.resstates.append(state)
 
@@ -314,12 +312,12 @@ class TitratableResidueList(list):
         if len(statelist) != len(self):
             warnings.warn(('Number of states (%d) does not equal number of '
                             'residues (%d). Using default initial states.') %
-                            (len(statelist), len(self)), CpinInputWarning)
+                            (len(statelist), len(self)), AmberWarning)
             return
         # Check that all states are allowable
         for i, state in enumerate(statelist):
             if state < 0 or state >= len(self[i].states):
-                raise CpinInputError('Bad state choice (%d). Minimum is 0, '
+                raise AmberError('Bad state choice (%d). Minimum is 0, '
                             'maximum is %d' % (state, len(self[i].states)))
         # If we got here, then we are OK
         self.resstates = statelist
@@ -414,8 +412,8 @@ class TitratableResidueList(list):
         buf.add_word(' STATENE=')
         for i, energy in enumerate(energies):
             if energy is None:
-                raise CpinInputError("%d'th reference energy not known for "
-                                     "igb = %d" % (i, igb))
+                raise AmberError("%d'th reference energy not known for "
+                                 "igb = %d" % (i, igb))
             buf.add_word('%s,' % energy)
         buf.flush()
         # Print the # of residues and explicit solvent info if required

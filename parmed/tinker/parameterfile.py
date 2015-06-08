@@ -4,13 +4,10 @@ TINKER-based parameter file.
 """
 from __future__ import print_function
 from parmed.utils.six.moves import range
-from parmed.exceptions import (AmoebaParamFileError, APIError,
-            AmoebaParamFileWarning)
+from parmed.exceptions import TinkerError, TinkerWarning
 from collections import OrderedDict
 import re
 import warnings
-
-warnings.filterwarnings('always', category=AmoebaParamFileWarning)
 
 class BookmarkedFile(object):
     """ Allows setting a bookmark and rewinding to that bookmark """
@@ -66,7 +63,7 @@ class _ParamType(object):
                 warnmsg += ' [same parameters]'
             else:
                 warnmsg += ' [different parameters]'
-            warnings.warn(warnmsg, AmoebaParamFileWarning)
+            warnings.warn(warnmsg, TinkerWarning)
         cls.TypeList[key] = obj
 
     @classmethod
@@ -340,7 +337,7 @@ class _Atom(object):
     def _size(self): return self.type.size
     def _epsilon(self): return self.type.epsilon
     def _reduction(self): return self.type.reduction
-    def _blocked(self): raise APIError('Cannot set this attribute')
+    def _blocked(self): raise NotImplementedError('Cannot set this attribute')
     # Now set the above as properties
     typeindex = property(fget=_typeindex, fset=_blocked)
     atomic_number = property(fget=_atomic_number, fset=_blocked)
@@ -440,7 +437,7 @@ class AmoebaParameterSet(object):
                 self.attributes[words[0].lower()] = words[1]
             line = f.readline().replace('\t', ' ')
         if not done_with_attributes:
-            raise AmoebaParamFileError('Could not find force field attributes.')
+            raise TinkerError('Could not find force field attributes.')
         # Now get the atom types
         while line.lstrip()[:5].lower() != 'atom ':
             line = f.readline().replace('\t', ' ')

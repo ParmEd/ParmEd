@@ -7,7 +7,7 @@ from __future__ import division, print_function
 from parmed.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
             NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
-from parmed.exceptions import FlagError
+from parmed.exceptions import AmberError
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps, string_types, add_metaclass
@@ -854,7 +854,7 @@ class AmberFormat(object):
             be raised
         """
         if flag_name in self.parm_data:
-            raise FlagError('%s already exists' % (flag_name))
+            raise AmberError('%s already exists' % (flag_name))
         if after is not None:
             after = after.upper()
             if not after in self.flag_list:
@@ -872,8 +872,8 @@ class AmberFormat(object):
             self.parm_data[flag_name.upper()] = list(data)
         else:
             if num_items < 0:
-                raise FlagError("If you do not supply prmtop data, num_items "
-                                "must be non-negative!")
+                raise AmberError("If you do not supply prmtop data, num_items "
+                                 "must be non-negative!")
             self.parm_data[flag_name.upper()] = [0 for i in range(num_items)]
         if comments is not None:
             if isinstance(comments, string_types):

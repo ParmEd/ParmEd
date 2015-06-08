@@ -6,7 +6,7 @@ from __future__ import print_function
 
 from parmed import Atom
 from parmed.constants import RAD_TO_DEG
-from parmed.exceptions import AmberOFFWarning
+from parmed.exceptions import AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from parmed.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
@@ -235,7 +235,7 @@ class AmberOFFLibrary(object):
         n = int(fileobj.readline().strip())
         if nres + 1 != n:
             warnings.warn('Unexpected childsequence (%d); expected %d for '
-                          'residue %s' % (n, nres+1, name), AmberOFFWarning)
+                          'residue %s' % (n, nres+1, name), AmberWarning)
         elif not isinstance(templ, ResidueTemplate) and n != len(templ) + 1:
             raise RuntimeError('child sequence must be 1 greater than the '
                                'number of residues in the unit')
@@ -262,7 +262,7 @@ class AmberOFFLibrary(object):
         elif tail > 0 and nres > 1:
             if tail < sum([len(r) for r in container]):
                 warnings.warn('TAIL on multi-residue unit not supported (%s). '
-                              'Ignored...' % name, AmberOFFWarning)
+                              'Ignored...' % name, AmberWarning)
         # Get the connectivity array to set bonds
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec6re.match(line)
@@ -355,7 +355,7 @@ class AmberOFFLibrary(object):
             if next - start != len(container[i]):
                 warnings.warn('residue table predicted %d, not %d atoms for '
                               'residue %s' % (next-start, len(container[i]),
-                              name), AmberOFFWarning)
+                              name), AmberWarning)
             if typ == 'p':
                 container[i].type = PROTEIN
             elif typ == 'n':
@@ -364,7 +364,7 @@ class AmberOFFLibrary(object):
                 container[i].type = SOLVENT
             elif typ != '?':
                 warnings.warn('Unknown residue type "%s"' % typ,
-                              AmberOFFWarning)
+                              AmberWarning)
             if nres > 1:
                 container[i].name = resname
         # Get the residues sequence table
@@ -540,7 +540,7 @@ class AmberOFFLibrary(object):
                 typ='?'
             else:
                 warnings.warn('Unrecognized residue type %r' % r.type,
-                              AmberOFFWarning)
+                              AmberWarning)
                 typ = '?'
             dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i+1, 1+len(r), c,
                        typ, _imaging_atom(r)))

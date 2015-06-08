@@ -5,7 +5,7 @@ This module contains functionality relevant to loading and parsing GROMACS GRO
 from __future__ import print_function, division, absolute_import
 
 from parmed.constants import TINY
-from parmed.exceptions import ParsingError
+from parmed.exceptions import GromacsError
 from parmed.formats.registry import FileFormatType
 from parmed.geometry import (box_vectors_to_lengths_and_angles,
                                 box_lengths_and_angles_to_vectors,
@@ -101,7 +101,7 @@ class GromacsGroFile(object):
             try:
                 natom = int(fileobj.readline().strip())
             except ValueError:
-                raise ParsingError('Could not parse %s as GRO file' % filename)
+                raise GromacsError('Could not parse %s as GRO file' % filename)
             for i, line in enumerate(fileobj):
                 if i == natom: break
                 try:
@@ -129,7 +129,7 @@ class GromacsGroFile(object):
                             elif i == 5: atom.vy = float(line[wbeg:wend]) * 10
                             elif i == 5: atom.vz = float(line[wbeg:wend]) * 10
                 except (ValueError, IndexError):
-                    raise ParsingError('Could not parse the atom record of '
+                    raise GromacsError('Could not parse the atom record of '
                                        'GRO file %s' % filename)
                 struct.add_atom(atom, resname, resnum)
             # Get the box from the last line if it's present
@@ -137,7 +137,7 @@ class GromacsGroFile(object):
                 try:
                     box = [float(x) for x in line.split()]
                 except ValueError:
-                    raise ParsingError('Could not understand box line of GRO '
+                    raise GromacsError('Could not understand box line of GRO '
                                        'file %s' % filename)
                 if len(box) == 3:
                     struct.box = [box[0]*10, box[1]*10, box[2]*10,

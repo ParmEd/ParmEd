@@ -24,8 +24,7 @@ Boston, MA 02111-1307, USA.
 from __future__ import division, print_function
 
 from parmed.constants import DEG_TO_RAD
-from parmed.exceptions import (ChemError, MissingParameter,
-        MissingParameterWarning)
+from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
 from parmed.residue import WATER_NAMES
@@ -44,7 +43,6 @@ from parmed.vec3 import Vec3
 from copy import copy
 import math
 import re
-import warnings
 try:
     import numpy as np
     create_array = lambda x: np.array(x, dtype=np.float64)
@@ -1311,8 +1309,8 @@ class Structure(object):
             last_residue = None
             last_omm_residue = None
         except IndexError:
-            raise ChemError('No residues and/or atoms exist; '
-                            'cannot create Topology')
+            # Empty topology
+            return self._topology
         # Add the atoms
         for i, atom in enumerate(self.atoms):
             # See if we need to add a new residue
@@ -1543,7 +1541,7 @@ class Structure(object):
         This function calls prune_empty_terms if any Topology lists have changed
         """
         if self.unknown_functional:
-            raise ChemError('Cannot createSystem from an unknown functional')
+            raise ParameterError('Cannot createSystem: unknown functional')
         # Establish defaults
         if nonbondedMethod is None:
             nonbondedMethod = app.NoCutoff
@@ -1780,7 +1778,7 @@ class Structure(object):
                     not flexibleConstraints and constraints is app.HBonds):
                 continue
             if bond.type is None:
-                raise MissingParameter('Cannot find necessary parameters')
+                raise ParameterError('Cannot find necessary parameters')
             force.addBond(bond.atom1.idx, bond.atom2.idx,
                           bond.type.req*length_conv, 2*bond.type.k*frc_conv)
         # Done adding the force
@@ -1831,7 +1829,7 @@ class Structure(object):
                     angle.atom2.element == 8) and not flexibleConstraints):
                 continue
             if angle.type is None:
-                raise MissingParameter('Cannot find angle parameters')
+                raise ParameterError('Cannot find angle parameters')
             force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
                            angle.type.theteq*DEG_TO_RAD, 2*angle.type.k*frc_conv)
         if force.getNumAngles() == 0:
@@ -1855,7 +1853,7 @@ class Structure(object):
         force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
         for tor in self.dihedrals:
             if tor.type is None:
-                raise MissingParameter('Cannot find torsion parameters')
+                raise ParameterError('Cannot find torsion parameters')
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
@@ -1886,7 +1884,7 @@ class Structure(object):
         force.setForceGroup(self.RB_TORSION_FORCE_GROUP)
         for tor in self.rb_torsions:
             if tor.type is None:
-                raise MissingParameter('Cannot find R-B torsion parameters')
+                raise ParameterError('Cannot find R-B torsion parameters')
             force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx,
                              tor.atom4.idx, tor.type.c0*conv, tor.type.c1*conv,
                              tor.type.c2*conv, tor.type.c3*conv,
@@ -1913,7 +1911,7 @@ class Structure(object):
         force.setForceGroup(self.UREY_BRADLEY_FORCE_GROUP)
         for urey in self.urey_bradleys:
             if urey.type is None:
-                raise MissingParameter('Cannot find urey-bradley parameters')
+                raise ParameterError('Cannot find urey-bradley parameters')
             force.addBond(urey.atom1.idx, urey.atom2.idx,
                           urey.type.req*length_conv, 2*urey.type.k*frc_conv)
         return force
@@ -1937,7 +1935,7 @@ class Structure(object):
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for imp in self.impropers:
             if imp.type is None:
-                raise MissingParameter('Cannot find improper torsion '
+                raise ParameterError('Cannot find improper torsion '
                                        'parameters')
             force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
                              imp.atom4.idx, (imp.type.psi_k*frc_conv,
@@ -1965,7 +1963,7 @@ class Structure(object):
         cmap_map = dict()
         for cmap in self.cmaps:
             if cmap.type is None:
-                raise MissingParameter('Cannot find CMAP torsion parameters')
+                raise ParameterError('Cannot find CMAP torsion parameters')
             if not id(cmap.type) in cmap_type_list:
                 ct = cmap.type
                 cmap_type_list.append(id(ct))
@@ -2427,7 +2425,7 @@ class Structure(object):
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         if (not hasattr(self.trigonal_angle_types, 'degree') or not
                 hasattr(self.trigonal_angle_types, 'coeffs')):
-            raise MissingParameter('Do not have the trigonal angle force '
+            raise ParameterError('Do not have the trigonal angle force '
                                    'table parameters')
         force = mm.AmoebaInPlaneAngleForce()
         c = self.trigonal_angle_types.coeffs
@@ -2438,7 +2436,7 @@ class Structure(object):
         force.setForceGroup(self.TRIGONAL_ANGLE_FORCE_GROUP)
         for ang in self.trigonal_angles:
             if ang.type is None:
-                raise MissingParameter('Missing trigonal angle parameters')
+                raise ParameterError('Missing trigonal angle parameters')
             force.addAngle(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
                            ang.atom4.idx, ang.type.theteq,
                            ang.type.k*frc_conv)
@@ -2459,7 +2457,7 @@ class Structure(object):
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         if (not hasattr(self.out_of_plane_bend_types, 'degree') or not
                 hasattr(self.out_of_plane_bend_types, 'coeffs')):
-            raise MissingParameter('Do not have the trigonal angle force '
+            raise ParameterError('Do not have the trigonal angle force '
                                    'table parameters')
         force = mm.AmoebaOutOfPlaneBendForce()
         c = self.out_of_plane_bend_types.coeffs
@@ -2470,7 +2468,7 @@ class Structure(object):
         force.setForceGroup(self.OUT_OF_PLANE_BEND_FORCE_GROUP)
         for ang in self.out_of_plane_bends:
             if ang.type is None:
-                raise MissingParameter('Missing out-of-plane bend parameters')
+                raise ParameterError('Missing out-of-plane bend parameters')
             force.addOutOfPlaneBend(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
                                     ang.atom4.idx, 2*ang.type.k*frc_conv)
         return force
@@ -2492,7 +2490,7 @@ class Structure(object):
         force.setForceGroup(self.PI_TORSION_FORCE_GROUP)
         for ang in self.pi_torsions:
             if ang.type is None:
-                raise MissingParameter('Missing pi-torsion parameters')
+                raise ParameterError('Missing pi-torsion parameters')
             force.addPiTorsion(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx,
                                ang.atom4.idx, ang.atom5.idx, ang.atom6.idx,
                                ang.type.phi_k*frc_conv)
@@ -2517,7 +2515,7 @@ class Structure(object):
         force.setForceGroup(self.STRETCH_BEND_FORCE_GROUP)
         for strbnd in self.stretch_bends:
             if strbnd.type is None:
-                raise MissingParameter("Missing stretch-bend parameters")
+                raise ParameterError("Missing stretch-bend parameters")
             force.addStretchBend(strbnd.atom1.idx, strbnd.atom2.idx,
                                  strbnd.atom3.idx, strbnd.type.req1*length_conv,
                                  strbnd.type.req2*length_conv,
@@ -2537,8 +2535,7 @@ class Structure(object):
         """
         if not self.torsion_torsions: return None
         # Not implemented yet...
-        warnings.warn("Torsion-torsions found, but not yet implemented!",
-                      MissingParameterWarning)
+        raise NotImplementedError("Torsion-torsions not yet implemented")
 
     #===================================================
 

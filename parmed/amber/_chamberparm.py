@@ -24,9 +24,9 @@ from __future__ import division, print_function
 
 from parmed.amber._amberparm import AmberParm
 from parmed.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
-from parmed.exceptions import AmberParmError, AmberParmWarning
+from parmed.exceptions import AmberError, AmberWarning
 from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
-                                       ImproperType, CmapType, ExtraPoint)
+                                    ImproperType, CmapType, ExtraPoint)
 from parmed.utils.six.moves import zip, range
 import copy
 from math import sqrt
@@ -213,7 +213,7 @@ class ChamberParm(AmberParm):
                               'constant to 0 to ensure 1-4 nonbonded pairs are '
                               'properly identified. This might cause a shift '
                               'in the energy, but will leave forces unaffected',
-                              AmberParmWarning)
+                              AmberWarning)
                 dt.phi_k = 0.0
                 dt.per = 1.0
         inst.remake_parm()
@@ -377,8 +377,8 @@ class ChamberParm(AmberParm):
         def check_length(key, length, required=True):
             if not required and not key in self.parm_data: return
             if len(self.parm_data[key]) != length:
-                raise AmberParmError('FLAG %s has %d elements; expected %d' %
-                                     (key, len(self.parm_data[key]), length))
+                raise AmberError('FLAG %s has %d elements; expected %d' %
+                                 (key, len(self.parm_data[key]), length))
 
         check_length('CHARMM_UREY_BRADLEY_COUNT', 2)
         check_length('CHARMM_UREY_BRADLEY', self.pointers['NUB']*3)

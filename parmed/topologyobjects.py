@@ -6,8 +6,7 @@ by Jason Swails
 """
 from __future__ import division, print_function, absolute_import
 
-from parmed.exceptions import (BondError, DihedralError, CmapError,
-                                  AmoebaError, MissingParameter)
+from parmed.exceptions import MoleculeError, ParameterError
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 import parmed.unit as u
 from parmed.utils.six import string_types
@@ -138,7 +137,7 @@ class _FourAtomTerm(object):
     def __init__(self, atom1, atom2, atom3, atom4):
         if (atom1 is atom2 or atom1 is atom3 or atom1 is atom4 or
             atom2 is atom3 or atom2 is atom4 or atom3 is atom4):
-            raise BondError('4-atom term cannot have duplicate atoms')
+            raise MoleculeError('4-atom term cannot have duplicate atoms')
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
@@ -777,14 +776,14 @@ class Atom(_ListItem):
         Notes
         -----
         This action adds `self` to `other.bond_partners`. Raises
-        :class:`BondError` if `other is self`
+        :class:`MoleculeError` if `other is self`
         """
         if isinstance(other, ExtraPoint):
             self.children.append(other)
         elif isinstance(self, ExtraPoint):
             other.children.append(self)
         if self is other:
-            raise BondError("Cannot bond atom to itself!")
+            raise MoleculeError("Cannot bond atom to itself!")
         self._bond_partners.append(other)
         other._bond_partners.append(self)
 
@@ -802,10 +801,10 @@ class Atom(_ListItem):
         Notes
         -----
         This action adds `self` to `other.angle_partners`. Raises
-        :class:`BondError` if `other is self`
+        :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise BondError("Cannot angle an atom with itself!")
+            raise MoleculeError("Cannot angle an atom with itself!")
         self._angle_partners.append(other)
         other._angle_partners.append(self)
    
@@ -823,10 +822,10 @@ class Atom(_ListItem):
         Notes
         -----
         This action adds `self` to `other.dihedral_partners`. Raises
-        :class:`BondError` if `other is self`
+        :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise BondError("Cannot dihedral an atom with itself!")
+            raise MoleculeError("Cannot dihedral an atom with itself!")
         self._dihedral_partners.append(other)
         other._dihedral_partners.append(self)
       
@@ -844,10 +843,10 @@ class Atom(_ListItem):
         Notes
         -----
         This action adds `self` to `other.tortor_partners`. Raises
-        :class:`BondError` if `other is self`
+        :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise BondError('Cannot coupled-dihedral atom to itself')
+            raise MoleculeError('Cannot coupled-dihedral atom to itself')
         self._tortor_partners.append(self)
         other._tortor_partners.append(self)
 
@@ -865,10 +864,10 @@ class Atom(_ListItem):
         Notes
         -----
         This action adds `self` to `other.exclusion_partners`. Raises
-        :class:`BondError` if `other is self`
+        :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise BondError("Cannot exclude an atom from itself")
+            raise MoleculeError("Cannot exclude an atom from itself")
         self._exclusion_partners.append(other)
         other._exclusion_partners.append(self)
 
@@ -1325,21 +1324,21 @@ class ThreeParticleExtraPointFrame(object):
             for bond in parent.bonds:
                 if a1 in bond:
                     if bond.type is None:
-                        raise MissingParameter('Could not determine virtual '
-                                               'site geometry')
+                        raise ParameterError('Could not determine virtual '
+                                             'site geometry')
                     dp1 = bond.type.req
                 if a2 in bond:
                     if bond.type is None:
-                        raise MissingParameter('Could not determine virtual '
-                                               'site geometry')
+                        raise ParameterError('Could not determine virtual '
+                                             'site geometry')
                     dp2 = bond.type.req
         if theteq is None and d12 is None:
             if a2 not in a1.angle_partners:
                 for bond in a1.bonds:
                     if a2 not in bond: continue
                     if bond.type is None:
-                        raise MissingParameter('Could not determine virtual '
-                                               'site geometry')
+                        raise ParameterError('Could not determine virtual '
+                                             'site geometry')
                     d12 = bond.type.req
                 # Get angle from law of cosines
                 theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
@@ -1618,7 +1617,7 @@ class Bond(object):
     Notes
     -----
     You can test whether an :class:`Atom` is contained within the bond using the
-    `in` operator. A `BondError` is raised if `atom1` and `atom2` are identical.
+    `in` operator. A `MoleculeError` is raised if `atom1` and `atom2` are identical.
     This bond instance is `append`ed to the `bonds` list for both `atom1` and
     `atom2` and is automatically removed from those lists upon garbage
     collection
@@ -1635,7 +1634,7 @@ class Bond(object):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise BondError('Cannot bond atom to itself!')
+            raise MoleculeError('Cannot bond atom to itself!')
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
@@ -1776,7 +1775,7 @@ class Angle(object):
     def __init__(self, atom1, atom2, atom3, type=None):
         # Make sure we're not angling me to myself
         if atom1 is atom2 or atom1 is atom3 or atom2 is atom3:
-            raise BondError('Cannot angle atom to itself!')
+            raise MoleculeError('Cannot angle atom to itself!')
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
@@ -2030,6 +2029,10 @@ class Dihedral(_FourAtomTerm):
         -----
         This raises a ``TypeError`` if thing is not a Dihedral and is not
         iterable
+
+        Raises
+        ------
+        TypeError
         """
         if isinstance(thing, Dihedral):
             # I'm comparing with another Dihedral here
@@ -2042,8 +2045,8 @@ class Dihedral(_FourAtomTerm):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 4:
-            raise DihedralError('comparative %s has %d elements! Expect 4.'
-                                % (type(thing).__name__, len(thing)))
+            raise TypeError('comparative %s has %d elements! Expect 4.'
+                            % (type(thing).__name__, len(thing)))
         # Compare starting_index, since we may not have an index right now
         return ( (self.atom1.idx == thing[0] and 
                 self.atom2.idx == thing[1] and
@@ -2300,15 +2303,30 @@ class DihedralTypeList(list, _ListItem):
         return True
 
     def append(self, other):
+        """ Adds a DihedralType to the DihedralTypeList
+
+        Parameters
+        ----------
+        other : :class:`DihedralType`
+            The DihedralType instance to add to this list. It cannot have the
+            same periodicity as any other DihedralType in the list
+
+        Raises
+        ------
+        TypeError if other is not an instance of :class:`DihedralTypeList`
+
+        ParameterError if other has the same periodicity as another member in
+        this list
+        """
         if not isinstance(other, DihedralType):
             raise TypeError('Can only add DihedralType to DihedralTypeList')
         for existing in self:
             if existing.per == other.per:
                 # Do not add duplicate periodicities
                 if existing == other: return
-                raise DihedralError('Cannot add two DihedralType instances '
-                                    'with the same periodicity to the same '
-                                    'DihedralTypeList')
+                raise ParameterError('Cannot add two DihedralType instances '
+                                     'with the same periodicity to the same '
+                                     'DihedralTypeList')
         list.append(self, other)
 
     @property
@@ -2348,7 +2366,7 @@ class UreyBradley(object):
     Notes
     -----
     You can test whether an :class:`Atom` is contained within the bond using the
-    `in` operator. A :class:`BondError` is raised if `atom1` and `atom2` are
+    `in` operator. A :class:`MoleculeError` is raised if `atom1` and `atom2` are
     identical.  You can also test that a :class:`Bond` is contained in this
     Urey-Bradley valence angle
 
@@ -2368,7 +2386,7 @@ class UreyBradley(object):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise BondError('Cannot angle atom to itself!')
+            raise MoleculeError('Cannot angle atom to itself!')
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
@@ -2460,7 +2478,7 @@ class Improper(_FourAtomTerm):
     Notes
     -----
     An Improper torsion can contain bonds or atoms. A bond is contained if it
-    exists between atom 1 and any other atom. Raises :class:`BondError` if any
+    exists between atom 1 and any other atom. Raises :class:`MoleculeError` if any
     of the atoms are duplicates.
 
     Examples
@@ -2650,7 +2668,7 @@ class Cmap(object):
         for i in range(len(atmlist)):
             for j in range(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
-                    raise BondError('Cannot cmap atom to itself!')
+                    raise MoleculeError('Cannot cmap atom to itself!')
         # Set up instances
         self.atom1 = atom1
         self.atom2 = atom2
@@ -2807,12 +2825,16 @@ class CmapType(_ListItem, _ParameterType):
 
     Notes
     -----
-    A CmapError is raised if the `grid` does not have the correct number of
-    elements for the given `resolution`. Two `CmapType`s are equal if their
-    resolution is the same and each grid point is the same to within 1E-8
+    Two `CmapType`s are equal if their resolution is the same and each grid
+    point is the same to within 1E-8
 
     See the docs for `_CmapGrid` for information on how to access the
-    interpolating grid data.
+    interpolating grid data if necessary.
+
+    Raises
+    ------
+    TypeError is raised if the grid does not have the correct number of elements
+    for the given resolution
 
     Examples
     --------
@@ -2833,7 +2855,7 @@ class CmapType(_ListItem, _ParameterType):
         self.resolution = resolution
         self.grid = _CmapGrid(resolution, grid)
         if len(grid) != self.resolution * self.resolution:
-            raise CmapError('CMAP grid does not match expected resolution')
+            raise TypeError('CMAP grid does not match expected resolution')
         if comments is None:
             self.comments = []
         else:
@@ -3465,7 +3487,7 @@ class _TorTorTable(object):
 
     Notes
     -----
-    Raises `AmoebaError` if the dimension of the data array does not match the
+    Raises `TypeError` if the dimension of the data array does not match the
     number of data required by ang1 and ang2
 
     Elements from the table are obtained and/or set by using angles as indexes.
@@ -3487,9 +3509,9 @@ class _TorTorTable(object):
     """
     def __init__(self, ang1, ang2, data):
         if len(data) != len(ang1) * len(ang2):
-            raise AmoebaError('Coupled torsion parameter size mismatch. %dx%d '
-                              'grid expects %d elements (got %d)' % (len(ang1),
-                              len(ang2), len(ang1)*len(ang2), len(data)))
+            raise TypeError('Coupled torsion parameter size mismatch. %dx%d '
+                            'grid expects %d elements (got %d)' % (len(ang1),
+                            len(ang2), len(ang1)*len(ang2), len(data)))
         self.data = _strip_units(data, u.kilocalories_per_mole)
         self._indexes = dict()
         i = 0
@@ -4604,15 +4626,15 @@ class AtomType(object):
 
 class _UnassignedAtomType(object):
     """
-    This raises the appropriate exceptions (MissingParameter) when you try to
+    This raises the appropriate exceptions (ParameterError) when you try to
     access its properties
     """
 
     def __int__(self):
-        raise MissingParameter('Atom type is not defined')
+        raise ParameterError('Atom type is not defined')
 
     def __str__(self):
-        raise MissingParameter('Atom type is not defined')
+        raise ParameterError('Atom type is not defined')
 
 _UnassignedAtomType = _UnassignedAtomType() # Make it a singleton
 

@@ -11,7 +11,7 @@ from __future__ import division
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
                        DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
-from parmed.exceptions import CharmmFileError
+from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
@@ -93,13 +93,13 @@ class CharmmParameterSet(ParameterSet):
     @staticmethod
     def _convert(data, type, msg=''):
         """
-        Converts a data type to a desired type, raising CharmmFileError if it
+        Converts a data type to a desired type, raising CharmmError if it
         fails
         """
         try:
             return type(data)
         except ValueError:
-            raise CharmmFileError('Could not convert %s to %s' % (msg, type))
+            raise CharmmError('Could not convert %s to %s' % (msg, type))
 
     def __init__(self, *args):
         # Instantiate the list types
@@ -277,7 +277,7 @@ class CharmmParameterSet(ParameterSet):
                     name = words[2]
                     mass = conv(words[3], float, 'atom mass')
                 except IndexError:
-                    raise CharmmFileError('Could not parse MASS section.')
+                    raise CharmmError('Could not parse MASS section.')
                 # The parameter file might or might not have an element name
                 try:
                     elem = words[4]
@@ -301,7 +301,7 @@ class CharmmParameterSet(ParameterSet):
                     k = conv(words[2], float, 'bond force constant')
                     req = conv(words[3], float, 'bond equilibrium dist')
                 except IndexError:
-                    raise CharmmFileError('Could not parse bonds.')
+                    raise CharmmError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
                 bond_type = BondType(k, req)
                 self.bond_types[(type1, type2)] = bond_type
@@ -317,7 +317,7 @@ class CharmmParameterSet(ParameterSet):
                     k = conv(words[3], float, 'angle force constant')
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
-                    raise CharmmFileError('Could not parse angles.')
+                    raise CharmmError('Could not parse angles.')
                 angle_type = AngleType(k, theteq)
                 self.angle_types[(type1, type2, type3)] = angle_type
                 self.angle_types[(type3, type2, type1)] = angle_type
@@ -344,7 +344,7 @@ class CharmmParameterSet(ParameterSet):
                     n = conv(words[5], float, 'dihedral periodicity')
                     phase = conv(words[6], float, 'dihedral phase')
                 except IndexError:
-                    raise CharmmFileError('Could not parse dihedrals.')
+                    raise CharmmError('Could not parse dihedrals.')
                 key = (type1, type2, type3, type4)
                 # See if this is a second (or more) term of the dihedral group
                 # that's already present.
@@ -391,7 +391,7 @@ class CharmmParameterSet(ParameterSet):
                     k = conv(words[4], float, 'improper force constant')
                     theteq = conv(words[5], float, 'improper equil. value')
                 except IndexError:
-                    raise CharmmFileError('Could not parse dihedrals.')
+                    raise CharmmError('Could not parse dihedrals.')
                 # If we have a 7th column, that is the real psi0 (and the 6th
                 # is just a dummy 0)
                 try:
@@ -433,7 +433,7 @@ class CharmmParameterSet(ParameterSet):
                         type8 = words[7]
                         res = conv(words[8], int, 'CMAP resolution')
                     except IndexError:
-                        raise CharmmFileError('Could not parse CMAP data.')
+                        raise CharmmError('Could not parse CMAP data.')
                     # order the torsions independently
                     k1 = [type1,type2,type3,type4,type5,type6,type7,type8]
                     k2 = [type8,type7,type6,type5,type4,type3,type2,type1]
@@ -455,10 +455,10 @@ class CharmmParameterSet(ParameterSet):
                     # just be parsing the settings that should be used. So
                     # soldier on
                     if not read_first_nonbonded: continue
-                    raise CharmmFileError('Could not parse nonbonded terms.')
-                except CharmmFileError as e:
+                    raise CharmmError('Could not parse nonbonded terms.')
+                except CharmmError:
                     if not read_first_nonbonded: continue
-                    raise CharmmFileError(str(e))
+                    raise
                 else:
                     # OK, we've read our first nonbonded section for sure now
                     read_first_nonbonded = True
@@ -497,7 +497,7 @@ class CharmmParameterSet(ParameterSet):
                         # adding that nbfix and press on
                         pass
                 except IndexError:
-                    raise CharmmFileError('Could not parse NBFIX terms.')
+                    raise CharmmError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
         # If we had any CMAP terms, then the last one will not have been added
         # yet. Add it here
@@ -551,8 +551,8 @@ class CharmmParameterSet(ParameterSet):
                         name = words[2]
                         mass = conv(words[3], float, 'atom mass')
                     except IndexError:
-                        raise CharmmFileError('Could not parse MASS section of '
-                                              '%s' % tfile)
+                        raise CharmmError('Could not parse MASS section of %s' %
+                                          tfile)
                     # The parameter file might or might not have an element name
                     try:
                         elem = words[4]

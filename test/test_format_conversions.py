@@ -4,7 +4,7 @@ from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
 
 import os
 from parmed import load_file, gromacs, amber, openmm
-from parmed.exceptions import GromacsTopologyWarning
+from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import unit as u
 try:
@@ -19,7 +19,7 @@ import warnings
 
 class TestCase(TestCaseRelative):
     def setUp(self):
-        warnings.filterwarnings('default', category=GromacsTopologyWarning)
+        warnings.filterwarnings('default', category=GromacsWarning)
         try:
             os.makedirs(get_fn('writes'))
         except OSError:

@@ -11,7 +11,7 @@ from __future__ import print_function, division
 
 from parmed.utils import io
 from parmed.formats.registry import FileFormatType
-from parmed.exceptions import CharmmFileError
+from parmed.exceptions import CharmmError
 from parmed import unit as u
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
@@ -168,14 +168,14 @@ class CharmmCrdFile(object):
                     self.weighting.append(float(line[9]))
 
                 if 3*self.natom != len(self.coords):
-                    raise CharmmFileError("Error parsing CHARMM .crd file: %d "
+                    raise CharmmError("Error parsing CHARMM .crd file: %d "
                                           "atoms requires %d coords (not %d)" %
                                           (self.natom, 3*self.natom,
                                            len(self.coords))
                     )
 
             except (ValueError, IndexError):
-                raise CharmmFileError('Error parsing CHARMM coordinate file')
+                raise CharmmError('Error parsing CHARMM coordinate file')
 
 @add_metaclass(FileFormatType)
 class CharmmRstFile(object):
@@ -287,7 +287,7 @@ class CharmmRstFile(object):
             while readingHeader:
                 line = crdfile.readline()
                 if not len(line):
-                    raise CharmmFileError('Premature end of file')
+                    raise CharmmError('Premature end of file')
                 line = line.strip()
                 words = line.split()
                 if len(line) != 0:  
@@ -313,7 +313,7 @@ class CharmmRstFile(object):
                             break
                        
                         except (ValueError, IndexError):
-                            raise CharmmFileError('Problem parsing CHARMM restart')
+                            raise CharmmError('Problem parsing CHARMM restart')
 
             self.scan(crdfile, '!XOLD')
             self._get_formatted_crds(crdfile, self.coordsold)
@@ -335,7 +335,7 @@ class CharmmRstFile(object):
         while scanning:
             line = handle.readline()
             if not line:
-                raise CharmmFileError('Premature end of file')
+                raise CharmmError('Premature end of file')
 
             if len(line.strip()) != 0:
                 if line.strip().split()[0][0:len(str)] == str:
@@ -346,10 +346,10 @@ class CharmmRstFile(object):
             line = crdfile.readline()
 
             if not line:
-                raise CharmmFileError('Premature end of file')
+                raise CharmmError('Premature end of file')
 
             if len(line) < 3*charmlen:
-                raise CharmmFileError("Less than 3 coordinates present in "
+                raise CharmmError("Less than 3 coordinates present in "
                                       "coordinate row or coords may be "
                                       "truncated.") 
 

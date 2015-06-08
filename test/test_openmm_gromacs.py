@@ -16,7 +16,7 @@ except ImportError:
 from parmed import load_file, ExtraPoint, openmm
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
-from parmed.exceptions import GromacsTopologyWarning, ChemError, OpenMMWarning
+from parmed.exceptions import GromacsWarning, ParmedError, OpenMMWarning
 import parmed.unit as u
 from parmed.utils.six.moves import range, zip
 from parmed.vec3 import Vec3
@@ -62,7 +62,7 @@ class TestGromacsTop(utils.TestCaseRelative):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
     def setUp(self):
-        warnings.filterwarnings('always', category=GromacsTopologyWarning)
+        warnings.filterwarnings('always', category=GromacsWarning)
 
     def testTiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
@@ -248,7 +248,7 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testDPPC(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
-        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
+        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
         gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         top.box = gro.box[:]
@@ -277,7 +277,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce
-        warnings.filterwarnings('ignore', category=GromacsTopologyWarning)
+        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
         gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         top.box = gro.box[:]
@@ -290,7 +290,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                 openmm.load_topology(top.topology, system)
         )
         warnings.filterwarnings('ignore', category=OpenMMWarning)
-        self.assertRaises(ChemError, bad_system)
+        self.assertRaises(ParmedError, bad_system)
         for i in range(len(system.getForces())):
             if isinstance(system.getForce(i), mm.CustomNonbondedForce):
                 system.removeForce(i)
