@@ -13,7 +13,7 @@ from parmed.exceptions import ParmedError, FormatNotFound
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
-from parmed.utils.six import iteritems, string_types, add_metaclass
+from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 from collections import OrderedDict
@@ -2698,6 +2698,8 @@ class ls(Action):
         process = Popen(['/bin/ls', '-C'] + self.args, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate('')
         process.wait()
+        if PY3:
+            return (out + err).decode('UTF-8')
         return out + err
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
