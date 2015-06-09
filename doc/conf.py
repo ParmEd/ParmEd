@@ -24,6 +24,15 @@ cwd = os.path.abspath(os.path.split(sys.argv[0])[0])
 
 sys.path.insert(0, os.path.abspath(os.path.join(cwd, '..')))
 
+while True:
+    for i, folder in enumerate(sys.path):
+        if os.path.exists(os.path.join(folder, 'parmed.py')) and not \
+                os.path.isdir(os.path.join(folder, 'parmed')):
+            break
+    else:
+        break
+    sys.path.pop(i)
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
