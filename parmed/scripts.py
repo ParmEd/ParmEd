@@ -171,13 +171,18 @@ def clapp():
                 for line in f:
                     if line.startswith('# Log started on'): continue
                     readline.add_history(line.rstrip())
-            logfile = open(opt.logfile, 'a')
-            now = datetime.datetime.now()
-            logfile.write('# Log started on %02d/%02d/%d [mm/dd/yyyy] at '
-                          '%02d:%02d:%02d\n' % (now.month, now.day, now.year,
-                                            now.hour, now.minute, now.second))
-            parmed_commands.setlog(logfile)
-            close_log_file = True
+            try:
+                logfile = open(opt.logfile, 'a')
+                now = datetime.datetime.now()
+                logfile.write('# Log started on %02d/%02d/%d [mm/dd/yyyy] at '
+                              '%02d:%02d:%02d\n' % (now.month, now.day, now.year,
+                                                now.hour, now.minute, now.second))
+                parmed_commands.setlog(logfile)
+                close_log_file = True
+                could_open_logfile = True
+            except:
+                print ("could not open logfile. Skip logging")
+                could_open_logfile = False
         # Loop through all of the commands
         try:
             try:
@@ -189,7 +194,7 @@ def clapp():
                 # then that means we wanted to exit
                 sys.exit(1)
         finally:
-            if close_log_file:
+            if close_log_file and could_open_logfile:
                 logfile.close()
     
     print('Done!')
