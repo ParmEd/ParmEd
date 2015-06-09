@@ -179,10 +179,9 @@ def clapp():
                                                 now.hour, now.minute, now.second))
                 parmed_commands.setlog(logfile)
                 close_log_file = True
-                could_open_logfile = True
             except:
-                print ("could not open logfile. Skip logging")
-                could_open_logfile = False
+                sys.stderr.write("Could not open logfile. Skip logging")
+                close_log_file = False
         # Loop through all of the commands
         try:
             try:
@@ -194,7 +193,7 @@ def clapp():
                 # then that means we wanted to exit
                 sys.exit(1)
         finally:
-            if close_log_file and could_open_logfile:
+            if close_log_file:
                 logfile.close()
     
     print('Done!')
