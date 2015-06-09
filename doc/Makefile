@@ -53,8 +53,7 @@ clean:
 html:
 	-/bin/rm -fr api
 	/bin/mkdir api
-	$(SPHINXAPIDOC) -o api/chemistry -e ../chemistry
-	$(SPHINXAPIDOC) -o api/ParmedTools -e ../ParmedTools
+	$(SPHINXAPIDOC) -o api/parmed -e ../parmed
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
