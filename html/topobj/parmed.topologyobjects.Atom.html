@@ -1,0 +1,675 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.topologyobjects.Atom &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-topologyobjects-atom">
+<h1>parmed.topologyobjects.Atom<a class="headerlink" href="#parmed-topologyobjects-atom" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.topologyobjects.Atom">
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Atom</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>An atom. Only use these as elements in AtomList instances, since AtomList
+will keep track of when indexes and other stuff needs to be updated. All
+parameters are optional.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atomic_number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The atomic number of this atom</p>
+</div></blockquote>
+<p><strong>name</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The name of this atom</p>
+</div></blockquote>
+<p><strong>type</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The type name of this atom</p>
+</div></blockquote>
+<p><strong>charge</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The partial atomic charge of this atom in fractions of an electron</p>
+</div></blockquote>
+<p><strong>mass</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The atomic mass of this atom in daltons</p>
+</div></blockquote>
+<p><strong>nb_idx</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The nonbonded index. This is a pointer that is relevant in the context
+of an Amber topology file and identifies its Lennard-Jones atom type</p>
+</div></blockquote>
+<p><strong>radii</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The intrinsic solvation radius of this atom.</p>
+</div></blockquote>
+<p><strong>screen</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The Generalized Born screening factor for this atom.</p>
+</div></blockquote>
+<p><strong>occupancy</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The occupancy of the atom (see PDB file)</p>
+</div></blockquote>
+<p><strong>bfactor</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The B-factor of the atom (see PDB file)</p>
+</div></blockquote>
+<p><strong>altloc</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>Alternate location indicator (see PDB file)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first"><strong>list</strong> : <a class="reference internal" href="parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt></a></p>
+<blockquote>
+<div><p>The AtomList that this atom belongs to. If None, this atom does not
+belong to any list. This can be any iterable, but should typically be an
+AtomList or None</p>
+</div></blockquote>
+<p><strong>tree</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The tree chain identifier assigned to this atom. Relevant in the context
+of an Amber topology file, and not used for very much.</p>
+</div></blockquote>
+<p><strong>join</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The &#8216;join` property of atoms stored in the Amber topology file. At the
+time of writing this class, <cite>join</cite> is unused, but still oddly required.
+Add support for future-proofing</p>
+</div></blockquote>
+<p><strong>irotat</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The <cite>irotat</cite> property of atoms stored in the Amber topology file.
+Unused, but included for future-proofing.</p>
+</div></blockquote>
+<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The serial number given to the atom (see PDB file)</p>
+</div></blockquote>
+<p><strong>rmin</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The Rmin/2 Lennard-Jones parameter for this atom. Default evaluates to 0</p>
+</div></blockquote>
+<p><strong>epsilon</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The epsilon (well depth) Lennard-Jones parameter for this atom. Default
+evaluates to 0</p>
+</div></blockquote>
+<p><strong>rmin14</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The Rmin/2 Lennard-Jones parameter for this atom in 1-4 interactions.
+Default evaluates to 0</p>
+</div></blockquote>
+<p><strong>epsilon14</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote class="last">
+<div><p>The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
+interactions. Default evaluates to 0</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The bond_partners, angle_partners, dihedral_partners, and exclusion_partners
+arrays are actually generated as properties by taking differences of sets
+and sorting them. As a result, accessing this attribute constantly can be
+less efficient than you would expect. Iterating over them in a loop requires
+minimal overhead. But if frequent access is needed and these sets are
+guaranteed not to change, you should save a reference to the object and use
+that instead.</p>
+<p>Binary comparisons are done by atom index and are used primarily for sorting
+sublists of atoms. The == operator is not defined, so Atom equality should
+be done using the <cite>is</cite> operator. This allows Atom instances to be hashable
+(and so used as <cite>dict</cite> keys and put in <a href="#id1"><span class="problematic" id="id2">`</span></a>set`s)</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;CO&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;OC&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;O&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="o">.</span><span class="n">bond_to</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="ow">in</span> <span class="n">a2</span><span class="o">.</span><span class="n">bond_partners</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">a1</span><span class="o">.</span><span class="n">bond_partners</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="o">.</span><span class="n">idx</span> <span class="c"># Not part of a container</span>
+<span class="go">-1</span>
+</pre></div>
+</div>
+<p>This object also supports automatic indexing when it is part of a container</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">(</span><span class="nb">list</span><span class="o">=</span><span class="n">atom_list</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;CO&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">(</span><span class="nb">list</span><span class="o">=</span><span class="n">atom_list</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;OC&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.angle_partners" title="parmed.topologyobjects.Atom.angle_partners"><tt class="xref py py-obj docutils literal"><span class="pre">angle_partners</span></tt></a></td>
+<td>List of all angle partners that are NOT bond partners</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.atname" title="parmed.topologyobjects.Atom.atname"><tt class="xref py py-obj docutils literal"><span class="pre">atname</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.attype" title="parmed.topologyobjects.Atom.attype"><tt class="xref py py-obj docutils literal"><span class="pre">attype</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.bond_partners" title="parmed.topologyobjects.Atom.bond_partners"><tt class="xref py py-obj docutils literal"><span class="pre">bond_partners</span></tt></a></td>
+<td>Go through all bonded partners</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.dihedral_partners" title="parmed.topologyobjects.Atom.dihedral_partners"><tt class="xref py py-obj docutils literal"><span class="pre">dihedral_partners</span></tt></a></td>
+<td>List of all dihedral partners that are NOT angle or bond partners</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.element" title="parmed.topologyobjects.Atom.element"><tt class="xref py py-obj docutils literal"><span class="pre">element</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.epsilon" title="parmed.topologyobjects.Atom.epsilon"><tt class="xref py py-obj docutils literal"><span class="pre">epsilon</span></tt></a></td>
+<td>Lennard-Jones epsilon parameter (the Lennard-Jones well depth)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.epsilon_14" title="parmed.topologyobjects.Atom.epsilon_14"><tt class="xref py py-obj docutils literal"><span class="pre">epsilon_14</span></tt></a></td>
+<td>The 1-4 Lennard-Jones epsilon parameter</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.exclusion_partners" title="parmed.topologyobjects.Atom.exclusion_partners"><tt class="xref py py-obj docutils literal"><span class="pre">exclusion_partners</span></tt></a></td>
+<td>List of all exclusions not otherwise excluded by bonds/angles/torsions</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.idx" title="parmed.topologyobjects.Atom.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.rmin" title="parmed.topologyobjects.Atom.rmin"><tt class="xref py py-obj docutils literal"><span class="pre">rmin</span></tt></a></td>
+<td>Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.rmin_14" title="parmed.topologyobjects.Atom.rmin_14"><tt class="xref py py-obj docutils literal"><span class="pre">rmin_14</span></tt></a></td>
+<td>The 1-4 Lennard-Jones Rmin/2 parameter</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma" title="parmed.topologyobjects.Atom.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma_14" title="parmed.topologyobjects.Atom.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.starting_index" title="parmed.topologyobjects.Atom.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_partners" title="parmed.topologyobjects.Atom.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
+<td>List of all 1-5 partners that are NOT in angle or bond partners.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.angle_to" title="parmed.topologyobjects.Atom.angle_to"><tt class="xref py py-obj docutils literal"><span class="pre">angle_to</span></tt></a>(other)</td>
+<td>Log this atom as angled to another atom.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.bond_to" title="parmed.topologyobjects.Atom.bond_to"><tt class="xref py py-obj docutils literal"><span class="pre">bond_to</span></tt></a>(other)</td>
+<td>Log this atom as bonded to another atom.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.dihedral_to" title="parmed.topologyobjects.Atom.dihedral_to"><tt class="xref py py-obj docutils literal"><span class="pre">dihedral_to</span></tt></a>(other)</td>
+<td>Log this atom as dihedral-ed to another atom.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.exclude" title="parmed.topologyobjects.Atom.exclude"><tt class="xref py py-obj docutils literal"><span class="pre">exclude</span></tt></a>(other)</td>
+<td>Add one atom to my arbitrary exclusion list</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.nonbonded_exclusions" title="parmed.topologyobjects.Atom.nonbonded_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">nonbonded_exclusions</span></tt></a>([only_greater,&nbsp;index_from])</td>
+<td>Returns the total number of nonbonded atom exclusions for this atom.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.prune_exclusions" title="parmed.topologyobjects.Atom.prune_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">prune_exclusions</span></tt></a>()</td>
+<td>For extra points, the exclusion partners may be filled before the bond, angle, dihedral, and tortor partners.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.reset_topology" title="parmed.topologyobjects.Atom.reset_topology"><tt class="xref py py-obj docutils literal"><span class="pre">reset_topology</span></tt></a>([keep_exclusions])</td>
+<td>Empties all of the bond, angle, and dihedral partners so they can be set up again with updated data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_to" title="parmed.topologyobjects.Atom.tortor_to"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_to</span></tt></a>(other)</td>
+<td>Log this atom as 1-5 partners to another atom</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>list=None</em>, <em>atomic_number=0</em>, <em>name=''</em>, <em>type=''</em>, <em>charge=0.0</em>, <em>mass=0.0</em>, <em>nb_idx=0</em>, <em>radii=0.0</em>, <em>screen=0.0</em>, <em>tree='BLA'</em>, <em>join=0.0</em>, <em>irotat=0.0</em>, <em>occupancy=0.0</em>, <em>bfactor=0.0</em>, <em>altloc=''</em>, <em>number=-1</em>, <em>rmin=None</em>, <em>epsilon=None</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.__init__" title="parmed.topologyobjects.Atom.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([list,&nbsp;atomic_number,&nbsp;name,&nbsp;type,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.angle_to" title="parmed.topologyobjects.Atom.angle_to"><tt class="xref py py-obj docutils literal"><span class="pre">angle_to</span></tt></a>(other)</td>
+<td>Log this atom as angled to another atom.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.bond_to" title="parmed.topologyobjects.Atom.bond_to"><tt class="xref py py-obj docutils literal"><span class="pre">bond_to</span></tt></a>(other)</td>
+<td>Log this atom as bonded to another atom.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.dihedral_to" title="parmed.topologyobjects.Atom.dihedral_to"><tt class="xref py py-obj docutils literal"><span class="pre">dihedral_to</span></tt></a>(other)</td>
+<td>Log this atom as dihedral-ed to another atom.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.exclude" title="parmed.topologyobjects.Atom.exclude"><tt class="xref py py-obj docutils literal"><span class="pre">exclude</span></tt></a>(other)</td>
+<td>Add one atom to my arbitrary exclusion list</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.nonbonded_exclusions" title="parmed.topologyobjects.Atom.nonbonded_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">nonbonded_exclusions</span></tt></a>([only_greater,&nbsp;index_from])</td>
+<td>Returns the total number of nonbonded atom exclusions for this atom.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.prune_exclusions" title="parmed.topologyobjects.Atom.prune_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">prune_exclusions</span></tt></a>()</td>
+<td>For extra points, the exclusion partners may be filled before the bond, angle, dihedral, and tortor partners.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.reset_topology" title="parmed.topologyobjects.Atom.reset_topology"><tt class="xref py py-obj docutils literal"><span class="pre">reset_topology</span></tt></a>([keep_exclusions])</td>
+<td>Empties all of the bond, angle, and dihedral partners so they can be set up again with updated data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_to" title="parmed.topologyobjects.Atom.tortor_to"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_to</span></tt></a>(other)</td>
+<td>Log this atom as 1-5 partners to another atom</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.angle_partners" title="parmed.topologyobjects.Atom.angle_partners"><tt class="xref py py-obj docutils literal"><span class="pre">angle_partners</span></tt></a></td>
+<td>List of all angle partners that are NOT bond partners</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.atname" title="parmed.topologyobjects.Atom.atname"><tt class="xref py py-obj docutils literal"><span class="pre">atname</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.attype" title="parmed.topologyobjects.Atom.attype"><tt class="xref py py-obj docutils literal"><span class="pre">attype</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.bond_partners" title="parmed.topologyobjects.Atom.bond_partners"><tt class="xref py py-obj docutils literal"><span class="pre">bond_partners</span></tt></a></td>
+<td>Go through all bonded partners</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.dihedral_partners" title="parmed.topologyobjects.Atom.dihedral_partners"><tt class="xref py py-obj docutils literal"><span class="pre">dihedral_partners</span></tt></a></td>
+<td>List of all dihedral partners that are NOT angle or bond partners</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.element" title="parmed.topologyobjects.Atom.element"><tt class="xref py py-obj docutils literal"><span class="pre">element</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.epsilon" title="parmed.topologyobjects.Atom.epsilon"><tt class="xref py py-obj docutils literal"><span class="pre">epsilon</span></tt></a></td>
+<td>Lennard-Jones epsilon parameter (the Lennard-Jones well depth)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.epsilon_14" title="parmed.topologyobjects.Atom.epsilon_14"><tt class="xref py py-obj docutils literal"><span class="pre">epsilon_14</span></tt></a></td>
+<td>The 1-4 Lennard-Jones epsilon parameter</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.exclusion_partners" title="parmed.topologyobjects.Atom.exclusion_partners"><tt class="xref py py-obj docutils literal"><span class="pre">exclusion_partners</span></tt></a></td>
+<td>List of all exclusions not otherwise excluded by bonds/angles/torsions</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.idx" title="parmed.topologyobjects.Atom.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.rmin" title="parmed.topologyobjects.Atom.rmin"><tt class="xref py py-obj docutils literal"><span class="pre">rmin</span></tt></a></td>
+<td>Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.rmin_14" title="parmed.topologyobjects.Atom.rmin_14"><tt class="xref py py-obj docutils literal"><span class="pre">rmin_14</span></tt></a></td>
+<td>The 1-4 Lennard-Jones Rmin/2 parameter</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma" title="parmed.topologyobjects.Atom.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma_14" title="parmed.topologyobjects.Atom.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.starting_index" title="parmed.topologyobjects.Atom.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_partners" title="parmed.topologyobjects.Atom.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
+<td>List of all 1-5 partners that are NOT in angle or bond partners.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.angle_partners">
+<tt class="descname">angle_partners</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.angle_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.angle_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all angle partners that are NOT bond partners</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.angle_to">
+<tt class="descname">angle_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.angle_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.angle_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log this atom as angled to another atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote class="last">
+<div><p>An atom that will be added to <cite>angle_partners</cite></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This action adds <cite>self</cite> to <cite>other.angle_partners</cite>. Raises
+<tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if <cite>other is self</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.bond_partners">
+<tt class="descname">bond_partners</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.bond_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.bond_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through all bonded partners</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.bond_to">
+<tt class="descname">bond_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log this atom as bonded to another atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote class="last">
+<div><p>An atom that will be added to <cite>bond_partners</cite></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This action adds <cite>self</cite> to <cite>other.bond_partners</cite>. Raises
+<tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if <cite>other is self</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.dihedral_partners">
+<tt class="descname">dihedral_partners</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.dihedral_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.dihedral_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all dihedral partners that are NOT angle or bond partners</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.dihedral_to">
+<tt class="descname">dihedral_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.dihedral_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.dihedral_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log this atom as dihedral-ed to another atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote class="last">
+<div><p>An atom that will be added to <cite>dihedral_partners</cite></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This action adds <cite>self</cite> to <cite>other.dihedral_partners</cite>. Raises
+<tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if <cite>other is self</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.epsilon">
+<tt class="descname">epsilon</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lennard-Jones epsilon parameter (the Lennard-Jones well depth)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.epsilon_14">
+<tt class="descname">epsilon_14</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.epsilon_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.epsilon_14" title="Permalink to this definition">¶</a></dt>
+<dd><p>The 1-4 Lennard-Jones epsilon parameter</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.exclude">
+<tt class="descname">exclude</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add one atom to my arbitrary exclusion list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote class="last">
+<div><p>An atom that will be added to <cite>exclusion_partners</cite>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This action adds <cite>self</cite> to <cite>other.exclusion_partners</cite>. Raises
+<tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if <cite>other is self</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.exclusion_partners">
+<tt class="descname">exclusion_partners</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.exclusion_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.exclusion_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all exclusions not otherwise excluded by bonds/angles/torsions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.nonbonded_exclusions">
+<tt class="descname">nonbonded_exclusions</tt><big>(</big><em>only_greater=True</em>, <em>index_from=0</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.nonbonded_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.nonbonded_exclusions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total number of nonbonded atom exclusions for this atom. The
+general rules for building the exclusion list is to include both
+exceptions AND exclusions (i.e., the Amber scaling of 1-4 interactions
+means that the 1-4 terms are excluded and a special pairlist is built to
+handle those exceptions).</p>
+<p>All atoms in the <cite>_partners</cite> arrays are nonbonded exclusions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>only_greater</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, only atoms whose <cite>idx</cite> value is greater than this <cite>Atom`s
+`idx</cite> will be counted as an exclusion (to avoid double-counting
+exclusions). If False, all exclusions will be counted.</p>
+</div></blockquote>
+<p><strong>index_from</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>This is the index of the first atom, and is intended to be 0 (for C-
+and Python-style numbering) or 1 (for Fortran-style numbering, such
+as that used in the Amber and CHARMM topology files)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">int</span></tt></p>
+<blockquote class="last">
+<div><p>The returned list will be the atom indexes of the exclusion partners
+for this atom (indexing starts from <tt class="docutils literal"><span class="pre">index_from</span></tt>)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If this instance&#8217;s <cite>idx</cite> attribute evaluates to -1 &#8211; meaning it is not
+in an AtomList &#8211; a IndexError will be raised. If you have two extra
+points (i.e., those with atomic numbers of 0) bonded to each other, this
+routine may raise a <tt class="docutils literal"><span class="pre">RuntimeError</span></tt> if the recursion depth is exceeded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.prune_exclusions">
+<tt class="descname">prune_exclusions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.prune_exclusions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.prune_exclusions" title="Permalink to this definition">¶</a></dt>
+<dd><p>For extra points, the exclusion partners may be filled before the bond,
+angle, dihedral, and tortor partners. Since we don&#8217;t want memory of
+these exclusions if any of those topological features were to break, we
+want to <em>remove</em> those from the exclusion list. This function makes sure
+that nothing in the bond, angle, dihedral, and tortor lists appears in
+the exclusion list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.reset_topology">
+<tt class="descname">reset_topology</tt><big>(</big><em>keep_exclusions=True</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.reset_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.reset_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties all of the bond, angle, and dihedral partners so they can be set
+up again with updated data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>keep_exclusions</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote class="last">
+<div><p>If True, the <cite>exclusion_partners</cite> array is left alone. If False,
+<cite>exclusion_partners</cite> is emptied as well.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.rmin">
+<tt class="descname">rmin</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.rmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.rmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.rmin_14">
+<tt class="descname">rmin_14</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.rmin_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.rmin_14" title="Permalink to this definition">¶</a></dt>
+<dd><p>The 1-4 Lennard-Jones Rmin/2 parameter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.sigma">
+<tt class="descname">sigma</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lennard-Jones sigma parameter &#8211; directly related to Rmin</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.sigma_14">
+<tt class="descname">sigma_14</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.sigma_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.sigma_14" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lennard-Jones sigma parameter &#8211; directly related to Rmin</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.tortor_partners">
+<tt class="descname">tortor_partners</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.tortor_partners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.tortor_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all 1-5 partners that are NOT in angle or bond partners. This is
+<em>only</em> used in the Amoeba force field</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Atom.tortor_to">
+<tt class="descname">tortor_to</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Atom.tortor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.tortor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log this atom as 1-5 partners to another atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote class="last">
+<div><p>An atom that will be added to <cite>tortor_partners</cite></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This action adds <cite>self</cite> to <cite>other.tortor_partners</cite>. Raises
+<tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if <cite>other is self</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/parmed.topologyobjects.Atom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

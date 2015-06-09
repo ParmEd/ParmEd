@@ -1,7 +1,0 @@
-chemistry.formats.pdbx.PdbxContainers module
-============================================
-
-.. automodule:: chemistry.formats.pdbx.PdbxContainers
-    :members:
-    :undoc-members:
-    :show-inheritance:

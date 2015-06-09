@@ -1,6 +1,0 @@
-chemistry.formats.registry.load_file
-====================================
-
-.. currentmodule:: chemistry.formats.registry
-
-.. autofunction:: load_file

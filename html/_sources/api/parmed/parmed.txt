@@ -1,0 +1,43 @@
+parmed package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+
+    parmed.amber
+    parmed.charmm
+    parmed.formats
+    parmed.gromacs
+    parmed.modeller
+    parmed.openmm
+    parmed.rosetta
+    parmed.tinker
+    parmed.tools
+    parmed.unit
+    parmed.utils
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.constants
+   parmed.exceptions
+   parmed.geometry
+   parmed.parameters
+   parmed.periodic_table
+   parmed.residue
+   parmed.scripts
+   parmed.structure
+   parmed.topologyobjects
+   parmed.vec3
+
+Module contents
+---------------
+
+.. automodule:: parmed
+    :members:
+    :undoc-members:
+    :show-inheritance:

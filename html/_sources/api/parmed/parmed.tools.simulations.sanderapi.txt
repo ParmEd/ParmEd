@@ -1,0 +1,7 @@
+parmed.tools.simulations.sanderapi module
+=========================================
+
+.. automodule:: parmed.tools.simulations.sanderapi
+    :members:
+    :undoc-members:
+    :show-inheritance:

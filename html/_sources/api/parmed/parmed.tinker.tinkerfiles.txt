@@ -1,0 +1,7 @@
+parmed.tinker.tinkerfiles module
+================================
+
+.. automodule:: parmed.tinker.tinkerfiles
+    :members:
+    :undoc-members:
+    :show-inheritance:

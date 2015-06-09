@@ -1,0 +1,7 @@
+parmed.unit.baseunit module
+===========================
+
+.. automodule:: parmed.unit.baseunit
+    :members:
+    :undoc-members:
+    :show-inheritance:

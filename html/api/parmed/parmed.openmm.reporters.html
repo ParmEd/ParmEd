@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.openmm.reporters module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.openmm.reporters">
+<span id="parmed-openmm-reporters-module"></span><h1>parmed.openmm.reporters module<a class="headerlink" href="#module-parmed.openmm.reporters" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.openmm.reporters.EnergyMinimizerReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">EnergyMinimizerReporter</tt><big>(</big><em>f</em>, <em>volume=False</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#EnergyMinimizerReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.EnergyMinimizerReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter" title="parmed.openmm.reporters.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">parmed.openmm.reporters.StateDataReporter</span></tt></a></p>
+<p>This class acts as a simple energy reporter class for minimizations. This
+is not meant to be used as a reporter for OpenMM&#8217;s molecular dynamics
+routines, but instead passed a simulation object for printing out
+single-point energies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f</strong> : str or file-like</p>
+<blockquote>
+<div><p>File name or object to write energies to</p>
+</div></blockquote>
+<p><strong>volume</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, write the system volume (default is False)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.EnergyMinimizerReporter.describeNextReport" title="parmed.openmm.reporters.EnergyMinimizerReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Disable this reporter inside MD</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.EnergyMinimizerReporter.finalize" title="parmed.openmm.reporters.EnergyMinimizerReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.EnergyMinimizerReporter.report" title="parmed.openmm.reporters.EnergyMinimizerReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation[,&nbsp;frame])</td>
+<td>Print out the current energy</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.EnergyMinimizerReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#EnergyMinimizerReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.EnergyMinimizerReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable this reporter inside MD</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.EnergyMinimizerReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#EnergyMinimizerReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.EnergyMinimizerReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.EnergyMinimizerReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#EnergyMinimizerReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.EnergyMinimizerReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print out the current energy</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.openmm.reporters.MdcrdReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">MdcrdReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
+be significantly slower than binary file reporters (like DCDReporter or
+NetCDFReporter).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to write the trajectory to</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>Number of steps between writing trajectory frames</p>
+</div></blockquote>
+<p><strong>crds</strong> : bool=True</p>
+<blockquote>
+<div><p>Write coordinates to this trajectory file?</p>
+</div></blockquote>
+<p><strong>vels</strong> : bool=False</p>
+<blockquote>
+<div><p>Write velocities to this trajectory file?</p>
+</div></blockquote>
+<p><strong>frcs</strong> : bool=False</p>
+<blockquote class="last">
+<div><p>Write forces to this trajectory file?</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>You can only write one of coordinates, forces, or velocities to a mdcrd
+file.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.MdcrdReporter.describeNextReport" title="parmed.openmm.reporters.MdcrdReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.MdcrdReporter.finalize" title="parmed.openmm.reporters.MdcrdReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.MdcrdReporter.report" title="parmed.openmm.reporters.MdcrdReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.MdcrdReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.MdcrdReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.MdcrdReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>simulation (Simulation) The Simulation to generate a report for</li>
+<li>state (State) The current state of the simulation</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.openmm.reporters.NetCDFReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">NetCDFReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>NetCDFReporter prints a trajectory in NetCDF format</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.NetCDFReporter.describeNextReport" title="parmed.openmm.reporters.NetCDFReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.NetCDFReporter.finalize" title="parmed.openmm.reporters.NetCDFReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.NetCDFReporter.report" title="parmed.openmm.reporters.NetCDFReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.NetCDFReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.NetCDFReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.NetCDFReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+<p><strong>state</strong> : <tt class="xref py py-class docutils literal"><span class="pre">mm.State</span></tt></p>
+<blockquote class="last">
+<div><p>The current state of the simulation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.openmm.reporters.ProgressReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">ProgressReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter" title="parmed.openmm.reporters.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">parmed.openmm.reporters.StateDataReporter</span></tt></a></p>
+<p>A class that prints out a progress report of how much MD (or minimization)
+has been done, how fast the simulation is running, and how much time is left
+(similar to the mdinfo file in Amber)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f</strong> : str</p>
+<blockquote>
+<div><p>The file name of the progress report file (overwritten each time)</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>The step interval between which to write frames</p>
+</div></blockquote>
+<p><strong>totalSteps</strong> : int</p>
+<blockquote>
+<div><p>The total number of steps that will be run in the simulation (used to
+estimate time remaining)</p>
+</div></blockquote>
+<p><strong>potentialEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the potential energy (default True)</p>
+</div></blockquote>
+<p><strong>kineticEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the kinetic energy (default True)</p>
+</div></blockquote>
+<p><strong>totalEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the total energy (default True)</p>
+</div></blockquote>
+<p><strong>temperature</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the system temperature (default True)</p>
+</div></blockquote>
+<p><strong>volume</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the system volume (default False)</p>
+</div></blockquote>
+<p><strong>density</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to print the system density (default False)</p>
+</div></blockquote>
+<p><strong>systemMass</strong> : float or <tt class="xref py py-class docutils literal"><span class="pre">unit.Quantity</span></tt></p>
+<blockquote class="last">
+<div><p>The mass of the system used when reporting density (useful in instances
+where masses are set to 0 to constrain their positions)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">In</span></tt>, <a class="reference internal" href="#parmed.openmm.reporters.ProgressReporter" title="parmed.openmm.reporters.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>, <a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter" title="parmed.openmm.reporters.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a></p>
+</div>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.ProgressReporter.describeNextReport" title="parmed.openmm.reporters.ProgressReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.ProgressReporter.finalize" title="parmed.openmm.reporters.ProgressReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.ProgressReporter.report" title="parmed.openmm.reporters.ProgressReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report and predict the time to completion (and</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.ProgressReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.ProgressReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.ProgressReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report and predict the time to completion (and
+current/overall MD performance)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.openmm.reporters.RestartReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">RestartReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Use a reporter to handle writing restarts at specified intervals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to write the restart to.</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>Number of steps between writing restart files</p>
+</div></blockquote>
+<p><strong>write_multiple</strong> : bool=False</p>
+<blockquote>
+<div><p>Either write a separate restart each time (appending the step number in
+the format .# to the file name given above) if True, or overwrite the
+same file each time if False</p>
+</div></blockquote>
+<p><strong>netcdf</strong> : bool=False</p>
+<blockquote>
+<div><p>Use the Amber NetCDF restart file format</p>
+</div></blockquote>
+<p><strong>write_velocities</strong> : bool=True</p>
+<blockquote class="last">
+<div><p>Write velocities to the restart file. You can turn this off for passing
+in, for instance, a minimized structure.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.RestartReporter.describeNextReport" title="parmed.openmm.reporters.RestartReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.RestartReporter.finalize" title="parmed.openmm.reporters.RestartReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>No-op here</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.RestartReporter.report" title="parmed.openmm.reporters.RestartReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(sim,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.RestartReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.RestartReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>No-op here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.RestartReporter.report">
+<tt class="descname">report</tt><big>(</big><em>sim</em>, <em>state</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sim</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+<p><strong>state</strong> : <tt class="xref py py-class docutils literal"><span class="pre">mm.State</span></tt></p>
+<blockquote class="last">
+<div><p>The current state of the simulation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.openmm.reporters.StateDataReporter">
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This class acts as a state data reporter for OpenMM simulations, but it is a
+little more generalized. Notable differences are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>It allows the units of the output to be specified, with defaults being
+those used in Amber (e.g., kcal/mol, angstroms^3, etc.)</li>
+<li>It will write to any object containing a &#8216;write&#8217; method; not just
+files. This allows, for instance, writing to a GUI window that
+implements the desired &#8216;write&#8217; attribute.</li>
+</ul>
+</div></blockquote>
+<p>Most of this code is copied from the OpenMM StateDataReporter class, with
+the above-mentioned changes made.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f</strong> : str or file-like</p>
+<blockquote>
+<div><p>Destination to write the state data (file name or file object)</p>
+</div></blockquote>
+<p><strong>reportInterval</strong> : int</p>
+<blockquote>
+<div><p>Number of steps between state data reports</p>
+</div></blockquote>
+<p><strong>step</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the step number (Default True)</p>
+</div></blockquote>
+<p><strong>time</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the simulation time (Defaults True)</p>
+</div></blockquote>
+<p><strong>potentialEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the potential energy of the structure (Default True)</p>
+</div></blockquote>
+<p><strong>kineticEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the kinetic energy of the structure (Default True)</p>
+</div></blockquote>
+<p><strong>totalEnergy</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the total energy of the system (Default True)</p>
+</div></blockquote>
+<p><strong>temperature</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the temperature of the system (Default True)</p>
+</div></blockquote>
+<p><strong>volume</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the volume of the unit cell. If the system is not periodic,
+the value is meaningless (Default False)</p>
+</div></blockquote>
+<p><strong>density</strong> : bool, optional</p>
+<blockquote>
+<div><p>Print out the density of the unit cell. If the system is not periodic,
+the value is meaningless (Default False)</p>
+</div></blockquote>
+<p><strong>separator</strong> : str, optional</p>
+<blockquote>
+<div><p>The string to separate data fields (Default &#8216;,&#8217;)</p>
+</div></blockquote>
+<p><strong>systemMass</strong> : float, optional</p>
+<blockquote>
+<div><p>If not None, the density will be computed from this mass, since setting
+a mass to 0 is used to constrain the position of that particle. (Default
+None)</p>
+</div></blockquote>
+<p><strong>energyUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units to print energies in (default unit.kilocalories_per_mole)</p>
+</div></blockquote>
+<p><strong>timeUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units to print time in (default unit.picoseconds)</p>
+</div></blockquote>
+<p><strong>volumeUnit</strong> : unit, optional</p>
+<blockquote>
+<div><p>The units print volume in (default unit.angstroms**3)</p>
+</div></blockquote>
+<p><strong>densityUnit</strong> : unit, optional</p>
+<blockquote class="last">
+<div><p>The units to print density in (default
+unit.grams/unit.item/unit.milliliter)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter.describeNextReport" title="parmed.openmm.reporters.StateDataReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>
+<td>Get information about the next report this object will generate.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter.finalize" title="parmed.openmm.reporters.StateDataReporter.finalize"><tt class="xref py py-obj docutils literal"><span class="pre">finalize</span></tt></a>()</td>
+<td>Closes any open file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter.report" title="parmed.openmm.reporters.StateDataReporter.report"><tt class="xref py py-obj docutils literal"><span class="pre">report</span></tt></a>(simulation,&nbsp;state)</td>
+<td>Generate a report.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.openmm.reporters.StateDataReporter.describeNextReport">
+<tt class="descname">describeNextReport</tt><big>(</big><em>simulation</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the next report this object will generate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The simulation to generate a report for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
+<blockquote class="last">
+<div><p>nsteps is the number of steps until the next report
+pos, vel, frc, and ene are flags indicating whether positions,
+velocities, forces, and/or energies are needed from the Context</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.StateDataReporter.finalize">
+<tt class="descname">finalize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes any open file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.reporters.StateDataReporter.report">
+<tt class="descname">report</tt><big>(</big><em>simulation</em>, <em>state</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <tt class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></tt></p>
+<blockquote>
+<div><p>The Simulation to generate a report for</p>
+</div></blockquote>
+<p><strong>state</strong> : <tt class="xref py py-class docutils literal"><span class="pre">mm.State</span></tt></p>
+<blockquote class="last">
+<div><p>The current state of the simulation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.openmm.reporters.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

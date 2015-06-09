@@ -1,0 +1,6 @@
+parmed.amber.netcdffiles.use
+============================
+
+.. currentmodule:: parmed.amber.netcdffiles
+
+.. autofunction:: use

@@ -1,0 +1,27 @@
+parmed.unit.BaseUnit
+====================
+
+.. currentmodule:: parmed.unit
+
+.. autoclass:: BaseUnit
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BaseUnit.__init__
+      ~BaseUnit.conversion_factor_to
+      ~BaseUnit.define_conversion_factor_to
+      ~BaseUnit.get_dimension_tuple
+      ~BaseUnit.iter_base_dimensions
+      ~BaseUnit.iter_base_units
+   
+   
+
+   
+   
+   

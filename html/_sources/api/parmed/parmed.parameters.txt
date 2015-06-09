@@ -1,0 +1,7 @@
+parmed.parameters module
+========================
+
+.. automodule:: parmed.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

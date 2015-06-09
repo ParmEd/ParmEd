@@ -1,0 +1,7 @@
+parmed.geometry module
+======================
+
+.. automodule:: parmed.geometry
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.tools.actions module
+===========================
+
+.. automodule:: parmed.tools.actions
+    :members:
+    :undoc-members:
+    :show-inheritance:

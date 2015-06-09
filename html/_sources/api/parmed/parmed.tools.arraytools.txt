@@ -1,0 +1,7 @@
+parmed.tools.arraytools module
+==============================
+
+.. automodule:: parmed.tools.arraytools
+    :members:
+    :undoc-members:
+    :show-inheritance:

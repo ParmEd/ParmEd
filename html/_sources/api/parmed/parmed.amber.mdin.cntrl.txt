@@ -1,0 +1,7 @@
+parmed.amber.mdin.cntrl module
+==============================
+
+.. automodule:: parmed.amber.mdin.cntrl
+    :members:
+    :undoc-members:
+    :show-inheritance:

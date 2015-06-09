@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.openmm.topsystem module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.openmm.topsystem">
+<span id="parmed-openmm-topsystem-module"></span><h1>parmed.openmm.topsystem module<a class="headerlink" href="#module-parmed.openmm.topsystem" title="Permalink to this headline">¶</a></h1>
+<p>Convert an OpenMM Topology into a Structure instance, optionally filling in
+parameters from a System</p>
+<dl class="function">
+<dt id="parmed.openmm.topsystem.load_topology">
+<tt class="descclassname">parmed.openmm.topsystem.</tt><tt class="descname">load_topology</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/topsystem.html#load_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.topsystem.load_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a> instance from an OpenMM
+Topology, optionally filling in parameters from a System</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>topology</strong> : <tt class="xref py py-class docutils literal"><span class="pre">simtk.openmm.app.Topology</span></tt></p>
+<blockquote>
+<div><p>The Topology instance with the list of atoms and bonds for this system</p>
+</div></blockquote>
+<p><strong>system</strong> : <tt class="xref py py-class docutils literal"><span class="pre">simtk.openmm.System</span></tt> or str, optional</p>
+<blockquote>
+<div><p>If provided, parameters from this System will be applied to the
+Structure. If a string is given, it will be interpreted as the file name
+of an XML-serialized System, and it will be deserialized into a System
+before used to supply parameters</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>The structure from the provided topology</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>OpenMMWarning if parameters are found that cannot be interpreted or</strong></p>
+<p><strong>processed by ParmEd</strong></p>
+<p><strong>TypeError if there are any mismatches between the provided topology and</strong></p>
+<p><strong>system (e.g., they have different numbers of atoms)</strong></p>
+<p class="last"><strong>IOError if system is a string and it is not an existing file</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Due to its flexibility with CustomForces, it is entirely possible that the
+functional form of the potential will be unknown to ParmEd. This function
+will try to use the energy expression to identify supported potential types
+that are implemented as CustomForce objects. In particular, quadratic
+improper torsions, when recognized, will be extracted.</p>
+<p>Other CustomForces, including the CustomNonbondedForce used to implement
+NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be
+processed and will result in an unknown functional form</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.openmm.topsystem.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.fortranformat.config &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="parmed.utils" href="../../utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.utils.fortranformat.config</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c"># Should all edit descriptor values be returned even if they were not</span>
+<span class="c"># written to?</span>
+<span class="n">RET_WRITTEN_VARS_ONLY</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c"># Should &#39;None&#39; values be returned when no record is available to read</span>
+<span class="c"># from or the FORTRAN &#39;default&#39;?</span>
+<span class="n">RET_UNWRITTEN_VARS_NONE</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c"># The order in which edit desciptors are tried by default when G edit</span>
+<span class="c"># descriptor encountered on input</span>
+<span class="n">G_INPUT_TRIAL_EDS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;L&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">]</span>
+<span class="c"># Contrary to specification, many compilers allow zero width edit</span>
+<span class="c"># descriptors</span>
+<span class="n">ALLOW_ZERO_WIDTH_EDS</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c"># Set the characters that separate the records</span>
+<span class="n">RECORD_SEPARATOR</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+
+<span class="c"># The maximum size for an integer</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="n">PROC_MAXINT</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">PROC_MAXINT</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxint</span>
+<span class="c"># Processor dependant default for including leading plus or not</span>
+<span class="n">PROC_INCL_PLUS</span> <span class="o">=</span> <span class="bp">False</span> 
+<span class="c"># Option to allow signed binary, octal and hex on input (not a FORTRAN feature)</span>
+<span class="n">PROC_ALLOW_NEG_BOZ</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c"># Prcessor dependant padding character</span>
+<span class="n">PROC_PAD_CHAR</span> <span class="o">=</span> <span class="s">&#39; &#39;</span>
+<span class="c"># Interpret blanks or jsut a negative as a zero, as in ifort behaviour</span>
+<span class="n">PROC_NEG_AS_ZERO</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c"># Show a sign for zero?</span>
+<span class="n">PROC_SIGN_ZERO</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">PROC_MIN_FIELD_WIDTH</span> <span class="o">=</span> <span class="mi">46</span>
+<span class="n">PROC_DECIMAL_CHAR</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span>
+<span class="n">G0_NO_BLANKS</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">PROC_NO_LEADING_BLANK</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c"># The default value if BN, BZ edit descriptors are not specified</span>
+<span class="n">PROC_BLANKS_AS_ZEROS</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="reset"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.config.html#parmed.utils.fortranformat.config.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">RET_WRITTEN_VARS_ONLY</span><span class="p">,</span> <span class="n">RET_UNWRITTEN_VARS_NONE</span><span class="p">,</span> <span class="n">PROC_INCL_PLUS</span><span class="p">,</span> \
+        <span class="n">PROC_ALLOW_NEG_BOZ</span><span class="p">,</span> <span class="n">PROC_PAD_CHAR</span><span class="p">,</span> <span class="n">PROC_NEG_AS_ZERO</span><span class="p">,</span> <span class="n">PROC_SIGN_ZERO</span><span class="p">,</span> \
+        <span class="n">PROC_MIN_FIELD_WIDTH</span><span class="p">,</span> <span class="n">PROC_DECIMAL_CHAR</span><span class="p">,</span> <span class="n">G0_NO_BLANKS</span><span class="p">,</span> \
+        <span class="n">PROC_NO_LEADING_BLANK</span><span class="p">,</span> <span class="n">PROC_BLANKS_AS_ZEROS</span><span class="p">,</span> <span class="n">PROC_MAXINT</span><span class="p">,</span> <span class="n">G_INPUT_TRIAL_EDS</span><span class="p">,</span> \
+        <span class="n">ALLOW_ZERO_WIDTH_EDS</span>
+    <span class="n">G_INPUT_TRIAL_EDS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;L&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">PROC_MAXINT</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">PROC_MAXINT</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxint</span>
+    <span class="n">RET_WRITTEN_VARS_ONLY</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">RET_UNWRITTEN_VARS_NONE</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">PROC_INCL_PLUS</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">PROC_ALLOW_NEG_BOZ</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">PROC_PAD_CHAR</span> <span class="o">=</span> <span class="s">&#39; &#39;</span>
+    <span class="n">PROC_NEG_AS_ZERO</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">PROC_SIGN_ZERO</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">PROC_MIN_FIELD_WIDTH</span> <span class="o">=</span> <span class="mi">46</span>
+    <span class="n">PROC_DECIMAL_CHAR</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span>
+    <span class="n">G0_NO_BLANKS</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">PROC_NO_LEADING_BLANK</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">PROC_BLANKS_AS_ZEROS</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">ALLOW_ZERO_WIDTH_EDS</span> <span class="o">=</span> <span class="bp">True</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../utils.html" >parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

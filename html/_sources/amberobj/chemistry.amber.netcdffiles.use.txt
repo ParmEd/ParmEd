@@ -1,6 +1,0 @@
-chemistry.amber.netcdffiles.use
-===============================
-
-.. currentmodule:: chemistry.amber.netcdffiles
-
-.. autofunction:: use

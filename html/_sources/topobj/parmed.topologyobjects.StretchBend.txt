@@ -1,0 +1,29 @@
+parmed.topologyobjects.StretchBend
+==================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: StretchBend
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StretchBend.__init__
+      ~StretchBend.delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~StretchBend.strbnd_type
+   
+   

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Dimensional Analysis (working with chemistry.unit) &mdash; ParmEd 2.0 documentation</title>
+    <title>Dimensional Analysis (working with parmed.unit) &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="chemistry.unit.Quantity" href="unitobj/chemistry.unit.Quantity.html" />
-    <link rel="prev" title="chemistry.formats.registry.load_file" href="structobj/chemistry.formats.registry.load_file.html" /> 
+    <link rel="next" title="parmed.unit.Quantity" href="unitobj/parmed.unit.Quantity.html" />
+    <link rel="prev" title="parmed.formats.registry.load_file" href="structobj/parmed.formats.registry.load_file.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,10 +39,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="unitobj/chemistry.unit.Quantity.html" title="chemistry.unit.Quantity"
+          <a href="unitobj/parmed.unit.Quantity.html" title="parmed.unit.Quantity"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="structobj/chemistry.formats.registry.load_file.html" title="chemistry.formats.registry.load_file"
+          <a href="structobj/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -53,8 +53,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="dimensional-analysis-working-with-chemistry-unit">
-<h1>Dimensional Analysis (working with <a class="reference internal" href="api/chemistry/chemistry.unit.html#module-chemistry.unit" title="chemistry.unit"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.unit</span></tt></a>)<a class="headerlink" href="#dimensional-analysis-working-with-chemistry-unit" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="dimensional-analysis-working-with-parmed-unit">
+<h1>Dimensional Analysis (working with <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.unit</span></tt></a>)<a class="headerlink" href="#dimensional-analysis-working-with-parmed-unit" title="Permalink to this headline">¶</a></h1>
 <p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package was originally developed by Christopher M. Bruns at
 SimTK (Stanford University) for the <tt class="docutils literal"><span class="pre">simtk</span></tt> Python package in <a class="reference external" href="http://simtk.org/home/openmm">OpenMM</a>.</p>
 <p>Different programs use different systems of units internally while performing
@@ -71,11 +71,11 @@ both, requires that the input for each program conform to its expected system of
 units. Not doing so can result in <a class="reference external" href="http://www.wired.com/2010/11/1110mars-climate-observer-report/">a very costly mistake</a></p>
 <p>In all of the examples below, I will assume that the <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package has
 been imported as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 </pre></div>
 </div>
-<div class="section" id="what-does-chemistry-unit-do">
-<h2>What does <a class="reference internal" href="api/chemistry/chemistry.unit.html#module-chemistry.unit" title="chemistry.unit"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.unit</span></tt></a> do?<a class="headerlink" href="#what-does-chemistry-unit-do" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-does-parmed-unit-do">
+<h2>What does <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.unit</span></tt></a> do?<a class="headerlink" href="#what-does-parmed-unit-do" title="Permalink to this headline">¶</a></h2>
 <p>The main classes in the <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> module are shown below:</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -83,25 +83,25 @@ been imported as follows:</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-obj docutils literal"><span class="pre">Quantity</span></tt></a>([value,&nbsp;unit])</td>
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-obj docutils literal"><span class="pre">Quantity</span></tt></a>([value,&nbsp;unit])</td>
 <td>Physical quantity, such as 1.3 meters per second.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#chemistry.unit.is_quantity" title="chemistry.unit.is_quantity"><tt class="xref py py-obj docutils literal"><span class="pre">is_quantity</span></tt></a>(x)</td>
+<tr class="row-even"><td><a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><tt class="xref py py-obj docutils literal"><span class="pre">is_quantity</span></tt></a>(x)</td>
 <td>Returns True if x is a Quantity, False otherwise.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.Unit.html#chemistry.unit.Unit" title="chemistry.unit.Unit"><tt class="xref py py-obj docutils literal"><span class="pre">Unit</span></tt></a>(base_or_scaled_units)</td>
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.Unit.html#parmed.unit.Unit" title="parmed.unit.Unit"><tt class="xref py py-obj docutils literal"><span class="pre">Unit</span></tt></a>(base_or_scaled_units)</td>
 <td>Physical unit such as meter or ampere.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="unitobj/chemistry.unit.BaseUnit.html#chemistry.unit.BaseUnit" title="chemistry.unit.BaseUnit"><tt class="xref py py-obj docutils literal"><span class="pre">BaseUnit</span></tt></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
+<tr class="row-even"><td><a class="reference internal" href="unitobj/parmed.unit.BaseUnit.html#parmed.unit.BaseUnit" title="parmed.unit.BaseUnit"><tt class="xref py py-obj docutils literal"><span class="pre">BaseUnit</span></tt></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
 <td>Physical unit expressed in exactly one BaseDimension.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-obj docutils literal"><span class="pre">UnitSystem</span></tt></a>(units)</td>
+<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-obj docutils literal"><span class="pre">UnitSystem</span></tt></a>(units)</td>
 <td><p class="rubric">Methods</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package allows you to turn <em>numbers</em> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>,
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package allows you to turn <em>numbers</em> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>,
 that has both a value and a unit.  It allows you to do basic math with units and
 it automatically performs the requisite dimensional analysis, raising an
 exception if you try to illegally combine incompatible units.  For example:</p>
@@ -137,12 +137,12 @@ more complex units as well:</p>
 <p>There are a variety of tasks you may want to do with units &#8211; the more popular
 of which is shown in the sections below.</p>
 <div class="section" id="checking-to-see-if-an-object-is-a-quantity">
-<h3>Checking to see if an object is a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a><a class="headerlink" href="#checking-to-see-if-an-object-is-a-quantity" title="Permalink to this headline">¶</a></h3>
+<h3>Checking to see if an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a><a class="headerlink" href="#checking-to-see-if-an-object-is-a-quantity" title="Permalink to this headline">¶</a></h3>
 <p>There may be times when you want to see if a Python object is a
-<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance, or if it is just a raw number. Many functions in
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance, or if it is just a raw number. Many functions in
 ParmEd do this when taking user input, converting to its internal AKMA unit
-system (see below). Checking that an object is a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> is done using
-the <a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#chemistry.unit.is_quantity" title="chemistry.unit.is_quantity"><tt class="xref py py-func docutils literal"><span class="pre">is_quantity()</span></tt></a> function in the <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> namespace:</p>
+system (see below). Checking that an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> is done using
+the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><tt class="xref py py-func docutils literal"><span class="pre">is_quantity()</span></tt></a> function in the <tt class="docutils literal"><span class="pre">parmed.unit</span></tt> namespace:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -157,7 +157,7 @@ the <a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#
 <p>You can create a unit in one of two ways:</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">Use the <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> constructor, as shown below:</p>
+<li><p class="first">Use the <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> constructor, as shown below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
 <span class="go">Quantity(1, nanometer)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**-</span><span class="mi">3</span><span class="p">)</span> <span class="c"># You can raise units to exponents</span>
@@ -176,25 +176,25 @@ the <a class="reference internal" href="unitobj/chemistry.unit.is_quantity.html#
 </ol>
 </div></blockquote>
 <p>Seems easy enough, and I usually use method 2 when turning a <tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">int</span></tt>,
-<tt class="docutils literal"><span class="pre">list</span></tt>, or <tt class="docutils literal"><span class="pre">tuple</span></tt> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. However, this does <em>not</em> work
+<tt class="docutils literal"><span class="pre">list</span></tt>, or <tt class="docutils literal"><span class="pre">tuple</span></tt> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. However, this does <em>not</em> work
 for numpy arrays, since numpy arrays overload all of the multiplication
 operators (<tt class="docutils literal"><span class="pre">__mul__</span></tt>, <tt class="docutils literal"><span class="pre">__imul__</span></tt>, ... etc.), which is the mechanism by which
-unit multiplication creates a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. As a result, you <em>must</em> use
-method #1 when converting a <tt class="docutils literal"><span class="pre">numpy.ndarray</span></tt> into a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>.</p>
+unit multiplication creates a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. As a result, you <em>must</em> use
+method #1 when converting a <tt class="docutils literal"><span class="pre">numpy.ndarray</span></tt> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>.</p>
 </div>
 <div class="section" id="converting-to-another-unit">
 <h3>Converting to another unit<a class="headerlink" href="#converting-to-another-unit" title="Permalink to this headline">¶</a></h3>
 <p>Aside from using units as a type-checker to make sure you are not making an
 arithmetic mistake with your transformations, the most common reason to use the
-<tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package is to handle unit conversions for you. The <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
+<tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> package is to handle unit conversions for you. The <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
 class defines two functions for this:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><tt class="docutils literal"><span class="pre">in_units_of(unit)</span></tt>: This method returns a new <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
+<li><tt class="docutils literal"><span class="pre">in_units_of(unit)</span></tt>: This method returns a new <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>
 instance with the specified <tt class="docutils literal"><span class="pre">unit</span></tt> (a <tt class="docutils literal"><span class="pre">TypeError</span></tt> is raised).</li>
 <li><tt class="docutils literal"><span class="pre">value_in_unit(unit)</span></tt>: This method returns a copy of the underlying
 data <em>without</em> an attached <tt class="docutils literal"><span class="pre">unit</span></tt> (i.e., it is <em>not</em> a
-<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance). This should be used when a scalar is needed
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance). This should be used when a scalar is needed
 from a quantity for use in a particular API, or if the performance hit
 from the dimensional analysis is unacceptable.</li>
 </ol>
@@ -210,19 +210,19 @@ differences:</p>
 </div>
 </div>
 <div class="section" id="converting-units-in-batch-the-unitsystem">
-<h3>Converting units in batch &#8211; the <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#converting-units-in-batch-the-unitsystem" title="Permalink to this headline">¶</a></h3>
-<p>The previous section described how to convert a <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> into another
-<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> in a different, but <em>compatible</em> unit. The argument to
+<h3>Converting units in batch &#8211; the <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#converting-units-in-batch-the-unitsystem" title="Permalink to this headline">¶</a></h3>
+<p>The previous section described how to convert a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> into another
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> in a different, but <em>compatible</em> unit. The argument to
 <tt class="docutils literal"><span class="pre">in_units_of</span></tt> and <tt class="docutils literal"><span class="pre">value_in_unit</span></tt> methods <em>must</em> be a compatible unit, which
 can be limiting if you want to write a function that changes the units of an
 argument with unknown dimensionality into a particular system of units.</p>
-<p>This is where <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> comes in. Each <a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance also
+<p>This is where <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> comes in. Each <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance also
 has a corresponding methods for conversion to units compatible within a
-particular <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a>:</p>
+particular <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a>:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><tt class="docutils literal"><span class="pre">in_unit_system(UnitSystem)</span></tt>: This method returns a new
-<a class="reference internal" href="unitobj/chemistry.unit.Quantity.html#chemistry.unit.Quantity" title="chemistry.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance composed of the base units defined in that
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a> instance composed of the base units defined in that
 unit system.</li>
 <li><tt class="docutils literal"><span class="pre">value_in_unit_system(UnitSystem)</span></tt>: This method returns a scalar of the
 value in that particular unit system.</li>
@@ -241,7 +241,7 @@ units, but it comes with some drawbacks (see below), so you should avoid unit
 system conversions when you can.</p>
 </div>
 <div class="section" id="a-warning-about-unitsystem">
-<h3>A warning about <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#a-warning-about-unitsystem" title="Permalink to this headline">¶</a></h3>
+<h3>A warning about <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a><a class="headerlink" href="#a-warning-about-unitsystem" title="Permalink to this headline">¶</a></h3>
 <p>Note that this method does not provide the added security of checking that the
 <em>dimensions</em> are correct &#8211; it simply converts all base dimensions to the ones
 defining the unit system. For instance, consider the two functions below:</p>
@@ -291,9 +291,9 @@ mistake easier to find.</p>
 </div>
 </div>
 <div class="section" id="available-unitsystem-options">
-<h2>Available <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> options<a class="headerlink" href="#available-unitsystem-options" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> module contains a number of <a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> instances
-available in the <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> namespace. They are summarized in the table
+<h2>Available <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> options<a class="headerlink" href="#available-unitsystem-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">unit</span></tt> module contains a number of <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a> instances
+available in the <tt class="docutils literal"><span class="pre">parmed.unit</span></tt> namespace. They are summarized in the table
 below, along with the units defining them (the energy unit is a composite of the
 mass unit times the square of the ratio of the length-to-time units):</p>
 <table border="1" class="docutils">
@@ -308,7 +308,7 @@ mass unit times the square of the ratio of the length-to-time units):</p>
 <col width="10%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head"><a class="reference internal" href="unitobj/chemistry.unit.UnitSystem.html#chemistry.unit.UnitSystem" title="chemistry.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a></th>
+<tr class="row-odd"><th class="head"><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></tt></a></th>
 <th class="head">Length unit</th>
 <th class="head">Mass unit</th>
 <th class="head">Time unit</th>
@@ -427,8 +427,8 @@ the table below summarizes a subset of programs and the unit systems they use:</
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt>)</a><ul>
-<li><a class="reference internal" href="#what-does-chemistry-unit-do">What does <tt class="docutils literal"><span class="pre">chemistry.unit</span></tt> do?</a></li>
+<li><a class="reference internal" href="#">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">parmed.unit</span></tt>)</a><ul>
+<li><a class="reference internal" href="#what-does-parmed-unit-do">What does <tt class="docutils literal"><span class="pre">parmed.unit</span></tt> do?</a></li>
 <li><a class="reference internal" href="#how-do-i-use-units">How do I use <tt class="docutils literal"><span class="pre">units</span></tt>?</a><ul>
 <li><a class="reference internal" href="#checking-to-see-if-an-object-is-a-quantity">Checking to see if an object is a <tt class="docutils literal"><span class="pre">Quantity</span></tt></a></li>
 <li><a class="reference internal" href="#creating-units">Creating units</a></li>
@@ -474,10 +474,10 @@ the table below summarizes a subset of programs and the unit systems they use:</
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="unitobj/chemistry.unit.Quantity.html" title="chemistry.unit.Quantity"
+          <a href="unitobj/parmed.unit.Quantity.html" title="parmed.unit.Quantity"
              >next</a> |</li>
         <li class="right" >
-          <a href="structobj/chemistry.formats.registry.load_file.html" title="chemistry.formats.registry.load_file"
+          <a href="structobj/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
              >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>

@@ -1,0 +1,49 @@
+parmed.amber.NetCDFTraj
+=======================
+
+.. currentmodule:: parmed.amber
+
+.. autoclass:: NetCDFTraj
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NetCDFTraj.__init__
+      ~NetCDFTraj.add_box
+      ~NetCDFTraj.add_cell_lengths_angles
+      ~NetCDFTraj.add_coordinates
+      ~NetCDFTraj.add_forces
+      ~NetCDFTraj.add_remd_indices
+      ~NetCDFTraj.add_temp0
+      ~NetCDFTraj.add_time
+      ~NetCDFTraj.add_velocities
+      ~NetCDFTraj.box
+      ~NetCDFTraj.cell_lengths_angles
+      ~NetCDFTraj.close
+      ~NetCDFTraj.coordinates
+      ~NetCDFTraj.flush
+      ~NetCDFTraj.forces
+      ~NetCDFTraj.id_format
+      ~NetCDFTraj.open_new
+      ~NetCDFTraj.open_old
+      ~NetCDFTraj.remd_indices
+      ~NetCDFTraj.temp0
+      ~NetCDFTraj.time
+      ~NetCDFTraj.velocities
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~NetCDFTraj.remd_dimtype
+   
+   

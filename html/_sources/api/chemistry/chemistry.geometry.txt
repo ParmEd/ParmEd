@@ -1,7 +1,0 @@
-chemistry.geometry module
-=========================
-
-.. automodule:: chemistry.geometry
-    :members:
-    :undoc-members:
-    :show-inheritance:

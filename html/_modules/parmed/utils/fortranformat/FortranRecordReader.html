@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.fortranformat.FortranRecordReader &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="parmed.utils" href="../../utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.utils.fortranformat.FortranRecordReader</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">._input</span> <span class="kn">import</span> <span class="nb">input</span> <span class="k">as</span> <span class="n">_input</span>
+<span class="kn">from</span> <span class="nn">._parser</span> <span class="kn">import</span> <span class="n">parser</span> <span class="k">as</span> <span class="n">_parser</span>
+<span class="kn">from</span> <span class="nn">._lexer</span> <span class="kn">import</span> <span class="n">lexer</span> <span class="k">as</span> <span class="n">_lexer</span>
+
+<div class="viewcode-block" id="FortranRecordReader"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader">[docs]</a><span class="k">class</span> <span class="nc">FortranRecordReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate a reader object for FORTRAN format strings</span>
+
+<span class="sd">    Typical use case ...</span>
+
+<span class="sd">    &gt;&gt;&gt; header_line = FortranRecordReader(&#39;(A15, A15, A15)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; header_line.read(&#39;              x              y              z&#39;)</span>
+<span class="sd">    [&#39;              x&#39;, &#39;              y&#39;, &#39;              z&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; line = FortranRecordReader(&#39;(3F15.3)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; line.read(&#39;          1.000          0.000          0.500&#39;)</span>
+<span class="sd">    [1.0, 0.0, 0.5]</span>
+<span class="sd">    &gt;&gt;&gt; line.read(&#39;          1.100          0.100          0.600&#39;)</span>
+<span class="sd">    [1.1, 0.1, 0.6]</span>
+
+<span class="sd">    Note: it is best to create a new object for each format, changing the format</span>
+<span class="sd">    causes the parser to reevalute the format string which is costly in terms of</span>
+<span class="sd">    performance</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rev_eds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_format</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">FortranRecordReader</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">format</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FortranRecordReader.match"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">RecordError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="FortranRecordReader.read"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Pass a string representing a FORTRAN record to obtain the relevent</span>
+<span class="sd">        values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rev_eds</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FortranRecordReader.get_format"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.get_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format</span></div>
+<div class="viewcode-block" id="FortranRecordReader.set_format"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.set_format">[docs]</a>    <span class="k">def</span> <span class="nf">set_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format</span> <span class="o">=</span> <span class="n">format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_format</span><span class="p">()</span></div>
+    <span class="n">format</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_format</span><span class="p">,</span> <span class="n">set_format</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rev_eds</span> <span class="o">=</span> <span class="n">_parser</span><span class="p">(</span><span class="n">_lexer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">))</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../utils.html" >parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

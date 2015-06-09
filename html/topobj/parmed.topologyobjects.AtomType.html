@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.topologyobjects.AtomType &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-topologyobjects-atomtype">
+<h1>parmed.topologyobjects.AtomType<a class="headerlink" href="#parmed-topologyobjects-atomtype" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.topologyobjects.AtomType">
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">AtomType</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em>, <em>bond_type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atom types can either be compared by indexes or names. Can be assigned with
+a string, integer, (string is not automatically cast) or with both.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The name of the atom type</p>
+</div></blockquote>
+<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The serial index of the atom type</p>
+</div></blockquote>
+<p><strong>mass</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>The mass of the atom type</p>
+</div></blockquote>
+<p><strong>atomic_number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt>, optional</p>
+<blockquote>
+<div><p>The atomic number of the element of the atom type. Default -1</p>
+</div></blockquote>
+<p><strong>bond_type</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
+<blockquote class="last">
+<div><p>If defined, this is the type name used to look up bonded parameters.
+Default is None (which falls back to <tt class="docutils literal"><span class="pre">name</span></tt>)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This object is primarily used to build parameter databases from parameter
+files. Also, sigma is related to Rmin, but rmin is Rmin/2, so there is an
+extra factor of 2 in the sigma for this reason.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="s">&#39;HA&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.008</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">number</span>
+<span class="go">(&#39;HA&#39;, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at2</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="s">&#39;CA&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">12.01</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at2</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at2</span><span class="o">.</span><span class="n">number</span>
+<span class="go">(&#39;CA&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">at</span><span class="p">)))</span>
+<span class="go">HA: 1</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.bond_type" title="parmed.topologyobjects.AtomType.bond_type"><tt class="xref py py-obj docutils literal"><span class="pre">bond_type</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.sigma" title="parmed.topologyobjects.AtomType.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.sigma_14" title="parmed.topologyobjects.AtomType.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.add_nbfix" title="parmed.topologyobjects.AtomType.add_nbfix"><tt class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></tt></a>(typename,&nbsp;rmin,&nbsp;epsilon[,&nbsp;rmin14,&nbsp;...])</td>
+<td>Adds a new NBFIX exclusion for this atom type</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.set_lj_params" title="parmed.topologyobjects.AtomType.set_lj_params"><tt class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></tt></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
+<td>Sets Lennard-Jones parameters on this atom type</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em>, <em>bond_type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.__init__" title="parmed.topologyobjects.AtomType.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(name,&nbsp;number,&nbsp;mass,&nbsp;atomic_number)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.add_nbfix" title="parmed.topologyobjects.AtomType.add_nbfix"><tt class="xref py py-obj docutils literal"><span class="pre">add_nbfix</span></tt></a>(typename,&nbsp;rmin,&nbsp;epsilon[,&nbsp;rmin14,&nbsp;...])</td>
+<td>Adds a new NBFIX exclusion for this atom type</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.set_lj_params" title="parmed.topologyobjects.AtomType.set_lj_params"><tt class="xref py py-obj docutils literal"><span class="pre">set_lj_params</span></tt></a>(eps,&nbsp;rmin[,&nbsp;eps14,&nbsp;rmin14])</td>
+<td>Sets Lennard-Jones parameters on this atom type</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.bond_type" title="parmed.topologyobjects.AtomType.bond_type"><tt class="xref py py-obj docutils literal"><span class="pre">bond_type</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.sigma" title="parmed.topologyobjects.AtomType.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomType.sigma_14" title="parmed.topologyobjects.AtomType.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Sigma is Rmin / 2^(1/6)</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomType.add_nbfix">
+<tt class="descname">add_nbfix</tt><big>(</big><em>typename</em>, <em>rmin</em>, <em>epsilon</em>, <em>rmin14=None</em>, <em>epsilon14=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType.add_nbfix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType.add_nbfix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new NBFIX exclusion for this atom type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>typename</strong> : str</p>
+<blockquote>
+<div><p>The name of the <em>other</em> type with which this NBFIX is defined</p>
+</div></blockquote>
+<p><strong>rmin</strong> : float</p>
+<blockquote>
+<div><p>The combined Rmin value for this NBFIXed pair. If no units, assumed
+to be in Angstroms</p>
+</div></blockquote>
+<p><strong>epsilon</strong> : float</p>
+<blockquote>
+<div><p>The combined epsilon value for this NBFIXed pair. If no units,
+assumed to be in kcal/mol</p>
+</div></blockquote>
+<p><strong>rmin14</strong> : float, optional</p>
+<blockquote>
+<div><p>Same as rmin, but for 1-4 interactions. If None (default), it is
+given the same value as rmin</p>
+</div></blockquote>
+<p><strong>epsilon14</strong> : float, optional</p>
+<blockquote class="last">
+<div><p>Same as epsilon, but for 1-4 interactions. If None (default), it is
+given the same value as rmin</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomType.set_lj_params">
+<tt class="descname">set_lj_params</tt><big>(</big><em>eps</em>, <em>rmin</em>, <em>eps14=None</em>, <em>rmin14=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType.set_lj_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType.set_lj_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets Lennard-Jones parameters on this atom type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.AtomType.sigma">
+<tt class="descname">sigma</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType.sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sigma is Rmin / 2^(1/6)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.AtomType.sigma_14">
+<tt class="descname">sigma_14</tt><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomType.sigma_14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType.sigma_14" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sigma is Rmin / 2^(1/6)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/parmed.topologyobjects.AtomType.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

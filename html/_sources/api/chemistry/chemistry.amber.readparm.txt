@@ -1,7 +1,0 @@
-chemistry.amber.readparm module
-===============================
-
-.. automodule:: chemistry.amber.readparm
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,0 +1,895 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.formats.pdbx.PdbxContainers module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.formats.pdbx.PdbxContainers">
+<span id="parmed-formats-pdbx-pdbxcontainers-module"></span><h1>parmed.formats.pdbx.PdbxContainers module<a class="headerlink" href="#module-parmed.formats.pdbx.PdbxContainers" title="Permalink to this headline">¶</a></h1>
+<p>A collection of container classes supporting the PDBx/mmCIF storage model.</p>
+<p>A base container class is defined which supports common features of
+data and definition containers.   PDBx data files are organized in
+sections called data blocks which are mapped to data containers.
+PDBx dictionaries contain definition sections and data sections
+which are mapped to definition and data containes respectively.</p>
+<p>Data in both PDBx data files and dictionaries are organized in
+data categories. In the PDBx syntax individual items or data
+identified by labels of the form &#8216;_categoryName.attributeName&#8217;.
+The terms category and attribute in PDBx jargon are analogous
+table and column in relational data model, or class and attribute
+in an object oriented data model.</p>
+<p>The DataCategory class provides base storage container for instance
+data and definition meta data.</p>
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.CifName">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">CifName</tt><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#CifName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.CifName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class of utilities for CIF-style data names -</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.CifName.attributePart" title="parmed.formats.pdbx.PdbxContainers.CifName.attributePart"><tt class="xref py py-obj docutils literal"><span class="pre">attributePart</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.CifName.categoryPart" title="parmed.formats.pdbx.PdbxContainers.CifName.categoryPart"><tt class="xref py py-obj docutils literal"><span class="pre">categoryPart</span></tt></a>(name)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="parmed.formats.pdbx.PdbxContainers.CifName.attributePart">
+<em class="property">static </em><tt class="descname">attributePart</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#CifName.attributePart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.CifName.attributePart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.formats.pdbx.PdbxContainers.CifName.categoryPart">
+<em class="property">static </em><tt class="descname">categoryPart</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#CifName.categoryPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.CifName.categoryPart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">ContainerBase</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Container base class for data and definition objects.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.append" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(obj)</td>
+<td>Add the input object to the current object catalog.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.exists" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.exists"><tt class="xref py py-obj docutils literal"><span class="pre">exists</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getName" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.getName"><tt class="xref py py-obj docutils literal"><span class="pre">getName</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getObj" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.getObj"><tt class="xref py py-obj docutils literal"><span class="pre">getObj</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getObjNameList" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.getObjNameList"><tt class="xref py py-obj docutils literal"><span class="pre">getObjNameList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getType" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.getType"><tt class="xref py py-obj docutils literal"><span class="pre">getType</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.printIt" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.printIt"><tt class="xref py py-obj docutils literal"><span class="pre">printIt</span></tt></a>([fh,&nbsp;type])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.remove" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(curName)</td>
+<td>Revmove object by name.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.rename" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.rename"><tt class="xref py py-obj docutils literal"><span class="pre">rename</span></tt></a>(curName,&nbsp;newName)</td>
+<td>Change the name of an object in place -</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.replace" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.replace"><tt class="xref py py-obj docutils literal"><span class="pre">replace</span></tt></a>(obj)</td>
+<td>Replace an existing object with the input object</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.setName" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.setName"><tt class="xref py py-obj docutils literal"><span class="pre">setName</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.setType" title="parmed.formats.pdbx.PdbxContainers.ContainerBase.setType"><tt class="xref py py-obj docutils literal"><span class="pre">setType</span></tt></a>(type)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.append">
+<tt class="descname">append</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the input object to the current object catalog. An existing object
+of the same name will be overwritten.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.exists">
+<tt class="descname">exists</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.getName">
+<tt class="descname">getName</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.getObj">
+<tt class="descname">getObj</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.getObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.getObjNameList">
+<tt class="descname">getObjNameList</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.getObjNameList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getObjNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.getType">
+<tt class="descname">getType</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.getType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.getType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.printIt">
+<tt class="descname">printIt</tt><big>(</big><em>fh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em>, <em>type='brief'</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.printIt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.printIt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.remove">
+<tt class="descname">remove</tt><big>(</big><em>curName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revmove object by name.  Return True on success or False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.rename">
+<tt class="descname">rename</tt><big>(</big><em>curName</em>, <em>newName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.rename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the name of an object in place -</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.replace">
+<tt class="descname">replace</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.replace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace an existing object with the input object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.setName">
+<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.setName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.setName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.ContainerBase.setType">
+<tt class="descname">setType</tt><big>(</big><em>type</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#ContainerBase.setType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase.setType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">DataCategory</tt><big>(</big><em>name</em>, <em>attributeNameList=None</em>, <em>rowList=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase" title="parmed.formats.pdbx.PdbxContainers.DataCategoryBase"><tt class="xref py py-class docutils literal"><span class="pre">parmed.formats.pdbx.PdbxContainers.DataCategoryBase</span></tt></a></p>
+<p>Methods for creating, accessing, and formatting PDBx cif data categories.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.append" title="parmed.formats.pdbx.PdbxContainers.DataCategory.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(row)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttribute" title="parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttribute"><tt class="xref py py-obj docutils literal"><span class="pre">appendAttribute</span></tt></a>(attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttributeExtendRows" title="parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttributeExtendRows"><tt class="xref py py-obj docutils literal"><span class="pre">appendAttributeExtendRows</span></tt></a>(attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.dumpIt" title="parmed.formats.pdbx.PdbxContainers.DataCategory.dumpIt"><tt class="xref py py-obj docutils literal"><span class="pre">dumpIt</span></tt></a>([fh])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.get" title="parmed.formats.pdbx.PdbxContainers.DataCategory.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeCount" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeCount"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeCount</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeIndex" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeIndex"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeIndex</span></tt></a>(attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeLengthMaximumList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeList"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeListWithOrder" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeListWithOrder"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeListWithOrder</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeValueMaxLengthList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeValueMaxLengthList"><tt class="xref py py-obj docutils literal"><span class="pre">getAttributeValueMaxLengthList</span></tt></a>([steps])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute"><tt class="xref py py-obj docutils literal"><span class="pre">getCurrentAttribute</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeList"><tt class="xref py py-obj docutils literal"><span class="pre">getFormatTypeList</span></tt></a>([steps])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeListX" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeListX"><tt class="xref py py-obj docutils literal"><span class="pre">getFormatTypeListX</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFullRow" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getFullRow"><tt class="xref py py-obj docutils literal"><span class="pre">getFullRow</span></tt></a>(index)</td>
+<td>Return a full row based on the length of the the attribute list.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getIndex" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getIndex"><tt class="xref py py-obj docutils literal"><span class="pre">getIndex</span></tt></a>(attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getItemNameList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getItemNameList"><tt class="xref py py-obj docutils literal"><span class="pre">getItemNameList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getName" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getName"><tt class="xref py py-obj docutils literal"><span class="pre">getName</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRow" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getRow"><tt class="xref py py-obj docutils literal"><span class="pre">getRow</span></tt></a>(index)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowCount" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowCount"><tt class="xref py py-obj docutils literal"><span class="pre">getRowCount</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowIndex" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowIndex"><tt class="xref py py-obj docutils literal"><span class="pre">getRowIndex</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowList"><tt class="xref py py-obj docutils literal"><span class="pre">getRowList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValue" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getValue"><tt class="xref py py-obj docutils literal"><span class="pre">getValue</span></tt></a>([attributeName,&nbsp;rowIndex])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted"><tt class="xref py py-obj docutils literal"><span class="pre">getValueFormatted</span></tt></a>([attributeName,&nbsp;rowIndex])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormattedByIndex" title="parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormattedByIndex"><tt class="xref py py-obj docutils literal"><span class="pre">getValueFormattedByIndex</span></tt></a>(attributeIndex,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.hasAttribute" title="parmed.formats.pdbx.PdbxContainers.DataCategory.hasAttribute"><tt class="xref py py-obj docutils literal"><span class="pre">hasAttribute</span></tt></a>(attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeAttributeMethod" title="parmed.formats.pdbx.PdbxContainers.DataCategory.invokeAttributeMethod"><tt class="xref py py-obj docutils literal"><span class="pre">invokeAttributeMethod</span></tt></a>(attributeName,&nbsp;type,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod" title="parmed.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod"><tt class="xref py py-obj docutils literal"><span class="pre">invokeCategoryMethod</span></tt></a>(type,&nbsp;method,&nbsp;db)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.printIt" title="parmed.formats.pdbx.PdbxContainers.DataCategory.printIt"><tt class="xref py py-obj docutils literal"><span class="pre">printIt</span></tt></a>([fh])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.removeRow" title="parmed.formats.pdbx.PdbxContainers.DataCategory.removeRow"><tt class="xref py py-obj docutils literal"><span class="pre">removeRow</span></tt></a>(index)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.renameAttribute" title="parmed.formats.pdbx.PdbxContainers.DataCategory.renameAttribute"><tt class="xref py py-obj docutils literal"><span class="pre">renameAttribute</span></tt></a>(curAttributeName,&nbsp;...)</td>
+<td>Change the name of an attribute in place -</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceSubstring" title="parmed.formats.pdbx.PdbxContainers.DataCategory.replaceSubstring"><tt class="xref py py-obj docutils literal"><span class="pre">replaceSubstring</span></tt></a>(oldValue,&nbsp;newValue,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceValue" title="parmed.formats.pdbx.PdbxContainers.DataCategory.replaceValue"><tt class="xref py py-obj docutils literal"><span class="pre">replaceValue</span></tt></a>(oldValue,&nbsp;newValue,&nbsp;attributeName)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setAttributeNameList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.setAttributeNameList"><tt class="xref py py-obj docutils literal"><span class="pre">setAttributeNameList</span></tt></a>(attributeNameList)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setName" title="parmed.formats.pdbx.PdbxContainers.DataCategory.setName"><tt class="xref py py-obj docutils literal"><span class="pre">setName</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setRowList" title="parmed.formats.pdbx.PdbxContainers.DataCategory.setRowList"><tt class="xref py py-obj docutils literal"><span class="pre">setRowList</span></tt></a>(rowList)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setValue" title="parmed.formats.pdbx.PdbxContainers.DataCategory.setValue"><tt class="xref py py-obj docutils literal"><span class="pre">setValue</span></tt></a>(value[,&nbsp;attributeName,&nbsp;rowIndex])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.append">
+<tt class="descname">append</tt><big>(</big><em>row</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttribute">
+<tt class="descname">appendAttribute</tt><big>(</big><em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.appendAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttributeExtendRows">
+<tt class="descname">appendAttributeExtendRows</tt><big>(</big><em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.appendAttributeExtendRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.appendAttributeExtendRows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.dumpIt">
+<tt class="descname">dumpIt</tt><big>(</big><em>fh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.dumpIt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.dumpIt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeCount">
+<tt class="descname">getAttributeCount</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeIndex">
+<tt class="descname">getAttributeIndex</tt><big>(</big><em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList">
+<tt class="descname">getAttributeLengthMaximumList</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeLengthMaximumList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeList">
+<tt class="descname">getAttributeList</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeListWithOrder">
+<tt class="descname">getAttributeListWithOrder</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeListWithOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeListWithOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeValueMaxLengthList">
+<tt class="descname">getAttributeValueMaxLengthList</tt><big>(</big><em>steps=1</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getAttributeValueMaxLengthList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeValueMaxLengthList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute">
+<tt class="descname">getCurrentAttribute</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getCurrentAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeList">
+<tt class="descname">getFormatTypeList</tt><big>(</big><em>steps=1</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getFormatTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeListX">
+<tt class="descname">getFormatTypeListX</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getFormatTypeListX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFormatTypeListX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getFullRow">
+<tt class="descname">getFullRow</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getFullRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getFullRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a full row based on the length of the the attribute list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getIndex">
+<tt class="descname">getIndex</tt><big>(</big><em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getItemNameList">
+<tt class="descname">getItemNameList</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getItemNameList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getItemNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getName">
+<tt class="descname">getName</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getRow">
+<tt class="descname">getRow</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowCount">
+<tt class="descname">getRowCount</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getRowCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowIndex">
+<tt class="descname">getRowIndex</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getRowIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getRowList">
+<tt class="descname">getRowList</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getRowList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getRowList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getValue">
+<tt class="descname">getValue</tt><big>(</big><em>attributeName=None</em>, <em>rowIndex=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted">
+<tt class="descname">getValueFormatted</tt><big>(</big><em>attributeName=None</em>, <em>rowIndex=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getValueFormatted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormattedByIndex">
+<tt class="descname">getValueFormattedByIndex</tt><big>(</big><em>attributeIndex</em>, <em>rowIndex</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.getValueFormattedByIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormattedByIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.hasAttribute">
+<tt class="descname">hasAttribute</tt><big>(</big><em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.hasAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.hasAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.invokeAttributeMethod">
+<tt class="descname">invokeAttributeMethod</tt><big>(</big><em>attributeName</em>, <em>type</em>, <em>method</em>, <em>db</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.invokeAttributeMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeAttributeMethod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod">
+<tt class="descname">invokeCategoryMethod</tt><big>(</big><em>type</em>, <em>method</em>, <em>db</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.invokeCategoryMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.printIt">
+<tt class="descname">printIt</tt><big>(</big><em>fh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.printIt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.printIt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.removeRow">
+<tt class="descname">removeRow</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.removeRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.removeRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.renameAttribute">
+<tt class="descname">renameAttribute</tt><big>(</big><em>curAttributeName</em>, <em>newAttributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.renameAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.renameAttribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the name of an attribute in place -</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.replaceSubstring">
+<tt class="descname">replaceSubstring</tt><big>(</big><em>oldValue</em>, <em>newValue</em>, <em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.replaceSubstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceSubstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.replaceValue">
+<tt class="descname">replaceValue</tt><big>(</big><em>oldValue</em>, <em>newValue</em>, <em>attributeName</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.replaceValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.setAttributeNameList">
+<tt class="descname">setAttributeNameList</tt><big>(</big><em>attributeNameList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setAttributeNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.setName">
+<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.setRowList">
+<tt class="descname">setRowList</tt><big>(</big><em>rowList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setRowList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategory.setValue">
+<tt class="descname">setValue</tt><big>(</big><em>value</em>, <em>attributeName=None</em>, <em>rowIndex=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategory.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategory.setValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategoryBase">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">DataCategoryBase</tt><big>(</big><em>name</em>, <em>attributeNameList=None</em>, <em>rowList=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategoryBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base object definition for a data category -</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.get" title="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.get"><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setAttributeNameList" title="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setAttributeNameList"><tt class="xref py py-obj docutils literal"><span class="pre">setAttributeNameList</span></tt></a>(attributeNameList)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setName" title="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setName"><tt class="xref py py-obj docutils literal"><span class="pre">setName</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setRowList" title="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setRowList"><tt class="xref py py-obj docutils literal"><span class="pre">setRowList</span></tt></a>(rowList)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategoryBase.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setAttributeNameList">
+<tt class="descname">setAttributeNameList</tt><big>(</big><em>attributeNameList</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategoryBase.setAttributeNameList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setAttributeNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setName">
+<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategoryBase.setName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setRowList">
+<tt class="descname">setRowList</tt><big>(</big><em>rowList</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataCategoryBase.setRowList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataCategoryBase.setRowList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">DataContainer</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase" title="parmed.formats.pdbx.PdbxContainers.ContainerBase"><tt class="xref py py-class docutils literal"><span class="pre">parmed.formats.pdbx.PdbxContainers.ContainerBase</span></tt></a></p>
+<p>Container class for DataCategory objects.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.append" title="parmed.formats.pdbx.PdbxContainers.DataContainer.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(obj)</td>
+<td>Add the input object to the current object catalog.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.exists" title="parmed.formats.pdbx.PdbxContainers.DataContainer.exists"><tt class="xref py py-obj docutils literal"><span class="pre">exists</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getGlobal" title="parmed.formats.pdbx.PdbxContainers.DataContainer.getGlobal"><tt class="xref py py-obj docutils literal"><span class="pre">getGlobal</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getName" title="parmed.formats.pdbx.PdbxContainers.DataContainer.getName"><tt class="xref py py-obj docutils literal"><span class="pre">getName</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getObj" title="parmed.formats.pdbx.PdbxContainers.DataContainer.getObj"><tt class="xref py py-obj docutils literal"><span class="pre">getObj</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getObjNameList" title="parmed.formats.pdbx.PdbxContainers.DataContainer.getObjNameList"><tt class="xref py py-obj docutils literal"><span class="pre">getObjNameList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getType" title="parmed.formats.pdbx.PdbxContainers.DataContainer.getType"><tt class="xref py py-obj docutils literal"><span class="pre">getType</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod" title="parmed.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod"><tt class="xref py py-obj docutils literal"><span class="pre">invokeDataBlockMethod</span></tt></a>(type,&nbsp;method,&nbsp;db)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.printIt" title="parmed.formats.pdbx.PdbxContainers.DataContainer.printIt"><tt class="xref py py-obj docutils literal"><span class="pre">printIt</span></tt></a>([fh,&nbsp;type])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.remove" title="parmed.formats.pdbx.PdbxContainers.DataContainer.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(curName)</td>
+<td>Revmove object by name.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.rename" title="parmed.formats.pdbx.PdbxContainers.DataContainer.rename"><tt class="xref py py-obj docutils literal"><span class="pre">rename</span></tt></a>(curName,&nbsp;newName)</td>
+<td>Change the name of an object in place -</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.replace" title="parmed.formats.pdbx.PdbxContainers.DataContainer.replace"><tt class="xref py py-obj docutils literal"><span class="pre">replace</span></tt></a>(obj)</td>
+<td>Replace an existing object with the input object</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setGlobal" title="parmed.formats.pdbx.PdbxContainers.DataContainer.setGlobal"><tt class="xref py py-obj docutils literal"><span class="pre">setGlobal</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setName" title="parmed.formats.pdbx.PdbxContainers.DataContainer.setName"><tt class="xref py py-obj docutils literal"><span class="pre">setName</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setType" title="parmed.formats.pdbx.PdbxContainers.DataContainer.setType"><tt class="xref py py-obj docutils literal"><span class="pre">setType</span></tt></a>(type)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.append">
+<tt class="descname">append</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the input object to the current object catalog. An existing object
+of the same name will be overwritten.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.exists">
+<tt class="descname">exists</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.getGlobal">
+<tt class="descname">getGlobal</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataContainer.getGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getGlobal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.getName">
+<tt class="descname">getName</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.getObj">
+<tt class="descname">getObj</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.getObjNameList">
+<tt class="descname">getObjNameList</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getObjNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.getType">
+<tt class="descname">getType</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.getType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod">
+<tt class="descname">invokeDataBlockMethod</tt><big>(</big><em>type</em>, <em>method</em>, <em>db</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataContainer.invokeDataBlockMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.printIt">
+<tt class="descname">printIt</tt><big>(</big><em>fh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em>, <em>type='brief'</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.printIt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.remove">
+<tt class="descname">remove</tt><big>(</big><em>curName</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revmove object by name.  Return True on success or False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.rename">
+<tt class="descname">rename</tt><big>(</big><em>curName</em>, <em>newName</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the name of an object in place -</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.replace">
+<tt class="descname">replace</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace an existing object with the input object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.setGlobal">
+<tt class="descname">setGlobal</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DataContainer.setGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setGlobal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.setName">
+<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DataContainer.setType">
+<tt class="descname">setType</tt><big>(</big><em>type</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DataContainer.setType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.PdbxContainers.</tt><tt class="descname">DefinitionContainer</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DefinitionContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.ContainerBase" title="parmed.formats.pdbx.PdbxContainers.ContainerBase"><tt class="xref py py-class docutils literal"><span class="pre">parmed.formats.pdbx.PdbxContainers.ContainerBase</span></tt></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.append" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(obj)</td>
+<td>Add the input object to the current object catalog.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.exists" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.exists"><tt class="xref py py-obj docutils literal"><span class="pre">exists</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getName" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getName"><tt class="xref py py-obj docutils literal"><span class="pre">getName</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObj" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObj"><tt class="xref py py-obj docutils literal"><span class="pre">getObj</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObjNameList" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObjNameList"><tt class="xref py py-obj docutils literal"><span class="pre">getObjNameList</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getType" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getType"><tt class="xref py py-obj docutils literal"><span class="pre">getType</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isAttribute" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isAttribute"><tt class="xref py py-obj docutils literal"><span class="pre">isAttribute</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isCategory" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isCategory"><tt class="xref py py-obj docutils literal"><span class="pre">isCategory</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.printIt" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.printIt"><tt class="xref py py-obj docutils literal"><span class="pre">printIt</span></tt></a>([fh,&nbsp;type])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.remove" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(curName)</td>
+<td>Revmove object by name.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.rename" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.rename"><tt class="xref py py-obj docutils literal"><span class="pre">rename</span></tt></a>(curName,&nbsp;newName)</td>
+<td>Change the name of an object in place -</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.replace" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.replace"><tt class="xref py py-obj docutils literal"><span class="pre">replace</span></tt></a>(obj)</td>
+<td>Replace an existing object with the input object</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setName" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setName"><tt class="xref py py-obj docutils literal"><span class="pre">setName</span></tt></a>(name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setType" title="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setType"><tt class="xref py py-obj docutils literal"><span class="pre">setType</span></tt></a>(type)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.append">
+<tt class="descname">append</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the input object to the current object catalog. An existing object
+of the same name will be overwritten.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.exists">
+<tt class="descname">exists</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getName">
+<tt class="descname">getName</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObj">
+<tt class="descname">getObj</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObjNameList">
+<tt class="descname">getObjNameList</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getObjNameList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getType">
+<tt class="descname">getType</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.getType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isAttribute">
+<tt class="descname">isAttribute</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DefinitionContainer.isAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isCategory">
+<tt class="descname">isCategory</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DefinitionContainer.isCategory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.printIt">
+<tt class="descname">printIt</tt><big>(</big><em>fh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em>, <em>type='brief'</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxContainers.html#DefinitionContainer.printIt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.printIt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.remove">
+<tt class="descname">remove</tt><big>(</big><em>curName</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revmove object by name.  Return True on success or False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.rename">
+<tt class="descname">rename</tt><big>(</big><em>curName</em>, <em>newName</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the name of an object in place -</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.replace">
+<tt class="descname">replace</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace an existing object with the input object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setName">
+<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setType">
+<tt class="descname">setType</tt><big>(</big><em>type</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.setType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.formats.pdbx.PdbxContainers.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

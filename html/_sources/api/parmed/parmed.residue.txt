@@ -1,0 +1,7 @@
+parmed.residue module
+=====================
+
+.. automodule:: parmed.residue
+    :members:
+    :undoc-members:
+    :show-inheritance:

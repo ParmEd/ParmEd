@@ -33,7 +33,7 @@ Its features include:
 How does ParmEd enhance PyRosetta?
 -------------------------------
 
-.. currentmodule:: chemistry
+.. currentmodule:: parmed
 .. autosummary::
     :toctree: rosettaobj/
 

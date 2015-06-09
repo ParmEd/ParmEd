@@ -1,0 +1,6 @@
+parmed.formats.registry.load_file
+=================================
+
+.. currentmodule:: parmed.formats.registry
+
+.. autofunction:: load_file

@@ -1,0 +1,7 @@
+parmed.openmm.reporters module
+==============================
+
+.. automodule:: parmed.openmm.reporters
+    :members:
+    :undoc-members:
+    :show-inheritance:

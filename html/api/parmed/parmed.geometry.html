@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.geometry module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.geometry">
+<span id="parmed-geometry-module"></span><h1>parmed.geometry module<a class="headerlink" href="#module-parmed.geometry" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the functionality for carrying out geometrical calculations
+for molecules and molecular systems</p>
+<p>Author: Jason Swails
+Contributors:</p>
+<p>Copyright (C) 2014 - 2015  Jason Swails</p>
+<p>This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option) any
+later version.</p>
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.</p>
+<p>You should have received a copy of the GNU Lesser General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330
+Boston, MA 02111-1307, USA.</p>
+<dl class="function">
+<dt id="parmed.geometry.box_lengths_and_angles_to_vectors">
+<tt class="descclassname">parmed.geometry.</tt><tt class="descname">box_lengths_and_angles_to_vectors</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em>, <em>alpha</em>, <em>beta</em>, <em>gamma</em><big>)</big><a class="reference internal" href="../../_modules/parmed/geometry.html#box_lengths_and_angles_to_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_lengths_and_angles_to_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes the lengths of the unit cell vectors and the angles
+between them and returns 3 unit cell vectors satisfying those dimensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : double (or length Quantity)</p>
+<blockquote>
+<div><p>Length of the first unit cell vector</p>
+</div></blockquote>
+<p><strong>b</strong> : double (or length Quantity)</p>
+<blockquote>
+<div><p>Length of the second unit cell vector</p>
+</div></blockquote>
+<p><strong>c</strong> : double (or length Quantity)</p>
+<blockquote>
+<div><p>Length of the third unit cell vector</p>
+</div></blockquote>
+<p><strong>alpha</strong> : double (or angle Quantity)</p>
+<blockquote>
+<div><p>Angle between vectors b and c</p>
+</div></blockquote>
+<p><strong>beta</strong> : double (or angle Quantity)</p>
+<blockquote>
+<div><p>Angle between vectors a and c</p>
+</div></blockquote>
+<p><strong>gamma</strong> : double (or angle Quantity)</p>
+<blockquote>
+<div><p>Angle between vectors a and b</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list Quantity, list Quantity, list Quantity</p>
+<blockquote class="last">
+<div><p>The 3, 3-element vectors as quantities with dimension length</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The unit cell lengths are assumed to be Angstroms if no explicit unit is
+given. The angles are assumed to be degrees</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.geometry.box_vectors_to_lengths_and_angles">
+<tt class="descclassname">parmed.geometry.</tt><tt class="descname">box_vectors_to_lengths_and_angles</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em><big>)</big><a class="reference internal" href="../../_modules/parmed/geometry.html#box_vectors_to_lengths_and_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_vectors_to_lengths_and_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes the lengths of the unit cell vectors and the angles
+between them and returns 3 unit cell vectors satisfying those dimensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : collection of 3 floats (or length Quantity)</p>
+<blockquote>
+<div><p>The first unit cell vector</p>
+</div></blockquote>
+<p><strong>b</strong> : collection of 3 floats (or length Quantity)</p>
+<blockquote>
+<div><p>The second unit cell vector</p>
+</div></blockquote>
+<p><strong>c</strong> : collection of 3 floats (or length Quantity)</p>
+<blockquote>
+<div><p>The third unit cell vector</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(a, b, c), (alpha, beta, gamma)</p>
+<blockquote class="last">
+<div><p>Two tuples, the first is the 3 unit cell vector lengths as
+length-dimension Quantity objects and the second is the set of angles
+between the unit cell vectors as angle-dimension Quantity objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The unit cell lengths are assumed to be Angstroms if no explicit unit is
+given.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.geometry.center_of_mass">
+<tt class="descclassname">parmed.geometry.</tt><tt class="descname">center_of_mass</tt><big>(</big><em>coordinates</em>, <em>masses</em><big>)</big><a class="reference internal" href="../../_modules/parmed/geometry.html#center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the center of mass of a group of coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Coordinate array</p>
+</div></blockquote>
+<p><strong>masses</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Array of masses</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">COM</p>
+<blockquote class="last">
+<div><p>np.ndarray of shape (3,) identifying the cartesian center of mass</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method <em>requires</em> that the parameters be passed in as numpy arrays.
+AttributeError&#8217;s will ensue if this is not the case. Also, coordinates must
+be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.geometry.reduce_box_vectors">
+<tt class="descclassname">parmed.geometry.</tt><tt class="descname">reduce_box_vectors</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em><big>)</big><a class="reference internal" href="../../_modules/parmed/geometry.html#reduce_box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.reduce_box_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function puts three unit cell vectors in a reduced form where a is
+&#8220;mostly&#8221; in x, b is &#8220;mostly&#8221; in y, and c is &#8220;mostly&#8221; in z. This form is
+necessary for some programs (notably OpenMM and Gromacs)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>First unit cell vector</p>
+</div></blockquote>
+<p><strong>b</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>Second unit cell vector</p>
+</div></blockquote>
+<p><strong>c</strong> : 3-element collection of float</p>
+<blockquote>
+<div><p>Third unit cell vector</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>red_a, red_b, red_c</strong> : Vec3, Vec3, Vec3</p>
+<blockquote class="last">
+<div><p>The reduced unit cell vectors in units of angstroms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The implementation here is taken from the OpenMM Python application layer
+written by Peter Eastman</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.geometry.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

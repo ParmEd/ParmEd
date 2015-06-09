@@ -1,0 +1,35 @@
+parmed.amber.AmberFormat
+========================
+
+.. currentmodule:: parmed.amber
+
+.. autoclass:: AmberFormat
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AmberFormat.__init__
+      ~AmberFormat.addFlag
+      ~AmberFormat.add_flag
+      ~AmberFormat.deleteFlag
+      ~AmberFormat.delete_flag
+      ~AmberFormat.id_format
+      ~AmberFormat.parse
+      ~AmberFormat.rdparm
+      ~AmberFormat.rdparm_old
+      ~AmberFormat.rdparm_slow
+      ~AmberFormat.set_version
+      ~AmberFormat.view
+      ~AmberFormat.writeParm
+      ~AmberFormat.write_parm
+   
+   
+
+   
+   
+   

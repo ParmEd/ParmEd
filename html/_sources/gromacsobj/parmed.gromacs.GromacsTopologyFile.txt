@@ -1,0 +1,80 @@
+parmed.gromacs.GromacsTopologyFile
+==================================
+
+.. currentmodule:: parmed.gromacs
+
+.. autoclass:: GromacsTopologyFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GromacsTopologyFile.__init__
+      ~GromacsTopologyFile.add_atom
+      ~GromacsTopologyFile.add_atom_to_residue
+      ~GromacsTopologyFile.copy
+      ~GromacsTopologyFile.createSystem
+      ~GromacsTopologyFile.from_structure
+      ~GromacsTopologyFile.has_NBFIX
+      ~GromacsTopologyFile.id_format
+      ~GromacsTopologyFile.is_changed
+      ~GromacsTopologyFile.omm_add_constraints
+      ~GromacsTopologyFile.omm_angle_force
+      ~GromacsTopologyFile.omm_bond_force
+      ~GromacsTopologyFile.omm_cmap_force
+      ~GromacsTopologyFile.omm_dihedral_force
+      ~GromacsTopologyFile.omm_gbsa_force
+      ~GromacsTopologyFile.omm_improper_force
+      ~GromacsTopologyFile.omm_nonbonded_force
+      ~GromacsTopologyFile.omm_out_of_plane_bend_force
+      ~GromacsTopologyFile.omm_pi_torsion_force
+      ~GromacsTopologyFile.omm_rb_torsion_force
+      ~GromacsTopologyFile.omm_set_virtual_sites
+      ~GromacsTopologyFile.omm_stretch_bend_force
+      ~GromacsTopologyFile.omm_torsion_torsion_force
+      ~GromacsTopologyFile.omm_trigonal_angle_force
+      ~GromacsTopologyFile.omm_urey_bradley_force
+      ~GromacsTopologyFile.parametrize
+      ~GromacsTopologyFile.prune_empty_terms
+      ~GromacsTopologyFile.read
+      ~GromacsTopologyFile.split
+      ~GromacsTopologyFile.strip
+      ~GromacsTopologyFile.to_dataframe
+      ~GromacsTopologyFile.unchange
+      ~GromacsTopologyFile.update_dihedral_exclusions
+      ~GromacsTopologyFile.write
+      ~GromacsTopologyFile.write_cif
+      ~GromacsTopologyFile.write_pdb
+      ~GromacsTopologyFile.write_psf
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GromacsTopologyFile.ANGLE_FORCE_GROUP
+      ~GromacsTopologyFile.BOND_FORCE_GROUP
+      ~GromacsTopologyFile.CMAP_FORCE_GROUP
+      ~GromacsTopologyFile.DIHEDRAL_FORCE_GROUP
+      ~GromacsTopologyFile.IMPROPER_FORCE_GROUP
+      ~GromacsTopologyFile.NONBONDED_FORCE_GROUP
+      ~GromacsTopologyFile.OUT_OF_PLANE_BEND_FORCE_GROUP
+      ~GromacsTopologyFile.PI_TORSION_FORCE_GROUP
+      ~GromacsTopologyFile.RB_TORSION_FORCE_GROUP
+      ~GromacsTopologyFile.STRETCH_BEND_FORCE_GROUP
+      ~GromacsTopologyFile.TORSION_TORSION_FORCE_GROUP
+      ~GromacsTopologyFile.TRIGONAL_ANGLE_FORCE_GROUP
+      ~GromacsTopologyFile.UREY_BRADLEY_FORCE_GROUP
+      ~GromacsTopologyFile.box_vectors
+      ~GromacsTopologyFile.positions
+      ~GromacsTopologyFile.topology
+      ~GromacsTopologyFile.velocities
+   
+   

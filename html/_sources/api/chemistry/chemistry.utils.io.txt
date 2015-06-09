@@ -1,7 +1,0 @@
-chemistry.utils.io module
-=========================
-
-.. automodule:: chemistry.utils.io
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.vec3 module
+==================
+
+.. automodule:: parmed.vec3
+    :members:
+    :undoc-members:
+    :show-inheritance:

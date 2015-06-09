@@ -1,0 +1,30 @@
+parmed.amber package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    parmed.amber.mdin
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.amber.amberformat
+   parmed.amber.asciicrd
+   parmed.amber.mask
+   parmed.amber.netcdffiles
+   parmed.amber.parameters
+   parmed.amber.readparm
+   parmed.amber.titratable_residues
+
+Module contents
+---------------
+
+.. automodule:: parmed.amber
+    :members:
+    :undoc-members:
+    :show-inheritance:

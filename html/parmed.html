@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="next" title="The ParmEd API" href="parmed_api.html" />
-    <link rel="prev" title="chemistry.load_rosetta" href="rosettaobj/chemistry.load_rosetta.html" /> 
+    <link rel="prev" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,7 +42,7 @@
           <a href="parmed_api.html" title="The ParmEd API"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="rosettaobj/chemistry.load_rosetta.html" title="chemistry.load_rosetta"
+          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -56,10 +56,10 @@
   <div class="section" id="using-parmed-py">
 <h1>Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt><a class="headerlink" href="#using-parmed-py" title="Permalink to this headline">¶</a></h1>
 <p>This page details using the command-line version of ParmEd, which is the
-primary front-end program using the <a class="reference internal" href="api/chemistry/chemistry.html#module-chemistry" title="chemistry"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry</span></tt></a> and <a class="reference internal" href="api/ParmedTools/ParmedTools.html#module-ParmedTools" title="ParmedTools"><tt class="xref py py-mod docutils literal"><span class="pre">ParmedTools</span></tt></a>
+primary front-end program using the <a class="reference internal" href="api/parmed/parmed.html#module-parmed" title="parmed"><tt class="xref py py-mod docutils literal"><span class="pre">parmed</span></tt></a> and <a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></tt></a>
 packages to provide a set of <em>Actions</em> by which you can modify a system topology
 and parameters (it currently only works for Amber topology files, although
-support for the entire <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+support for the entire <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
 hierarchy is planned).</p>
 <p>There are two ways in which ParmEd can be run&#8212;in batch reading from an input
 file or <em>script</em>, and with an interactive interpreter. A script can either be
@@ -879,7 +879,7 @@ script, or make use of <a class="reference internal" href="#a-very-dirty-trick">
 wince.</p>
 <p>Perhaps of the most importance, however, is that the topology file list is made
 available to you in the Python interpreter namespace as the name
-<tt class="docutils literal"><span class="pre">amber_prmtop</span></tt>, which is an instance of <a class="reference internal" href="api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList" title="ParmedTools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a>. So <tt class="docutils literal"><span class="pre">amber_prmtop.parm</span></tt> is the currently
+<tt class="docutils literal"><span class="pre">amber_prmtop</span></tt>, which is an instance of <a class="reference internal" href="api/parmed/parmed.tools.parmlist.html#parmed.tools.parmlist.ParmList" title="parmed.tools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a>. So <tt class="docutils literal"><span class="pre">amber_prmtop.parm</span></tt> is the currently
 active parameter-topology object.</p>
 <p>Let&#8217;s have a look at how we might be able to use that:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; !print amber_prmtop.parm.bonds[0].type
@@ -913,7 +913,7 @@ input (and will be destroyed after the interpreter is finished).</p>
 Python interpreter is <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt> (and <tt class="docutils literal"><span class="pre">type(self)</span></tt>, but only in Python
 3, since it is an old-style class in Python 2 by virtue of deriving from
 <tt class="docutils literal"><span class="pre">cmd.Cmd</span></tt>).</p>
-<p>So you can attach your function to the <a class="reference internal" href="api/ParmedTools/ParmedTools.parmlist.html#ParmedTools.parmlist.ParmList" title="ParmedTools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a> object <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt> and retrieve it from
+<p>So you can attach your function to the <a class="reference internal" href="api/parmed/parmed.tools.parmlist.html#parmed.tools.parmlist.ParmList" title="parmed.tools.parmlist.ParmList"><tt class="xref py py-class docutils literal"><span class="pre">ParmList</span></tt></a> object <tt class="docutils literal"><span class="pre">amber_prmtop</span></tt> and retrieve it from
 there later.  Be careful not to clobber a critical attribute of that class,
 though!  This trick is demonstrated continuing from the interpreter session from
 above:</p>
@@ -1084,7 +1084,7 @@ that action.</p>
           <a href="parmed_api.html" title="The ParmEd API"
              >next</a> |</li>
         <li class="right" >
-          <a href="rosettaobj/chemistry.load_rosetta.html" title="chemistry.load_rosetta"
+          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>

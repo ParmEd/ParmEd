@@ -1,7 +1,0 @@
-chemistry.tinker.tinkerfiles module
-===================================
-
-.. automodule:: chemistry.tinker.tinkerfiles
-    :members:
-    :undoc-members:
-    :show-inheritance:

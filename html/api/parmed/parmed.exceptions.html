@@ -1,0 +1,591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.exceptions module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.exceptions">
+<span id="parmed-exceptions-module"></span><h1>parmed.exceptions module<a class="headerlink" href="#module-parmed.exceptions" title="Permalink to this headline">¶</a></h1>
+<p>This module contains all of the exceptions that are used in the chemistry
+package</p>
+<dl class="exception">
+<dt id="parmed.exceptions.AmberError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">AmberError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#AmberError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.AmberError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParsingError" title="parmed.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParsingError</span></tt></a></p>
+<p>This is a generic AmberParmError</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.AmberError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.AmberError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.AmberError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.AmberError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.AmberWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">AmberWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#AmberWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.AmberWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>If there is something that is non-fatal</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.AmberWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.AmberWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.AmberWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.AmberWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.CharmmError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">CharmmError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#CharmmError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.CharmmError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParsingError" title="parmed.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParsingError</span></tt></a></p>
+<p>If there is a problem parsing CHARMM PSF files</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.CharmmError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.CharmmError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.CharmmPsfEOF">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">CharmmPsfEOF</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#CharmmPsfEOF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.CharmmPsfEOF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If we hit an end-of-file in parsing CHARMM files</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmPsfEOF.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.CharmmPsfEOF.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmPsfEOF.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.CharmmPsfEOF.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.CharmmWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">CharmmWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#CharmmWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.CharmmWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>For non-fatal PSF parsing issues</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.CharmmWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.CharmmWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.CharmmWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.FormatNotFound">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">FormatNotFound</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#FormatNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.FormatNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If the file format does not have a registered parser with it</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.FormatNotFound.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.FormatNotFound.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.FormatNotFound.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.FormatNotFound.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.GromacsError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">GromacsError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#GromacsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.GromacsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there is a problem parsing GROMACS topology files</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.GromacsError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.GromacsError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.GromacsError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.GromacsError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.GromacsWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">GromacsWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#GromacsWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.GromacsWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>If we are uncertain about something regarding the GROMACS topology file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.GromacsWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.GromacsWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.GromacsWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.GromacsWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.MaskError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">MaskError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#MaskError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.MaskError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>Error when a Mask is poorly formed</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.MaskError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.MaskError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.MaskError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.MaskError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.Mol2Error">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">Mol2Error</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#Mol2Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.Mol2Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParsingError" title="parmed.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParsingError</span></tt></a></p>
+<p>If there was a problem parsing a Mol2 file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.Mol2Error.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.Mol2Error.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.Mol2Error.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.Mol2Error.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.MoleculeError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">MoleculeError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#MoleculeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.MoleculeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there is a problem defining a molecule via the bond graph</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.MoleculeError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.MoleculeError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.MoleculeError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.MoleculeError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.OpenMMError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">OpenMMError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#OpenMMError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.OpenMMError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there&#8217;s a problem making an OpenMM system</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.OpenMMError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.OpenMMError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.OpenMMError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.OpenMMError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.OpenMMWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">OpenMMWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#OpenMMWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.OpenMMWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>If there is something we should warn when processing OpenMM objects</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.OpenMMWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.OpenMMWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.OpenMMWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.OpenMMWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PDBError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PDBError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#PDBError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PDBError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParsingError" title="parmed.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParsingError</span></tt></a></p>
+<p>If there was a problem parsing a PDB file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PDBError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PDBError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PDBError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PDBError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PDBWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PDBWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#PDBWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PDBWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>A non-fatal error to indicate a problematic PDB file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PDBWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PDBWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PDBWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PDBWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ParameterError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ParameterError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ParameterError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ParameterError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If a parameter is missing from a database</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ParameterError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ParameterError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ParameterError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ParameterError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ParameterWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ParameterWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ParameterWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ParameterWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>If a type of parameter is missing, but you don&#8217;t want it to be fatal</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ParameterWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ParameterWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ParameterWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ParameterWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ParmedError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ParmedError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ParmedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ParmedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Base class for all non-trivial exceptions raised by ParmEd</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ParmedError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ParmedError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ParmedError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ParmedError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ParmedWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ParmedWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ParmedWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ParmedWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Warning</span></tt></p>
+<p>Base class for all warnings raised by ParmEd</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ParmedWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ParmedWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ParmedWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ParmedWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ParsingError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ParsingError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ParsingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ParsingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there was a problem parsing any kind of file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ParsingError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ParsingError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ParsingError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ParsingError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PdbxError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PdbxError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#PdbxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PdbxError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>Class for catching general errors with PDBx/mmCIF parsing</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PdbxError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PdbxError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PdbxError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PdbxError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PdbxSyntaxError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PdbxSyntaxError</tt><big>(</big><em>lineNumber='-1'</em>, <em>text=''</em><big>)</big><a class="reference internal" href="../../_modules/parmed/exceptions.html#PdbxSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PdbxSyntaxError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.PdbxError" title="parmed.exceptions.PdbxError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.PdbxError</span></tt></a></p>
+<p>Class for catching errors in mmCIF/PDBx syntax</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PdbxSyntaxError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PdbxSyntaxError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PdbxSyntaxError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PdbxSyntaxError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PreProcessorError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PreProcessorError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#PreProcessorError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PreProcessorError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there is a problem running the C-like preprocessor</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PreProcessorError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PreProcessorError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PreProcessorError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PreProcessorError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.PreProcessorWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">PreProcessorWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#PreProcessorWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.PreProcessorWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>If there is something we should warn about in preprocessing</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.PreProcessorWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.PreProcessorWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.PreProcessorWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.PreProcessorWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.ResidueError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">ResidueError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#ResidueError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.ResidueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>For when there are problems defining a residue</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.ResidueError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.ResidueError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.ResidueError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.ResidueError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.RosettaError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">RosettaError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#RosettaError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.RosettaError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedError" title="parmed.exceptions.ParmedError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedError</span></tt></a></p>
+<p>If there is a problem loading a Rosetta pose object</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.RosettaError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.RosettaError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.RosettaError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.RosettaError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.SplitResidueWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">SplitResidueWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#SplitResidueWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.SplitResidueWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<p>For if a residue with the same number but different names is split</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.SplitResidueWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.SplitResidueWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.SplitResidueWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.SplitResidueWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.TinkerError">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">TinkerError</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#TinkerError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.TinkerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParsingError" title="parmed.exceptions.ParsingError"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParsingError</span></tt></a></p>
+<p>Raised when one of the TINKER parsing routines hits a bad file</p>
+<dl class="attribute">
+<dt id="parmed.exceptions.TinkerError.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.TinkerError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.TinkerError.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.TinkerError.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="parmed.exceptions.TinkerWarning">
+<em class="property">exception </em><tt class="descclassname">parmed.exceptions.</tt><tt class="descname">TinkerWarning</tt><a class="reference internal" href="../../_modules/parmed/exceptions.html#TinkerWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.exceptions.TinkerWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.exceptions.ParmedWarning" title="parmed.exceptions.ParmedWarning"><tt class="xref py py-class docutils literal"><span class="pre">parmed.exceptions.ParmedWarning</span></tt></a></p>
+<dl class="attribute">
+<dt id="parmed.exceptions.TinkerWarning.args">
+<tt class="descname">args</tt><a class="headerlink" href="#parmed.exceptions.TinkerWarning.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.exceptions.TinkerWarning.message">
+<tt class="descname">message</tt><a class="headerlink" href="#parmed.exceptions.TinkerWarning.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.exceptions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

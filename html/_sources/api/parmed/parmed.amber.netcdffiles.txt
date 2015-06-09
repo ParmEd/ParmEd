@@ -1,0 +1,7 @@
+parmed.amber.netcdffiles module
+===============================
+
+.. automodule:: parmed.amber.netcdffiles
+    :members:
+    :undoc-members:
+    :show-inheritance:

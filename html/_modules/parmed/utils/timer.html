@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.timer &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed.utils" href="../utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.utils.timer</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This is a module that contains basic timer facilities. It&#39;s useful for profiling</span>
+<span class="sd">the performance of a script in &quot;chunks&quot;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">linesep</span> <span class="k">as</span> <span class="n">ls</span>
+
+<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+
+<div class="viewcode-block" id="Timer"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer">[docs]</a><span class="k">class</span> <span class="nc">Timer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot; Timer class. It adds new timers and keeps track of how much time has been</span>
+<span class="sd">       spent. &quot;&quot;&quot;</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Declares the global timer &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timers</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;global&#39;</span> <span class="p">:</span> <span class="o">-</span><span class="n">time</span><span class="p">()}</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">descriptions</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;global&#39;</span> <span class="p">:</span> <span class="s">&#39;Total time taken:&#39;</span><span class="p">}</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;global&#39;</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;global&#39;</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s">&#39;sec.&#39;</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+
+<div class="viewcode-block" id="Timer.add_timer"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.add_timer">[docs]</a>   <span class="k">def</span> <span class="nf">add_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Add a new timer &quot;&quot;&quot;</span>
+      <span class="c"># Check to make sure it doesn&#39;t already exist. Then add it if it doesn&#39;t</span>
+      <span class="k">if</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
+         <span class="k">return</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timer_name</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">descriptions</span><span class="p">[</span><span class="n">timer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+</div>
+<div class="viewcode-block" id="Timer.start_timer"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.start_timer">[docs]</a>   <span class="k">def</span> <span class="nf">start_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Start the specified timer &quot;&quot;&quot;</span>
+      <span class="c"># Make sure the timer is not on already</span>
+      <span class="k">if</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">:</span>
+         <span class="k">return</span>
+      
+      <span class="c"># Check to make sure we&#39;ve added the timer or not. If not, then add it</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">add_timer</span><span class="p">(</span><span class="n">timer_name</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> timer&#39;</span> <span class="o">%</span> <span class="n">timer_name</span><span class="p">)</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer_name</span><span class="p">]</span> <span class="o">-=</span> <span class="n">time</span><span class="p">()</span>
+
+      <span class="c"># This timer is now on</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timer_name</span><span class="p">)</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+</div>
+<div class="viewcode-block" id="Timer.stop_timer"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.stop_timer">[docs]</a>   <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer_name</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; End the specified timer &quot;&quot;&quot;</span>
+      <span class="c"># First make sure that it is a timer to begin with</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
+         <span class="k">return</span>
+
+      <span class="c"># Next make sure that the timer is on in the first place</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">timer_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">:</span>
+         <span class="k">return</span>
+
+      <span class="c"># Now if it&#39;s on, end it and remove it from the list of active timers</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer_name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">time</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">timer_name</span><span class="p">))</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+</div>
+<div class="viewcode-block" id="Timer.end_all"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.end_all">[docs]</a>   <span class="k">def</span> <span class="nf">end_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; End all of the timers &quot;&quot;&quot;</span>
+      <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_timers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+</div>
+<div class="viewcode-block" id="Timer.done"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.done">[docs]</a>   <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Tell Timer we are done, and we can convert units to best </span>
+<span class="sd">          human-readable option </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+
+      <span class="c"># Make sure all timers are ended</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">end_all</span><span class="p">()</span>
+      
+      <span class="n">tfactor</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="c"># Now test the magnitude of the global timer so we can decide what the </span>
+      <span class="c"># reported units should be</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="s">&#39;global&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">48</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s">&#39;days&#39;</span>
+         <span class="n">tfactor</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span>
+      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="s">&#39;global&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s">&#39;hr.&#39;</span>
+         <span class="n">tfactor</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="s">&#39;global&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s">&#39;min.&#39;</span>
+         <span class="n">tfactor</span> <span class="o">=</span> <span class="mi">60</span>
+
+      <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_names</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer</span><span class="p">]</span> <span class="o">/=</span> <span class="n">tfactor</span>
+
+   <span class="c">#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#</span>
+</div>
+<div class="viewcode-block" id="Timer.print_"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.timer.html#parmed.utils.timer.Timer.print_">[docs]</a>   <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot; Prints the value of the timer &quot;&quot;&quot;</span>
+      <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%-40s</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descriptions</span><span class="p">[</span><span class="n">timer</span><span class="p">],</span> 
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">[</span><span class="n">timer</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
+      <span class="k">if</span> <span class="n">newline</span><span class="p">:</span>
+         <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
+
+<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../utils.html" >parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

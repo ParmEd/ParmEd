@@ -1,0 +1,30 @@
+parmed.topologyobjects.Improper
+===============================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: Improper
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Improper.__init__
+      ~Improper.delete
+      ~Improper.same_atoms
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Improper.improp_type
+   
+   

@@ -1,0 +1,7 @@
+parmed.modeller.offlib module
+=============================
+
+.. automodule:: parmed.modeller.offlib
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed
+======
+
+.. toctree::
+   :maxdepth: 4
+
+   parmed

@@ -1,0 +1,51 @@
+parmed.topologyobjects.Atom
+===========================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: Atom
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Atom.__init__
+      ~Atom.angle_to
+      ~Atom.bond_to
+      ~Atom.dihedral_to
+      ~Atom.exclude
+      ~Atom.nonbonded_exclusions
+      ~Atom.prune_exclusions
+      ~Atom.reset_topology
+      ~Atom.tortor_to
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Atom.angle_partners
+      ~Atom.atname
+      ~Atom.attype
+      ~Atom.bond_partners
+      ~Atom.dihedral_partners
+      ~Atom.element
+      ~Atom.epsilon
+      ~Atom.epsilon_14
+      ~Atom.exclusion_partners
+      ~Atom.idx
+      ~Atom.rmin
+      ~Atom.rmin_14
+      ~Atom.sigma
+      ~Atom.sigma_14
+      ~Atom.starting_index
+      ~Atom.tortor_partners
+   
+   

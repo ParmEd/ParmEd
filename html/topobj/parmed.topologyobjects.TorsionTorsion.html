@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.topologyobjects.TorsionTorsion &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-topologyobjects-torsiontorsion">
+<h1>parmed.topologyobjects.TorsionTorsion<a class="headerlink" href="#parmed-topologyobjects-torsiontorsion" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.topologyobjects.TorsionTorsion">
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">TorsionTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#TorsionTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a coupled-torsion map used in the AMOEBA force field similar to the
+correction-map (CMAP) potential used by the CHARMM force field</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>An atom on one end of the valence torsion-torsion bonded to atom2</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>An atom in the middle of the torsion-torsion bonded to atoms 1 and 3</p>
+</div></blockquote>
+<p><strong>atom3</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>An atom in the middle of the torsion-torsion bonded to atoms 2 and 4</p>
+</div></blockquote>
+<p><strong>atom4</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>An atom in the middle of the torsion-torsion bonded to atoms 3 and 5</p>
+</div></blockquote>
+<p><strong>atom5</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>An atom in the middle of the torsion-torsion bonded to atom 4</p>
+</div></blockquote>
+<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.TorsionTorsionType.html#parmed.topologyobjects.TorsionTorsionType" title="parmed.topologyobjects.TorsionTorsionType"><tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsionType</span></tt></a></p>
+<blockquote class="last">
+<div><p>The TorsionTorsionType object containing the parameter map for this term</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>A TorsionTorsion can contain bonds or atoms. A bond is contained if it
+exists between atoms 1 and 2, between atoms 2 and 3, between atoms 3 and 4,
+or between atoms 4 and 5.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tortor</span> <span class="o">=</span> <span class="n">TorsionTorsion</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tortor</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tortor</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tortor</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion.cmap_type" title="parmed.topologyobjects.TorsionTorsion.cmap_type"><tt class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion.tortor_type" title="parmed.topologyobjects.TorsionTorsion.tortor_type"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_type</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.delete" title="parmed.topologyobjects.TorsionTorsion.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<td>Deletes this TorsionTorsion from the atoms that make it up.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.extended" title="parmed.topologyobjects.TorsionTorsion.extended"><tt class="xref py py-obj docutils literal"><span class="pre">extended</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
+<td>Alternative constructor for correction maps defined with 8 atoms (each torsion being separately specified).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.same_atoms" title="parmed.topologyobjects.TorsionTorsion.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
+<td>A coupled-torsion is equivalent if the 5 atoms are in the same or</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.TorsionTorsion.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#TorsionTorsion.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.__init__" title="parmed.topologyobjects.TorsionTorsion.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.delete" title="parmed.topologyobjects.TorsionTorsion.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<td>Deletes this TorsionTorsion from the atoms that make it up.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.extended" title="parmed.topologyobjects.TorsionTorsion.extended"><tt class="xref py py-obj docutils literal"><span class="pre">extended</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4,&nbsp;atom5,&nbsp;...)</td>
+<td>Alternative constructor for correction maps defined with 8 atoms (each torsion being separately specified).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TorsionTorsion.same_atoms" title="parmed.topologyobjects.TorsionTorsion.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
+<td>A coupled-torsion is equivalent if the 5 atoms are in the same or</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion.cmap_type" title="parmed.topologyobjects.TorsionTorsion.cmap_type"><tt class="xref py py-obj docutils literal"><span class="pre">cmap_type</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion.tortor_type" title="parmed.topologyobjects.TorsionTorsion.tortor_type"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_type</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.TorsionTorsion.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#TorsionTorsion.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes this TorsionTorsion from the atoms that make it up. This method
+removes the TorsionTorsion from the <cite>tortors</cite> list for atom1, atom2,
+atom3, atom4, and atom5, and removes each atom from the others&#8217;
+tortor_partners list.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.topologyobjects.TorsionTorsion.extended">
+<em class="property">classmethod </em><tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative constructor for correction maps defined with 8 atoms (each
+torsion being separately specified). Correction maps are, to the best of
+my knowledge, used to parametrized &#8220;consecutive&#8221; torsions (i.e., atoms
+2, 3, and 4 are common to both torsions). However, the CHARMM definition
+specifies the torsions separately.</p>
+<p>If the torsions are _not_ consecutive (i.e., if atoms 2, 3, and 4 are
+not the same as atoms 5, 6, and 7), NotImplementedError is raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The first atom of the first torsion</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The second atom of the first torsion</p>
+</div></blockquote>
+<p><strong>atom3</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The third atom of the first torsion</p>
+</div></blockquote>
+<p><strong>atom4</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The fourth atom of the first torsion</p>
+</div></blockquote>
+<p><strong>atom5</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The first atom of the second torsion</p>
+</div></blockquote>
+<p><strong>atom6</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The second atom of the second torsion</p>
+</div></blockquote>
+<p><strong>atom7</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The third atom of the second torsion</p>
+</div></blockquote>
+<p><strong>atom8</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The fourth atom of the second torsion</p>
+</div></blockquote>
+<p><strong>type</strong> : <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.CmapType" title="parmed.topologyobjects.CmapType"><tt class="xref py py-class docutils literal"><span class="pre">CmapType</span></tt></a></p>
+<blockquote class="last">
+<div><p>The CmapType object containing the parameter map for this term</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.TorsionTorsion.same_atoms">
+<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.same_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coupled-torsion is equivalent if the 5 atoms are in the same or
+reverse order Allow comparison with another type of cmap or with a
+sequence of 5 indexes</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/parmed.topologyobjects.TorsionTorsion.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

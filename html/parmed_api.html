@@ -58,15 +58,15 @@
 <p>In some cases, <tt class="docutils literal"><span class="pre">parmed.py</span></tt> interpreter is insufficient to do what you need it
 to do, or perhaps you want to use some of ParmEd&#8217;s functionality in your own
 Python script or program.</p>
-<p>In that case, the ParmEd API is here! Every <a class="reference internal" href="api/ParmedTools/ParmedTools.ParmedActions.html#ParmedTools.ParmedActions.Action" title="ParmedTools.ParmedActions.Action"><tt class="xref py py-class docutils literal"><span class="pre">Action</span></tt></a> subclass is available for import from
-<a class="reference internal" href="api/ParmedTools/ParmedTools.html#module-ParmedTools" title="ParmedTools"><tt class="xref py py-mod docutils literal"><span class="pre">ParmedTools</span></tt></a>. For a full listing of available actions, you are forward to
+<p>In that case, the ParmEd API is here! Every <a class="reference internal" href="api/parmed/parmed.tools.actions.html#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><tt class="xref py py-class docutils literal"><span class="pre">Action</span></tt></a> subclass is available for import from
+<a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></tt></a>. For a full listing of available actions, you are forward to
 the auto-generated list in <a class="reference internal" href="parmed.html"><em>the parmed.py page</em></a>.</p>
 <div class="section" id="importing-the-actions">
 <h2>Importing the actions<a class="headerlink" href="#importing-the-actions" title="Permalink to this headline">¶</a></h2>
-<p>All actions can be imported from <tt class="docutils literal"><span class="pre">ParmedTools</span></tt> with the same camelcase shown
+<p>All actions can be imported from <tt class="docutils literal"><span class="pre">parmed.tools</span></tt> with the same camelcase shown
 in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> page. Examples are shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
 </pre></div>
 </div>
 </div>
@@ -75,16 +75,16 @@ in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> page
 <p>Each of the actions described on the previous page can be invoked either on a
 parm list (a few, like <tt class="xref doc docutils literal"><span class="pre">interpolate</span></tt>, actually <em>require</em> a parm list with
 multiple topologies), or a raw <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt>
-object. Note that some actions do not support all <a class="reference internal" href="amberobj/chemistry.amber.AmberParm.html#chemistry.amber.AmberParm" title="chemistry.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> subclasses (like those for the CHARMM or Amoeba
+object. Note that some actions do not support all <a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> subclasses (like those for the CHARMM or Amoeba
 force fields).</p>
-<p>The first step is to instantiate the action with the <a class="reference internal" href="amberobj/chemistry.amber.AmberParm.html#chemistry.amber.AmberParm" title="chemistry.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> instance as the first argument. The arguments that
+<p>The first step is to instantiate the action with the <a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> instance as the first argument. The arguments that
 each action requires in the ParmEd interpreter can then be given as separate
 arguments to the constructor or all as a single string in the second argument.
 Keyword arguments can optionally be given as keyword arguments to the action
 constructor.</p>
 <p>Examples of valid syntax for <tt class="xref doc docutils literal"><span class="pre">addLJType</span></tt> are shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ParmedTools</span> <span class="kn">import</span> <span class="n">addLJType</span>
-<span class="kn">from</span> <span class="nn">chemistry.amber</span> <span class="kn">import</span> <span class="n">AmberParm</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">addLJType</span>
+<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 
 <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 

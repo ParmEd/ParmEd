@@ -1,0 +1,935 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.six &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed.utils" href="../utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.utils.six</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Utilities for writing code that runs on Python 2 and 3&quot;&quot;&quot;</span>
+
+<span class="c"># Copyright (c) 2010-2015 Benjamin Peterson</span>
+<span class="c">#</span>
+<span class="c"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c"># in the Software without restriction, including without limitation the rights</span>
+<span class="c"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c"># furnished to do so, subject to the following conditions:</span>
+<span class="c">#</span>
+<span class="c"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c"># copies or substantial portions of the Software.</span>
+<span class="c">#</span>
+<span class="c"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c"># SOFTWARE.</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Benjamin Peterson &lt;benjamin@python.org&gt;&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;1.9.0&quot;</span>
+
+
+<span class="c"># Useful for very coarse version differentiation.</span>
+<span class="n">PY2</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+<span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">string_types</span> <span class="o">=</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">class_types</span> <span class="o">=</span> <span class="nb">type</span><span class="p">,</span>
+    <span class="n">text_type</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">binary_type</span> <span class="o">=</span> <span class="nb">bytes</span>
+
+    <span class="n">MAXSIZE</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">string_types</span> <span class="o">=</span> <span class="nb">basestring</span><span class="p">,</span>
+    <span class="n">integer_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">)</span>
+    <span class="n">class_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span><span class="p">)</span>
+    <span class="n">text_type</span> <span class="o">=</span> <span class="nb">unicode</span>
+    <span class="n">binary_type</span> <span class="o">=</span> <span class="nb">str</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;java&quot;</span><span class="p">):</span>
+        <span class="c"># Jython always uses 32 bits.</span>
+        <span class="n">MAXSIZE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># It&#39;s possible to have sizeof(long) != sizeof(Py_ssize_t).</span>
+        <span class="k">class</span> <span class="nc">X</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">OverflowError</span><span class="p">:</span>
+            <span class="c"># 32-bit</span>
+            <span class="n">MAXSIZE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># 64-bit</span>
+            <span class="n">MAXSIZE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">63</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">X</span>
+
+
+<span class="k">def</span> <span class="nf">_add_doc</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add documentation to a function.&quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+
+
+<span class="k">def</span> <span class="nf">_import_module</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Import module, returning the module after the last dot.&quot;&quot;&quot;</span>
+    <span class="nb">__import__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">_LazyDescr</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">tp</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">()</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="c"># Invokes __set__.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># This is a bit ugly, but it avoids running this again by</span>
+            <span class="c"># removing this descriptor.</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="MovedModule"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.MovedModule">[docs]</a><span class="k">class</span> <span class="nc">MovedModule</span><span class="p">(</span><span class="n">_LazyDescr</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MovedModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">new</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">old</span>
+
+    <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+</div>
+<span class="k">class</span> <span class="nc">_LazyModule</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__doc__</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;__doc__&quot;</span><span class="p">,</span> <span class="s">&quot;__name__&quot;</span><span class="p">]</span>
+        <span class="n">attrs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">attr</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moved_attributes</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">attrs</span>
+
+    <span class="c"># Subclasses should override this</span>
+    <span class="n">_moved_attributes</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="MovedAttribute"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.MovedAttribute">[docs]</a><span class="k">class</span> <span class="nc">MovedAttribute</span><span class="p">(</span><span class="n">_LazyDescr</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old_mod</span><span class="p">,</span> <span class="n">new_mod</span><span class="p">,</span> <span class="n">old_attr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">new_attr</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MovedAttribute</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_mod</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">new_mod</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">new_mod</span>
+            <span class="k">if</span> <span class="n">new_attr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">old_attr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">new_attr</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_attr</span> <span class="o">=</span> <span class="n">old_attr</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span> <span class="o">=</span> <span class="n">new_attr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">old_mod</span>
+            <span class="k">if</span> <span class="n">old_attr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">old_attr</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span> <span class="o">=</span> <span class="n">old_attr</span>
+
+    <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">_import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
+
+</div>
+<span class="k">class</span> <span class="nc">_SixMetaPathImporter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A meta path importer to import six.moves and its submodules.</span>
+
+<span class="sd">    This class implements a PEP302 finder and loader. It should be compatible</span>
+<span class="sd">    with Python 2.5 and all existing versions of Python3</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">six_module_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">six_module_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_add_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="o">*</span><span class="n">fullnames</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="n">fullnames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">fullname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod</span>
+
+    <span class="k">def</span> <span class="nf">_get_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">fullname</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__get_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&quot;This loader does not know module &quot;</span> <span class="o">+</span> <span class="n">fullname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># in case of a reload</span>
+            <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">MovedModule</span><span class="p">):</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">_resolve</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mod</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod</span>
+        <span class="k">return</span> <span class="n">mod</span>
+
+    <span class="k">def</span> <span class="nf">is_package</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return true, if the named module is a package.</span>
+
+<span class="sd">        We need this method to get correct spec objects with</span>
+<span class="sd">        Python 3.4 (see PEP451)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">),</span> <span class="s">&quot;__path__&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return None</span>
+
+<span class="sd">        Required, if is_package is implemented&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__get_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>  <span class="c"># eventually raises ImportError</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">get_source</span> <span class="o">=</span> <span class="n">get_code</span>  <span class="c"># same as get_code</span>
+
+<span class="n">_importer</span> <span class="o">=</span> <span class="n">_SixMetaPathImporter</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_MovedItems</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects&quot;&quot;&quot;</span>
+    <span class="n">__path__</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># mark as package</span>
+
+
+<span class="n">_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;cStringIO&quot;</span><span class="p">,</span> <span class="s">&quot;cStringIO&quot;</span><span class="p">,</span> <span class="s">&quot;io&quot;</span><span class="p">,</span> <span class="s">&quot;StringIO&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;filter&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;ifilter&quot;</span><span class="p">,</span> <span class="s">&quot;filter&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;filterfalse&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;ifilterfalse&quot;</span><span class="p">,</span> <span class="s">&quot;filterfalse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;raw_input&quot;</span><span class="p">,</span> <span class="s">&quot;input&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;intern&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;sys&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;map&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;imap&quot;</span><span class="p">,</span> <span class="s">&quot;map&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;range&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;xrange&quot;</span><span class="p">,</span> <span class="s">&quot;range&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;reload_module&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;imp&quot;</span><span class="p">,</span> <span class="s">&quot;reload&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;reduce&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;functools&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;shlex_quote&quot;</span><span class="p">,</span> <span class="s">&quot;pipes&quot;</span><span class="p">,</span> <span class="s">&quot;shlex&quot;</span><span class="p">,</span> <span class="s">&quot;quote&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;StringIO&quot;</span><span class="p">,</span> <span class="s">&quot;StringIO&quot;</span><span class="p">,</span> <span class="s">&quot;io&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;UserDict&quot;</span><span class="p">,</span> <span class="s">&quot;UserDict&quot;</span><span class="p">,</span> <span class="s">&quot;collections&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;UserList&quot;</span><span class="p">,</span> <span class="s">&quot;UserList&quot;</span><span class="p">,</span> <span class="s">&quot;collections&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;UserString&quot;</span><span class="p">,</span> <span class="s">&quot;UserString&quot;</span><span class="p">,</span> <span class="s">&quot;collections&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;xrange&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;xrange&quot;</span><span class="p">,</span> <span class="s">&quot;range&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;zip&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;izip&quot;</span><span class="p">,</span> <span class="s">&quot;zip&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;zip_longest&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;itertools&quot;</span><span class="p">,</span> <span class="s">&quot;izip_longest&quot;</span><span class="p">,</span> <span class="s">&quot;zip_longest&quot;</span><span class="p">),</span>
+
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;builtins&quot;</span><span class="p">,</span> <span class="s">&quot;__builtin__&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;configparser&quot;</span><span class="p">,</span> <span class="s">&quot;ConfigParser&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;copyreg&quot;</span><span class="p">,</span> <span class="s">&quot;copy_reg&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;dbm_gnu&quot;</span><span class="p">,</span> <span class="s">&quot;gdbm&quot;</span><span class="p">,</span> <span class="s">&quot;dbm.gnu&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;_dummy_thread&quot;</span><span class="p">,</span> <span class="s">&quot;dummy_thread&quot;</span><span class="p">,</span> <span class="s">&quot;_dummy_thread&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;http_cookiejar&quot;</span><span class="p">,</span> <span class="s">&quot;cookielib&quot;</span><span class="p">,</span> <span class="s">&quot;http.cookiejar&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;http_cookies&quot;</span><span class="p">,</span> <span class="s">&quot;Cookie&quot;</span><span class="p">,</span> <span class="s">&quot;http.cookies&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;html_entities&quot;</span><span class="p">,</span> <span class="s">&quot;htmlentitydefs&quot;</span><span class="p">,</span> <span class="s">&quot;html.entities&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;html_parser&quot;</span><span class="p">,</span> <span class="s">&quot;HTMLParser&quot;</span><span class="p">,</span> <span class="s">&quot;html.parser&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;http_client&quot;</span><span class="p">,</span> <span class="s">&quot;httplib&quot;</span><span class="p">,</span> <span class="s">&quot;http.client&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;email_mime_multipart&quot;</span><span class="p">,</span> <span class="s">&quot;email.MIMEMultipart&quot;</span><span class="p">,</span> <span class="s">&quot;email.mime.multipart&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;email_mime_nonmultipart&quot;</span><span class="p">,</span> <span class="s">&quot;email.MIMENonMultipart&quot;</span><span class="p">,</span> <span class="s">&quot;email.mime.nonmultipart&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;email_mime_text&quot;</span><span class="p">,</span> <span class="s">&quot;email.MIMEText&quot;</span><span class="p">,</span> <span class="s">&quot;email.mime.text&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;email_mime_base&quot;</span><span class="p">,</span> <span class="s">&quot;email.MIMEBase&quot;</span><span class="p">,</span> <span class="s">&quot;email.mime.base&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;BaseHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;BaseHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;http.server&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;CGIHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;CGIHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;http.server&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;SimpleHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;SimpleHTTPServer&quot;</span><span class="p">,</span> <span class="s">&quot;http.server&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;cPickle&quot;</span><span class="p">,</span> <span class="s">&quot;cPickle&quot;</span><span class="p">,</span> <span class="s">&quot;pickle&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;queue&quot;</span><span class="p">,</span> <span class="s">&quot;Queue&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;reprlib&quot;</span><span class="p">,</span> <span class="s">&quot;repr&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;socketserver&quot;</span><span class="p">,</span> <span class="s">&quot;SocketServer&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;_thread&quot;</span><span class="p">,</span> <span class="s">&quot;thread&quot;</span><span class="p">,</span> <span class="s">&quot;_thread&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter&quot;</span><span class="p">,</span> <span class="s">&quot;Tkinter&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_dialog&quot;</span><span class="p">,</span> <span class="s">&quot;Dialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.dialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_filedialog&quot;</span><span class="p">,</span> <span class="s">&quot;FileDialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.filedialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_scrolledtext&quot;</span><span class="p">,</span> <span class="s">&quot;ScrolledText&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.scrolledtext&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_simpledialog&quot;</span><span class="p">,</span> <span class="s">&quot;SimpleDialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.simpledialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_tix&quot;</span><span class="p">,</span> <span class="s">&quot;Tix&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.tix&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_ttk&quot;</span><span class="p">,</span> <span class="s">&quot;ttk&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.ttk&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_constants&quot;</span><span class="p">,</span> <span class="s">&quot;Tkconstants&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.constants&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_dnd&quot;</span><span class="p">,</span> <span class="s">&quot;Tkdnd&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.dnd&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_colorchooser&quot;</span><span class="p">,</span> <span class="s">&quot;tkColorChooser&quot;</span><span class="p">,</span>
+                <span class="s">&quot;tkinter.colorchooser&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_commondialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkCommonDialog&quot;</span><span class="p">,</span>
+                <span class="s">&quot;tkinter.commondialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_tkfiledialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkFileDialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.filedialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_font&quot;</span><span class="p">,</span> <span class="s">&quot;tkFont&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.font&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_messagebox&quot;</span><span class="p">,</span> <span class="s">&quot;tkMessageBox&quot;</span><span class="p">,</span> <span class="s">&quot;tkinter.messagebox&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;tkinter_tksimpledialog&quot;</span><span class="p">,</span> <span class="s">&quot;tkSimpleDialog&quot;</span><span class="p">,</span>
+                <span class="s">&quot;tkinter.simpledialog&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;urllib_parse&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib_parse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;urllib_error&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib_error&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.error&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;urllib_robotparser&quot;</span><span class="p">,</span> <span class="s">&quot;robotparser&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.robotparser&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;xmlrpc_client&quot;</span><span class="p">,</span> <span class="s">&quot;xmlrpclib&quot;</span><span class="p">,</span> <span class="s">&quot;xmlrpc.client&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;xmlrpc_server&quot;</span><span class="p">,</span> <span class="s">&quot;SimpleXMLRPCServer&quot;</span><span class="p">,</span> <span class="s">&quot;xmlrpc.server&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s">&quot;winreg&quot;</span><span class="p">,</span> <span class="s">&quot;_winreg&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">_MovedItems</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">MovedModule</span><span class="p">):</span>
+        <span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="s">&quot;moves.&quot;</span> <span class="o">+</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">_MovedItems</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_moved_attributes</span>
+
+<span class="n">moves</span> <span class="o">=</span> <span class="n">_MovedItems</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves&quot;</span><span class="p">)</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">moves</span><span class="p">,</span> <span class="s">&quot;moves&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib_parse"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib_parse">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib_parse</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects in six.moves.urllib_parse&quot;&quot;&quot;</span>
+
+</div>
+<span class="n">_urllib_parse_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;ParseResult&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;SplitResult&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;parse_qs&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;parse_qsl&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urldefrag&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urljoin&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlsplit&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlunparse&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlunsplit&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;quote&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;quote_plus&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;unquote&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;unquote_plus&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlencode&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;splitquery&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;splittag&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;splituser&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;uses_fragment&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;uses_netloc&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;uses_params&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;uses_query&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;uses_relative&quot;</span><span class="p">,</span> <span class="s">&quot;urlparse&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.parse&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_urllib_parse_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">Module_six_moves_urllib_parse</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">Module_six_moves_urllib_parse</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_parse_moved_attributes</span>
+
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_parse</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib_parse&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib_parse&quot;</span><span class="p">,</span> <span class="s">&quot;moves.urllib.parse&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib_error"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib_error">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib_error</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects in six.moves.urllib_error&quot;&quot;&quot;</span>
+
+</div>
+<span class="n">_urllib_error_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;URLError&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.error&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPError&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.error&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;ContentTooShortError&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.error&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_urllib_error_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">Module_six_moves_urllib_error</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">Module_six_moves_urllib_error</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_error_moved_attributes</span>
+
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_error</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib.error&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib_error&quot;</span><span class="p">,</span> <span class="s">&quot;moves.urllib.error&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib_request"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib_request">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib_request</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects in six.moves.urllib_request&quot;&quot;&quot;</span>
+
+</div>
+<span class="n">_urllib_request_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlopen&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;install_opener&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;build_opener&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;pathname2url&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;url2pathname&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;getproxies&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;Request&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;OpenerDirector&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPDefaultErrorHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPRedirectHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPCookieProcessor&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;ProxyHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;BaseHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPPasswordMgr&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPPasswordMgrWithDefaultRealm&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;AbstractBasicAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPBasicAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;ProxyBasicAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;AbstractDigestAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPDigestAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;ProxyDigestAuthHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPSHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;FileHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;FTPHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;CacheFTPHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;UnknownHandler&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;HTTPErrorProcessor&quot;</span><span class="p">,</span> <span class="s">&quot;urllib2&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlretrieve&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;urlcleanup&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;URLopener&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;FancyURLopener&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;proxy_bypass&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.request&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_urllib_request_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">Module_six_moves_urllib_request</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">Module_six_moves_urllib_request</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_request_moved_attributes</span>
+
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_request</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib.request&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib_request&quot;</span><span class="p">,</span> <span class="s">&quot;moves.urllib.request&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib_response"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib_response">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib_response</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects in six.moves.urllib_response&quot;&quot;&quot;</span>
+
+</div>
+<span class="n">_urllib_response_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;addbase&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.response&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;addclosehook&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.response&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;addinfo&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.response&quot;</span><span class="p">),</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;addinfourl&quot;</span><span class="p">,</span> <span class="s">&quot;urllib&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.response&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_urllib_response_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">Module_six_moves_urllib_response</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">Module_six_moves_urllib_response</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_response_moved_attributes</span>
+
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_response</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib.response&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib_response&quot;</span><span class="p">,</span> <span class="s">&quot;moves.urllib.response&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib_robotparser"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib_robotparser">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib_robotparser</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lazy loading of moved objects in six.moves.urllib_robotparser&quot;&quot;&quot;</span>
+
+</div>
+<span class="n">_urllib_robotparser_moved_attributes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MovedAttribute</span><span class="p">(</span><span class="s">&quot;RobotFileParser&quot;</span><span class="p">,</span> <span class="s">&quot;robotparser&quot;</span><span class="p">,</span> <span class="s">&quot;urllib.robotparser&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_urllib_robotparser_moved_attributes</span><span class="p">:</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">Module_six_moves_urllib_robotparser</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">attr</span>
+
+<span class="n">Module_six_moves_urllib_robotparser</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_robotparser_moved_attributes</span>
+
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_robotparser</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib.robotparser&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib_robotparser&quot;</span><span class="p">,</span> <span class="s">&quot;moves.urllib.robotparser&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Module_six_moves_urllib"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Module_six_moves_urllib">[docs]</a><span class="k">class</span> <span class="nc">Module_six_moves_urllib</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a six.moves.urllib namespace that resembles the Python 3 namespace&quot;&quot;&quot;</span>
+    <span class="n">__path__</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># mark as package</span>
+    <span class="n">parse</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s">&quot;moves.urllib_parse&quot;</span><span class="p">)</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s">&quot;moves.urllib_error&quot;</span><span class="p">)</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s">&quot;moves.urllib_request&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s">&quot;moves.urllib_response&quot;</span><span class="p">)</span>
+    <span class="n">robotparser</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s">&quot;moves.urllib_robotparser&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s">&#39;parse&#39;</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="s">&#39;request&#39;</span><span class="p">,</span> <span class="s">&#39;response&#39;</span><span class="p">,</span> <span class="s">&#39;robotparser&#39;</span><span class="p">]</span>
+</div>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.moves.urllib&quot;</span><span class="p">),</span>
+                      <span class="s">&quot;moves.urllib&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="add_move"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.add_move">[docs]</a><span class="k">def</span> <span class="nf">add_move</span><span class="p">(</span><span class="n">move</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add an item to six.moves.&quot;&quot;&quot;</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">_MovedItems</span><span class="p">,</span> <span class="n">move</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">move</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="remove_move"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.remove_move">[docs]</a><span class="k">def</span> <span class="nf">remove_move</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove item from six.moves.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="n">_MovedItems</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">moves</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;no such move, </span><span class="si">%r</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,))</span>
+
+</div>
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">_meth_func</span> <span class="o">=</span> <span class="s">&quot;__func__&quot;</span>
+    <span class="n">_meth_self</span> <span class="o">=</span> <span class="s">&quot;__self__&quot;</span>
+
+    <span class="n">_func_closure</span> <span class="o">=</span> <span class="s">&quot;__closure__&quot;</span>
+    <span class="n">_func_code</span> <span class="o">=</span> <span class="s">&quot;__code__&quot;</span>
+    <span class="n">_func_defaults</span> <span class="o">=</span> <span class="s">&quot;__defaults__&quot;</span>
+    <span class="n">_func_globals</span> <span class="o">=</span> <span class="s">&quot;__globals__&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_meth_func</span> <span class="o">=</span> <span class="s">&quot;im_func&quot;</span>
+    <span class="n">_meth_self</span> <span class="o">=</span> <span class="s">&quot;im_self&quot;</span>
+
+    <span class="n">_func_closure</span> <span class="o">=</span> <span class="s">&quot;func_closure&quot;</span>
+    <span class="n">_func_code</span> <span class="o">=</span> <span class="s">&quot;func_code&quot;</span>
+    <span class="n">_func_defaults</span> <span class="o">=</span> <span class="s">&quot;func_defaults&quot;</span>
+    <span class="n">_func_globals</span> <span class="o">=</span> <span class="s">&quot;func_globals&quot;</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">advance_iterator</span> <span class="o">=</span> <span class="nb">next</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">advance_iterator</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="nb">next</span> <span class="o">=</span> <span class="n">advance_iterator</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">callable</span> <span class="o">=</span> <span class="nb">callable</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="s">&quot;__call__&quot;</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span> <span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">__mro__</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_unbound_function</span><span class="p">(</span><span class="n">unbound</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unbound</span>
+
+    <span class="n">create_bound_method</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span>
+
+    <span class="n">Iterator</span> <span class="o">=</span> <span class="nb">object</span>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="get_unbound_function"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.get_unbound_function">[docs]</a>    <span class="k">def</span> <span class="nf">get_unbound_function</span><span class="p">(</span><span class="n">unbound</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unbound</span><span class="o">.</span><span class="n">im_func</span>
+</div>
+<div class="viewcode-block" id="create_bound_method"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.create_bound_method">[docs]</a>    <span class="k">def</span> <span class="nf">create_bound_method</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Iterator"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Iterator">[docs]</a>    <span class="k">class</span> <span class="nc">Iterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Iterator.next"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Iterator.next">[docs]</a>        <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div></div>
+    <span class="nb">callable</span> <span class="o">=</span> <span class="nb">callable</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">get_unbound_function</span><span class="p">,</span>
+         <span class="sd">&quot;&quot;&quot;Get the function out of a possibly unbound function&quot;&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="n">get_method_function</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_meth_func</span><span class="p">)</span>
+<span class="n">get_method_self</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_meth_self</span><span class="p">)</span>
+<span class="n">get_function_closure</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_func_closure</span><span class="p">)</span>
+<span class="n">get_function_code</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_func_code</span><span class="p">)</span>
+<span class="n">get_function_defaults</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_func_defaults</span><span class="p">)</span>
+<span class="n">get_function_globals</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">_func_globals</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">iterkeys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">itervalues</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">iteritems</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">iterlists</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">lists</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+
+    <span class="n">viewkeys</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;keys&quot;</span><span class="p">)</span>
+
+    <span class="n">viewvalues</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;values&quot;</span><span class="p">)</span>
+
+    <span class="n">viewitems</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;items&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="iterkeys"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.iterkeys">[docs]</a>    <span class="k">def</span> <span class="nf">iterkeys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="itervalues"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.itervalues">[docs]</a>    <span class="k">def</span> <span class="nf">itervalues</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="iteritems"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.iteritems">[docs]</a>    <span class="k">def</span> <span class="nf">iteritems</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="iterlists"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.iterlists">[docs]</a>    <span class="k">def</span> <span class="nf">iterlists</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">iterlists</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">))</span>
+</div>
+    <span class="n">viewkeys</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;viewkeys&quot;</span><span class="p">)</span>
+
+    <span class="n">viewvalues</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;viewvalues&quot;</span><span class="p">)</span>
+
+    <span class="n">viewitems</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;viewitems&quot;</span><span class="p">)</span>
+
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">iterkeys</span><span class="p">,</span> <span class="s">&quot;Return an iterator over the keys of a dictionary.&quot;</span><span class="p">)</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">itervalues</span><span class="p">,</span> <span class="s">&quot;Return an iterator over the values of a dictionary.&quot;</span><span class="p">)</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">iteritems</span><span class="p">,</span>
+         <span class="s">&quot;Return an iterator over the (key, value) pairs of a dictionary.&quot;</span><span class="p">)</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">iterlists</span><span class="p">,</span>
+         <span class="s">&quot;Return an iterator over the (key, [values]) pairs of a dictionary.&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;latin-1&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="nb">unichr</span> <span class="o">=</span> <span class="nb">chr</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">int2byte</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">((</span><span class="n">i</span><span class="p">,))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># This is about 2x faster than the implementation above on 3.2+</span>
+        <span class="n">int2byte</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s">&quot;to_bytes&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;big&quot;</span><span class="p">)</span>
+    <span class="n">byte2int</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">indexbytes</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">getitem</span>
+    <span class="n">iterbytes</span> <span class="o">=</span> <span class="nb">iter</span>
+    <span class="kn">import</span> <span class="nn">io</span>
+    <span class="n">StringIO</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span>
+    <span class="n">BytesIO</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span>
+    <span class="n">_assertCountEqual</span> <span class="o">=</span> <span class="s">&quot;assertCountEqual&quot;</span>
+    <span class="n">_assertRaisesRegex</span> <span class="o">=</span> <span class="s">&quot;assertRaisesRegex&quot;</span>
+    <span class="n">_assertRegex</span> <span class="o">=</span> <span class="s">&quot;assertRegex&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="b"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.b">[docs]</a>    <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="c"># Workaround for standalone backslash</span></div>
+<div class="viewcode-block" id="u"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.u">[docs]</a>    <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">r&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">r&#39;</span><span class="se">\\\\</span><span class="s">&#39;</span><span class="p">),</span> <span class="s">&quot;unicode_escape&quot;</span><span class="p">)</span></div>
+    <span class="nb">unichr</span> <span class="o">=</span> <span class="nb">unichr</span>
+    <span class="n">int2byte</span> <span class="o">=</span> <span class="nb">chr</span>
+<div class="viewcode-block" id="byte2int"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.byte2int">[docs]</a>    <span class="k">def</span> <span class="nf">byte2int</span><span class="p">(</span><span class="n">bs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">bs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+<div class="viewcode-block" id="indexbytes"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.indexbytes">[docs]</a>    <span class="k">def</span> <span class="nf">indexbytes</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+    <span class="n">iterbytes</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">imap</span><span class="p">,</span> <span class="nb">ord</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">StringIO</span>
+    <span class="n">StringIO</span> <span class="o">=</span> <span class="n">BytesIO</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span>
+    <span class="n">_assertCountEqual</span> <span class="o">=</span> <span class="s">&quot;assertItemsEqual&quot;</span>
+    <span class="n">_assertRaisesRegex</span> <span class="o">=</span> <span class="s">&quot;assertRaisesRegexp&quot;</span>
+    <span class="n">_assertRegex</span> <span class="o">=</span> <span class="s">&quot;assertRegexpMatches&quot;</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s">&quot;&quot;&quot;Byte literal&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="s">&quot;&quot;&quot;Text literal&quot;&quot;&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="assertCountEqual"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.assertCountEqual">[docs]</a><span class="k">def</span> <span class="nf">assertCountEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_assertCountEqual</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="assertRaisesRegex"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.assertRaisesRegex">[docs]</a><span class="k">def</span> <span class="nf">assertRaisesRegex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_assertRaisesRegex</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="assertRegex"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.assertRegex">[docs]</a><span class="k">def</span> <span class="nf">assertRegex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_assertRegex</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">exec_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">builtins</span><span class="p">,</span> <span class="s">&quot;exec&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="reraise"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.reraise">[docs]</a>    <span class="k">def</span> <span class="nf">reraise</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">tp</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">__traceback__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">tb</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">value</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">value</span>
+</div>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="exec_"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.exec_">[docs]</a>    <span class="k">def</span> <span class="nf">exec_</span><span class="p">(</span><span class="n">_code_</span><span class="p">,</span> <span class="n">_globs_</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">_locs_</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute code in a namespace.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">_globs_</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">_globs_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span>
+            <span class="k">if</span> <span class="n">_locs_</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">_locs_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span>
+            <span class="k">del</span> <span class="n">frame</span>
+        <span class="k">elif</span> <span class="n">_locs_</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">_locs_</span> <span class="o">=</span> <span class="n">_globs_</span>
+        <span class="k">exec</span><span class="p">(</span><span class="s">&quot;&quot;&quot;exec _code_ in _globs_, _locs_&quot;&quot;&quot;</span><span class="p">)</span>
+
+</div>
+    <span class="n">exec_</span><span class="p">(</span><span class="s">&quot;&quot;&quot;def reraise(tp, value, tb=None):</span>
+<span class="s">    raise tp, value, tb</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">exec_</span><span class="p">(</span><span class="s">&quot;&quot;&quot;def raise_from(value, from_value):</span>
+<span class="s">    if from_value is None:</span>
+<span class="s">        raise value</span>
+<span class="s">    raise value from from_value</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">exec_</span><span class="p">(</span><span class="s">&quot;&quot;&quot;def raise_from(value, from_value):</span>
+<span class="s">    raise value from from_value</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="raise_from"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.raise_from">[docs]</a>    <span class="k">def</span> <span class="nf">raise_from</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">from_value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">value</span>
+
+</div>
+<span class="n">print_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">builtins</span><span class="p">,</span> <span class="s">&quot;print&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">print_</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The new-style print function for Python 2.4 and 2.5.&quot;&quot;&quot;</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;file&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="c"># If the file has an encoding, encode unicode with it.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s">&quot;errors&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">errors</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">errors</span> <span class="o">=</span> <span class="s">&quot;strict&quot;</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">want_unicode</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;sep&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+                <span class="n">want_unicode</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;sep must be None or a string&quot;</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;end&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+                <span class="n">want_unicode</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;end must be None or a string&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;invalid keyword arguments to print()&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">want_unicode</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+                    <span class="n">want_unicode</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">want_unicode</span><span class="p">:</span>
+            <span class="n">newline</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="n">space</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newline</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">space</span> <span class="o">=</span> <span class="s">&quot; &quot;</span>
+        <span class="k">if</span> <span class="n">sep</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="n">space</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">newline</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+                <span class="n">write</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+            <span class="n">write</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+    <span class="n">_print</span> <span class="o">=</span> <span class="n">print_</span>
+<div class="viewcode-block" id="print_"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;file&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="n">flush</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;flush&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flush</span> <span class="ow">and</span> <span class="n">fp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</div>
+<span class="n">_add_doc</span><span class="p">(</span><span class="n">reraise</span><span class="p">,</span> <span class="s">&quot;&quot;&quot;Reraise an exception.&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+<div class="viewcode-block" id="wraps"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.wraps">[docs]</a>    <span class="k">def</span> <span class="nf">wraps</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">assigned</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">WRAPPER_ASSIGNMENTS</span><span class="p">,</span>
+              <span class="n">updated</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">WRAPPER_UPDATES</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">assigned</span><span class="p">,</span> <span class="n">updated</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">wrapped</span>
+            <span class="k">return</span> <span class="n">f</span>
+        <span class="k">return</span> <span class="n">wrapper</span></div>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">wraps</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">wraps</span>
+
+<div class="viewcode-block" id="with_metaclass"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.with_metaclass">[docs]</a><span class="k">def</span> <span class="nf">with_metaclass</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="o">*</span><span class="n">bases</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a base class with a metaclass.&quot;&quot;&quot;</span>
+    <span class="c"># This requires a bit of explanation: the basic idea is to make a dummy</span>
+    <span class="c"># metaclass for one level of class instantiation that replaces itself with</span>
+    <span class="c"># the actual metaclass.</span>
+    <span class="k">class</span> <span class="nc">metaclass</span><span class="p">(</span><span class="n">meta</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">this_bases</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">meta</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="s">&#39;temporary_class&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+
+</div>
+<div class="viewcode-block" id="add_metaclass"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.add_metaclass">[docs]</a><span class="k">def</span> <span class="nf">add_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class decorator for creating a class with a metaclass.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">orig_vars</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">slots</span> <span class="o">=</span> <span class="n">orig_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;__slots__&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">slots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">slots</span> <span class="o">=</span> <span class="p">[</span><span class="n">slots</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">slots_var</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+                <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">slots_var</span><span class="p">)</span>
+        <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;__dict__&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;__weakref__&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metaclass</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__bases__</span><span class="p">,</span> <span class="n">orig_vars</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+</div>
+<div class="viewcode-block" id="python_2_unicode_compatible"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.python_2_unicode_compatible">[docs]</a><span class="k">def</span> <span class="nf">python_2_unicode_compatible</span><span class="p">(</span><span class="n">klass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A decorator that defines __unicode__ and __str__ methods under Python 2.</span>
+<span class="sd">    Under Python 3 it does nothing.</span>
+
+<span class="sd">    To support Python 2 and 3 with a single code base, define a __str__ method</span>
+<span class="sd">    returning text and apply this decorator to the class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&#39;__str__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;@python_2_unicode_compatible cannot be applied &quot;</span>
+                             <span class="s">&quot;to </span><span class="si">%s</span><span class="s"> because it doesn&#39;t define __str__().&quot;</span> <span class="o">%</span>
+                             <span class="n">klass</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="n">klass</span><span class="o">.</span><span class="n">__unicode__</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">__str__</span>
+        <span class="n">klass</span><span class="o">.</span><span class="n">__str__</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unicode__</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">klass</span>
+
+
+<span class="c"># Complete the moves implementation.</span>
+<span class="c"># This code is at the end of this module to speed up module loading.</span>
+<span class="c"># Turn this module into a package.</span></div>
+<span class="n">__path__</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># required for PEP 302 and PEP 451</span>
+<span class="n">__package__</span> <span class="o">=</span> <span class="n">__name__</span>  <span class="c"># see PEP 366 @ReservedAssignment</span>
+<span class="k">if</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;__spec__&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">__spec__</span><span class="o">.</span><span class="n">submodule_search_locations</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># PEP 451 @UndefinedVariable</span>
+<span class="c"># Remove other six meta path importers, since they cause problems. This can</span>
+<span class="c"># happen if six is removed from sys.modules and then reloaded. (Setuptools does</span>
+<span class="c"># this for some reason.)</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">importer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="p">):</span>
+        <span class="c"># Here&#39;s some real nastiness: Another &quot;instance&quot; of the six module might</span>
+        <span class="c"># be floating around. Therefore, we can&#39;t use isinstance() to check for</span>
+        <span class="c"># the six meta path importer, since the other six instance will have</span>
+        <span class="c"># inserted an importer with different class.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">importer</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;_SixMetaPathImporter&quot;</span> <span class="ow">and</span>
+            <span class="n">importer</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">__name__</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">break</span>
+    <span class="k">del</span> <span class="n">i</span><span class="p">,</span> <span class="n">importer</span>
+<span class="c"># Finally, add the importer to the meta path import hook.</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_importer</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../utils.html" >parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

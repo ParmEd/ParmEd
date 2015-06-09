@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The chemistry.charmm package &mdash; ParmEd 2.0 documentation</title>
+    <title>The parmed.charmm package &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="chemistry.charmm.CharmmPsfFile" href="charmmobj/chemistry.charmm.CharmmPsfFile.html" /> 
+    <link rel="next" title="parmed.charmm.CharmmPsfFile" href="charmmobj/parmed.charmm.CharmmPsfFile.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="charmmobj/chemistry.charmm.CharmmPsfFile.html" title="chemistry.charmm.CharmmPsfFile"
+          <a href="charmmobj/parmed.charmm.CharmmPsfFile.html" title="parmed.charmm.CharmmPsfFile"
              accesskey="N">next</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -49,8 +49,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-chemistry-charmm-package">
-<h1>The <a class="reference internal" href="api/chemistry/chemistry.charmm.html#module-chemistry.charmm" title="chemistry.charmm"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.charmm</span></tt></a> package<a class="headerlink" href="#the-chemistry-charmm-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="the-parmed-charmm-package">
+<h1>The <a class="reference internal" href="api/parmed/parmed.charmm.html#module-parmed.charmm" title="parmed.charmm"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.charmm</span></tt></a> package<a class="headerlink" href="#the-parmed-charmm-package" title="Permalink to this headline">¶</a></h1>
 <p>The <tt class="xref py py-mod docutils literal"><span class="pre">charmm</span></tt> package contains classes that can parse a variety of CHARMM
 files, including PSF files, parameter files, and coordinate files.
 Parameter files (PAR), stream files (STR), CHARMM coordinate files, and CHARMM
@@ -75,14 +75,14 @@ currently).</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="charmmobj/chemistry.charmm.CharmmPsfFile.html#chemistry.charmm.CharmmPsfFile" title="chemistry.charmm.CharmmPsfFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmPsfFile</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmPsfFile</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</td>
 </tr>
 </tbody>
 </table>
-<p>This class is a subclass of <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>,
+<p>This class is a subclass of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>,
 and as such contains the corresponding topology arrays <tt class="xref py py-attr docutils literal"><span class="pre">atoms</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">bonds</span></tt>, ... etc. An example
-demonstrating the use of <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmPsfFile.html#chemistry.charmm.CharmmPsfFile" title="chemistry.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></a> to parse <tt class="docutils literal"><span class="pre">dhfr_cmap_pbc.psf</span></tt>
+demonstrating the use of <a class="reference internal" href="charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></a> to parse <tt class="docutils literal"><span class="pre">dhfr_cmap_pbc.psf</span></tt>
 (a sample PSF file in the ParmEd unit test suite) is shown below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">psf</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;dhfr_cmap_pbc.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">psf</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
@@ -100,7 +100,7 @@ demonstrating the use of <a class="reference internal" href="charmmobj/chemistry
 <h2>CHARMM Parameter Sets<a class="headerlink" href="#charmm-parameter-sets" title="Permalink to this headline">¶</a></h2>
 <p>CHARMM parameters are spread across three different types of files: <em>Residue
 topology files</em> (RTF), <em>Parameter files</em> (PAR), and <em>stream files</em> (STR). A
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> (described briefly below) will build a parameter
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> (described briefly below) will build a parameter
 database from collections of all three of these files.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -108,13 +108,13 @@ database from collections of all three of these files.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmParameterSet</span></tt></a>(*args)</td>
+<tr class="row-odd"><td><a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmParameterSet</span></tt></a>(*args)</td>
 <td>Stores a parameter set defined by CHARMM files.</td>
 </tr>
 </tbody>
 </table>
 <p>To instantiate a parameter set, you can pass a list of file names (any iterable
-will suffice) to the <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> constructor, and the format
+will suffice) to the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> constructor, and the format
 will be determined from the file name itself. File type recognition follows the
 rules summarized in the table below:</p>
 <table border="1" class="docutils">
@@ -146,10 +146,10 @@ Otherwise <tt class="docutils literal"><span class="pre">ValueError</span></tt> 
 </table>
 <p>If your file name does not match one of the patterns above, you need to either
 rename your file or use alternate ways to read in each file (see
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet.load_set" title="chemistry.charmm.CharmmParameterSet.load_set"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.load_set()</span></tt></a> as well as the sections below).</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.load_set()</span></tt></a> as well as the sections below).</p>
 <p>An example is shown processing the sample CHARMM 22 force field files provided
 in the ParmEd unit test files:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry.charmm</span> <span class="kn">import</span> <span class="n">CharmmParameterSet</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmParameterSet</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">(</span><span class="s">&#39;par_all22_prot.inp&#39;</span><span class="p">,</span> <span class="s">&#39;top_all22_prot.inp&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[(</span><span class="s">&#39;CE1&#39;</span><span class="p">,</span> <span class="s">&#39;CE1&#39;</span><span class="p">)]</span>
 <span class="go">&lt;BondType; k=440.000, Req=1.340&gt;</span>
@@ -165,7 +165,7 @@ in the ParmEd unit test files:</p>
 <p>Notice that the dictionaries have keys matching all permutations of the atom
 types defining a parameter. In the example above, the angle type keys <tt class="docutils literal"><span class="pre">('H',</span>
 <span class="pre">'NH2',</span> <span class="pre">'CT1')</span></tt> and <tt class="docutils literal"><span class="pre">('CT1',</span> <span class="pre">'NH2',</span> <span class="pre">'H')</span></tt> both point to the same
-<a class="reference internal" href="topobj/chemistry.topologyobjects.AngleType.html#chemistry.topologyobjects.AngleType" title="chemistry.topologyobjects.AngleType"><tt class="xref py py-class docutils literal"><span class="pre">AngleType</span></tt></a>. In fact, they point to
+<a class="reference internal" href="topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><tt class="xref py py-class docutils literal"><span class="pre">AngleType</span></tt></a>. In fact, they point to
 the exact same <em>object</em>, so that if you modify that angle type, it is changed
 for both keys:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="s">&#39;CT1&#39;</span><span class="p">,</span> <span class="s">&#39;NH2&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mf">60.0</span>
@@ -191,16 +191,16 @@ within the residues, their connectivity, and a standard internal coordinate
 representation of their orientation). It also describes various <em>patches</em> (i.e.,
 small fragments meant to adorn or modify the more typical residues) that are
 used to modify the residues. This information is <em>not</em> currently processed by
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a>. The only information that the RTF file contains
-that <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> makes use of is the listing of atom types.</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a>. The only information that the RTF file contains
+that <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> makes use of is the listing of atom types.</p>
 <p>As of the CHARMM 36 parameter set, however, this information is now stored in
 the parameter files, so the RTF files are not strictly required by the
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> for these newer force fields.</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> for these newer force fields.</p>
 <p>When they <em>are</em> required, however, they must be loaded into the
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> <em>before</em> the corresponding parameter file, since the
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> <em>before</em> the corresponding parameter file, since the
 atom types need to be defined before they can be used.</p>
 <p>To specifically load a topology file, use
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet.read_topology_file" title="chemistry.charmm.CharmmParameterSet.read_topology_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_topology_file()</span></tt></a>. Note, this should only be
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_topology_file()</span></tt></a>. Note, this should only be
 necessary when adding on to an existing parameter set or when the default name
 recognition does not appropriately classify your file as an RTF.</p>
 </div>
@@ -210,7 +210,7 @@ recognition does not appropriately classify your file as an RTF.</p>
 defined between specific atom type names. For newer force fields, they also
 include the atom type name to type index mapping as well as atom masses.</p>
 <p>To specifically load a parameter file, use
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet.read_parameter_file" title="chemistry.charmm.CharmmParameterSet.read_parameter_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_parameter_file()</span></tt></a>.</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_parameter_file()</span></tt></a>.</p>
 </div>
 <div class="section" id="stream-files-str">
 <h3>Stream Files (STR)<a class="headerlink" href="#stream-files-str" title="Permalink to this headline">¶</a></h3>
@@ -218,13 +218,13 @@ include the atom type name to type index mapping as well as atom masses.</p>
 directives are ignored, but any <em>rtf</em> or <em>par</em> sections will be read to augment
 a parameter set with additional atom types and parameters.</p>
 <p>To specifically load a stream file, use
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet.read_stream_file" title="chemistry.charmm.CharmmParameterSet.read_stream_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_stream_file()</span></tt></a>.</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.read_stream_file()</span></tt></a>.</p>
 </div>
 <div class="section" id="add-to-an-existing-parameter-set">
 <h3>Add to an existing parameter set<a class="headerlink" href="#add-to-an-existing-parameter-set" title="Permalink to this headline">¶</a></h3>
-<p>If you have an existing <a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet" title="chemistry.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> instance and want to read in
+<p>If you have an existing <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a> instance and want to read in
 another parameter, topology, and/or stream file(s), you can use the
-<a class="reference internal" href="charmmobj/chemistry.charmm.CharmmParameterSet.html#chemistry.charmm.CharmmParameterSet.load_set" title="chemistry.charmm.CharmmParameterSet.load_set"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.load_set()</span></tt></a> as a shortcut for reading parameter, RTF,
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><tt class="xref py py-meth docutils literal"><span class="pre">CharmmParameterSet.load_set()</span></tt></a> as a shortcut for reading parameter, RTF,
 and stream files separately.</p>
 </div>
 </div>
@@ -238,10 +238,10 @@ coordinate files and restart files, summarized below.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="charmmobj/chemistry.charmm.CharmmCrdFile.html#chemistry.charmm.CharmmCrdFile" title="chemistry.charmm.CharmmCrdFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmCrdFile</span></tt></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="charmmobj/parmed.charmm.CharmmCrdFile.html#parmed.charmm.CharmmCrdFile" title="parmed.charmm.CharmmCrdFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmCrdFile</span></tt></a>(fname)</td>
 <td>Reads and parses a CHARMM coordinate file (.crd) into its components, namely the coordinates, CHARMM atom types, resid, resname, etc.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="charmmobj/chemistry.charmm.CharmmRstFile.html#chemistry.charmm.CharmmRstFile" title="chemistry.charmm.CharmmRstFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmRstFile</span></tt></a>(fname)</td>
+<tr class="row-even"><td><a class="reference internal" href="charmmobj/parmed.charmm.CharmmRstFile.html#parmed.charmm.CharmmRstFile" title="parmed.charmm.CharmmRstFile"><tt class="xref py py-obj docutils literal"><span class="pre">CharmmRstFile</span></tt></a>(fname)</td>
 <td>Reads and parses data, velocities and coordinates from a CHARMM restart</td>
 </tr>
 </tbody>
@@ -260,7 +260,7 @@ old coordinates) are available as attributes to the objects.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">chemistry.charmm</span></tt> package</a><ul>
+<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">parmed.charmm</span></tt> package</a><ul>
 <li><a class="reference internal" href="#the-protein-structure-file-psf">The Protein Structure File (PSF)</a></li>
 <li><a class="reference internal" href="#charmm-parameter-sets">CHARMM Parameter Sets</a><ul>
 <li><a class="reference internal" href="#residue-topology-file-rtf">Residue Topology File (RTF)</a></li>
@@ -306,7 +306,7 @@ old coordinates) are available as attributes to the objects.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="charmmobj/chemistry.charmm.CharmmPsfFile.html" title="chemistry.charmm.CharmmPsfFile"
+          <a href="charmmobj/parmed.charmm.CharmmPsfFile.html" title="parmed.charmm.CharmmPsfFile"
              >next</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>

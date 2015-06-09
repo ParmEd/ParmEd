@@ -1,7 +1,0 @@
-ParmedTools.argumentlist module
-===============================
-
-.. automodule:: ParmedTools.argumentlist
-    :members:
-    :undoc-members:
-    :show-inheritance:

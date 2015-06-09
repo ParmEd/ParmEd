@@ -1,7 +1,0 @@
-chemistry.vec3 module
-=====================
-
-.. automodule:: chemistry.vec3
-    :members:
-    :undoc-members:
-    :show-inheritance:

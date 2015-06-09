@@ -1,0 +1,18 @@
+parmed.gromacs package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.gromacs.gromacsgro
+   parmed.gromacs.gromacstop
+
+Module contents
+---------------
+
+.. automodule:: parmed.gromacs
+    :members:
+    :undoc-members:
+    :show-inheritance:

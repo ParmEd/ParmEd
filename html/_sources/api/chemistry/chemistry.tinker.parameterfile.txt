@@ -1,7 +1,0 @@
-chemistry.tinker.parameterfile module
-=====================================
-
-.. automodule:: chemistry.tinker.parameterfile
-    :members:
-    :undoc-members:
-    :show-inheritance:

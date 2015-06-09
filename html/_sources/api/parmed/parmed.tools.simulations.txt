@@ -1,0 +1,18 @@
+parmed.tools.simulations package
+================================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.tools.simulations.openmm
+   parmed.tools.simulations.sanderapi
+
+Module contents
+---------------
+
+.. automodule:: parmed.tools.simulations
+    :members:
+    :undoc-members:
+    :show-inheritance:

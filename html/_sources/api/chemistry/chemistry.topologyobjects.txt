@@ -1,7 +1,0 @@
-chemistry.topologyobjects module
-================================
-
-.. automodule:: chemistry.topologyobjects
-    :members:
-    :undoc-members:
-    :show-inheritance:

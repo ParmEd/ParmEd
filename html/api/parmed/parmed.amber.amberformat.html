@@ -1,0 +1,551 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.amber.amberformat module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.amber.amberformat">
+<span id="parmed-amber-amberformat-module"></span><h1>parmed.amber.amberformat module<a class="headerlink" href="#module-parmed.amber.amberformat" title="Permalink to this headline">¶</a></h1>
+<p>This is a generalization of the readparm.AmberParm class to handle similar
+Amber-style files with %FLAG/%FORMAT tags</p>
+<dl class="class">
+<dt id="parmed.amber.amberformat.AmberFormat">
+<em class="property">class </em><tt class="descclassname">parmed.amber.amberformat.</tt><tt class="descname">AmberFormat</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A class that can parse and print files stored in the Amber topology or MDL
+format. In particular, these files have the general form:</p>
+<p><tt class="docutils literal"><span class="pre">`</span>
+<span class="pre">%VERSION</span> <span class="pre">VERSION_STAMP</span> <span class="pre">=</span> <span class="pre">V00001.000</span>&nbsp; <span class="pre">DATE</span> <span class="pre">=</span> <span class="pre">XX/XX/XX</span>&nbsp; <span class="pre">XX:XX:XX</span>
+<span class="pre">%FLAG</span> <span class="pre">&lt;FLAG_NAME&gt;</span>
+<span class="pre">%COMMENT</span> <span class="pre">&lt;comments&gt;</span>
+<span class="pre">%FORMAT(&lt;Fortran_Format&gt;)</span>
+<span class="pre">...</span> <span class="pre">data</span> <span class="pre">corresponding</span> <span class="pre">to</span> <span class="pre">that</span> <span class="pre">Fortran</span> <span class="pre">Format</span>
+<span class="pre">%FLAG</span> <span class="pre">&lt;FLAG_NAME2&gt;</span>
+<span class="pre">%COMMENT</span> <span class="pre">&lt;comments&gt;</span>
+<span class="pre">%FORMAT(&lt;Fortran_Format&gt;)</span>
+<span class="pre">...</span> <span class="pre">data</span> <span class="pre">corresponding</span> <span class="pre">to</span> <span class="pre">that</span> <span class="pre">Fortran</span> <span class="pre">Format</span>
+<span class="pre">`</span></tt></p>
+<p>where the <cite>%COMMENT</cite> sections are entirely optional</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, this file is parsed and the data structures will be loaded
+from the data in this file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>parm_data</td>
+<td>(dict {str) A dictionary that maps FLAG names to all of the data contained in that section of the Amber file.</td>
+</tr>
+<tr class="row-even"><td>formats</td>
+<td>(dict {str) A dictionary that maps FLAG names to the FortranFormat instance in which the data is stored in that section</td>
+</tr>
+<tr class="row-odd"><td>parm_comments</td>
+<td>(dict {str) A dictionary that maps FLAG names to the list of COMMENT lines that were stored in the original file</td>
+</tr>
+<tr class="row-even"><td>flag_list</td>
+<td>(list) An ordered list of all FLAG names. This must be kept synchronized with <cite>parm_data</cite>, <cite>formats</cite>, and <cite>parm_comments</cite> such that every item in <cite>flag_list</cite> is a key to those 3 dicts and no other keys exist</td>
+</tr>
+<tr class="row-odd"><td>charge_flag</td>
+<td>(str=&#8217;CHARGE&#8217;) The name of the name of the FLAG that describes partial atomic charge data. If this flag is found, then its data are multiplied by the ELECTROSTATIC_CONSTANT to convert back to fractions of electrons</td>
+</tr>
+<tr class="row-even"><td>version</td>
+<td>(str) The VERSION string from the Amber file</td>
+</tr>
+<tr class="row-odd"><td>name</td>
+<td>(str) The file name of the originally parsed file (set to the fname parameter)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.addFlag" title="parmed.amber.amberformat.AmberFormat.addFlag"><tt class="xref py py-obj docutils literal"><span class="pre">addFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.add_flag" title="parmed.amber.amberformat.AmberFormat.add_flag"><tt class="xref py py-obj docutils literal"><span class="pre">add_flag</span></tt></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.deleteFlag" title="parmed.amber.amberformat.AmberFormat.deleteFlag"><tt class="xref py py-obj docutils literal"><span class="pre">deleteFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.delete_flag" title="parmed.amber.amberformat.AmberFormat.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.id_format" title="parmed.amber.amberformat.AmberFormat.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.parse" title="parmed.amber.amberformat.AmberFormat.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<td>Meant for use with the automatic file loader, this will automatically</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.rdparm" title="parmed.amber.amberformat.AmberFormat.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
+<td>Parses the Amber format file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.rdparm_old" title="parmed.amber.amberformat.AmberFormat.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
+<td>This reads an old-style topology file and stores the results in the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.rdparm_slow" title="parmed.amber.amberformat.AmberFormat.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
+<td>Parses the Amber format file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.set_version" title="parmed.amber.amberformat.AmberFormat.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
+<td>Sets the version string</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.view" title="parmed.amber.amberformat.AmberFormat.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<td>Returns a view of the current object as another object.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.writeParm" title="parmed.amber.amberformat.AmberFormat.writeParm"><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.AmberFormat.write_parm" title="parmed.amber.amberformat.AmberFormat.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
+<td>Writes the current data in parm_data into a new topology file with</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.addFlag">
+<tt class="descname">addFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.addFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new flag with the given flag name and Fortran format string and
+initializes the array with the values given, or as an array of 0s
+of length num_items</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flag_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the flag to insert. It is converted to all upper case</p>
+</div></blockquote>
+<p><strong>flag_format</strong> : str</p>
+<blockquote>
+<div><p>Fortran format string representing how the data in this section
+should be written and read. Do not enclose in ()</p>
+</div></blockquote>
+<p><strong>data</strong> : list=None</p>
+<blockquote>
+<div><p>Sequence with data for the new flag. If None, a list of zeros of
+length <cite>num_items</cite> (see below) is given as a holder</p>
+</div></blockquote>
+<p><strong>num_items</strong> : int=-1</p>
+<blockquote>
+<div><p>Number of items in the section. This variable is ignored if a set of
+data are given in <cite>data</cite></p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str=None</p>
+<blockquote>
+<div><p>List of comments to add to this section</p>
+</div></blockquote>
+<p><strong>after</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, the added flag will be added after the one with the
+name given to <cite>after</cite>. If this flag does not exist, IndexError will
+be raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.add_flag">
+<tt class="descname">add_flag</tt><big>(</big><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.add_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.add_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new flag with the given flag name and Fortran format string and
+initializes the array with the values given, or as an array of 0s
+of length num_items</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flag_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the flag to insert. It is converted to all upper case</p>
+</div></blockquote>
+<p><strong>flag_format</strong> : str</p>
+<blockquote>
+<div><p>Fortran format string representing how the data in this section
+should be written and read. Do not enclose in ()</p>
+</div></blockquote>
+<p><strong>data</strong> : list=None</p>
+<blockquote>
+<div><p>Sequence with data for the new flag. If None, a list of zeros of
+length <cite>num_items</cite> (see below) is given as a holder</p>
+</div></blockquote>
+<p><strong>num_items</strong> : int=-1</p>
+<blockquote>
+<div><p>Number of items in the section. This variable is ignored if a set of
+data are given in <cite>data</cite></p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str=None</p>
+<blockquote>
+<div><p>List of comments to add to this section</p>
+</div></blockquote>
+<p><strong>after</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, the added flag will be added after the one with the
+name given to <cite>after</cite>. If this flag does not exist, IndexError will
+be raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.deleteFlag">
+<tt class="descname">deleteFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.deleteFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a flag from the topology file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.delete_flag">
+<tt class="descname">delete_flag</tt><big>(</big><em>flag_name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.delete_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.delete_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a flag from the topology file</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.amber.amberformat.AmberFormat.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as either Amber-format file (like prmtop) or an
+old-style topology file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber-style format, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.amber.amberformat.AmberFormat.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meant for use with the automatic file loader, this will automatically
+return a subclass of AmberFormat corresponding to what the information
+in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
+AmoebaParm, or AmberFormat)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.rdparm">
+<tt class="descname">rdparm</tt><big>(</big><em>fname</em>, <em>slow=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.rdparm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.rdparm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the Amber format file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.rdparm_old">
+<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em>, <em>check=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.rdparm_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.rdparm_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>This reads an old-style topology file and stores the results in the
+same data structures as a new-style topology file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prmtop_lines</strong> : list of str</p>
+<blockquote>
+<div><p>List of all lines in the prmtop file</p>
+</div></blockquote>
+<p><strong>check</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, only the first couple sections will be read to determine if
+this is, in fact, an old-style topology file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.rdparm_slow">
+<tt class="descname">rdparm_slow</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.rdparm_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.rdparm_slow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the Amber format file. This parser is written in pure Python and
+is therefore slower than the C++-optimized version</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.set_version">
+<tt class="descname">set_version</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.set_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.set_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the version string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.view">
+<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a view of the current object as another object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cls</strong> : type</p>
+<blockquote>
+<div><p>Class definition of an AmberParm subclass for the current object to
+be converted into</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">instance of cls initialized from data in this object. This is NOT a deep</p>
+<p>copy, so modifying the original object may modify this. The copy</p>
+<p class="last">function will create a deep copy of any AmberFormat-derived object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.writeParm">
+<tt class="descname">writeParm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.writeParm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.writeParm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.AmberFormat.write_parm">
+<tt class="descname">write_parm</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#AmberFormat.write_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.AmberFormat.write_parm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the current data in parm_data into a new topology file with
+the given name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the file to write the topology file to</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.amber.amberformat.FortranFormat">
+<em class="property">class </em><tt class="descclassname">parmed.amber.amberformat.</tt><tt class="descname">FortranFormat</tt><big>(</big><em>format_string</em>, <em>strip_strings=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#FortranFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Processes Fortran format strings according to the Fortran specification for
+such formats. This object handles reading and writing data with any valid
+Fortran format. It does this by using the <cite>fortranformat</cite> project
+[<a class="reference external" href="https://bitbucket.org/brendanarnold/py-fortranformat">https://bitbucket.org/brendanarnold/py-fortranformat</a>].</p>
+<p>However, while <cite>fortranformat</cite> is very general and adheres well to the
+standard, it is very slow. As a result, simple, common format strings have
+been optimized and processes reads and writes between 3 and 5 times faster.
+The format strings (case-insensitive) of the following form (where # can be
+replaced by any number) are optimized:</p>
+<blockquote>
+<div><ul class="simple">
+<li>#E#.#</li>
+<li>#D#.#</li>
+<li>#F#.#</li>
+<li>#(F#.#)</li>
+<li>#a#</li>
+<li>#I#</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>format_string</strong> : str</p>
+<blockquote>
+<div><p>The Fortran Format string to process</p>
+</div></blockquote>
+<p><strong>strip_strings</strong> : bool=True</p>
+<blockquote class="last">
+<div><p>If True, strings are stripped before being processed by stripping
+(only) trailing whitespace</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.amberformat.FortranFormat.read" title="parmed.amber.amberformat.FortranFormat.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(line)</td>
+<td>Reads the line and returns the converted data</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.amberformat.FortranFormat.write" title="parmed.amber.amberformat.FortranFormat.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(items,&nbsp;dest)</td>
+<td>Writes an iterable of data (or a single item) to the passed file-like</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.amber.amberformat.FortranFormat.floatre">
+<tt class="descname">floatre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x106283af0&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.amberformat.FortranFormat.floatre2">
+<tt class="descname">floatre2</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x1062f3198&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.amberformat.FortranFormat.intre">
+<tt class="descname">intre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x10629fb88&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.FortranFormat.read">
+<tt class="descname">read</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#FortranFormat.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the line and returns the converted data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.amberformat.FortranFormat.strre">
+<tt class="descname">strre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x10629fa80&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.amberformat.FortranFormat.write">
+<tt class="descname">write</tt><big>(</big><em>items</em>, <em>dest</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/amberformat.html#FortranFormat.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes an iterable of data (or a single item) to the passed file-like
+object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>items</strong> : iterable or single float/str/int</p>
+<blockquote>
+<div><p>These are the objects to write in this format. The types of each
+item should match the type specified in this Format for that
+argument</p>
+</div></blockquote>
+<p><strong>dest</strong> : file or file-like</p>
+<blockquote class="last">
+<div><p>This is the file to write the data to. It must have a <cite>write</cite> method
+or an AttributeError will be raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method may be replaced with _write_string (for #a#-style formats)
+or _write_ffwriter in the class initializer if no optimization is
+provided for this format, but the call signatures and behavior are the
+same for each of those functions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.amber.amberformat.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

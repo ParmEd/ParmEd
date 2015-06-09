@@ -1,4 +1,4 @@
-The :mod:`chemistry.gromacs` package
+The :mod:`parmed.gromacs` package
 ==================================
 
 The :mod:`gromacs` package contains classes that can parse the Gromacs topology
@@ -35,18 +35,18 @@ ParmEd will look for Gromacs in the following places (in this order):
    ``/usr/local/gromacs/share/gromacs`` is used.
 
 If you wish to specify the location, you can do so by modifying the
-``GROMACS_TOPDIR`` variable in the ``chemistry.gromacs`` package in the
+``GROMACS_TOPDIR`` variable in the ``parmed.gromacs`` package in the
 following way::
 
-    from chemistry import gromacs
+    from parmed import gromacs
     gromacs.GROMACS_TOPDIR = "/path/to/gromacs/installation/share/gromacs/top"
 
 Note, because strings are immutable in Python, the following will *not* work::
 
-    from chemistry.gromacs import GROMACS_TOPDIR
+    from parmed.gromacs import GROMACS_TOPDIR
     GROMACS_TOPDIR = "/path/to/gromacs/installation/share/gromacs/top"
 
-In the above example, ``chemistry.gromacs.GROMACS_TOPDIR`` will remain
+In the above example, ``parmed.gromacs.GROMACS_TOPDIR`` will remain
 unchanged.
 
 The topology file
@@ -56,7 +56,7 @@ The primary file in Gromacs defining the system topology and the parameters
 defining the force field for that system is called the *topology* file, whose
 format is detailed in the Gromacs User's manual.
 
-.. currentmodule:: chemistry.gromacs
+.. currentmodule:: parmed.gromacs
 .. autosummary::
     :toctree: gromacsobj/
 
@@ -67,8 +67,8 @@ The :class:`GromacsTopologyFile` class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This class inherits from the base class :class:`Structure
-<chemistry.structure.Structure>`, adding the attributes ``parameterset`` (a
-:class:`ParameterSet <chemistry.parameters.ParameterSet>` object with all
+<parmed.structure.Structure>`, adding the attributes ``parameterset`` (a
+:class:`ParameterSet <parmed.parameters.ParameterSet>` object with all
 parameters parsed from the include topology files) and ``itps`` (a list of all
 include topology files that were included and parsed while processing the
 topology file).
@@ -83,26 +83,26 @@ is shown below::
     
 
 You can manipulate the ``top`` instance any way you can a :class:`Structure
-<chemistry.structure.Structure>` instance.
+<parmed.structure.Structure>` instance.
 
 The GRO coordinate
 ------------------
 
 ParmEd also supplies classes for parsing the various variants of the GROMACS GRO
 file. Because the GRO file resembles a PDB file, the :class:`GromacsGroFile
-<chemistry.gromacs.GromacsGroFile>` has a ``parse`` method that will parse a GRO
-file and instantiate a :class:`Structure <chemistry.structure.Structure>`.
+<parmed.gromacs.GromacsGroFile>` has a ``parse`` method that will parse a GRO
+file and instantiate a :class:`Structure <parmed.structure.Structure>`.
 
 The coordinates can be extracted from the ``xx``, ``xy``, and ``xz`` attributes
-on each :class:`Atom <chemistry.topologyobjects.Atom>` instance in the
+on each :class:`Atom <parmed.topologyobjects.Atom>` instance in the
 Structure.
 
-The GRO file is automatically detected by :meth:`chemistry.load_file`, and this
+The GRO file is automatically detected by :meth:`parmed.load_file`, and this
 is the recommended way to parse these files.
 
 The corresponding classes are:
 
-.. currentmodule:: chemistry.gromacs
+.. currentmodule:: parmed.gromacs
 .. autosummary::
     :toctree: amberobj/
 
@@ -116,7 +116,7 @@ Many exciting possibilities are available with `GromacsTopologyFile` and `Gromac
 For example, ParmEd is the first software package to enable conversion of Gromacs simulation
 input files to AMBER format in just a few lines of code::
 
-    >>> from chemistry import gromacs, amber
+    >>> from parmed import gromacs, amber
     >>> gmx_top = GromacsTopologyFile('topol.top')
     >>> gmx_gro = GromacsGroFile('conf.gro')
     >>> gmx_top.box = gmx_gro.box # Needed because .prmtop contains box info

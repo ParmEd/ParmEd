@@ -1,7 +1,0 @@
-chemistry.utils.timer module
-============================
-
-.. automodule:: chemistry.utils.timer
-    :members:
-    :undoc-members:
-    :show-inheritance:

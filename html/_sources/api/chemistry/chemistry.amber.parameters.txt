@@ -1,7 +1,0 @@
-chemistry.amber.parameters module
-=================================
-
-.. automodule:: chemistry.amber.parameters
-    :members:
-    :undoc-members:
-    :show-inheritance:

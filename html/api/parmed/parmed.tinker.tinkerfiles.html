@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.tinker.tinkerfiles module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.tinker.tinkerfiles">
+<span id="parmed-tinker-tinkerfiles-module"></span><h1>parmed.tinker.tinkerfiles module<a class="headerlink" href="#module-parmed.tinker.tinkerfiles" title="Permalink to this headline">¶</a></h1>
+<p>This module contains classes for reading various TINKER-style files</p>
+<dl class="class">
+<dt id="parmed.tinker.tinkerfiles.DynFile">
+<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">DynFile</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Reads and processes a Tinker DYN file</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.DynFile.read" title="parmed.tinker.tinkerfiles.DynFile.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(fname)</td>
+<td>Parses the .dyn file</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.DynFile.read">
+<tt class="descname">read</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the .dyn file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.tinker.tinkerfiles.KeywordControlFile">
+<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">KeywordControlFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#KeywordControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.KeywordControlFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Reads and processes a keyword control file for TINKER simulations</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.tinker.tinkerfiles.XyzFile">
+<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">XyzFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#XyzFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Reads and processes a Tinker XYZ file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.tinker.tinkerfiles.is_float">
+<tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">is_float</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#is_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.is_float" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.tinker.tinkerfiles.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

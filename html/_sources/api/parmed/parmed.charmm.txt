@@ -1,0 +1,19 @@
+parmed.charmm package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.charmm.charmmcrds
+   parmed.charmm.parameters
+   parmed.charmm.psf
+
+Module contents
+---------------
+
+.. automodule:: parmed.charmm
+    :members:
+    :undoc-members:
+    :show-inheritance:

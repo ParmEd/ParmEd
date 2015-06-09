@@ -1,0 +1,31 @@
+parmed.topologyobjects.Cmap
+===========================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: Cmap
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Cmap.__init__
+      ~Cmap.delete
+      ~Cmap.extended
+      ~Cmap.same_atoms
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Cmap.cmap_type
+   
+   

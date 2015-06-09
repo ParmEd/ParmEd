@@ -1,0 +1,43 @@
+parmed.amber.NetCDFRestart
+==========================
+
+.. currentmodule:: parmed.amber
+
+.. autoclass:: NetCDFRestart
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NetCDFRestart.__init__
+      ~NetCDFRestart.close
+      ~NetCDFRestart.flush
+      ~NetCDFRestart.id_format
+      ~NetCDFRestart.open_new
+      ~NetCDFRestart.open_old
+      ~NetCDFRestart.parse
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~NetCDFRestart.box
+      ~NetCDFRestart.cell_angles
+      ~NetCDFRestart.cell_lengths
+      ~NetCDFRestart.coordinates
+      ~NetCDFRestart.remd_dimtype
+      ~NetCDFRestart.remd_groups
+      ~NetCDFRestart.remd_indices
+      ~NetCDFRestart.temp0
+      ~NetCDFRestart.time
+      ~NetCDFRestart.velocities
+   
+   

@@ -1,0 +1,7 @@
+parmed.utils.decorators module
+==============================
+
+.. automodule:: parmed.utils.decorators
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.utils.io module
+======================
+
+.. automodule:: parmed.utils.io
+    :members:
+    :undoc-members:
+    :show-inheritance:

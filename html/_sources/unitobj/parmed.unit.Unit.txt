@@ -1,0 +1,36 @@
+parmed.unit.Unit
+================
+
+.. currentmodule:: parmed.unit
+
+.. autoclass:: Unit
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Unit.__init__
+      ~Unit.conversion_factor_to
+      ~Unit.create_unit
+      ~Unit.get_conversion_factor_to_base_units
+      ~Unit.get_name
+      ~Unit.get_symbol
+      ~Unit.in_unit_system
+      ~Unit.is_compatible
+      ~Unit.is_dimensionless
+      ~Unit.iter_all_base_units
+      ~Unit.iter_base_dimensions
+      ~Unit.iter_base_or_scaled_units
+      ~Unit.iter_scaled_units
+      ~Unit.iter_top_base_units
+      ~Unit.sqrt
+   
+   
+
+   
+   
+   

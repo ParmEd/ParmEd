@@ -1,0 +1,42 @@
+parmed.unit.Quantity
+====================
+
+.. currentmodule:: parmed.unit
+
+.. autoclass:: Quantity
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Quantity.__init__
+      ~Quantity.append
+      ~Quantity.count
+      ~Quantity.extend
+      ~Quantity.format
+      ~Quantity.in_unit_system
+      ~Quantity.in_units_of
+      ~Quantity.index
+      ~Quantity.insert
+      ~Quantity.max
+      ~Quantity.mean
+      ~Quantity.min
+      ~Quantity.pop
+      ~Quantity.reduce_unit
+      ~Quantity.remove
+      ~Quantity.reshape
+      ~Quantity.sqrt
+      ~Quantity.std
+      ~Quantity.sum
+      ~Quantity.value_in_unit
+      ~Quantity.value_in_unit_system
+   
+   
+
+   
+   
+   

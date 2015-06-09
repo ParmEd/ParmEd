@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.unit.Unit &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="Dimensional Analysis (working with parmed.unit)" href="../dimensional_analysis.html" />
+    <link rel="prev" title="parmed.unit.is_quantity" href="parmed.unit.is_quantity.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed.unit.is_quantity.html" title="parmed.unit.is_quantity"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../dimensional_analysis.html" accesskey="U">Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">parmed.unit</span></tt>)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-unit-unit">
+<h1>parmed.unit.Unit<a class="headerlink" href="#parmed-unit-unit" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.unit.Unit">
+<em class="property">class </em><tt class="descclassname">parmed.unit.</tt><tt class="descname">Unit</tt><big>(</big><em>base_or_scaled_units</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Physical unit such as meter or ampere.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.conversion_factor_to" title="parmed.unit.Unit.conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></tt></a>(other)</td>
+<td>Returns conversion factor for computing all of the common dimensions between self and other from self base units to other base units.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.create_unit" title="parmed.unit.Unit.create_unit"><tt class="xref py py-obj docutils literal"><span class="pre">create_unit</span></tt></a>(scale,&nbsp;name,&nbsp;symbol)</td>
+<td>Convenience method for creating a new simple unit from another simple unit.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.get_conversion_factor_to_base_units" title="parmed.unit.Unit.get_conversion_factor_to_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">get_conversion_factor_to_base_units</span></tt></a>()</td>
+<td>There may be ScaleUnit components to this Unit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.get_name" title="parmed.unit.Unit.get_name"><tt class="xref py py-obj docutils literal"><span class="pre">get_name</span></tt></a>()</td>
+<td>Returns a unit name (string) for this Unit, composed of its various BaseUnit symbols.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.get_symbol" title="parmed.unit.Unit.get_symbol"><tt class="xref py py-obj docutils literal"><span class="pre">get_symbol</span></tt></a>()</td>
+<td>Returns a unit symbol (string) for this Unit, composed of its various BaseUnit symbols.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.in_unit_system" title="parmed.unit.Unit.in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></tt></a>(system)</td>
+<td>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.is_compatible" title="parmed.unit.Unit.is_compatible"><tt class="xref py py-obj docutils literal"><span class="pre">is_compatible</span></tt></a>(other)</td>
+<td>Returns True if two Units share the same dimension.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.is_dimensionless" title="parmed.unit.Unit.is_dimensionless"><tt class="xref py py-obj docutils literal"><span class="pre">is_dimensionless</span></tt></a>()</td>
+<td>Returns True if this Unit has no dimensions.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.iter_all_base_units" title="parmed.unit.Unit.iter_all_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">iter_all_base_units</span></tt></a>()</td>
+<td>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits found within ScaledUnits.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.iter_base_dimensions" title="parmed.unit.Unit.iter_base_dimensions"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></tt></a>()</td>
+<td>Yields (BaseDimension, exponent) tuples comprising this unit.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_or_scaled_units</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_scaled_units</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.iter_top_base_units" title="parmed.unit.Unit.iter_top_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">iter_top_base_units</span></tt></a>()</td>
+<td>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.sqrt" title="parmed.unit.Unit.sqrt"><tt class="xref py py-obj docutils literal"><span class="pre">sqrt</span></tt></a>()</td>
+<td>Returns square root of a unit.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.unit.Unit.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>base_or_scaled_units</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Unit.</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>self (Unit) The newly created Unit.</li>
+<li>base_or_scaled_units (dict) Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.__init__" title="parmed.unit.Unit.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(base_or_scaled_units)</td>
+<td>Create a new Unit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.conversion_factor_to" title="parmed.unit.Unit.conversion_factor_to"><tt class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></tt></a>(other)</td>
+<td>Returns conversion factor for computing all of the common dimensions between self and other from self base units to other base units.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.create_unit" title="parmed.unit.Unit.create_unit"><tt class="xref py py-obj docutils literal"><span class="pre">create_unit</span></tt></a>(scale,&nbsp;name,&nbsp;symbol)</td>
+<td>Convenience method for creating a new simple unit from another simple unit.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.get_conversion_factor_to_base_units" title="parmed.unit.Unit.get_conversion_factor_to_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">get_conversion_factor_to_base_units</span></tt></a>()</td>
+<td>There may be ScaleUnit components to this Unit.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.get_name" title="parmed.unit.Unit.get_name"><tt class="xref py py-obj docutils literal"><span class="pre">get_name</span></tt></a>()</td>
+<td>Returns a unit name (string) for this Unit, composed of its various BaseUnit symbols.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.get_symbol" title="parmed.unit.Unit.get_symbol"><tt class="xref py py-obj docutils literal"><span class="pre">get_symbol</span></tt></a>()</td>
+<td>Returns a unit symbol (string) for this Unit, composed of its various BaseUnit symbols.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.in_unit_system" title="parmed.unit.Unit.in_unit_system"><tt class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></tt></a>(system)</td>
+<td>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.is_compatible" title="parmed.unit.Unit.is_compatible"><tt class="xref py py-obj docutils literal"><span class="pre">is_compatible</span></tt></a>(other)</td>
+<td>Returns True if two Units share the same dimension.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.is_dimensionless" title="parmed.unit.Unit.is_dimensionless"><tt class="xref py py-obj docutils literal"><span class="pre">is_dimensionless</span></tt></a>()</td>
+<td>Returns True if this Unit has no dimensions.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.iter_all_base_units" title="parmed.unit.Unit.iter_all_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">iter_all_base_units</span></tt></a>()</td>
+<td>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits found within ScaledUnits.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.iter_base_dimensions" title="parmed.unit.Unit.iter_base_dimensions"><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></tt></a>()</td>
+<td>Yields (BaseDimension, exponent) tuples comprising this unit.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_base_or_scaled_units</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">iter_scaled_units</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.Unit.iter_top_base_units" title="parmed.unit.Unit.iter_top_base_units"><tt class="xref py py-obj docutils literal"><span class="pre">iter_top_base_units</span></tt></a>()</td>
+<td>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.Unit.sqrt" title="parmed.unit.Unit.sqrt"><tt class="xref py py-obj docutils literal"><span class="pre">sqrt</span></tt></a>()</td>
+<td>Returns square root of a unit.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.unit.Unit.conversion_factor_to">
+<tt class="descname">conversion_factor_to</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns conversion factor for computing all of the common dimensions
+between self and other from self base units to other base units.</p>
+<p>The two units need not share all of the same dimensions.  In case they
+do not, the conversion factor applies only to the BaseUnits of self
+that correspond to different BaseUnits in other.</p>
+<p>This method requires strict compatibility between the two units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.create_unit">
+<tt class="descname">create_unit</tt><big>(</big><em>scale</em>, <em>name</em>, <em>symbol</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit.create_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method for creating a new simple unit from another simple unit.
+Both units must consist of a single BaseUnit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.get_conversion_factor_to_base_units">
+<tt class="descname">get_conversion_factor_to_base_units</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>There may be ScaleUnit components to this Unit.
+Returns conversion factor to the set of BaseUnits returned by iter_all_base_units().</p>
+<p>Units comprised of only BaseUnits return 1.0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unit name (string) for this Unit, composed of its various
+BaseUnit symbols.  e.g. &#8216;kilogram meter**2 secon**-1&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.get_symbol">
+<tt class="descname">get_symbol</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.get_symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unit symbol (string) for this Unit, composed of its various
+BaseUnit symbols.  e.g. &#8216;kg m**2 s**-1&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.in_unit_system">
+<tt class="descname">in_unit_system</tt><big>(</big><em>system</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</p>
+<p>Strips off any ScaledUnits in the Unit, leaving only BaseUnits.</p>
+<dl class="docutils">
+<dt>Parameters</dt>
+<dd><ul class="first last simple">
+<li>system: a dictionary of (BaseDimension, BaseUnit) pairs</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.is_compatible">
+<tt class="descname">is_compatible</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#parmed.unit.Unit.is_compatible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if two Units share the same dimension.
+Returns False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.is_dimensionless">
+<tt class="descname">is_dimensionless</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.is_dimensionless" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if this Unit has no dimensions.
+Returns False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.iter_all_base_units">
+<tt class="descname">iter_all_base_units</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.iter_all_base_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits
+found within ScaledUnits.</p>
+<p>There might be multiple BaseUnits with the same dimension.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.iter_base_dimensions">
+<tt class="descname">iter_base_dimensions</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields (BaseDimension, exponent) tuples comprising this unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.iter_top_base_units">
+<tt class="descname">iter_top_base_units</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.iter_top_base_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.unit.Unit.sqrt">
+<tt class="descname">sqrt</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.unit.Unit.sqrt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns square root of a unit.</p>
+<p>Raises ArithmeticError if component exponents are not even.
+This behavior can be changed if you present a reasonable real life case to me.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/unitobj/parmed.unit.Unit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parmed.unit.is_quantity.html" title="parmed.unit.is_quantity"
+             >previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../dimensional_analysis.html" >Dimensional Analysis (working with <tt class="docutils literal"><span class="pre">parmed.unit</span></tt>)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

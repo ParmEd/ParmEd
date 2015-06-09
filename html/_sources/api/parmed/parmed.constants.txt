@@ -1,0 +1,7 @@
+parmed.constants module
+=======================
+
+.. automodule:: parmed.constants
+    :members:
+    :undoc-members:
+    :show-inheritance:

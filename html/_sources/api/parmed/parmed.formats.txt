@@ -1,0 +1,27 @@
+parmed.formats package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    parmed.formats.pdbx
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.formats.mol2
+   parmed.formats.pdb
+   parmed.formats.psf
+   parmed.formats.registry
+
+Module contents
+---------------
+
+.. automodule:: parmed.formats
+    :members:
+    :undoc-members:
+    :show-inheritance:

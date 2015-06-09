@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.topologyobjects.AtomList &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-topologyobjects-atomlist">
+<h1>parmed.topologyobjects.AtomList<a class="headerlink" href="#parmed-topologyobjects-atomlist" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.topologyobjects.AtomList">
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">AtomList</tt><big>(</big><em>arg=[]</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of Atoms</p>
+<p class="rubric">Notes</p>
+<p>Deleting an atom from the AtomList also deletes that atom from the residue
+it belongs to.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.append" title="parmed.topologyobjects.AtomList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.assign_nbidx_from_types" title="parmed.topologyobjects.AtomList.assign_nbidx_from_types"><tt class="xref py py-obj docutils literal"><span class="pre">assign_nbidx_from_types</span></tt></a>()</td>
+<td>Assigns the nb_idx attribute of every atom inside here from the atom_type definition.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.claim" title="parmed.topologyobjects.AtomList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
+<td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.count" title="parmed.topologyobjects.AtomList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.extend" title="parmed.topologyobjects.AtomList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.find_original_index" title="parmed.topologyobjects.AtomList.find_original_index"><tt class="xref py py-obj docutils literal"><span class="pre">find_original_index</span></tt></a>(idx)</td>
+<td>Finds an atom with the given original index.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.index" title="parmed.topologyobjects.AtomList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.index_members" title="parmed.topologyobjects.AtomList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
+<td>Assigns the idx variable for every member of this list to its place in</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.insert" title="parmed.topologyobjects.AtomList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.pop" title="parmed.topologyobjects.AtomList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.prune_unused" title="parmed.topologyobjects.AtomList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
+<td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.remove" title="parmed.topologyobjects.AtomList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.reverse" title="parmed.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.unmark" title="parmed.topologyobjects.AtomList.unmark"><tt class="xref py py-obj docutils literal"><span class="pre">unmark</span></tt></a>()</td>
+<td>Unmark all atoms in this list</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>arg=[]</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.__init__" title="parmed.topologyobjects.AtomList.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([arg])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.append" title="parmed.topologyobjects.AtomList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.assign_nbidx_from_types" title="parmed.topologyobjects.AtomList.assign_nbidx_from_types"><tt class="xref py py-obj docutils literal"><span class="pre">assign_nbidx_from_types</span></tt></a>()</td>
+<td>Assigns the nb_idx attribute of every atom inside here from the atom_type definition.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.claim" title="parmed.topologyobjects.AtomList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
+<td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.count" title="parmed.topologyobjects.AtomList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.extend" title="parmed.topologyobjects.AtomList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.find_original_index" title="parmed.topologyobjects.AtomList.find_original_index"><tt class="xref py py-obj docutils literal"><span class="pre">find_original_index</span></tt></a>(idx)</td>
+<td>Finds an atom with the given original index.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.index" title="parmed.topologyobjects.AtomList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.index_members" title="parmed.topologyobjects.AtomList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
+<td>Assigns the idx variable for every member of this list to its place in</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.insert" title="parmed.topologyobjects.AtomList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.pop" title="parmed.topologyobjects.AtomList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.prune_unused" title="parmed.topologyobjects.AtomList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
+<td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.remove" title="parmed.topologyobjects.AtomList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.reverse" title="parmed.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.unmark" title="parmed.topologyobjects.AtomList.unmark"><tt class="xref py py-obj docutils literal"><span class="pre">unmark</span></tt></a>()</td>
+<td>Unmark all atoms in this list</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.assign_nbidx_from_types">
+<tt class="descname">assign_nbidx_from_types</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomList.assign_nbidx_from_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomList.assign_nbidx_from_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns the nb_idx attribute of every atom inside here from the
+atom_type definition. If the atom_type is not assigned, RuntimeError is
+raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">dict</span></tt></p>
+<blockquote class="last">
+<div><p>Each element is a <cite>set</cite> of the <cite>nb_idx</cite> indices for which NBFIX
+alterations are defined for the type with that given that index
+(minus 1, to adjust for indexing from 0 and nb_idx starting from 1)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.claim">
+<tt class="descname">claim</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.claim" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
+subsequently indexes all of its items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.AtomList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.find_original_index">
+<tt class="descname">find_original_index</tt><big>(</big><em>idx</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomList.find_original_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomList.find_original_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds an atom with the given original index. Cannot assume that the
+original indexes are in order, since reordering may have been necessary.
+As a result, the complexity of this algorithm is O(N)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>idx</strong> : int</p>
+<blockquote>
+<div><p>The integer corresponding to the original index</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>atom</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<blockquote>
+<div><p>The atom with the original index <tt class="docutils literal"><span class="pre">idx</span></tt></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError</strong></p>
+<blockquote class="last">
+<div><p>If no atom has the original index <tt class="docutils literal"><span class="pre">idx</span></tt></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.topologyobjects.AtomList.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.index_members">
+<tt class="descname">index_members</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.index_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns the idx variable for every member of this list to its place in
+the list, if the members of this list permit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.prune_unused">
+<tt class="descname">prune_unused</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.prune_unused" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method inspects the <cite>used</cite> attribute of all of its members, if it
+has one, and deletes any item in which it is set to <cite>False</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.unmark">
+<tt class="descname">unmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#AtomList.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomList.unmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unmark all atoms in this list</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topobj/parmed.topologyobjects.AtomList.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

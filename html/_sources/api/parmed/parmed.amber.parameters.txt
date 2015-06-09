@@ -1,0 +1,7 @@
+parmed.amber.parameters module
+==============================
+
+.. automodule:: parmed.amber.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

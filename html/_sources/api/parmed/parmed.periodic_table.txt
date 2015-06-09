@@ -1,0 +1,7 @@
+parmed.periodic_table module
+============================
+
+.. automodule:: parmed.periodic_table
+    :members:
+    :undoc-members:
+    :show-inheritance:

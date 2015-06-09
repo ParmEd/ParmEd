@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.fortranformat.FortranRecordReader module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.utils.fortranformat.FortranRecordReader">
+<span id="parmed-utils-fortranformat-fortranrecordreader-module"></span><h1>parmed.utils.fortranformat.FortranRecordReader module<a class="headerlink" href="#module-parmed.utils.fortranformat.FortranRecordReader" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader">
+<em class="property">class </em><tt class="descclassname">parmed.utils.fortranformat.FortranRecordReader.</tt><tt class="descname">FortranRecordReader</tt><big>(</big><em>format</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/fortranformat/FortranRecordReader.html#FortranRecordReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Generate a reader object for FORTRAN format strings</p>
+<p>Typical use case ...</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">header_line</span> <span class="o">=</span> <span class="n">FortranRecordReader</span><span class="p">(</span><span class="s">&#39;(A15, A15, A15)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">header_line</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;              x              y              z&#39;</span><span class="p">)</span>
+<span class="go">[&#39;              x&#39;, &#39;              y&#39;, &#39;              z&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">FortranRecordReader</span><span class="p">(</span><span class="s">&#39;(3F15.3)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;          1.000          0.000          0.500&#39;</span><span class="p">)</span>
+<span class="go">[1.0, 0.0, 0.5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;          1.100          0.100          0.600&#39;</span><span class="p">)</span>
+<span class="go">[1.1, 0.1, 0.6]</span>
+</pre></div>
+</div>
+<p>Note: it is best to create a new object for each format, changing the format
+causes the parser to reevalute the format string which is costly in terms of
+performance</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.format" title="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.format"><tt class="xref py py-obj docutils literal"><span class="pre">format</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.get_format" title="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.get_format"><tt class="xref py py-obj docutils literal"><span class="pre">get_format</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match" title="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match"><tt class="xref py py-obj docutils literal"><span class="pre">match</span></tt></a>(record)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.read" title="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(record)</td>
+<td>Pass a string representing a FORTRAN record to obtain the relevent</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.set_format" title="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.set_format"><tt class="xref py py-obj docutils literal"><span class="pre">set_format</span></tt></a>(format)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.format">
+<tt class="descname">format</tt><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.get_format">
+<tt class="descname">get_format</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/fortranformat/FortranRecordReader.html#FortranRecordReader.get_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.get_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match">
+<tt class="descname">match</tt><big>(</big><em>record</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/fortranformat/FortranRecordReader.html#FortranRecordReader.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.read">
+<tt class="descname">read</tt><big>(</big><em>record</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/fortranformat/FortranRecordReader.html#FortranRecordReader.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass a string representing a FORTRAN record to obtain the relevent
+values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.set_format">
+<tt class="descname">set_format</tt><big>(</big><em>format</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/fortranformat/FortranRecordReader.html#FortranRecordReader.set_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.set_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.utils.fortranformat.FortranRecordReader.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

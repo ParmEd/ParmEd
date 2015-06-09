@@ -1,0 +1,29 @@
+parmed.topologyobjects.OutOfPlaneBend
+=====================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: OutOfPlaneBend
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OutOfPlaneBend.__init__
+      ~OutOfPlaneBend.delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OutOfPlaneBend.oopbend_type
+   
+   

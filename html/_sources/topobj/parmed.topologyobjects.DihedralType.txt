@@ -1,0 +1,28 @@
+parmed.topologyobjects.DihedralType
+===================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: DihedralType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DihedralType.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DihedralType.idx
+   
+   

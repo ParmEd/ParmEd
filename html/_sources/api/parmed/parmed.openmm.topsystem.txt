@@ -1,0 +1,7 @@
+parmed.openmm.topsystem module
+==============================
+
+.. automodule:: parmed.openmm.topsystem
+    :members:
+    :undoc-members:
+    :show-inheritance:

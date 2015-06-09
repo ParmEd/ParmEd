@@ -1,7 +1,0 @@
-chemistry.unit.constants module
-===============================
-
-.. automodule:: chemistry.unit.constants
-    :members:
-    :undoc-members:
-    :show-inheritance:

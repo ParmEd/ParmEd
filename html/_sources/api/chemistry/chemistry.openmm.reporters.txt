@@ -1,7 +1,0 @@
-chemistry.openmm.reporters module
-=================================
-
-.. automodule:: chemistry.openmm.reporters
-    :members:
-    :undoc-members:
-    :show-inheritance:

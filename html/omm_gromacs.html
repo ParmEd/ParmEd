@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="up" title="OpenMM Functionality" href="openmm.html" />
-    <link rel="next" title="chemistry.openmm.StateDataReporter" href="openmmobj/chemistry.openmm.StateDataReporter.html" />
+    <link rel="next" title="parmed.openmm.StateDataReporter" href="openmmobj/parmed.openmm.StateDataReporter.html" />
     <link rel="prev" title="Examples using CHARMM Files" href="omm_charmm.html" /> 
   </head>
   <body>
@@ -40,7 +40,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="openmmobj/chemistry.openmm.StateDataReporter.html" title="chemistry.openmm.StateDataReporter"
+          <a href="openmmobj/parmed.openmm.StateDataReporter.html" title="parmed.openmm.StateDataReporter"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="omm_charmm.html" title="Examples using CHARMM Files"
@@ -90,9 +90,9 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
 
 <span class="c"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="kn">from</span> <span class="nn">chemistry.openmm.reporters</span> <span class="kn">import</span> <span class="n">NetCDFReporter</span>
-<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="kn">from</span> <span class="nn">parmed.openmm.reporters</span> <span class="kn">import</span> <span class="n">NetCDFReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c"># Load the Gromacs files</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading Gromacs files...&#39;</span><span class="p">)</span>
@@ -148,7 +148,7 @@ statements that announce when each stage begins.</p>
 <div class="section" id="loading-gromacs-files">
 <h3>Loading Gromacs files<a class="headerlink" href="#loading-gromacs-files" title="Permalink to this headline">¶</a></h3>
 <p>In this stage, we simply load the Gromacs topology file, using automatic
-file-type detection. This will instantiate the <a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html#chemistry.gromacs.GromacsTopologyFile" title="chemistry.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object from the input topology and
+file-type detection. This will instantiate the <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object from the input topology and
 coordinate files. After this command, <tt class="docutils literal"><span class="pre">top</span></tt> will contain a full description of
 every particle, the parameters defining their interactions, and their positions.</p>
 </div>
@@ -265,9 +265,9 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
 
 <span class="c"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="kn">from</span> <span class="nn">chemistry.openmm.reporters</span> <span class="kn">import</span> <span class="n">NetCDFReporter</span>
-<span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="kn">from</span> <span class="nn">parmed.openmm.reporters</span> <span class="kn">import</span> <span class="n">NetCDFReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c"># Load the Gromacs files</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading Gromacs files...&#39;</span><span class="p">)</span>
@@ -325,7 +325,7 @@ statements that announce when each stage begins.</p>
 <div class="section" id="id1">
 <h3>Loading Gromacs files<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>In this stage, we simply load the Gromacs topology file, using automatic
-file-type detection. This will instantiate the <a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html#chemistry.gromacs.GromacsTopologyFile" title="chemistry.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object from the input topology and
+file-type detection. This will instantiate the <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object from the input topology and
 coordinate files. After this command, <tt class="docutils literal"><span class="pre">top</span></tt> will contain a full description of
 every particle, the parameters defining their interactions, and their positions.</p>
 </div>
@@ -483,7 +483,7 @@ regarding running a long simulation in chunks.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="openmmobj/chemistry.openmm.StateDataReporter.html" title="chemistry.openmm.StateDataReporter"
+          <a href="openmmobj/parmed.openmm.StateDataReporter.html" title="parmed.openmm.StateDataReporter"
              >next</a> |</li>
         <li class="right" >
           <a href="omm_charmm.html" title="Examples using CHARMM Files"

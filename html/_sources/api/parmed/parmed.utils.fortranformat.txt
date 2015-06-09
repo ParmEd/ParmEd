@@ -1,0 +1,19 @@
+parmed.utils.fortranformat package
+==================================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.utils.fortranformat.FortranRecordReader
+   parmed.utils.fortranformat.FortranRecordWriter
+   parmed.utils.fortranformat.config
+
+Module contents
+---------------
+
+.. automodule:: parmed.utils.fortranformat
+    :members:
+    :undoc-members:
+    :show-inheritance:

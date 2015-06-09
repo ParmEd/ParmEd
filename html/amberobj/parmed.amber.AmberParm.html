@@ -1,0 +1,2238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.amber.AmberParm &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="The parmed.amber package" href="../amber.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-amber-amberparm">
+<h1>parmed.amber.AmberParm<a class="headerlink" href="#parmed-amber-amberparm" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="parmed.amber.AmberParm">
+<em class="property">class </em><tt class="descclassname">parmed.amber.</tt><tt class="descname">AmberParm</tt><big>(</big><em>prm_name=None</em>, <em>rst7_name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Amber Topology (parm7 format) class. Gives low, and some high, level access
+to topology data. You can interact with the raw data in the topology file
+directly or interact with some of the high-level classes comprising the
+system topology and parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prm_name</strong> : str=None</p>
+<blockquote>
+<div><p>If provided, this file is parsed and the data structures will be loaded
+from the data in this file</p>
+</div></blockquote>
+<p><strong>rst7_name</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, the coordinates and unit cell dimensions from the provided
+Amber inpcrd/restart file will be loaded into the molecule</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.bonds_inc_h" title="parmed.amber.AmberParm.bonds_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">bonds_inc_h</span></tt></a></td>
+<td>All bonds including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.bonds_without_h" title="parmed.amber.AmberParm.bonds_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">bonds_without_h</span></tt></a></td>
+<td>All bonds without hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.angles_inc_h" title="parmed.amber.AmberParm.angles_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">angles_inc_h</span></tt></a></td>
+<td>All angles including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.angles_without_h" title="parmed.amber.AmberParm.angles_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">angles_without_h</span></tt></a></td>
+<td>All angles including hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.dihedrals_inc_h" title="parmed.amber.AmberParm.dihedrals_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">dihedrals_inc_h</span></tt></a></td>
+<td>All dihedrals including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.dihedrals_without_h" title="parmed.amber.AmberParm.dihedrals_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">dihedrals_without_h</span></tt></a></td>
+<td>All dihedrals including hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.chamber" title="parmed.amber.AmberParm.chamber"><tt class="xref py py-obj docutils literal"><span class="pre">chamber</span></tt></a></td>
+<td>Whether this instance uses the CHARMM force field</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.amoeba" title="parmed.amber.AmberParm.amoeba"><tt class="xref py py-obj docutils literal"><span class="pre">amoeba</span></tt></a></td>
+<td>Whether this instance uses the Amoeba force field</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_cmap" title="parmed.amber.AmberParm.has_cmap"><tt class="xref py py-obj docutils literal"><span class="pre">has_cmap</span></tt></a></td>
+<td>Whether this instance has correction map terms or not</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="96%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>parm_data</td>
+<td>(dict {str) A dictionary that maps FLAG names to all of the data contained in that section of the Amber file.</td>
+</tr>
+<tr class="row-even"><td>formats</td>
+<td>(dict {str) A dictionary that maps FLAG names to the FortranFormat instance in which the data is stored in that section</td>
+</tr>
+<tr class="row-odd"><td>parm_comments</td>
+<td>(dict {str) A dictionary that maps FLAG names to the list of COMMENT lines that were stored in the original file</td>
+</tr>
+<tr class="row-even"><td>flag_list</td>
+<td>(list) An ordered list of all FLAG names. This must be kept synchronized with <cite>parm_data</cite>, <cite>formats</cite>, and <cite>parm_comments</cite> such that every item in <cite>flag_list</cite> is a key to those 3 dicts and no other keys exist</td>
+</tr>
+<tr class="row-odd"><td>charge_flag</td>
+<td>(str=&#8217;CHARGE&#8217;) The name of the name of the FLAG that describes partial atomic charge data. If this flag is found, then its data are multiplied by the ELECTROSTATIC_CONSTANT to convert back to fractions of electrons</td>
+</tr>
+<tr class="row-even"><td>version</td>
+<td>(str) The VERSION string from the Amber file</td>
+</tr>
+<tr class="row-odd"><td>name</td>
+<td>(str) The file name of the originally parsed file (set to the fname parameter)</td>
+</tr>
+<tr class="row-even"><td>LJ_types</td>
+<td>(dict {str) A mapping whose keys are atom types paired with the nonbonded index of that type</td>
+</tr>
+<tr class="row-odd"><td>LJ_radius</td>
+<td>(list(float)) A list of floats corresponding to the Rmin/2 parameter for every Lennard-Jones type. The indexes are the nonbonded index (<cite>nb_idx</cite> attribute of the <cite>Atom</cite> class) minus 1 to account for indexing from 0 in Python. The values are in Angstroms. To get the radius for a particular atom type, you can use <cite>LJ_radius[LJ_types[&#8220;type&#8221;]-1]</cite></td>
+</tr>
+<tr class="row-even"><td>LJ_depth</td>
+<td>(list(float)) A list of Lennard-Jones epsilon parameters laid out the same way as LJ_radius, described above.</td>
+</tr>
+<tr class="row-odd"><td>atoms</td>
+<td>(AtomList(Atom)) List of all atoms in the system</td>
+</tr>
+<tr class="row-even"><td>residues</td>
+<td>(ResidueList(Residue)) List of all residues in the system</td>
+</tr>
+<tr class="row-odd"><td>bonds</td>
+<td>(TrackedList(Bond)) List of bonds between two atoms in the system</td>
+</tr>
+<tr class="row-even"><td>angles</td>
+<td>(TrackedList(Angle)) List of angles between three atoms in the system</td>
+</tr>
+<tr class="row-odd"><td>dihedrals</td>
+<td>(TrackedList(Angle)) List of all proper and improper torsions between 4 atoms in the system</td>
+</tr>
+<tr class="row-even"><td>box</td>
+<td>(list of 6 floats) Periodic boundary unit cell dimensions and angles</td>
+</tr>
+<tr class="row-odd"><td>bond_types</td>
+<td>(TrackedList(BondType)) The bond types containing the parameters for each bond stretching term</td>
+</tr>
+<tr class="row-even"><td>angle_types</td>
+<td>(TrackedList(AngleType)) The angle types containing the parameters for each angle bending term</td>
+</tr>
+<tr class="row-odd"><td>dihedral_types</td>
+<td>(TrackedList(DihedralType)) The dihedral types containing the parameters for each torsional term</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.addFlag" title="parmed.amber.AmberParm.addFlag"><tt class="xref py py-obj docutils literal"><span class="pre">addFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_atom" title="parmed.amber.AmberParm.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
+<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_atom_to_residue" title="parmed.amber.AmberParm.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
+<td>Adds a new atom to the Structure at the end if the given residue</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_flag" title="parmed.amber.AmberParm.add_flag"><tt class="xref py py-obj docutils literal"><span class="pre">add_flag</span></tt></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.copy" title="parmed.amber.AmberParm.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
+<td>Makes a copy of the current structure as an instance of a specified</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.createSystem" title="parmed.amber.AmberParm.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.deleteFlag" title="parmed.amber.AmberParm.deleteFlag"><tt class="xref py py-obj docutils literal"><span class="pre">deleteFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.delete_flag" title="parmed.amber.AmberParm.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.fill_LJ" title="parmed.amber.AmberParm.fill_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></tt></a>()</td>
+<td>Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each atom type by computing their values from the A and B coefficients of each atom interacting with itself.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_rawdata" title="parmed.amber.AmberParm.from_rawdata"><tt class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></tt></a>(rawdata)</td>
+<td>Take the raw data from a AmberFormat object and initialize an AmberParm from that data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_structure" title="parmed.amber.AmberParm.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<td>Take a Structure instance and initialize an AmberParm instance from that data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_1012" title="parmed.amber.AmberParm.has_1012"><tt class="xref py py-obj docutils literal"><span class="pre">has_1012</span></tt></a>()</td>
+<td>This routine determines whether there are any defined 10-12</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_NBFIX" title="parmed.amber.AmberParm.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.id_format" title="parmed.amber.AmberParm.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.initialize_topology" title="parmed.amber.AmberParm.initialize_topology"><tt class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></tt></a>([rst7_name])</td>
+<td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.is_changed" title="parmed.amber.AmberParm.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<td>Determines if any of the topological arrays have changed since the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_atom_info" title="parmed.amber.AmberParm.load_atom_info"><tt class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></tt></a>()</td>
+<td>Loads atom properties into the atoms that have been loaded.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_coordinates" title="parmed.amber.AmberParm.load_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">load_coordinates</span></tt></a>(coords)</td>
+<td>Loads the coordinates into the atom list</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_from_rawdata</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_from_structure</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_pointers" title="parmed.amber.AmberParm.load_pointers"><tt class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></tt></a>()</td>
+<td>Loads the data in POINTERS section into a pointers dictionary with each</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_rst7" title="parmed.amber.AmberParm.load_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></tt></a>(rst7)</td>
+<td>Loads coordinates into the AmberParm class</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_structure" title="parmed.amber.AmberParm.load_structure"><tt class="xref py py-obj docutils literal"><span class="pre">load_structure</span></tt></a>()</td>
+<td>Loads all of the topology instance variables.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_velocities" title="parmed.amber.AmberParm.load_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">load_velocities</span></tt></a>(vels)</td>
+<td>Loads the coordinates into the atom list</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_add_constraints" title="parmed.amber.AmberParm.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds constraints to a given system</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_angle_force" title="parmed.amber.AmberParm.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_bond_force" title="parmed.amber.AmberParm.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_cmap_force" title="parmed.amber.AmberParm.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM CMAP torsion force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_dihedral_force" title="parmed.amber.AmberParm.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_gbsa_force" title="parmed.amber.AmberParm.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates a Generalized Born force for running implicit solvent</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_improper_force" title="parmed.amber.AmberParm.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="parmed.amber.AmberParm.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if necessary) to define the nonbonded interatomic potential for this system.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="parmed.amber.AmberParm.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba out-of-plane bend force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="parmed.amber.AmberParm.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba pi-torsion force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="parmed.amber.AmberParm.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="parmed.amber.AmberParm.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="parmed.amber.AmberParm.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="parmed.amber.AmberParm.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="parmed.amber.AmberParm.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba trigonal-angle force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="parmed.amber.AmberParm.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM Urey-Bradley force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<td>Meant for use with the automatic file loader, this will automatically</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.prune_empty_terms" title="parmed.amber.AmberParm.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<td>Looks through all of the topological lists and gets rid of terms</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.ptr" title="parmed.amber.AmberParm.ptr"><tt class="xref py py-obj docutils literal"><span class="pre">ptr</span></tt></a>(pointer)</td>
+<td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm" title="parmed.amber.AmberParm.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
+<td>Parses the Amber format file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_old" title="parmed.amber.AmberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
+<td>This reads an old-style topology file and stores the results in the</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_slow" title="parmed.amber.AmberParm.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
+<td>Parses the Amber format file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.recalculate_LJ" title="parmed.amber.AmberParm.recalculate_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></tt></a>()</td>
+<td>Fills the <tt class="docutils literal"><span class="pre">LENNARD_JONES_ACOEF</span></tt> and <tt class="docutils literal"><span class="pre">LENNARD_JONES_BCOEF</span></tt> arrays in the <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> raw data dictionary by applying the canonical Lorentz-Berthelot combining rules to the values in <tt class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></tt> and <tt class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></tt>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rediscover_molecules" title="parmed.amber.AmberParm.rediscover_molecules"><tt class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></tt></a>([solute_ions,&nbsp;fix_broken])</td>
+<td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.remake_parm" title="parmed.amber.AmberParm.remake_parm"><tt class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></tt></a>()</td>
+<td>Fills <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> from the data in the parameter and topology</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.set_version" title="parmed.amber.AmberParm.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
+<td>Sets the version string</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.split" title="parmed.amber.AmberParm.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
+<td>Split the current Structure into separate Structure instances for each unique molecule.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.strip" title="parmed.amber.AmberParm.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.to_dataframe" title="parmed.amber.AmberParm.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Creates a pandas.DataFrame object from the current Structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.unchange" title="parmed.amber.AmberParm.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<td>Toggles all lists so that they do not indicate any changes</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.update_dihedral_exclusions" title="parmed.amber.AmberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<td>Nonbonded exclusions and exceptions have the following priority:</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.view" title="parmed.amber.AmberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<td>Returns a view of the current object as another object.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from the current Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
+<td>Writes the current data in parm_data into a new topology file with a given name.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></tt></a>(name[,&nbsp;netcdf])</td>
+<td>Writes a restart file with the current coordinates and velocities and</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.amber.AmberParm.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>prm_name=None</em>, <em>rst7_name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an AmberParm object from data in prm_name and establishes
+validity based on presence of POINTERS and CHARGE sections. In general,
+you should use LoadParm from the readparm module instead. LoadParm will
+correctly dispatch the object to the &#8216;correct&#8217; flavor of AmberParm</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.__init__" title="parmed.amber.AmberParm.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([prm_name,&nbsp;rst7_name])</td>
+<td>Instantiates an AmberParm object from data in prm_name and establishes validity based on presence of POINTERS and CHARGE sections.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.addFlag" title="parmed.amber.AmberParm.addFlag"><tt class="xref py py-obj docutils literal"><span class="pre">addFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_atom" title="parmed.amber.AmberParm.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
+<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_atom_to_residue" title="parmed.amber.AmberParm.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
+<td>Adds a new atom to the Structure at the end if the given residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_flag" title="parmed.amber.AmberParm.add_flag"><tt class="xref py py-obj docutils literal"><span class="pre">add_flag</span></tt></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
+<td>Adds a new flag with the given flag name and Fortran format string and</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.copy" title="parmed.amber.AmberParm.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
+<td>Makes a copy of the current structure as an instance of a specified</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.createSystem" title="parmed.amber.AmberParm.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.deleteFlag" title="parmed.amber.AmberParm.deleteFlag"><tt class="xref py py-obj docutils literal"><span class="pre">deleteFlag</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.delete_flag" title="parmed.amber.AmberParm.delete_flag"><tt class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></tt></a>(flag_name)</td>
+<td>Removes a flag from the topology file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.fill_LJ" title="parmed.amber.AmberParm.fill_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></tt></a>()</td>
+<td>Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each atom type by computing their values from the A and B coefficients of each atom interacting with itself.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_rawdata" title="parmed.amber.AmberParm.from_rawdata"><tt class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></tt></a>(rawdata)</td>
+<td>Take the raw data from a AmberFormat object and initialize an AmberParm from that data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_structure" title="parmed.amber.AmberParm.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<td>Take a Structure instance and initialize an AmberParm instance from that data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_1012" title="parmed.amber.AmberParm.has_1012"><tt class="xref py py-obj docutils literal"><span class="pre">has_1012</span></tt></a>()</td>
+<td>This routine determines whether there are any defined 10-12</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_NBFIX" title="parmed.amber.AmberParm.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.id_format" title="parmed.amber.AmberParm.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.initialize_topology" title="parmed.amber.AmberParm.initialize_topology"><tt class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></tt></a>([rst7_name])</td>
+<td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.is_changed" title="parmed.amber.AmberParm.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<td>Determines if any of the topological arrays have changed since the</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_atom_info" title="parmed.amber.AmberParm.load_atom_info"><tt class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></tt></a>()</td>
+<td>Loads atom properties into the atoms that have been loaded.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_coordinates" title="parmed.amber.AmberParm.load_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">load_coordinates</span></tt></a>(coords)</td>
+<td>Loads the coordinates into the atom list</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_from_rawdata</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_from_structure</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_pointers" title="parmed.amber.AmberParm.load_pointers"><tt class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></tt></a>()</td>
+<td>Loads the data in POINTERS section into a pointers dictionary with each</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_rst7" title="parmed.amber.AmberParm.load_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></tt></a>(rst7)</td>
+<td>Loads coordinates into the AmberParm class</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_structure" title="parmed.amber.AmberParm.load_structure"><tt class="xref py py-obj docutils literal"><span class="pre">load_structure</span></tt></a>()</td>
+<td>Loads all of the topology instance variables.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_velocities" title="parmed.amber.AmberParm.load_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">load_velocities</span></tt></a>(vels)</td>
+<td>Loads the coordinates into the atom list</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_add_constraints" title="parmed.amber.AmberParm.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds constraints to a given system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_angle_force" title="parmed.amber.AmberParm.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_bond_force" title="parmed.amber.AmberParm.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_cmap_force" title="parmed.amber.AmberParm.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM CMAP torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_dihedral_force" title="parmed.amber.AmberParm.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_gbsa_force" title="parmed.amber.AmberParm.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates a Generalized Born force for running implicit solvent</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_improper_force" title="parmed.amber.AmberParm.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="parmed.amber.AmberParm.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if necessary) to define the nonbonded interatomic potential for this system.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="parmed.amber.AmberParm.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba out-of-plane bend force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="parmed.amber.AmberParm.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba pi-torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="parmed.amber.AmberParm.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="parmed.amber.AmberParm.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="parmed.amber.AmberParm.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="parmed.amber.AmberParm.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="parmed.amber.AmberParm.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba trigonal-angle force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="parmed.amber.AmberParm.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM Urey-Bradley force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<td>Meant for use with the automatic file loader, this will automatically</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.prune_empty_terms" title="parmed.amber.AmberParm.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<td>Looks through all of the topological lists and gets rid of terms</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.ptr" title="parmed.amber.AmberParm.ptr"><tt class="xref py py-obj docutils literal"><span class="pre">ptr</span></tt></a>(pointer)</td>
+<td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm" title="parmed.amber.AmberParm.rdparm"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm</span></tt></a>(fname[,&nbsp;slow])</td>
+<td>Parses the Amber format file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_old" title="parmed.amber.AmberParm.rdparm_old"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></tt></a>(prmtop_lines[,&nbsp;check])</td>
+<td>This reads an old-style topology file and stores the results in the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_slow" title="parmed.amber.AmberParm.rdparm_slow"><tt class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></tt></a>(fname)</td>
+<td>Parses the Amber format file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.recalculate_LJ" title="parmed.amber.AmberParm.recalculate_LJ"><tt class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></tt></a>()</td>
+<td>Fills the <tt class="docutils literal"><span class="pre">LENNARD_JONES_ACOEF</span></tt> and <tt class="docutils literal"><span class="pre">LENNARD_JONES_BCOEF</span></tt> arrays in the <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> raw data dictionary by applying the canonical Lorentz-Berthelot combining rules to the values in <tt class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></tt> and <tt class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></tt>.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rediscover_molecules" title="parmed.amber.AmberParm.rediscover_molecules"><tt class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></tt></a>([solute_ions,&nbsp;fix_broken])</td>
+<td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.remake_parm" title="parmed.amber.AmberParm.remake_parm"><tt class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></tt></a>()</td>
+<td>Fills <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> from the data in the parameter and topology</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.set_version" title="parmed.amber.AmberParm.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
+<td>Sets the version string</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.split" title="parmed.amber.AmberParm.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
+<td>Split the current Structure into separate Structure instances for each unique molecule.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.strip" title="parmed.amber.AmberParm.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.to_dataframe" title="parmed.amber.AmberParm.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Creates a pandas.DataFrame object from the current Structure</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.unchange" title="parmed.amber.AmberParm.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<td>Toggles all lists so that they do not indicate any changes</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.update_dihedral_exclusions" title="parmed.amber.AmberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<td>Nonbonded exclusions and exceptions have the following priority:</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.view" title="parmed.amber.AmberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<td>Returns a view of the current object as another object.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from the current Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><tt class="xref py py-obj docutils literal"><span class="pre">write_parm</span></tt></a>(name)</td>
+<td>Writes the current data in parm_data into a new topology file with a given name.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><tt class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></tt></a>(name[,&nbsp;netcdf])</td>
+<td>Writes a restart file with the current coordinates and velocities and</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ANGLE_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">BOND_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">CMAP_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DIHEDRAL_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">IMPROPER_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">NONBONDED_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">OUT_OF_PLANE_BEND_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">PI_TORSION_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">RB_TORSION_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">STRETCH_BEND_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">TORSION_TORSION_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">TRIGONAL_ANGLE_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">UREY_BRADLEY_FORCE_GROUP</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.amoeba" title="parmed.amber.AmberParm.amoeba"><tt class="xref py py-obj docutils literal"><span class="pre">amoeba</span></tt></a></td>
+<td>Whether this instance uses the Amoeba force field</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.angles_inc_h" title="parmed.amber.AmberParm.angles_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">angles_inc_h</span></tt></a></td>
+<td>All angles including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.angles_without_h" title="parmed.amber.AmberParm.angles_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">angles_without_h</span></tt></a></td>
+<td>All angles including hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.bonds_inc_h" title="parmed.amber.AmberParm.bonds_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">bonds_inc_h</span></tt></a></td>
+<td>All bonds including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.bonds_without_h" title="parmed.amber.AmberParm.bonds_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">bonds_without_h</span></tt></a></td>
+<td>All bonds without hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.box_vectors" title="parmed.amber.AmberParm.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
+<td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.chamber" title="parmed.amber.AmberParm.chamber"><tt class="xref py py-obj docutils literal"><span class="pre">chamber</span></tt></a></td>
+<td>Whether this instance uses the CHARMM force field</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.dihedrals_inc_h" title="parmed.amber.AmberParm.dihedrals_inc_h"><tt class="xref py py-obj docutils literal"><span class="pre">dihedrals_inc_h</span></tt></a></td>
+<td>All dihedrals including hydrogen</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.dihedrals_without_h" title="parmed.amber.AmberParm.dihedrals_without_h"><tt class="xref py py-obj docutils literal"><span class="pre">dihedrals_without_h</span></tt></a></td>
+<td>All dihedrals including hydrogen</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_cmap" title="parmed.amber.AmberParm.has_cmap"><tt class="xref py py-obj docutils literal"><span class="pre">has_cmap</span></tt></a></td>
+<td>Whether this instance has correction map terms or not</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.positions" title="parmed.amber.AmberParm.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">solvent_residues</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.topology" title="parmed.amber.AmberParm.topology"><tt class="xref py py-obj docutils literal"><span class="pre">topology</span></tt></a></td>
+<td>The OpenMM Topology object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.velocities" title="parmed.amber.AmberParm.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<td>A list of 3-element Quantity tuples of dimension length representing the</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.amber.AmberParm.addFlag">
+<tt class="descname">addFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.addFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new flag with the given flag name and Fortran format string and
+initializes the array with the values given, or as an array of 0s
+of length num_items</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flag_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the flag to insert. It is converted to all upper case</p>
+</div></blockquote>
+<p><strong>flag_format</strong> : str</p>
+<blockquote>
+<div><p>Fortran format string representing how the data in this section
+should be written and read. Do not enclose in ()</p>
+</div></blockquote>
+<p><strong>data</strong> : list=None</p>
+<blockquote>
+<div><p>Sequence with data for the new flag. If None, a list of zeros of
+length <cite>num_items</cite> (see below) is given as a holder</p>
+</div></blockquote>
+<p><strong>num_items</strong> : int=-1</p>
+<blockquote>
+<div><p>Number of items in the section. This variable is ignored if a set of
+data are given in <cite>data</cite></p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str=None</p>
+<blockquote>
+<div><p>List of comments to add to this section</p>
+</div></blockquote>
+<p><strong>after</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, the added flag will be added after the one with the
+name given to <cite>after</cite>. If this flag does not exist, IndexError will
+be raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
+it has a different name or number as the last residue added and adding
+it to the <cite>atoms</cite> list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue list</p>
+</div></blockquote>
+<p><strong>resname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The name of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>resnum</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The number of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The chain ID character for this residue</p>
+</div></blockquote>
+<p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote class="last">
+<div><p>The insertion code ID character for this residue (it is stripped)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If the residue name and number differ from the last residue in this
+list, a new residue is added and the atom is added to that residue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.add_atom_to_residue">
+<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure at the end if the given residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to the system</p>
+</div></blockquote>
+<p><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue to which to add this atom. It MUST be part of this
+Structure instance already or a ValueError is raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This atom is added at the end of the residue and is inserted into the
+<cite>atoms</cite> list in such a way that all residues are composed of atoms
+contiguous in the atoms list. For large systems, this may be a
+relatively expensive operation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.add_flag">
+<tt class="descname">add_flag</tt><big>(</big><em>flag_name</em>, <em>flag_format</em>, <em>data=None</em>, <em>num_items=-1</em>, <em>comments=None</em>, <em>after=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.add_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new flag with the given flag name and Fortran format string and
+initializes the array with the values given, or as an array of 0s
+of length num_items</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flag_name</strong> : str</p>
+<blockquote>
+<div><p>Name of the flag to insert. It is converted to all upper case</p>
+</div></blockquote>
+<p><strong>flag_format</strong> : str</p>
+<blockquote>
+<div><p>Fortran format string representing how the data in this section
+should be written and read. Do not enclose in ()</p>
+</div></blockquote>
+<p><strong>data</strong> : list=None</p>
+<blockquote>
+<div><p>Sequence with data for the new flag. If None, a list of zeros of
+length <cite>num_items</cite> (see below) is given as a holder</p>
+</div></blockquote>
+<p><strong>num_items</strong> : int=-1</p>
+<blockquote>
+<div><p>Number of items in the section. This variable is ignored if a set of
+data are given in <cite>data</cite></p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str=None</p>
+<blockquote>
+<div><p>List of comments to add to this section</p>
+</div></blockquote>
+<p><strong>after</strong> : str=None</p>
+<blockquote class="last">
+<div><p>If provided, the added flag will be added after the one with the
+name given to <cite>after</cite>. If this flag does not exist, IndexError will
+be raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.amoeba">
+<tt class="descname">amoeba</tt><a class="headerlink" href="#parmed.amber.AmberParm.amoeba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this instance uses the Amoeba force field</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.angles_inc_h">
+<tt class="descname">angles_inc_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.angles_inc_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All angles including hydrogen</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.angles_without_h">
+<tt class="descname">angles_without_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.angles_without_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All angles including hydrogen</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.bonds_inc_h">
+<tt class="descname">bonds_inc_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.bonds_inc_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All bonds including hydrogen</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.bonds_without_h">
+<tt class="descname">bonds_without_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.bonds_without_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All bonds without hydrogen</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.box_vectors">
+<tt class="descname">box_vectors</tt><a class="headerlink" href="#parmed.amber.AmberParm.box_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
+dimension length</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.chamber">
+<tt class="descname">chamber</tt><a class="headerlink" href="#parmed.amber.AmberParm.chamber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this instance uses the CHARMM force field</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.copy">
+<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a copy of the current structure as an instance of a specified
+subclass</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cls</strong> : Structure subclass</p>
+<blockquote>
+<div><p>The returned object is a copy of this structure as a <cite>cls</cite> instance</p>
+</div></blockquote>
+<p><strong>split_dihedrals</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, then the Dihedral entries will be split up so that each one
+is paired with a single DihedralType (rather than a
+DihedralTypeList)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>cls</em> instance</p>
+<blockquote class="last">
+<div><p>The instance of the Structure subclass <cite>cls</cite> with a copy of the
+current Structure&#8217;s topology information</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.createSystem">
+<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.createSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an OpenMM System representing the topology described by the
+prmtop file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating point number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff.</p>
+</div></blockquote>
+<p><strong>switchDistance</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The distance at which the switching function is turned on for van
+der Waals interactions. This is ignored when no cutoff is used, and
+no switch is used if switchDistance is 0, negative, or greater than
+the cutoff</p>
+</div></blockquote>
+<p><strong>constraints</strong> : None, app.HBonds, app.HAngles, or app.AllBonds</p>
+<blockquote>
+<div><p>Which type of constraints to add to the system (e.g., SHAKE). None
+means no bonds are constrained. HBonds means bonds with hydrogen are
+constrained</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, water is kept rigid regardless of the value of constraints.
+A value of False is ignored if constraints is not None.</p>
+</div></blockquote>
+<p><strong>implicitSolvent</strong> : None, app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2</p>
+<blockquote>
+<div><p>The Generalized Born implicit solvent model to use.</p>
+</div></blockquote>
+<p><strong>implicitSolventKappa</strong> : float or 1/distance Quantity = None</p>
+<blockquote>
+<div><p>This is the Debye kappa property related to modeling saltwater
+conditions in GB. It should have units of 1/distance (1/nanometers
+is assumed if no units present). A value of None means that kappa
+will be calculated from implicitSolventSaltConc (below)</p>
+</div></blockquote>
+<p><strong>implicitSolventSaltConc</strong> : float or amount/volume Quantity=0 moles/liter</p>
+<blockquote>
+<div><p>If implicitSolventKappa is None, the kappa will be computed from the
+salt concentration. It should have units compatible with mol/L</p>
+</div></blockquote>
+<p><strong>temperature</strong> : float or temperature Quantity = 298.15 kelvin</p>
+<blockquote>
+<div><p>This is only used to compute kappa from implicitSolventSaltConc</p>
+</div></blockquote>
+<p><strong>soluteDielectric</strong> : float=1.0</p>
+<blockquote>
+<div><p>The dielectric constant of the protein interior used in GB</p>
+</div></blockquote>
+<p><strong>solventDielectric</strong> : float=78.5</p>
+<blockquote>
+<div><p>The dielectric constant of the water used in GB</p>
+</div></blockquote>
+<p><strong>useSASA</strong> : bool=False</p>
+<blockquote>
+<div><p>If True, use the ACE non-polar solvation model. Otherwise, use no
+SASA-based nonpolar solvation model.</p>
+</div></blockquote>
+<p><strong>removeCMMotion</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, the center-of-mass motion will be removed periodically
+during the simulation. If False, it will not.</p>
+</div></blockquote>
+<p><strong>hydrogenMass</strong> : float or mass quantity = None</p>
+<blockquote>
+<div><p>If not None, hydrogen masses will be changed to this mass and the
+difference subtracted from the attached heavy atom (hydrogen mass
+repartitioning)</p>
+</div></blockquote>
+<p><strong>ewaldErrorTolerance</strong> : float=0.0005</p>
+<blockquote>
+<div><p>When using PME or Ewald, the Ewald parameters will be calculated
+from this value</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If False, the energies and forces from the constrained degrees of
+freedom will NOT be computed. If True, they will (but those degrees
+of freedom will <em>still</em> be constrained).</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool=False</p>
+<blockquote class="last">
+<div><p>If True, the progress of this subroutine will be printed to stdout</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function calls prune_empty_terms if any Topology lists have changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.deleteFlag">
+<tt class="descname">deleteFlag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.deleteFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a flag from the topology file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.delete_flag">
+<tt class="descname">delete_flag</tt><big>(</big><em>flag_name</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.delete_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a flag from the topology file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.dihedrals_inc_h">
+<tt class="descname">dihedrals_inc_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.dihedrals_inc_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All dihedrals including hydrogen</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.dihedrals_without_h">
+<tt class="descname">dihedrals_without_h</tt><a class="headerlink" href="#parmed.amber.AmberParm.dihedrals_without_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>All dihedrals including hydrogen</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.fill_LJ">
+<tt class="descname">fill_LJ</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.fill_LJ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each
+atom type by computing their values from the A and B coefficients of
+each atom interacting with itself.</p>
+<p>This fills the <tt class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></tt>, and <tt class="xref py py-attr docutils literal"><span class="pre">LJ_types</span></tt>
+data structures.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.amber.AmberParm.from_rawdata">
+<em class="property">classmethod </em><tt class="descname">from_rawdata</tt><big>(</big><em>rawdata</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.from_rawdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take the raw data from a AmberFormat object and initialize an AmberParm
+from that data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rawdata</strong> : <a class="reference internal" href="parmed.amber.AmberFormat.html#parmed.amber.AmberFormat" title="parmed.amber.AmberFormat"><tt class="xref py py-class docutils literal"><span class="pre">AmberFormat</span></tt></a></p>
+<blockquote>
+<div><p>An AmberFormat instance that has already been instantiated</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>parm</strong> : <a class="reference internal" href="#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a></p>
+<blockquote class="last">
+<div><p>An instance of this type from the data in rawdata</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.amber.AmberParm.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a Structure instance and initialize an AmberParm instance from that
+data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The input structure from which to construct an AmberParm instance</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError</strong></p>
+<blockquote class="last">
+<div><p>If the structure has parameters not supported by the standard Amber
+force field (i.e., standard bond, angle, and dihedral types)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.has_1012">
+<tt class="descname">has_1012</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.has_1012" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine determines whether there are any defined 10-12
+Lennard-Jones interactions that are non-zero</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>has_10_12</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, 10-12 interactions <em>are</em> defined for this particular system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.has_NBFIX">
+<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine determines whether there are any off-diagonal Lennard-Jones
+modifications (i.e., if any two atoms have a L-J pair interaction that
+does not match the combined L-J parameters for that pair).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nbfix</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, off-diagonal elements in the combined Lennard-Jones matrix
+exist. If False, they do not.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.has_cmap">
+<tt class="descname">has_cmap</tt><a class="headerlink" href="#parmed.amber.AmberParm.has_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this instance has correction map terms or not</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.amber.AmberParm.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as either Amber-format file (like prmtop) or an
+old-style topology file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber-style format, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.initialize_topology">
+<tt class="descname">initialize_topology</tt><big>(</big><em>rst7_name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.initialize_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes topology data structures, like the list of atoms, bonds,
+etc., after the topology file has been read.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.is_changed">
+<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.is_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if any of the topological arrays have changed since the
+last upload</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_atom_info">
+<tt class="descname">load_atom_info</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_atom_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads atom properties into the atoms that have been loaded. If any
+arrays are too short or too long, an IndexError will be raised</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_coordinates">
+<tt class="descname">load_coordinates</tt><big>(</big><em>coords</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the coordinates into the atom list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coords</strong> : list of floats</p>
+<blockquote class="last">
+<div><p>A 1-dimensional iterable of coordinates of shape (natom*3,) from
+which all atomic coordinates are assigned. In Angstroms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_pointers">
+<tt class="descname">load_pointers</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_pointers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the data in POINTERS section into a pointers dictionary with each
+key being the pointer name according to <a class="reference external" href="http://ambermd.org/formats.html">http://ambermd.org/formats.html</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_rst7">
+<tt class="descname">load_rst7</tt><big>(</big><em>rst7</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_rst7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads coordinates into the AmberParm class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rst7</strong> : str or <a class="reference internal" href="parmed.amber.Rst7.html#parmed.amber.Rst7" title="parmed.amber.Rst7"><tt class="xref py py-class docutils literal"><span class="pre">Rst7</span></tt></a></p>
+<blockquote class="last">
+<div><p>The Amber coordinate file (either ASCII restart or NetCDF restart)
+object or filename to assign atomic coordinates from.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_structure">
+<tt class="descname">load_structure</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all of the topology instance variables. This is necessary if we
+actually want to modify the topological layout of our system
+(like deleting atoms)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.load_velocities">
+<tt class="descname">load_velocities</tt><big>(</big><em>vels</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.load_velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the coordinates into the atom list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vels</strong> : list of floats</p>
+<blockquote class="last">
+<div><p>A 1-dimensional iterable of velocities of shape (natom*3,) from
+which all atomic velocities are assigned. In Angstroms/picosecond</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_add_constraints">
+<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds constraints to a given system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote>
+<div><p>The OpenMM system for which constraints should be added</p>
+</div></blockquote>
+<p><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>Which kind of constraints should be used</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, water bonds are constrained regardless of whether
+constrains is None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_angle_force">
+<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
+angles are for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicAngleForce (or AmoebaAngleForce if this is an Amoeba
+system), or None if there are no angles to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_bond_force">
+<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
+for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool=True</p>
+<blockquote>
+<div><p>Should water-H bonds be constrained regardless of <cite>constraints</cite>?</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicBondForce (or AmoebaBondForce if this is an Amoeba system),
+or None if there are no bonds to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_cmap_force">
+<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM CMAP torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CMAPTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None, if no CMAP terms are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_dihedral_force">
+<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">PeriodicTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_gbsa_force">
+<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Generalized Born force for running implicit solvent
+calculations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>implicitSolvent</strong> : app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2</p>
+<blockquote>
+<div><p>The Generalized Born implicit solvent model to use.</p>
+</div></blockquote>
+<p><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace. Default is NoCutoff</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating opint number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff</p>
+</div></blockquote>
+<p><strong>implicitSolventKappa</strong> : float or 1/distance Quantity = None</p>
+<blockquote>
+<div><p>This is the Debye kappa property related to modeling saltwater
+conditions in GB. It should have units of 1/distance (1/nanometers
+is assumed if no units present). A value of None means that kappa
+will be calculated from implicitSolventSaltConc (below)</p>
+</div></blockquote>
+<p><strong>implicitSolventSaltConc</strong> : float or amount/volume Quantity=0 moles/liter</p>
+<blockquote>
+<div><p>If implicitSolventKappa is None, the kappa will be computed from the
+salt concentration. It should have units compatible with mol/L</p>
+</div></blockquote>
+<p><strong>temperature</strong> : float or temperature Quantity = 298.15 kelvin</p>
+<blockquote>
+<div><p>This is only used to compute kappa from implicitSolventSaltConc</p>
+</div></blockquote>
+<p><strong>soluteDielectric</strong> : float=1.0</p>
+<blockquote>
+<div><p>The dielectric constant of the protein interior used in GB</p>
+</div></blockquote>
+<p><strong>solventDielectric</strong> : float=78.5</p>
+<blockquote class="last">
+<div><p>The dielectric constant of the water used in GB</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_improper_force">
+<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CustomTorsionForce</p>
+<blockquote class="last">
+<div><p>With the formula k*(phi-phi0)^2, or None if there are no impropers</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_nonbonded_force">
+<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if
+necessary) to define the nonbonded interatomic potential for this
+system. A CustomNonbondedForce is used for the r^-4 part of the 12-6-4
+Lennard-Jones potential as well as any modified off-diagonal (i.e.,
+NBFIX) terms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating point number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff.</p>
+</div></blockquote>
+<p><strong>switchDistance</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The distance at which the switching function is turned on for van
+der Waals interactions. This is ignored when no cutoff is used, and
+no switch is used if switchDistance is 0, negative, or greater than
+the cutoff</p>
+</div></blockquote>
+<p><strong>ewaldErrorTolerance</strong> : float=0.0005</p>
+<blockquote>
+<div><p>When using PME or Ewald, the Ewald parameters will be calculated
+from this value</p>
+</div></blockquote>
+<p><strong>reactionFieldDielectric</strong> : float=78.5</p>
+<blockquote>
+<div><p>If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+region beyond the cutoff is treated using a reaction field method
+with this dielectric constant. It should be set to 1 if another
+implicit solvent model is being used (e.g., GB)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">NonbondedForce [, CustomNonbondedForce]</p>
+<blockquote class="last">
+<div><p>If a CustomNonbondedForce is necessary, the return value is a
+2-element tuple of NonbondedForce, CustomNonbondedForce. If only a
+NonbondedForce is necessary, that is the return value</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_out_of_plane_bend_force">
+<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba out-of-plane bend force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaOutOfPlaneBendForce</p>
+<blockquote class="last">
+<div><p>The out-of-plane bend Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_pi_torsion_force">
+<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba pi-torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaPiTorsionForce</p>
+<blockquote class="last">
+<div><p>The pi-torsion force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_rb_torsion_force">
+<tt class="descname">omm_rb_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">RBTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_set_virtual_sites">
+<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
+points defined in this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote class="last">
+<div><p>The system for which the virtual sites will be set. All particles
+must have already been added to this System before calling this
+method</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_stretch_bend_force">
+<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaStretchBendForce</p>
+<blockquote class="last">
+<div><p>The stretch-bend force containing all terms in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_torsion_torsion_force">
+<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaTorsionTorsionForce</p>
+<blockquote class="last">
+<div><p>The torsion-torsion (CMAP) force with all coupled-torsion parameters
+for this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_trigonal_angle_force">
+<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba trigonal-angle force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaInPlaneAngleForce</p>
+<blockquote class="last">
+<div><p>The trigonal in-plane Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.omm_urey_bradley_force">
+<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM Urey-Bradley force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">HarmonicBondForce</p>
+<blockquote class="last">
+<div><p>Or None, if no urey-bradleys are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.amber.AmberParm.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meant for use with the automatic file loader, this will automatically
+return a subclass of AmberFormat corresponding to what the information
+in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
+AmoebaParm, or AmberFormat)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.positions">
+<tt class="descname">positions</tt><a class="headerlink" href="#parmed.amber.AmberParm.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of 3-element Quantity tuples of dimension length representing the
+atomic positions for every atom in the system. If set with unitless
+numbers, those numbers are assumed to be in angstroms</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.prune_empty_terms">
+<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks through all of the topological lists and gets rid of terms
+in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
+to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.ptr">
+<tt class="descname">ptr</tt><big>(</big><em>pointer</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.ptr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the given pointer, and converts to upper-case so
+it&#8217;s case-insensitive. A non-existent pointer meets with a KeyError</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pointer</strong> : str</p>
+<blockquote>
+<div><p>The AMBER pointer for which to extract the value</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">int</p>
+<blockquote class="last">
+<div><p>The returned integer is the value of that pointer</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.rdparm">
+<tt class="descname">rdparm</tt><big>(</big><em>fname</em>, <em>slow=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.rdparm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the Amber format file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.rdparm_old">
+<tt class="descname">rdparm_old</tt><big>(</big><em>prmtop_lines</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.rdparm_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>This reads an old-style topology file and stores the results in the
+same data structures as a new-style topology file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prmtop_lines</strong> : list of str</p>
+<blockquote>
+<div><p>List of all lines in the prmtop file</p>
+</div></blockquote>
+<p><strong>check</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, only the first couple sections will be read to determine if
+this is, in fact, an old-style topology file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.rdparm_slow">
+<tt class="descname">rdparm_slow</tt><big>(</big><em>fname</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.rdparm_slow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the Amber format file. This parser is written in pure Python and
+is therefore slower than the C++-optimized version</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.recalculate_LJ">
+<tt class="descname">recalculate_LJ</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.recalculate_LJ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills the <tt class="docutils literal"><span class="pre">LENNARD_JONES_ACOEF</span></tt> and <tt class="docutils literal"><span class="pre">LENNARD_JONES_BCOEF</span></tt> arrays in
+the <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> raw data dictionary by applying the canonical
+Lorentz-Berthelot combining rules to the values in <tt class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></tt> and
+<tt class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.rediscover_molecules">
+<tt class="descname">rediscover_molecules</tt><big>(</big><em>solute_ions=True</em>, <em>fix_broken=True</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.rediscover_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>This determines the molecularity and sets the ATOMS_PER_MOLECULE and
+SOLVENT_POINTERS sections of the prmtops. Returns the new atom sequence
+in terms of the &#8216;old&#8217; atom indexes if re-ordering was necessary to fix
+the tleap bug. Returns None otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.remake_parm">
+<tt class="descname">remake_parm</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.remake_parm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills <tt class="xref py py-attr docutils literal"><span class="pre">parm_data</span></tt> from the data in the parameter and topology
+arrays (e.g., <tt class="xref py py-attr docutils literal"><span class="pre">atoms</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">bonds</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">bond_types</span></tt>, ...)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.set_version">
+<tt class="descname">set_version</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.set_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the version string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.split">
+<tt class="descname">split</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the current Structure into separate Structure instances for each
+unique molecule. A molecule is defined as all atoms connected by a graph
+of covalent bonds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, int) tuples</p>
+<blockquote class="last">
+<div><p>List of all molecules in the order that they appear first in the
+parent structure accompanied by the number of times that molecule
+appears in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.strip">
+<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.strip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : AmberMask, str, or iterable of bool</p>
+<blockquote class="last">
+<div><p>This is the selection of atoms that will be deleted from this
+structure. If it is a string, it will be interpreted as an
+AmberMask. If it is an AmberMask, it will be converted to a
+selection of atoms. If it is an iterable, it must be the same length
+as the <cite>atoms</cite> list.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.to_dataframe">
+<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pandas.DataFrame object from the current Structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The DataFrame will be over all atoms. The columns will be the attributes
+of the atom (as well as its containing residue). Some columns will
+<em>always</em> exist. Others will only exist if those attributes have been set
+on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+attributes and their meaning). The columns that will always be present
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+<li>resname : str (name of the containing residue)</li>
+<li>resid : int (Sequential index of the containing residue)</li>
+<li>resnum : int (original residue number in the input structure)</li>
+<li>chain : str (chain ID that the containing residue belongs to)</li>
+</ul>
+</div></blockquote>
+<p>The following attributes are optionally present if they were present in
+the original file defining the structure:</p>
+<blockquote>
+<div><ul class="simple">
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+<li>type_idx : int (integer type index for AMOEBA)</li>
+<li>class_idx : int (integer class type index for AMOEBA)</li>
+<li>multipole_111 : float (Monopole)</li>
+<li>multipole_211 : float (1,1 Dipole component)</li>
+<li>multipole_212 : float (1,2 Dipole component)</li>
+<li>multipole_222 : float (2,2 Dipole component)</li>
+<li>multipole_411 : float (1,1 Quadrupole component)</li>
+<li>multipole_412 : float (1,2 Quadrupole component)</li>
+<li>multipole_422 : float (2,2 Quadrupole component)</li>
+<li>multipole_413 : float (1,3 Quadrupole component)</li>
+<li>multipole_423 : float (2,3 Quadrupole component)</li>
+<li>multipole_433 : float (3,3 Quadrupole component)</li>
+<li>polarizability : float (dipole polarizability)</li>
+<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
+<li>segid : segment ID (similar to chain, but for CHARMM)</li>
+<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
+<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
+<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
+<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
+<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
+<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.topology">
+<tt class="descname">topology</tt><a class="headerlink" href="#parmed.amber.AmberParm.topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
+Structure instance results in the topology being deleted and rebuilt</p>
+<p class="rubric">Notes</p>
+<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+changed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.unchange">
+<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.unchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles all lists so that they do not indicate any changes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.update_dihedral_exclusions">
+<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
+<p>bond -&gt; angle -&gt; dihedral</p>
+<p>Since bonds and angles are completely excluded, any ring systems in
+which two atoms are attached by a bond or angle as well as a dihedral
+should be completely excluded as the bond and angle exclusion rules take
+precedence.  If a Bond or Angle was _added_ to the structure between a
+pair of atoms previously connected only by a dihedral term, it&#8217;s
+possible that those two atoms have both an exclusion <em>and</em> an exception
+defined. The result of this scenario is that sander and pmemd will
+happily compute an energy, _including_ the 1-4 nonbonded terms between
+atoms now connected by a bond or an Angle.  OpenMM, on the other hand,
+will complain about an exception specified multiple times. This method
+scans through all of the dihedrals in which <cite>ignore_end</cite> is <cite>False</cite> and
+turns it to <cite>True</cite> if the two end atoms are in the bond or angle
+partners arrays</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.amber.AmberParm.velocities">
+<tt class="descname">velocities</tt><a class="headerlink" href="#parmed.amber.AmberParm.velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of 3-element Quantity tuples of dimension length representing the
+atomic velocities for every atom in the system</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.view">
+<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a view of the current object as another object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cls</strong> : type</p>
+<blockquote>
+<div><p>Class definition of an AmberParm subclass for the current object to
+be converted into</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">instance of cls initialized from data in this object. This is NOT a deep</p>
+<p>copy, so modifying the original object may modify this. The copy</p>
+<p class="last">function will create a deep copy of any AmberFormat-derived object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.write_cif">
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.write_cif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from the current Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote class="last">
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.write_parm">
+<tt class="descname">write_parm</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.write_parm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the current data in parm_data into a new topology file with a
+given name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
+<blockquote class="last">
+<div><p>The name of the file to write the prmtop to</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.write_pdb">
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously. Default is True</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : str, optional</p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written. Default is False</p>
+</div></blockquote>
+<p><strong>charmm</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
+in the typical CHARMM-style PDB output. This will be omitted for any
+atom that does not contain a SEGID identifier. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.write_psf">
+<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.write_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.AmberParm.write_rst7">
+<tt class="descname">write_rst7</tt><big>(</big><em>name</em>, <em>netcdf=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberParm.write_rst7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a restart file with the current coordinates and velocities and
+box info if it&#8217;s present</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to write the restart file to</p>
+</div></blockquote>
+<p><strong>netcdf</strong> : bool=False</p>
+<blockquote class="last">
+<div><p>If True, write a NetCDF-format restart file (requires a NetCDF
+backend; scipy, netCDF4, or ScientificPython; to be installed)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>netcdf</cite> is not specified and the filename extension given by <cite>name</cite>
+is <cite>.ncrst</cite>, the a NetCDF restart file will be written. However, an
+explicit value for <cite>netcdf</cite> will override any filename extensions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/amberobj/parmed.amber.AmberParm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

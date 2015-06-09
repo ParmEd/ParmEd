@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.tinker.topologyobjects &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed" href="../../parmed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.tinker.topologyobjects</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains all of the class objects for the Tinker topology</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An atom in the system &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> 
+                 <span class="n">atomic_number</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">valence</span><span class="p">,</span> <span class="n">desc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">class_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atomic_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valence</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">valence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Atom.add_vdw"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.Atom.add_vdw">[docs]</a>    <span class="k">def</span> <span class="nf">add_vdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">radius14</span><span class="p">,</span> <span class="n">epsilon14</span><span class="p">,</span> <span class="n">reduction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds van der Waals terms to the atom &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
+        <span class="c"># These values might not exist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">radius14</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius14</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius14</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius14</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">epsilon14</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epsilon14</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epsilon14</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">epsilon14</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">reduction</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">reduction</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;Atom </span><span class="si">%s</span><span class="s"> [#</span><span class="si">%d</span><span class="s">]; Mass=</span><span class="si">%.2f</span><span class="s">; &quot;</span><span class="si">%s</span><span class="s">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retstr</span> <span class="o">=</span>  <span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%s</span><span class="s"> [#</span><span class="si">%s</span><span class="s">] </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span>
+                    <span class="s">&#39;   Type:        </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                    <span class="s">&#39;   Class:       </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                    <span class="s">&#39;   Mass:        </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span>
+                    <span class="s">&#39;   Valence:     </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> 
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valence</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;radius&#39;</span><span class="p">):</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">   vdW Rad:     </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span>
+                        <span class="s">&#39;   vdW Eps:     </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius14</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon14</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">retstr</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">   vdW 1-4 Rad: </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">   vdW 1-4 Eps: </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius14</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon14</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">   vdW Reduct:  </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">retstr</span>
+</div>
+<span class="k">class</span> <span class="nc">_ParamTypeList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A list for all types of parameters. This should be subclassed for each</span>
+<span class="sd">    parameter type that&#39;s necessary. It performs type checking as well as other</span>
+<span class="sd">    tasks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeclass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typeclass</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Can only append &quot;</span><span class="si">%s</span><span class="s">&quot; objects to </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeclass</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">things</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; List for Atom instances &quot;&quot;&quot;</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">Atom</span>
+</div>
+<div class="viewcode-block" id="BondStretch"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.BondStretch">[docs]</a><span class="k">class</span> <span class="nc">BondStretch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A bond-stretching term &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; k=</span><span class="si">%.2f</span><span class="s">; Req=</span><span class="si">%.2f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;     K = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;   Req = </span><span class="si">%.4f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BondList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.BondList">[docs]</a><span class="k">class</span> <span class="nc">BondList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">BondStretch</span>
+</div>
+<div class="viewcode-block" id="AngleBend"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.AngleBend">[docs]</a><span class="k">class</span> <span class="nc">AngleBend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An angle-bending term &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="n">fold</span><span class="p">,</span> <span class="n">type_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">theteq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">fold</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fold</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="s">&#39;Harmonic&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="s">&#39;&lt;AngleBend [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; k=</span><span class="si">%.2f</span><span class="s">; Theta_eq=</span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&#39;; fold=</span><span class="si">%.1f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fold</span>
+        <span class="k">return</span> <span class="n">retstr</span> <span class="o">+</span> <span class="s">&#39;; </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;AngleBend </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                  <span class="s">&#39;     K = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                  <span class="s">&#39; Theta = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&#39;  Fold = </span><span class="si">%.1f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fold</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">retstr</span> <span class="o">+</span> <span class="s">&#39;  Type = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AngleList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.AngleList">[docs]</a><span class="k">class</span> <span class="nc">AngleList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">AngleBend</span>
+</div>
+<div class="viewcode-block" id="StretchBend"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.StretchBend">[docs]</a><span class="k">class</span> <span class="nc">StretchBend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A stretch-bending term &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">,</span> <span class="n">r1eq</span><span class="p">,</span> <span class="n">r2eq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">theteq</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r1eq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r1eq</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r2eq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r2eq</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;&lt;StretchBend [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; k=</span><span class="si">%.2f</span><span class="s">; Theta_eq=</span><span class="si">%.2f</span><span class="s">; R1eq=</span><span class="si">%.2f</span><span class="s">; &#39;</span>
+                <span class="s">&#39;R2eq=</span><span class="si">%.2f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">r1eq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r2eq</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;StretchBend </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;     K = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39; Theta = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;  R1eq = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;  R2eq = </span><span class="si">%.4f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r1eq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r2eq</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="StretchBendList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.StretchBendList">[docs]</a><span class="k">class</span> <span class="nc">StretchBendList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">StretchBend</span>
+</div>
+<div class="viewcode-block" id="UreyBradley"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.UreyBradley">[docs]</a><span class="k">class</span> <span class="nc">UreyBradley</span><span class="p">(</span><span class="n">BondStretch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A urey-bradley term -- functionally identical to a bond-stretch &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="UreyBradleyList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.UreyBradleyList">[docs]</a><span class="k">class</span> <span class="nc">UreyBradleyList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">UreyBradley</span>
+</div>
+<div class="viewcode-block" id="OutOfPlaneBend"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.OutOfPlaneBend">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An out-of-plane bending term &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atom4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; k=</span><span class="si">%.2f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;   K = </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="OutOfPlaneBendList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.OutOfPlaneBendList">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBendList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">OutOfPlaneBend</span>
+</div>
+<div class="viewcode-block" id="OutOfPlaneDist"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.OutOfPlaneDist">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneDist</span><span class="p">(</span><span class="n">OutOfPlaneBend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An out-of-plane distance (functionally equivalent to OOP Bend &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="OutOfPlaneDistList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.OutOfPlaneDistList">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneDistList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">OutOfPlaneDist</span>
+</div>
+<div class="viewcode-block" id="TorsionAngle"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionAngle">[docs]</a><span class="k">class</span> <span class="nc">TorsionAngle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Torsional Angle parameter &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atom4</span>
+        <span class="c"># We don&#39;t know how many terms to expect, but it will be a multiple of 3</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;TorsionAngle expects an equal number of &#39;</span>
+                            <span class="s">&#39;Amplitudes, phases, and periodicities.&#39;</span><span class="p">)</span>
+        <span class="n">nterms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nterms</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nterms</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodicity</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nterms</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periodicity</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;BUGBUG!! Inconsistent # of terms in torsion&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;&lt;TorsionAngle [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; No Terms&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;TorsionAngle [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; Ampl=</span><span class="si">%s</span><span class="s">; Phase=</span><span class="si">%s</span><span class="s">; Per=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodicity</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s">&#39;TorsionAngle </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                    <span class="s">&#39;   No Terms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="s">&#39;TorsionAngle </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="p">)</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">per</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">periodicity</span><span class="p">)):</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">   Term </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                       <span class="s">&#39;   Amplitude = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                       <span class="s">&#39;       Phase = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                       <span class="s">&#39; Periodicity = </span><span class="si">%.4f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">per</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">retstr</span>
+</div>
+<div class="viewcode-block" id="TorsionAngleList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionAngleList">[docs]</a><span class="k">class</span> <span class="nc">TorsionAngleList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">TorsionAngle</span>
+</div>
+<div class="viewcode-block" id="PiTorsion"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.PiTorsion">[docs]</a><span class="k">class</span> <span class="nc">PiTorsion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A Pi-Orbital Torsion parameter &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;PiTorsion [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; Ampl=</span><span class="si">%.2f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;PiTorsion </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">   Amplitude = </span><span class="si">%.4f</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="PiTorsionList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.PiTorsionList">[docs]</a><span class="k">class</span> <span class="nc">PiTorsionList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">PiTorsion</span>
+</div>
+<div class="viewcode-block" id="TorsionTorsion"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionTorsion">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A coupled-torsion parameter (like CMAP) &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">atom5</span><span class="p">,</span> <span class="n">spline1</span><span class="p">,</span> <span class="n">spline2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="n">atom4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span> <span class="o">=</span> <span class="n">atom5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spline1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spline1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spline2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spline2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;TorsionTorsion [</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">]; Spline=(</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;TorsionTorsion </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="s"> ---</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;                      </span><span class="si">%r</span><span class="s"> --- </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;   Spline Grid = (</span><span class="si">%d</span><span class="s"> x </span><span class="si">%d</span><span class="s">)&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline2</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TorsionTorsionList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionTorsionList">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsionList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">TorsionTorsion</span>
+</div>
+<div class="viewcode-block" id="TorsionTorsionGrid"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionTorsionGrid">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsionGrid</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The interpolation grid of a coupled-torsion correction map. Every unique</span>
+<span class="sd">    grid is cached and if a duplicate grid is instantiated, a reference to the</span>
+<span class="sd">    original grid is returned. As a result, all unique TorsionTorsionGrid</span>
+<span class="sd">    instances are singletons and should be compared for equality with &quot;is&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Because these grids are space-consuming, we only hold onto unique grids</span>
+    <span class="n">_typelist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TorsionTorsionGrid.new"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.TorsionTorsionGrid.new">[docs]</a>    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">inst</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">d</span><span class="p">[:</span><span class="mi">2</span><span class="p">])]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c"># Potentially expensive comparison of all grids.</span>
+        <span class="k">for</span> <span class="n">ttg</span> <span class="ow">in</span> <span class="n">TorsionTorsionGrid</span><span class="o">.</span><span class="n">_typelist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ttg</span> <span class="o">==</span> <span class="n">inst</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttg</span>
+        <span class="n">TorsionTorsionGrid</span><span class="o">.</span><span class="n">_typelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span>
+   </div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-8</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+   
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="c"># No comparisons are implemented</span>
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s">&#39;TorsionTorsionGrid instances are not &#39;</span>
+                             <span class="s">&#39;well-ordered&#39;</span><span class="p">)</span>
+    <span class="n">__lt__</span> <span class="o">=</span> <span class="n">__ge__</span> <span class="o">=</span> <span class="n">__le__</span> <span class="o">=</span> <span class="n">__gt__</span>
+</div>
+<div class="viewcode-block" id="AtomicMultipole"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.AtomicMultipole">[docs]</a><span class="k">class</span> <span class="nc">AtomicMultipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Atomic multipole parameter &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">moments</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">frame</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moment</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">moments</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;AtomicMultipole [</span><span class="si">%s</span><span class="s">] </span><span class="si">%s</span><span class="s">; Frame=</span><span class="si">%s</span><span class="s">; Moments=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;AtomicMultipole </span><span class="si">%r</span><span class="s"> &quot;</span><span class="si">%s</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;     Frame = </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;   Moments = </span><span class="si">%8.5f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;             </span><span class="si">%8.5f</span><span class="s"> </span><span class="si">%8.5f</span><span class="s"> </span><span class="si">%8.5f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;             </span><span class="si">%8.5f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;             </span><span class="si">%8.5f</span><span class="s"> </span><span class="si">%8.5f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;             </span><span class="si">%8.5f</span><span class="s"> </span><span class="si">%8.5f</span><span class="s"> </span><span class="si">%8.5f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">moment</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AtomicMultipoleList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.AtomicMultipoleList">[docs]</a><span class="k">class</span> <span class="nc">AtomicMultipoleList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">AtomicMultipole</span>
+</div>
+<div class="viewcode-block" id="DipolePolarizability"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.DipolePolarizability">[docs]</a><span class="k">class</span> <span class="nc">DipolePolarizability</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A dipole polarizability parameter &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">group</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;DipolePolarizability [</span><span class="si">%s</span><span class="s">]; Alpha=</span><span class="si">%.2f</span><span class="s">; Group=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;DipolePolarizability </span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;    Alpha = </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                <span class="s">&#39;    Group = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="DipolePolarizabilityList"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.topologyobjects.html#parmed.tinker.topologyobjects.DipolePolarizabilityList">[docs]</a><span class="k">class</span> <span class="nc">DipolePolarizabilityList</span><span class="p">(</span><span class="n">_ParamTypeList</span><span class="p">):</span>
+    <span class="n">typeclass</span> <span class="o">=</span> <span class="n">DipolePolarizability</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,7 +1,0 @@
-chemistry.charmm.charmmcrds module
-==================================
-
-.. automodule:: chemistry.charmm.charmmcrds
-    :members:
-    :undoc-members:
-    :show-inheritance:

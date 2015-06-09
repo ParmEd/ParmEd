@@ -1,0 +1,32 @@
+parmed.topologyobjects.Residue
+==============================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: Residue
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Residue.__init__
+      ~Residue.add_atom
+      ~Residue.delete_atom
+      ~Residue.is_empty
+      ~Residue.sort
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Residue.idx
+   
+   

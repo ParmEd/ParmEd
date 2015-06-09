@@ -1,0 +1,7 @@
+parmed.tools.exceptions module
+==============================
+
+.. automodule:: parmed.tools.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:

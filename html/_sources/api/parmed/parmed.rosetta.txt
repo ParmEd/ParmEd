@@ -1,0 +1,17 @@
+parmed.rosetta package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.rosetta.pose
+
+Module contents
+---------------
+
+.. automodule:: parmed.rosetta
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.tools.addljtype module
+=============================
+
+.. automodule:: parmed.tools.addljtype
+    :members:
+    :undoc-members:
+    :show-inheritance:

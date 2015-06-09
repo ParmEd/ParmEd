@@ -1,7 +1,0 @@
-chemistry.amber.titratable_residues module
-==========================================
-
-.. automodule:: chemistry.amber.titratable_residues
-    :members:
-    :undoc-members:
-    :show-inheritance:

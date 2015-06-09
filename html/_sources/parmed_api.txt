@@ -6,31 +6,31 @@ to do, or perhaps you want to use some of ParmEd's functionality in your own
 Python script or program.
 
 In that case, the ParmEd API is here! Every :class:`Action
-<ParmedTools.ParmedActions.Action>` subclass is available for import from
-:mod:`ParmedTools`. For a full listing of available actions, you are forward to
+<parmed.tools.actions.Action>` subclass is available for import from
+:mod:`parmed.tools`. For a full listing of available actions, you are forward to
 the auto-generated list in :doc:`the parmed.py page <parmed>`.
 
 Importing the actions
 ---------------------
 
-All actions can be imported from ``ParmedTools`` with the same camelcase shown
+All actions can be imported from ``parmed.tools`` with the same camelcase shown
 in the ``parmed.py`` page. Examples are shown below::
 
-    >>> from ParmedTools import change, addLJType, changeRadii, tiMerge
-    >>> from ParmedTools import setBond, deleteBond, addDihedral, addPDB
+    >>> from parmed.tools import change, addLJType, changeRadii, tiMerge
+    >>> from parmed.tools import setBond, deleteBond, addDihedral, addPDB
 
 Using the actions
 -----------------
 
 Each of the actions described on the previous page can be invoked either on a
 parm list (a few, like :doc:`interpolate`, actually *require* a parm list with
-multiple topologies), or a raw :class:`AmberParm <chemistry.amber.Amberparm>`
+multiple topologies), or a raw :class:`AmberParm <parmed.amber.Amberparm>`
 object. Note that some actions do not support all :class:`AmberParm
-<chemistry.amber.AmberParm>` subclasses (like those for the CHARMM or Amoeba
+<parmed.amber.AmberParm>` subclasses (like those for the CHARMM or Amoeba
 force fields).
 
 The first step is to instantiate the action with the :class:`AmberParm
-<chemistry.amber.AmberParm>` instance as the first argument. The arguments that
+<parmed.amber.AmberParm>` instance as the first argument. The arguments that
 each action requires in the ParmEd interpreter can then be given as separate
 arguments to the constructor or all as a single string in the second argument.
 Keyword arguments can optionally be given as keyword arguments to the action
@@ -38,8 +38,8 @@ constructor.
 
 Examples of valid syntax for :doc:`addLJType` are shown below::
 
-    from ParmedTools import addLJType
-    from chemistry.amber import AmberParm
+    from parmed.tools import addLJType
+    from parmed.amber import AmberParm
 
     parm = AmberParm('trx.prmtop')
 

@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.modeller.residue &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed" href="../../parmed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.modeller.residue</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This contains the basic residue template and residue building libraries</span>
+<span class="sd">typically used in modelling applications</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;PROTEIN&#39;</span><span class="p">,</span> <span class="s">&#39;NUCLEIC&#39;</span><span class="p">,</span> <span class="s">&#39;SOLVENT&#39;</span><span class="p">,</span> <span class="s">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s">&#39;ResidueTemplate&#39;</span><span class="p">,</span>
+           <span class="s">&#39;ResidueTemplateContainer&#39;</span><span class="p">,</span> <span class="s">&#39;PatchTemplate&#39;</span><span class="p">]</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">class</span> <span class="nc">_ResidueType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Singleton for various types of residues &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;ResidueType </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<span class="n">PROTEIN</span> <span class="o">=</span> <span class="n">_ResidueType</span><span class="p">(</span><span class="s">&#39;PROTEIN&#39;</span><span class="p">)</span>
+<span class="n">NUCLEIC</span> <span class="o">=</span> <span class="n">_ResidueType</span><span class="p">(</span><span class="s">&#39;NUCLEIC&#39;</span><span class="p">)</span>
+<span class="n">SOLVENT</span> <span class="o">=</span> <span class="n">_ResidueType</span><span class="p">(</span><span class="s">&#39;SOLVENT&#39;</span><span class="p">)</span>
+<span class="n">UNKNOWN</span> <span class="o">=</span> <span class="n">_ResidueType</span><span class="p">(</span><span class="s">&#39;UNKNOWN&#39;</span><span class="p">)</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<div class="viewcode-block" id="ResidueTemplate"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate">[docs]</a><span class="k">class</span> <span class="nc">ResidueTemplate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a residue template, which contains a listing of the atoms in the</span>
+<span class="sd">    residue template as well as a mapping of which atoms are bonded to other</span>
+<span class="sd">    atoms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        If provided, this is the name of the residue</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms : :class:`AtomList`</span>
+<span class="sd">        List of atoms in this residue</span>
+<span class="sd">    bonds : :class:`TrackedList`</span>
+<span class="sd">        List of the bonds between the atoms in this residue</span>
+<span class="sd">    coordinates : numpy array or list</span>
+<span class="sd">        The partial atomic coordinates in a linear iterable. If numpy is</span>
+<span class="sd">        available, the coordinates are a numpy ndarray. Otherwise it is a list.</span>
+<span class="sd">    connections : list of :class:`Atom`</span>
+<span class="sd">        A list of all atoms that should form connections with atoms of another</span>
+<span class="sd">        residue *besides* the head and tail atoms</span>
+<span class="sd">    head : :class:`Atom` or None</span>
+<span class="sd">        The atom that is connected to the residue that comes before this one</span>
+<span class="sd">    tail : :class:`Atom` or None</span>
+<span class="sd">        The atom that is connected to the *next* residue after this one</span>
+<span class="sd">    first_patch : :class:`ResidueTemplate` or None</span>
+<span class="sd">        If it is not None, this is the patch whose tail is added to the head</span>
+<span class="sd">        atom of this residue when this residue is the first in a chain</span>
+<span class="sd">    last_patch : :class:`ResidueTemplate` or None</span>
+<span class="sd">        If it is not None, this is the patch whose head is added to the tail</span>
+<span class="sd">        atom of this residue when this residue is the last in a chain</span>
+<span class="sd">    groups : list of list(:class:`Atom`)</span>
+<span class="sd">        If set, each group is a list of Atom instances making up each group</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">UNKNOWN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="s">&#39;None&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="s">&#39;None&#39;</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">: </span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> bonds; head=</span><span class="si">%s</span><span class="s">; tail=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">),</span> <span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResidueTemplate.add_atom"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds an atom to this residue template</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atom : :class:`Atom`</span>
+<span class="sd">            The atom to add to this residue</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError if ``atom`` has the same name as another atom in this</span>
+<span class="sd">        residue already</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Residue already has atom named </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ResidueTemplate.add_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.add_bond">[docs]</a>    <span class="k">def</span> <span class="nf">add_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds a bond between the two provided atoms in the residue</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atom1 : :class:`Atom` or int or str</span>
+<span class="sd">            One of the atoms in the bond. It must be in the ``atoms`` list of</span>
+<span class="sd">            this ResidueTemplate. It can also be the atom index (index from 0)</span>
+<span class="sd">            of the atom in the bond.</span>
+<span class="sd">        atom2 : :class:`Atom` or int or str</span>
+<span class="sd">            The other atom in the bond. It must be in the ``atoms`` list of this</span>
+<span class="sd">            ResidueTemplate. It can also be the atom index (index from 0) of the</span>
+<span class="sd">            atom in the bond.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError if atom1 or atom2 are integers that are out of range of the</span>
+<span class="sd">        number of atoms already in this template</span>
+
+<span class="sd">        RuntimeError if atom1 or atom2 are :class:`Atom` instances but they are</span>
+<span class="sd">        *not* in the atoms list of this ResidueTemplate</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If atom1 and atom2 are already bonded, this routine does nothing. If</span>
+<span class="sd">        atom1 or atom2 are strings, then they will match the first instance of</span>
+<span class="sd">        the atom name that is the same as the atom name passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">atom1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom2</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">atom2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="ow">or</span> <span class="n">atom2</span><span class="o">.</span><span class="n">list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Both atoms must belong to template.atoms&#39;</span><span class="p">)</span>
+        <span class="c"># Do not add the same bond twice</span>
+        <span class="k">if</span> <span class="n">atom1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atom2</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">))</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ResidueTemplate.from_residue"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.from_residue">[docs]</a>    <span class="k">def</span> <span class="nf">from_residue</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This constructor creates a ResidueTemplate from a particular Residue</span>
+<span class="sd">        object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        residue : :class:`Residue`</span>
+<span class="sd">            The residue from which to create a template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">i1</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">)</span>
+                    <span class="n">i2</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                        <span class="n">oatom</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">oatom</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom1</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">oatom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">inst</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">oatom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">inst</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">oatom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">:</span>
+                        <span class="c"># Don&#39;t know WHAT to do with it</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Cannot determine head/tail for &#39;</span>
+                                      <span class="s">&#39;unordered residues.&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># Disulfide or something... not head or tail</span>
+                        <span class="n">inst</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inst</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ResidueTemplate.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Atomic coordinates, in Angstroms, of all atoms in the template &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;numpy is required to get ResidueTemplate &#39;</span>
+                                  <span class="s">&#39;coordinates&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span>
+
+    <span class="c"># Make ResidueTemplate look like a container of atoms, also indexable by the</span>
+    <span class="c"># atom name</span></div>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">atom</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">atom</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%s</span><span class="s"> not found in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="PatchTemplate"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.PatchTemplate">[docs]</a><span class="k">class</span> <span class="nc">PatchTemplate</span><span class="p">(</span><span class="n">ResidueTemplate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A residue patch (typically used for CHARMM) that is used to modify existing</span>
+<span class="sd">    residues in some way (e.g., terminal patches, disulfide bridges, etc.)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        If provided, this is the name of the residue</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    delete : list of str</span>
+<span class="sd">        List of atoms that need to be deleted in applying the patch</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`ResidueTemplate`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This class basically just provides an additional list of atoms that need to</span>
+<span class="sd">    be deleted when applying this patch -- something that does not apply to</span>
+<span class="sd">    standard Residues</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PatchTemplate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<div class="viewcode-block" id="ResidueTemplateContainer"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer">[docs]</a><span class="k">class</span> <span class="nc">ResidueTemplateContainer</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A container of ResidueTemplate objects representing a unit with multiple</span>
+<span class="sd">    residues</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        The name of the residue container</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">term_decorate</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a ResidueTemplateContainer from a Structure instance filled</span>
+<span class="sd">        with residues</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`parmed.structure.Structure`</span>
+<span class="sd">            The structure from which to generate the ResidueTemplateContainer</span>
+<span class="sd">            from</span>
+<span class="sd">        term_decorate : bool, optional</span>
+<span class="sd">            If True, terminal amino and nucleic acid residues will be adorned as</span>
+<span class="sd">            follows:</span>
+
+<span class="sd">                * N-prepended if it is an N-terminal amino acid</span>
+<span class="sd">                * C-prepended if it is a C-terminal amino acid</span>
+<span class="sd">                * 5-appended if it is a 5&#39;-terminal nucleic acid</span>
+<span class="sd">                * 3-appended if it is a 3&#39;-terminal nucleic acid</span>
+
+<span class="sd">            For example, an N-terminal GLY will become NGLY, while a 5&#39;-terminal</span>
+<span class="sd">            DA will become DA5. Default is True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+            <span class="n">rt</span> <span class="o">=</span> <span class="n">ResidueTemplate</span><span class="o">.</span><span class="n">from_residue</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="c"># See if we need to decorate the termini names</span>
+            <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;N</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">elif</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">5&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">elif</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;C</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">elif</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">3&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span>
+</div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c"># Behave like a dict here... albeit a slow one</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span> <span class="k">return</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResidueTemplateContainer.to_library"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer.to_library">[docs]</a>    <span class="k">def</span> <span class="nf">to_library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the ResidueTemplateContainer instance to a library of unique</span>
+<span class="sd">        :class:`ResidueTemplate` instances. The first of each kind of residue is</span>
+<span class="sd">        taken</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residues : dict {str : :class:`ResidueTemplate}</span>
+<span class="sd">            The residue library with all residues from this residue collection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="n">ret</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

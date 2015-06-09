@@ -1,7 +1,0 @@
-ParmedTools.logos module
-========================
-
-.. automodule:: ParmedTools.logos
-    :members:
-    :undoc-members:
-    :show-inheritance:

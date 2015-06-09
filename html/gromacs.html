@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The chemistry.gromacs package &mdash; ParmEd 2.0 documentation</title>
+    <title>The parmed.gromacs package &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="chemistry.gromacs.GromacsTopologyFile" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html" /> 
+    <link rel="next" title="parmed.gromacs.GromacsTopologyFile" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html" title="chemistry.gromacs.GromacsTopologyFile"
+          <a href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" title="parmed.gromacs.GromacsTopologyFile"
              accesskey="N">next</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -49,8 +49,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-chemistry-gromacs-package">
-<h1>The <a class="reference internal" href="api/chemistry/chemistry.gromacs.html#module-chemistry.gromacs" title="chemistry.gromacs"><tt class="xref py py-mod docutils literal"><span class="pre">chemistry.gromacs</span></tt></a> package<a class="headerlink" href="#the-chemistry-gromacs-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="the-parmed-gromacs-package">
+<h1>The <a class="reference internal" href="api/parmed/parmed.gromacs.html#module-parmed.gromacs" title="parmed.gromacs"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.gromacs</span></tt></a> package<a class="headerlink" href="#the-parmed-gromacs-package" title="Permalink to this headline">¶</a></h1>
 <p>The <tt class="xref py py-mod docutils literal"><span class="pre">gromacs</span></tt> package contains classes that can parse the Gromacs topology
 and coordinate files. Like <cite>grompp</cite>, ParmEd pre-processes the the topology file,
 automatically finding and parsing the include topology files (ITP) referenced by
@@ -81,18 +81,18 @@ the Gromacs install location.</li>
 <tt class="docutils literal"><span class="pre">/usr/local/gromacs/share/gromacs</span></tt> is used.</li>
 </ol>
 <p>If you wish to specify the location, you can do so by modifying the
-<tt class="docutils literal"><span class="pre">GROMACS_TOPDIR</span></tt> variable in the <tt class="docutils literal"><span class="pre">chemistry.gromacs</span></tt> package in the
+<tt class="docutils literal"><span class="pre">GROMACS_TOPDIR</span></tt> variable in the <tt class="docutils literal"><span class="pre">parmed.gromacs</span></tt> package in the
 following way:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">gromacs</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span>
 <span class="n">gromacs</span><span class="o">.</span><span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
 </pre></div>
 </div>
 <p>Note, because strings are immutable in Python, the following will <em>not</em> work:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">chemistry.gromacs</span> <span class="kn">import</span> <span class="n">GROMACS_TOPDIR</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed.gromacs</span> <span class="kn">import</span> <span class="n">GROMACS_TOPDIR</span>
 <span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
 </pre></div>
 </div>
-<p>In the above example, <tt class="docutils literal"><span class="pre">chemistry.gromacs.GROMACS_TOPDIR</span></tt> will remain
+<p>In the above example, <tt class="docutils literal"><span class="pre">parmed.gromacs.GROMACS_TOPDIR</span></tt> will remain
 unchanged.</p>
 </div>
 <div class="section" id="the-topology-file">
@@ -106,18 +106,18 @@ format is detailed in the Gromacs User&#8217;s manual.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html#chemistry.gromacs.GromacsTopologyFile" title="chemistry.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
 <td>Class providing a parser and writer for a GROMACS topology file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsGroFile.html#chemistry.gromacs.GromacsGroFile" title="chemistry.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
 <td>Parses and writes Gromacs GRO files</td>
 </tr>
 </tbody>
 </table>
 <div class="section" id="the-gromacstopologyfile-class">
-<h3>The <a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html#chemistry.gromacs.GromacsTopologyFile" title="chemistry.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> class<a class="headerlink" href="#the-gromacstopologyfile-class" title="Permalink to this headline">¶</a></h3>
-<p>This class inherits from the base class <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, adding the attributes <tt class="docutils literal"><span class="pre">parameterset</span></tt> (a
-<a class="reference internal" href="api/chemistry/chemistry.parameters.html#chemistry.parameters.ParameterSet" title="chemistry.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></a> object with all
+<h3>The <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> class<a class="headerlink" href="#the-gromacstopologyfile-class" title="Permalink to this headline">¶</a></h3>
+<p>This class inherits from the base class <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, adding the attributes <tt class="docutils literal"><span class="pre">parameterset</span></tt> (a
+<a class="reference internal" href="api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></a> object with all
 parameters parsed from the include topology files) and <tt class="docutils literal"><span class="pre">itps</span></tt> (a list of all
 include topology files that were included and parsed while processing the
 topology file).</p>
@@ -128,18 +128,18 @@ is shown below:</p>
 <span class="go">&lt;GromacsTopologyFile 1960 atoms; 129 residues; 1984 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
-<p>You can manipulate the <tt class="docutils literal"><span class="pre">top</span></tt> instance any way you can a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+<p>You can manipulate the <tt class="docutils literal"><span class="pre">top</span></tt> instance any way you can a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
 </div>
 </div>
 <div class="section" id="the-gro-coordinate">
 <h2>The GRO coordinate<a class="headerlink" href="#the-gro-coordinate" title="Permalink to this headline">¶</a></h2>
 <p>ParmEd also supplies classes for parsing the various variants of the GROMACS GRO
-file. Because the GRO file resembles a PDB file, the <a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsGroFile.html#chemistry.gromacs.GromacsGroFile" title="chemistry.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a> has a <tt class="docutils literal"><span class="pre">parse</span></tt> method that will parse a GRO
-file and instantiate a <a class="reference internal" href="structobj/chemistry.structure.Structure.html#chemistry.structure.Structure" title="chemistry.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</p>
+file. Because the GRO file resembles a PDB file, the <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a> has a <tt class="docutils literal"><span class="pre">parse</span></tt> method that will parse a GRO
+file and instantiate a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</p>
 <p>The coordinates can be extracted from the <tt class="docutils literal"><span class="pre">xx</span></tt>, <tt class="docutils literal"><span class="pre">xy</span></tt>, and <tt class="docutils literal"><span class="pre">xz</span></tt> attributes
-on each <a class="reference internal" href="topobj/chemistry.topologyobjects.Atom.html#chemistry.topologyobjects.Atom" title="chemistry.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance in the
+on each <a class="reference internal" href="topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance in the
 Structure.</p>
-<p>The GRO file is automatically detected by <tt class="xref py py-meth docutils literal"><span class="pre">chemistry.load_file()</span></tt>, and this
+<p>The GRO file is automatically detected by <tt class="xref py py-meth docutils literal"><span class="pre">parmed.load_file()</span></tt>, and this
 is the recommended way to parse these files.</p>
 <p>The corresponding classes are:</p>
 <table border="1" class="longtable docutils">
@@ -148,10 +148,10 @@ is the recommended way to parse these files.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html#chemistry.gromacs.GromacsTopologyFile" title="chemistry.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
 <td>Class providing a parser and writer for a GROMACS topology file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="gromacsobj/chemistry.gromacs.GromacsGroFile.html#chemistry.gromacs.GromacsGroFile" title="chemistry.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
 <td>Parses and writes Gromacs GRO files</td>
 </tr>
 </tbody>
@@ -162,7 +162,7 @@ is the recommended way to parse these files.</p>
 <p>Many exciting possibilities are available with <cite>GromacsTopologyFile</cite> and <cite>GromacsGroFile</cite>.
 For example, ParmEd is the first software package to enable conversion of Gromacs simulation
 input files to AMBER format in just a few lines of code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">chemistry</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s">&#39;topol.top&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_gro</span> <span class="o">=</span> <span class="n">GromacsGroFile</span><span class="p">(</span><span class="s">&#39;conf.gro&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">box</span> <span class="c"># Needed because .prmtop contains box info</span>
@@ -208,7 +208,7 @@ simulation results.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">chemistry.gromacs</span></tt> package</a><ul>
+<li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">parmed.gromacs</span></tt> package</a><ul>
 <li><a class="reference internal" href="#setting-up-gromacs">Setting up Gromacs</a></li>
 <li><a class="reference internal" href="#the-topology-file">The topology file</a><ul>
 <li><a class="reference internal" href="#the-gromacstopologyfile-class">The <tt class="docutils literal"><span class="pre">GromacsTopologyFile</span></tt> class</a></li>
@@ -252,7 +252,7 @@ simulation results.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gromacsobj/chemistry.gromacs.GromacsTopologyFile.html" title="chemistry.gromacs.GromacsTopologyFile"
+          <a href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" title="parmed.gromacs.GromacsTopologyFile"
              >next</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>

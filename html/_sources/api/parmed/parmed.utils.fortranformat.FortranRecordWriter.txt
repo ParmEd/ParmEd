@@ -1,0 +1,7 @@
+parmed.utils.fortranformat.FortranRecordWriter module
+=====================================================
+
+.. automodule:: parmed.utils.fortranformat.FortranRecordWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:
