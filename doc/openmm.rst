@@ -85,7 +85,7 @@ that kernel.
 How does ParmEd enhance OpenMM?
 -------------------------------
 
-.. currentmodule:: chemistry.openmm
+.. currentmodule:: parmed.openmm
 .. autosummary::
     :toctree: openmmobj/
 
@@ -152,13 +152,13 @@ and ``Topology`` instance from any of a number of file formats (e.g., Amber
 topology file, Gromacs topology file, or CHARMM PSF file), it is also possible
 to go in the reverse direction. That is, to start with ``Topology`` and
 ``System`` instances and convert those to a :class:`Structure
-<chemistry.structure.Structure>` instance.
+<parmed.structure.Structure>` instance.
 
 The function for this is :func:`load_openmm
-<chemistry.openmm.topsystem.load_openmm>`, and takes a mandatory ``Topology``
+<parmed.openmm.topsystem.load_openmm>`, and takes a mandatory ``Topology``
 instance, along with either an optional ``System`` instance or name of a
 serialized ``System`` XML file defining an OpenMM ``System``, and returns a
-populated :class:`Structure <chemistry.structure.Structure>` from it. This is
+populated :class:`Structure <parmed.structure.Structure>` from it. This is
 particularly useful when you parametrize a system using the OpenMM modelling
 capabilities, but want to use that parametrized system in another program, like
 Amber or Gromacs.
@@ -166,8 +166,8 @@ Amber or Gromacs.
 An example is shown below, using the OpenMM functionality to parametrize a PDB
 file with the ff99SB force field::
 
-    import chemistry as chem
-    import chemistry.unit as u
+    import parmed as chem
+    import parmed.unit as u
 
     from simtk.openmm import app
     from simtk import openmm as mm

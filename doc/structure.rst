@@ -11,7 +11,7 @@ populated through the PDB and mmCIF parsing routines.
 
 :class:`Structure` class
 ------------------------
-.. currentmodule:: chemistry.structure
+.. currentmodule:: parmed.structure
 .. autosummary::
     :toctree: structobj/
 
@@ -19,12 +19,12 @@ populated through the PDB and mmCIF parsing routines.
 
 The :class:`Structure` class may be instantiated directly, but is more often
 created by one of the parsers (see below for :func:`load_file
-<chemistry.formats.registry.load_file>`) or extended to
-support the structure files of various computational chemistry programs.
+<parmed.formats.registry.load_file>`) or extended to
+support the structure files of various computational parmed programs.
 
-:func:`load_file <chemistry.formats.registry.load_file>`
+:func:`load_file <parmed.formats.registry.load_file>`
 --------------------------------------------------------
-.. currentmodule:: chemistry.formats.registry
+.. currentmodule:: parmed.formats.registry
 .. autosummary::
     :toctree: structobj/
 
@@ -33,7 +33,7 @@ support the structure files of various computational chemistry programs.
 The :func:`load_file` function automatically determines the format of the file
 whose name is passed as an argument. The following formats are currently
 recognized and result in the instantiation of either a :class:`Structure
-<chemistry.structure.Structure>`. or one of its subclasses:
+<parmed.structure.Structure>`. or one of its subclasses:
 
 1. PDB
 2. PDBx/mmCIF
@@ -44,7 +44,7 @@ recognized and result in the instantiation of either a :class:`Structure
 7. Mol2 file
 
 Here, we will focus on instantiating a :class:`Structure
-<chemistry.structure.Structure>` instance from PDB and
+<parmed.structure.Structure>` instance from PDB and
 mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
 Bank or the world wide Protein Data Bank often contain a large amount of
 metadata describing the structure, such as the citation information,
@@ -54,7 +54,7 @@ This information is extracted from both PDB and PDBx/mmCIF files when available,
 along with anisotropic B-factors.
 
 The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a :class:`Structure <chemistry.structure.Structure>` instance.
+file to a :class:`Structure <parmed.structure.Structure>` instance.
 
 Examples
 --------
@@ -70,7 +70,7 @@ __ 4lzt_structures_
 
 The first example demonstrates reading the PDB file::
 
-    >>> from chemistry import load_file
+    >>> from parmed import load_file
     >>> lzt_pdb = load_file('4lzt.pdb')
     >>> len(lzt_pdb.atoms)
     1164
@@ -102,7 +102,7 @@ The first example demonstrates reading the PDB file::
 
 The second example demonstrates reading the CIF file::
 
-    >>> from chemistry import load_file
+    >>> from parmed import load_file
     >>> lzt_cif = load_file('4LZT.cif')
     >>> len(lzt_cif.atoms)
     1164
@@ -138,15 +138,15 @@ Converting PDBx/mmCIF files to PDB files
 ----------------------------------------
 
 If you noticed the ``write_cif`` and ``write_pdb`` methods attached to the
-:class:`Structure <chemistry.structure.Structure>` class, you may have deduced
+:class:`Structure <parmed.structure.Structure>` class, you may have deduced
 that you can very simply convert a PDBx/mmCIF file to a PDB file.
 
 This is likely to be increasingly popular, since the PDB is moving to the mmCIF
-format, but many programs in the field of computational chemistry and physics
+format, but many programs in the field of computational parmed and physics
 has decades worth of legacy code built around PDB files. Not to worry!  A quick
 1-liner will seamlessly convert PDBx to PDB::
 
-    from chemistry import load_file
+    from parmed import load_file
     load_file('4LZT.cif').write_pdb('4lzt_converted.pdb', write_anisou=True,
                                     renumber=False)
 
@@ -155,7 +155,7 @@ and ``AUTHOR`` records, to name a few). Only the coordinates, unit cell
 (``CYRST1`` record), and optionally anisotropic B-factor lines are translated.
 
 The ``renumber`` argument tells :class:`Structure
-<chemistry.structure.Structure>` to use the original PDB numbers, rather than
+<parmed.structure.Structure>` to use the original PDB numbers, rather than
 its internal number scheme that numbers sequentially from 1 to N, where N is
 the number of residues.
 
@@ -169,7 +169,7 @@ Structure manipulation: slicing, combining, replicating, and splitting
 ----------------------------------------------------------------------
 
 This section describes a number of simple, yet powerful manipulations you can do
-to :class:`Structure <chemistry.structure.Structure>` instances (and, by
+to :class:`Structure <parmed.structure.Structure>` instances (and, by
 extension, instances of their subclasses).  In order, these are *slicing*,
 *combining* (or *merging*), and *replicating*.
 
@@ -177,30 +177,30 @@ extension, instances of their subclasses).  In order, these are *slicing*,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 One of the things that ParmEd tries to make easy to do is to select a subset of
-a :class:`Structure <chemistry.structure.Structure>` instance as a new
-:class:`Structure <chemistry.structure.Structure>` (complete with all
+a :class:`Structure <parmed.structure.Structure>` instance as a new
+:class:`Structure <parmed.structure.Structure>` (complete with all
 remaining atoms, residues, and parameters) by using the common Python idiom of
 `slicing <http://www.pythoncentral.io/how-to-slice-listsarrays-and-tuples-in-python/>`_.
 The *slice*, or *selection* syntax of :class:`Structure
-<chemistry.structure.Structure>` is designed to be flexible, expressive, and
+<parmed.structure.Structure>` is designed to be flexible, expressive, and
 intuitive (although accomplishing all of these is a challenge!).
 
 There are three many ways to select from a :class:`Structure
-<chemistry.structure.Structure>` instance:
+<parmed.structure.Structure>` instance:
 
 1. By atom index
-2. By Amber selection mask (see :class:`AmberMask <chemistry.amber.AmberMask>`)
+2. By Amber selection mask (see :class:`AmberMask <parmed.amber.AmberMask>`)
 3. By selection arrays, mask arrays, or slices of chains, residues, and/or
    atoms.
 
-When selecting from a :class:`Structure <chemistry.structure.Structure>`
+When selecting from a :class:`Structure <parmed.structure.Structure>`
 instance, the return value can be one of three things:
 
 1. ``None`` if no atoms match the selection criteria
-2. :class:`Atom <chemistry.topologyobjects.Atom>` instance if the selection
+2. :class:`Atom <parmed.topologyobjects.Atom>` instance if the selection
    matches only a single atom. This instance is a reference to the original
    atom, it is *not* a copy.
-3. :class:`Structure <chemistry.structure.Structure>` with all of the selected
+3. :class:`Structure <parmed.structure.Structure>` with all of the selected
    atoms and all parameters that were present between the selected atoms. In
    this case, a copy is made of all selected atoms.
 
@@ -261,8 +261,8 @@ you want to select. These arrays can be any subscriptable iterable (e.g.,
 A *mask array* must have the same number of elements as your system has atoms.
 So if an array has the same number of elements as you have atoms, it is
 interpreted as a mask array.  A common use-case for a mask array is to convert a
-:class:`Structure <chemistry.structure.Structure>` to a Pandas ``DataFrame``
-(see :func:`Structure.to_dataframe <chemistry.structure.Structure.to_dataframe>`
+:class:`Structure <parmed.structure.Structure>` to a Pandas ``DataFrame``
+(see :func:`Structure.to_dataframe <parmed.structure.Structure.to_dataframe>`
 for more information), and using Pandas/numpy to generate the mask array. An
 example of this is shown below::
 
@@ -288,7 +288,7 @@ number of atoms is not double the number of residues).
 **Now let's look at selection arrays and slices of chains, residues, and/or
 atoms**
 
-:class:`Structure <chemistry.structure.Structure>` instances can take between 1
+:class:`Structure <parmed.structure.Structure>` instances can take between 1
 and 3 "slots" in their indexing scheme, corresponding to atom, residue, and
 chain selections.  If one slot is used, that selection applies to the list of
 atoms.  If two slots are used, the first slot applies to the list of residues
@@ -336,7 +336,7 @@ Structure Combining
 ~~~~~~~~~~~~~~~~~~~
 
 Two structures can be *combined* in the sense that a :class:`Structure
-<chemistry.structure.Structure>` instance can be created by taking the atoms,
+<parmed.structure.Structure>` instance can be created by taking the atoms,
 residues, and parameters of one ``Structure`` and tacking it on to the end of
 another one.
 
@@ -363,7 +363,7 @@ and ``biphenyl.prmtop``)::
     <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
 
 Note that the order of addition controls the order that the atoms are added to
-the resulting :class:`Structure <chemistry.structure.Structure>`, as you would
+the resulting :class:`Structure <parmed.structure.Structure>`, as you would
 probably expect::
 
     >>> [len(residue) for residue in (phenol + biphenyl).residues]
@@ -391,10 +391,10 @@ the sum of the type arrays from the two structures (you will see why this is
 important in the next section about *replicating* structures).
 
 One final comment to make is in regards to the type of the resulting
-:class:`Structure <chemistry.structure.Structure>` instance.  You can add any
-two :class:`Structure <chemistry.structure.Structure>` instances together,
+:class:`Structure <parmed.structure.Structure>` instance.  You can add any
+two :class:`Structure <parmed.structure.Structure>` instances together,
 including instances of subclasses (such as :class:`AmberParm
-<chemistry.amber._amberparm.AmberParm>`). The result will take the type of the
+<parmed.amber._amberparm.AmberParm>`). The result will take the type of the
 *first* operand.
 
 Structure Replicating
@@ -406,7 +406,7 @@ implemented by overloading the natural mathematical operator -- the
 multiplication operator (``*``).
 
 The only mode supported here is multiplying a :class:`Structure
-<chemistry.structure.Structure>` instance by an integer, which indicates the
+<parmed.structure.Structure>` instance by an integer, which indicates the
 number of copies of the original structure will be added to the result.  And
 like with combination, replication can be done both in-place and not::
 
@@ -426,7 +426,7 @@ like with combination, replication can be done both in-place and not::
     <AmberParm 130 atoms; 10 residues; 130 bonds; parametrized>
 
 A word of caution here -- the multiplication operator for integers is not
-implemented for :class:`Structure <chemistry.structure.Structure>` instances as
+implemented for :class:`Structure <parmed.structure.Structure>` instances as
 the other operand, so multiplying an integer by the structure will result in a
 ``TypeError``::
 
@@ -442,7 +442,7 @@ replicate points to the *same* parameter type as that same valence term in the
 other replicates.
 
 As a result, adding a structure to itself will result in an *equivalent*
-:class:`Structure <chemistry.structure.Structure>` instance (in that it will
+:class:`Structure <parmed.structure.Structure>` instance (in that it will
 have the same atom and residue order, valence terms and their order, and each
 parameter will have the same type), but combining a structure with itself will
 double the size of its type arrays, while replicating it will not.
@@ -450,21 +450,21 @@ double the size of its type arrays, while replicating it will not.
 Finally, replication is more efficient than combination arising from the simpler
 nature of replicating a structure than combining two different ones.
 
-:class:`Structure <chemistry.structure.Structure> splitting
+:class:`Structure <parmed.structure.Structure> splitting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes you want to be able to manipulate individual *molecules* inside a
-:class:`Structure <chemistry.structure.Structure>` instance individually. The
-:meth:`Structure.split <chemistry.structure.Structure.split>` method does just
+:class:`Structure <parmed.structure.Structure>` instance individually. The
+:meth:`Structure.split <parmed.structure.Structure.split>` method does just
 this.  It uses the bond graph in order to identify which atoms belong to which
 molecules and then return a list of molecules along with how many times that
 molecule occurs in the original :class:`Structure
-<chemistry.structure.Structure>` instance.
+<parmed.structure.Structure>` instance.
 
 It only returns one copy of each molecule due to the cost of splitting off
 potentially thousands of solvent molecules in larger solvated systems.  As a
 result, the return value is a list of ``tuple`` instances where each tuple is
-the :class:`Structure <chemistry.structure.Structure>` (or subclass) instances
+the :class:`Structure <parmed.structure.Structure>` (or subclass) instances
 followed by the number of times that structure occurs.  Using our phenol and
 biphenyl examples from earlier::
 

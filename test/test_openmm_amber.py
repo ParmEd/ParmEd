@@ -1,26 +1,26 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
     has_openmm = True
 except ImportError:
-    from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
+    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from chemistry.amber import AmberParm, ChamberParm, Rst7
-from chemistry.openmm import load_topology
-import chemistry.unit as u
-from chemistry.utils.six.moves import range, zip
+from parmed.amber import AmberParm, ChamberParm, Rst7
+from parmed.openmm import load_topology
+import parmed.unit as u
+from parmed.utils.six.moves import range, zip
 from copy import copy
 from math import sqrt
 import os
-import ParmedTools as PT
+import parmed.tools as PT
 import unittest
-import utils
 
 get_fn = utils.get_fn
 

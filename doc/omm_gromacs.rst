@@ -36,9 +36,9 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
 
     # ParmEd Imports
-    from chemistry import load_file
-    from chemistry.openmm.reporters import NetCDFReporter
-    from chemistry import unit as u
+    from parmed import load_file
+    from parmed.openmm.reporters import NetCDFReporter
+    from parmed import unit as u
 
     # Load the Gromacs files
     print('Loading Gromacs files...')
@@ -96,7 +96,7 @@ Loading Gromacs files
 
 In this stage, we simply load the Gromacs topology file, using automatic
 file-type detection. This will instantiate the :class:`GromacsTopologyFile
-<chemistry.gromacs.GromacsTopologyFile>` object from the input topology and
+<parmed.gromacs.GromacsTopologyFile>` object from the input topology and
 coordinate files. After this command, ``top`` will contain a full description of
 every particle, the parameters defining their interactions, and their positions.
 
@@ -219,9 +219,9 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
 
     # ParmEd Imports
-    from chemistry import load_file
-    from chemistry.openmm.reporters import NetCDFReporter
-    from chemistry import unit as u
+    from parmed import load_file
+    from parmed.openmm.reporters import NetCDFReporter
+    from parmed import unit as u
 
     # Load the Gromacs files
     print('Loading Gromacs files...')
@@ -281,7 +281,7 @@ Loading Gromacs files
 
 In this stage, we simply load the Gromacs topology file, using automatic
 file-type detection. This will instantiate the :class:`GromacsTopologyFile
-<chemistry.gromacs.GromacsTopologyFile>` object from the input topology and
+<parmed.gromacs.GromacsTopologyFile>` object from the input topology and
 coordinate files. After this command, ``top`` will contain a full description of
 every particle, the parameters defining their interactions, and their positions.
 

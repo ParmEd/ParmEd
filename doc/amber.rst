@@ -1,4 +1,4 @@
-The :mod:`chemistry.amber` package
+The :mod:`parmed.amber` package
 ==================================
 
 The :mod:`amber` package contains classes that can parse most of the file
@@ -20,7 +20,7 @@ format is detailed on http://ambermd.org/formats.html. There are several
 variants of this extensible file format, and these parsers rigorously implement
 the format specification.
 
-.. currentmodule:: chemistry.amber
+.. currentmodule:: parmed.amber
 .. autosummary::
     :toctree: amberobj/
 
@@ -41,7 +41,7 @@ files used in 3D-RISM calculations---use this format to store raw, structured
 data, and this class is appropriate for use with those files.
 
 In most cases, however, this simply serves as a base class, along with
-:class:`Structure <chemistry.structure.Structure>`, for the *prmtop* parsers.
+:class:`Structure <parmed.structure.Structure>`, for the *prmtop* parsers.
 
 An example using this class on `one of the test files in the ParmEd repostory
 <https://github.com/swails/ParmEd/blob/master/test/files/cSPCE.mdl>`_ is shown
@@ -67,7 +67,7 @@ The :class:`AmberParm`, :class:`ChamberParm`, and :class:`AmoebaParm` classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These classes are subclasses of both :class:`Structure
-<chemistry.structure.Structure>` and :class:`AmberFormat`. (The special classes
+<parmed.structure.Structure>` and :class:`AmberFormat`. (The special classes
 :class:`ChamberParm` and :class:`AmoebaParm`, implementing the CHARMM and Amoeba
 force fields, respectively, both inherit from :class:`AmberParm`.) You need to
 make sure that you use the correct class for the variant of *prmtop* file you
@@ -77,7 +77,7 @@ determine the correct class and return an instance of it (see below).
 The :class:`AmberParm` class parses a *prmtop* object and stores both the raw
 data (see the :class:`AmberFormat` description, above), as well as the standard
 topological data structures used in the :class:`Structure
-<chemistry.structure.Structure>` class. Different subclasses of
+<parmed.structure.Structure>` class. Different subclasses of
 :class:`AmberParm` will populate different term and parameter lists depending on
 the terms present in the force field.
 
@@ -113,7 +113,7 @@ WARNING
 Since the raw data and topological features are inextricably linked, there are
 risks associated with modifying the raw data in :attr:`AmberParm.parm_data`
 *and* the parameters and properties of the topological data structures in the
-lists inherited from :class:`Structure <chemistry.structure.Structure>`.
+lists inherited from :class:`Structure <parmed.structure.Structure>`.
 
 The required overhead to keep :attr:`AmberParm.parm_data` and the topology
 structures synchronized at all times introduces too great a cost, so keeping
@@ -135,10 +135,10 @@ functionality introduced to help:
       :attr:`AmberParm.remake_parm` if you ever need to access the contents
       of :attr:`AmberParm.parm_data` (but try to avoid using the raw data if
       possible)
-    - Use an available class from :mod:`ParmedTools` from the ParmEd API when
+    - Use an available class from :mod:`parmed.tools` from the ParmEd API when
       available, as those classes ensure that the raw data and topology objects
       are always synchronized when the action completes.
-    - Feel free to use the :class:`Action <ParmedTools.ParmedActions.Action>`
+    - Feel free to use the :class:`Action <parmed.tools.actions.Action>`
       classes as examples for working with an :class:`AmberParm`.
 
 +----------------------------------+---------------------------------------------------------------------------------------------+
@@ -246,9 +246,9 @@ test suite::
     >>> trxparm = LoadParm('trx.prmtop')
     >>> dhfrparm = LoadParm('dhfr_cmap_pbc.parm7')
     >>> type(trxparm) # see that this is an AmberParm
-    <class 'chemistry.amber._amberparm.AmberParm'>
+    <class 'parmed.amber._amberparm.AmberParm'>
     >>> type(dhfrparm) # see that this is a ChamberParm
-    <class 'chemistry.amber._chamberparm.ChamberParm'>
+    <class 'parmed.amber._chamberparm.ChamberParm'>
 
 You may ask "why don't I always use :func:`LoadParm`?"  And the answer is, "you
 could."  But perhaps you only want to accept a certain flavor of prmtop
@@ -270,13 +270,13 @@ only use these arrays as ``numpy`` arrays if you are sure ``numpy`` is
 available. (Since all NetCDF-capable libraries are built on ``numpy``, this
 warning really only applies to ASCII files... see below).
 
-Note that the :mod:`chemistry.amber` package needs some help from third-party
+Note that the :mod:`parmed.amber` package needs some help from third-party
 packages to read NetCDF-format files.  For more information on NetCDF support,
 see the last section of this page.
 
 The corresponding classes are:
 
-.. currentmodule:: chemistry.amber
+.. currentmodule:: parmed.amber
 .. autosummary::
     :toctree: amberobj/
 
@@ -353,10 +353,10 @@ Trajectory files
 
 Amber generates two different formats of trajectory files: *NetCDF* trajectory
 files and a standardized ASCII-format (raw text) trajectory files. The
-:mod:`chemistry` package contains classes that support both formats, described
+:mod:`parmed` package contains classes that support both formats, described
 below:
 
-.. currentmodule:: chemistry.amber
+.. currentmodule:: parmed.amber
 .. autosummary::
     :toctree: amberobj/
 
@@ -376,7 +376,7 @@ number, returns either all or just the requested coordinates. The analogous
 below uses the file ``tz2.truncoct.crd`` from the ParmEd unit tests, which has
 5827 atoms and box lengths::
 
-    >>> from chemistry.amber import AmberMdcrd
+    >>> from parmed.amber import AmberMdcrd
     >>> crd = AmberMdcrd('tz2.truncoct.crd', natom=5827, hasbox=True, mode='r')
     >>> crd.coordinates(0)
     array([ 0.078,  3.174, -8.844, ...,  2.178, -5.224,  8.991])
@@ -403,7 +403,7 @@ When you are writing an :class:`AmberMdcrd` file, you need to use the methods
 and :meth:`box <AmberMdcrd.box>`, as shown in the example below::
 
     import numpy as np
-    from chemistry.amber import AmberMdcrd
+    from parmed.amber import AmberMdcrd
     crd = AmberMdcrd('new.mdcrd', natom=30, hasbox=True, mode='w')
     # Add the first frame
     crd.add_coordinates(np.random.random((30,3)))
@@ -429,7 +429,7 @@ To parse an existing NetCDF trajectory, use the :meth:`open_old
 <NetCDFTraj.open_new>`. An example parsing an existing NetCDF trajectory (using
 the ``tz2.truncoct.nc`` file in the ParmEd unit tests) is shown below::
 
-    >>> from chemistry.amber import NetCDFTraj
+    >>> from parmed.amber import NetCDFTraj
     >>> traj = NetCDFTraj.open_old('tz2.truncoct.nc')
     >>> traj.atom  # number of atoms in the file
     5827
@@ -464,7 +464,7 @@ Likewise, you can set them with :meth:`add_velocities
 An example of writing a NetCDF trajectory (with velocities and forces) is shown
 below::
 
-    from chemistry.amber import NetCDFTraj
+    from parmed.amber import NetCDFTraj
     import numpy as np
     # Open the NetCDF trajectory file for writing
     crd = NetCDFTraj.open_new('new_crd.nc', natom=30, box=True,
@@ -503,7 +503,7 @@ particular, the following packages provide Python bindings to the NetCDF API:
 
 All three of these files provide similar, although not identical interfaces. The
 ParmEd API supports all three NetCDF backends. You can swap out backends at any
-time using the :func:`use <chemistry.amber.netcdffiles.use>` function. If you do
+time using the :func:`use <parmed.amber.netcdffiles.use>` function. If you do
 not choose one, one will be picked automatically based on the available
 packages.  If several of those packages are available, the first one in the
 above list that is available will be picked.
@@ -511,7 +511,7 @@ above list that is available will be picked.
 For most users, simply ensuring that at least one of the above packages is
 available and working and using the default will suffice. For the other small
 percentage that may want more fine-grained control, the :func:`use
-<chemistry.amber.netcdffiles.use>` function will let you specify a particular
+<parmed.amber.netcdffiles.use>` function will let you specify a particular
 implementation to use.  You can change the back-end at any time, but note that
 the behavior of a NetCDF object *created* with one implementation is undefined
 if you switch to a different one. So you are cautioned against switching NetCDF
@@ -519,7 +519,7 @@ implementations when open NetCDF file handles are still open.
 
 An example of switching between NetCDF implementations is shown below::
 
-    from chemistry.amber import netcdffiles
+    from parmed.amber import netcdffiles
     # Use the default NetCDF package (if one is already selected,
     # this does nothing)
     netcdffiles.use() # You can also pass "None"

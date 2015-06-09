@@ -16,7 +16,8 @@ in the Amber restart file. The energies are very close, but have been
 recalculated using ParmEd for comparison here to improve the precision. The
 implementation these energies were computed by has already been validated.
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
@@ -28,22 +29,21 @@ except ImportError:
     def PDBFile(*args, **kwargs): return None
     has_openmm = False
 
-from chemistry.amber.readparm import Rst7
-from chemistry.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
-                              CharmmParameterSet)
-from chemistry.exceptions import CharmmPSFWarning
-from chemistry import unit as u, openmm
-from chemistry.utils.six.moves import range
+from parmed.amber.readparm import Rst7
+from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+                           CharmmParameterSet)
+from parmed.exceptions import CharmmWarning
+from parmed import unit as u, openmm
+from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest
 import warnings
-import utils
     
 get_fn = utils.get_fn
 
 # Suppress warning output from bad psf file... sigh.
-warnings.filterwarnings('ignore', category=CharmmPSFWarning)
+warnings.filterwarnings('ignore', category=CharmmWarning)
 
 if has_openmm:
     # System

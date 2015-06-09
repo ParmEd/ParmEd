@@ -36,9 +36,9 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
     
     # ParmEd Imports
-    from chemistry.amber import AmberParm
-    from chemistry.openmm import StateDataReporter, NetCDFReporter
-    from chemistry import unit
+    from parmed.amber import AmberParm
+    from parmed.openmm import StateDataReporter, NetCDFReporter
+    from parmed import unit
     
     # Load the Amber files
     print('Loading Amber files...')
@@ -95,7 +95,7 @@ Loading Amber files
 ~~~~~~~~~~~~~~~~~~~
 
 In this stage, we simply instantiate the :class:`AmberParm
-<chemistry.amber.AmberParm>` object from the input topology and coordinate
+<parmed.amber.AmberParm>` object from the input topology and coordinate
 files. After this command, ``ala5_gas`` will contain a full description of every
 particle, the parameters defining their interactions, and their positions.
 
@@ -220,10 +220,10 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
     
     # ParmEd Imports
-    from chemistry.amber.openmmloader import AmberParm
-    from chemistry.charmm.parameters import CharmmParameterSet
-    from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
-    from chemistry import unit as u
+    from parmed.amber.openmmloader import AmberParm
+    from parmed.charmm.parameters import CharmmParameterSet
+    from parmed.openmm.reporters import StateDataReporter, NetCDFReporter
+    from parmed import unit as u
     
     # Load the Amber files
     print('Loading AMBER files...')
@@ -278,7 +278,7 @@ Loading Amber files
 ~~~~~~~~~~~~~~~~~~~
 
 In this stage, we simply instantiate the :class:`AmberParm
-<chemistry.amber.AmberParm>` object from the input topology and coordinate
+<parmed.amber.AmberParm>` object from the input topology and coordinate
 files. After this command, ``ala2_solv`` will contain a full description of
 every particle, the parameters defining their interactions, and their positions.
 

@@ -1,6 +1,8 @@
 """
-This module tests the various reporters included in the chemistry package
+This module tests the various reporters included in the parmed package
 """
+from __future__ import division, print_function
+import utils
 
 try:
     import simtk.openmm as mm
@@ -8,15 +10,14 @@ try:
     has_openmm = True
 except ImportError:
     has_openmm = False
-from chemistry import unit as u
-from chemistry.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
+from parmed import unit as u
+from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
                 AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
-from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
+from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 ProgressReporter, RestartReporter, StateDataReporter,
                 EnergyMinimizerReporter)
-from chemistry.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip
 import os
-import utils
 import unittest
 
 get_fn = utils.get_fn
