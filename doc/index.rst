@@ -58,6 +58,7 @@ biomolecular simulations.  For example, some of its features include:
 
         + Amber prmtop, inpcrd, NetCDF trajectory, and NetCDF restart files
         + CHARMM PSF, coordinate, and restart files
+        + Gromacs topology and GRO files
         + PDB files, supporting a wide range of dialects that technically
           violate the PDB standard
         + PDBx/mmCIF files -- the new standard for the Protein Data Bank
@@ -101,6 +102,32 @@ I will post any slides pertaining to ParmEd from talks that I've given here, in
 the hopes that they may be helpful or informative.
 
 - `April 10, 2015 at MSKCC <http://parmed.github.io/ParmEd/ParmEd_Slides_08Apr2015.pdf>`_
+
+Getting Started
+---------------
+
+When to use ParmEd?
+~~~~~~~~~~~~~~~~~~~
+
+- When you want to extract information about a structure or parameters from one
+  of the supported file formats.
+- When you want to manipulate molecular mechanical (force field) descriptions of
+  chemical systems to quickly prototype ideas involving Hamiltonian
+  modifications.
+- When you want to manipulate chemical systems by selecting a subset of the
+  atoms.
+- When you want to combine or replicate the contents of one or more chemical
+  systems.
+- When you want to convert molecular mechanical descriptions of molecules from a
+  format that one program supports to another (e.g., converting an Amber
+  topology file to a Gromacs topology file or vice-versa).
+- When you want to carry out molecular dynamics investigations on
+  high-performance computational hardware (like GPUs) using OpenMM
+
+Common examples
+~~~~~~~~~~~~~~~
+
+The simplest example is to use ParmEd to 
 
 Program and API Reference
 -------------------------
