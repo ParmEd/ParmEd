@@ -167,17 +167,26 @@ def clapp():
             if os.path.exists(opt.logfile) and readline is not None:
                 # Load the logfile as a history, and get rid of any timestamps
                 # from the history
-                f = open(opt.logfile, 'r')
-                for line in f:
-                    if line.startswith('# Log started on'): continue
-                    readline.add_history(line.rstrip())
-            logfile = open(opt.logfile, 'a')
-            now = datetime.datetime.now()
-            logfile.write('# Log started on %02d/%02d/%d [mm/dd/yyyy] at '
-                          '%02d:%02d:%02d\n' % (now.month, now.day, now.year,
-                                            now.hour, now.minute, now.second))
-            parmed_commands.setlog(logfile)
-            close_log_file = True
+                try:
+                    f = open(opt.logfile, 'r')
+                except IOError:
+                    pass # Do not have permission or something
+                else:
+                    for line in f:
+                        if line.startswith('# Log started on'): continue
+                        readline.add_history(line.rstrip())
+            try:
+                logfile = open(opt.logfile, 'a')
+            except IOError:
+                print("Could not open logfile. Skip logging", file=sys.stderr)
+                close_log_file = False
+            else:
+                now = datetime.datetime.now()
+                logfile.write('# Log started on %02d/%02d/%d [mm/dd/yyyy] at '
+                              '%02d:%02d:%02d\n' % (now.month, now.day, now.year,
+                                                now.hour, now.minute, now.second))
+                parmed_commands.setlog(logfile)
+                close_log_file = True
         # Loop through all of the commands
         try:
             try:

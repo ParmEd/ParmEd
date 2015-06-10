@@ -899,7 +899,7 @@ def energy(parm, args, output=sys.stdout):
         except IOError:
             raise SimulationError('Could not create temporary file for app '
                                   'layer energy calculation.')
-        except Exception, exc:
+        except Exception as exc:
             raise SimulationError('Error creating parm object from app layer. '
                                   '[ %s: %s ]' % (type(exc).__name__, exc))
 
