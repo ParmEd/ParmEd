@@ -1,5 +1,5 @@
 """
-This sets up the command interpreter for textual ParmEd (parmed.py).
+This sets up the command interpreter for textual ParmEd (parmed).
 """
 
 # Load some system modules that may be useful for various users in shell mode

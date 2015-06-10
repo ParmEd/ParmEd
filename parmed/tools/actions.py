@@ -112,7 +112,7 @@ class Action(lawsuit):
     # unpopulated
     needs_parm = True
     # Do we allow any action to overwrite existing files? Static variable.
-    overwrite = True # Default for API. parmed.py sets this every time
+    overwrite = True # Default for API. parmed sets this every time
     # We do one of two kinds of filtering for each action. Each action can
     # support either a strict subset of classes, in which case the type *must*
     # be an exact member (not a subclass) of one of that list. If that list is
@@ -1438,7 +1438,7 @@ class strip(Action):
 
 class defineSolvent(Action):
     """
-    Allows you to change what parmed.py will consider to be "solvent". 
+    Allows you to change what parmed will consider to be "solvent". 
     <residue list> must be a comma-separated set of residue names with no
     spaces between them.
     """
