@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
 import os
 import sys
 
-if sys.version < (2, 7):
+if sys.version_info < (2, 7):
     sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
                      'correctly.\n')
     sys.exit(0)
