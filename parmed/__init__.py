@@ -21,3 +21,6 @@ read_CIF = formats.CIFFile.parse
 write_PDB = formats.PDBFile.write
 write_CIF = formats.CIFFile.write
 load_rosetta = rosetta.RosettaPose.load
+
+download_PDB = formats.PDBFile.download
+download_CIF = formats.CIFFile.download

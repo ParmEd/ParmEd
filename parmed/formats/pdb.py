@@ -4,7 +4,13 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
+import io
 import itertools
+import ftplib
+try:
+    import gzip
+except ImportError:
+    gzip = None
 try:
     import numpy as np
     create_array = lambda x: np.array(x, dtype=np.float64)
@@ -20,6 +26,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass
 from parmed.utils.six.moves import range
 import re
+import socket
 import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,6 +97,58 @@ class PDBFile(object):
                 continue
             return False
         return True
+
+    #===================================================
+
+    @staticmethod
+    def download(pdb_id, timeout=10):
+        """
+        Goes to the wwPDB website and downloads the requested PDB, loading it
+        as a :class:`Structure` instance
+
+        Parameters
+        ----------
+        pdb_id : str
+            The 4-letter PDB ID to try and download from the RCSB PDB database
+        timeout : float, optional
+            The number of seconds to wait before raising a timeout error.
+            Default is 10 seconds
+
+        Returns
+        -------
+        struct : :class:`Structure <parmed.structure.Structure>`
+            Structure instance populated by the requested PDB
+
+        Raises
+        ------
+        socket.timeout if the connection times out while trying to contact the
+        FTP server
+
+        IOError if there is a problem retrieving the requested PDB
+
+        ImportError if the gzip module is not available
+
+        TypeError if pdb_id is not a 4-character string
+        """
+        if gzip is None:
+            raise ImportError('Cannot import gzip module')
+        if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
+            raise TypeError('pdb_id must be the 4-letter PDB code')
+
+        pdb_id = pdb_id.lower()
+        ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
+        ftp.login()
+        fileobj = io.BytesIO()
+        try:
+            ftp.retrbinary('RETR /pub/pdb/data/structures/divided/pdb/'
+                           '%s/pdb%s.ent.gz' % (pdb_id[1:3], pdb_id),
+                           fileobj.write)
+        except ftplib.all_errors as err:
+            raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        # Rewind, wrap it in a GzipFile and send it to parse
+        fileobj.seek(0)
+        fileobj = gzip.GzipFile(fileobj=fileobj, mode='rb')
+        return PDBFile.parse(fileobj)
 
     #===================================================
 
@@ -708,6 +767,58 @@ class CIFFile(object):
             return False
         finally:
             f.close()
+
+    #===================================================
+
+    @staticmethod
+    def download(pdb_id, timeout=10):
+        """
+        Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
+        loading it as a :class:`Structure` instance
+
+        Parameters
+        ----------
+        pdb_id : str
+            The 4-letter PDB ID to try and download from the RCSB PDB database
+        timeout : float, optional
+            The number of seconds to wait before raising a timeout error.
+            Default is 10 seconds
+
+        Returns
+        -------
+        struct : :class:`Structure <parmed.structure.Structure>`
+            Structure instance populated by the requested PDB
+
+        Raises
+        ------
+        socket.timeout if the connection times out while trying to contact the
+        FTP server
+
+        IOError if there is a problem retrieving the requested PDB
+
+        ImportError if the gzip module is not available
+
+        TypeError if pdb_id is not a 4-character string
+        """
+        if gzip is None:
+            raise ImportError('Cannot import gzip module')
+        if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
+            raise TypeError('pdb_id must be the 4-letter PDB code')
+
+        pdb_id = pdb_id.lower()
+        ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
+        ftp.login()
+        fileobj = io.BytesIO()
+        try:
+            ftp.retrbinary('RETR /pub/pdb/data/structures/divided/mmCIF/'
+                           '%s/%s.cif.gz' % (pdb_id[1:3], pdb_id),
+                           fileobj.write)
+        except ftplib.all_errors as err:
+            raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        # Rewind, wrap it in a GzipFile and send it to parse
+        fileobj.seek(0)
+        fileobj = gzip.GzipFile(fileobj=fileobj, mode='rb')
+        return CIFFile.parse(fileobj)
 
     #===================================================
 
