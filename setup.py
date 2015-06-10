@@ -1,8 +1,11 @@
-from __future__ import print_function
-
 from distutils.core import setup, Extension
 import os
 import sys
+
+if sys.version_info < (2, 7):
+    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
+                     'correctly.\n')
+    sys.exit(0)
 
 # parmed package and all its subpackages
 packages = ['parmed', 'parmed.amber', 'parmed.modeller',
@@ -43,21 +46,25 @@ if __name__ == '__main__':
         if os.path.isdir(chem):
             try:
                 shutil.rmtree(chem)
-                print('Removing %s' % chem, file=sys.stderr)
+                sys.stderr.write('Removing %s\n' % chem)
             except OSError:
-                print('Could not remove old chemistry package %s; you should\n'
+                sys.stderr.write(
+                      'Could not remove old chemistry package %s; you should\n'
                       'make sure this is completely removed in order to make\n'
                       'sure you do not accidentally use the old version of '
-                      'ParmEd' % chem, file=sys.stderr)
+                      'ParmEd\n' % chem
+                )
         if os.path.isdir(pmdtools):
             try:
                 shutil.rmtree(pmdtools)
-                print('Removing %s' % pmdtools, file=sys.stderr)
+                sys.stderr.write('Removing %s\n' % pmdtools)
             except OSError:
-                print('Could not remove old ParmedTools package %s; you should\n'
+                sys.stderr.write(
+                      'Could not remove old ParmedTools package %s; you should\n'
                       'make sure this is completely removed in order to make\n'
                       'sure you do not accidentally use the old version of '
-                      'ParmEd' % pmdtools, file=sys.stderr)
+                      'ParmEd\n' % pmdtools
+                )
 
     setup(name='ParmEd',
           version=parmed.__version__,

@@ -4,11 +4,9 @@ Tests parmed.formats package
 from __future__ import division
 import utils
 
-from parmed import amber
-from parmed import charmm
-from parmed import exceptions
-from parmed import formats
-from parmed import Structure, read_PDB, write_PDB, read_CIF
+from parmed import amber, charmm, exceptions, formats, gromacs
+from parmed import (Structure, read_PDB, write_PDB, read_CIF,
+                    download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
 try:
@@ -123,6 +121,16 @@ class TestFileLoader(unittest.TestCase):
         mol3 = formats.load_file(get_fn('tripos9.mol2'))
         self.assertIsInstance(mol3, ResidueTemplate)
 
+    def testLoadGromacsTop(self):
+        """ Tests automatic loading of Gromacs topology file """
+        top = formats.load_file(get_fn('1aki.charmm27.top'))
+        self.assertIsInstance(top, gromacs.GromacsTopologyFile)
+
+    def testLoadGromacsGro(self):
+        """ Tests automatic loading of Gromacs GRO file """
+        gro = formats.load_file(get_fn('1aki.ff99sbildn.gro'))
+        self.assertIsInstance(gro, Structure)
+
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
         self.assertRaises(exceptions.FormatNotFound, lambda:
@@ -155,12 +163,16 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testAscii(self):
         """ Test PDB file parsing """
-        self._check4lyt(read_PDB(self.pdb))
+        self._check4lzt(read_PDB(self.pdb))
         # The PDB file with multiple models
         pdbfile = read_PDB(open(self.models))
         self.assertEqual(len(pdbfile.pdbxyz), 20)
         self.assertEqual(pdbfile.pdbxyz[0][:3], [-8.886, -5.163, 9.647])
         self.assertEqual(pdbfile.pdbxyz[19][-3:], [-12.051, 5.205, -2.146])
+
+    def testDownload(self):
+        """ Tests downloading PDB files """
+        self._check4lzt(download_PDB('4lzt'))
 
     def testPositions(self):
         """ Tests that positions are Vec3's with units """
@@ -172,11 +184,11 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     def testGzip(self):
         """ Test Gzipped-PDB file parsing """
-        self._check4lyt(read_PDB(self.pdbgz))
+        self._check4lzt(read_PDB(self.pdbgz))
 
     def testBzip(self):
         """ Test Bzipped-PDB file parsing """
-        self._check4lyt(read_PDB(self.pdbbz2))
+        self._check4lzt(read_PDB(self.pdbbz2))
 
     @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def testVmdOverflow(self):
@@ -224,18 +236,18 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def testPdbWriteXtal(self):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
-        self._check4lyt(pdbfile)
+        self._check4lzt(pdbfile)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output, renumber=False)
         output.seek(0)
         pdbfile2 = read_PDB(output)
-        self._check4lyt(pdbfile2, check_meta=False)
+        self._check4lzt(pdbfile2, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
         output = reset_stringio(output)
         write_PDB(pdbfile, output)
         output.seek(0)
         pdbfile3 = read_PDB(output)
-        self._check4lyt(pdbfile3, check_meta=False)
+        self._check4lzt(pdbfile3, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile3, True)
         # Now check that renumbering is done correctly. 4lzt skips residues 130
         # through 200
@@ -251,26 +263,26 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def testPdbWriteAltlocOptions(self):
         """ Test PDB file writing with different altloc options """
         pdbfile = read_PDB(self.pdb)
-        self._check4lyt(pdbfile)
+        self._check4lzt(pdbfile)
         output = StringIO.StringIO()
         pdbfile.write_pdb(output, renumber=False, altlocs='all')
         output.seek(0)
         pdbfile2 = read_PDB(output)
-        self._check4lyt(pdbfile2, check_meta=False)
+        self._check4lzt(pdbfile2, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
         # Check that 'first' option works
         output = reset_stringio(output)
         pdbfile.write_pdb(output, renumber=False, altlocs='first')
         output.seek(0)
         pdbfile3 = read_PDB(output)
-        self._check4lyt(pdbfile3, check_meta=False, has_altloc=False)
+        self._check4lzt(pdbfile3, check_meta=False, has_altloc=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile3, altloc_option='first')
         # Check that the 'occupancy' option works
         output = reset_stringio(output)
         write_PDB(pdbfile, output, renumber=False, altlocs='occupancy')
         output.seek(0)
         pdbfile4 = read_PDB(output)
-        self._check4lyt(pdbfile4, check_meta=False, has_altloc=False)
+        self._check4lzt(pdbfile4, check_meta=False, has_altloc=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile4, altloc_option='occupancy')
         # Double-check 'first' vs. 'occupancy'. Residue 85 (SER) has a conformer
         # A that has an occupancy of 0.37 and conformer B with occupancy 0.63
@@ -437,7 +449,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 self.assertEqual(r1.number, r2.number)
 
     # Private helper test functions
-    def _check4lyt(self, obj, check_meta=True, has_altloc=True):
+    def _check4lzt(self, obj, check_meta=True, has_altloc=True):
         self.assertEqual(len(obj.pdbxyz), 1)
         self.assertEqual(obj.box,
                          [27.24, 31.87, 34.23, 88.52, 108.53, 111.89])
@@ -585,7 +597,13 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
     def test4LZT(self):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
-        cif = read_CIF(self.lzt)
+        self._check4lzt(read_CIF(self.lzt))
+
+    def testDownload(self):
+        """ Test CIF downloading on 4LZT """
+        self._check4lzt(download_CIF('4lzt'))
+
+    def _check4lzt(self, cif):
         pdb = read_PDB(self.lztpdb)
         self.assertEqual(len(cif.atoms), len(pdb.atoms))
         nextra = 0
