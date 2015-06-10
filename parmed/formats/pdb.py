@@ -23,7 +23,7 @@ from parmed.periodic_table import AtomicNum, Mass, Element
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
-from parmed.utils.six import iteritems, string_types, add_metaclass
+from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
 import re
 import socket
@@ -147,7 +147,10 @@ class PDBFile(object):
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
         # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
-        fileobj = gzip.GzipFile(fileobj=fileobj, mode='rb')
+        if PY3:
+            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
+        else:
+            fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
         return PDBFile.parse(fileobj)
 
     #===================================================
@@ -815,9 +818,11 @@ class CIFFile(object):
                            fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
-        # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
-        fileobj = gzip.GzipFile(fileobj=fileobj, mode='rb')
+        if PY3:
+            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
+        else:
+            fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
         return CIFFile.parse(fileobj)
 
     #===================================================
