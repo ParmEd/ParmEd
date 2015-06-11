@@ -72,16 +72,24 @@ if __name__ == '__main__':
         pmdtools = os.path.join(folder, 'ParmedTools')
         pmd = os.path.join(folder, 'parmed.py')
         xpmd = os.path.join(folder, 'xparmed.py')
+        pmdc = os.path.join(folder, 'parmed.pyc')
+        xpmdc = os.path.join(folder, 'xparmed.pyc')
         if os.path.isdir(chem): deldir(chem)
         if os.path.isdir(pmdtools): deldir(pmdtools)
         if os.path.exists(pmd): delfile(pmd)
         if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(pmdc): delfile(pmdc)
+        if os.path.exists(xpmdc): delfile(xpmdc)
 
     for folder in os.getenv('PATH').split(os.pathsep):
         pmd = os.path.join(folder, 'parmed.py')
         xpmd = os.path.join(folder, 'xparmed.py')
+        pmdc = os.path.join(folder, 'parmed.pyc')
+        xpmdc = os.path.join(folder, 'xparmed.pyc')
         if os.path.exists(pmd): delfile(pmd)
         if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(pmdc): delfile(pmdc)
+        if os.path.exists(xpmdc): delfile(xpmdc)
 
     scripts = [os.path.join('scripts', 'parmed'),
                os.path.join('scripts', 'xparmed')]
