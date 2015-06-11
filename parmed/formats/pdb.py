@@ -145,6 +145,8 @@ class PDBFile(object):
                            fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        finally:
+            ftp.close()
         # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
         if PY3:
@@ -818,6 +820,8 @@ class CIFFile(object):
                            fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        finally:
+            ftp.close()
         fileobj.seek(0)
         if PY3:
             fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
