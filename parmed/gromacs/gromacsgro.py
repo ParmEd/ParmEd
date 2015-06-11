@@ -112,22 +112,20 @@ class GromacsGroFile(object):
                     atom = Atom(name=atomname, number=atnum)
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5
-                    for i in range(1, 4):
-                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                        wend = (pdeci[0]-4)+(5+ndeci)*i
-                        if i == 1: atom.xx = float(line[wbeg:wend]) * 10
-                        elif i == 2: atom.xy = float(line[wbeg:wend]) * 10
-                        elif i == 3: atom.xz = float(line[wbeg:wend]) * 10
+                    atom.xx, atom.xy, atom.xz = (
+                            float(line[(pdeci[0]-4)+(5+ndeci)*i:
+                                       (pdeci[0]-4)+(5+ndeci)*(i+1)])*10
+                            for i in range(3)
+                    )
                     i = 4
                     wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
                     wend = (pdeci[0]-4)+(5+ndeci)*i
                     if line[wbeg:wend].strip():
-                        for i in range(4, 7):
-                            wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                            wend = (pdeci[0]-4)+(5+ndeci)*i
-                            if i == 4: atom.vx = float(line[wbeg:wend]) * 10
-                            elif i == 5: atom.vy = float(line[wbeg:wend]) * 10
-                            elif i == 5: atom.vz = float(line[wbeg:wend]) * 10
+                        atom.vx, atom.vy, atom.vz = (
+                                float(line[(pdeci[0]-4)+(5+ndeci)*i:
+                                           (pdeci[0]-4)+(5+ndeci)*(i+1)])*10
+                                for i in range(3, 6)
+                        )
                 except (ValueError, IndexError):
                     raise GromacsError('Could not parse the atom record of '
                                        'GRO file %s' % filename)
