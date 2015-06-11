@@ -66,6 +66,9 @@ if __name__ == '__main__':
                       'ParmEd\n' % pmdtools
                 )
 
+    scripts = [os.path.join('scripts', 'parmed'),
+               os.path.join('scripts', 'xparmed')]
+
     setup(name='ParmEd',
           version=parmed.__version__,
           description='Amber parameter file editor',
@@ -76,5 +79,5 @@ if __name__ == '__main__':
           packages=packages,
           ext_modules=extensions,
           cmdclass={'build_py' : build_py},
-          scripts=['parmed.py', 'xparmed.py'],
+          scripts=scripts,
     )
