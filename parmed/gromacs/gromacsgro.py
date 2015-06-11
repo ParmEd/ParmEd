@@ -102,6 +102,7 @@ class GromacsGroFile(object):
                 natom = int(fileobj.readline().strip())
             except ValueError:
                 raise GromacsError('Could not parse %s as GRO file' % filename)
+            digits = None
             for i, line in enumerate(fileobj):
                 if i == natom: break
                 try:
@@ -110,20 +111,21 @@ class GromacsGroFile(object):
                     atomname = line[10:15].strip()
                     atnum = int(line[15:20])
                     atom = Atom(name=atomname, number=atnum)
-                    pdeci = [i for i, x in enumerate(line) if x == '.']
-                    ndeci = pdeci[1] - pdeci[0] - 5
+                    if digits is None:
+                        pdeci = line.index('.', 20)
+                        ndeci = line.index('.', pdeci+1)
+                        digits = ndeci - pdeci
                     atom.xx, atom.xy, atom.xz = (
-                            float(line[(pdeci[0]-4)+(5+ndeci)*i:
-                                       (pdeci[0]-4)+(5+ndeci)*(i+1)])*10
-                            for i in range(3)
+                            float(line[20+i*digits:20+(i+1)*digits])*10
+                                for i in range(3)
                     )
                     i = 4
-                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    wbeg = (pdeci-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci-4)+(5+ndeci)*i
                     if line[wbeg:wend].strip():
                         atom.vx, atom.vy, atom.vz = (
-                                float(line[(pdeci[0]-4)+(5+ndeci)*i:
-                                           (pdeci[0]-4)+(5+ndeci)*(i+1)])*10
+                                float(line[(pdeci-3)+(6+ndeci)*i:
+                                           (pdeci-3)+(6+ndeci)*(i+1)])*10
                                 for i in range(3, 6)
                         )
                 except (ValueError, IndexError):
