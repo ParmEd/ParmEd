@@ -1,25 +1,23 @@
 """
-This module tests the various reporters included in the chemistry package
+This module tests the various reporters included in the parmed package
 """
+from __future__ import division, print_function
+import utils
 
 try:
     import simtk.openmm as mm
     from simtk.openmm import app
-    import simtk.unit as u
-    from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
-                    ProgressReporter, RestartReporter, AmberStateDataReporter,
-                    EnergyMinimizerReporter)
-    from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
     has_openmm = True
 except ImportError:
-    from chemistry.amber.readparm import AmberParm
     has_openmm = False
-
-from chemistry.amber import HAS_NETCDF
-from chemistry.amber.asciicrd import AmberMdcrd, AmberAsciiRestart
-from chemistry.amber.netcdffiles import NetCDFTraj, NetCDFRestart
+from parmed import unit as u
+from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
+                AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
+from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
+                ProgressReporter, RestartReporter, StateDataReporter,
+                EnergyMinimizerReporter)
+from parmed.utils.six.moves import range, zip
 import os
-import utils
 import unittest
 
 get_fn = utils.get_fn
@@ -27,42 +25,43 @@ get_fn = utils.get_fn
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(unittest.TestCase):
 
     def setUp(self):
         if not os.path.isdir(get_fn('writes')):
             os.makedirs(get_fn('writes'))
+        else:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
 
     def tearDown(self):
         for f in os.listdir(get_fn('writes')):
             os.unlink(get_fn(f, written=True))
 
     def testStateDataReporter(self):
-        """ Test AmberStateDataReporter with various options """
+        """ Test StateDataReporter with various options """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         f = open(get_fn('akma5.dat', written=True), 'w')
         sim.reporters.extend([
-            AmberStateDataReporter(get_fn('akma1.dat', written=True), 10),
-            AmberStateDataReporter(get_fn('akma2.dat', written=True), 10,
-                                   time=False, potentialEnergy=False,
-                                   kineticEnergy=False, totalEnergy=False,
-                                   temperature=False),
-            AmberStateDataReporter(get_fn('akma3.dat', written=True), 10,
-                                   volume=True, density=True),
-            AmberStateDataReporter(get_fn('akma4.dat', written=True), 10,
-                                   separator='\t'),
-            AmberStateDataReporter(get_fn('units.dat', written=True), 10,
-                                   volume=True, density=True,
-                                   energyUnit=u.kilojoules_per_mole,
-                                   temperatureUnit=u.kelvin,
-                                   volumeUnit=u.milliliters,
-                                   densityUnit=u.kilograms/u.item/u.meter**3,
-                                   timeUnit=u.femtoseconds),
-            AmberStateDataReporter(f, 10)
+            StateDataReporter(get_fn('akma1.dat', written=True), 10),
+            StateDataReporter(get_fn('akma2.dat', written=True), 10,
+                              time=False, potentialEnergy=False,
+                              kineticEnergy=False, totalEnergy=False,
+                              temperature=False),
+            StateDataReporter(get_fn('akma3.dat', written=True), 10,
+                              volume=True, density=True),
+            StateDataReporter(get_fn('akma4.dat', written=True), 10,
+                              separator='\t'),
+            StateDataReporter(get_fn('units.dat', written=True), 10,
+                              volume=True, density=True,
+                              energyUnit=u.kilojoules_per_mole,
+                              volumeUnit=u.nanometers**3),
+            StateDataReporter(f, 10)
         ])
         sim.step(500)
         f.close()
@@ -132,11 +131,8 @@ class TestStateDataReporter(unittest.TestCase):
         akma5.close()
         # UNITS -- compare other units
         ene = u.kilojoule_per_mole.conversion_factor_to(u.kilocalorie_per_mole)
-        time = u.femtoseconds.conversion_factor_to(u.picoseconds)
-        volume = u.milliliters.conversion_factor_to(u.angstroms**3)
-        density = 1/(u.grams/u.milliliter).conversion_factor_to(
-                        u.kilograms/u.meter**3)
-        conversions = [1, time, ene, ene, ene, 1, volume, density]
+        volume = u.nanometers.conversion_factor_to(u.angstroms)**3
+        conversions = [1, 1, ene, ene, ene, 1, volume, 1]
         headers = units.readline().strip()[1:].split(',')
         self.assertEqual(len(headers), 8)
         for i, line in enumerate(units):
@@ -153,16 +149,14 @@ class TestStateDataReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.append(
             ProgressReporter(get_fn('progress_reporter.dat', written=True), 10,
                              500, step=True, time=True, potentialEnergy=True,
                              kineticEnergy=True, totalEnergy=True,
                              temperature=True, volume=True, density=True,
-                             systemMass=None,
-                             energyUnit=u.kilocalories_per_mole,
-                             volumeUnit=u.angstroms**3)
+                             systemMass=None)
         )
         sim.step(500)
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
@@ -173,6 +167,7 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
+@unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
 class TestTrajRestartReporter(unittest.TestCase):
 
     def setUp(self):
@@ -188,7 +183,7 @@ class TestTrajRestartReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj1.nc', written=True), 10),
@@ -314,11 +309,6 @@ class TestTrajRestartReporter(unittest.TestCase):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)
-
-if not has_openmm:
-    del TestStateDataReporter, TestTrajRestartReporter
-elif not HAS_NETCDF:
-    del TestTrajReporter.TestNetCDFReporter
 
 if __name__ == '__main__':
     unittest.main()

@@ -8,8 +8,7 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber.openmmloader import AmberParm
-from chemistry.charmm.parameters import CharmmParameterSet
+from chemistry.amber import AmberParm
 from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
 from chemistry import unit as u
 

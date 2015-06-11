@@ -1,56 +1,33 @@
-
 from distutils.core import setup, Extension
 import os
 import sys
 
-# First the ParmedTools packages:
-packages = ['ParmedTools', 'ParmedTools.gui', 'ParmedTools.simulations']
+if sys.version_info < (2, 7):
+    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
+                     'correctly.\n')
+    sys.exit(0)
 
-# Next the main chemistry packages
-packages += ['chemistry', 'chemistry.amber', 'chemistry.modeller',
-             'chemistry.tinker', 'chemistry.unit', 'chemistry.amber.mdin',
-             'chemistry.charmm', 'chemistry.formats.pdbx', 'chemistry.formats',
-             'fortranformat']
-
-# Modules
-modules = ['compat24']
-
-# Scripts
-scripts = ['parmed.py', 'xparmed.py']
+# parmed package and all its subpackages
+packages = ['parmed', 'parmed.amber', 'parmed.modeller',
+            'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
+            'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
+            'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
+            'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+            'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm
-extensions = [Extension('chemistry.amber._rdparm',
+extensions = [Extension('parmed.amber._rdparm',
                         sources=['src/_rdparm.cpp', 'src/readparm.cpp'],
                         include_dirs=[os.path.join(os.path.abspath('.'),'src')],
                         depends=['src/CompatibilityMacros.h', 'src/readparm.h']
 )]
 
-# See if our Python version will support OpenMM. Of the ParmEd-supported
-# Pythons, only 2.4 and 2.5 do not work with OpenMM
-major, minor = sys.version_info[:2]
-if major > 2 or minor >= 6:
-    packages.append('chemistry.openmm')
-
 if __name__ == '__main__':
 
-    try:
-        from distutils.command.build_py import build_py_2to3 as build_py
-        from distutils.command.build_scripts import build_scripts_2to3 as build_scripts
-        PY3 = True
-    except ImportError:
-        from distutils.command.build_py import build_py
-        from distutils.command.build_scripts import build_scripts
-        PY3 = False
-
-    if PY3:
-        # Monkey-patch Mixin2to3 to disable the has_key fix. ParmEd doesn't ever
-        # use "has_key" on dicts, and ArgumentList defines that method. So we
-        # want to preserve has_key everywhere it appears.
-        from distutils.util import Mixin2to3
-        from lib2to3.refactor import get_fixers_from_package as get_fixers
-        fixers = [x for x in get_fixers('lib2to3.fixes')
-                    if not 'has_key' in x and not 'itertools_imports' in x]
-        Mixin2to3.fixer_names = fixers
+    from distutils.command.build_py import build_py
+    from distutils.command.build_scripts import build_scripts
+    import shutil
+    import parmed
 
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
@@ -59,15 +36,48 @@ if __name__ == '__main__':
                                        'Python.h')):
         extensions = []
 
+    # Since we changed package names from "chemistry" to "parmed", make sure we
+    # delete all of the old versions
+    for folder in sys.path:
+        folder = os.path.realpath(os.path.abspath(folder))
+        if folder == os.path.realpath(os.path.abspath('.')): continue
+        chem = os.path.join(folder, 'chemistry')
+        pmdtools = os.path.join(folder, 'ParmedTools')
+        if os.path.isdir(chem):
+            try:
+                shutil.rmtree(chem)
+                sys.stderr.write('Removing %s\n' % chem)
+            except OSError:
+                sys.stderr.write(
+                      'Could not remove old chemistry package %s; you should\n'
+                      'make sure this is completely removed in order to make\n'
+                      'sure you do not accidentally use the old version of '
+                      'ParmEd\n' % chem
+                )
+        if os.path.isdir(pmdtools):
+            try:
+                shutil.rmtree(pmdtools)
+                sys.stderr.write('Removing %s\n' % pmdtools)
+            except OSError:
+                sys.stderr.write(
+                      'Could not remove old ParmedTools package %s; you should\n'
+                      'make sure this is completely removed in order to make\n'
+                      'sure you do not accidentally use the old version of '
+                      'ParmEd\n' % pmdtools
+                )
+
+    scripts = [os.path.join('scripts', 'parmed'),
+               os.path.join('scripts', 'xparmed')]
+
     setup(name='ParmEd',
-          version='15.0b',
+          version=parmed.__version__,
           description='Amber parameter file editor',
           author='Jason Swails',
           author_email='jason.swails -at- gmail.com',
           url='http://jswails.wikidot.com/parmed',
           license='GPL v2 or later',
           packages=packages,
-          py_modules=modules,
           ext_modules=extensions,
-          cmdclass={'build_py':build_py, 'build_scripts':build_scripts},
-          scripts=scripts)
+          cmdclass={'build_py' : build_py},
+          scripts=scripts,
+    )

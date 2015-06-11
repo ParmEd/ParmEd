@@ -24,6 +24,15 @@ cwd = os.path.abspath(os.path.split(sys.argv[0])[0])
 
 sys.path.insert(0, os.path.abspath(os.path.join(cwd, '..')))
 
+while True:
+    for i, folder in enumerate(sys.path):
+        if os.path.exists(os.path.join(folder, 'parmed.py')) and not \
+                os.path.isdir(os.path.join(folder, 'parmed')):
+            break
+    else:
+        break
+    sys.path.pop(i)
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -278,7 +287,7 @@ texinfo_documents = [
 # Create the .rst file for the ParmEd reference automatically from the
 # docstrings
 
-from ParmedTools import ParmedActions as act
+from parmed.tools import actions as act
 
 help_args = []
 
@@ -365,11 +374,11 @@ def _process_docstring(doc, currcmd):
     return '\n'.join(lines)
 
 keylist = sorted(act.COMMANDMAP.keys())
-# Construct the docs from ParmedActions
+# Construct the docs from parmed.tools.actions 
 for action in keylist:
     usage = act.Usages[action.lower()]
     actname = act.COMMANDMAP[action].__name__
-    # Some actions are part of the interpreter, NOT members of ParmedTools.
+    # Some actions are part of the interpreter, NOT members of parmed.tools.
     # Special-case those here
     if action == 'help':
         help_args.append("""
@@ -428,10 +437,10 @@ Using ``parmed.py``
 ===================
 
 This page details using the command-line version of ParmEd, which is the
-primary front-end program using the :mod:`chemistry` and :mod:`ParmedTools`
+primary front-end program using the :mod:`parmed` and :mod:`parmed.tools`
 packages to provide a set of *Actions* by which you can modify a system topology
 and parameters (it currently only works for Amber topology files, although
-support for the entire :class:`Structure <chemistry.structure.Structure>`
+support for the entire :class:`Structure <parmed.structure.Structure>`
 hierarchy is planned).
 
 There are two ways in which ParmEd can be run---in batch reading from an input
@@ -646,7 +655,7 @@ wince.
 Perhaps of the most importance, however, is that the topology file list is made
 available to you in the Python interpreter namespace as the name
 ``amber_prmtop``, which is an instance of :class:`ParmList
-<ParmedTools.parmlist.ParmList>`. So ``amber_prmtop.parm`` is the currently
+<parmed.tools.parmlist.ParmList>`. So ``amber_prmtop.parm`` is the currently
 active parameter-topology object.
 
 Let's have a look at how we might be able to use that:
@@ -689,7 +698,7 @@ Python interpreter is ``amber_prmtop`` (and ``type(self)``, but only in Python
 ``cmd.Cmd``).
 
 So you can attach your function to the :class:`ParmList
-<ParmedTools.parmlist.ParmList>` object ``amber_prmtop`` and retrieve it from
+<parmed.tools.parmlist.ParmList>` object ``amber_prmtop`` and retrieve it from
 there later.  Be careful not to clobber a critical attribute of that class,
 though!  This trick is demonstrated continuing from the interpreter session from
 above:
