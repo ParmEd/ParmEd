@@ -253,7 +253,7 @@ defineSolvent
 
     defineSolvent <residue_list>
 
-Allows you to change what parmed.py will consider to be "solvent". <residue list> must be a comma-separated set of residue names with no spaces between them.
+Allows you to change what parmed will consider to be "solvent". <residue list> must be a comma-separated set of residue names with no spaces between them.
 
 deleteBond
 ~~~~~~~~~~

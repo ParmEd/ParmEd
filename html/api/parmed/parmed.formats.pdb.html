@@ -61,17 +61,57 @@ PDBx/mmCIF files.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.id_format" title="parmed.formats.pdb.CIFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.download" title="parmed.formats.pdb.CIFFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout])</td>
+<td>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.id_format" title="parmed.formats.pdb.CIFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as a PDBx/mmCIF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.parse" title="parmed.formats.pdb.CIFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.parse" title="parmed.formats.pdb.CIFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
 <td>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.write" title="parmed.formats.pdb.CIFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.write" title="parmed.formats.pdb.CIFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
 </tbody>
 </table>
+<dl class="staticmethod">
+<dt id="parmed.formats.pdb.CIFFile.download">
+<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
+loading it as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pdb_id</strong> : str</p>
+<blockquote>
+<div><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
+</div></blockquote>
+<p><strong>timeout</strong> : float, optional</p>
+<blockquote>
+<div><p>The number of seconds to wait before raising a timeout error.
+Default is 10 seconds</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>Structure instance populated by the requested PDB</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>socket.timeout if the connection times out while trying to contact the</strong></p>
+<p><strong>FTP server</strong></p>
+<p><strong>IOError if there is a problem retrieving the requested PDB</strong></p>
+<p><strong>ImportError if the gzip module is not available</strong></p>
+<p class="last"><strong>TypeError if pdb_id is not a 4-character string</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="staticmethod">
 <dt id="parmed.formats.pdb.CIFFile.id_format">
 <em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
@@ -206,17 +246,57 @@ False, ANISOU records are not written</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.id_format" title="parmed.formats.pdb.PDBFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.download" title="parmed.formats.pdb.PDBFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout])</td>
+<td>Goes to the wwPDB website and downloads the requested PDB, loading it</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.id_format" title="parmed.formats.pdb.PDBFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.parse" title="parmed.formats.pdb.PDBFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.parse" title="parmed.formats.pdb.PDBFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
 <td>Read a PDB file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.write" title="parmed.formats.pdb.PDBFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.write" title="parmed.formats.pdb.PDBFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
 </tbody>
 </table>
+<dl class="staticmethod">
+<dt id="parmed.formats.pdb.PDBFile.download">
+<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Goes to the wwPDB website and downloads the requested PDB, loading it
+as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pdb_id</strong> : str</p>
+<blockquote>
+<div><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
+</div></blockquote>
+<p><strong>timeout</strong> : float, optional</p>
+<blockquote>
+<div><p>The number of seconds to wait before raising a timeout error.
+Default is 10 seconds</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<blockquote>
+<div><p>Structure instance populated by the requested PDB</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>socket.timeout if the connection times out while trying to contact the</strong></p>
+<p><strong>FTP server</strong></p>
+<p><strong>IOError if there is a problem retrieving the requested PDB</strong></p>
+<p><strong>ImportError if the gzip module is not available</strong></p>
+<p class="last"><strong>TypeError if pdb_id is not a 4-character string</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="staticmethod">
 <dt id="parmed.formats.pdb.PDBFile.id_format">
 <em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>

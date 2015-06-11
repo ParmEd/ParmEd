@@ -64,7 +64,7 @@
 <span class="kn">from</span> <span class="nn">parmed.formats</span> <span class="kn">import</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">CIFFile</span><span class="p">,</span> <span class="n">Mol2File</span>
 <span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span><span class="p">,</span> <span class="n">AmberOFFLibrary</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
@@ -163,7 +163,7 @@
     <span class="c"># unpopulated</span>
     <span class="n">needs_parm</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="c"># Do we allow any action to overwrite existing files? Static variable.</span>
-    <span class="n">overwrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># Default for API. parmed.py sets this every time</span>
+    <span class="n">overwrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># Default for API. parmed sets this every time</span>
     <span class="c"># We do one of two kinds of filtering for each action. Each action can</span>
     <span class="c"># support either a strict subset of classes, in which case the type *must*</span>
     <span class="c"># be an exact member (not a subclass) of one of that list. If that list is</span>
@@ -1489,7 +1489,7 @@
 </div></div>
 <div class="viewcode-block" id="defineSolvent"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.defineSolvent">[docs]</a><span class="k">class</span> <span class="nc">defineSolvent</span><span class="p">(</span><span class="n">Action</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Allows you to change what parmed.py will consider to be &quot;solvent&quot;. </span>
+<span class="sd">    Allows you to change what parmed will consider to be &quot;solvent&quot;. </span>
 <span class="sd">    &lt;residue list&gt; must be a comma-separated set of residue names with no</span>
 <span class="sd">    spaces between them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2749,6 +2749,8 @@
         <span class="n">process</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">([</span><span class="s">&#39;/bin/ls&#39;</span><span class="p">,</span> <span class="s">&#39;-C&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
         <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
         <span class="n">process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;UTF-8&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="n">err</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>

@@ -57,8 +57,14 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+    <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
     <span class="n">HAS_OPENMM</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="k">del</span> <span class="n">mm</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">simtk.openmm.app.internal</span> <span class="kn">import</span> <span class="n">unitcell</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">SUPPORTED_VERSION</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">SUPPORTED_VERSION</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">HAS_OPENMM</span> <span class="o">=</span> <span class="bp">False</span>
 
@@ -68,6 +74,8 @@
     <span class="k">def</span> <span class="nf">new_fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_OPENMM</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Could not find or import OpenMM&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SUPPORTED_VERSION</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;You must have at least OpenMM 6.3 installed&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">new_fcn</span>

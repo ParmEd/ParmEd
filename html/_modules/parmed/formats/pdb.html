@@ -56,7 +56,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
+<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">ftplib</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">gzip</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">gzip</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
     <span class="n">create_array</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -69,9 +75,10 @@
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -142,6 +149,61 @@
                 <span class="k">continue</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PDBFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.PDBFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Goes to the wwPDB website and downloads the requested PDB, loading it</span>
+<span class="sd">        as a :class:`Structure` instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pdb_id : str</span>
+<span class="sd">            The 4-letter PDB ID to try and download from the RCSB PDB database</span>
+<span class="sd">        timeout : float, optional</span>
+<span class="sd">            The number of seconds to wait before raising a timeout error.</span>
+<span class="sd">            Default is 10 seconds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        struct : :class:`Structure &lt;parmed.structure.Structure&gt;`</span>
+<span class="sd">            Structure instance populated by the requested PDB</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        socket.timeout if the connection times out while trying to contact the</span>
+<span class="sd">        FTP server</span>
+
+<span class="sd">        IOError if there is a problem retrieving the requested PDB</span>
+
+<span class="sd">        ImportError if the gzip module is not available</span>
+
+<span class="sd">        TypeError if pdb_id is not a 4-character string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">gzip</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Cannot import gzip module&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;pdb_id must be the 4-letter PDB code&#39;</span><span class="p">)</span>
+
+        <span class="n">pdb_id</span> <span class="o">=</span> <span class="n">pdb_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">ftp</span> <span class="o">=</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">FTP</span><span class="p">(</span><span class="s">&#39;ftp.wwpdb.org&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+        <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ftp</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span><span class="s">&#39;RETR /pub/pdb/data/structures/divided/pdb/&#39;</span>
+                           <span class="s">&#39;</span><span class="si">%s</span><span class="s">/pdb</span><span class="si">%s</span><span class="s">.ent.gz&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pdb_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">pdb_id</span><span class="p">),</span>
+                           <span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">all_errors</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Could not retrieve PDB ID </span><span class="si">%s</span><span class="s">; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+        <span class="c"># Rewind, wrap it in a GzipFile and send it to parse</span>
+        <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PDBFile</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -760,6 +822,60 @@
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CIFFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.CIFFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</span>
+<span class="sd">        loading it as a :class:`Structure` instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pdb_id : str</span>
+<span class="sd">            The 4-letter PDB ID to try and download from the RCSB PDB database</span>
+<span class="sd">        timeout : float, optional</span>
+<span class="sd">            The number of seconds to wait before raising a timeout error.</span>
+<span class="sd">            Default is 10 seconds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        struct : :class:`Structure &lt;parmed.structure.Structure&gt;`</span>
+<span class="sd">            Structure instance populated by the requested PDB</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        socket.timeout if the connection times out while trying to contact the</span>
+<span class="sd">        FTP server</span>
+
+<span class="sd">        IOError if there is a problem retrieving the requested PDB</span>
+
+<span class="sd">        ImportError if the gzip module is not available</span>
+
+<span class="sd">        TypeError if pdb_id is not a 4-character string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">gzip</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Cannot import gzip module&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;pdb_id must be the 4-letter PDB code&#39;</span><span class="p">)</span>
+
+        <span class="n">pdb_id</span> <span class="o">=</span> <span class="n">pdb_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">ftp</span> <span class="o">=</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">FTP</span><span class="p">(</span><span class="s">&#39;ftp.wwpdb.org&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+        <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ftp</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span><span class="s">&#39;RETR /pub/pdb/data/structures/divided/mmCIF/&#39;</span>
+                           <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">.cif.gz&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pdb_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">pdb_id</span><span class="p">),</span>
+                           <span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">all_errors</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Could not retrieve PDB ID </span><span class="si">%s</span><span class="s">; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+        <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CIFFile</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>

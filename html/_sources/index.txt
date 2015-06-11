@@ -58,6 +58,7 @@ biomolecular simulations.  For example, some of its features include:
 
         + Amber prmtop, inpcrd, NetCDF trajectory, and NetCDF restart files
         + CHARMM PSF, coordinate, and restart files
+        + Gromacs topology and GRO files
         + PDB files, supporting a wide range of dialects that technically
           violate the PDB standard
         + PDBx/mmCIF files -- the new standard for the Protein Data Bank
@@ -101,6 +102,59 @@ I will post any slides pertaining to ParmEd from talks that I've given here, in
 the hopes that they may be helpful or informative.
 
 - `April 10, 2015 at MSKCC <http://parmed.github.io/ParmEd/ParmEd_Slides_08Apr2015.pdf>`_
+
+Getting Started
+---------------
+
+When to use ParmEd?
+~~~~~~~~~~~~~~~~~~~
+
+- When you want to extract information about a structure or parameters from one
+  of the supported file formats.
+- When you want to manipulate molecular mechanical (force field) descriptions of
+  chemical systems to quickly prototype ideas involving Hamiltonian
+  modifications.
+- When you want to manipulate chemical systems by selecting a subset of the
+  atoms.
+- When you want to combine or replicate the contents of one or more chemical
+  systems.
+- When you want to convert molecular mechanical descriptions of molecules from a
+  format that one program supports to another (e.g., converting an Amber
+  topology file to a Gromacs topology file or vice-versa).
+- When you want to carry out molecular dynamics investigations on
+  high-performance computational hardware (like GPUs) using OpenMM
+
+Common examples
+~~~~~~~~~~~~~~~
+
+The simplest example is to use ParmEd to download and inspect a PDB file. We can
+find out numerous attributes about a structure defined by a PDB file, like the
+number of atoms, residues, and even various citation information. For example::
+
+    >>> import parmed as pmd
+    >>> pmd.download_PDB('4lzt')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
+    >>> lysozyme = pmd.download_PDB('4lzt')
+    >>> lysozyme.authors
+    'M.A.WALSH,T.SCHNEIDER,L.C.SIEKER,Z.DAUTER,V.LAMZIN,K.S.WILSON'
+    >>> lysozyme.experimental
+    'X-RAY DIFFRACTION'
+    >>> len(lysozyme.atoms)
+    1164
+    >>> len(lysozyme.residues)
+    274
+    >>> # Get all backbone atoms
+    ... lysozyme['@CA,C,N']
+    <Structure 393 atoms; 135 residues; 0 bonds; NOT parametrized>
+
+A simple example demonstrating the file conversion capabilities is to convert a
+PDBx/mmCIF file into the more commonly supported PDB format::
+
+    >>> import parmed as pmd
+    >>> pmd.write_PDB(pmd.download_CIF('4lzt'), '4lzt.pdb')
+    >>> # Now read in the PDB file we just created
+    ... pmd.read_PDB('4lzt.pdb')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
 
 Program and API Reference
 -------------------------
