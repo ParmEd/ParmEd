@@ -503,11 +503,9 @@ class AmberFormat(object):
             CHARGE_SCALE = CHARMM_ELECTROSTATIC
         else:
             CHARGE_SCALE = AMBER_ELECTROSTATIC
-        try:
+        if self.charge_flag in self.parm_data:
             for i, chg in enumerate(self.parm_data[self.charge_flag]):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
-        except KeyError:
-            pass
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
             with closing(genopen(self.name, 'r')) as f:

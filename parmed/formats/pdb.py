@@ -481,10 +481,7 @@ class PDBFile(object):
                     except (IndexError, ValueError):
                         A = B = C = 90.0
                     struct.box = [a, b, c, A, B, C]
-                    try:
-                        struct.space_group = line[55:66].strip()
-                    except IndexError:
-                        pass
+                    struct.space_group = line[55:66].strip()
                 elif rec == 'EXPDTA':
                     struct.experimental = line[6:].strip()
                 elif rec == 'AUTHOR':
@@ -503,6 +500,7 @@ class PDBFile(object):
                             try:
                                 struct.year = int(line[62:66])
                             except ValueError:
+                                # Shouldn't happen, but don't throw a fit
                                 pass
                     elif part == 'PMID':
                         struct.pmid = line[19:].strip()
