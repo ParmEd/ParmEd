@@ -2915,10 +2915,8 @@ class _CmapGrid(object):
     @property
     def transpose(self):
         """ The transpose of the potential grid """
-        try:
+        if hasattr(self, '_transpose'):
             return self._transpose
-        except AttributeError:
-            pass
         _transpose = []
         size = len(self._data)
         for i in range(self.resolution):
@@ -3907,10 +3905,10 @@ class TrackedList(list):
     >>> tl.needs_indexing, tl.changed
     (False, False)
     """
-    def __init__(self, arg=[]):
+    def __init__(self, *args):
         self.changed = False
         self.needs_indexing = False
-        return list.__init__(self, arg)
+        return list.__init__(self, *args)
 
     @_changes
     def __delitem__(self, item):
@@ -3924,10 +3922,12 @@ class TrackedList(list):
             try:
                 self[index]._idx = -1
             except AttributeError:
+                # If we can't set _idx attribute on this object, don't fret
                 pass
             try:
                 self[index].list = None
             except AttributeError:
+                # If we can't set list attribute on this object, don't fret
                 pass
 
         return list.__delitem__(self, item)
@@ -3941,10 +3941,12 @@ class TrackedList(list):
             try:
                 self[index]._idx = -1
             except AttributeError:
+                # If we can't set _idx attribute on this object, don't fret
                 pass
             try:
                 self[index].list = None
             except AttributeError:
+                # If we can't set list attribute on this object, don't fret
                 pass
         return list.__delslice__(self, start, stop)
 

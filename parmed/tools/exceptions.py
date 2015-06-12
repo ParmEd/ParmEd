@@ -1,6 +1,6 @@
 """ Exceptions used in parmed.py """
 from sys import stderr
-from parmed.exceptions import ParmedError, ParmedWarning
+from parmed.exceptions import ParmedError, ParmedWarning, InputError
 
 class ParmError(ParmedError):
     """ Base parmed error """
@@ -122,9 +122,6 @@ class SimulationWarning(ParmWarning):
     pass
 
 class UnhandledArgumentWarning(SeriousParmWarning):
-    pass
-
-class InputError(ParmError):
     pass
 
 class ParmIndexError(ParmError, IndexError):

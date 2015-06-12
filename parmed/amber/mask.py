@@ -35,7 +35,19 @@ class AmberMask(object):
     #======================================================
 
     def Selected(self, invert=False):
-        """ Generator that returns the indexes of selected atoms """
+        """ Generator that returns the indexes of selected atoms
+        
+        Parameters
+        ----------
+        invert : bool, optional
+            If True, all atoms *not* selected by the mask will be returned
+
+        Returns
+        -------
+        generator of int
+            Each iteration will yield the index of the next atom that has been
+            selected by the mask. Atom indices are 0-based
+        """
         for i, v in enumerate(self.Selection(invert=invert)):
             if v:
                 yield i
@@ -46,6 +58,25 @@ class AmberMask(object):
         """
         Parses the mask and analyzes the result to return an atom
         selection array
+
+        Parameters
+        ----------
+        prnlev : int, optional
+            Print debug information on the processing of the Amber mask string.
+            This is mainly useful if you are modifying the mask parser. Default
+            value is 0 (no printout), values between 1 and 8 control the level
+            of output (larger values produce more output). Default 0
+        invert : bool, optional
+            If True, the returned array will invert the selection of the mask
+            (i.e., selected atoms will not be selected and vice-versa)
+
+        Returns
+        -------
+        mask : list of int
+            A list with length equal to the number of atoms in the assigned
+            :class:`Structure <parmed.structure.Structure>` instance. Selected
+            atoms will have a value of 1 placed in the corresponding slot in the
+            return list while atoms not selected will be assigned 0.
         """
         from sys import stderr, stdout
         if prnlev > 2: stderr.write('In AmberMask.Selection(), debug active!\n')
@@ -56,17 +87,17 @@ class AmberMask(object):
             return [1 for atom in self.parm.atoms]
 
         # 1) preprocess input expression
-        infix = AmberMask._tokenize(self, prnlev)
+        infix = self._tokenize(prnlev)
         if prnlev > 5: stdout.write('tokenized mask: ==%s==\n' % infix)
 
         # 2) construct postfix (RPN) notation
-        postfix = AmberMask._torpn(self, infix, prnlev)
+        postfix = self._torpn(infix, prnlev)
         if prnlev > 5: stdout.write('postfix mask: ==%s==\n' % postfix)
 
         # 3) evaluate the postfix notation
         if invert:
-            return [1-i for i in AmberMask._evaluate(self, postfix, prnlev)]
-        return AmberMask._evaluate(self, postfix, prnlev)
+            return [1-i for i in self._evaluate(postfix, prnlev)]
+        return self._evaluate(postfix, prnlev)
 
     #======================================================
 

@@ -319,6 +319,7 @@ class CPreProcessor(object):
             try:
                 del self.defines[words[0]]
             except KeyError:
+                # Undefining an undefined variable is a no-op
                 pass
         elif len(words) > 1:
             warnings.warn('Ignored tokens in #undef: %s' % ', '.join(words[1:]),

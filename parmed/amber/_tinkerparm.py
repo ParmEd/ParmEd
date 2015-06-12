@@ -620,23 +620,19 @@ class AmoebaParm(AmberParm):
         """ Loads the AMOEBA chiral and multipole frames """
         data = self.parm_data
         del self.chiral_frames[:]
-        try:
+        if 'AMOEBA_CHIRAL_FRAME_LIST' in data:
             it = iter(data['AMOEBA_CHIRAL_FRAME_LIST'])
             for i, j, k in zip(it, it, it):
                 self.chiral_frames.append(
                         ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
                 )
-        except KeyError:
-            pass
         del self.multipole_frames[:]
-        try:
+        if 'AMOEBA_FRAME_DEF_LIST' in data:
             it = iter(data['AMOEBA_FRAME_DEF_LIST'])
             for i, j, k, l, m in zip(it, it, it, it, it):
                 self.multipole_frames.append(
                         MultipoleFrame(self.atoms[i-1], j, k, l, m)
                 )
-        except KeyError:
-            pass
 
     #=============================================
 
@@ -645,23 +641,21 @@ class AmoebaParm(AmberParm):
         del self.adjust_types[:]
         del self.adjusts[:]
         data = self.parm_data
-        try:
-            for a,b,c,d,e in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
-                self.adjust_types.append(
-                        NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
-                )
-            it = iter(data['AMOEBA_ADJUST_LIST'])
-            for i, j, k in zip(it, it, it):
-                self.adjusts.append(
-                        NonbondedException(self.atoms[i-1], self.atoms[j-1],
-                                           self.adjust_types[k-1])
-                )
-        except KeyError:
-            pass
+        # This section should always be present
+        for a,b,c,d,e in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
+            self.adjust_types.append(
+                    NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
+            )
+        it = iter(data['AMOEBA_ADJUST_LIST'])
+        for i, j, k in zip(it, it, it):
+            self.adjusts.append(
+                    NonbondedException(self.atoms[i-1], self.atoms[j-1],
+                                        self.adjust_types[k-1])
+            )
 
     #=============================================
 

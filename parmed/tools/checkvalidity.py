@@ -159,13 +159,10 @@ def check_validity(parm, warnings):
                                 True, False, True, float)
 
     # Check that ATOMS_PER_MOLECULE == NATOM
-    try:
-        if (sum(parm.parm_data['ATOMS_PER_MOLECULE']) != 
-            parm.ptr('natom')):
+    if 'ATOMS_PER_MOLECULE' in parm.parm_data:
+        if sum(parm.parm_data['ATOMS_PER_MOLECULE']) != parm.ptr('natom'):
             warnings.warn('sum(ATOMS_PER_MOLECULE) != NATOM. Use '
-                '"setMolecules" to fix this', FixableParmWarning)
-    except KeyError:
-        pass
+                          '"setMolecules" to fix this', FixableParmWarning)
 
     # Duplicate pmemd's checks
     if parm.ptr('ifpert') != 0:
