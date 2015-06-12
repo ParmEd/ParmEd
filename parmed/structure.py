@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function
 
-from parmed.constants import DEG_TO_RAD
+from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
@@ -322,6 +322,11 @@ class Structure(object):
         retstr.append('; %d bonds' % nbond)
         if self.box is not None:
             retstr.append('; PBC')
+            if (abs(box[3]-90) > SMALL or abs(box[4]-90) > SMALL or
+                    abs(box[5]-90) > SMALL):
+                retstr.append(' (triclinic)')
+            else:
+                retstr.append(' (orthogonal)')
         # Just assume that if the first bond has a defined type, so does
         # everything else... we don't want __repr__ to be super expensive
         if len(self.bonds) > 0 and self.bonds[0].type is not None:
