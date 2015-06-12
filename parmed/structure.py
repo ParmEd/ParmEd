@@ -322,8 +322,8 @@ class Structure(object):
         retstr.append('; %d bonds' % nbond)
         if self.box is not None:
             retstr.append('; PBC')
-            if (abs(box[3]-90) > SMALL or abs(box[4]-90) > SMALL or
-                    abs(box[5]-90) > SMALL):
+            if (abs(self.box[3]-90) > SMALL or abs(self.box[4]-90) > SMALL or
+                    abs(self.box[5]-90) > SMALL):
                 retstr.append(' (triclinic)')
             else:
                 retstr.append(' (orthogonal)')
