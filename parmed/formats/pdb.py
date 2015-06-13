@@ -4,6 +4,7 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
+from contextlib import closing
 import io
 import itertools
 import ftplib
@@ -81,9 +82,8 @@ class PDBFile(object):
         is_fmt : bool
             True if it is a PDB file
         """
-        f = genopen(filename, 'r')
-        lines = [f.readline() for i in range(3)]
-        f.close()
+        with closing(genopen(filename, 'r')) as f:
+            lines = [f.readline() for i in range(3)]
 
         for line in lines:
             if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
@@ -101,7 +101,7 @@ class PDBFile(object):
     #===================================================
 
     @staticmethod
-    def download(pdb_id, timeout=10):
+    def download(pdb_id, timeout=10, saveto=None):
         """
         Goes to the wwPDB website and downloads the requested PDB, loading it
         as a :class:`Structure` instance
@@ -113,6 +113,12 @@ class PDBFile(object):
         timeout : float, optional
             The number of seconds to wait before raising a timeout error.
             Default is 10 seconds
+        saveto : str, optional
+            If provided, this will be treated as a file name to which the PDB
+            file will be saved. If None (default), no PDB file will be written.
+            This will be a verbatim copy of the downloaded PDB file, unlike the
+            somewhat-stripped version you would get by using
+            :meth:`Structure.write_pdb <parmed.structure.Structure.write_pdb>`
 
         Returns
         -------
@@ -124,7 +130,8 @@ class PDBFile(object):
         socket.timeout if the connection times out while trying to contact the
         FTP server
 
-        IOError if there is a problem retrieving the requested PDB
+        IOError if there is a problem retrieving the requested PDB or writing a
+        requested ``saveto`` file
 
         ImportError if the gzip module is not available
 
@@ -153,6 +160,10 @@ class PDBFile(object):
             fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        if saveto is not None:
+            with closing(genopen(saveto, 'w')) as f:
+                f.write(fileobj.read())
+            fileobj.seek(0)
         return PDBFile.parse(fileobj)
 
     #===================================================
@@ -774,7 +785,7 @@ class CIFFile(object):
     #===================================================
 
     @staticmethod
-    def download(pdb_id, timeout=10):
+    def download(pdb_id, timeout=10, saveto=None):
         """
         Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
         loading it as a :class:`Structure` instance
@@ -786,11 +797,17 @@ class CIFFile(object):
         timeout : float, optional
             The number of seconds to wait before raising a timeout error.
             Default is 10 seconds
+        saveto : str, optional
+            If provided, this will be treated as a file name to which the PDB
+            file will be saved. If None (default), no CIF file will be written.
+            This will be a verbatim copy of the downloaded CIF file, unlike the
+            somewhat-stripped version you would get by using
+            :meth:`Structure.write_cif <parmed.structure.Structure.write_cif>`
 
         Returns
         -------
         struct : :class:`Structure <parmed.structure.Structure>`
-            Structure instance populated by the requested PDB
+            Structure instance populated by the requested PDBx/mmCIF
 
         Raises
         ------
@@ -825,6 +842,10 @@ class CIFFile(object):
             fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        if saveto is not None:
+            with closing(genopen(saveto, 'w')) as f:
+                f.write(fileobj.read())
+            fileobj.seek(0)
         return CIFFile.parse(fileobj)
 
     #===================================================

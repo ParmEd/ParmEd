@@ -174,6 +174,12 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
 
+    def testDownloadSave(self):
+        """ Tests downloading PDB files and saving a copy """
+        fname = get_fn('downloaded.pdb', written=True)
+        self._check4lzt(download_PDB('4lzt', saveto=fname))
+        self._check4lzt(read_PDB(fname))
+
     def testPositions(self):
         """ Tests that positions are Vec3's with units """
         from parmed import unit as u
