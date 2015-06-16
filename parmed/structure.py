@@ -1351,16 +1351,25 @@ class Structure(object):
         """
         A list of 3-element Quantity tuples of dimension length representing the
         atomic positions for every atom in the system. If set with unitless
-        numbers, those numbers are assumed to be in angstroms
+        numbers, those numbers are assumed to be in angstroms. If any atoms do
+        not have coordinates, this is simply ``None``.
         """
-        return [Vec3(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+        try:
+            return [Vec3(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+        except AttributeError:
+            return None
 
     @positions.setter
     def positions(self, value):
         """
         A list of 3-element Quantity tuples of dimension length representing the
         atomic positions for every atom in the system. If set with unitless
-        numbers, those numbers are assumed to be in angstroms
+        numbers, those numbers are assumed to be in angstroms.
+
+        Raises
+        ------
+        ValueError if the positions are not either a (natom, 3)-shape iterable
+        of iterables or a (natom*3)-length iterable.
         """
         if u.is_quantity(value):
             value = value.value_in_unit(u.angstroms)
