@@ -3,7 +3,7 @@ The parmed package manipulates molecular structures and provides a way to go
 between standard and amber file formats, manipulate structures, etc.
 """
 
-__version__ = '2.0beta1'
+__version__ = '2.0beta2'
 __author__ = 'Jason Swails'
 
 from parmed import exceptions, periodic_table
