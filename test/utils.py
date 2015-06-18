@@ -20,10 +20,6 @@ import os
 from os.path import join, split, abspath
 import random
 import unittest
-try:
-    import numpy
-except ImportError:
-    numpy = None
 
 try:
     from simtk import openmm
@@ -131,7 +127,7 @@ def has_pynetcdf():
         return False
 
 def has_numpy():
-    return numpy is not None
+    return True
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,

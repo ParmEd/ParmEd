@@ -14,12 +14,12 @@ export PATH=$HOME/miniconda/bin:$PATH
 conda install --yes conda-build jinja2 binstar pip
 conda config --add channels http://conda.binstar.org/omnia
 
-if [ -z "$NO_NUMPY" ]; then
+if [ -z "$MINIMAL_PACKAGES" ]; then
     conda create -y -n myenv python=$PYTHON_VERSION \
         numpy scipy netcdf4 pandas nose openmm-dev
 else
     # Do not install the full numpy/scipy stack
-    conda create -y -n myenv python=$PYTHON_VERSION nose
+    conda create -y -n myenv python=$PYTHON_VERSION nose numpy
 fi
 
 source activate myenv

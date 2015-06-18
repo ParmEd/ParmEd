@@ -42,10 +42,7 @@ from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
 from collections import defaultdict
 import copy
-try:
-    import numpy as np
-except ImportError:
-    np = None
+import numpy as np
 from math import sqrt
 try:
     from simtk import openmm as mm

@@ -269,11 +269,10 @@ class Atom(_ListItem):
         In some cases, "type" is an ambiguous choice of an integer serial number
         or a string descriptor. In this case, atom_type is an AtomType instance
         that disambiguates this discrepancy.
-    anisou : ``numpy.ndarray(float64) (or list of floats)``
+    anisou : numpy.ndarray(float64) (or list of floats)
         Anisotropic temperature scaling factors. This is a 6-element numpy array
-        (if numpy is not available, it is a 6-element list) of floating point
-        numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),
-        U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.
+        They are the 3x3 symmetric matrix elements U(1,1), U(2,2), U(3,3),
+        U(1,2), U(1,3), U(2,3). If no factors available, it is None.
     idx : ``int``
         The index of this atom in the list. Set to -1 if this atom is not part
         of a list or the index cannot otherwise be determined (i.e., if the
