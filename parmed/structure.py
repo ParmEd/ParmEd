@@ -1400,13 +1400,13 @@ class Structure(object):
             except AttributeError:
                 return None
             else:
-                return np.array(coords)[np.newaxis,:,:]
+                return np.array(coords)
         else:
             assert len(self._coordinates.shape) == 3, \
                     'Internal coordinate shape wrong'
             assert self._coordinates.shape[1] == len(self.atoms), \
                     'Coordinate shape different from number of atoms'
-            return self._coordinates
+            return self._coordinates[0]
 
     @coordinates.setter
     def coordinates(self, value):
@@ -1419,11 +1419,40 @@ class Structure(object):
         else:
             if u.is_quantity(value):
                 value = value.value_in_unit(u.angstroms)
+            value = list(value)
             coords = np.array(value, dtype=np.float64, copy=False, subok=True)
             coords = coords.reshape((-1, len(self.atoms), 3))
             for a, xyz in zip(self.atoms, coords[0]):
                 a.xx, a.xy, a.xz = xyz
             self._coordinates = coords
+
+    def get_coordinates(self, frame):
+        """
+        In some cases, multiple conformations may be stored in the Structure.
+        This function retrieves a particular frame's coordinates
+
+        Parameters
+        ----------
+        frame : int or 'all'
+            The frame number whose coordinates should be retrieved
+
+        Returns
+        -------
+        coords : np.ndarray, shape([#,] natom, 3) or None
+            If frame is 'all', all coordinates are returned with shape
+            (#, natom, 3). Otherwise the requested frame is returned with shape
+            (natom, 2). If no coordinates exist and 'all' is requested, None is
+            returned
+
+        Raises
+        ------
+        IndexError if there are fewer than ``frame`` coordinates
+        """
+        if frame == 'all':
+            return self._coordinates
+        elif self._coordinates is None:
+            raise IndexError('No coordinate frames present')
+        return self._coordinates[frame]
 
     @property
     def box(self):

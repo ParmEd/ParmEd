@@ -141,23 +141,26 @@ class TestStructureAPI(unittest.TestCase):
         xyz = np.random.random((natom, 3))
         for a, x in zip(s.atoms, xyz):
             a.xx, a.xy, a.xz = x
-        self.assertEqual(s.coordinates.shape, (1, natom, 3))
-        np.testing.assert_equal(s.coordinates, xyz[np.newaxis,:,:])
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        np.testing.assert_equal(s.coordinates, xyz[:,:])
         self.assertIs(s._coordinates, None)
         # Now set multiple frames
         xyz = np.random.random((5, natom, 3)).tolist()
         s.coordinates = xyz
         self.assertIsInstance(s.coordinates, np.ndarray)
-        self.assertEqual(s.coordinates.shape, (5, natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
         for a, x in zip(s.atoms, xyz[0]):
             self.assertEqual(a.xx, x[0])
             self.assertEqual(a.xy, x[1])
             self.assertEqual(a.xz, x[2])
+        np.testing.assert_equal(s.get_coordinates('all'), xyz)
+        for i in range(5):
+            np.testing.assert_equal(s.get_coordinates(i), xyz[i])
         # Now try setting with units
         xyz = u.Quantity(np.random.random((3, natom, 3)), u.nanometers)
         s.coordinates = xyz
         self.assertIsInstance(s.coordinates, np.ndarray)
-        self.assertEqual(s.coordinates.shape, (3, natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
         for a, x in zip(s.atoms, xyz[0]._value):
             self.assertEqual(a.xx, x[0]*10)
             self.assertEqual(a.xy, x[1]*10)
@@ -171,11 +174,17 @@ class TestStructureAPI(unittest.TestCase):
         self.assertIs(s.coordinates, None)
         # Now check setting flattened arrays
         s.coordinates = np.random.random((natom, 3))
-        self.assertEqual(s.coordinates.shape, (1, natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
         s.coordinates = np.random.random(natom*3)
-        self.assertEqual(s.coordinates.shape, (1, natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
         s.coordinates = np.random.random(natom*3*10)
-        self.assertEqual(s.coordinates.shape, (10, natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        # Now check other iterables
+        old_crds = s.coordinates
+        s.coordinates = (random.random() for i in range(3*len(s.atoms)))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        diff = (old_crds - s.coordinates).ravel()**2
+        self.assertGreater(diff.sum(), 0.01)
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
