@@ -93,17 +93,6 @@ class Quantity(object):
             Note - unit conversions will cause tuples to be converted to lists
       4 - lists of tuples of numbers, lists of lists of ... etc. of numbers
       5 - numpy.arrays
-
-    Create numpy.arrays with units using the Quantity constructor, not the
-    multiply operator.  e.g.
-
-      Quantity(numpy.array([1,2,3]), centimeters) # correct
-
-        *NOT*
-
-      numpy.array([1,2,3]) * centimeters # won't work
-
-    because numpy.arrays already overload the multiply operator for EVERYTHING.
     """
 
     def __init__(self, value=None, unit=None):
