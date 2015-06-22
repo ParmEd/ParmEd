@@ -113,11 +113,7 @@ You can create a unit in one of two ways:
            Quantity(value=1, unit=/(meter**3))
 
 Seems easy enough, and I usually use method 2 when turning a ``float``, ``int``,
-``list``, or ``tuple`` into a :class:`Quantity`. However, this does *not* work
-for numpy arrays, since numpy arrays overload all of the multiplication
-operators (``__mul__``, ``__imul__``, ... etc.), which is the mechanism by which
-unit multiplication creates a :class:`Quantity`. As a result, you *must* use
-method #1 when converting a ``numpy.ndarray`` into a :class:`Quantity`.
+``list``, or ``tuple`` into a :class:`Quantity`.
 
 Converting to another unit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
