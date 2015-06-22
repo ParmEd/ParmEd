@@ -687,5 +687,12 @@ class TestNumpyUnits(QuantityTestCase):
         b = a.reshape((5, 2))
         self.assertTrue(u.is_quantity(b))
 
+    def testMultiplication(self):
+        """ Tests that units override numpy.ndarray multiplication """
+        self.assertIsInstance(np.arange(10)*u.angstroms, u.Quantity)
+        x = np.array([1]) * u.liters
+        self.assertIsInstance(x, u.Quantity)
+        self.assertIsInstance(np.arange(10) * x, u.Quantity)
+
 if __name__ == '__main__':
     unittest.main()
