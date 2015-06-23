@@ -4,6 +4,10 @@ typically used in modelling applications
 """
 
 import copy
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 try:
@@ -229,6 +233,102 @@ class ResidueTemplate(object):
                     return atom
             raise IndexError('Atom %s not found in %s' % (idx, self.name))
         return self.atoms[idx]
+
+    def to_dataframe(self):
+        """ Create a pandas dataframe from the atom information
+
+        Returns
+        -------
+        df : :class:`pandas.DataFrame`
+            The pandas DataFrame with all of the atomic properties
+
+        Notes
+        -----
+        The DataFrame will be over all atoms. The columns will be the attributes
+        of the atom (as well as its containing residue). Some columns will
+        *always* exist. Others will only exist if those attributes have been set
+        on the Atom instances (see the :class:`Atom` docs for possible
+        attributes and their meaning). The columns that will always be present
+        are:
+
+            - number : int
+            - name : str
+            - type : str
+            - atomic_number : int
+            - charge : float
+            - mass : float
+            - nb_idx : int
+            - radii : float
+            - screen : float
+            - occupancy : float
+            - bfactor : float
+            - altloc : str
+            - tree : str
+            - join : int
+            - irotat : int
+            - rmin : float
+            - epsilon : float
+            - rmin_14 : float
+            - epsilon_14 : float
+
+        The following attributes are optionally present if they were present in
+        the original file defining the structure:
+
+            - xx : float (x-coordinate position)
+            - xy : float (y-coordinate position)
+            - xz : float (z-coordinate position)
+            - vx : float (x-coordinate velocity)
+            - vy : float (y-coordinate velocity)
+            - vz : float (z-coordinate velocity)
+        """
+        if pd is None:
+            raise ImportError('pandas is not available; cannot create a pandas '
+                              'DataFrame from this Structure')
+        ret = pd.DataFrame()
+
+        ret['number'] = [atom.number for atom in self.atoms]
+        ret['name'] = [atom.name for atom in self.atoms]
+        ret['type'] = [atom.type for atom in self.atoms]
+        ret['atomic_number'] = [atom.atomic_number for atom in self.atoms]
+        ret['charge'] = [atom.charge for atom in self.atoms]
+        ret['mass'] = [atom.mass for atom in self.atoms]
+        ret['nb_idx'] = [atom.nb_idx for atom in self.atoms]
+        ret['radii'] = [atom.radii for atom in self.atoms]
+        ret['screen'] = [atom.screen for atom in self.atoms]
+        ret['occupancy'] = [atom.occupancy for atom in self.atoms]
+        ret['bfactor'] = [atom.bfactor for atom in self.atoms]
+        ret['altloc'] = [atom.altloc for atom in self.atoms]
+        ret['tree'] = [atom.tree for atom in self.atoms]
+        ret['join'] = [atom.join for atom in self.atoms]
+        ret['irotat'] = [atom.irotat for atom in self.atoms]
+        ret['rmin'] = [atom.rmin for atom in self.atoms]
+        ret['epsilon'] = [atom.epsilon for atom in self.atoms]
+        ret['rmin_14'] = [atom.rmin_14 for atom in self.atoms]
+        ret['epsilon_14'] = [atom.epsilon_14 for atom in self.atoms]
+        ret['resname'] = [atom.residue.name for atom in self.atoms]
+
+        # Now for optional attributes
+        # Coordinates
+        try:
+            coords = pd.DataFrame(
+                    [[atom.xx, atom.xy, atom.xz] for atom in self.atoms],
+                    columns=['xx', 'xy', 'xz']
+            )
+        except AttributeError:
+            pass
+        else:
+            ret = ret.join(coords)
+        # Velocities
+        try:
+            vels = pd.DataFrame(
+                    [[atom.vx, atom.vy, atom.vz] for atom in self.atoms],
+                    columns=['vx', 'vy', 'vz']
+            )
+        except AttributeError:
+            pass
+        else:
+            ret = ret.join(vels)
+        return ret
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
