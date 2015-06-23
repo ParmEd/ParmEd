@@ -1,11 +1,11 @@
 The :mod:`parmed.gromacs` package
 ==================================
 
-The :mod:`gromacs` package contains classes that can parse the Gromacs topology
-and coordinate files. Like `grompp`, ParmEd pre-processes the the topology file,
-automatically finding and parsing the include topology files (ITP) referenced by
-your topology file.  It also recognizes ``#define`` tokens, which can be used in
-ParmEd the same way you can with Gromacs.
+The :mod:`gromacs <parmed.gromacs>` package contains classes that can parse the
+Gromacs topology and coordinate files. Like `grompp`, ParmEd pre-processes the
+topology file, automatically finding and parsing the include topology files
+(ITP) referenced by your topology file.  It also recognizes ``#define`` tokens,
+which can be used in ParmEd the same way you can with Gromacs.
 
 Note, like with the standard C and Gromacs preprocessors, include files will
 *first* be looked for in the directory in which the processed file resides. If
@@ -112,13 +112,14 @@ The corresponding classes are:
 Example usage
 -------------
 
-Many exciting possibilities are available with `GromacsTopologyFile` and `GromacsGroFile`.
-For example, ParmEd is the first software package to enable conversion of Gromacs simulation
-input files to AMBER format in just a few lines of code::
+Many exciting possibilities are available with :class:`GromacsTopologyFile` and
+:class:`GromacsGroFile`.  For example, ParmEd is the first software package to
+enable conversion of Gromacs simulation input files to AMBER format in just a
+few lines of code::
 
-    >>> from parmed import gromacs, amber
+    >>> from parmed import gromacs, amber, unit as u
     >>> gmx_top = GromacsTopologyFile('topol.top')
-    >>> gmx_gro = GromacsGroFile('conf.gro')
+    >>> gmx_gro = GromacsGroFile.parse('conf.gro')
     >>> gmx_top.box = gmx_gro.box # Needed because .prmtop contains box info
     >>> gmx_top.positions = gmx_gro.positions
     >>> amb_prm = AmberParm.load_from_structure(gmx_top)
@@ -128,9 +129,9 @@ input files to AMBER format in just a few lines of code::
     >>> amb_inpcrd.box = gmx_top.box
     >>> amb_inpcrd.close()
 
-Furthermore, you may check the correctness of topology loading by using the `GromacsTopologyFile`
-object to calculate an OpenMM potential energy and force, then comparing that result with your own 
-output from Gromacs::
+Furthermore, you may check the correctness of topology loading by using the
+:class:`GromacsTopologyFile` object to calculate an OpenMM potential energy and
+force, then comparing that result with your own output from Gromacs::
 
     >>> import simtk.openmm as mm
     >>> import simtk.openmm.app as app
@@ -143,11 +144,12 @@ output from Gromacs::
     >>> state = simul.context.getState(getEnergy=True, getForces=True)
     >>> print(state.getPotentialEnergy())
 
-A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
-and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run 
-this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
-the forces between the software packages are accurate to 1 part in 10,000. The remaining differences 
-are due to how the different software packages treat nonbonded interactions in the cut-off region, use
-of single precision in the computation, and other small factors that are not expected to affect the 
+A typical protein/water system with 23,000 atoms at ambient conditions with
+periodic boundary conditions and PME electrostatics has average forces on the
+order of 20 kcal/mol/Angstrom. ParmEd allows us to run this same simulation in
+OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
+the forces between the software packages are accurate to 1 part in 10,000. The
+remaining differences are due to how the different software packages treat
+nonbonded interactions in the cut-off region, use of single precision in the
+computation, and other small factors that are not expected to affect the
 simulation results.
-
