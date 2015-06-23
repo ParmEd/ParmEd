@@ -213,20 +213,11 @@ class GromacsGroFile(object):
                            a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
             dest.write('\n')
         elif not nobox and struct.atoms:
-            # Find the extent of the molecule in all dimensions
-            xdim = [struct.atoms[0].xx, struct.atoms[1].xx]
-            ydim = [struct.atoms[0].xy, struct.atoms[1].xy]
-            zdim = [struct.atoms[0].xz, struct.atoms[1].xz]
-            for atom in struct.atoms:
-                xdim[0] = min(xdim[0], atom.xx)
-                xdim[1] = max(xdim[1], atom.xx)
-                ydim[0] = min(ydim[0], atom.xy)
-                ydim[1] = max(ydim[1], atom.xy)
-                zdim[0] = min(zdim[0], atom.xz)
-                zdim[1] = max(zdim[1], atom.xz)
-            dest.write('%10.5f'*3 % ((xdim[1]-xdim[0]+5)/10,
-                                     (ydim[1]-ydim[0]+5)/10,
-                                     (zdim[1]-zdim[0]+5)/10))
+            # Find the extent of the molecule in all dimensions, and buffer it
+            # by 5 A
+            crds = struct.coordinates
+            diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
+            dest.write('%10.5f'*3 % (diff[0], diff[1], diff[2]))
             dest.write('\n')
         if own_handle:
             dest.close()

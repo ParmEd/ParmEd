@@ -19,10 +19,7 @@ from parmed import unit as u
 from collections import OrderedDict
 import copy
 import math
-try:
-    import numpy as np
-except ImportError:
-    np = None
+import numpy as np
 import os
 from parmed.tools.argumentlist import ArgumentList
 from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
@@ -365,6 +362,8 @@ class loadCoordinates(Action):
         - Amber NetCDF trajectory
         - PDB file
         - PDBx/mmCIF file
+        - Gromacs GRO file
+        - Mol2 file
     """
     usage = '<filename>'
     def init(self, arg_list):
@@ -375,43 +374,16 @@ class loadCoordinates(Action):
                 self.filename)
 
     def execute(self):
+        crd = load_file(self.filename, natom=len(self.parm.atoms),
+                        hasbox=self.parm.box is not None)
         try:
-            crd = load_file(self.filename, natom=len(self.parm.atoms),
-                            hasbox=self.parm.box is not None)
-        except FormatNotFound:
-            raise ParmError('%s file type not recognized' % self.filename)
-        if isinstance(crd, Structure):
-            # Must be mmCIF or PDB file
-            if len(crd.atoms) != len(self.parm.atoms):
-                raise ParmError('%s and %s natom incompatible' % (self.parm,
-                                self.filename))
-            for a1, a2 in zip(self.parm.atoms, crd.atoms):
-                a1.xx, a1.xy, a1.xz = a2.xx, a2.xy, a2.xz
-            if self.parm.box is not None and crd.box is not None:
-                self.parm.box = copy.copy(crd.box)
+            self.parm.coordinates = copy.copy(crd.coordinates)
+        except AttributeError:
+            raise ParmError('Cannot get coordinates from %s' % self.filename)
+        if crd.box is None or len(crd.box.shape) == 1:
+            self.parm.box = copy.copy(crd.box)
         else:
-            coords = crd.coordinates
-            if callable(coords):
-                # Usually a trajectory; take the 1st frame
-                coords = coords(0)
-            if len(coords) != 3 * len(self.parm.atoms):
-                raise ParmError('%s and %s natom incompatible' % (self.parm,
-                                self.filename))
-            for i, atom in enumerate(self.parm.atoms):
-                i3 = i * 3
-                atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
-            if self.parm.box is not None:
-                box = crd.box
-                if callable(box): box = box(0) # 1st frame of a trajectory
-                self.parm.box = copy(box)
-        if hasattr(self.parm, coords):
-            coordinates = []
-            for atom in self.parm.atoms:
-                coordinates.extend([atom.xx, atom.xy, atom.xz])
-            if np is not None:
-                self.parm.coords = np.asarray(coordinates)
-            else:
-                self.parm.coords = coordinates
+            self.parm.box = copy.copy(crd.box[0])
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -561,7 +533,7 @@ class writeOFF(Action):
     def execute(self):
         if not Action.overwrite and os.path.exists(self.off_file):
             raise FileExists('%s exists; not overwriting' % self.off_file)
-        if self.parm.coords is None:
+        if self.parm.coordinates is None:
             raise WriteOFFError('You must load a restart for WriteOFF!')
 
         lib = ResidueTemplateContainer.from_structure(self.parm).to_library()
@@ -1255,7 +1227,7 @@ class setMolecules(Action):
     def execute(self):
         owner = self.parm.rediscover_molecules(self.solute_ions)
         if owner is not None:
-            if self.parm.coords is None:
+            if self.parm.coordinates is None:
                 warnings.warn(
                         'The atoms in %s were reordered to correct molecule '
                         'ordering. Any topology printed from now on will *not* '
@@ -2280,7 +2252,7 @@ class tiMerge(Action):
                             'to be merged adjacent in the PDB file.'
                     )
 
-        if not hasattr(self.parm, 'coords'):
+        if self.parm.coordinates is None:
             raise TiMergeError('Load coordinates before merging topology.')
       
         # we now have enough info to remap the atom indicies if an atom in
@@ -2344,13 +2316,8 @@ class tiMerge(Action):
             for j in range(len(mol2common)):
                 atm_j = mol2common[j]
                 diff_count = 0
-                for k in range(3):
-                    diff = (self.parm.coords[3*atm_i + k] - 
-                            self.parm.coords[3*atm_j + k])
-                    if abs(diff) < self.tol:
-                        diff_count += 1
-
-                if diff_count == 3:
+                diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
+                if (diff.abs() < self.tol).sum() == 3:
                     mol2common_sort.append(atm_j)
 
         mol2common = mol2common_sort
@@ -2365,12 +2332,10 @@ class tiMerge(Action):
         for i in range(len(mol1common)):
             atm_i = mol1common[i]
             atm_j = mol2common[i]               
-            for k in range(3):
-                diff = (self.parm.coords[3*atm_i + k] - 
-                        self.parm.coords[3*atm_j + k])
-                if abs(diff) > self.tol:
-                    raise TiMergeError('Common (nonsoftcore) atoms must have '
-                                       'the same coordinates.')
+            diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
+            if (diff.abs() > self.tol).any():
+                raise TiMergeError('Common (nonsoftcore) atoms must have the '
+                                   'same coordinates.')
       
         for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
@@ -3371,7 +3336,7 @@ class OpenMM(Action):
         # First try to load a restart file if it was supplied
         inptraj = self.arg_list.has_key('-y', mark=False)
         has_inpcrd = self.arg_list.has_key('-c', mark=False)
-        if self.parm.coords is None and not inptraj and not has_inpcrd:
+        if self.parm.coordinates is None and not inptraj and not has_inpcrd:
             raise SimulationError('No input coordinates provided.')
         # Eliminate some incompatibilities that are easy to catch now
         if self.parm.ptr('ifbox') > 1:
@@ -3782,68 +3747,46 @@ class chamber(Action):
 
         # Read the PDB and set the box information
         if self.crdfile is not None:
-            crdbox = None # Really only ever available in a VMD-created PDB
+            crdbox = None
             # Automatic format determination
+            crd = load_file(self.crdfile)
             try:
-                crd = load_file(self.crdfile)
-            except FormatNotFound:
-                raise ChamberError('Could not determine file type format for '
-                                   'coordinate file %s' % self.crdfile)
-            if isinstance(crd, Structure):
-                # PDB or CIF?
-                try:
-                    coords = []
-                    for a in crd.atoms:
-                        coords.extend([a.xx, a.xy, a.xz])
-                except AttributeError:
-                    raise ChamberError('Coordinate file %s is not a coordinate '
-                                       'file format' % self.crdfile)
-            else:
-                try:
+                if len(crd.coordinates.shape) == 3:
+                    coords = crd.coordinates[0]
+                else:
                     coords = crd.coordinates
-                except AttributeError:
-                    raise ChamberError('Coordinate file %s is not a coordinate '
-                                       'file format' % self.crdfile)
-            if callable(coords):
-                # Must be a trajectory; take the first frame
-                coords = coords(0)
+            except AttributeError:
+                raise ChamberError('No coordinates in %s' % self.crdfile)
             if hasattr(crd, 'box') and crd.box is not None:
-                crdbox = crd.box
-            if len(coords) != len(psf.atoms) * 3:
+                if len(crd.box.shape) == 1:
+                    crdbox = crd.box
+                else:
+                    # Trajectory
+                    crdbox = crd.box[0]
+            if coords.shape != (len(psf.atoms), 3):
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
                                    '3*number of atoms (%d)' % (len(coords),
                                    3*len(psf.atoms)))
             # Set the coordinates now, since creating the parm may re-order the
             # atoms in order to maintain contiguous molecules
-            for i, atom in enumerate(psf.atoms):
-                i3 = i * 3
-                atom.xx, atom.xy, atom.xz = coords[i3:i3+3]
+            psf.coordinates = coords
             # Set the box info from self.box if set
             if self.box is None and crdbox is not None:
                 if len(crdbox) == 3:
-                    psf.box = crdbox + [90.0, 90.0, 90.0]
+                    psf.box = list(crdbox) + [90.0, 90.0, 90.0]
                 elif len(crdbox) == 6:
-                    psf.box = crdbox[:]
+                    psf.box = list(crdbox)
                 else:
                     raise ValueError('Unexpected box array shape')
             elif self.box == 'bounding':
                 # Define the bounding box
-                xmin, ymin, zmin = coords[:3]
-                xmax, ymax, zmax = xmin, ymin, zmin
-                for i in range(1, len(psf.atoms)):
-                    i3 = i * 3
-                    xmin = min(xmin, coords[i3  ])
-                    xmax = max(xmax, coords[i3  ])
-                    ymin = min(ymin, coords[i3+1])
-                    ymax = max(ymax, coords[i3+1])
-                    zmin = min(zmin, coords[i3+2])
-                    zmax = max(zmax, coords[i3+2])
-                psf.box = [xmax-xmin, ymax-ymin, zmax-zmin, 90.0, 90.0, 90.0]
+                extent = coords.max(axis=0) - coords.min(axis=0)
+                psf.box = list(extent) + [90.0, 90.0, 90.0]
             elif self.box is not None:
                 if len(self.box) == 3:
-                    psf.box = self.box + [90.0, 90.0, 90.0]
+                    psf.box = list(self.box) + [90.0, 90.0, 90.0]
                 elif len(self.box) == 6:
-                    psf.box = self.box[:]
+                    psf.box = copy.copy(self.box)
                 else:
                     raise ValueError('Unexpected box array shape')
             else:
@@ -3854,8 +3797,8 @@ class chamber(Action):
                 psf.box = None
             else:
                 if len(self.box) == 3:
-                    psf.box = self.box + [90.0, 90.0, 90.0]
-                elif len(crdbox) == 6:
+                    psf.box = list(self.box) + [90.0, 90.0, 90.0]
+                elif len(self.box) == 6:
                     psf.box = self.box[:]
                 else:
                     raise ValueError('Unexpected box array shape')
@@ -3997,7 +3940,7 @@ class minimize(Action):
         if not HAS_OPENMM:
             raise SimulationError('OpenMM could not be imported. Skipping.')
 
-        if not hasattr(self.parm, 'coords'):
+        if self.parm.coordinates is None:
             raise SimulationError('You must load coordinates before "minimize"')
         minimize(self.parm, self.igb, self.saltcon, self.cutoff,
                  self.restrain, self.weight, self.script, self.platform,
@@ -4021,7 +3964,7 @@ class outPDB(Action):
         self.charmm = arg_list.has_key('charmm')
         self.anisou = arg_list.has_key('anisou')
         self.filename = arg_list.get_next_string()
-        if self.parm.coords is None:
+        if self.parm.coordinates is None:
             raise InputError('Parm %s does not have loaded coordinates' %
                              self.parm)
 
@@ -4057,7 +4000,7 @@ class outCIF(Action):
         self.renumber = not arg_list.has_key('norenumber')
         self.anisou = arg_list.has_key('anisou')
         self.filename = arg_list.get_next_string()
-        if self.parm.coords is None:
+        if self.parm.coordinates is None:
             raise InputError('Parm %s does not have loaded coordinates' %
                              self.parm)
 

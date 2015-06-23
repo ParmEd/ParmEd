@@ -5,7 +5,6 @@ interaction with the various NetCDF-Python APIs that are available, namely
     -  scipy
     -  netCDF4
     -  ScientificPython
-    -  pynetcdf
 
 This module contains objects relevant to Amber NetCDF files. The use() function
 is responsible for selecting the API based on a default choice or user-selection
@@ -23,7 +22,7 @@ import warnings
 # This determines which NetCDF package we're going to use...
 NETCDF_PACKAGE = None
 
-ALLOWED_NETCDF_PACKAGES = ('netCDF4', 'Scientific', 'pynetcdf', 'scipy')
+ALLOWED_NETCDF_PACKAGES = ('netCDF4', 'Scientific', 'scipy')
 
 NETCDF_INITIALIZED = False
 SELECTED_NETCDF = ''
@@ -63,16 +62,6 @@ except ImportError:
     _HAS_SCIENTIFIC_PYTHON = False
 
 try:
-    from pynetcdf.NetCDF import NetCDFFile as pynNetCDFFile
-    pynopen_netcdf = lambda name, mode: pynNetCDFFile(name, mode)
-    pynget_int_dimension = lambda obj, name: obj.dimensions[name]
-    pynget_float = lambda obj, name: obj.variables[name].getValue()
-    _HAS_PYNETCDF = True
-except ImportError:
-    pynopen_netcdf = pynget_int_dimension = pynget_float = None
-    _HAS_PYNETCDF = False
-
-try:
     from scipy.io.netcdf import netcdf_file as spNetCDFFile
     spopen_netcdf = lambda name, mode: spNetCDFFile(name, mode)
     spget_int_dimension = lambda obj, name: obj.dimensions[name]
@@ -104,7 +93,7 @@ def use(package=None):
     ----------
     package : str
         This specifies which package to use, and may be either scipy, netCDF4,
-        Scientific/ScientificPython, pynetcdf, or None.  If None, it chooses the
+        Scientific/ScientificPython, or None.  If None, it chooses the
         first available implementation from the above list (in that order).
 
     Notes
@@ -115,10 +104,6 @@ def use(package=None):
     useful for development testing as the backend NetCDF choice is virtually
     invisible to the user.
 
-    The pynetcdf implementation has long since been abandoned (ca. 2006), and is
-    not recommended for use. It appears to parse NetCDF files just fine, but it
-    does not seem to write them successfully according to my tests.
-    
     The NetCDF files have been tested against netCDF v. 1.0.4, Scientific
     v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to work barring
     backwards-incompatible changes. Other versions are expected to work barring
@@ -148,11 +133,6 @@ def use(package=None):
             get_int_dimension = sciget_int_dimension
             get_float = sciget_float
             SELECTED_NETCDF = 'ScientificPython'
-        elif _HAS_PYNETCDF:
-            open_netcdf = pynopen_netcdf
-            get_int_dimension = pynget_int_dimension
-            get_float = pynget_float
-            SELECTED_NETCDF = 'pynetcdf'
     elif package == 'netCDF4':
         if not _HAS_NC4:
             raise ImportError('Could not find netCDF4 package')
@@ -173,17 +153,6 @@ def use(package=None):
         open_netcdf = spopen_netcdf
         get_int_dimension = spget_int_dimension
         get_float = spget_float
-    elif package == 'pynetcdf':
-        if not _HAS_PYNETCDF:
-            raise ImportError('Could not find package pynetcdf')
-        warnings.warn('pynetcdf is no longer maintained and may not work '
-                      'properly. If you experience problems, try installing a '
-                      'different NetCDF package like Scientific, scipy, or '
-                      'netCDF4.')
-        open_netcdf = pynopen_netcdf
-        get_int_dimension = pynget_int_dimension
-        get_float = pynget_float
-        SELECTED_NETCDF = 'pynetcdf'
     else:
         raise ImportError('%s not a valid NetCDF package. Available options '
                           'are %s' % (package, 
@@ -192,14 +161,8 @@ def use(package=None):
     
     NETCDF_INITIALIZED = True # We have now selected a NetCDF implementation
 
+import numpy as np
 from parmed import __version__
-try:
-    import numpy as np
-except ImportError:
-    # This is just to prevent NetCDF imports from bringing everything down if
-    # numpy is not available. np can be used inside any method since it will be
-    # required for any NetCDF to work in the first place.
-    np = None
 
 def needs_netcdf(fcn):
     """
@@ -432,18 +395,19 @@ class NetCDFRestart(object):
 
     @property
     def coordinates(self):
-        return self._ncfile.variables['coordinates'][:].flatten()
+        coords = self._ncfile.variables['coordinates'][:]
+        return coords.reshape((1, self.atom, 3))
 
     @coordinates.setter
     def coordinates(self, stuff):
-        self._ncfile.variables['coordinates'][:] = \
-                                np.reshape(stuff, (self.atom, 3))
+        stuff = np.array(stuff, copy=False).reshape((self.atom, 3))
+        self._ncfile.variables['coordinates'][:] = stuff
         self.flush()
 
     @property
     def velocities(self):
-        return (self._ncfile.variables['velocities'][:].flatten() *
-                self.velocity_scale)
+        vels = self._ncfile.variables['velocities'][:]
+        return (vels.reshape((-1, self.atom, 3)) * self.velocity_scale)
 
     @velocities.setter
     def velocities(self, stuff):
@@ -753,41 +717,37 @@ class NetCDFTraj(object):
         inst.hasfrcs = 'forces' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
                        'cell_angles' in ncfile.variables)
+        if inst.hascrds:
+            inst._coordinates = np.array(ncfile.variables['coordinates'][:])
         if inst.hasvels:
-            inst.velocity_scale = ncfile.variables['velocities'].scale_factor
+            try:
+                scale = ncfile.variables['velocities'].scale_factor
+            except AttributeError:
+                scale = 1
             try:
                 # Prevent NetCDF4 from trying to autoscale the values. Ugh.
                 ncfile.variables['velocities'].set_auto_maskandscale(False)
             except AttributeError:
                 # Other packages do not have this variable.
                 pass
+            inst._velocities = np.array(ncfile.variables['velocities'][:])*scale
+            inst.velocity_scale = scale
+        if inst.hasfrcs:
+            inst._forces = np.array(ncfile.variables['forces'][:])
         if inst.frame is None:
             if 'time' in ncfile.variables:
                 inst.frame = len(ncfile.variables['time'][:])
             elif inst.hascrds:
-                inst.frame = len(ncfile.variables['coordinates'][:])
+                inst.frame = inst._coordinates.shape[0]
             elif inst.hasvels:
-                inst.frame = len(ncfile.variables['velocities'][:])
+                inst.frame = inst._velocities.shape[0]
             elif inst.hasfrcs:
-                inst.frame = len(ncfile.variables['forces'][:])
+                inst.frame = inst._forces.shape[0]
         return inst
 
-    def coordinates(self, frame):
-        """
-        Get the coordinates of a particular frame in the trajectory
-    
-        Parameters
-        ----------
-        frame : int
-            Which snapshot to get (first snapshot is frame 0)
-    
-        Returns
-        -------
-        coordinates
-            numpy array of length 3*natom with the given coordinates in the
-            format [x1, y1, z1, x2, y2, z2, ...] in Angstroms
-        """
-        return self._ncfile.variables['coordinates'][frame][:].flatten()
+    @property
+    def coordinates(self):
+        return self._coordinates
 
     def add_coordinates(self, stuff):
         """
@@ -811,23 +771,9 @@ class NetCDFTraj(object):
         self._last_crd_frame += 1
         self.flush()
 
-    def velocities(self, frame):
-        """
-        Get the velocities of a particular frame in the trajectory
-
-        Parameters
-        ----------
-        frame : int
-            Which snapshot to get (first snapshot is frame 0)
-
-        Returns
-        -------
-        velocities
-            numpy array of length 3*atom with the given velocities properly
-            scaled to be of units angstrom/picosecond
-        """
-        return (self._ncfile.variables['velocities'][frame][:].flatten() * 
-                self.velocity_scale)
+    @property
+    def velocities(self):
+        return self._velocities
 
     def add_velocities(self, stuff):
         """
@@ -851,22 +797,9 @@ class NetCDFTraj(object):
         self._last_vel_frame += 1
         self.flush()
 
-    def forces(self, frame):
-        """
-        Get the forces of a particular frame in the trajectory
-
-        Parameters
-        ----------
-        frame : int
-            Which snapshot to get (first snapshot is frame 0)
-
-        Returns
-        -------
-        forces
-            numpy array of length 3*atom with the given forces properly
-            scaled to be of kcal/mol/Angstroms
-        """
-        return (self._ncfile.variables['forces'][frame][:].flatten())
+    @property
+    def forces(self):
+        return self._forces
 
     def add_forces(self, stuff):
         """
@@ -889,40 +822,13 @@ class NetCDFTraj(object):
         self._last_frc_frame += 1
         self.flush()
 
-    def cell_lengths_angles(self, frame):
-        """
-        Get the cell lengths and cell angles of a particular frame in the
-        trajectory
+    @property
+    def cell_lengths_angles(self):
+        return np.hstack((self._ncfile.variables['cell_lengths'][:],
+                          self._ncfile.variables['cell_angles'][:]))
 
-        Parameters
-        ----------
-        frame : int
-            Which snapshot to get (first snapshot is frame 0)
+    box = cell_lengths_angles
 
-        Returns
-        -------
-        lengths, angles
-            2-element tuple: (length-3 numpy array of cell lengths, length-3
-            numpy array of cell angles) in Angstroms
-        """
-        return (self._ncfile.variables['cell_lengths'][frame][:],
-                self._ncfile.variables['cell_angles'][frame][:])
-
-    def box(self, frame):
-        """
-        Get the cell lengths and angles as one array
-
-        Parameters
-        ----------
-        frame : int
-            Frame to get the box from
-
-        Returns
-        -------
-            6-element array with 3 lengths followed by 3 angles (in degrees)
-        """
-        return np.concatenate(self.cell_lengths_angles(frame))
-   
     def add_cell_lengths_angles(self, lengths, angles=None):
         """
         Adds a new cell length and angle frame to the end of a NetCDF
@@ -961,21 +867,9 @@ class NetCDFTraj(object):
 
     add_box = add_cell_lengths_angles
 
-    def time(self, frame):
-        """
-        Get the time of a particular frame in the trajectory
-
-        Parameters
-        ----------
-        frame : int
-            Which snapshot to get (first snapshot is frame 0)
-
-        Returns
-        -------
-        time : float
-            The time of the given frame in ps
-        """
-        return self._ncfile.variables['time'][frame]
+    @property
+    def time(self):
+        return self._ncfile.variables['time'][:]
 
     def add_time(self, stuff):
         """ Adds the time to the current frame of the NetCDF file
@@ -990,15 +884,9 @@ class NetCDFTraj(object):
         self._last_time_frame += 1
         self.flush()
 
-    def remd_indices(self, frame):
-        """ Returns the REMD indices for the desired frame
-
-        Parameters
-        ----------
-        frame : int
-            The frame to get the REMD indices from (0 is the first frame)
-        """
-        return self._ncfile.variables['remd_indices'][frame][:]
+    @property
+    def remd_indices(self):
+        return self._ncfile.variables['remd_indices'][:]
 
     def add_remd_indices(self, stuff):
         """ Add REMD indices to the current frame of the NetCDF file
@@ -1013,15 +901,9 @@ class NetCDFTraj(object):
         self._last_remd_frame += 1
         self.flush()
 
-    def temp0(self, frame):
-        """ Returns the temperature of the current frame in kelvin
-
-        Parameters
-        ----------
-        frame : int
-            The frame to get the temperature from (0 is the first frame)
-        """
-        return self._ncfile.variables['temp0'][frame]
+    @property
+    def temp0(self):
+        return self._ncfile.variables['temp0']
 
     def add_temp0(self, stuff):
         """ The temperature to add to the current frame of the NetCDF file

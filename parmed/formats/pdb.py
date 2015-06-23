@@ -220,12 +220,6 @@ class PDBFile(object):
             The Structure object initialized with all of the information from
             the PDB file.  No bonds or other topological features are added by
             default.
-    
-        Notes
-        -----
-        The returned structure has an extra attribute, pdbxyz, that contains all
-        of the coordinates for all of the frames in the PDB file as a list of
-        NATOM*3 lists.
         """
         if isinstance(filename, string_types):
             own_handle = True
@@ -541,7 +535,8 @@ class PDBFile(object):
             if len(coordinates) != 3*len(struct.atoms):
                 raise ValueError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
-        struct.pdbxyz = all_coordinates
+        struct._coordinates = np.array(all_coordinates).reshape(
+                        (-1, len(struct.atoms), 3))
         return struct
 
     #===================================================
@@ -902,12 +897,6 @@ class CIFFile(object):
             the PDBx/mmCIF file.  No bonds or other topological features are
             added by default. If multiple structures are defined in the CIF
             file, multiple Structure instances will be returned as a tuple.
-
-        Notes
-        -----
-        The returned structure has an extra attribute, pdbxyz, that contains all
-        of the coordinates for all of the frames in the PDB file as a list of
-        NATOM*3 lists.
         """
         if isinstance(filename, string_types):
             own_handle = True
@@ -1012,6 +1001,7 @@ class CIFFile(object):
             modelid = atoms.getAttributeIndex('pdbx_PDB_model_num')
             origmodel = None
             lastmodel = None
+            all_coords = []
             xyz = []
             atommap = dict()
             last_atom = Atom()
@@ -1092,10 +1082,10 @@ class CIFFile(object):
                     if model == lastmodel:
                         xyz.extend([x, y, z])
                     else:
-                        if lastmodel == origmodel:
-                            struct.pdbxyz = [xyz]
-                        else:
-                            struct.pdbxyz.append(xyz)
+                        if all_coords and len(xyz) != len(all_coords[-1]):
+                            raise ValueError('All frames must have same number '
+                                             'of atoms')
+                        all_coords.append(xyz)
                         xyz = []
                 # Keep a mapping in case we need to go back and add attributes,
                 # like anisotropic b-factors
@@ -1174,11 +1164,10 @@ class CIFFile(object):
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
                                      'same atoms')
-                try:
-                    struct.pdbxyz.append(xyz)
-                except AttributeError:
-                    # Hasn't been assigned yet
-                    struct.pdbxyz = xyz
+                all_coords.append(xyz)
+            if all_coords:
+                struct._coordinates = np.array(all_coords).reshape(
+                            (-1, len(struct.atoms), 3))
 
         # Build the return value
         if len(structures) == 1:
@@ -1297,7 +1286,7 @@ class CIFFile(object):
                         a = item
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
-            raise Exception("Should not be here!")
+            assert False, 'Should not be here'
         # Now add the atom section. Include all names that the CIF standard
         # usually includes, but put '?' in sections that contain data we don't
         # store in the Structure, Residue, or Atom classes
@@ -1313,9 +1302,6 @@ class CIFFile(object):
                  'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
                  'pdbx_PDB_model_num']
         )
-        # Generator expression here instead of list comp, since the generator
-        # need only execute until the first True (no point in wasting the time
-        # or space creating the entire list just to see if one is True...)
         write_anisou = write_anisou and any(atom.anisou is not None
                                             for atom in struct.atoms)
         if write_anisou:

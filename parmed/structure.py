@@ -1415,7 +1415,10 @@ class Structure(object):
             # Wipe out coordinates
             self._coordinates = None
             for atom in self.atoms:
-                del atom.xx, atom.xy, atom.xz
+                try:
+                    del atom.xx, atom.xy, atom.xz
+                except AttributeError:
+                    pass
         else:
             if u.is_quantity(value):
                 value = value.value_in_unit(u.angstroms)
@@ -1491,11 +1494,14 @@ class Structure(object):
     @property
     def velocities(self):
         """
-        A list of 3-element Quantity tuples of dimension length representing the
-        atomic velocities for every atom in the system
+        A (natom, 3)-shape numpy array with atomic velocities for every atom in
+        the system (in units of angstrom/picosecond), or None if there are no
+        velocities
         """
-        unit = u.angstroms / u.picoseconds
-        return [Vec3(a.vx,a.vy,a.vz) for a in self.atoms] * unit
+        try:
+            return np.array([[a.vx, a.vy, a.vz] for a in self.atoms])
+        except AttributeError:
+            return None
 
     @velocities.setter
     def velocities(self, value):
@@ -1505,17 +1511,16 @@ class Structure(object):
         """
         if u.is_quantity(value):
             value = value.value_in_unit(u.angstroms/u.picoseconds)
-        # See if the array is flattened
-        if len(value) == len(self.atoms):
-            # It had better all be 3-length iterables
-            for i, atom in enumerate(self.atoms):
-                atom.vx, atom.vy, atom.vz = value[i]
-        elif len(value) == 3 * len(self.atoms):
-            for i, atom in enumerate(self.atoms):
-                i3 = i * 3
-                atom.vx, atom.vy, atom.vz = value[i3:i3+3]
+        if value is None:
+            for atom in self.atoms:
+                try:
+                    del atom.vx, atom.vy, atom.vz
+                except AttributeError:
+                    pass
         else:
-            raise ValueError('Wrong shape for velocities array')
+            value = np.array(value, copy=False).reshape((-1,len(self.atoms),3))
+            for i, atom in enumerate(self.atoms):
+                atom.vx, atom.vy, atom.vz = value[0][i]
 
     #===================================================
 

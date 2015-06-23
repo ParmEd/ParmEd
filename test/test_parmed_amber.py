@@ -3,7 +3,7 @@ Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
 from utils import get_fn, has_numpy
-from array import array
+import numpy as np
 from parmed.amber import readparm, asciicrd, mask
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types
@@ -52,13 +52,8 @@ class TestReadParm(unittest.TestCase):
         coords = rst.coordinates
         vels = rst.vels
         for i, atom in enumerate(gasparm.atoms):
-            i3 = i * 3
-            self.assertEqual(coords[i3  ], atom.xx)
-            self.assertEqual(coords[i3+1], atom.xy)
-            self.assertEqual(coords[i3+2], atom.xz)
-            self.assertEqual(vels[i3  ], atom.vx)
-            self.assertEqual(vels[i3+1], atom.vy)
-            self.assertEqual(vels[i3+2], atom.vz)
+            np.testing.assert_allclose(coords[0,i], [atom.xx, atom.xy, atom.xz])
+            np.testing.assert_allclose(vels[0,i], [atom.vx, atom.vy, atom.vz])
 
     def testRemakeParm(self):
         """ Tests the rebuilding of the AmberParm raw data structures """
@@ -211,30 +206,12 @@ class TestCoordinateFiles(unittest.TestCase):
         mdcrd = asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'),
                                     natom=5827, hasbox=True, mode='r')
         self.assertEqual(mdcrd.frame, 10)
-        if has_numpy():
-            import numpy as np
-            self.assertIsInstance(mdcrd.coordinates(0), np.ndarray)
-            # Hack numpy off so we test that code path, too
-            asciicrd.np = None
-            asciicrd.array = array
-            mdcrdarray = asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'),
-                                             natom=5827, hasbox=True, mode='r')
-            asciicrd.np = np
-        else:
-            mdcrdarray = mdcrd
-        self.assertIsInstance(mdcrdarray.coordinates(0), array)
+        self.assertIsInstance(mdcrd.coordinates, np.ndarray)
 
-        if has_numpy():
-            runsum = 0
-            for i in range(10):
-                arr1 = mdcrd.coordinates(i)
-                arr2 = mdcrdarray.coordinates(i)
-                runsum += arr1.sum()
-                self.assertAlmostEqual(arr1.sum(), sum(arr2), places=3)
-        else:
-            runsum = 0
-            for i in range(10):
-                runsum += sum(mdcrdarray.coordinates(i))
+        runsum = 0
+        for i in range(10):
+            arr1 = mdcrd.coordinates[i]
+            runsum += arr1.sum()
         self.assertAlmostEqual(runsum, 7049.817, places=3)
 
     def testRestart(self):
@@ -243,21 +220,8 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertEqual(restart.natom, 5293)
         self.assertTrue(restart.hasbox)
         self.assertFalse(restart.hasvels)
-        if has_numpy():
-            import numpy as np
-            self.assertIsInstance(restart.coordinates, np.ndarray)
-            # Hack numpy off so we test that code path, too
-            asciicrd.np = None
-            asciicrd.array = array
-            restartarray = asciicrd.AmberAsciiRestart(
-                                        get_fn('tz2.ortho.rst7'), 'r')
-            self.assertAlmostEqual(restart.coordinates.sum(),
-                                   sum(restartarray.coordinates), places=4)
-            crdsum = restart.coordinates.sum()
-        else:
-            restartarray = restart
-            crdsum = sum(restart.coordinates)
-        self.assertIsInstance(restartarray.coordinates, array)
+        self.assertIsInstance(restart.coordinates, np.ndarray)
+        crdsum = restart.coordinates.sum()
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
 class TestAmberMask(unittest.TestCase):
@@ -468,10 +432,8 @@ class TestWriteFiles(unittest.TestCase):
         rst.close()
         self._check_written_restarts(box)
 
-    @unittest.skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberRestartNumpy(self):
         """ Test writing Amber restart file passing numpy arrays """
-        import numpy as np
         Restart = asciicrd.AmberAsciiRestart
         box = np.asarray([10, 10, 10, 90, 90, 90])
         rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
@@ -519,10 +481,8 @@ class TestWriteFiles(unittest.TestCase):
         crd.close()
         self._check_written_mdcrds(box)
 
-    @unittest.skipIf(not has_numpy(), "Cannot test without numpy")
     def testAmberMdcrdNumpy(self):
         """ Test writing ASCII trajectory file passing numpy arrays """
-        import numpy as np
         box = np.asarray([15, 15, 15])
         Mdcrd = asciicrd.AmberMdcrd
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=False,
@@ -592,31 +552,27 @@ class TestWriteFiles(unittest.TestCase):
         rst = readparm.Rst7.open(get_fn('testc.rst7', written=True))
         self.assertFalse(rst.hasbox)
         self.assertFalse(rst.hasvels)
-        for x1, x2 in zip(rst.coordinates, range(27)):
-            self.assertEqual(x1, x2)
+        np.testing.assert_equal(rst.coordinates.flatten(), list(range(27)))
         rst = readparm.Rst7.open(get_fn('testcb.rst7', written=True))
         self.assertTrue(rst.hasbox)
         self.assertFalse(rst.hasvels)
-        for x1, x2 in zip(rst.coordinates, range(21)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.box, box):
-            self.assertEqual(x1, x2)
+        np.testing.assert_equal(rst.coordinates.flatten(), list(range(21)))
+        np.testing.assert_equal(rst.box.flatten(), box)
         rst = readparm.Rst7.open(get_fn('testcv.rst7', written=True))
         self.assertTrue(rst.hasvels)
         self.assertFalse(rst.hasbox)
-        for x1, x2 in zip(rst.coordinates, range(60)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.vels, reversed(range(60))):
-            self.assertAlmostEqual(x1, x2, places=5)
+        np.testing.assert_equal(rst.coordinates,
+                np.arange(60).reshape(rst.coordinates.shape))
+        np.testing.assert_allclose(rst.velocities,
+                np.array(list(reversed(range(60)))).reshape(rst.velocities.shape))
         rst = readparm.Rst7.open(get_fn('testcvb.rst7', written=True))
         self.assertTrue(rst.hasvels)
         self.assertTrue(rst.hasbox)
-        for x1, x2 in zip(rst.coordinates, range(45)):
-            self.assertEqual(x1, x2)
-        for x1, x2 in zip(rst.vels, reversed(range(45))):
-            self.assertAlmostEqual(x1, x2, places=5)
-        for x1, x2 in zip(rst.box, box):
-            self.assertEqual(x1, x2)
+        np.testing.assert_equal(rst.coordinates,
+                np.arange(45).reshape(rst.coordinates.shape))
+        np.testing.assert_allclose(rst.velocities,
+                np.array(list(reversed(range(45)))).reshape(rst.velocities.shape))
+        np.testing.assert_equal(rst.box, box)
 
     def _check_written_mdcrds(self, box):
         # Now try to read them and verify the information
@@ -625,11 +581,12 @@ class TestWriteFiles(unittest.TestCase):
         self.assertEqual(crd.title, 'Test file')
         self.assertFalse(crd.hasbox)
         for i in range(crd.frame):
-            for x1, x2 in zip(crd.coordinates(i), [x+i for x in range(45)]):
-                self.assertEqual(x1, x2)
-        for i, array in enumerate(crd.coordinates()):
-            for x1, x2 in zip(array, [x+i for x in range(45)]):
-                self.assertEqual(x1, x2)
+            shape = crd.coordinates[i].shape
+            refcrd = np.arange(45) + i
+            np.testing.assert_equal(crd.coordinates[i], refcrd.reshape(shape))
+        for i, array in enumerate(crd.coordinates):
+            refcrd = (np.arange(45) + i).reshape(array.shape)
+            np.testing.assert_equal(array, refcrd)
         crd.close()
 
         crd = asciicrd.AmberMdcrd(get_fn('testcb.mdcrd', written=True),
@@ -637,15 +594,12 @@ class TestWriteFiles(unittest.TestCase):
         self.assertEqual(crd.title, 'Test file')
         self.assertTrue(crd.hasbox)
         for i in range(crd.frame):
-            for x1, x2 in zip(crd.coordinates(i), [x+i for x in range(54)]):
-                self.assertEqual(x1, x2)
-            for x1, x2 in zip(crd.box(i), box):
-                self.assertEqual(x1, x2)
-        for i, (coords, mybox) in enumerate(zip(crd.coordinates(), crd.box())):
-            for x1, x2 in zip(coords, [x+i for x in range(45)]):
-                self.assertEqual(x1, x2)
-            for x1, x2 in zip(mybox, box):
-                self.assertEqual(x1, x2)
+            refcrd = (np.arange(54) + i).reshape(crd.coordinates[i].shape)
+            np.testing.assert_equal(crd.coordinates[i], refcrd)
+            np.testing.assert_equal(crd.box[i], box)
+        for i, (coords, mybox) in enumerate(zip(crd.coordinates, crd.box)):
+            np.testing.assert_equal(coords, (np.arange(54)+i).reshape(coords.shape))
+            np.testing.assert_equal(mybox, box)
 
 class TestObjectAPIs(unittest.TestCase):
     """ Tests various object APIs """

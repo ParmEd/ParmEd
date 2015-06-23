@@ -4,7 +4,7 @@ Tests the functionality in the parmed.unit package.
 from __future__ import division
 
 import utils
-from utils import has_numpy, numpy as np
+import numpy as np
 from parmed import unit as u
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
@@ -639,7 +639,6 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
-@unittest.skipIf(not has_numpy(), "Cannot test without numpy")
 class TestNumpyUnits(QuantityTestCase):
 
     def testNumpyQuantity(self):

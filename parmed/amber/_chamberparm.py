@@ -187,19 +187,12 @@ class ChamberParm(AmberParm):
                 or abs(struct.box[5] - 90) > TINY):
             inst.parm_data['POINTERS'][IFBOX] = 2
             inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = ([struct.box[3]] +
+                                               list(struct.box[:3]))
         else:
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
-            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
-        try:
-            coords = []
-            for atom in struct.atoms:
-                coords.extend([atom.xx, atom.xy, atom.xz])
-        except AttributeError:
-            raise
-        else:
-            inst.load_coordinates(coords)
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
