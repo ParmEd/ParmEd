@@ -71,8 +71,7 @@ except ImportError:
     spopen_netcdf = spget_int_dimension = spget_float = None
     _HAS_SCIPY_NETCDF = False
 
-HAS_NETCDF = (_HAS_NC4 or _HAS_SCIENTIFIC_PYTHON or 
-              _HAS_PYNETCDF or _HAS_SCIPY_NETCDF)
+HAS_NETCDF = (_HAS_NC4 or _HAS_SCIENTIFIC_PYTHON or _HAS_SCIPY_NETCDF)
 
 def _coerce_to_string(string, encoding='ascii'):
     """
@@ -113,7 +112,7 @@ def use(package=None):
     global HAS_NETCDF, SELECTED_NETCDF, nc4open_netcdf, nc4get_int_dimension
     global nc4get_float, sciopen_netcdf, sciget_int_dimension, sciget_float
     global pynopen_netcdf, pynget_int, pynget_float, ALLOWED_NETCDF_PACKAGES
-    global _HAS_NC4, _HAS_SCIENTIFIC_PYTHON, _HAS_PYNETCDF, _HAS_SCIPY_NETCDF
+    global _HAS_NC4, _HAS_SCIENTIFIC_PYTHON, _HAS_SCIPY_NETCDF
 
     if package is None:
         if NETCDF_INITIALIZED:
