@@ -45,6 +45,7 @@ class BaseUnit(object):
     For example, meter_base_unit could be a BaseUnit for the length dimension.
     The BaseUnit class is used internally in the more general Unit class.
     '''
+    __array_priority__ = 100
 
     def __init__(self, base_dim, name, symbol):
         """Creates a new BaseUnit.

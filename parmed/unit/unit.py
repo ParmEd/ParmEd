@@ -50,6 +50,9 @@ class Unit(object):
     """
     Physical unit such as meter or ampere.
     """
+
+    __array_priority__ = 100
+
     def __init__(self, base_or_scaled_units):
         """Create a new Unit.
 
@@ -496,6 +499,8 @@ class ScaledUnit(object):
     ScaledUnit and BaseUnit are both used in the internals of Unit.  They
     should only be used during the construction of Units.
     """
+    __array_priority__ = 100
+
     def __init__(self, factor, master, name, symbol):
         self.factor = factor
         # Convert to one base_unit per dimension
