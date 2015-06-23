@@ -2,6 +2,10 @@
 Tests the functionality in parmed.modeller
 """
 import utils
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from parmed import Atom, read_PDB
 from parmed.exceptions import AmberWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
@@ -395,6 +399,15 @@ class TestAmberOFFLibrary(unittest.TestCase):
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
+
+    @unittest.skipIf(pd is None, "Cannot test without pandas")
+    def testDataFrame(self):
+        """ Test converting ResidueTemplate to a DataFrame """
+        offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
+        df = offlib['ALA'].to_dataframe()
+        self.assertEqual(df.shape, (10, 26))
+        self.assertAlmostEqual(df.charge.sum(), 0)
+        self.assertEqual(df.atomic_number.sum(), 38)
 
     def _check_read_written_libs(self, offlib, offlib2):
         # Check that offlib and offlib2 are equivalent

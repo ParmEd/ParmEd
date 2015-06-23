@@ -605,7 +605,7 @@ class Quantity(object):
         return bool(self._value)
 
     def __bool__(self):
-        return self.__nonzero__()
+        return bool(self._value)
 
     def __complex__(self):
         return Quantity(complex(self._value), self.unit)
