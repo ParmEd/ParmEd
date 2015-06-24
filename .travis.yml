@@ -17,7 +17,7 @@ script:
     # them
     - export PARMED_SKIP_BIG_TESTS=1
     # Print out the version of OpenMM we're using
-    - test -z $MINIMAL_PACKAGES && python -c "import simtk.openmm as mm; print('OPENMM VERSION = %s [git rev. %s]' % (mm.version.full_version, mm.version.git_revision))"
+    - test -z $MINIMAL_PACKAGES && python -c "import simtk.openmm as mm; print('OPENMM VERSION = %s [git rev. %s]' % (mm.version.full_version, mm.version.git_revision))") || true
     - cd test
     - echo "Using `which python` (`python -V`)::"
     - nosetests -vs .
