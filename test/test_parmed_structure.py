@@ -3,9 +3,10 @@ Tests the parmed/structure module
 """
 from __future__ import division
 
-from utils import create_random_structure
+import numpy as np
 import parmed.structure as structure
 from parmed.topologyobjects import *
+import parmed.unit as u
 from parmed.utils.six import integer_types
 from parmed.utils.six.moves import range, zip
 from copy import copy
@@ -13,6 +14,7 @@ import random
 import string
 import unittest
 import os
+from utils import create_random_structure
 
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """
@@ -77,6 +79,112 @@ class TestStructureAPI(unittest.TestCase):
                              len(residue))
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
+
+    def testBoxHandling(self):
+        """ Tests that Structure.box is always the expected type """
+        s = create_random_structure(parametrized=False)
+        self.assertIs(s.box, None)
+        s.box = [10, 10, 10, 90, 90, 90]
+        self.assertIsInstance(s.box, np.ndarray)
+        self.assertEqual(s.box[0], 10)
+        self.assertEqual(s.box[1], 10)
+        self.assertEqual(s.box[2], 10)
+        self.assertEqual(s.box[3], 90)
+        self.assertEqual(s.box[4], 90)
+        self.assertEqual(s.box[5], 90)
+        s.box = np.array([10, 10, 10, 90, 90, 90], dtype=np.float64)
+        self.assertIsInstance(s.box, np.ndarray)
+        self.assertEqual(s.box[0], 10)
+        self.assertEqual(s.box[1], 10)
+        self.assertEqual(s.box[2], 10)
+        self.assertEqual(s.box[3], 90)
+        self.assertEqual(s.box[4], 90)
+        self.assertEqual(s.box[5], 90)
+        s.box = [10*u.angstroms, 10*u.angstroms, 10*u.angstroms,
+                 90*u.degrees, 90*u.degrees, 90*u.degrees]
+        self.assertIsInstance(s.box, np.ndarray)
+        self.assertEqual(s.box[0], 10)
+        self.assertEqual(s.box[1], 10)
+        self.assertEqual(s.box[2], 10)
+        self.assertEqual(s.box[3], 90)
+        self.assertEqual(s.box[4], 90)
+        self.assertEqual(s.box[5], 90)
+
+    def testBadBoxHandling(self):
+        """ Tests error handling when Structure.box is improperly assigned """
+        s = create_random_structure(parametrized=True)
+        def wrong_number_of_args():
+            s.box = [0, 1, 2, 3, 4]
+        def wrong_number_of_args2():
+            s.box = [0, 1, 2, 3, 4, 5, 6]
+        self.assertRaises(ValueError, wrong_number_of_args)
+        self.assertRaises(ValueError, wrong_number_of_args2)
+        try:
+            wrong_number_of_args()
+        except ValueError as err:
+            self.assertIn('6', str(err))
+        # Try wrong units
+        for i in range(6):
+            box = [10, 10, 10, 90, 90, 90]
+            box[i] *= u.liters
+            def func():
+                s.box = box
+            self.assertRaises(TypeError, func)
+
+    def testCoordinates(self):
+        """ Tests coordinate handling in Structure """
+        s = create_random_structure(parametrized=False)
+        self.assertIs(s.coordinates, None)
+        natom = len(s.atoms)
+        # Make sure coordinates will be generated from Atom.xx, xy, xz if not
+        # otherwise generated
+        xyz = np.random.random((natom, 3))
+        for a, x in zip(s.atoms, xyz):
+            a.xx, a.xy, a.xz = x
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        np.testing.assert_equal(s.coordinates, xyz[:,:])
+        self.assertIs(s._coordinates, None)
+        # Now set multiple frames
+        xyz = np.random.random((5, natom, 3)).tolist()
+        s.coordinates = xyz
+        self.assertIsInstance(s.coordinates, np.ndarray)
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        for a, x in zip(s.atoms, xyz[0]):
+            self.assertEqual(a.xx, x[0])
+            self.assertEqual(a.xy, x[1])
+            self.assertEqual(a.xz, x[2])
+        np.testing.assert_equal(s.get_coordinates('all'), xyz)
+        for i in range(5):
+            np.testing.assert_equal(s.get_coordinates(i), xyz[i])
+        # Now try setting with units
+        xyz = u.Quantity(np.random.random((3, natom, 3)), u.nanometers)
+        s.coordinates = xyz
+        self.assertIsInstance(s.coordinates, np.ndarray)
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        for a, x in zip(s.atoms, xyz[0]._value):
+            self.assertEqual(a.xx, x[0]*10)
+            self.assertEqual(a.xy, x[1]*10)
+            self.assertEqual(a.xz, x[2]*10)
+        # Now check setting None
+        s.coordinates = None
+        for a in s.atoms:
+            self.assertFalse(hasattr(a, 'xx'))
+            self.assertFalse(hasattr(a, 'xy'))
+            self.assertFalse(hasattr(a, 'xz'))
+        self.assertIs(s.coordinates, None)
+        # Now check setting flattened arrays
+        s.coordinates = np.random.random((natom, 3))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        s.coordinates = np.random.random(natom*3)
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        s.coordinates = np.random.random(natom*3*10)
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        # Now check other iterables
+        old_crds = s.coordinates
+        s.coordinates = (random.random() for i in range(3*len(s.atoms)))
+        self.assertEqual(s.coordinates.shape, (natom, 3))
+        diff = (old_crds - s.coordinates).ravel()**2
+        self.assertGreater(diff.sum(), 0.01)
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """

@@ -43,11 +43,7 @@ from parmed.vec3 import Vec3
 from copy import copy
 import math
 import re
-try:
-    import numpy as np
-    create_array = lambda x: np.array(x, dtype=np.float64)
-except ImportError:
-    create_array = lambda x: [float(v) for v in x]
+import numpy as np
 
 try:
     import pandas as pd
@@ -228,6 +224,12 @@ class Structure(object):
     title : ``str``
         Cosmetic only, it is an arbitrary title assigned to the system. Default
         value is an empty string
+    positions : u.Quantity(list(Vec3), u.angstroms)
+        Unit-bearing atomic coordinates. If not all atoms have coordinates, this
+        property is None
+    coordinates : np.ndarray of shape (nframes, natom, 3)
+        If no coordinates are set, this is set to None. The first frame will
+        match the coordinates present on the atoms.
 
     Notes
     -----
@@ -302,7 +304,8 @@ class Structure(object):
         self.torsion_torsion_types = TrackedList()
         self.adjust_types = TrackedList()
 
-        self.box = None
+        self._box = None
+        self._coordinates = None
         self.space_group = "P 1"
         self.unknown_functional = False
         self.nrexcl = 3
@@ -619,6 +622,7 @@ class Structure(object):
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
         c.box = copy(self.box)
+        c._coordinates = copy(self._coordinates)
         return c
 
     #===================================================
@@ -958,6 +962,9 @@ class Structure(object):
         self.prune_empty_terms()
         self.residues.prune()
         self.unchange()
+        # Slice out coordinates if present
+        if self._coordinates is not None:
+            self._coordinates = self._coordinates[np.array(sel)==0]
 
     #===================================================
 
@@ -1385,16 +1392,143 @@ class Structure(object):
         else:
             raise ValueError('Wrong shape for position array')
 
+    @property
+    def coordinates(self):
+        if self._coordinates is None:
+            try:
+                coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+            except AttributeError:
+                return None
+            else:
+                return np.array(coords)
+        elif self.is_changed():
+            # Make sure our first frame matches our atomic coordinates. If not,
+            # delete those coordinates
+            coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+            if np.abs(self._coordinates[0] - coords).max() > SMALL:
+                self._coordinates = None
+                return coords
+        assert len(self._coordinates.shape) == 3, \
+                'Internal coordinate shape wrong'
+        assert self._coordinates.shape[1] == len(self.atoms), \
+                'Coordinate shape different from number of atoms'
+        return self._coordinates[0]
+
+    @coordinates.setter
+    def coordinates(self, value):
+        """ Setting coordinates will also set xx, xy, and xz on the atoms """
+        if value is None:
+            # Wipe out coordinates
+            self._coordinates = None
+            for atom in self.atoms:
+                try:
+                    del atom.xx, atom.xy, atom.xz
+                except AttributeError:
+                    pass
+        else:
+            if u.is_quantity(value):
+                value = value.value_in_unit(u.angstroms)
+            value = list(value)
+            coords = np.array(value, dtype=np.float64, copy=False, subok=True)
+            coords = coords.reshape((-1, len(self.atoms), 3))
+            for a, xyz in zip(self.atoms, coords[0]):
+                a.xx, a.xy, a.xz = xyz
+            self._coordinates = coords
+
+    def get_coordinates(self, frame='all'):
+        """
+        In some cases, multiple conformations may be stored in the Structure.
+        This function retrieves a particular frame's coordinates
+
+        Parameters
+        ----------
+        frame : int or 'all', optional
+            The frame number whose coordinates should be retrieved. Default is
+            'all'
+
+        Returns
+        -------
+        coords : np.ndarray, shape([#,] natom, 3) or None
+            If frame is 'all', all coordinates are returned with shape
+            (#, natom, 3). Otherwise the requested frame is returned with shape
+            (natom, 3). If no coordinates exist and 'all' is requested, None is
+            returned
+
+        Raises
+        ------
+        IndexError if there are fewer than ``frame`` coordinates
+        """
+        if self.is_changed() and self._coordinates is not None:
+            try:
+                coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+            except AttributeError:
+                self._coordinates = None
+            else:
+                if np.abs(self._coordinates[0] - coords).max() > SMALL:
+                    self._coordinates = None
+        if frame == 'all':
+            if self._coordinates is not None:
+                return self._coordinates
+            try:
+                return np.array([[a.xx, a.xy, a.xz]
+                    for a in self.atoms]).reshape((1, len(self.atoms), 3))
+            except AttributeError:
+                return None
+        elif self._coordinates is None:
+            if frame == 0:
+                try:
+                    return np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+                except AttributeError:
+                    raise IndexError('No coordinate frames present')
+            # We requested *not* the first frame
+            raise IndexError('No coordinate frames present')
+        return self._coordinates[frame]
+
+    @property
+    def box(self):
+        return self._box
+
+    @box.setter
+    def box(self, value):
+        if value is None:
+            self._box = None
+        else:
+            if isinstance(value, np.ndarray):
+                box = value
+            else:
+                box = list(value)
+                if len(box) != 6:
+                    raise ValueError('Box information must be 6 floats')
+                if u.is_quantity(box[0]):
+                    box[0] = box[0].value_in_unit(u.angstroms)
+                if u.is_quantity(box[1]):
+                    box[1] = box[1].value_in_unit(u.angstroms)
+                if u.is_quantity(box[2]):
+                    box[2] = box[2].value_in_unit(u.angstroms)
+                if u.is_quantity(box[3]):
+                    box[3] = box[3].value_in_unit(u.degrees)
+                if u.is_quantity(box[4]):
+                    box[4] = box[4].value_in_unit(u.degrees)
+                if u.is_quantity(box[5]):
+                    box[5] = box[5].value_in_unit(u.degrees)
+            box = np.array(box, dtype=np.float64, copy=False, subok=True)
+            if box.shape != (6,):
+                raise ValueError('Box information must be 6 floats')
+            self._box = box
+
     #===================================================
 
     @property
     def velocities(self):
         """
-        A list of 3-element Quantity tuples of dimension length representing the
-        atomic velocities for every atom in the system
+        A (natom, 3)-shape numpy array with atomic velocities for every atom in
+        the system (in units of angstrom/picosecond), or None if there are no
+        velocities
         """
-        unit = u.angstroms / u.picoseconds
-        return [Vec3(a.vx,a.vy,a.vz) for a in self.atoms] * unit
+        try:
+            return np.array([[a.vx, a.vy, a.vz] for a in self.atoms])
+        except AttributeError:
+            return None
 
     @velocities.setter
     def velocities(self, value):
@@ -1404,17 +1538,16 @@ class Structure(object):
         """
         if u.is_quantity(value):
             value = value.value_in_unit(u.angstroms/u.picoseconds)
-        # See if the array is flattened
-        if len(value) == len(self.atoms):
-            # It had better all be 3-length iterables
-            for i, atom in enumerate(self.atoms):
-                atom.vx, atom.vy, atom.vz = value[i]
-        elif len(value) == 3 * len(self.atoms):
-            for i, atom in enumerate(self.atoms):
-                i3 = i * 3
-                atom.vx, atom.vy, atom.vz = value[i3:i3+3]
+        if value is None:
+            for atom in self.atoms:
+                try:
+                    del atom.vx, atom.vy, atom.vz
+                except AttributeError:
+                    pass
         else:
-            raise ValueError('Wrong shape for velocities array')
+            value = np.array(value, copy=False).reshape((-1,len(self.atoms),3))
+            for atom, xyz in zip(self.atoms, value[0]):
+                atom.vx, atom.vy, atom.vz = xyz
 
     #===================================================
 
@@ -1449,7 +1582,7 @@ class Structure(object):
         3, 3-element tuple of unit cell vectors that are Quantity objects of
         dimension length
         """
-        if self.box is None: return None
+        if self._box is None: return None
         return box_lengths_and_angles_to_vectors(*self.box)
 
     @box_vectors.setter
@@ -1465,7 +1598,7 @@ class Structure(object):
         A = A.value_in_unit(u.degrees)
         B = B.value_in_unit(u.degrees)
         G = G.value_in_unit(u.degrees)
-        self.box = create_array([a, b, c, A, B, G])
+        self._box = np.array([a, b, c, A, B, G], dtype=np.float64)
 
     #===================================================
 
@@ -2942,6 +3075,12 @@ class Structure(object):
                            ['atom1', 'atom2'])
         copy_valence_terms(other.groups, [], self.groups, [],
                            ['bs', 'type', 'move'])
+        if self._coordinates is None or other._coordinates is None:
+            self._coordinates = None
+        elif self._coordinates.shape[0] != other._coordinates.shape[0]:
+            self._coordinates = None
+        else:
+            np.concatenate((self._coordinates, other.coordinates))
         return self
 
     def __mul__(self, ncopies):
@@ -3031,6 +3170,10 @@ class Structure(object):
                                ['atom1', 'atom2'])
             copy_valence_terms(other.groups, aoffset, self.groups, [],
                                ['bs', 'type', 'move'])
+        if self._coordinates is not None:
+            coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
+                    (-1, len(self.atoms), 3))
+            self._coordinates = coords
         return self
 
     #===================================================

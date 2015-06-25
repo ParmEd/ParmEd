@@ -2,6 +2,8 @@
 Tests the functionality in parmed.modeller
 """
 import utils
+import numpy as np
+import os
 try:
     import pandas as pd
 except ImportError:
@@ -14,7 +16,6 @@ from parmed.amber import AmberParm
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
-import os
 from parmed.tools import changeRadii
 import random
 import sys
@@ -157,9 +158,8 @@ class TestResidueTemplate(unittest.TestCase):
                     self.assertIn(templ[id1], templ[id2].bond_partners)
                     self.assertIn(templ[id2], templ[id1].bond_partners)
         # Make sure that our coordinates come as a numpy array
-        if utils.has_numpy():
-            self.assertIsInstance(templ.coordinates, utils.numpy.ndarray)
-            self.assertEqual(templ.coordinates.shape, (len(templ)*3,))
+        self.assertIsInstance(templ.coordinates, np.ndarray)
+        self.assertEqual(templ.coordinates.shape, (len(templ), 3))
 
 class TestResidueTemplateContainer(unittest.TestCase):
     """ Tests the ResidueTemplateContainer class """

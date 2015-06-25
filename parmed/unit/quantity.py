@@ -73,7 +73,7 @@ __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
 
-from parmed.utils.six import string_types
+from parmed.utils.six import string_types, PY3
 from parmed.utils.six.moves import range
 import math
 import copy
@@ -783,6 +783,8 @@ class Quantity(object):
     # list.sort with no arguments will delegate correctly
     # list.sort with a comparison function cannot be done correctly
 
+if PY3:
+    del Quantity.__nonzero__
 
 def is_quantity(x):
     """

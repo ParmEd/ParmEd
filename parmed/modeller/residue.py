@@ -56,9 +56,8 @@ class ResidueTemplate(object):
         List of atoms in this residue
     bonds : :class:`TrackedList`
         List of the bonds between the atoms in this residue
-    coordinates : numpy array or list
-        The partial atomic coordinates in a linear iterable. If numpy is
-        available, the coordinates are a numpy ndarray. Otherwise it is a list.
+    coordinates : np.ndarray(natom, 3)
+        The partial atomic coordinates
     connections : list of :class:`Atom`
         A list of all atoms that should form connections with atoms of another
         residue *besides* the head and tail atoms
@@ -207,10 +206,7 @@ class ResidueTemplate(object):
         try:
             return self._crd
         except AttributeError:
-            if np is None:
-                raise ImportError('numpy is required to get ResidueTemplate '
-                                  'coordinates')
-            self._crd = np.array([[a.xx, a.xy, a.xz] for a in self]).flatten()
+            self._crd = np.array([[a.xx, a.xy, a.xz] for a in self])
         return self._crd
 
     # Make ResidueTemplate look like a container of atoms, also indexable by the

@@ -20,6 +20,7 @@ from copy import copy
 from math import sqrt
 import os
 import parmed.tools as PT
+import sys
 import unittest
 
 get_fn = utils.get_fn
@@ -503,6 +504,7 @@ class TestAmberParm(utils.TestCaseRelative):
     def testDispersionCorrection(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        sys.stdout.flush()
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
