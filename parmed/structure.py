@@ -1405,7 +1405,7 @@ class Structure(object):
             # Make sure our first frame matches our atomic coordinates. If not,
             # delete those coordinates
             coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-            if np.abs(self._coordinates - coords).max() > SMALL:
+            if np.abs(self._coordinates[0] - coords).max() > SMALL:
                 self._coordinates = None
                 return coords
         assert len(self._coordinates.shape) == 3, \
@@ -1451,16 +1451,36 @@ class Structure(object):
         coords : np.ndarray, shape([#,] natom, 3) or None
             If frame is 'all', all coordinates are returned with shape
             (#, natom, 3). Otherwise the requested frame is returned with shape
-            (natom, 2). If no coordinates exist and 'all' is requested, None is
+            (natom, 3). If no coordinates exist and 'all' is requested, None is
             returned
 
         Raises
         ------
         IndexError if there are fewer than ``frame`` coordinates
         """
+        if self.is_changed() and self._coordinates is not None:
+            try:
+                coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+            except AttributeError:
+                self._coordinates = None
+            else:
+                if np.abs(self._coordinates[0] - coords).max() > SMALL:
+                    self._coordinates = None
         if frame == 'all':
-            return self._coordinates
+            if self._coordinates is not None:
+                return self._coordinates
+            try:
+                return np.array([[a.xx, a.xy, a.xz]
+                    for a in self.atoms]).reshape((1, len(self.atoms), 3))
+            except AttributeError:
+                return None
         elif self._coordinates is None:
+            if frame == 0:
+                try:
+                    return np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+                except AttributeError:
+                    raise IndexError('No coordinate frames present')
+            # We requested *not* the first frame
             raise IndexError('No coordinate frames present')
         return self._coordinates[frame]
 
