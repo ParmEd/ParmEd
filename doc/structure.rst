@@ -450,8 +450,8 @@ double the size of its type arrays, while replicating it will not.
 Finally, replication is more efficient than combination arising from the simpler
 nature of replicating a structure than combining two different ones.
 
-:class:`Structure <parmed.structure.Structure> splitting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`Structure <parmed.structure.Structure>` splitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes you want to be able to manipulate individual *molecules* inside a
 :class:`Structure <parmed.structure.Structure>` instance individually. The
