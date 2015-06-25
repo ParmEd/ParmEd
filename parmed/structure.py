@@ -1401,12 +1401,18 @@ class Structure(object):
                 return None
             else:
                 return np.array(coords)
-        else:
-            assert len(self._coordinates.shape) == 3, \
-                    'Internal coordinate shape wrong'
-            assert self._coordinates.shape[1] == len(self.atoms), \
-                    'Coordinate shape different from number of atoms'
-            return self._coordinates[0]
+        elif self.is_changed():
+            # Make sure our first frame matches our atomic coordinates. If not,
+            # delete those coordinates
+            coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+            if np.abs(self._coordinates - coords).max() > SMALL:
+                self._coordinates = None
+                return coords
+        assert len(self._coordinates.shape) == 3, \
+                'Internal coordinate shape wrong'
+        assert self._coordinates.shape[1] == len(self.atoms), \
+                'Coordinate shape different from number of atoms'
+        return self._coordinates[0]
 
     @coordinates.setter
     def coordinates(self, value):
@@ -1429,15 +1435,16 @@ class Structure(object):
                 a.xx, a.xy, a.xz = xyz
             self._coordinates = coords
 
-    def get_coordinates(self, frame):
+    def get_coordinates(self, frame='all'):
         """
         In some cases, multiple conformations may be stored in the Structure.
         This function retrieves a particular frame's coordinates
 
         Parameters
         ----------
-        frame : int or 'all'
-            The frame number whose coordinates should be retrieved
+        frame : int or 'all', optional
+            The frame number whose coordinates should be retrieved. Default is
+            'all'
 
         Returns
         -------
@@ -1519,8 +1526,8 @@ class Structure(object):
                     pass
         else:
             value = np.array(value, copy=False).reshape((-1,len(self.atoms),3))
-            for i, atom in enumerate(self.atoms):
-                atom.vx, atom.vy, atom.vz = value[0][i]
+            for atom, xyz in zip(self.atoms, value[0]):
+                atom.vx, atom.vy, atom.vz = xyz
 
     #===================================================
 
