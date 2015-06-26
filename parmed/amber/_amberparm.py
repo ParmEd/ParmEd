@@ -37,7 +37,7 @@ from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from parmed import unit as u
-from parmed.utils.six import iteritems
+from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
 from collections import defaultdict
@@ -62,12 +62,16 @@ class AmberParm(AmberFormat, Structure):
 
     Parameters
     ----------
-    prm_name : str=None
+    prm_name : str, optional
         If provided, this file is parsed and the data structures will be loaded
         from the data in this file
-    rst7_name : str=None
+    xyz : str or array, optional
         If provided, the coordinates and unit cell dimensions from the provided
-        Amber inpcrd/restart file will be loaded into the molecule
+        Amber inpcrd/restart file will be loaded into the molecule, or the
+        coordinates will be loaded from the coordinate array
+    box : array, optional
+        If provided, the unit cell information will be set from the provided
+        unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)
 
     Attributes
     ----------
@@ -153,7 +157,7 @@ class AmberParm(AmberFormat, Structure):
 
     solvent_residues = ('WAT', 'HOH', 'SOL')
 
-    def __init__(self, prm_name=None, rst7_name=None):
+    def __init__(self, prm_name=None, xyz=None, box=None, rst7_name=None):
         """
         Instantiates an AmberParm object from data in prm_name and establishes
         validity based on presence of POINTERS and CHARGE sections. In general,
@@ -165,16 +169,24 @@ class AmberParm(AmberFormat, Structure):
         self.hasvels = False
         self.hasbox = False
         self.box = None
+        if xyz is None and rst7_name is not None:
+            warn('rst7_name keyword is deprecated. Use xyz instead',
+                 DeprecationWarning)
+            xyz = rst7_name
+        elif xyz is not None and rst7_name is not None:
+            warn('rst7_name keyword is deprecated and ignored in favor of xyz',
+                 DeprecationWarning)
         if prm_name is not None:
-            self.initialize_topology(rst7_name)
+            self.initialize_topology(xyz, box)
 
     #===================================================
 
-    def initialize_topology(self, rst7_name=None):
+    def initialize_topology(self, xyz=None, box=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read.
         """
+        from parmed import load_file
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
         if 'RESIDUE_ICODE' in self.flag_list:
@@ -190,12 +202,24 @@ class AmberParm(AmberFormat, Structure):
         # Instantiate the Structure data structures
         self.load_structure()
 
-        if rst7_name is not None:
-            self.load_rst7(rst7_name)
-        elif self.parm_data['POINTERS'][IFBOX] > 0:
-            self.hasbox = True
+        if isinstance(xyz, string_types):
+            f = load_file(xyz)
+            if not hasattr(f, 'coordinates') or f.coordinates is None:
+                raise TypeError('%s does not have coordinates' % xyz)
+            self.coordinates = f.coordinates
+            if hasattr(f, 'box') and f.box is not None and box is None:
+                self.box = box
+        else:
+            self.coordinates = xyz
+        if box is not None:
+            self.box = box
+
+        # If all else fails, set the box from the prmtop file
+        if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
             box = self.parm_data['BOX_DIMENSIONS']
             self.box = list(box[1:]) + [box[0], box[0], box[0]]
+
+        self.hasbox = self.box is not None
 
     #===================================================
 
@@ -1838,13 +1862,21 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _add_missing_13_14(self):
+    def _add_missing_13_14(self, ignore_inconsistent_vdw=False):
         """
         Uses the bond graph to fill in zero-parameter angles and dihedrals. The
         reason this is necessary is that Amber assumes that the list of angles
         and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
         bond graph, respectively. As a result, Amber programs use the angle and
         dihedral lists to set nonbonded exclusions and exceptions.
+
+        Parameters
+        ----------
+        ignore_inconsistent_vdw : bool, optional
+            If True, do not make inconsistent 1-4 vdW parameters fatal. For
+            ChamberParm, the 1-4 specific vdW parameters can compensate. For
+            AmberParm, the 1-4 scaling factor cannot represent arbitrary
+            exceptions. Default is False (should only be True for ChamberParm)
 
         Returns
         -------
@@ -1894,7 +1926,10 @@ class AmberParm(AmberFormat, Structure):
                         scee = 1 / pair.type.chgscale
                     if (abs(rref - pair.type.rmin) > SMALL and
                             pair.type.epsilon != 0):
-                        raise TypeError('Cannot translate exceptions')
+                        if ignore_inconsistent_vdw:
+                            scnb = 1.0
+                        else:
+                            raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
                         continue
@@ -1954,9 +1989,6 @@ class AmberParm(AmberFormat, Structure):
                                 # already present
                                 eref = sqrt(pair.atom1.epsilon_14*
                                             pair.atom2.epsilon_14)
-                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
-                                if abs(rmin - rref) > SMALL:
-                                    raise TypeError('Cannot translate exceptions')
                                 if pair.type.epsilon == 0:
                                     scnb = 1e10
                                 else:
@@ -1965,6 +1997,14 @@ class AmberParm(AmberFormat, Structure):
                                     scee = 1e10
                                 else:
                                     scee = 1 / pair.type.chgscale
+                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
+                                if abs(rmin - rref) > SMALL:
+                                    if ignore_inconsistent_vdw:
+                                        scnb = 1.0
+                                    else:
+                                        raise TypeError(
+                                                'Cannot translate exceptions'
+                                        )
                                 tortype = DihedralType(0, 1, 0, scee, scnb,
                                                        list=self.dihedral_types)
                                 self.dihedral_types.append(tortype)

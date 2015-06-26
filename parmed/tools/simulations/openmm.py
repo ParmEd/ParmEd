@@ -13,7 +13,7 @@ from parmed import unit as u
 from parmed.utils.six.moves import range
 from math import sqrt
 import os
-from ParmedTools.exceptions import (SimulationError, SimulationWarning,
+from parmed.tools.exceptions import (SimulationError, SimulationWarning,
         UnhandledArgumentWarning)
 import sys
 import warnings

@@ -11,7 +11,7 @@ try:
 except ImportError:
     sander = None
 
-from ParmedTools.exceptions import (SimulationError, SimulationWarning,
+from parmed.tools.exceptions import (SimulationError, SimulationWarning,
                UnhandledArgumentWarning)
 
 HAS_SANDER = sander is not None

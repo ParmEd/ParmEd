@@ -153,7 +153,7 @@ class AmoebaParm(AmberParm):
 
     #=============================================
 
-    def initialize_topology(self, rst7_name=None):
+    def initialize_topology(self, xyz=None, box=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read.
@@ -183,13 +183,25 @@ class AmoebaParm(AmberParm):
 
         # Load the structure arrays
         self.load_structure()
-      
-        if rst7_name is not None:
-            self.load_rst7(rst7_name)
-        elif self.parm_data['POINTERS'][IFBOX] > 0:
-            self.hasbox = True
+
+        if isinstance(xyz, string_types):
+            f = load_file(xyz)
+            if not hasattr(f, 'coordinates') or f.coordinates is None:
+                raise TypeError('%s does not have coordinates' % xyz)
+            self.coordinates = f.coordinates
+            if hasattr(f, 'box') and f.box is not None and box is None:
+                self.box = box
+        else:
+            self.coordinates = xyz
+        if box is not None:
+            self.box = box
+
+        # If all else fails, set the box from the prmtop file
+        if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
             box = self.parm_data['BOX_DIMENSIONS']
-            self.box = box[1:] + [box[0], box[0], box[0]]
+            self.box = list(box[1:]) + [box[0], box[0], box[0]]
+
+        self.hasbox = self.box is not None
 
     #=============================================
 
