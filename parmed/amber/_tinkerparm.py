@@ -32,6 +32,7 @@ from parmed import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 TorsionTorsionType)
 from parmed import AmoebaNonbondedExceptionType as NonbondedExceptionType
 from parmed.exceptions import AmberError
+from parmed.utils.six import string_types
 from parmed.utils.six.moves import range, zip
 
 class AmoebaParm(AmberParm):
