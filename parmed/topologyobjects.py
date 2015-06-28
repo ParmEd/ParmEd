@@ -2536,7 +2536,7 @@ class Improper(_FourAtomTerm):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 4:
-            raise DihedralError('Impropers have 4 atoms, not %s' % len(thing))
+            raise MoleculeError('Impropers have 4 atoms, not %s' % len(thing))
         if self.atom1.idx != thing[0]:
             return False
         selfset = set([self.atom2.idx, self.atom3.idx, self.atom4.idx])
@@ -2761,8 +2761,8 @@ class Cmap(object):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 5:
-            raise DihedralError('CMAP can compare to 5 elements, not %d'
-                                % (type(thing).__name__, len(thing)))
+            raise MoleculeError('CMAP can compare to 5 elements, not %d' %
+                                (type(thing).__name__, len(thing)))
         return ((self.atom1.idx == thing[0] and self.atom2.idx == thing[1] and
                  self.atom3.idx == thing[2] and self.atom4.idx == thing[3] and
                  self.atom5.idx == thing[4]) or

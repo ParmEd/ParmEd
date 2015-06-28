@@ -8,10 +8,11 @@ from parmed.constants import TINY
 from parmed.exceptions import GromacsError
 from parmed.formats.registry import FileFormatType
 from parmed.geometry import (box_vectors_to_lengths_and_angles,
-                                box_lengths_and_angles_to_vectors,
-                                reduce_box_vectors)
+                             box_lengths_and_angles_to_vectors,
+                             reduce_box_vectors)
+from parmed.periodic_table import AtomicNum, element_by_name, Mass
 from parmed.structure import Structure
-from parmed.topologyobjects import Atom
+from parmed.topologyobjects import Atom, ExtraPoint
 from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
@@ -109,8 +110,15 @@ class GromacsGroFile(object):
                     resnum = int(line[:5])
                     resname = line[5:10].strip()
                     atomname = line[10:15].strip()
+                    elem = element_by_name(atomname)
+                    atomic_number = AtomicNum[elem]
+                    mass = Mass[elem]
                     atnum = int(line[15:20])
-                    atom = Atom(name=atomname, number=atnum)
+                    if atomic_number == 0:
+                        atom = ExtraPoint(name=atomname, number=atnum)
+                    else:
+                        atom = Atom(atomic_number=atomic_number, name=atomname,
+                                    number=atnum, mass=mass)
                     if digits is None:
                         pdeci = line.index('.', 20)
                         ndeci = line.index('.', pdeci+1)

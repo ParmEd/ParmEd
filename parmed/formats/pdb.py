@@ -20,7 +20,7 @@ except ImportError:
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
-from parmed.periodic_table import AtomicNum, Mass, Element
+from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
@@ -277,18 +277,9 @@ class PDBFile(object):
                     except KeyError:
                         # Now try based on the atom name... but don't try too
                         # hard (e.g., don't try to differentiate b/w Ca and C)
-                        try:
-                            atomic_number = AtomicNum[atname.strip()[0].upper()]
-                            mass = Mass[atname.strip()[0].upper()]
-                        except KeyError:
-                            try:
-                                sym = atname.strip()[:2]
-                                sym = '%s%s' % (sym[0].upper(), sym[0].lower())
-                                atomic_number = AtomicNum[sym]
-                                mass = Mass[sym]
-                            except KeyError:
-                                atomic_number = 0 # give up
-                                mass = 0.0
+                        elem = element_by_name(atname)
+                        atomic_number = AtomicNum[elem]
+                        mass = Mass[elem]
                     try:
                         bfactor = float(bfactor)
                     except ValueError:

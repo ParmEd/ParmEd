@@ -122,10 +122,10 @@ few lines of code::
     >>> gmx_gro = GromacsGroFile.parse('conf.gro')
     >>> gmx_top.box = gmx_gro.box # Needed because .prmtop contains box info
     >>> gmx_top.positions = gmx_gro.positions
-    >>> amb_prm = AmberParm.load_from_structure(gmx_top)
+    >>> amb_prm = AmberParm.from_structure(gmx_top)
     >>> amb_prm.write("prmtop")
     >>> amb_inpcrd = amber.AmberAsciiRestart("inpcrd", mode="w")
-    >>> amb_inpcrd.coordinates = np.array(gmx_top.positions.value_in_unit(u.angstrom)).reshape(-1,3)
+    >>> amb_inpcrd.coordinates = gmx_top.coordinates
     >>> amb_inpcrd.box = gmx_top.box
     >>> amb_inpcrd.close()
 
@@ -135,7 +135,7 @@ force, then comparing that result with your own output from Gromacs::
 
     >>> import simtk.openmm as mm
     >>> import simtk.openmm.app as app
-    >>> system = gmx_top.createSystem() # OpenMM system creation; make sure to pass keyword arguments consistent with your .mdp file
+    >>> system = gmx_top.createSystem() # OpenMM System creation
     >>> integ = mm.VerletIntegrator(1.0*u.femtosecond)
     >>> plat = mm.Platform.getPlatformByName('Reference')
     >>> simul = app.Simulation(gmx_top.topology, system, integ, plat)

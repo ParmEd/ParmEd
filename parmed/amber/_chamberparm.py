@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.
 from __future__ import division, print_function
 
 from parmed.amber._amberparm import AmberParm
-from parmed.constants import NTYPES, NATYP, IFBOX, TINY, NATOM
+from parmed.constants import NTYPES, NATYP, IFBOX, TINY, NATOM, SMALL
 from parmed.exceptions import AmberError, AmberWarning
 from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                     ImproperType, CmapType, ExtraPoint)
@@ -44,18 +44,19 @@ class ChamberParm(AmberParm):
 
     Parameters
     ----------
-    prm_name : str=None
+    prm_name : str, optional
         If provided, this file is parsed and the data structures will be loaded
         from the data in this file
-    rst7_name : str=None
+    xyz : str or array, optional
         If provided, the coordinates and unit cell dimensions from the provided
-        Amber inpcrd/restart file will be loaded into the molecule
+        Amber inpcrd/restart file will be loaded into the molecule, or the
+        coordinates will be loaded from the coordinate array
+    box : array, optional
+        If provided, the unit cell information will be set from the provided
+        unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)
 
     Attributes
     ----------
-    In addition to the attributes listed for `AmberParm`, the following
-    attributes are available:
-
     LJ_14_radius : list(float)
         The same as LJ_radius, except specific for 1-4 nonbonded parameters,
         which may differ in the CHARMM force field
@@ -82,6 +83,11 @@ class ChamberParm(AmberParm):
         not an AMOEBA-style topology file
     has_cmap : bool
         True if CMAP parameters are present in this system; False otherwise
+
+    See Also
+    --------
+    :class:`AmberParm <parmed.amber._amberparm.AmberParm>` for list of other
+    attributes present in ChamberParm instances
     """
 
     solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC',
@@ -89,7 +95,7 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def initialize_topology(self, rst7_name=None):
+    def initialize_topology(self, xyz=None, box=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read. The following methods are
@@ -97,7 +103,7 @@ class ChamberParm(AmberParm):
         """
         self.LJ_14_radius = []
         self.LJ_14_depth = []
-        AmberParm.initialize_topology(self, rst7_name)
+        AmberParm.initialize_topology(self, xyz, box)
       
     #===================================================
 
@@ -154,8 +160,7 @@ class ChamberParm(AmberParm):
                              'defined in the input Structure')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
-        inst._add_missing_13_14()
-        del inst.adjusts[:]
+        inst._add_missing_13_14(ignore_inconsistent_vdw=True)
         inst.pointers = {}
         inst.LJ_types = {}
         nbfixes = inst.atoms.assign_nbidx_from_types()
@@ -211,6 +216,7 @@ class ChamberParm(AmberParm):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
+        del inst.adjusts[:]
         inst.parm_data['FORCE_FIELD_TYPE'] = fftype = []
         fftype.extend([1, 'CHARMM force field: No FF information parsed...'])
 
@@ -602,6 +608,7 @@ class ChamberParm(AmberParm):
         """
         Sets the tables of Lennard-Jones nonbonded interaction pairs
         """
+        from parmed.tools.actions import addLJType
         data = self.parm_data
         ntypes = data['POINTERS'][NTYPES]
         ntypes2 = ntypes * ntypes
@@ -639,6 +646,81 @@ class ChamberParm(AmberParm):
                     data['LENNARD_JONES_BCOEF'][idx] = 2 * eps * rmin**6
                     data['LENNARD_JONES_14_ACOEF'][idx] = eps14 * rmin14**12
                     data['LENNARD_JONES_14_BCOEF'][idx] = 2 * eps14 * rmin14**6
+        # If we had an explicit set of exceptions, we need to implement all of
+        # those exclusions. The electrostatic component of that exception is
+        # already handled (since a scaling factor *can* represent the full
+        # flexibility of electrostatic exceptions). The vdW component must be
+        # handled as 1-4 A- and B-coefficients. If vdW types are too compressed
+        # for this to be handled correctly, use "addLJType" to expand the types
+        # by 1 (so the tables only get as big as they *need* to get, to make
+        # sure they continue to fit in CUDA shared memory).
+        #
+        # The way we do this is to fill all of the elements with None, then fill
+        # them in as we walk through the 1-4 exceptions. If we hit a case where
+        # the target element is not None and *doesn't* equal the computed A- and
+        # B-coefficients, we have to expand our type list (assume all type
+        # names will have the same L-J parameters, which has been a fair
+        # assumption in my experience).
+        if not self.adjusts: return
+        for i in range(len(data['LENNARD_JONES_14_ACOEF'])):
+            data['LENNARD_JONES_14_ACOEF'][i] = None
+            data['LENNARD_JONES_14_BCOEF'][i] = None
+        atom_types_assigned_unique_idx = set()
+        ii = 0
+        while True:
+            needed_split = False
+            for pair in self.adjusts:
+                a1, a2 = pair.atom1, pair.atom2
+                i, j = sorted([a1.nb_idx - 1, a2.nb_idx - 1])
+                idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                eps = sqrt(a1.epsilon_14 * a2.epsilon_14)
+                rmin = a1.rmin_14 + a2.rmin_14
+                rmin6 = rmin * rmin * rmin * rmin * rmin * rmin
+                acoef = eps * rmin6*rmin6
+                bcoef = 2 * eps * rmin6
+                if data['LENNARD_JONES_14_ACOEF'][idx] is not None:
+                    if abs(data['LENNARD_JONES_14_ACOEF'][idx] - acoef) > SMALL:
+                        # Need to split out another type
+                        needed_split = True
+                        if a1.type in atom_types_assigned_unique_idx:
+                            if a2.type in atom_types_assigned_unique_idx:
+                                # Ugh. Split out this atom by itself
+                                mask = '@%d' % (a1.idx + 1)
+                            else:
+                                mask = '@%%%s' % a2.type
+                                atom_types_assigned_unique_idx.add(a2.type)
+                        else:
+                            atom_types_assigned_unique_idx.add(a1.type)
+                            mask = '@%%%s' % a1.type
+                        addLJType(self, mask, radius_14=0,
+                                  epsilon_14=0).execute()
+                        ntypes += 1
+                        # None-out all of the added terms
+                        j = ntypes - 1
+                        for i in range(j):
+                            _ = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                            data['LENNARD_JONES_14_ACOEF'][_] = None
+                            data['LENNARD_JONES_14_BCOEF'][_] = None
+                        # We can stop here, since the next loop through the
+                        # explicit exclusions will fill this in
+                else:
+                    data['LENNARD_JONES_14_ACOEF'][idx] = acoef
+                    data['LENNARD_JONES_14_BCOEF'][idx] = bcoef
+            ii += 1
+            if not needed_split:
+                break
+            # The following should never happen
+            if ii > len(self.atoms):
+                raise RuntimeError("Could not resolve all exceptions. Some "
+                                   "unexpected problem with the algorithm")
+        # Now go through and change all None's to 0s, as these terms won't be
+        # used for any exceptions, anyway
+        for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):
+            if item is None:
+                assert data['LENNARD_JONES_14_BCOEF'][i] is None, \
+                        'A- and B- coefficients must be in lock-step!'
+                data['LENNARD_JONES_14_ACOEF'][i] = 0.0
+                data['LENNARD_JONES_14_BCOEF'][i] = 0.0
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
