@@ -262,6 +262,9 @@ class TestGromacsGro(unittest.TestCase):
         self.assertAlmostEqual(gro.box[3], 70.52882666)
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
+        # Check atomic number and mass assignment
+        self.assertEqual(gro.atoms[0].atomic_number, 7)
+        self.assertEqual(gro.atoms[0].mass, 14.0067)
 
     def testWriteGroFile(self):
         """ Tests writing GRO file """
