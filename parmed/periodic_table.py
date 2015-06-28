@@ -284,11 +284,11 @@ def element_by_name(name):
     try:
         atomic_number = AtomicNum[name.strip()[0].upper()]
     except KeyError:
+        sym = name.strip()[:2]
         try:
-            sym = atname.strip()[:2]
-            sym = '%s%s' % (sym[0].upper(), sym[0].lower())
+            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
             atomic_number = AtomicNum[sym]
-        except KeyError:
+        except (KeyError, IndexError):
             atomic_number = 0 # give up
 
     return Element[atomic_number]
