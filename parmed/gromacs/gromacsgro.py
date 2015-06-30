@@ -200,8 +200,10 @@ class GromacsGroFile(object):
         crdfmt = '%%%d.%df' % (varwidth, precision)
         velfmt = '%%%d.%df' % (varwidth, precision+1)
         for atom in struct.atoms:
-            dest.write('%5d%-5s%5s%5d' % (atom.residue.idx+1, atom.residue.name,
-                                          atom.name, atom.idx+1))
+            resid = (atom.residue.idx + 1) % 100000
+            atid = (atom.idx + 1) % 100000
+            dest.write('%5d%-5s%5s%5d' % (resid, atom.residue.name[:5],
+                                          atom.name[:5], atid))
             dest.write((crdfmt % (atom.xx/10))[:varwidth])
             dest.write((crdfmt % (atom.xy/10))[:varwidth])
             dest.write((crdfmt % (atom.xz/10))[:varwidth])
