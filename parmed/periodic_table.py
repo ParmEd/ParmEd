@@ -6,8 +6,6 @@ by the element's symbol. For consistency with AMBER, a fictitious element
 or any other meaningful attribute. It's just a container to put an extra 
 charge 
 """
-from parmed.utils.six import iteritems
-
 # Data descriptions:
 #
 #  KNOWN_ELEMENTS: number of known elements
