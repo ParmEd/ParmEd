@@ -227,12 +227,7 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
-# Have a set of sorted masses so we can optimize element_by_mass
-tmp = sorted(list(Mass.items()), key=lambda x: x[1])
-_sorted_masses = OrderedDict()
-for _, __ in tmp:
-    _sorted_masses[_] = __
-del _, __, tmp
+_sorted_masses = sorted(Mass.items(), key=lambda x: x[1])
 
 def element_by_mass(mass):
     """
@@ -255,10 +250,10 @@ def element_by_mass(mass):
     masses have changed -- particularly in the case of Hydrogen mass
     repartitioning.
     """
-    diff = mass
+    diff = mass + 1
     best_guess = 'EP'
 
-    for element, element_mass in iteritems(_sorted_masses):
+    for element, element_mass in _sorted_masses:
         d = abs(element_mass - mass)
         if d < diff:
             best_guess = element
