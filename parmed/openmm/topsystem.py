@@ -11,9 +11,9 @@ from parmed.geometry import box_vectors_to_lengths_and_angles
 from parmed.periodic_table import Element
 from parmed.structure import Structure
 from parmed.topologyobjects import (Atom, Bond, BondType, Angle, AngleType,
-        Dihedral, DihedralType, Improper, ImproperType, AtomType, ExtraPoint,
-        UreyBradley, NonbondedExceptionType, NonbondedException, Cmap, CmapType,
-        RBTorsionType)
+                                    Dihedral, DihedralType, Improper, ImproperType, AtomType, ExtraPoint,
+                                    UreyBradley, NonbondedExceptionType, NonbondedException, Cmap, CmapType,
+                                    RBTorsionType)
 from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems, string_types
@@ -21,10 +21,12 @@ from parmed.utils.six.moves import range
 from collections import defaultdict
 try:
     import numpy as np
+
     def create_array(array):
         return np.asarray(array)
 except ImportError:
     np = None
+
     def create_array(array):
         return array
 import os
@@ -33,6 +35,7 @@ try:
 except ImportError:
     pass
 import warnings
+
 
 @needs_openmm
 def load_topology(topology, system=None):
@@ -115,7 +118,7 @@ def load_topology(topology, system=None):
     # We have a system, try to extract parameters from it
     if len(struct.atoms) != system.getNumParticles():
         raise TypeError('Topology and System have different numbers of atoms '
-                '(%d vs. %d)' % (len(struct.atoms), system.getNumParticles()))
+                        '(%d vs. %d)' % (len(struct.atoms), system.getNumParticles()))
 
     processed_forces = set()
     ignored_forces = (mm.CMMotionRemover, mm.AndersenThermostat,
@@ -129,7 +132,7 @@ def load_topology(topology, system=None):
         leng = leng.value_in_unit(u.angstroms)
         ang = ang.value_in_unit(u.degrees)
         struct.box = create_array(
-                [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
+            [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
         )
     else:
         struct.box = None
@@ -166,6 +169,7 @@ def load_topology(topology, system=None):
 
     return struct
 
+
 def _process_bond(struct, force):
     """ Adds bond parameters to the structure """
     typemap = dict()
@@ -176,7 +180,7 @@ def _process_bond(struct, force):
         if key in typemap:
             bond_type = typemap[key]
         else:
-            bond_type = BondType(k*0.5, req)
+            bond_type = BondType(k * 0.5, req)
             typemap[key] = bond_type
             struct.bond_types.append(bond_type)
         if aj in ai.bond_partners:
@@ -191,6 +195,7 @@ def _process_bond(struct, force):
             struct.bonds.append(Bond(ai, aj, type=bond_type))
     struct.bond_types.claim()
 
+
 def _process_angle(struct, force):
     """ Adds angle parameters to the structure """
     typemap = dict()
@@ -201,11 +206,12 @@ def _process_angle(struct, force):
         if key in typemap:
             angle_type = typemap[key]
         else:
-            angle_type = AngleType(frc_k*0.5, theteq)
+            angle_type = AngleType(frc_k * 0.5, theteq)
             typemap[key] = angle_type
             struct.angle_types.append(angle_type)
         struct.angles.append(Angle(ai, aj, ak, type=angle_type))
     struct.angle_types.claim()
+
 
 def _process_urey_bradley(struct, force):
     """ Adds Urey-Bradley parameters to the structure """
@@ -227,11 +233,12 @@ def _process_urey_bradley(struct, force):
         if key in typemap:
             urey_type = typemap[key]
         else:
-            urey_type = BondType(k*0.5, req)
+            urey_type = BondType(k * 0.5, req)
             typemap[key] = urey_type
             struct.urey_bradley_types.append(urey_type)
         struct.urey_bradleys.append(UreyBradley(ai, aj, type=urey_type))
     struct.urey_bradley_types.claim()
+
 
 def _process_dihedral(struct, force):
     """ Adds periodic torsions to the structure """
@@ -253,6 +260,7 @@ def _process_dihedral(struct, force):
                                          type=dihed_type))
     struct.dihedral_types.claim()
 
+
 def _process_rbtorsion(struct, force):
     """ Adds Ryckaert-Bellemans torsions to the structure """
     typemap = dict()
@@ -271,11 +279,13 @@ def _process_rbtorsion(struct, force):
         if key in typemap:
             dihed_type = typemap[key]
         else:
-            dihed_type = RBTorsionType(c0*f, c1*f, c2*f, c3*f, c4*f, c5*f)
+            dihed_type = RBTorsionType(
+                c0 * f, c1 * f, c2 * f, c3 * f, c4 * f, c5 * f)
             typemap[key] = dihed_type
             struct.rb_torsion_types.append(dihed_type)
         struct.rb_torsions.append(Dihedral(ai, aj, ak, al, type=dihed_type))
     struct.rb_torsion_types.claim()
+
 
 def _process_improper(struct, force):
     """ Processes a CustomTorsionForce and looks at the energy expression to see
@@ -308,13 +318,14 @@ def _process_improper(struct, force):
         if key in typemap:
             imp_type = typemap[key]
         else:
-            imp_type = ImproperType(psi_k*fac*u.kilojoule_per_mole/u.radian**2,
-                                    psi_eq*u.radian)
+            imp_type = ImproperType(psi_k * fac * u.kilojoule_per_mole / u.radian**2,
+                                    psi_eq * u.radian)
             typemap[key] = imp_type
             struct.improper_types.append(imp_type)
         struct.impropers.append(Improper(ai, aj, ak, al, type=imp_type))
     struct.improper_types.claim()
     return True
+
 
 def _process_cmap(struct, force):
     """ Adds CMAPs to the structure """
@@ -326,7 +337,7 @@ def _process_cmap(struct, force):
         if u.is_quantity(grid):
             typ = CmapType(size, grid)
         else:
-            typ = CmapType(size, grid*u.kilojoules_per_mole)
+            typ = CmapType(size, grid * u.kilojoules_per_mole)
         cmap_types.append(typ)
         typ.grid = typ.grid.T.switch_range()
         typ.used = False
@@ -347,6 +358,7 @@ def _process_cmap(struct, force):
             struct.cmap_types.append(cmap_type)
     struct.cmap_types.claim()
 
+
 def _process_nonbonded(struct, force):
     """ Adds nonbonded parameters to the structure """
     typemap = dict()
@@ -365,7 +377,7 @@ def _process_nonbonded(struct, force):
             atom_type = AtomType(atype_name, None, atom.mass,
                                  atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
-        rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
+        rmin = sig.value_in_unit(u.angstroms) * 2**(1 / 6) / 2  # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
         atom_type.set_lj_params(eps, rmin)
         atom.atom_type = atom_type
@@ -397,7 +409,7 @@ def _process_nonbonded(struct, force):
                 raise TypeError('Cannot scale charge product of 0 to match '
                                 '%s' % q)
             chgscale = 1
-        nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
+        nbtype = NonbondedExceptionType(sig * 2**(1 / 6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
         struct.adjust_types.append(nbtype)
     struct.adjust_types.claim()

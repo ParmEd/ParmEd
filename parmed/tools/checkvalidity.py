@@ -4,13 +4,14 @@ topology file
 """
 
 from parmed.tools.exceptions import (AmberIncompatibleWarning, BadParmWarning,
-        FixableParmWarning, NonfatalWarning, NonUniversalWarning,
-        MissingDisulfide, LongBondWarning)
+                                     FixableParmWarning, NonfatalWarning, NonUniversalWarning,
+                                     MissingDisulfide, LongBondWarning)
 from parmed.constants import TINY
 from parmed.amber.mask import AmberMask
 from parmed.exceptions import MoleculeError
 from parmed.utils.six.moves import range
 from math import sqrt
+
 
 def check_validity(parm, warnings):
 
@@ -21,7 +22,7 @@ def check_validity(parm, warnings):
 
     # Make sure all of our sections that we expect are present and have the
     # right number of variables in it
-    nttyp = parm.ptr('ntypes') * (parm.ptr('ntypes') + 1) // 2 # for LJ stuff
+    nttyp = parm.ptr('ntypes') * (parm.ptr('ntypes') + 1) // 2  # for LJ stuff
     checkme('ATOM_NAME', parm.ptr('natom'), True, False, None, str)
     checkme('CHARGE', parm.ptr('natom'), True, False, None, float)
     checkme('MASS', parm.ptr('natom'), True, False, None, float)
@@ -31,14 +32,16 @@ def check_validity(parm, warnings):
             None, int)
     checkme('RESIDUE_LABEL', parm.ptr('nres'), True, False, None, str)
     checkme('RESIDUE_POINTER', parm.ptr('nres'), True, False, None, int)
-    checkme('BOND_FORCE_CONSTANT', parm.ptr('numbnd'), True, False, None, float)
+    checkme('BOND_FORCE_CONSTANT', parm.ptr(
+        'numbnd'), True, False, None, float)
     checkme('BOND_EQUIL_VALUE', parm.ptr('numbnd'), True, False, None, float)
     checkme('ANGLE_FORCE_CONSTANT', parm.ptr('numang'), True, False,
             None, float)
     checkme('ANGLE_EQUIL_VALUE', parm.ptr('numang'), True, False, None, float)
     checkme('DIHEDRAL_FORCE_CONSTANT', parm.ptr('nptra'), True,
             False, None, float)
-    checkme('DIHEDRAL_PERIODICITY', parm.ptr('nptra'), True, False, None, float)
+    checkme('DIHEDRAL_PERIODICITY', parm.ptr(
+        'nptra'), True, False, None, float)
     checkme('DIHEDRAL_PHASE', parm.ptr('nptra'), True, False, None, float)
     checkme('SCEE_SCALE_FACTOR', parm.ptr('nptra'), False,
             True, 'scee 1.2', float)
@@ -47,15 +50,17 @@ def check_validity(parm, warnings):
     checkme('SOLTY', parm.ptr('natyp'), True, False, None, float)
     checkme('LENNARD_JONES_ACOEF', nttyp, True, False, None, float)
     checkme('LENNARD_JONES_BCOEF', nttyp, True, False, None, float)
-    checkme('BONDS_INC_HYDROGEN', parm.ptr('nbonh')*3, True, False, None, int)
-    checkme('BONDS_WITHOUT_HYDROGEN', parm.ptr('nbona')*3, True,
+    checkme('BONDS_INC_HYDROGEN', parm.ptr(
+        'nbonh') * 3, True, False, None, int)
+    checkme('BONDS_WITHOUT_HYDROGEN', parm.ptr('nbona') * 3, True,
             False, None, int)
-    checkme('ANGLES_INC_HYDROGEN', parm.ptr('ntheth')*4, True, False, None, int)
-    checkme('ANGLES_WITHOUT_HYDROGEN', parm.ptr('ntheta')*4, True,
+    checkme('ANGLES_INC_HYDROGEN', parm.ptr(
+        'ntheth') * 4, True, False, None, int)
+    checkme('ANGLES_WITHOUT_HYDROGEN', parm.ptr('ntheta') * 4, True,
             False, None, int)
-    checkme('DIHEDRALS_INC_HYDROGEN', parm.ptr('nphih')*5, True,
+    checkme('DIHEDRALS_INC_HYDROGEN', parm.ptr('nphih') * 5, True,
             False, None, int)
-    checkme('DIHEDRALS_WITHOUT_HYDROGEN', parm.ptr('nphia')*5, True,
+    checkme('DIHEDRALS_WITHOUT_HYDROGEN', parm.ptr('nphia') * 5, True,
             False, None, int)
     checkme('EXCLUDED_ATOMS_LIST', parm.ptr('next'), True, False, None, int)
     checkme('HBOND_ACOEF', parm.ptr('nphb'), True, False, None, float)
@@ -93,7 +98,7 @@ def check_validity(parm, warnings):
         checkme('RADII', parm.ptr('natom'), True, True, 'changeRadii', float)
         checkme('SCREEN', parm.ptr('natom'), True, True, 'changeRadii', float)
         checkme('RADIUS_SET', 1, True, True, 'changeRadii', str)
-        checkme('ATOMIC_NUMBER', parm.ptr('natom'),False,
+        checkme('ATOMIC_NUMBER', parm.ptr('natom'), False,
                 True, 'addAtomicNumber', int)
     # Some chamber checks
     if parm.chamber:
@@ -119,7 +124,8 @@ def check_validity(parm, warnings):
                 elif i % 2 == 1 and not isinstance(val, str):
                     warnings.warn('str type mismatch in FORCE_FIELD_TYPE',
                                   BadParmWarning)
-        hasallkeys = checkme('CHARMM_UREY_BRADLEY_COUNT', 2, False, False, None, int)
+        hasallkeys = checkme(
+            'CHARMM_UREY_BRADLEY_COUNT', 2, False, False, None, int)
         hk = checkme('CHARMM_NUM_IMPROPERS', 1, True, False, None, int)
         hasallkeys = hasallkeys and hk
         hk = checkme('CHARMM_NUM_IMPR_TYPES', 1, True, False, None, int)
@@ -127,7 +133,7 @@ def check_validity(parm, warnings):
         if has_cmap:
             hk = checkme('CHARMM_CMAP_COUNT', 2, True, False, None, int)
             hasallkeys = hasallkeys and hk
-     
+
         if hasallkeys:
             # Get the number of terms
             nub = parm.parm_data['CHARMM_UREY_BRADLEY_COUNT'][0]
@@ -140,19 +146,20 @@ def check_validity(parm, warnings):
             checkme('LENNARD_JONES_14_ACOEF', nttyp, True, False, None, float)
             checkme('LENNARD_JONES_14_BCOEF', nttyp, True, False, None, float)
             checkme('CHARMM_UREY_BRADLEY', nub, True, False, None, int)
-            checkme('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', nubtypes, 
+            checkme('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', nubtypes,
                     True, False, None, float)
             checkme('CHARMM_UREY_BRADLEY_EQUIL_CONSTANT', nubtypes,
                     True, False, None, float)
-            checkme('CHARMM_IMPROPERS', nimphi*5, True, False, None, int)
+            checkme('CHARMM_IMPROPERS', nimphi * 5, True, False, None, int)
             checkme('CHARMM_IMPROPER_FORCE_CONSTANT', nimprtyp, True,
                     False, None, float)
-            checkme('CHARMM_IMPROPER_PHASE', nimprtyp, True, False, None, float)
+            checkme(
+                'CHARMM_IMPROPER_PHASE', nimprtyp, True, False, None, float)
             if has_cmap:
-                checkme('CHARMM_CMAP_INDEX', cmap_term_cnt*6, True,
-                        False, None,int)
+                checkme('CHARMM_CMAP_INDEX', cmap_term_cnt * 6, True,
+                        False, None, int)
                 if checkme('CHARMM_CMAP_RESOLUTION', cmap_type_cnt, True,
-                     False, True, int):
+                           False, True, int):
                     for i in range(cmap_type_cnt):
                         checkme('CHARMM_CMAP_PARAMETER_%s' % (str(i).zfill(2)),
                                 parm.parm_data['CHARMM_CMAP_RESOLUTION'][i],
@@ -167,10 +174,10 @@ def check_validity(parm, warnings):
     # Duplicate pmemd's checks
     if parm.ptr('ifpert') != 0:
         warnings.warn('IFPERT must be 0! Parm will not work in Amber',
-                        AmberIncompatibleWarning)
+                      AmberIncompatibleWarning)
     if (parm.ptr('mbona') != parm.ptr('nbona') or
-                parm.ptr('mtheta') != parm.ptr('ntheta') or
-                parm.ptr('mphia') != parm.ptr('nphia')):
+            parm.ptr('mtheta') != parm.ptr('ntheta') or
+            parm.ptr('mphia') != parm.ptr('nphia')):
         warnings.warn('Constraints can no longer be put in the prmtop '
                       'in Amber programs!', AmberIncompatibleWarning)
 
@@ -182,7 +189,8 @@ def check_validity(parm, warnings):
     try:
         for i in range(ntypes):
             for j in range(ntypes):
-                idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                idx = parm.parm_data['NONBONDED_PARM_INDEX'][
+                    ntypes * i + j] - 1
                 rij = parm.LJ_radius[i] + parm.LJ_radius[j]
                 wdij = sqrt(parm.LJ_depth[i] * parm.LJ_depth[j])
                 acoef = parm.parm_data['LENNARD_JONES_ACOEF'][idx]
@@ -204,7 +212,8 @@ def check_validity(parm, warnings):
     # though, we can only check that CYX sulfurs are bonded to another Sulfur
     mask = AmberMask(parm, ':CYX@SG')
     for i, sel in enumerate(mask.Selection()):
-        if not sel: continue
+        if not sel:
+            continue
         atm = parm.atoms[i]
         # We expect 2 bonds
         bondedatms = [a.name for a in atm.bond_partners]
@@ -219,21 +228,22 @@ def check_validity(parm, warnings):
         mask = AmberMask(parm, ':CYS,CYM@SG')
         s_atms = []
         for i, sel in enumerate(mask.Selection()):
-            if not sel: continue
+            if not sel:
+                continue
             s_atms.append(parm.atoms[i])
         try:
-            for i in range(len(s_atms)-1):
+            for i in range(len(s_atms) - 1):
                 for j in range(i, len(s_atms)):
                     dx = s_atms[i].xx - s_atms[j].xx
                     dy = s_atms[i].xy - s_atms[j].xy
                     dz = s_atms[i].xz - s_atms[j].xz
                     if (dx * dx + dy * dy + dz * dz) < 9.0:
                         warnings.warn(
-                                "Detected two cysteine residues whose sulfur "
-                                "atoms are within 3 Angstroms. Rename CYS to "
-                                "CYX in the PDB file and use the 'bond' "
-                                "command in tleap to create the disulfide "
-                                "bond", MissingDisulfide
+                            "Detected two cysteine residues whose sulfur "
+                            "atoms are within 3 Angstroms. Rename CYS to "
+                            "CYX in the PDB file and use the 'bond' "
+                            "command in tleap to create the disulfide "
+                            "bond", MissingDisulfide
                         )
                         raise StopIteration
         except StopIteration:
@@ -244,21 +254,22 @@ def check_validity(parm, warnings):
             dx = bnd.atom1.xx - bnd.atom2.xx
             dy = bnd.atom1.xy - bnd.atom2.xy
             dz = bnd.atom1.xz - bnd.atom2.xz
-            d2 = dx*dx + dy*dy + dz*dz
+            d2 = dx * dx + dy * dy + dz * dz
             req = bnd.type.req
             # Warn if any bond starts at > 3 times its equilibrium length
-            if d2 > 9 * req*req:
+            if d2 > 9 * req * req:
                 warnings.warn('Atoms %d (%s %d [%s]) and %d (%s %d [%s]) are '
-                    'bonded (equilibrium length %.3f A) but are %.3f A apart. '
-                    'This often indicates gaps in the original sequence and '
-                    'should be checked carefully.' %
-                     (bnd.atom1.idx+1, bnd.atom1.residue.name,
-                      bnd.atom1.residue.idx+1, bnd.atom1.name,
-                      bnd.atom2.idx+1, bnd.atom2.residue.name,
-                      bnd.atom2.residue.idx+1, bnd.atom2.name,
-                      req, sqrt(d2)),
-                    LongBondWarning
-                )
+                              'bonded (equilibrium length %.3f A) but are %.3f A apart. '
+                              'This often indicates gaps in the original sequence and '
+                              'should be checked carefully.' %
+                              (bnd.atom1.idx + 1, bnd.atom1.residue.name,
+                               bnd.atom1.residue.idx + 1, bnd.atom1.name,
+                               bnd.atom2.idx + 1, bnd.atom2.residue.name,
+                               bnd.atom2.residue.idx + 1, bnd.atom2.name,
+                               req, sqrt(d2)),
+                              LongBondWarning
+                              )
+
 
 def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
                        addaction=None, typ=str, warnings=None):
@@ -272,7 +283,7 @@ def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
 
     if addable and addaction is None:
         warnings.warn('Implementation Error: addable/addaction must be '
-                        'specified together!')
+                      'specified together!')
         addable = False
 
     if not key in parm.parm_data:
@@ -284,7 +295,7 @@ def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
                               FixableParmWarning)
             else:
                 warnings.warn('%%FLAG %s not found, but it is not required.',
-                            NonfatalWarning)
+                              NonfatalWarning)
         else:
             if addable:
                 warnings.warn('%%FLAG %s not found! Use the [[ %s ]] command '
@@ -296,8 +307,8 @@ def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
         return
 
     if len(parm.parm_data[key]) != nvals:
-        warnings.warn('%%FLAG %s has %d values, expected %d!' % (key, 
-                        len(parm.parm_data[key]), nvals))
+        warnings.warn('%%FLAG %s has %d values, expected %d!' % (key,
+                                                                 len(parm.parm_data[key]), nvals))
 
     for val in parm.parm_data[key]:
         if not isinstance(val, typ):

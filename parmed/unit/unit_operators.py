@@ -58,6 +58,7 @@ from .quantity import Quantity, is_quantity
 # I put them here to avoid circular dependence in imports.
 # i.e. Quantity depends on Unit, but not vice versa
 
+
 def _unit_class_rdiv(self, other):
     """
     Divide another object type by a Unit.
@@ -66,7 +67,8 @@ def _unit_class_rdiv(self, other):
     of the inverse of self.
     """
     if is_unit(other):
-        raise NotImplementedError('programmer is surprised __rtruediv__ was called instead of __truediv__')
+        raise NotImplementedError(
+            'programmer is surprised __rtruediv__ was called instead of __truediv__')
     else:
         # print "R scalar / unit"
         unit = pow(self, -1.0)
@@ -98,7 +100,8 @@ def _unit_class_mul(self, other):
         else:
             Unit._multiplication_cache[self] = {}
         # print "unit * unit"
-        result1 = {} # dictionary of dimensionTuple: (BaseOrScaledUnit, exponent)
+        # dictionary of dimensionTuple: (BaseOrScaledUnit, exponent)
+        result1 = {}
         for unit, exponent in self.iter_base_or_scaled_units():
             d = unit.get_dimension_tuple()
             if d not in result1:
@@ -112,7 +115,7 @@ def _unit_class_mul(self, other):
             if unit not in result1[d]:
                 result1[d][unit] = 0
             result1[d][unit] += exponent
-        result2 = {} # stripped of zero exponents
+        result2 = {}  # stripped of zero exponents
         for d in result1:
             for unit in result1[d]:
                 exponent = result1[d][unit]
@@ -141,7 +144,8 @@ Unit._multiplication_cache = {}
 
 
 # run module directly for testing
-if __name__=='__main__':
+if __name__ == '__main__':
     # Test the examples in the docstrings
-    import doctest, sys
+    import doctest
+    import sys
     doctest.testmod(sys.modules[__name__])

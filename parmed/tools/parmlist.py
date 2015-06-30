@@ -10,16 +10,19 @@ from parmed import load_file, Structure
 from parmed.exceptions import FormatNotFound
 from parmed.tools.exceptions import DuplicateParm, ParmIndexError, ParmError
 
+
 class ParmList(object):
+
     """
     List of Structure objects index-able via either file name or file index
     (based on order added)
     """
+
     def __init__(self):
         """ Must be instantiated by itself """
         self._parm_names = []
         self._parm_instances = []
-        self.parm = None # The active parm instance
+        self.parm = None  # The active parm instance
         self.current_index = 0
 
     def set_new_active(self, idx):
@@ -73,7 +76,7 @@ class ParmList(object):
             return name >= 0 and name < len(self)
         else:
             return str(name) in self._parm_names
-   
+
     def __iter__(self):
         """ Iterate through the prmtop names """
         return iter(self._parm_instances)
